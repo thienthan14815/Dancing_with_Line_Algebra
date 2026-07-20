@@ -1,0 +1,115 @@
+/* AI TUTOR — style trợ giảng. Mọi class prefix "tt-".
+   Dùng lại design token của app (var(--panel)…) kèm fallback để an toàn. */
+
+.tt-tutor {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.tt-head {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
+
+.tt-title {
+  font-weight: 700;
+  font-size: 1rem;
+  color: var(--text, #f5f5f5);
+}
+
+.tt-sub {
+  font-size: 0.78rem;
+  color: var(--text-muted, #9aa0aa);
+}
+
+.tt-count {
+  margin-left: auto;
+  font-size: 0.78rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-dim, #c7ccd4);
+}
+
+.tt-empty {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--text-muted, #9aa0aa);
+  line-height: 1.5;
+}
+
+/* --- Phân tích lỗi --- */
+.tt-analysis {
+  border: 1px solid var(--bad, #ef4444);
+  border-left-width: 4px;
+  border-radius: var(--radius-sm, 8px);
+  background: color-mix(in srgb, var(--bad, #ef4444) 10%, transparent);
+  padding: 10px 12px;
+}
+
+.tt-analysis-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.tt-analysis-title {
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: var(--text, #f5f5f5);
+}
+
+.tt-analysis-body {
+  font-size: 0.9rem;
+  line-height: 1.55;
+  color: var(--text-dim, #d5d9e0);
+}
+
+/* --- Danh sách gợi ý --- */
+.tt-hints {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.tt-hint {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 10px 12px;
+  border: 1px solid var(--border, #2b2f38);
+  border-left-width: 4px;
+  border-radius: var(--radius-sm, 8px);
+  background: var(--panel-2, var(--bg-elevated, #1b1e25));
+}
+
+.tt-hint-l1 { border-left-color: var(--text-muted, #9aa0aa); }
+.tt-hint-l2 { border-left-color: var(--accent, #22c55e); }
+.tt-hint-l3 { border-left-color: var(--warn, #f59e0b); }
+.tt-hint-l4 { border-left-color: var(--good, #22c55e); }
+
+.tt-hint-text {
+  font-size: 0.9rem;
+  line-height: 1.55;
+  color: var(--text, #eef0f3);
+}
+
+.tt-line {
+  margin: 2px 0;
+}
+
+/* --- Hành động --- */
+.tt-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.tt-actions-spacer {
+  flex: 1 1 auto;
+}

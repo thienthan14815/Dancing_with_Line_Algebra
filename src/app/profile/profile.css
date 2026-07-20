@@ -1,0 +1,208 @@
+/* =====================================================================
+   HỒ SƠ / THÀNH TỰU — style riêng, prefix `pf-`.
+   Dùng lại token màu trong src/styles/global.css. KHÔNG sửa shell/global.
+   ===================================================================== */
+
+/* ---------- Header hồ sơ ---------- */
+.pf-hero {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  margin-bottom: 16px;
+}
+.pf-avatar {
+  flex-shrink: 0;
+  width: 72px;
+  height: 72px;
+  border-radius: 20px;
+  display: grid;
+  place-items: center;
+  font-size: 32px;
+  font-weight: 900;
+  color: #fff;
+  background: linear-gradient(135deg, var(--accent), var(--vec-result));
+}
+.pf-hero-body {
+  min-width: 0;
+}
+.pf-name {
+  font-size: 24px;
+  font-weight: 900;
+  margin: 0 0 8px;
+}
+.pf-hero-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.pf-since {
+  margin: 8px 0 0;
+  font-size: 13px;
+}
+
+/* ---------- Thẻ chỉ số ---------- */
+.pf-stat-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-bottom: 16px;
+}
+.pf-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 4px;
+  padding: 16px 10px;
+}
+.pf-stat-icon {
+  font-size: 24px;
+}
+.pf-stat-num {
+  font-size: 26px;
+  font-weight: 900;
+  line-height: 1.1;
+}
+.pf-stat-lbl {
+  font-size: 12px;
+  color: var(--text-muted);
+  line-height: 1.35;
+}
+
+/* ---------- Khối chung ---------- */
+.pf-sec {
+  margin-bottom: 16px;
+}
+.pf-sec-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+.pf-sec-title {
+  font-size: 18px;
+  font-weight: 800;
+  margin: 0;
+}
+
+/* ---------- Thành tựu ---------- */
+.pf-ach-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 12px;
+}
+.pf-ach {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 5px;
+  padding: 16px 12px;
+  border-radius: 16px;
+  border: 1px solid var(--border);
+  background: var(--panel-2);
+}
+.pf-ach.unlocked {
+  border-color: rgba(245, 197, 24, 0.4);
+  background: rgba(245, 197, 24, 0.08);
+}
+.pf-ach.locked {
+  opacity: 0.5;
+  filter: grayscale(0.6);
+}
+.pf-ach-icon {
+  font-size: 34px;
+  line-height: 1;
+}
+.pf-ach-title {
+  font-size: 14px;
+  font-weight: 800;
+}
+.pf-ach-desc {
+  font-size: 11.5px;
+  color: var(--text-muted);
+  line-height: 1.35;
+}
+.pf-ach-date {
+  margin-top: 2px;
+  font-size: 11px;
+  font-weight: 700;
+  color: #f5c518;
+}
+
+/* ---------- Nhiệm vụ ---------- */
+.pf-quests {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.pf-quest {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  background: var(--panel-2);
+  border: 1px solid var(--border);
+}
+.pf-quest-ring {
+  font-size: 12px;
+  font-weight: 800;
+}
+.pf-quest-body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.pf-quest-title {
+  font-weight: 700;
+  font-size: 14.5px;
+}
+.pf-quest-prog {
+  font-size: 12.5px;
+  color: var(--text-muted);
+}
+
+/* ---------- Social placeholder ---------- */
+.pf-social-body {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.pf-social-icon {
+  font-size: 40px;
+  flex-shrink: 0;
+}
+.pf-social-text {
+  margin: 0;
+  line-height: 1.5;
+  font-size: 14px;
+}
+
+/* ---------- Footer ---------- */
+.pf-foot {
+  margin-top: 10px;
+  display: flex;
+  justify-content: center;
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 640px) {
+  .pf-stat-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .pf-hero {
+    flex-direction: column;
+    text-align: center;
+  }
+  .pf-hero-tags {
+    justify-content: center;
+  }
+  .pf-social-body {
+    flex-direction: column;
+    text-align: center;
+  }
+}

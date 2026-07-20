@@ -1,0 +1,329 @@
+/* =============================================================================
+   PRACTICE CENTER — styles. Mọi class dùng tiền tố `pc-` để KHÔNG đụng shell.css.
+   Chỉ dựa vào design token toàn cục trong src/styles/global.css.
+   ========================================================================== */
+
+.pc-page {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 24px 20px 64px;
+}
+
+/* ---- Hero ---------------------------------------------------------------- */
+.pc-hero {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+.pc-hero-main {
+  flex: 1 1 260px;
+}
+.pc-hero-kicker {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+.pc-hero-title {
+  margin: 4px 0 6px;
+  font-size: 28px;
+  line-height: 1.2;
+}
+.pc-hero-sub {
+  margin: 0;
+  color: var(--text-muted);
+}
+.pc-hero-stats {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.pc-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 84px;
+  padding: 12px 14px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+.pc-stat-val {
+  font-size: 22px;
+  font-weight: 800;
+  line-height: 1;
+}
+.pc-stat-lbl {
+  margin-top: 4px;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+/* ---- Grid of category cards --------------------------------------------- */
+.pc-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+}
+
+.pc-cat {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  height: 100%;
+}
+.pc-cat-top {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+.pc-cat-icon {
+  flex: 0 0 auto;
+  width: 46px;
+  height: 46px;
+  display: grid;
+  place-items: center;
+  font-size: 24px;
+  border-radius: 12px;
+  background: var(--panel-2);
+  border: 1px solid var(--border-soft);
+}
+.pc-cat-heads {
+  min-width: 0;
+}
+.pc-cat-title {
+  margin: 2px 0 2px;
+  font-size: 17px;
+  font-weight: 700;
+}
+.pc-cat-sub {
+  margin: 0;
+  font-size: 13px;
+  color: var(--text-muted);
+  line-height: 1.4;
+}
+
+.pc-cat-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  min-height: 4px;
+}
+.pc-chip {
+  font-size: 11.5px;
+  padding: 3px 9px;
+  border-radius: 999px;
+  background: var(--panel-2);
+  border: 1px solid var(--border-soft);
+  color: var(--text-muted);
+  white-space: nowrap;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.pc-cat-foot {
+  margin-top: auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.pc-count {
+  font-size: 13px;
+  color: var(--text-muted);
+}
+.pc-count b {
+  color: var(--text);
+  font-size: 15px;
+}
+.pc-empty {
+  font-size: 13px;
+  color: var(--text-dim);
+  line-height: 1.4;
+}
+
+/* ---- Session ------------------------------------------------------------- */
+.pc-session {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 20px 20px 64px;
+}
+.pc-session-top {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+.pc-close {
+  flex: 0 0 auto;
+  width: 34px;
+  height: 34px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--panel);
+  color: var(--text-muted);
+  font-size: 15px;
+  cursor: pointer;
+}
+.pc-close:hover {
+  color: var(--text);
+  border-color: var(--text-dim);
+}
+.pc-progress {
+  flex: 1 1 auto;
+  height: 12px;
+  border-radius: 999px;
+  background: var(--panel-2);
+  overflow: hidden;
+}
+.pc-progress-fill {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: var(--good);
+  transition: width 0.35s ease;
+}
+.pc-progress-count {
+  flex: 0 0 auto;
+  font-size: 13px;
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.pc-session-kicker {
+  display: block;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 8px;
+}
+.pc-q-head {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.pc-prompt {
+  font-size: 17px;
+  line-height: 1.5;
+  margin-bottom: 16px;
+}
+.pc-hintbox {
+  margin-top: 14px;
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  background: rgba(56, 189, 248, 0.08);
+  border: 1px solid rgba(56, 189, 248, 0.25);
+  font-size: 14px;
+}
+
+/* Feedback panel */
+.pc-feedback {
+  margin-top: 14px;
+  padding: 14px 16px;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+}
+.pc-feedback.good {
+  background: rgba(34, 197, 94, 0.1);
+  border-color: rgba(34, 197, 94, 0.4);
+}
+.pc-feedback.bad {
+  background: rgba(239, 68, 68, 0.1);
+  border-color: rgba(239, 68, 68, 0.4);
+}
+.pc-feedback-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+.pc-feedback-icon {
+  width: 24px;
+  height: 24px;
+  border-radius: 999px;
+  display: grid;
+  place-items: center;
+  color: #fff;
+  font-size: 14px;
+}
+.pc-feedback.good .pc-feedback-icon {
+  background: var(--good);
+}
+.pc-feedback.bad .pc-feedback-icon {
+  background: var(--bad);
+}
+.pc-feedback-body {
+  font-size: 14.5px;
+  line-height: 1.55;
+}
+.pc-feedback-steps {
+  margin: 8px 0 0;
+  padding-left: 20px;
+  font-size: 13.5px;
+  color: var(--text-muted);
+}
+.pc-feedback-steps li {
+  margin: 2px 0;
+}
+
+/* Action bar */
+.pc-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 18px;
+}
+.pc-actions-spacer {
+  flex: 1 1 auto;
+}
+
+/* Summary */
+.pc-summary {
+  text-align: center;
+  padding: 32px 24px;
+}
+.pc-summary-emoji {
+  font-size: 52px;
+  line-height: 1;
+}
+.pc-summary-title {
+  margin: 12px 0 4px;
+  font-size: 24px;
+}
+.pc-summary-stats {
+  display: flex;
+  justify-content: center;
+  gap: 28px;
+  margin: 22px 0 26px;
+  flex-wrap: wrap;
+}
+.pc-summary-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.pc-summary-val {
+  font-size: 26px;
+  font-weight: 800;
+}
+.pc-summary-val.xp {
+  color: var(--warn);
+}
+.pc-summary-lbl {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+.pc-summary-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  flex-wrap: wrap;
+}

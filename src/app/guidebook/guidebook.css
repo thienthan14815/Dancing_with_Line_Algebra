@@ -1,0 +1,308 @@
+/* =====================================================================
+   SỔ TAY (Guidebook) — style riêng, prefix `gb-`.
+   Dùng lại token màu trong src/styles/global.css. KHÔNG sửa shell/global.
+   ===================================================================== */
+
+.gb-page {
+  max-width: 820px;
+}
+
+/* ---------- Hero danh sách ---------- */
+.gb-hero {
+  margin-bottom: 22px;
+}
+.gb-hero-title {
+  font-size: 30px;
+  font-weight: 900;
+  margin: 0 0 6px;
+  letter-spacing: 0.2px;
+}
+
+/* ---------- Lưới Section ---------- */
+.gb-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 14px;
+}
+.gb-card-link {
+  text-decoration: none;
+  color: inherit;
+  display: block;
+}
+.gb-card-link:hover {
+  text-decoration: none;
+}
+.gb-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  height: 100%;
+}
+.gb-card-num {
+  flex-shrink: 0;
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  display: grid;
+  place-items: center;
+  font-weight: 900;
+  font-size: 18px;
+  color: var(--accent);
+  background: rgba(56, 189, 248, 0.12);
+  border: 1px solid rgba(56, 189, 248, 0.32);
+}
+.gb-card-body {
+  flex: 1;
+  min-width: 0;
+}
+.gb-card-title {
+  font-size: 17px;
+  font-weight: 800;
+  margin: 0 0 2px;
+}
+.gb-card-en {
+  margin: 0 0 6px;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+.gb-card-sub {
+  margin: 0 0 10px;
+  font-size: 13.5px;
+  color: var(--text-muted);
+  line-height: 1.45;
+}
+.gb-card-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.gb-card-arrow {
+  flex-shrink: 0;
+  align-self: center;
+  font-size: 20px;
+  color: var(--text-dim);
+  transition: transform 0.15s ease, color 0.15s ease;
+}
+.gb-card-link:hover .gb-card-arrow {
+  transform: translateX(3px);
+  color: var(--accent);
+}
+
+/* ---------- Trang chi tiết ---------- */
+.gb-back-link {
+  display: inline-block;
+  margin-bottom: 14px;
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--text-muted);
+  text-decoration: none;
+}
+.gb-back-link:hover {
+  color: var(--accent);
+  text-decoration: none;
+}
+.gb-detail-head {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+.gb-detail-num {
+  flex-shrink: 0;
+  width: 56px;
+  height: 56px;
+  border-radius: 16px;
+  display: grid;
+  place-items: center;
+  font-weight: 900;
+  font-size: 24px;
+  color: #fff;
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+}
+.gb-detail-title {
+  font-size: 26px;
+  font-weight: 900;
+  margin: 0 0 2px;
+}
+.gb-detail-en {
+  margin: 0 0 4px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+.gb-detail-sub {
+  margin: 0;
+  font-size: 14px;
+}
+
+/* ---------- Khối nội dung ---------- */
+.gb-sec {
+  margin-bottom: 14px;
+}
+.gb-sec-title {
+  font-size: 16px;
+  font-weight: 800;
+  margin: 0 0 12px;
+}
+.gb-list {
+  margin: 0;
+  padding-left: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.gb-list li {
+  line-height: 1.5;
+  font-size: 14.5px;
+}
+.gb-list-warn {
+  list-style: none;
+  padding-left: 4px;
+}
+.gb-list-warn li {
+  padding-left: 22px;
+  position: relative;
+}
+.gb-list-warn li::before {
+  content: '⚠';
+  position: absolute;
+  left: 0;
+  color: var(--warn);
+}
+.gb-list-good {
+  list-style: none;
+  padding-left: 4px;
+}
+.gb-list-good li {
+  padding-left: 22px;
+  position: relative;
+}
+.gb-list-good li::before {
+  content: '✓';
+  position: absolute;
+  left: 0;
+  color: var(--good);
+  font-weight: 900;
+}
+
+/* ---------- Ký hiệu ---------- */
+.gb-symbols {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 10px;
+}
+.gb-symbol {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: var(--panel-2);
+  border: 1px solid var(--border);
+}
+.gb-symbol-tex {
+  flex-shrink: 0;
+  min-width: 56px;
+  font-size: 17px;
+  color: var(--text);
+}
+.gb-symbol-desc {
+  font-size: 13px;
+  color: var(--text-muted);
+  line-height: 1.4;
+}
+
+/* ---------- Công thức ---------- */
+.gb-formulas {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.gb-formula {
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: var(--panel-2);
+  border: 1px solid var(--border);
+}
+.gb-formula-tex {
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 4px 0 8px;
+}
+.gb-formula-desc {
+  margin: 0;
+  font-size: 13.5px;
+  color: var(--text-muted);
+  line-height: 1.45;
+}
+
+/* ---------- Trực giác + ví dụ (2 cột) ---------- */
+.gb-two {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin-bottom: 14px;
+}
+.gb-two .gb-sec {
+  margin-bottom: 0;
+}
+.gb-intuition {
+  border-left: 3px solid var(--accent);
+}
+.gb-intuition-text {
+  margin: 0;
+  line-height: 1.55;
+  font-size: 14.5px;
+}
+.gb-example {
+  border-left: 3px solid var(--vec-2);
+}
+.gb-example p {
+  margin: 0 0 8px;
+  line-height: 1.5;
+  font-size: 14.5px;
+}
+.gb-example-tex {
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+.gb-pitfalls {
+  border-left: 3px solid var(--warn);
+}
+
+/* ---------- Hành động cuối trang ---------- */
+.gb-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 20px;
+}
+.gb-action-link {
+  text-decoration: none;
+  display: block;
+}
+.gb-action-link:hover {
+  text-decoration: none;
+}
+
+.gb-notfound {
+  text-align: center;
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 640px) {
+  .gb-two {
+    grid-template-columns: 1fr;
+  }
+  .gb-grid {
+    grid-template-columns: 1fr;
+  }
+  .gb-detail-title {
+    font-size: 22px;
+  }
+}

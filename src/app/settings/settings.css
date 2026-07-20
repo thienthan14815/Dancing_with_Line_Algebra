@@ -1,0 +1,216 @@
+/* =====================================================================
+   LinAlgLab — Màn Cài đặt / Đồng bộ backend. Mọi class prefix `st-`.
+   Dùng lại token màu trong src/styles/global.css.
+   ===================================================================== */
+
+.st-page {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* ---------- Hero ---------- */
+.st-hero {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.st-title {
+  margin: 0;
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: var(--text);
+}
+
+/* ---------- Card chung ---------- */
+.st-note,
+.st-form,
+.st-contract {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 18px 20px;
+}
+
+/* ---------- Khối giải thích trung thực ---------- */
+.st-note {
+  border-left: 4px solid var(--accent);
+}
+.st-note-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 1.02rem;
+}
+.st-note-icon {
+  font-size: 1.15rem;
+}
+.st-note p {
+  margin: 0;
+  line-height: 1.55;
+  color: var(--text-dim, var(--text));
+}
+.st-note-warn {
+  padding: 10px 12px;
+  border-radius: var(--radius-sm, 8px);
+  background: color-mix(in srgb, var(--warn) 14%, transparent);
+}
+
+/* ---------- Form ---------- */
+.st-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.st-label {
+  font-weight: 700;
+  font-size: 0.92rem;
+  color: var(--text);
+}
+.st-input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm, 8px);
+  background: var(--bg);
+  color: var(--text);
+  font: inherit;
+  font-family: var(--font-mono, monospace);
+  font-size: 0.92rem;
+  transition: border-color 0.15s ease;
+}
+.st-input:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+.st-hint {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  line-height: 1.4;
+}
+
+.st-toggle {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  user-select: none;
+  font-size: 0.95rem;
+}
+.st-toggle input {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--accent);
+  cursor: pointer;
+}
+
+.st-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+/* ---------- Thông báo kết quả ---------- */
+.st-msg {
+  margin: 0;
+  padding: 10px 12px;
+  border-radius: var(--radius-sm, 8px);
+  font-size: 0.9rem;
+  line-height: 1.45;
+}
+.st-msg-good {
+  background: color-mix(in srgb, var(--good) 16%, transparent);
+  color: var(--good);
+}
+.st-msg-bad {
+  background: color-mix(in srgb, var(--bad) 16%, transparent);
+  color: var(--bad);
+}
+.st-msg-muted {
+  background: var(--panel);
+  color: var(--text-muted);
+}
+
+.st-status {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  font-size: 0.85rem;
+}
+
+/* ---------- Hợp đồng endpoint ---------- */
+.st-h2 {
+  margin: 0;
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: var(--text);
+}
+.st-contract code {
+  font-family: var(--font-mono, monospace);
+  font-size: 0.85em;
+  padding: 1px 5px;
+  border-radius: 4px;
+  background: var(--panel);
+}
+.st-endpoints {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.st-ep {
+  display: grid;
+  grid-template-columns: 68px minmax(0, auto) 1fr;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border: 1px solid var(--border-soft, var(--border));
+  border-radius: var(--radius-sm, 8px);
+  background: var(--bg);
+}
+.st-verb {
+  text-align: center;
+  font-weight: 800;
+  font-size: 0.72rem;
+  letter-spacing: 0.03em;
+  padding: 3px 6px;
+  border-radius: 6px;
+  color: #fff;
+}
+.st-verb-get {
+  background: var(--good);
+}
+.st-verb-put {
+  background: var(--accent);
+}
+.st-verb-delete {
+  background: var(--bad);
+}
+.st-path {
+  font-family: var(--font-mono, monospace);
+  font-size: 0.86rem;
+  color: var(--text);
+  background: transparent !important;
+}
+.st-ep-note {
+  font-size: 0.82rem;
+  text-align: right;
+}
+.st-fine {
+  margin: 0;
+  font-size: 0.84rem;
+  line-height: 1.5;
+}
+
+/* ---------- Hẹp: xếp dọc endpoint ---------- */
+@media (max-width: 560px) {
+  .st-ep {
+    grid-template-columns: 60px 1fr;
+  }
+  .st-ep-note {
+    grid-column: 1 / -1;
+    text-align: left;
+  }
+}
