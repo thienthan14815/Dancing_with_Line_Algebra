@@ -1,0 +1,91 @@
+{
+  "url": "https://vi.d2l.ai/chapter_convolutional-modern/index.html",
+  "chapter": "chapter_convolutional-modern",
+  "title": "7. Mạng thần kinh phức tạp hiện đại",
+  "crawled_at": "2026-07-20T12:39:46.880462+00:00",
+  "headings": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "mang-than-kinh-phuc-tap-hien-dai",
+      "text": "7. Mạng thần kinh phức tạp hiện đại"
+    }
+  ],
+  "content": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "mang-than-kinh-phuc-tap-hien-dai",
+      "text": "7. Mạng thần kinh phức tạp hiện đại"
+    },
+    {
+      "type": "paragraph",
+      "text": "Bây giờ chúng tôi hiểu những điều cơ bản của hệ thống dây điện với nhau\nCNN, chúng tôi sẽ đưa bạn qua một chuyến tham quan các kiến trúc CNN\nhiện đại. Trong chương này, mỗi phần tương ứng với một kiến trúc CNN\nquan trọng đó là tại một số điểm (hoặc hiện tại) mô hình cơ sở mà trên\nđó nhiều dự án nghiên cứu và hệ thống triển khai đã được xây dựng. Mỗi\nmạng này là một kiến trúc thống trị ngắn gọn và nhiều người là người\nchiến thắng hoặc á quân trong cuộc thi ImageNet, đã phục vụ như một\nphong vũ biểu tiến bộ về học tập được giám sát trong tầm nhìn máy tính\nkể từ năm 2010."
+    },
+    {
+      "type": "paragraph",
+      "text": "Các mô hình này bao gồm AlexNet, mạng quy mô lớn đầu tiên được triển\nkhai để đánh bại các phương pháp tầm nhìn máy tính thông thường trên một\nthách thức tầm nhìn quy mô lớn; mạng VGG, sử dụng một số khối lặp lại\ncủa các yếu tố; mạng trong mạng (Nin) mà xoay quanh toàn bộ mạng thần\nkinh patch-wise qua đầu vào; GoogLeNet, sử dụng mạng có kết nối song\nsong; mạng dư (ResNet), vẫn là kiến trúc ngoài kệ phổ biến nhất trong\ntầm nhìn máy tính; và các mạng kết nối mật độ (DenseNet), đắt tiền để\ntính toán nhưng đã đặt ra một số điểm chuẩn gần đây."
+    },
+    {
+      "type": "paragraph",
+      "text": "Mặc dù ý tưởng về mạng nơ-ron * deep* khá đơn giản (xếp chồng lên nhau\nmột loạt các lớp), hiệu suất có thể thay đổi rất nhiều trên các kiến\ntrúc và các lựa chọn siêu tham số. Các mạng thần kinh được mô tả trong\nchương này là sản phẩm của trực giác, một vài hiểu biết toán học, và rất\nnhiều thử nghiệm và sai. Chúng tôi trình bày các mô hình này theo thứ tự\nthời gian, một phần để truyền đạt ý thức về lịch sử để bạn có thể hình\nthành trực giác của riêng bạn về nơi lĩnh vực đang hướng đến và có lẽ\nphát triển kiến trúc của riêng bạn. Ví dụ, bình thường hóa hàng loạt và\ncác kết nối còn lại được mô tả trong chương này đã đưa ra hai ý tưởng\nphổ biến để đào tạo và thiết kế các mô hình sâu."
+    },
+    {
+      "type": "list",
+      "ordered": false,
+      "items": [
+        "7.1. Mạng thần kinh phức tạp sâu (AlexNet) 7.1.1. Đại diện học tập 7.1.2. AlexNet 7.1.3. Đọc tập dữ liệu 7.1.4. Đào tạo 7.1.5. Tóm tắt 7.1.6. Bài tập",
+        "7.1.1. Đại diện học tập",
+        "7.1.2. AlexNet",
+        "7.1.3. Đọc tập dữ liệu",
+        "7.1.4. Đào tạo",
+        "7.1.5. Tóm tắt",
+        "7.1.6. Bài tập",
+        "7.2. Mạng sử dụng khối (VGG) 7.2.1. VGG Blocks 7.2.2. VGG mạng 7.2.3. Đào tạo 7.2.4. Tóm tắt 7.2.5. Bài tập",
+        "7.2.1. VGG Blocks",
+        "7.2.2. VGG mạng",
+        "7.2.3. Đào tạo",
+        "7.2.4. Tóm tắt",
+        "7.2.5. Bài tập",
+        "7.3. Mạng trong mạng (Nin) 7.3.1. NiN Blocks 7.3.2. Mô hình NiN 7.3.3. Đào tạo 7.3.4. Tóm tắt 7.3.5. Bài tập",
+        "7.3.1. NiN Blocks",
+        "7.3.2. Mô hình NiN",
+        "7.3.3. Đào tạo",
+        "7.3.4. Tóm tắt",
+        "7.3.5. Bài tập",
+        "7.4. Mạng có kết nối song song (GoogLeNet) 7.4.1. Chống** Bắt nối 7.4.2. Mô hình GoogLeNet 7.4.3. Đào tạo 7.4.4. Tóm tắt 7.4.5. Bài tập",
+        "7.4.1. Chống** Bắt nối",
+        "7.4.2. Mô hình GoogLeNet",
+        "7.4.3. Đào tạo",
+        "7.4.4. Tóm tắt",
+        "7.4.5. Bài tập",
+        "7.5. Chuẩn hóa hàng loạt 7.5.1. Đào tạo mạng sâu 7.5.2. Các lớp chuẩn hóa hàng loạt 7.5.3. Implementation from Scratch 7.5.4. Áp dụng Bình thường hóa hàng loạt trong LeNet 7.5.5. Thiết tập 7.5.6. Tranh cãi 7.5.7. Tóm tắt 7.5.8. Bài tập",
+        "7.5.1. Đào tạo mạng sâu",
+        "7.5.2. Các lớp chuẩn hóa hàng loạt",
+        "7.5.3. Implementation from Scratch",
+        "7.5.4. Áp dụng Bình thường hóa hàng loạt trong LeNet",
+        "7.5.5. Thiết tập",
+        "7.5.6. Tranh cãi",
+        "7.5.7. Tóm tắt",
+        "7.5.8. Bài tập",
+        "7.6. Mạng dư (ResNet) 7.6.1. Các lớp hàm 7.6.2. Khối** Residual 7.6.3. Mô hình ResNet 7.6.4. Đào tạo 7.6.5. Tóm tắt 7.6.6. Bài tập",
+        "7.6.1. Các lớp hàm",
+        "7.6.2. Khối** Residual",
+        "7.6.3. Mô hình ResNet",
+        "7.6.4. Đào tạo",
+        "7.6.5. Tóm tắt",
+        "7.6.6. Bài tập",
+        "7.7. Mạng kết nối mật độ (DenseNet) 7.7.1. Từ ResNet đến DenseNet 7.7.2. Khối dày dàng 7.7.3. Layers Transition 7.7.4. Mô hình DenseNet 7.7.5. Đào tạo 7.7.6. Tóm tắt 7.7.7. Bài tập",
+        "7.7.1. Từ ResNet đến DenseNet",
+        "7.7.2. Khối dày dàng",
+        "7.7.3. Layers Transition",
+        "7.7.4. Mô hình DenseNet",
+        "7.7.5. Đào tạo",
+        "7.7.6. Tóm tắt",
+        "7.7.7. Bài tập"
+      ]
+    }
+  ],
+  "images": [],
+  "text": "7. Mạng thần kinh phức tạp hiện đại\nBây giờ chúng tôi hiểu những điều cơ bản của hệ thống dây điện với nhau\nCNN, chúng tôi sẽ đưa bạn qua một chuyến tham quan các kiến trúc CNN\nhiện đại. Trong chương này, mỗi phần tương ứng với một kiến trúc CNN\nquan trọng đó là tại một số điểm (hoặc hiện tại) mô hình cơ sở mà trên\nđó nhiều dự án nghiên cứu và hệ thống triển khai đã được xây dựng. Mỗi\nmạng này là một kiến trúc thống trị ngắn gọn và nhiều người là người\nchiến thắng hoặc á quân trong cuộc thi ImageNet, đã phục vụ như một\nphong vũ biểu tiến bộ về học tập được giám sát trong tầm nhìn máy tính\nkể từ năm 2010.\nCác mô hình này bao gồm AlexNet, mạng quy mô lớn đầu tiên được triển\nkhai để đánh bại các phương pháp tầm nhìn máy tính thông thường trên một\nthách thức tầm nhìn quy mô lớn; mạng VGG, sử dụng một số khối lặp lại\ncủa các yếu tố; mạng trong mạng (Nin) mà xoay quanh toàn bộ mạng thần\nkinh patch-wise qua đầu vào; GoogLeNet, sử dụng mạng có kết nối song\nsong; mạng dư (ResNet), vẫn là kiến trúc ngoài kệ phổ biến nhất trong\ntầm nhìn máy tính; và các mạng kết nối mật độ (DenseNet), đắt tiền để\ntính toán nhưng đã đặt ra một số điểm chuẩn gần đây.\nMặc dù ý tưởng về mạng nơ-ron * deep* khá đơn giản (xếp chồng lên nhau\nmột loạt các lớp), hiệu suất có thể thay đổi rất nhiều trên các kiến\ntrúc và các lựa chọn siêu tham số. Các mạng thần kinh được mô tả trong\nchương này là sản phẩm của trực giác, một vài hiểu biết toán học, và rất\nnhiều thử nghiệm và sai. Chúng tôi trình bày các mô hình này theo thứ tự\nthời gian, một phần để truyền đạt ý thức về lịch sử để bạn có thể hình\nthành trực giác của riêng bạn về nơi lĩnh vực đang hướng đến và có lẽ\nphát triển kiến trúc của riêng bạn. Ví dụ, bình thường hóa hàng loạt và\ncác kết nối còn lại được mô tả trong chương này đã đưa ra hai ý tưởng\nphổ biến để đào tạo và thiết kế các mô hình sâu.\n7.1. Mạng thần kinh phức tạp sâu (AlexNet) 7.1.1. Đại diện học tập 7.1.2. AlexNet 7.1.3. Đọc tập dữ liệu 7.1.4. Đào tạo 7.1.5. Tóm tắt 7.1.6. Bài tập\n7.1.1. Đại diện học tập\n7.1.2. AlexNet\n7.1.3. Đọc tập dữ liệu\n7.1.4. Đào tạo\n7.1.5. Tóm tắt\n7.1.6. Bài tập\n7.2. Mạng sử dụng khối (VGG) 7.2.1. VGG Blocks 7.2.2. VGG mạng 7.2.3. Đào tạo 7.2.4. Tóm tắt 7.2.5. Bài tập\n7.2.1. VGG Blocks\n7.2.2. VGG mạng\n7.2.3. Đào tạo\n7.2.4. Tóm tắt\n7.2.5. Bài tập\n7.3. Mạng trong mạng (Nin) 7.3.1. NiN Blocks 7.3.2. Mô hình NiN 7.3.3. Đào tạo 7.3.4. Tóm tắt 7.3.5. Bài tập\n7.3.1. NiN Blocks\n7.3.2. Mô hình NiN\n7.3.3. Đào tạo\n7.3.4. Tóm tắt\n7.3.5. Bài tập\n7.4. Mạng có kết nối song song (GoogLeNet) 7.4.1. Chống** Bắt nối 7.4.2. Mô hình GoogLeNet 7.4.3. Đào tạo 7.4.4. Tóm tắt 7.4.5. Bài tập\n7.4.1. Chống** Bắt nối\n7.4.2. Mô hình GoogLeNet\n7.4.3. Đào tạo\n7.4.4. Tóm tắt\n7.4.5. Bài tập\n7.5. Chuẩn hóa hàng loạt 7.5.1. Đào tạo mạng sâu 7.5.2. Các lớp chuẩn hóa hàng loạt 7.5.3. Implementation from Scratch 7.5.4. Áp dụng Bình thường hóa hàng loạt trong LeNet 7.5.5. Thiết tập 7.5.6. Tranh cãi 7.5.7. Tóm tắt 7.5.8. Bài tập\n7.5.1. Đào tạo mạng sâu\n7.5.2. Các lớp chuẩn hóa hàng loạt\n7.5.3. Implementation from Scratch\n7.5.4. Áp dụng Bình thường hóa hàng loạt trong LeNet\n7.5.5. Thiết tập\n7.5.6. Tranh cãi\n7.5.7. Tóm tắt\n7.5.8. Bài tập\n7.6. Mạng dư (ResNet) 7.6.1. Các lớp hàm 7.6.2. Khối** Residual 7.6.3. Mô hình ResNet 7.6.4. Đào tạo 7.6.5. Tóm tắt 7.6.6. Bài tập\n7.6.1. Các lớp hàm\n7.6.2. Khối** Residual\n7.6.3. Mô hình ResNet\n7.6.4. Đào tạo\n7.6.5. Tóm tắt\n7.6.6. Bài tập\n7.7. Mạng kết nối mật độ (DenseNet) 7.7.1. Từ ResNet đến DenseNet 7.7.2. Khối dày dàng 7.7.3. Layers Transition 7.7.4. Mô hình DenseNet 7.7.5. Đào tạo 7.7.6. Tóm tắt 7.7.7. Bài tập\n7.7.1. Từ ResNet đến DenseNet\n7.7.2. Khối dày dàng\n7.7.3. Layers Transition\n7.7.4. Mô hình DenseNet\n7.7.5. Đào tạo\n7.7.6. Tóm tắt\n7.7.7. Bài tập"
+}

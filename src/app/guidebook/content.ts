@@ -446,6 +446,232 @@ export const GUIDEBOOK: GuideEntry[] = [
       'Cơ học: năng lượng và phân tích độ ổn định.',
     ],
   },
+
+  // ================================================================= ch10
+  // NHÁNH DEEP LEARNING. Mỗi mục có "Nối với LA" gấp vào concepts/applications
+  // (component Guidebook chỉ render các trường cố định, không render trường mới).
+  {
+    id: 'ch10-ml',
+    nameVi: 'Học máy & Hồi quy',
+    nameEn: 'Machine Learning & Regression',
+    concepts: [
+      'Hồi quy tuyến tính khớp ŷ = w·x + b vào dữ liệu; huấn luyện = tối thiểu hóa MSE.',
+      'Gradient descent lặp: đi ngược hướng gradient của hàm mất mát để giảm dần lỗi.',
+      'Softmax biến logits thành phân phối xác suất; cross-entropy đo sai lệch phân loại.',
+      'Overfitting là học thuộc nhiễu; regularization (weight decay / L2) kìm hãm trọng số để mô hình tổng quát tốt.',
+      'Nối với LA: bài toán least squares (ch7–ch8) CHÍNH LÀ hồi quy tuyến tính. Nghiệm chuẩn (normal equation) x̂ = (AᵀA)⁻¹Aᵀb là công thức đóng; gradient descent là cách lặp thay thế khi dữ liệu lớn. Mặt mất mát MSE là một dạng toàn phương lồi (ch9).',
+    ],
+    symbols: [
+      { tex: '\\hat{y} = wx + b', desc: 'Dự đoán của hồi quy tuyến tính' },
+      { tex: 'L(w,b)', desc: 'Hàm mất mát (loss) theo tham số' },
+      { tex: '\\nabla L', desc: 'Gradient — vector đạo hàm riêng của L' },
+      { tex: '\\eta', desc: 'Tốc độ học (learning rate)' },
+    ],
+    formulas: [
+      { tex: 'L(w,b) = \\frac{1}{n}\\sum_{i=1}^{n}\\left(\\hat{y}_i - y_i\\right)^2', desc: 'Sai số bình phương trung bình (MSE)' },
+      { tex: '\\theta \\leftarrow \\theta - \\eta\\,\\nabla L(\\theta)', desc: 'Bước cập nhật gradient descent' },
+      { tex: '\\hat{\\mathbf{x}} = (A^{T}A)^{-1}A^{T}\\mathbf{b}', desc: 'Normal equation — nghiệm least squares (cầu nối ch8)' },
+      { tex: '\\operatorname{softmax}(\\mathbf{z})_i = \\dfrac{e^{z_i}}{\\sum_{j} e^{z_j}}', desc: 'Softmax biến logits thành xác suất' },
+      { tex: 'L = -\\sum_{k} y_k \\log \\hat{y}_k', desc: 'Cross-entropy cho phân loại' },
+    ],
+    intuition:
+      'Huấn luyện là lăn quả bóng xuống lòng chảo mất mát: mỗi bước gradient descent trượt xuống dốc nhất một chút cho tới đáy (nghiệm least squares).',
+    example: {
+      text: 'Khớp đường thẳng qua đám điểm nhiễu: giảm MSE bằng gradient descent hội tụ về cùng nghiệm mà normal equation cho.',
+      tex: '\\hat{y} = wx + b,\\quad \\theta \\leftarrow \\theta - \\eta\\,\\nabla L',
+    },
+    pitfalls: [
+      'Learning rate quá lớn → phân kỳ; quá nhỏ → hội tụ chậm.',
+      'Quên chuẩn hóa đặc trưng khiến mặt mất mát méo, GD zig-zag.',
+      'Nhầm softmax (xác suất, tổng 1) với logits thô (điểm số chưa chuẩn hóa).',
+    ],
+    applications: [
+      'Dự báo giá, nhu cầu, xu hướng (hồi quy).',
+      'Phân loại ảnh/chữ số bằng softmax regression.',
+      'Nối với LA: mọi mô hình tuyến tính đều quy về giải Ax = b theo nghĩa least squares.',
+    ],
+  },
+
+  // ================================================================= ch11
+  {
+    id: 'ch11-neural-nets',
+    nameVi: 'Mạng nơ-ron',
+    nameEn: 'Neural Networks',
+    concepts: [
+      'Một neuron = dot product của đầu vào với trọng số, cộng bias, rồi qua hàm kích hoạt.',
+      'MLP xếp chồng nhiều lớp; mỗi lớp là phép nhân ma trận Wx + b rồi một activation phi tuyến.',
+      'Forward: đẩy dữ liệu xuôi qua các lớp để ra dự đoán. Backprop: dùng chain rule lan gradient ngược.',
+      'Không có phi tuyến, chồng bao nhiêu lớp tuyến tính cũng chỉ tương đương MỘT lớp.',
+      'Nối với LA: một neuron chính là dot product (ch1); một lớp là matVec / matMul (ch3); nhiều lớp tuyến tính hợp lại = tích các ma trận (hợp biến đổi, ch3). Backprop = nhân chuỗi các ma trận Jacobian theo chain rule.',
+    ],
+    symbols: [
+      { tex: 'a = \\sigma(\\mathbf{w}\\cdot\\mathbf{x} + b)', desc: 'Đầu ra một neuron' },
+      { tex: 'W^{(l)}', desc: 'Ma trận trọng số của lớp l' },
+      { tex: '\\sigma', desc: 'Hàm kích hoạt phi tuyến' },
+      { tex: '\\delta^{(l)}', desc: 'Sai số (gradient) lan ngược tại lớp l' },
+    ],
+    formulas: [
+      { tex: 'a = \\sigma(\\mathbf{w}\\cdot\\mathbf{x} + b)', desc: 'Neuron = dot product + bias + activation' },
+      { tex: '\\mathbf{a}^{(l)} = \\sigma\\!\\left(W^{(l)}\\mathbf{a}^{(l-1)} + \\mathbf{b}^{(l)}\\right)', desc: 'Một lớp mạng = matVec + bias + activation' },
+      { tex: '\\dfrac{\\partial L}{\\partial W^{(l)}} = \\delta^{(l)}\\,\\bigl(\\mathbf{a}^{(l-1)}\\bigr)^{T}', desc: 'Gradient lớp l qua chain rule (backprop)' },
+    ],
+    intuition:
+      'Mỗi lớp bẻ và kéo giãn không gian đặc trưng (biến đổi tuyến tính) rồi bẻ cong bằng phi tuyến; chồng nhiều lớp tạo ra những vùng phân tách phức tạp mà một biến đổi tuyến tính không làm được.',
+    example: {
+      text: 'Neuron với w = (2, −1), x = (3, 4), b = 1: dot = 2·3 + (−1)·4 + 1 = 3, qua ReLU cho a = 3.',
+      tex: '\\sigma\\bigl((2,-1)\\cdot(3,4) + 1\\bigr) = \\operatorname{ReLU}(3) = 3',
+    },
+    pitfalls: [
+      'Quên phi tuyến giữa các lớp → mạng suy biến về một phép tuyến tính.',
+      'Nhầm chiều ma trận trọng số giữa các lớp (số cột lớp sau = số neuron lớp trước).',
+      'Gradient nổ/tan khi mạng quá sâu mà khởi tạo kém.',
+    ],
+    applications: [
+      'Nhận dạng ảnh, tiếng nói, văn bản.',
+      'Xấp xỉ hàm phi tuyến bất kỳ (universal approximation).',
+      'Nối với LA: forward pass là chuỗi matMul; backprop là chuỗi nhân ma trận Jacobian.',
+    ],
+  },
+
+  // ================================================================= ch12
+  {
+    id: 'ch12-modern-dl',
+    nameVi: 'Học sâu hiện đại',
+    nameEn: 'Modern Deep Learning',
+    concepts: [
+      'CNN dùng kernel trượt trên ảnh — tích chập chia sẻ trọng số, bắt đặc trưng cục bộ, ít tham số.',
+      'RNN xử lý chuỗi bằng trạng thái ẩn h_t cập nhật theo thời gian; GRU/LSTM chống mất trí nhớ dài hạn.',
+      'Attention tính trọng số "chú ý" bằng softmax(QKᵀ/√dₖ)V; Transformer xếp chồng self-attention thay cho hồi tiếp.',
+      'Word embedding ánh xạ từ thành vector dày đặc trong ℝ^d, khoảng cách/hướng phản ánh ngữ nghĩa.',
+      'Nối với LA: tích chập = tổng các dot product cục bộ (ch1); ma trận QKᵀ trong attention là bảng dot product (giống ma trận Gram, ch1/ch3) rồi chuẩn hóa bằng softmax; embedding sống trong không gian vector và giảm chiều bằng PCA/SVD (ch5–ch6).',
+    ],
+    symbols: [
+      { tex: '(I * K)', desc: 'Tích chập của ảnh I với kernel K' },
+      { tex: '\\mathbf{h}_t', desc: 'Trạng thái ẩn tại bước thời gian t' },
+      { tex: 'Q,\\,K,\\,V', desc: 'Query, Key, Value trong attention' },
+      { tex: '\\mathbf{e}_w \\in \\mathbb{R}^{d}', desc: 'Vector nhúng của từ w' },
+    ],
+    formulas: [
+      { tex: '(I * K)_{ij} = \\sum_{m}\\sum_{n} I_{i+m,\\,j+n}\\,K_{m,n}', desc: 'Tích chập 2D = tổng các dot product cục bộ' },
+      { tex: '\\mathbf{h}_t = \\sigma\\!\\left(W_h\\mathbf{h}_{t-1} + W_x\\mathbf{x}_t + \\mathbf{b}\\right)', desc: 'Cập nhật trạng thái ẩn RNN' },
+      { tex: '\\operatorname{Attention}(Q,K,V) = \\operatorname{softmax}\\!\\left(\\dfrac{QK^{T}}{\\sqrt{d_k}}\\right)V', desc: 'Scaled dot-product attention (QKᵀ + softmax)' },
+    ],
+    intuition:
+      'CNN nhìn cục bộ và chia sẻ bộ lọc khắp ảnh; RNN nhớ quá khứ qua trạng thái ẩn; attention để mỗi vị trí "hỏi" mọi vị trí khác xem nên chú ý vào đâu bằng độ tương đồng dot product.',
+    example: {
+      text: 'Điểm chú ý giữa hai token là dot product của query và key, chuẩn hóa bằng softmax để thành trọng số tổng bằng 1.',
+      tex: '\\alpha_{ij} = \\operatorname{softmax}_j\\!\\left(\\dfrac{\\mathbf{q}_i\\cdot\\mathbf{k}_j}{\\sqrt{d_k}}\\right)',
+    },
+    pitfalls: [
+      'Quên chia √dₖ trong attention → softmax bão hòa, gradient nhỏ.',
+      'CNN: nhầm padding/stride làm sai kích thước đầu ra.',
+      'RNN dài dễ gradient tan (vanishing) — cần LSTM/GRU.',
+    ],
+    applications: [
+      'Thị giác máy tính (CNN), dịch máy & chatbot (Transformer).',
+      'Mô hình ngôn ngữ lớn, tìm kiếm ngữ nghĩa (embeddings).',
+      'Nối với LA: attention là đại số của các dot product (QKᵀ); embeddings là hình học vector giảm chiều bằng SVD/PCA.',
+    ],
+  },
+
+  // ================================================================= ch13
+  {
+    id: 'ch13-optimization-apps',
+    nameVi: 'Tối ưu & Ứng dụng',
+    nameEn: 'Optimization & Applications',
+    concepts: [
+      'SGD cập nhật trên từng minibatch; Momentum tích lũy đà; Adam thích nghi learning rate riêng cho mỗi tham số.',
+      'Batch Norm chuẩn hóa kích hoạt trong mỗi batch để ổn định và tăng tốc huấn luyện.',
+      'Khởi tạo tốt (Xavier/He) giữ phương sai tín hiệu ổn định, tránh gradient nổ/tan.',
+      'Ứng dụng: Computer Vision (augmentation, fine-tuning, detection, segmentation) và NLP (mô hình ngôn ngữ, pretraining, fine-tuning).',
+      'Nối với LA: gradient descent trượt theo −∇ trên một mặt toàn phương (ch9); tốc độ hội tụ phụ thuộc SỐ ĐIỀU KIỆN — tỉ số eigenvalue lớn nhất / nhỏ nhất của Hessian (ch5, ch9). Batch norm = trừ trung bình rồi chia độ lệch chuẩn, thao tác thuần trên vector.',
+    ],
+    symbols: [
+      { tex: '\\mathbf{v}_t', desc: 'Vận tốc tích lũy (momentum)' },
+      { tex: '\\hat{m}_t,\\ \\hat{v}_t', desc: 'Ước lượng moment bậc 1 & 2 (Adam)' },
+      { tex: '\\mu_B,\\ \\sigma_B^{2}', desc: 'Trung bình & phương sai của batch' },
+      { tex: '\\kappa(A)', desc: 'Số điều kiện — λmax/λmin của Hessian' },
+    ],
+    formulas: [
+      { tex: '\\mathbf{v}_t = \\beta\\mathbf{v}_{t-1} + (1-\\beta)\\nabla L,\\quad \\theta \\leftarrow \\theta - \\eta\\,\\mathbf{v}_t', desc: 'Cập nhật momentum' },
+      { tex: '\\theta \\leftarrow \\theta - \\eta\\,\\dfrac{\\hat{m}_t}{\\sqrt{\\hat{v}_t} + \\epsilon}', desc: 'Bước cập nhật Adam (learning rate thích nghi)' },
+      { tex: '\\hat{x} = \\dfrac{x - \\mu_B}{\\sqrt{\\sigma_B^{2} + \\epsilon}}', desc: 'Chuẩn hóa Batch Norm' },
+    ],
+    intuition:
+      'Nếu lòng chảo mất mát dài và hẹp (số điều kiện lớn), GD zig-zag chậm; momentum cho quán tính lăn nhanh hơn, Adam co giãn từng trục, batch norm "bo tròn" lòng chảo cho dễ lăn.',
+    example: {
+      text: 'Batch norm đưa mỗi đặc trưng về trung bình 0, phương sai 1 trong batch — chính là chuẩn hóa vector như ở tiền xử lý dữ liệu.',
+      tex: '\\hat{x} = \\dfrac{x - \\mu_B}{\\sqrt{\\sigma_B^{2} + \\epsilon}}',
+    },
+    pitfalls: [
+      'Adam hội tụ nhanh nhưng đôi khi tổng quát kém hơn SGD + momentum đã tinh chỉnh.',
+      'Batch norm nhạy với batch quá nhỏ (ước lượng μ, σ nhiễu).',
+      'Quên rằng số điều kiện lớn (Hessian méo) làm GD chậm — cần chuẩn hóa/đổi tỷ lệ.',
+    ],
+    applications: [
+      'Huấn luyện mọi mạng sâu (optimizer + normalization).',
+      'CV: phân loại, phát hiện, phân đoạn ảnh; NLP: dịch máy, tóm tắt, hỏi đáp.',
+      'Nối với LA: phân tích hội tụ tối ưu dựa trên eigenvalue của Hessian (dạng toàn phương ch9).',
+    ],
+  },
+
+  // ================================================================= dl-map
+  // BẢN ĐỒ TỔNG QUAN — tóm lược ĐỦ các chủ đề lớn của giáo trình Deep Learning
+  // chuẩn (19 nhóm), mỗi dòng kèm cầu nối Đại số tuyến tính khi có. Đây là mục
+  // tra cứu "tổng hợp toàn bộ tài liệu" (id không trùng Section nào).
+  {
+    id: 'dl-map',
+    nameVi: 'Bản đồ Deep Learning',
+    nameEn: 'Deep Learning Map',
+    concepts: [
+      '1. Giới thiệu (Introduction): DL là học biểu diễn qua nhiều lớp; ba trụ cột là dữ liệu, mô hình và tối ưu.',
+      '2. Sơ bộ (Preliminaries): tensor (mảng nhiều chiều — tổng quát hóa Vec/Mat), tự đạo hàm (autograd), xác suất. ↔ LA: tensor mở rộng vector & ma trận.',
+      '3. Mạng nơ-ron tuyến tính: hồi quy tuyến tính & hồi quy softmax. ↔ least squares và normal equation (ch7–ch8).',
+      '4. MLP (Perceptron nhiều lớp): dropout, weight decay, backprop, khởi tạo (Xavier/He). ↔ mỗi lớp là matMul (ch3), backprop là chain rule qua Jacobian.',
+      '5. Tính toán DL: layer & block, quản lý tham số, đọc/ghi mô hình, tính trên GPU.',
+      '6. CNN: tích chập (convolution), padding/stride, pooling, LeNet. ↔ tích chập = tổng dot product cục bộ (ch1).',
+      '7. CNN hiện đại: AlexNet, VGG, NiN, GoogLeNet, Batch Norm, ResNet, DenseNet.',
+      '8. RNN: mô hình chuỗi (sequence), mô hình ngôn ngữ, BPTT (backprop qua thời gian).',
+      '9. RNN hiện đại: GRU, LSTM, seq2seq (encoder–decoder), beam search.',
+      '10. Attention: self-attention, positional encoding, Transformer. ↔ QKᵀ là bảng dot product (ma trận Gram, ch1/ch3) + softmax.',
+      '11. Tối ưu (Optimization): GD, SGD, momentum, Adagrad, RMSProp, Adam, lịch learning rate. ↔ ∇ của dạng toàn phương, hội tụ theo eigenvalue Hessian (ch9).',
+      '12. Hiệu năng tính toán: GPU, song song hóa (parallelism), biên dịch/hybridize, nhiều GPU.',
+      '13. Computer Vision: augmentation, fine-tuning, object detection, semantic segmentation, style transfer.',
+      '14. NLP pretraining: word2vec, GloVe, BERT. ↔ embedding là vector ℝ^d; giảm chiều/ngữ nghĩa bằng SVD/PCA (ch5–ch6).',
+      '15. NLP applications: phân tích cảm xúc (sentiment), suy luận ngôn ngữ tự nhiên (NLI), fine-tuning BERT.',
+      '16. Hệ gợi ý (Recommender systems): phân rã ma trận (matrix factorization). ↔ nhân tố ẩn từ SVD (ch6).',
+      '17. GAN (Generative Adversarial Networks): generator đấu với discriminator để sinh dữ liệu.',
+      '18. Toán cho DL: eigendecomposition, giải tích (calculus), xác suất, ước lượng hợp lý cực đại (MLE), lý thuyết thông tin. ↔ eigen (ch5), SVD (ch6), dạng toàn phương (ch9).',
+      'Xuyên suốt: Deep Learning = Đại số tuyến tính được áp dụng ở quy mô lớn — dot product, matMul, eigen/SVD và gradient của dạng toàn phương là bộ khung tính toán bên dưới mọi kiến trúc.',
+    ],
+    symbols: [
+      { tex: '\\mathsf{T} \\in \\mathbb{R}^{d_1\\times d_2\\times\\cdots\\times d_k}', desc: 'Tensor — tổng quát hóa của vector và ma trận' },
+      { tex: '\\nabla_\\theta L', desc: 'Gradient của mất mát theo tham số θ' },
+      { tex: 'W\\mathbf{x} + \\mathbf{b}', desc: 'Lớp tuyến tính — đơn vị chung của mọi mạng' },
+      { tex: 'A = U\\Sigma V^{T}', desc: 'SVD — nền của embedding, nén, recommender' },
+    ],
+    formulas: [
+      { tex: '\\mathbf{a}^{(l)} = \\sigma\\!\\left(W^{(l)}\\mathbf{a}^{(l-1)} + \\mathbf{b}^{(l)}\\right)', desc: 'Xương sống forward pass (matMul + activation)' },
+      { tex: '\\theta \\leftarrow \\theta - \\eta\\,\\nabla_\\theta L', desc: 'Xương sống huấn luyện (gradient descent)' },
+      { tex: '\\operatorname{Attention}(Q,K,V) = \\operatorname{softmax}\\!\\left(\\dfrac{QK^{T}}{\\sqrt{d_k}}\\right)V', desc: 'Xương sống Transformer (dot product + softmax)' },
+    ],
+    intuition:
+      'Toàn bộ giáo trình Deep Learning là một cây lớn mọc từ gốc Đại số tuyến tính: dữ liệu là tensor, mỗi lớp là phép biến đổi tuyến tính + phi tuyến, và học là đi ngược gradient trên mặt mất mát.',
+    example: {
+      text: 'Dù là CNN, RNN hay Transformer, bước tính lõi luôn quy về nhân ma trận (matMul) rồi một phi tuyến — khác nhau ở CÁCH chia sẻ và kết nối trọng số.',
+      tex: '\\text{CNN, RNN, Transformer} \\;\\Rightarrow\\; \\sigma(W\\mathbf{x} + \\mathbf{b})',
+    },
+    pitfalls: [
+      'Học kiến trúc mà bỏ qua nền LA/giải tích bên dưới → khó gỡ lỗi khi mạng không hội tụ.',
+      'Nhầm tưởng thêm lớp luôn tốt hơn — thiếu regularization/normalization dễ overfit hoặc mất ổn định.',
+      'Quên rằng dữ liệu và tối ưu quan trọng ngang kiến trúc.',
+    ],
+    applications: [
+      'Thị giác, ngôn ngữ, tiếng nói, hệ gợi ý, sinh dữ liệu (GAN).',
+      'Là bản đồ định hướng để đi sâu vào từng Section ch10–ch13.',
+      'Nối với LA: mỗi chủ đề DL đều có gốc từ một chương ch0–ch9 (dot product, matMul, eigen/SVD, least squares, dạng toàn phương).',
+    ],
+  },
 ];
 
 /** Tra cứu nhanh mục sổ tay theo Section id. */

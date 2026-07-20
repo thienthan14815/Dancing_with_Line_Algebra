@@ -1,0 +1,867 @@
+{
+  "url": "https://vi.d2l.ai/chapter_appendix-mathematics-for-deep-learning/single-variable-calculus.html",
+  "chapter": "chapter_appendix-mathematics-for-deep-learning",
+  "title": "18.3. Tính toán biến đơn",
+  "crawled_at": "2026-07-20T12:41:24.309214+00:00",
+  "headings": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "tinh-toan-bien-don",
+      "text": "18.3. Tính toán biến đơn"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "vi-phan-giai-tich-vi-phan-ve-co-ban-la-nghien-cuu-ve-cach-cac-chuc-nang-hoat-dong-duoi-nhung-thay-doi-nho-de-xem-ly-do-tai-sao-dieu-nay-la-cot-loi-de-hoc-sau-chung-ta-hay-xem-xet-mot-vi-du",
+      "text": "18.3.1. Vi phân Giải tích vi phân về cơ bản là nghiên cứu về cách các chức năng hoạt động dưới những thay đổi nhỏ. Để xem lý do tại sao điều này là cốt lõi để học sâu, chúng ta hãy xem xét một ví dụ."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "quy-tac-cua-calculus",
+      "text": "18.3.2. Quy tắc của Calculus"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "cac-dan-xuat-pho-bien-nhu-da-thay-trong-sec-calculus-khi-cac-dan-xuat-tinh-toan-nguoi-ta-thuong-co-the-su-dung-mot-loat-cac-quy-tac-de-giam-tinh-toan-cho-mot-vai-chuc-nang-cot-loi-chung-toi-lap-lai-chung-o-day-de-de-tham-khao",
+      "text": "18.3.2.1. Các dẫn xuất phổ biến Như đã thấy trong Section 2.4 , khi các dẫn xuất tính toán người ta thường có thể sử dụng một loạt các quy tắc để giảm tính toán cho một vài chức năng cốt lõi. Chúng tôi lặp lại chúng ở đây để dễ tham khảo."
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "quy-tac-phai-sinh-neu-moi-dao-ham-can-duoc-tinh-toan-rieng-va-luu-tru-trong-mot-bang-phep-tinh-vi-phan-se-gan-nhu-khong-the-do-la-mot-mon-qua-cua-toan-hoc-ma-chung-ta-co-the-khai-quat-hoa-cac-dan-xuat-tren-va-tinh-toan-cac-dan-xuat-phuc-tap-hon-nhu-tim-ra-dao-ham-cua-f-x-log-left-1-x-1-10-right-nhu-da-de-cap-trong-sec-calculus-chia-khoa-de-lam-nhu-vay-la-ma-hoa-nhung-gi-xay-ra-khi-chung-ta-thuc-hien-cac-chuc-nang-va-ket-hop-chung-theo-nhieu-cach-khac-nhau-quan-trong-nhat-la-tong-san-pham-va-thanh-phan",
+      "text": "18.3.2.2. Quy tắc phái sinh Nếu mọi đạo hàm cần được tính toán riêng và lưu trữ trong một bảng, phép tính vi phân sẽ gần như không thể. Đó là một món quà của toán học mà chúng ta có thể khái quát hóa các dẫn xuất trên và tính toán các dẫn xuất phức tạp hơn như tìm ra đạo hàm của \\(f(x) = \\log\\left(1+(x-1)^{10}\\right)\\) . Như đã đề cập trong Section 2.4 , chìa khóa để làm như vậy là mã hóa những gì xảy ra khi chúng ta thực hiện các chức năng và kết hợp chúng theo nhiều cách khác nhau, quan trọng nhất là: tổng, sản phẩm và thành phần."
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "xap-xi-tuyen-tinh-khi-lam-viec-voi-cac-dan-xuat-no-thuong-huu-ich-de-giai-thich-hinh-hoc-xap-xi-duoc-su-dung-o-tren-dac-biet-luu-y-rang-phuong-trinh",
+      "text": "18.3.2.3. Xấp xỉ tuyến tính Khi làm việc với các dẫn xuất, nó thường hữu ích để giải thích hình học xấp xỉ được sử dụng ở trên. Đặc biệt, lưu ý rằng phương trình"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "cao-hon-thiet-bi-trat-tu",
+      "text": "18.3.2.4. Cao hơn Thiết bị trật tự"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "dong-taylor",
+      "text": "18.3.2.5. Dòng Taylor"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tom-tat",
+      "text": "18.3.3. Tóm tắt"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bai-tap",
+      "text": "18.3.4. Bài tập"
+    }
+  ],
+  "content": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "tinh-toan-bien-don",
+      "text": "18.3. Tính toán biến đơn"
+    },
+    {
+      "type": "paragraph",
+      "text": "Năm Section 2.4 , chúng ta đã thấy các yếu tố cơ bản của\nphép tính vi phân. Phần này sẽ tìm hiểu sâu hơn về các nguyên tắc cơ bản\ncủa giải tích và cách chúng ta có thể hiểu và áp dụng nó trong bối cảnh\nhọc máy."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "vi-phan-giai-tich-vi-phan-ve-co-ban-la-nghien-cuu-ve-cach-cac-chuc-nang-hoat-dong-duoi-nhung-thay-doi-nho-de-xem-ly-do-tai-sao-dieu-nay-la-cot-loi-de-hoc-sau-chung-ta-hay-xem-xet-mot-vi-du",
+      "text": "18.3.1. Vi phân Giải tích vi phân về cơ bản là nghiên cứu về cách các chức năng hoạt động dưới những thay đổi nhỏ. Để xem lý do tại sao điều này là cốt lõi để học sâu, chúng ta hãy xem xét một ví dụ."
+    },
+    {
+      "type": "paragraph",
+      "text": "Giả sử rằng chúng ta có một mạng thần kinh sâu, nơi các trọng lượng, để\nthuận tiện, được nối thành một vector \\(\\mathbf{w} = (w_1, \\ldots, w_n)\\) duy nhất. Với một tập dữ liệu\nđào tạo, chúng tôi xem xét việc mất mạng thần kinh của chúng tôi trên\ntập dữ liệu này, mà chúng tôi sẽ viết là \\(\\mathcal{L}(\\mathbf{w})\\) ."
+    },
+    {
+      "type": "paragraph",
+      "text": "Chức năng này cực kỳ phức tạp, mã hóa hiệu suất của tất cả các mô hình\ncó thể có của kiến trúc đã cho trên tập dữ liệu này, vì vậy gần như\nkhông thể biết bộ trọng lượng \\(\\mathbf{w}\\) sẽ giảm thiểu tổn thất.\nDo đó, trong thực tế, chúng ta thường bắt đầu bằng cách khởi tạo trọng\nlượng* ngẫu nhiên*, và sau đó lặp đi lặp lại các bước nhỏ theo hướng\nlàm cho tổn thất giảm càng nhanh càng tốt."
+    },
+    {
+      "type": "paragraph",
+      "text": "Câu hỏi sau đó trở thành một cái gì đó mà trên bề mặt không dễ dàng hơn:\nlàm thế nào để chúng ta tìm thấy hướng làm cho trọng lượng giảm càng\nnhanh càng tốt? Để đào sâu vào điều này, trước tiên chúng ta hãy kiểm\ntra trường hợp chỉ với một trọng lượng duy nhất: \\(L(\\mathbf{w}) = L(x)\\) cho một giá trị thực duy nhất \\(x\\) ."
+    },
+    {
+      "type": "paragraph",
+      "text": "Chúng ta hãy lấy \\(x\\) và cố gắng hiểu những gì sẽ xảy ra khi chúng\nta thay đổi nó bằng một lượng nhỏ thành \\(x + \\epsilon\\) . Nếu bạn\nmuốn cụ thể, hãy nghĩ một con số như \\(\\epsilon = 0.0000001\\) . Để\ngiúp chúng ta hình dung những gì xảy ra, chúng ta hãy biểu đồ một hàm ví\ndụ, \\(f(x) = \\sin(x^x)\\) , trên \\([0, 3]\\) ."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "%matplotlib inline\nfrom IPython import display\nfrom mxnet import np, npx\nfrom d2l import mxnet as d2l\n\nnpx.set_np()\n\n# Plot a function in a normal range\nx_big = np.arange(0.01, 3.01, 0.01)\nys = np.sin(x_big**x_big)\nd2l.plot(x_big, ys, 'x', 'f(x)')"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_single-variable-calculus_47f3dd_3_0.svg",
+      "local_path": "_images/output_single-variable-calculus_47f3dd_3_0.svg",
+      "alt": "../_images/output_single-variable-calculus_47f3dd_3_0.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "%matplotlib inline\nimport torch\nfrom IPython import display\nfrom d2l import torch as d2l\n\ntorch.pi = torch.acos(torch.zeros(1)).item() * 2  # Define pi in torch\n\n# Plot a function in a normal range\nx_big = torch.arange(0.01, 3.01, 0.01)\nys = torch.sin(x_big**x_big)\nd2l.plot(x_big, ys, 'x', 'f(x)')"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_single-variable-calculus_47f3dd_6_0.svg",
+      "local_path": "_images/output_single-variable-calculus_47f3dd_6_0.svg",
+      "alt": "../_images/output_single-variable-calculus_47f3dd_6_0.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "%matplotlib inline\nimport tensorflow as tf\nfrom IPython import display\nfrom d2l import tensorflow as d2l\n\ntf.pi = tf.acos(tf.zeros(1)).numpy() * 2  # Define pi in TensorFlow\n\n# Plot a function in a normal range\nx_big = tf.range(0.01, 3.01, 0.01)\nys = tf.sin(x_big**x_big)\nd2l.plot(x_big, ys, 'x', 'f(x)')"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_single-variable-calculus_47f3dd_9_0.svg",
+      "local_path": "_images/output_single-variable-calculus_47f3dd_9_0.svg",
+      "alt": "../_images/output_single-variable-calculus_47f3dd_9_0.svg"
+    },
+    {
+      "type": "paragraph",
+      "text": "Ở quy mô lớn này, hành vi của hàm không đơn giản. Tuy nhiên, nếu chúng\nta giảm phạm vi của mình xuống một cái gì đó nhỏ hơn như \\([1.75,2.25]\\) , chúng ta thấy rằng biểu đồ trở nên đơn giản hơn\nnhiều."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "# Plot a the same function in a tiny range\nx_med = np.arange(1.75, 2.25, 0.001)\nys = np.sin(x_med**x_med)\nd2l.plot(x_med, ys, 'x', 'f(x)')"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_single-variable-calculus_47f3dd_15_0.svg",
+      "local_path": "_images/output_single-variable-calculus_47f3dd_15_0.svg",
+      "alt": "../_images/output_single-variable-calculus_47f3dd_15_0.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "# Plot a the same function in a tiny range\nx_med = torch.arange(1.75, 2.25, 0.001)\nys = torch.sin(x_med**x_med)\nd2l.plot(x_med, ys, 'x', 'f(x)')"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_single-variable-calculus_47f3dd_18_0.svg",
+      "local_path": "_images/output_single-variable-calculus_47f3dd_18_0.svg",
+      "alt": "../_images/output_single-variable-calculus_47f3dd_18_0.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "# Plot a the same function in a tiny range\nx_med = tf.range(1.75, 2.25, 0.001)\nys = tf.sin(x_med**x_med)\nd2l.plot(x_med, ys, 'x', 'f(x)')"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_single-variable-calculus_47f3dd_21_0.svg",
+      "local_path": "_images/output_single-variable-calculus_47f3dd_21_0.svg",
+      "alt": "../_images/output_single-variable-calculus_47f3dd_21_0.svg"
+    },
+    {
+      "type": "paragraph",
+      "text": "Đưa điều này đến cực đoan, nếu chúng ta phóng to thành một đoạn nhỏ,\nhành vi trở nên đơn giản hơn nhiều: nó chỉ là một đường thẳng."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "# Plot a the same function in a tiny range\nx_small = np.arange(2.0, 2.01, 0.0001)\nys = np.sin(x_small**x_small)\nd2l.plot(x_small, ys, 'x', 'f(x)')"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_single-variable-calculus_47f3dd_27_0.svg",
+      "local_path": "_images/output_single-variable-calculus_47f3dd_27_0.svg",
+      "alt": "../_images/output_single-variable-calculus_47f3dd_27_0.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "# Plot a the same function in a tiny range\nx_small = torch.arange(2.0, 2.01, 0.0001)\nys = torch.sin(x_small**x_small)\nd2l.plot(x_small, ys, 'x', 'f(x)')"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_single-variable-calculus_47f3dd_30_0.svg",
+      "local_path": "_images/output_single-variable-calculus_47f3dd_30_0.svg",
+      "alt": "../_images/output_single-variable-calculus_47f3dd_30_0.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "# Plot a the same function in a tiny range\nx_small = tf.range(2.0, 2.01, 0.0001)\nys = tf.sin(x_small**x_small)\nd2l.plot(x_small, ys, 'x', 'f(x)')"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_single-variable-calculus_47f3dd_33_0.svg",
+      "local_path": "_images/output_single-variable-calculus_47f3dd_33_0.svg",
+      "alt": "../_images/output_single-variable-calculus_47f3dd_33_0.svg"
+    },
+    {
+      "type": "paragraph",
+      "text": "Đây là quan sát chính của phép tính biến đơn lẻ: hành vi của các hàm\nquen thuộc có thể được mô hình hóa bởi một dòng trong một phạm vi đủ\nnhỏ. Điều này có nghĩa là đối với hầu hết các chức năng, thật hợp lý khi\nmong đợi rằng khi chúng ta thay đổi giá trị \\(x\\) của hàm một chút,\nđầu ra \\(f(x)\\) cũng sẽ được dịch chuyển một chút. Câu hỏi duy nhất\nchúng ta cần trả lời là, “Sự thay đổi trong đầu ra lớn bao nhiêu so với\nsự thay đổi trong đầu vào? Nó có lớn một nửa không? Gấp đôi lớn?”"
+    },
+    {
+      "type": "paragraph",
+      "text": "Do đó, chúng ta có thể xem xét tỷ lệ thay đổi trong đầu ra của một hàm\ncho một sự thay đổi nhỏ trong đầu vào của hàm. Chúng tôi có thể viết\nđiều này chính thức như"
+    },
+    {
+      "type": "math",
+      "latex": "(18.3.1)¶\\[\\frac{L(x+\\epsilon) - L(x)}{(x+\\epsilon) - x} = \\frac{L(x+\\epsilon) - L(x)}{\\epsilon}.\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Điều này đã đủ để bắt đầu chơi xung quanh với mã. Ví dụ, giả sử rằng\nchúng ta biết rằng \\(L(x) = x^{2} + 1701(x-4)^3\\) , sau đó chúng ta\ncó thể thấy giá trị này lớn như thế nào tại điểm \\(x = 4\\) như sau."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "# Define our function\ndef L(x):\n    return x**2 + 1701*(x-4)**3\n\n# Print the difference divided by epsilon for several epsilon\nfor epsilon in [0.1, 0.001, 0.0001, 0.00001]:\n    print(f'epsilon = {epsilon:.5f} -> {(L(4+epsilon) - L(4)) / epsilon:.5f}')"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "epsilon = 0.10000 -> 25.11000\nepsilon = 0.00100 -> 8.00270\nepsilon = 0.00010 -> 8.00012\nepsilon = 0.00001 -> 8.00001"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "# Define our function\ndef L(x):\n    return x**2 + 1701*(x-4)**3\n\n# Print the difference divided by epsilon for several epsilon\nfor epsilon in [0.1, 0.001, 0.0001, 0.00001]:\n    print(f'epsilon = {epsilon:.5f} -> {(L(4+epsilon) - L(4)) / epsilon:.5f}')"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "epsilon = 0.10000 -> 25.11000\nepsilon = 0.00100 -> 8.00270\nepsilon = 0.00010 -> 8.00012\nepsilon = 0.00001 -> 8.00001"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "# Define our function\ndef L(x):\n    return x**2 + 1701*(x-4)**3\n\n# Print the difference divided by epsilon for several epsilon\nfor epsilon in [0.1, 0.001, 0.0001, 0.00001]:\n    print(f'epsilon = {epsilon:.5f} -> {(L(4+epsilon) - L(4)) / epsilon:.5f}')"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "epsilon = 0.10000 -> 25.11000\nepsilon = 0.00100 -> 8.00270\nepsilon = 0.00010 -> 8.00012\nepsilon = 0.00001 -> 8.00001"
+    },
+    {
+      "type": "paragraph",
+      "text": "Bây giờ, nếu chúng ta quan sát, chúng ta sẽ nhận thấy rằng đầu ra của\ncon số này là đáng ngờ gần với \\(8\\) . Thật vậy, nếu chúng ta giảm \\(\\epsilon\\) , chúng ta sẽ thấy giá trị trở nên dần dần gần hơn với \\(8\\) . Vì vậy, chúng ta có thể kết luận, một cách chính xác, rằng\ngiá trị chúng ta tìm kiếm (mức độ thay đổi trong đầu vào thay đổi đầu\nra) nên là \\(8\\) tại điểm \\(x=4\\) . Cách mà một nhà toán học mã\nhóa thực tế này là"
+    },
+    {
+      "type": "math",
+      "latex": "(18.3.2)¶\\[\\lim_{\\epsilon \\rightarrow 0}\\frac{L(4+\\epsilon) - L(4)}{\\epsilon} = 8.\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Như một chút của một cuộc di truyền lịch sử: trong vài thập kỷ đầu tiên\ncủa nghiên cứu mạng thần kinh, các nhà khoa học đã sử dụng thuật toán\nnày (phương pháp * của sự khác biệt hữu hạn ) để đánh giá làm thế nào\nmột chức năng mất thay đổi theo nhiễu loạn nhỏ: chỉ cần thay đổi trọng\nlượng và xem mất thay đổi như thế nào. Đây là tính toán không hiệu quả,\nđòi hỏi hai đánh giá của hàm mất để xem một thay đổi duy nhất của một\nbiến ảnh hưởng đến tổn thất như thế nào. Nếu chúng tôi cố gắng làm điều\nnày với thậm chí một vài nghìn tham số nhẹ, nó sẽ yêu cầu vài nghìn đánh\ngiá của mạng trên toàn bộ dữ liệu! Nó không được giải quyết cho đến năm\n1986 rằng thuật toán *backpropagation* được giới thiệu trong\n:cite:`Rumelhart.Hinton.Williams.ea.1988` cung cấp một cách để tính\ntoán cách *any thay đổi trọng số cùng nhau sẽ thay đổi tổn thất trong\ncùng một thời gian tính toán như một dự đoán duy nhất của mạng qua tập\ndữ liệu."
+    },
+    {
+      "type": "paragraph",
+      "text": "Trở lại trong ví dụ của chúng tôi, giá trị này \\(8\\) là khác nhau\ncho các giá trị khác nhau của \\(x\\) , vì vậy nó có ý nghĩa để xác\nđịnh nó như một hàm của \\(x\\) . Chính thức hơn, tỷ lệ thay đổi phụ\nthuộc vào giá trị này được gọi là phái sinh được viết là"
+    },
+    {
+      "type": "math",
+      "latex": "(18.3.3)¶\\[\\frac{df}{dx}(x) = \\lim_{\\epsilon \\rightarrow 0}\\frac{f(x+\\epsilon) - f(x)}{\\epsilon}.\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Các văn bản khác nhau sẽ sử dụng các ký hiệu khác nhau cho đạo hàm. Ví\ndụ, tất cả các ký hiệu dưới đây chỉ ra điều tương tự:"
+    },
+    {
+      "type": "math",
+      "latex": "(18.3.4)¶\\[\\frac{df}{dx} = \\frac{d}{dx}f = f' = \\nabla_xf = D_xf = f_x.\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Hầu hết các tác giả sẽ chọn một ký hiệu duy nhất và gắn bó với nó, tuy\nnhiên ngay cả điều đó không được đảm bảo. Tốt nhất là làm quen với tất\ncả những điều này. Chúng ta sẽ sử dụng ký hiệu \\(\\frac{df}{dx}\\) trong suốt văn bản này, trừ khi chúng ta muốn lấy đạo hàm của một biểu\nthức phức tạp, trong trường hợp đó chúng ta sẽ sử dụng \\(\\frac{d}{dx}f\\) để viết các biểu thức như"
+    },
+    {
+      "type": "math",
+      "latex": "(18.3.5)¶\\[\\ frac {d} {dx}\\ left [x^4+\\ cos\\ left (\\ frac {x^2+1} {2x-1}\\ right)\\ right] .\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Thông thường, nó là trực giác hữu ích để làm sáng tỏ định nghĩa của đạo\nhàm (18.3.3) một lần nữa để xem một hàm thay đổi như thế\nnào khi chúng ta thực hiện một thay đổi nhỏ \\(x\\) :"
+    },
+    {
+      "type": "math",
+      "latex": "(18.3.6)¶\\[\\begin{split}\\begin{aligned} \\frac{df}{dx}(x) = \\lim_{\\epsilon \\rightarrow 0}\\frac{f(x+\\epsilon) - f(x)}{\\epsilon} & \\implies \\frac{df}{dx}(x) \\approx \\frac{f(x+\\epsilon) - f(x)}{\\epsilon} \\\\ & \\implies \\epsilon \\frac{df}{dx}(x) \\approx f(x+\\epsilon) - f(x) \\\\ & \\implies f(x+\\epsilon) \\approx f(x) + \\epsilon \\frac{df}{dx}(x). \\end{aligned}\\end{split}\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Phương trình cuối cùng đáng để gọi ra một cách rõ ràng. Nó cho chúng ta\nbiết rằng nếu bạn lấy bất kỳ hàm nào và thay đổi đầu vào bằng một lượng\nnhỏ, đầu ra sẽ thay đổi theo số lượng nhỏ đó được thu nhỏ theo đạo hàm."
+    },
+    {
+      "type": "paragraph",
+      "text": "Bằng cách này, chúng ta có thể hiểu đạo hàm là hệ số mở rộng cho chúng\nta biết thay đổi lớn như thế nào chúng ta nhận được trong đầu ra từ một\nsự thay đổi trong đầu vào."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "quy-tac-cua-calculus",
+      "text": "18.3.2. Quy tắc của Calculus"
+    },
+    {
+      "type": "paragraph",
+      "text": "Bây giờ chúng ta chuyển sang nhiệm vụ hiểu làm thế nào để tính toán đạo\nhàm của một hàm rõ ràng. Một điều trị chính thức đầy đủ của giải tích sẽ\nlấy được tất cả mọi thứ từ các nguyên tắc đầu tiên. Chúng tôi sẽ không\nthưởng thức sự cám dỗ này ở đây, mà là cung cấp một sự hiểu biết về các\nquy tắc chung gặp phải."
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "cac-dan-xuat-pho-bien-nhu-da-thay-trong-sec-calculus-khi-cac-dan-xuat-tinh-toan-nguoi-ta-thuong-co-the-su-dung-mot-loat-cac-quy-tac-de-giam-tinh-toan-cho-mot-vai-chuc-nang-cot-loi-chung-toi-lap-lai-chung-o-day-de-de-tham-khao",
+      "text": "18.3.2.1. Các dẫn xuất phổ biến Như đã thấy trong Section 2.4 , khi các dẫn xuất tính toán người ta thường có thể sử dụng một loạt các quy tắc để giảm tính toán cho một vài chức năng cốt lõi. Chúng tôi lặp lại chúng ở đây để dễ tham khảo."
+    },
+    {
+      "type": "list",
+      "ordered": false,
+      "items": [
+        "** Derivative của constants.** \\(\\frac{d}{dx}c = 0\\) .",
+        "** Derivative của các chức năng tuyến tính** \\(\\frac{d}{dx}(ax) = a\\) .",
+        "** Quy tắc điện.** \\(\\frac{d}{dx}x^n = nx^{n-1}\\) .",
+        "** Derivative của số mũ. ** \\(\\frac{d}{dx}e^x = e^x\\) .",
+        "** Derivative của logarit** \\(\\frac{d}{dx}\\log(x) = \\frac{1}{x}\\) ."
+      ]
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "quy-tac-phai-sinh-neu-moi-dao-ham-can-duoc-tinh-toan-rieng-va-luu-tru-trong-mot-bang-phep-tinh-vi-phan-se-gan-nhu-khong-the-do-la-mot-mon-qua-cua-toan-hoc-ma-chung-ta-co-the-khai-quat-hoa-cac-dan-xuat-tren-va-tinh-toan-cac-dan-xuat-phuc-tap-hon-nhu-tim-ra-dao-ham-cua-f-x-log-left-1-x-1-10-right-nhu-da-de-cap-trong-sec-calculus-chia-khoa-de-lam-nhu-vay-la-ma-hoa-nhung-gi-xay-ra-khi-chung-ta-thuc-hien-cac-chuc-nang-va-ket-hop-chung-theo-nhieu-cach-khac-nhau-quan-trong-nhat-la-tong-san-pham-va-thanh-phan",
+      "text": "18.3.2.2. Quy tắc phái sinh Nếu mọi đạo hàm cần được tính toán riêng và lưu trữ trong một bảng, phép tính vi phân sẽ gần như không thể. Đó là một món quà của toán học mà chúng ta có thể khái quát hóa các dẫn xuất trên và tính toán các dẫn xuất phức tạp hơn như tìm ra đạo hàm của \\(f(x) = \\log\\left(1+(x-1)^{10}\\right)\\) . Như đã đề cập trong Section 2.4 , chìa khóa để làm như vậy là mã hóa những gì xảy ra khi chúng ta thực hiện các chức năng và kết hợp chúng theo nhiều cách khác nhau, quan trọng nhất là: tổng, sản phẩm và thành phần."
+    },
+    {
+      "type": "list",
+      "ordered": false,
+      "items": [
+        "Sum rule. \\(\\frac{d}{dx}\\left(g(x) + h(x)\\right) = \\frac{dg}{dx}(x) + \\frac{dh}{dx}(x)\\) .",
+        "** Quy tắc sản phẩm.** \\(\\frac{d}{dx}\\left(g(x)\\cdot h(x)\\right) = g(x)\\frac{dh}{dx}(x) + \\frac{dg}{dx}(x)h(x)\\) .",
+        "** Quy tắc dây chuyển.** \\(\\frac{d}{dx}g(h(x)) = \\frac{dg}{dh}(h(x))\\cdot \\frac{dh}{dx}(x)\\) ."
+      ]
+    },
+    {
+      "type": "paragraph",
+      "text": "Hãy để chúng tôi xem cách chúng tôi có thể sử dụng (18.3.6) để hiểu các quy tắc này. Đối với quy tắc\ntổng, hãy xem xét chuỗi lý luận sau:"
+    },
+    {
+      "type": "math",
+      "latex": "(18.3.7)¶\\[\\begin{split}\\begin{aligned}\nf(x+\\epsilon) & = g(x+\\epsilon) + h(x+\\epsilon) \\\\\n& \\approx g(x) + \\epsilon \\frac{dg}{dx}(x) + h(x) + \\epsilon \\frac{dh}{dx}(x) \\\\\n& = g(x) + h(x) + \\epsilon\\left(\\frac{dg}{dx}(x) + \\frac{dh}{dx}(x)\\right) \\\\\n& = f(x) + \\epsilon\\left(\\frac{dg}{dx}(x) + \\frac{dh}{dx}(x)\\right).\n\\end{aligned}\\end{split}\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Bằng cách so sánh kết quả này với thực tế là \\(f(x+\\epsilon) \\approx f(x) + \\epsilon \\frac{df}{dx}(x)\\) , chúng ta\nthấy rằng \\(\\frac{df}{dx}(x) = \\frac{dg}{dx}(x) + \\frac{dh}{dx}(x)\\) như mong muốn. Trực giác ở đây là: khi chúng ta thay đổi đầu vào \\(x\\) , \\(g\\) và \\(h\\) cùng góp phần vào sự thay đổi đầu ra\ncủa \\(\\frac{dg}{dx}(x)\\) và \\(\\frac{dh}{dx}(x)\\) ."
+    },
+    {
+      "type": "paragraph",
+      "text": "Sản phẩm tinh tế hơn và sẽ yêu cầu một quan sát mới về cách làm việc với\ncác biểu thức này. Chúng tôi sẽ bắt đầu như trước khi sử dụng (18.3.6) :"
+    },
+    {
+      "type": "math",
+      "latex": "(18.3.8)¶\\[\\begin{split}\\begin{aligned}\nf(x+\\epsilon) & = g(x+\\epsilon)\\cdot h(x+\\epsilon) \\\\\n& \\approx \\left(g(x) + \\epsilon \\frac{dg}{dx}(x)\\right)\\cdot\\left(h(x) + \\epsilon \\frac{dh}{dx}(x)\\right) \\\\\n& = g(x)\\cdot h(x) + \\epsilon\\left(g(x)\\frac{dh}{dx}(x) + \\frac{dg}{dx}(x)h(x)\\right) + \\epsilon^2\\frac{dg}{dx}(x)\\frac{dh}{dx}(x) \\\\\n& = f(x) + \\epsilon\\left(g(x)\\frac{dh}{dx}(x) + \\frac{dg}{dx}(x)h(x)\\right) + \\epsilon^2\\frac{dg}{dx}(x)\\frac{dh}{dx}(x). \\\\\n\\end{aligned}\\end{split}\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Điều này giống như tính toán được thực hiện ở trên, và thực sự chúng ta\nthấy câu trả lời của chúng tôi\n( \\(\\frac{df}{dx}(x) = g(x)\\frac{dh}{dx}(x) + \\frac{dg}{dx}(x)h(x)\\) )\nngồi bên cạnh \\(\\epsilon\\) , nhưng có vấn đề về thuật ngữ đó có kích\nthước \\(\\epsilon^{2}\\) . Chúng tôi sẽ đề cập đến điều này là một điều\nkhoản * bậc cao hơn*, vì sức mạnh của \\(\\epsilon^2\\) cao hơn sức\nmạnh của \\(\\epsilon^1\\) . Chúng ta sẽ thấy trong một phần sau mà đôi\nkhi chúng ta sẽ muốn theo dõi những điều này, tuy nhiên bây giờ quan sát\nthấy rằng nếu \\(\\epsilon = 0.0000001\\) , thì \\(\\epsilon^{2}= 0.0000000000001\\) , nhỏ hơn rất nhiều. Khi chúng tôi\ngửi \\(\\epsilon \\rightarrow 0\\) , chúng tôi có thể bỏ qua một cách an\ntoàn các điều khoản đặt hàng cao hơn. Như một quy ước chung trong phụ\nlục này, chúng ta sẽ sử dụng “ \\(\\approx\\) ” để biểu thị rằng hai\nthuật ngữ này bằng với các điều khoản bậc cao hơn. Tuy nhiên, nếu chúng\nta muốn chính thức hơn, chúng ta có thể kiểm tra sự khác biệt thương"
+    },
+    {
+      "type": "math",
+      "latex": "(18.3.9)¶\\[\\frac{f(x+\\epsilon) - f(x)}{\\epsilon} = g(x)\\frac{dh}{dx}(x) + \\frac{dg}{dx}(x)h(x) + \\epsilon \\frac{dg}{dx}(x)\\frac{dh}{dx}(x),\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "và thấy rằng khi chúng tôi gửi \\(\\epsilon \\rightarrow 0\\) , thuật ngữ\ntay phải cũng đi đến không."
+    },
+    {
+      "type": "paragraph",
+      "text": "Cuối cùng, với quy tắc chuỗi, chúng ta có thể tiến bộ một lần nữa như\ntrước khi sử dụng (18.3.6) và thấy rằng"
+    },
+    {
+      "type": "math",
+      "latex": "(18.3.10)¶\\[\\begin{split}\\begin{aligned}\nf(x+\\epsilon) & = g(h(x+\\epsilon)) \\\\\n& \\approx g\\left(h(x) + \\epsilon \\frac{dh}{dx}(x)\\right) \\\\\n& \\approx g(h(x)) + \\epsilon \\frac{dh}{dx}(x) \\frac{dg}{dh}(h(x))\\\\\n& = f(x) + \\epsilon \\frac{dg}{dh}(h(x))\\frac{dh}{dx}(x),\n\\end{aligned}\\end{split}\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "trong đó trong dòng thứ hai, chúng tôi xem hàm \\(g\\) là có đầu vào\ncủa nó ( \\(h(x)\\) ) được dịch chuyển bởi số lượng nhỏ \\(\\epsilon \\frac{dh}{dx}(x)\\) ."
+    },
+    {
+      "type": "paragraph",
+      "text": "Quy tắc này cung cấp cho chúng ta một bộ công cụ linh hoạt để tính toán\nvề cơ bản bất kỳ biểu thức nào mong muốn. For instance ví dụ,"
+    },
+    {
+      "type": "math",
+      "latex": "(18.3.11)¶\\[\\begin{split}\\begin{aligned}\n\\frac{d}{dx}\\left[\\log\\left(1+(x-1)^{10}\\right)\\right] & = \\left(1+(x-1)^{10}\\right)^{-1}\\frac{d}{dx}\\left[1+(x-1)^{10}\\right]\\\\\n& = \\left(1+(x-1)^{10}\\right)^{-1}\\left(\\frac{d}{dx}[1] + \\frac{d}{dx}[(x-1)^{10}]\\right) \\\\\n& = \\left(1+(x-1)^{10}\\right)^{-1}\\left(0 + 10(x-1)^9\\frac{d}{dx}[x-1]\\right) \\\\\n& = 10\\left(1+(x-1)^{10}\\right)^{-1}(x-1)^9 \\\\\n& = \\frac{10(x-1)^9}{1+(x-1)^{10}}.\n\\end{aligned}\\end{split}\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Trong trường hợp mỗi dòng đã sử dụng các quy tắc sau:"
+    },
+    {
+      "type": "list",
+      "ordered": true,
+      "items": [
+        "Quy tắc chuỗi và đạo hàm của logarit.",
+        "Quy tắc tổng.",
+        "Đạo hàm của hằng số, quy tắc chuỗi, và quy tắc quyền lực.",
+        "Quy tắc tổng, đạo hàm của các hàm tuyến tính, đạo hàm của hằng số."
+      ]
+    },
+    {
+      "type": "paragraph",
+      "text": "Hai điều nên rõ ràng sau khi thực hiện ví dụ này:"
+    },
+    {
+      "type": "list",
+      "ordered": true,
+      "items": [
+        "Bất kỳ chức năng nào chúng ta có thể viết ra bằng cách sử dụng tổng,\nsản phẩm, hằng số, quyền hạn, số mũ và logarit có thể có đạo hàm của\nnó được tính toán một cách cơ học bằng cách tuân theo các quy tắc\nnày.",
+        "Có một con người tuân theo các quy tắc này có thể tẻ nhạt và dễ bị\nlỗi!"
+      ]
+    },
+    {
+      "type": "paragraph",
+      "text": "Rất may, hai sự kiện này cùng nhau gợi ý hướng tới một con đường phía\ntrước: đây là một ứng cử viên hoàn hảo cho cơ giới hóa! Thật vậy, tuyên\ntruyền ngược, mà chúng ta sẽ xem lại sau trong phần này, chính xác là\nđiều đó."
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "xap-xi-tuyen-tinh-khi-lam-viec-voi-cac-dan-xuat-no-thuong-huu-ich-de-giai-thich-hinh-hoc-xap-xi-duoc-su-dung-o-tren-dac-biet-luu-y-rang-phuong-trinh",
+      "text": "18.3.2.3. Xấp xỉ tuyến tính Khi làm việc với các dẫn xuất, nó thường hữu ích để giải thích hình học xấp xỉ được sử dụng ở trên. Đặc biệt, lưu ý rằng phương trình"
+    },
+    {
+      "type": "math",
+      "latex": "(18.3.12)¶\\[f(x+\\epsilon) \\approx f(x) + \\epsilon \\frac{df}{dx}(x),\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "xấp xỉ giá trị của \\(f\\) bởi một đường đi qua điểm \\((x, f(x))\\) và có độ dốc \\(\\frac{df}{dx}(x)\\) . Bằng cách này, chúng tôi nói rằng\nđạo hàm đưa ra một xấp xỉ tuyến tính cho hàm \\(f\\) , như minh họa\ndưới đây:"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "# Compute sin\nxs = np.arange(-np.pi, np.pi, 0.01)\nplots = [np.sin(xs)]\n\n# Compute some linear approximations. Use d(sin(x)) / dx = cos(x)\nfor x0 in [-1.5, 0, 2]:\n    plots.append(np.sin(x0) + (xs - x0) * np.cos(x0))\n\nd2l.plot(xs, plots, 'x', 'f(x)', ylim=[-1.5, 1.5])"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_single-variable-calculus_47f3dd_51_0.svg",
+      "local_path": "_images/output_single-variable-calculus_47f3dd_51_0.svg",
+      "alt": "../_images/output_single-variable-calculus_47f3dd_51_0.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "# Compute sin\nxs = torch.arange(-torch.pi, torch.pi, 0.01)\nplots = [torch.sin(xs)]\n\n# Compute some linear approximations. Use d(sin(x))/dx = cos(x)\nfor x0 in [-1.5, 0.0, 2.0]:\n    plots.append(torch.sin(torch.tensor(x0)) + (xs - x0) *\n                 torch.cos(torch.tensor(x0)))\n\nd2l.plot(xs, plots, 'x', 'f(x)', ylim=[-1.5, 1.5])"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_single-variable-calculus_47f3dd_54_0.svg",
+      "local_path": "_images/output_single-variable-calculus_47f3dd_54_0.svg",
+      "alt": "../_images/output_single-variable-calculus_47f3dd_54_0.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "# Compute sin\nxs = tf.range(-tf.pi, tf.pi, 0.01)\nplots = [tf.sin(xs)]\n\n# Compute some linear approximations. Use d(sin(x))/dx = cos(x)\nfor x0 in [-1.5, 0.0, 2.0]:\n    plots.append(tf.sin(tf.constant(x0)) + (xs - x0) *\n                 tf.cos(tf.constant(x0)))\n\nd2l.plot(xs, plots, 'x', 'f(x)', ylim=[-1.5, 1.5])"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_single-variable-calculus_47f3dd_57_0.svg",
+      "local_path": "_images/output_single-variable-calculus_47f3dd_57_0.svg",
+      "alt": "../_images/output_single-variable-calculus_47f3dd_57_0.svg"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "cao-hon-thiet-bi-trat-tu",
+      "text": "18.3.2.4. Cao hơn Thiết bị trật tự"
+    },
+    {
+      "type": "paragraph",
+      "text": "Bây giờ chúng ta hãy làm một cái gì đó có thể trên bề mặt có vẻ lạ. Lấy\nmột hàm \\(f\\) và tính toán đạo hàm \\(\\frac{df}{dx}\\) . Điều này\ncho chúng ta tỷ lệ thay đổi \\(f\\) tại bất kỳ điểm nào."
+    },
+    {
+      "type": "paragraph",
+      "text": "Tuy nhiên, đạo hàm, \\(\\frac{df}{dx}\\) , có thể được xem như một hàm\nchính nó, vì vậy không có gì ngăn cản chúng ta tính toán đạo hàm của \\(\\frac{df}{dx}\\) để có được \\(\\frac{d^2f}{dx^2} = \\frac{df}{dx}\\left(\\frac{df}{dx}\\right)\\) .\nChúng ta sẽ gọi đây là đạo hàm thứ hai của \\(f\\) . Chức năng này là\ntốc độ thay đổi tỷ lệ thay đổi \\(f\\) , hay nói cách khác, tốc độ thay\nđổi đang thay đổi như thế nào. Chúng tôi có thể áp dụng đạo hàm bất kỳ\nsố lần nào để có được cái được gọi là đạo hàm \\(n\\) -th. Để giữ cho\nký hiệu sạch sẽ, chúng ta sẽ biểu thị đạo hàm \\(n\\) -th là"
+    },
+    {
+      "type": "math",
+      "latex": "(18.3.13)¶\\[f^{(n)}(x) = \\frac{d^{n}f}{dx^{n}} = \\left(\\frac{d}{dx}\\right)^{n} f.\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Hãy để chúng tôi cố gắng hiểu * tại sao * đây là một khái niệm hữu\ních. Dưới đây, chúng tôi hình dung \\(f^{(2)}(x)\\) , \\(f^{(1)}(x)\\) và \\(f(x)\\) ."
+    },
+    {
+      "type": "paragraph",
+      "text": "Đầu tiên, hãy xem xét trường hợp đạo hàm thứ hai \\(f^{(2)}(x)\\) là\nmột hằng số dương. Điều này có nghĩa là độ dốc của đạo hàm đầu tiên là\ndương. Kết quả là, đạo hàm đầu tiên \\(f^{(1)}(x)\\) có thể bắt đầu\nâm, trở thành 0 tại một điểm, và sau đó trở thành dương cuối cùng. Điều\nnày cho chúng ta biết độ dốc của chức năng ban đầu của chúng tôi \\(f\\) và do đó, chức năng \\(f\\) tự giảm, làm phẳng, sau đó tăng\nlên. Nói cách khác, hàm \\(f\\) cong lên, và có một mức tối thiểu duy\nnhất như được hiển thị trong Fig. 18.3.1 ."
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/posSecDer.svg",
+      "local_path": "_images/posSecDer.svg",
+      "alt": "../_images/posSecDer.svg"
+    },
+    {
+      "type": "paragraph",
+      "text": "Fig. 18.3.1 If we assume the second derivative is a positive constant, then the\nfist derivative in increasing, which implies the function itself has\na minimum. ¶"
+    },
+    {
+      "type": "paragraph",
+      "text": "Thứ hai, nếu đạo hàm thứ hai là hằng số âm, điều đó có nghĩa là đạo hàm\nthứ nhất đang giảm. Điều này ngụ ý đạo hàm đầu tiên có thể bắt đầu\ndương, trở thành 0 tại một điểm, và sau đó trở thành âm. Do đó, chức\nnăng \\(f\\) tự tăng lên, làm phẳng ra, sau đó giảm. Nói cách khác,\nhàm \\(f\\) cong xuống, và có một tối đa duy nhất như được thể hiện\ntrong Fig. 18.3.2 ."
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/negSecDer.svg",
+      "local_path": "_images/negSecDer.svg",
+      "alt": "../_images/negSecDer.svg"
+    },
+    {
+      "type": "paragraph",
+      "text": "Fig. 18.3.2 If we assume the second derivative is a negative constant, then the\nfist derivative in decreasing, which implies the function itself has\na maximum. ¶"
+    },
+    {
+      "type": "paragraph",
+      "text": "Thứ ba, nếu đạo hàm thứ hai là một luôn bằng 0, thì đạo hàm đầu tiên sẽ\nkhông bao giờ thay đổi—nó là hằng số! Điều này có nghĩa là \\(f\\) tăng (hoặc giảm) với tốc độ cố định và \\(f\\) bản thân nó là một\nđường thẳng như thể hiện trong Fig. 18.3.3 ."
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/zeroSecDer.svg",
+      "local_path": "_images/zeroSecDer.svg",
+      "alt": "../_images/zeroSecDer.svg"
+    },
+    {
+      "type": "paragraph",
+      "text": "Fig. 18.3.3 If we assume the second derivative is zero, then the fist derivative\nis constant, which implies the function itself is a straight line. ¶"
+    },
+    {
+      "type": "paragraph",
+      "text": "Tóm lại, đạo hàm thứ hai có thể được hiểu là mô tả cách hàm \\(f\\) đường cong. Một đạo hàm thứ hai dương dẫn đến một đường cong lên trên,\ntrong khi đạo hàm thứ hai âm có nghĩa là \\(f\\) đường cong xuống\ndưới, và đạo hàm thứ hai bằng 0 có nghĩa là \\(f\\) không cong chút\nnào."
+    },
+    {
+      "type": "paragraph",
+      "text": "Hãy để chúng tôi thực hiện điều này thêm một bước nữa. Hãy xem xét chức\nnăng \\(g(x) = ax^{2}+ bx + c\\) . We can then computetính toán that"
+    },
+    {
+      "type": "math",
+      "latex": "(18.3.14)¶\\[\\begin{split}\\begin{aligned}\n\\frac{dg}{dx}(x) & = 2ax + b \\\\\n\\frac{d^2g}{dx^2}(x) & = 2a.\n\\end{aligned}\\end{split}\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Nếu chúng ta có một số hàm gốc \\(f(x)\\) trong tâm trí, chúng ta có\nthể tính toán hai dẫn xuất đầu tiên và tìm các giá trị cho \\(a, b\\) ,\nvà \\(c\\) mà làm cho chúng phù hợp với tính toán này. Tương tự như\nphần trước, nơi chúng ta thấy rằng đạo hàm đầu tiên đã đưa ra xấp xỉ tốt\nnhất với một đường thẳng, cấu trúc này cung cấp xấp xỉ tốt nhất bằng một\nbậc hai. Hãy để chúng tôi hình dung điều này cho \\(f(x) = \\sin(x)\\) ."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "# Compute sin\nxs = np.arange(-np.pi, np.pi, 0.01)\nplots = [np.sin(xs)]\n\n# Compute some quadratic approximations. Use d(sin(x)) / dx = cos(x)\nfor x0 in [-1.5, 0, 2]:\n    plots.append(np.sin(x0) + (xs - x0) * np.cos(x0) -\n                              (xs - x0)**2 * np.sin(x0) / 2)\n\nd2l.plot(xs, plots, 'x', 'f(x)', ylim=[-1.5, 1.5])"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_single-variable-calculus_47f3dd_63_0.svg",
+      "local_path": "_images/output_single-variable-calculus_47f3dd_63_0.svg",
+      "alt": "../_images/output_single-variable-calculus_47f3dd_63_0.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "# Compute sin\nxs = torch.arange(-torch.pi, torch.pi, 0.01)\nplots = [torch.sin(xs)]\n\n# Compute some quadratic approximations. Use d(sin(x)) / dx = cos(x)\nfor x0 in [-1.5, 0.0, 2.0]:\n    plots.append(torch.sin(torch.tensor(x0)) + (xs - x0) *\n                 torch.cos(torch.tensor(x0)) - (xs - x0)**2 *\n                 torch.sin(torch.tensor(x0)) / 2)\n\nd2l.plot(xs, plots, 'x', 'f(x)', ylim=[-1.5, 1.5])"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_single-variable-calculus_47f3dd_66_0.svg",
+      "local_path": "_images/output_single-variable-calculus_47f3dd_66_0.svg",
+      "alt": "../_images/output_single-variable-calculus_47f3dd_66_0.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "# Compute sin\nxs = tf.range(-tf.pi, tf.pi, 0.01)\nplots = [tf.sin(xs)]\n\n# Compute some quadratic approximations. Use d(sin(x)) / dx = cos(x)\nfor x0 in [-1.5, 0.0, 2.0]:\n    plots.append(tf.sin(tf.constant(x0)) + (xs - x0) *\n                 tf.cos(tf.constant(x0)) - (xs - x0)**2 *\n                 tf.sin(tf.constant(x0)) / 2)\n\nd2l.plot(xs, plots, 'x', 'f(x)', ylim=[-1.5, 1.5])"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_single-variable-calculus_47f3dd_69_0.svg",
+      "local_path": "_images/output_single-variable-calculus_47f3dd_69_0.svg",
+      "alt": "../_images/output_single-variable-calculus_47f3dd_69_0.svg"
+    },
+    {
+      "type": "paragraph",
+      "text": "Chúng tôi sẽ mở rộng ý tưởng này cho ý tưởng về một loạt * Taylor * trong\nphần tiếp theo."
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "dong-taylor",
+      "text": "18.3.2.5. Dòng Taylor"
+    },
+    {
+      "type": "paragraph",
+      "text": "Các dòng * Taylor * cung cấp một phương thức để xấp xỉ hàm \\(f(x)\\) nếu chúng ta được đưa ra các giá trị cho các dẫn xuất \\(n\\) đầu tiên\ntại một điểm \\(x_0\\) , tức là, \\(\\left\\{ f(x_0), f^{(1)}(x_0), f^{(2)}(x_0), \\ldots, f^{(n)}(x_0) \\right\\}\\) .\nÝ tưởng sẽ là tìm một đa thức độ \\(n\\) phù hợp với tất cả các dẫn\nxuất đã cho tại \\(x_0\\) ."
+    },
+    {
+      "type": "paragraph",
+      "text": "Chúng tôi đã thấy trường hợp của \\(n=2\\) trong phần trước và một đại\nsố nhỏ cho thấy điều này là"
+    },
+    {
+      "type": "math",
+      "latex": "(18.3.15)¶\\[f(x) \\approx \\frac{1}{2}\\frac{d^2f}{dx^2}(x_0)(x-x_0)^{2}+ \\frac{df}{dx}(x_0)(x-x_0) + f(x_0).\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Như chúng ta có thể thấy ở trên, mẫu số của \\(2\\) có để hủy bỏ \\(2\\) chúng ta nhận được khi chúng ta lấy hai dẫn xuất là \\(x^2\\) , trong khi các thuật ngữ khác đều bằng 0. Logic tương tự áp\ndụng cho đạo hàm đầu tiên và chính giá trị."
+    },
+    {
+      "type": "paragraph",
+      "text": "Nếu chúng ta đẩy logic hơn nữa lên \\(n=3\\) , chúng ta sẽ kết luận\nrằng"
+    },
+    {
+      "type": "math",
+      "latex": "(18.3.16)¶\\[f(x) \\approx \\frac{\\frac{d^3f}{dx^3}(x_0)}{6}(x-x_0)^3 + \\frac{\\frac{d^2f}{dx^2}(x_0)}{2}(x-x_0)^{2}+ \\frac{df}{dx}(x_0)(x-x_0) + f(x_0).\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "nơi $6 = 3 lần 2 = 3! $ comes from the constant we get in front if we\ntake three derivatives of \\(x^3\\) ."
+    },
+    {
+      "type": "paragraph",
+      "text": "Hơn nữa, chúng ta có thể nhận được một mức độ \\(n\\) đa thức bởi"
+    },
+    {
+      "type": "math",
+      "latex": "(18.3.17)¶\\[P_n(x) = \\sum_{i = 0}^{n} \\frac{f^{(i)}(x_0)}{i!}(x-x_0)^{i}.\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "where the notation ký hiệu"
+    },
+    {
+      "type": "math",
+      "latex": "(18.3.18)¶\\[f^{(n)}(x) = \\frac{d^{n}f}{dx^{n}} = \\left(\\frac{d}{dx}\\right)^{n} f.\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Thật vậy, \\(P_n(x)\\) có thể được xem là xấp xỉ đa thức độ \\(n\\) -th tốt nhất với chức năng của chúng tôi \\(f(x)\\) ."
+    },
+    {
+      "type": "paragraph",
+      "text": "Mặc dù chúng ta sẽ không đi sâu vào lỗi của các xấp xỉ trên, nhưng điều\nđáng nói là giới hạn vô hạn. Trong trường hợp này, đối với các hàm được\nxử lý tốt (được gọi là hàm phân tích thực) như \\(\\cos(x)\\) hoặc \\(e^{x}\\) , chúng ta có thể viết ra số lượng thuật ngữ vô hạn và xấp\nxỉ cùng một hàm"
+    },
+    {
+      "type": "math",
+      "latex": "(18.3.19)¶\\[f(x) = \\sum_{n = 0}^\\infty \\frac{f^{(n)}(x_0)}{n!}(x-x_0)^{n}.\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Lấy \\(f(x) = e^{x}\\) làm ví dụ. Vì \\(e^{x}\\) là đạo hàm riêng\ncủa nó, chúng ta biết rằng \\(f^{(n)}(x) = e^{x}\\) . Do đó, \\(e^{x}\\) có thể được xây dựng lại bằng cách lấy loạt Taylor tại \\(x_0 = 0\\) , tức là,"
+    },
+    {
+      "type": "math",
+      "latex": "(18.3.20)¶\\[e^{x} = \\sum_{n = 0}^\\infty \\frac{x^{n}}{n!} = 1 + x + \\frac{x^2}{2} + \\frac{x^3}{6} + \\cdots.\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Chúng ta hãy xem cách điều này hoạt động trong mã và quan sát cách tăng\nmức độ xấp xỉ Taylor đưa chúng ta đến gần hơn với chức năng mong muốn \\(e^x\\) ."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "# Compute the exponential function\nxs = np.arange(0, 3, 0.01)\nys = np.exp(xs)\n\n# Compute a few Taylor series approximations\nP1 = 1 + xs\nP2 = 1 + xs + xs**2 / 2\nP5 = 1 + xs + xs**2 / 2 + xs**3 / 6 + xs**4 / 24 + xs**5 / 120\n\nd2l.plot(xs, [ys, P1, P2, P5], 'x', 'f(x)', legend=[\n    \"Exponential\", \"Degree 1 Taylor Series\", \"Degree 2 Taylor Series\",\n    \"Degree 5 Taylor Series\"])"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_single-variable-calculus_47f3dd_75_0.svg",
+      "local_path": "_images/output_single-variable-calculus_47f3dd_75_0.svg",
+      "alt": "../_images/output_single-variable-calculus_47f3dd_75_0.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "# Compute the exponential function\nxs = torch.arange(0, 3, 0.01)\nys = torch.exp(xs)\n\n# Compute a few Taylor series approximations\nP1 = 1 + xs\nP2 = 1 + xs + xs**2 / 2\nP5 = 1 + xs + xs**2 / 2 + xs**3 / 6 + xs**4 / 24 + xs**5 / 120\n\nd2l.plot(xs, [ys, P1, P2, P5], 'x', 'f(x)', legend=[\n    \"Exponential\", \"Degree 1 Taylor Series\", \"Degree 2 Taylor Series\",\n    \"Degree 5 Taylor Series\"])"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_single-variable-calculus_47f3dd_78_0.svg",
+      "local_path": "_images/output_single-variable-calculus_47f3dd_78_0.svg",
+      "alt": "../_images/output_single-variable-calculus_47f3dd_78_0.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "# Compute the exponential function\nxs = tf.range(0, 3, 0.01)\nys = tf.exp(xs)\n\n# Compute a few Taylor series approximations\nP1 = 1 + xs\nP2 = 1 + xs + xs**2 / 2\nP5 = 1 + xs + xs**2 / 2 + xs**3 / 6 + xs**4 / 24 + xs**5 / 120\n\nd2l.plot(xs, [ys, P1, P2, P5], 'x', 'f(x)', legend=[\n    \"Exponential\", \"Degree 1 Taylor Series\", \"Degree 2 Taylor Series\",\n    \"Degree 5 Taylor Series\"])"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_single-variable-calculus_47f3dd_81_0.svg",
+      "local_path": "_images/output_single-variable-calculus_47f3dd_81_0.svg",
+      "alt": "../_images/output_single-variable-calculus_47f3dd_81_0.svg"
+    },
+    {
+      "type": "paragraph",
+      "text": "Taylor series có hai ứng dụng chính:"
+    },
+    {
+      "type": "list",
+      "ordered": true,
+      "items": [
+        "Các ứng dụng lý đầu*: Thường khi chúng ta cố gắng hiểu một hàm\nquá phức tạp, sử dụng Taylor series cho phép chúng ta biến nó\nthành một đa thức mà chúng ta có thể làm việc trực tiếp.",
+        "Các ứng dụng lý đầu*: Thường khi chúng ta cố gắng hiểu một hàm\nquá phức tạp, sử dụng Taylor series cho phép chúng ta biến nó\nthành một đa thức mà chúng ta có thể làm việc trực tiếp.",
+        "Các ứng dụng số : Một số chức năng như \\(e^{x}\\) hoặc \\(\\cos(x)\\) rất khó để máy tính toán. Họ có thể lưu trữ các bảng\ngiá trị ở độ chính xác cố định (và điều này thường được thực hiện),\nnhưng nó vẫn để lại các câu hỏi mở như “Chữ số 1000 của \\(\\cos(1)\\) là gì?” Taylor loạt thường hữu ích để trả lời những\ncâu hỏi như vậy."
+      ]
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tom-tat",
+      "text": "18.3.3. Tóm tắt"
+    },
+    {
+      "type": "list",
+      "ordered": false,
+      "items": [
+        "Các dẫn xuất có thể được sử dụng để diễn tả các hàm thay đổi như thế\nnào khi chúng ta thay đổi đầu vào bằng một lượng nhỏ.",
+        "Các dẫn xuất tiểu học có thể được kết hợp bằng cách sử dụng các quy\ntắc phái sinh để tạo ra các dẫn xuất phức tạp tùy ý.",
+        "Các dẫn xuất có thể được lặp lại để có được các dẫn xuất bậc hai hoặc\ncao hơn. Mỗi sự gia tăng theo thứ tự cung cấp thông tin hạt mịn hơn\nvề hành vi của chức năng.",
+        "Sử dụng thông tin trong các dẫn xuất của một ví dụ dữ liệu duy nhất,\nchúng ta có thể xấp xỉ các hàm hoạt động tốt bằng các đa thức thu\nđược từ chuỗi Taylor."
+      ]
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bai-tap",
+      "text": "18.3.4. Bài tập"
+    },
+    {
+      "type": "list",
+      "ordered": true,
+      "items": [
+        "Đạo hàm của \\(x^3-4x+1\\) là gì?",
+        "Đạo hàm của \\(\\log(\\frac{1}{x})\\) là gì?",
+        "Đúng hay Sai: Nếu \\(f'(x) = 0\\) thì \\(f\\) có tối đa hoặc tối\nthiểu là \\(x\\) ?",
+        "Nơi tối thiểu là \\(f(x) = x\\log(x)\\) cho \\(x\\ge0\\) (trong đó\nchúng tôi giả định rằng \\(f\\) có giá trị giới hạn là \\(0\\) tại \\(f(0)\\) )?"
+      ]
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    }
+  ],
+  "images": [
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_single-variable-calculus_47f3dd_3_0.svg",
+      "local_path": "_images/output_single-variable-calculus_47f3dd_3_0.svg",
+      "alt": "../_images/output_single-variable-calculus_47f3dd_3_0.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_single-variable-calculus_47f3dd_6_0.svg",
+      "local_path": "_images/output_single-variable-calculus_47f3dd_6_0.svg",
+      "alt": "../_images/output_single-variable-calculus_47f3dd_6_0.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_single-variable-calculus_47f3dd_9_0.svg",
+      "local_path": "_images/output_single-variable-calculus_47f3dd_9_0.svg",
+      "alt": "../_images/output_single-variable-calculus_47f3dd_9_0.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_single-variable-calculus_47f3dd_15_0.svg",
+      "local_path": "_images/output_single-variable-calculus_47f3dd_15_0.svg",
+      "alt": "../_images/output_single-variable-calculus_47f3dd_15_0.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_single-variable-calculus_47f3dd_18_0.svg",
+      "local_path": "_images/output_single-variable-calculus_47f3dd_18_0.svg",
+      "alt": "../_images/output_single-variable-calculus_47f3dd_18_0.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_single-variable-calculus_47f3dd_21_0.svg",
+      "local_path": "_images/output_single-variable-calculus_47f3dd_21_0.svg",
+      "alt": "../_images/output_single-variable-calculus_47f3dd_21_0.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_single-variable-calculus_47f3dd_27_0.svg",
+      "local_path": "_images/output_single-variable-calculus_47f3dd_27_0.svg",
+      "alt": "../_images/output_single-variable-calculus_47f3dd_27_0.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_single-variable-calculus_47f3dd_30_0.svg",
+      "local_path": "_images/output_single-variable-calculus_47f3dd_30_0.svg",
+      "alt": "../_images/output_single-variable-calculus_47f3dd_30_0.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_single-variable-calculus_47f3dd_33_0.svg",
+      "local_path": "_images/output_single-variable-calculus_47f3dd_33_0.svg",
+      "alt": "../_images/output_single-variable-calculus_47f3dd_33_0.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_single-variable-calculus_47f3dd_51_0.svg",
+      "local_path": "_images/output_single-variable-calculus_47f3dd_51_0.svg",
+      "alt": "../_images/output_single-variable-calculus_47f3dd_51_0.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_single-variable-calculus_47f3dd_54_0.svg",
+      "local_path": "_images/output_single-variable-calculus_47f3dd_54_0.svg",
+      "alt": "../_images/output_single-variable-calculus_47f3dd_54_0.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_single-variable-calculus_47f3dd_57_0.svg",
+      "local_path": "_images/output_single-variable-calculus_47f3dd_57_0.svg",
+      "alt": "../_images/output_single-variable-calculus_47f3dd_57_0.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/posSecDer.svg",
+      "local_path": "_images/posSecDer.svg",
+      "alt": "../_images/posSecDer.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/negSecDer.svg",
+      "local_path": "_images/negSecDer.svg",
+      "alt": "../_images/negSecDer.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/zeroSecDer.svg",
+      "local_path": "_images/zeroSecDer.svg",
+      "alt": "../_images/zeroSecDer.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_single-variable-calculus_47f3dd_63_0.svg",
+      "local_path": "_images/output_single-variable-calculus_47f3dd_63_0.svg",
+      "alt": "../_images/output_single-variable-calculus_47f3dd_63_0.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_single-variable-calculus_47f3dd_66_0.svg",
+      "local_path": "_images/output_single-variable-calculus_47f3dd_66_0.svg",
+      "alt": "../_images/output_single-variable-calculus_47f3dd_66_0.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_single-variable-calculus_47f3dd_69_0.svg",
+      "local_path": "_images/output_single-variable-calculus_47f3dd_69_0.svg",
+      "alt": "../_images/output_single-variable-calculus_47f3dd_69_0.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_single-variable-calculus_47f3dd_75_0.svg",
+      "local_path": "_images/output_single-variable-calculus_47f3dd_75_0.svg",
+      "alt": "../_images/output_single-variable-calculus_47f3dd_75_0.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_single-variable-calculus_47f3dd_78_0.svg",
+      "local_path": "_images/output_single-variable-calculus_47f3dd_78_0.svg",
+      "alt": "../_images/output_single-variable-calculus_47f3dd_78_0.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_single-variable-calculus_47f3dd_81_0.svg",
+      "local_path": "_images/output_single-variable-calculus_47f3dd_81_0.svg",
+      "alt": "../_images/output_single-variable-calculus_47f3dd_81_0.svg"
+    }
+  ],
+  "text": "18.3. Tính toán biến đơn\nNăm Section 2.4 , chúng ta đã thấy các yếu tố cơ bản của\nphép tính vi phân. Phần này sẽ tìm hiểu sâu hơn về các nguyên tắc cơ bản\ncủa giải tích và cách chúng ta có thể hiểu và áp dụng nó trong bối cảnh\nhọc máy.\n18.3.1. Vi phân Giải tích vi phân về cơ bản là nghiên cứu về cách các chức năng hoạt động dưới những thay đổi nhỏ. Để xem lý do tại sao điều này là cốt lõi để học sâu, chúng ta hãy xem xét một ví dụ.\nGiả sử rằng chúng ta có một mạng thần kinh sâu, nơi các trọng lượng, để\nthuận tiện, được nối thành một vector \\(\\mathbf{w} = (w_1, \\ldots, w_n)\\) duy nhất. Với một tập dữ liệu\nđào tạo, chúng tôi xem xét việc mất mạng thần kinh của chúng tôi trên\ntập dữ liệu này, mà chúng tôi sẽ viết là \\(\\mathcal{L}(\\mathbf{w})\\) .\nChức năng này cực kỳ phức tạp, mã hóa hiệu suất của tất cả các mô hình\ncó thể có của kiến trúc đã cho trên tập dữ liệu này, vì vậy gần như\nkhông thể biết bộ trọng lượng \\(\\mathbf{w}\\) sẽ giảm thiểu tổn thất.\nDo đó, trong thực tế, chúng ta thường bắt đầu bằng cách khởi tạo trọng\nlượng* ngẫu nhiên*, và sau đó lặp đi lặp lại các bước nhỏ theo hướng\nlàm cho tổn thất giảm càng nhanh càng tốt.\nCâu hỏi sau đó trở thành một cái gì đó mà trên bề mặt không dễ dàng hơn:\nlàm thế nào để chúng ta tìm thấy hướng làm cho trọng lượng giảm càng\nnhanh càng tốt? Để đào sâu vào điều này, trước tiên chúng ta hãy kiểm\ntra trường hợp chỉ với một trọng lượng duy nhất: \\(L(\\mathbf{w}) = L(x)\\) cho một giá trị thực duy nhất \\(x\\) .\nChúng ta hãy lấy \\(x\\) và cố gắng hiểu những gì sẽ xảy ra khi chúng\nta thay đổi nó bằng một lượng nhỏ thành \\(x + \\epsilon\\) . Nếu bạn\nmuốn cụ thể, hãy nghĩ một con số như \\(\\epsilon = 0.0000001\\) . Để\ngiúp chúng ta hình dung những gì xảy ra, chúng ta hãy biểu đồ một hàm ví\ndụ, \\(f(x) = \\sin(x^x)\\) , trên \\([0, 3]\\) .\nỞ quy mô lớn này, hành vi của hàm không đơn giản. Tuy nhiên, nếu chúng\nta giảm phạm vi của mình xuống một cái gì đó nhỏ hơn như \\([1.75,2.25]\\) , chúng ta thấy rằng biểu đồ trở nên đơn giản hơn\nnhiều.\nĐưa điều này đến cực đoan, nếu chúng ta phóng to thành một đoạn nhỏ,\nhành vi trở nên đơn giản hơn nhiều: nó chỉ là một đường thẳng.\nĐây là quan sát chính của phép tính biến đơn lẻ: hành vi của các hàm\nquen thuộc có thể được mô hình hóa bởi một dòng trong một phạm vi đủ\nnhỏ. Điều này có nghĩa là đối với hầu hết các chức năng, thật hợp lý khi\nmong đợi rằng khi chúng ta thay đổi giá trị \\(x\\) của hàm một chút,\nđầu ra \\(f(x)\\) cũng sẽ được dịch chuyển một chút. Câu hỏi duy nhất\nchúng ta cần trả lời là, “Sự thay đổi trong đầu ra lớn bao nhiêu so với\nsự thay đổi trong đầu vào? Nó có lớn một nửa không? Gấp đôi lớn?”\nDo đó, chúng ta có thể xem xét tỷ lệ thay đổi trong đầu ra của một hàm\ncho một sự thay đổi nhỏ trong đầu vào của hàm. Chúng tôi có thể viết\nđiều này chính thức như\nĐiều này đã đủ để bắt đầu chơi xung quanh với mã. Ví dụ, giả sử rằng\nchúng ta biết rằng \\(L(x) = x^{2} + 1701(x-4)^3\\) , sau đó chúng ta\ncó thể thấy giá trị này lớn như thế nào tại điểm \\(x = 4\\) như sau.\nBây giờ, nếu chúng ta quan sát, chúng ta sẽ nhận thấy rằng đầu ra của\ncon số này là đáng ngờ gần với \\(8\\) . Thật vậy, nếu chúng ta giảm \\(\\epsilon\\) , chúng ta sẽ thấy giá trị trở nên dần dần gần hơn với \\(8\\) . Vì vậy, chúng ta có thể kết luận, một cách chính xác, rằng\ngiá trị chúng ta tìm kiếm (mức độ thay đổi trong đầu vào thay đổi đầu\nra) nên là \\(8\\) tại điểm \\(x=4\\) . Cách mà một nhà toán học mã\nhóa thực tế này là\nNhư một chút của một cuộc di truyền lịch sử: trong vài thập kỷ đầu tiên\ncủa nghiên cứu mạng thần kinh, các nhà khoa học đã sử dụng thuật toán\nnày (phương pháp * của sự khác biệt hữu hạn ) để đánh giá làm thế nào\nmột chức năng mất thay đổi theo nhiễu loạn nhỏ: chỉ cần thay đổi trọng\nlượng và xem mất thay đổi như thế nào. Đây là tính toán không hiệu quả,\nđòi hỏi hai đánh giá của hàm mất để xem một thay đổi duy nhất của một\nbiến ảnh hưởng đến tổn thất như thế nào. Nếu chúng tôi cố gắng làm điều\nnày với thậm chí một vài nghìn tham số nhẹ, nó sẽ yêu cầu vài nghìn đánh\ngiá của mạng trên toàn bộ dữ liệu! Nó không được giải quyết cho đến năm\n1986 rằng thuật toán *backpropagation* được giới thiệu trong\n:cite:`Rumelhart.Hinton.Williams.ea.1988` cung cấp một cách để tính\ntoán cách *any thay đổi trọng số cùng nhau sẽ thay đổi tổn thất trong\ncùng một thời gian tính toán như một dự đoán duy nhất của mạng qua tập\ndữ liệu.\nTrở lại trong ví dụ của chúng tôi, giá trị này \\(8\\) là khác nhau\ncho các giá trị khác nhau của \\(x\\) , vì vậy nó có ý nghĩa để xác\nđịnh nó như một hàm của \\(x\\) . Chính thức hơn, tỷ lệ thay đổi phụ\nthuộc vào giá trị này được gọi là phái sinh được viết là\nCác văn bản khác nhau sẽ sử dụng các ký hiệu khác nhau cho đạo hàm. Ví\ndụ, tất cả các ký hiệu dưới đây chỉ ra điều tương tự:\nHầu hết các tác giả sẽ chọn một ký hiệu duy nhất và gắn bó với nó, tuy\nnhiên ngay cả điều đó không được đảm bảo. Tốt nhất là làm quen với tất\ncả những điều này. Chúng ta sẽ sử dụng ký hiệu \\(\\frac{df}{dx}\\) trong suốt văn bản này, trừ khi chúng ta muốn lấy đạo hàm của một biểu\nthức phức tạp, trong trường hợp đó chúng ta sẽ sử dụng \\(\\frac{d}{dx}f\\) để viết các biểu thức như\nThông thường, nó là trực giác hữu ích để làm sáng tỏ định nghĩa của đạo\nhàm (18.3.3) một lần nữa để xem một hàm thay đổi như thế\nnào khi chúng ta thực hiện một thay đổi nhỏ \\(x\\) :\nPhương trình cuối cùng đáng để gọi ra một cách rõ ràng. Nó cho chúng ta\nbiết rằng nếu bạn lấy bất kỳ hàm nào và thay đổi đầu vào bằng một lượng\nnhỏ, đầu ra sẽ thay đổi theo số lượng nhỏ đó được thu nhỏ theo đạo hàm.\nBằng cách này, chúng ta có thể hiểu đạo hàm là hệ số mở rộng cho chúng\nta biết thay đổi lớn như thế nào chúng ta nhận được trong đầu ra từ một\nsự thay đổi trong đầu vào.\n18.3.2. Quy tắc của Calculus\nBây giờ chúng ta chuyển sang nhiệm vụ hiểu làm thế nào để tính toán đạo\nhàm của một hàm rõ ràng. Một điều trị chính thức đầy đủ của giải tích sẽ\nlấy được tất cả mọi thứ từ các nguyên tắc đầu tiên. Chúng tôi sẽ không\nthưởng thức sự cám dỗ này ở đây, mà là cung cấp một sự hiểu biết về các\nquy tắc chung gặp phải.\n18.3.2.1. Các dẫn xuất phổ biến Như đã thấy trong Section 2.4 , khi các dẫn xuất tính toán người ta thường có thể sử dụng một loạt các quy tắc để giảm tính toán cho một vài chức năng cốt lõi. Chúng tôi lặp lại chúng ở đây để dễ tham khảo.\n** Derivative của constants.** \\(\\frac{d}{dx}c = 0\\) .\n** Derivative của các chức năng tuyến tính** \\(\\frac{d}{dx}(ax) = a\\) .\n** Quy tắc điện.** \\(\\frac{d}{dx}x^n = nx^{n-1}\\) .\n** Derivative của số mũ. ** \\(\\frac{d}{dx}e^x = e^x\\) .\n** Derivative của logarit** \\(\\frac{d}{dx}\\log(x) = \\frac{1}{x}\\) .\n18.3.2.2. Quy tắc phái sinh Nếu mọi đạo hàm cần được tính toán riêng và lưu trữ trong một bảng, phép tính vi phân sẽ gần như không thể. Đó là một món quà của toán học mà chúng ta có thể khái quát hóa các dẫn xuất trên và tính toán các dẫn xuất phức tạp hơn như tìm ra đạo hàm của \\(f(x) = \\log\\left(1+(x-1)^{10}\\right)\\) . Như đã đề cập trong Section 2.4 , chìa khóa để làm như vậy là mã hóa những gì xảy ra khi chúng ta thực hiện các chức năng và kết hợp chúng theo nhiều cách khác nhau, quan trọng nhất là: tổng, sản phẩm và thành phần.\nSum rule. \\(\\frac{d}{dx}\\left(g(x) + h(x)\\right) = \\frac{dg}{dx}(x) + \\frac{dh}{dx}(x)\\) .\n** Quy tắc sản phẩm.** \\(\\frac{d}{dx}\\left(g(x)\\cdot h(x)\\right) = g(x)\\frac{dh}{dx}(x) + \\frac{dg}{dx}(x)h(x)\\) .\n** Quy tắc dây chuyển.** \\(\\frac{d}{dx}g(h(x)) = \\frac{dg}{dh}(h(x))\\cdot \\frac{dh}{dx}(x)\\) .\nHãy để chúng tôi xem cách chúng tôi có thể sử dụng (18.3.6) để hiểu các quy tắc này. Đối với quy tắc\ntổng, hãy xem xét chuỗi lý luận sau:\nBằng cách so sánh kết quả này với thực tế là \\(f(x+\\epsilon) \\approx f(x) + \\epsilon \\frac{df}{dx}(x)\\) , chúng ta\nthấy rằng \\(\\frac{df}{dx}(x) = \\frac{dg}{dx}(x) + \\frac{dh}{dx}(x)\\) như mong muốn. Trực giác ở đây là: khi chúng ta thay đổi đầu vào \\(x\\) , \\(g\\) và \\(h\\) cùng góp phần vào sự thay đổi đầu ra\ncủa \\(\\frac{dg}{dx}(x)\\) và \\(\\frac{dh}{dx}(x)\\) .\nSản phẩm tinh tế hơn và sẽ yêu cầu một quan sát mới về cách làm việc với\ncác biểu thức này. Chúng tôi sẽ bắt đầu như trước khi sử dụng (18.3.6) :\nĐiều này giống như tính toán được thực hiện ở trên, và thực sự chúng ta\nthấy câu trả lời của chúng tôi\n( \\(\\frac{df}{dx}(x) = g(x)\\frac{dh}{dx}(x) + \\frac{dg}{dx}(x)h(x)\\) )\nngồi bên cạnh \\(\\epsilon\\) , nhưng có vấn đề về thuật ngữ đó có kích\nthước \\(\\epsilon^{2}\\) . Chúng tôi sẽ đề cập đến điều này là một điều\nkhoản * bậc cao hơn*, vì sức mạnh của \\(\\epsilon^2\\) cao hơn sức\nmạnh của \\(\\epsilon^1\\) . Chúng ta sẽ thấy trong một phần sau mà đôi\nkhi chúng ta sẽ muốn theo dõi những điều này, tuy nhiên bây giờ quan sát\nthấy rằng nếu \\(\\epsilon = 0.0000001\\) , thì \\(\\epsilon^{2}= 0.0000000000001\\) , nhỏ hơn rất nhiều. Khi chúng tôi\ngửi \\(\\epsilon \\rightarrow 0\\) , chúng tôi có thể bỏ qua một cách an\ntoàn các điều khoản đặt hàng cao hơn. Như một quy ước chung trong phụ\nlục này, chúng ta sẽ sử dụng “ \\(\\approx\\) ” để biểu thị rằng hai\nthuật ngữ này bằng với các điều khoản bậc cao hơn. Tuy nhiên, nếu chúng\nta muốn chính thức hơn, chúng ta có thể kiểm tra sự khác biệt thương\nvà thấy rằng khi chúng tôi gửi \\(\\epsilon \\rightarrow 0\\) , thuật ngữ\ntay phải cũng đi đến không.\nCuối cùng, với quy tắc chuỗi, chúng ta có thể tiến bộ một lần nữa như\ntrước khi sử dụng (18.3.6) và thấy rằng\ntrong đó trong dòng thứ hai, chúng tôi xem hàm \\(g\\) là có đầu vào\ncủa nó ( \\(h(x)\\) ) được dịch chuyển bởi số lượng nhỏ \\(\\epsilon \\frac{dh}{dx}(x)\\) .\nQuy tắc này cung cấp cho chúng ta một bộ công cụ linh hoạt để tính toán\nvề cơ bản bất kỳ biểu thức nào mong muốn. For instance ví dụ,\nTrong trường hợp mỗi dòng đã sử dụng các quy tắc sau:\nQuy tắc chuỗi và đạo hàm của logarit.\nQuy tắc tổng.\nĐạo hàm của hằng số, quy tắc chuỗi, và quy tắc quyền lực.\nQuy tắc tổng, đạo hàm của các hàm tuyến tính, đạo hàm của hằng số.\nHai điều nên rõ ràng sau khi thực hiện ví dụ này:\nBất kỳ chức năng nào chúng ta có thể viết ra bằng cách sử dụng tổng,\nsản phẩm, hằng số, quyền hạn, số mũ và logarit có thể có đạo hàm của\nnó được tính toán một cách cơ học bằng cách tuân theo các quy tắc\nnày.\nCó một con người tuân theo các quy tắc này có thể tẻ nhạt và dễ bị\nlỗi!\nRất may, hai sự kiện này cùng nhau gợi ý hướng tới một con đường phía\ntrước: đây là một ứng cử viên hoàn hảo cho cơ giới hóa! Thật vậy, tuyên\ntruyền ngược, mà chúng ta sẽ xem lại sau trong phần này, chính xác là\nđiều đó.\n18.3.2.3. Xấp xỉ tuyến tính Khi làm việc với các dẫn xuất, nó thường hữu ích để giải thích hình học xấp xỉ được sử dụng ở trên. Đặc biệt, lưu ý rằng phương trình\nxấp xỉ giá trị của \\(f\\) bởi một đường đi qua điểm \\((x, f(x))\\) và có độ dốc \\(\\frac{df}{dx}(x)\\) . Bằng cách này, chúng tôi nói rằng\nđạo hàm đưa ra một xấp xỉ tuyến tính cho hàm \\(f\\) , như minh họa\ndưới đây:\n18.3.2.4. Cao hơn Thiết bị trật tự\nBây giờ chúng ta hãy làm một cái gì đó có thể trên bề mặt có vẻ lạ. Lấy\nmột hàm \\(f\\) và tính toán đạo hàm \\(\\frac{df}{dx}\\) . Điều này\ncho chúng ta tỷ lệ thay đổi \\(f\\) tại bất kỳ điểm nào.\nTuy nhiên, đạo hàm, \\(\\frac{df}{dx}\\) , có thể được xem như một hàm\nchính nó, vì vậy không có gì ngăn cản chúng ta tính toán đạo hàm của \\(\\frac{df}{dx}\\) để có được \\(\\frac{d^2f}{dx^2} = \\frac{df}{dx}\\left(\\frac{df}{dx}\\right)\\) .\nChúng ta sẽ gọi đây là đạo hàm thứ hai của \\(f\\) . Chức năng này là\ntốc độ thay đổi tỷ lệ thay đổi \\(f\\) , hay nói cách khác, tốc độ thay\nđổi đang thay đổi như thế nào. Chúng tôi có thể áp dụng đạo hàm bất kỳ\nsố lần nào để có được cái được gọi là đạo hàm \\(n\\) -th. Để giữ cho\nký hiệu sạch sẽ, chúng ta sẽ biểu thị đạo hàm \\(n\\) -th là\nHãy để chúng tôi cố gắng hiểu * tại sao * đây là một khái niệm hữu\ních. Dưới đây, chúng tôi hình dung \\(f^{(2)}(x)\\) , \\(f^{(1)}(x)\\) và \\(f(x)\\) .\nĐầu tiên, hãy xem xét trường hợp đạo hàm thứ hai \\(f^{(2)}(x)\\) là\nmột hằng số dương. Điều này có nghĩa là độ dốc của đạo hàm đầu tiên là\ndương. Kết quả là, đạo hàm đầu tiên \\(f^{(1)}(x)\\) có thể bắt đầu\nâm, trở thành 0 tại một điểm, và sau đó trở thành dương cuối cùng. Điều\nnày cho chúng ta biết độ dốc của chức năng ban đầu của chúng tôi \\(f\\) và do đó, chức năng \\(f\\) tự giảm, làm phẳng, sau đó tăng\nlên. Nói cách khác, hàm \\(f\\) cong lên, và có một mức tối thiểu duy\nnhất như được hiển thị trong Fig. 18.3.1 .\nFig. 18.3.1 If we assume the second derivative is a positive constant, then the\nfist derivative in increasing, which implies the function itself has\na minimum. ¶\nThứ hai, nếu đạo hàm thứ hai là hằng số âm, điều đó có nghĩa là đạo hàm\nthứ nhất đang giảm. Điều này ngụ ý đạo hàm đầu tiên có thể bắt đầu\ndương, trở thành 0 tại một điểm, và sau đó trở thành âm. Do đó, chức\nnăng \\(f\\) tự tăng lên, làm phẳng ra, sau đó giảm. Nói cách khác,\nhàm \\(f\\) cong xuống, và có một tối đa duy nhất như được thể hiện\ntrong Fig. 18.3.2 .\nFig. 18.3.2 If we assume the second derivative is a negative constant, then the\nfist derivative in decreasing, which implies the function itself has\na maximum. ¶\nThứ ba, nếu đạo hàm thứ hai là một luôn bằng 0, thì đạo hàm đầu tiên sẽ\nkhông bao giờ thay đổi—nó là hằng số! Điều này có nghĩa là \\(f\\) tăng (hoặc giảm) với tốc độ cố định và \\(f\\) bản thân nó là một\nđường thẳng như thể hiện trong Fig. 18.3.3 .\nFig. 18.3.3 If we assume the second derivative is zero, then the fist derivative\nis constant, which implies the function itself is a straight line. ¶\nTóm lại, đạo hàm thứ hai có thể được hiểu là mô tả cách hàm \\(f\\) đường cong. Một đạo hàm thứ hai dương dẫn đến một đường cong lên trên,\ntrong khi đạo hàm thứ hai âm có nghĩa là \\(f\\) đường cong xuống\ndưới, và đạo hàm thứ hai bằng 0 có nghĩa là \\(f\\) không cong chút\nnào.\nHãy để chúng tôi thực hiện điều này thêm một bước nữa. Hãy xem xét chức\nnăng \\(g(x) = ax^{2}+ bx + c\\) . We can then computetính toán that\nNếu chúng ta có một số hàm gốc \\(f(x)\\) trong tâm trí, chúng ta có\nthể tính toán hai dẫn xuất đầu tiên và tìm các giá trị cho \\(a, b\\) ,\nvà \\(c\\) mà làm cho chúng phù hợp với tính toán này. Tương tự như\nphần trước, nơi chúng ta thấy rằng đạo hàm đầu tiên đã đưa ra xấp xỉ tốt\nnhất với một đường thẳng, cấu trúc này cung cấp xấp xỉ tốt nhất bằng một\nbậc hai. Hãy để chúng tôi hình dung điều này cho \\(f(x) = \\sin(x)\\) .\nChúng tôi sẽ mở rộng ý tưởng này cho ý tưởng về một loạt * Taylor * trong\nphần tiếp theo.\n18.3.2.5. Dòng Taylor\nCác dòng * Taylor * cung cấp một phương thức để xấp xỉ hàm \\(f(x)\\) nếu chúng ta được đưa ra các giá trị cho các dẫn xuất \\(n\\) đầu tiên\ntại một điểm \\(x_0\\) , tức là, \\(\\left\\{ f(x_0), f^{(1)}(x_0), f^{(2)}(x_0), \\ldots, f^{(n)}(x_0) \\right\\}\\) .\nÝ tưởng sẽ là tìm một đa thức độ \\(n\\) phù hợp với tất cả các dẫn\nxuất đã cho tại \\(x_0\\) .\nChúng tôi đã thấy trường hợp của \\(n=2\\) trong phần trước và một đại\nsố nhỏ cho thấy điều này là\nNhư chúng ta có thể thấy ở trên, mẫu số của \\(2\\) có để hủy bỏ \\(2\\) chúng ta nhận được khi chúng ta lấy hai dẫn xuất là \\(x^2\\) , trong khi các thuật ngữ khác đều bằng 0. Logic tương tự áp\ndụng cho đạo hàm đầu tiên và chính giá trị.\nNếu chúng ta đẩy logic hơn nữa lên \\(n=3\\) , chúng ta sẽ kết luận\nrằng\nnơi $6 = 3 lần 2 = 3! $ comes from the constant we get in front if we\ntake three derivatives of \\(x^3\\) .\nHơn nữa, chúng ta có thể nhận được một mức độ \\(n\\) đa thức bởi\nwhere the notation ký hiệu\nThật vậy, \\(P_n(x)\\) có thể được xem là xấp xỉ đa thức độ \\(n\\) -th tốt nhất với chức năng của chúng tôi \\(f(x)\\) .\nMặc dù chúng ta sẽ không đi sâu vào lỗi của các xấp xỉ trên, nhưng điều\nđáng nói là giới hạn vô hạn. Trong trường hợp này, đối với các hàm được\nxử lý tốt (được gọi là hàm phân tích thực) như \\(\\cos(x)\\) hoặc \\(e^{x}\\) , chúng ta có thể viết ra số lượng thuật ngữ vô hạn và xấp\nxỉ cùng một hàm\nLấy \\(f(x) = e^{x}\\) làm ví dụ. Vì \\(e^{x}\\) là đạo hàm riêng\ncủa nó, chúng ta biết rằng \\(f^{(n)}(x) = e^{x}\\) . Do đó, \\(e^{x}\\) có thể được xây dựng lại bằng cách lấy loạt Taylor tại \\(x_0 = 0\\) , tức là,\nChúng ta hãy xem cách điều này hoạt động trong mã và quan sát cách tăng\nmức độ xấp xỉ Taylor đưa chúng ta đến gần hơn với chức năng mong muốn \\(e^x\\) .\nTaylor series có hai ứng dụng chính:\nCác ứng dụng lý đầu*: Thường khi chúng ta cố gắng hiểu một hàm\nquá phức tạp, sử dụng Taylor series cho phép chúng ta biến nó\nthành một đa thức mà chúng ta có thể làm việc trực tiếp.\nCác ứng dụng lý đầu*: Thường khi chúng ta cố gắng hiểu một hàm\nquá phức tạp, sử dụng Taylor series cho phép chúng ta biến nó\nthành một đa thức mà chúng ta có thể làm việc trực tiếp.\nCác ứng dụng số : Một số chức năng như \\(e^{x}\\) hoặc \\(\\cos(x)\\) rất khó để máy tính toán. Họ có thể lưu trữ các bảng\ngiá trị ở độ chính xác cố định (và điều này thường được thực hiện),\nnhưng nó vẫn để lại các câu hỏi mở như “Chữ số 1000 của \\(\\cos(1)\\) là gì?” Taylor loạt thường hữu ích để trả lời những\ncâu hỏi như vậy.\n18.3.3. Tóm tắt\nCác dẫn xuất có thể được sử dụng để diễn tả các hàm thay đổi như thế\nnào khi chúng ta thay đổi đầu vào bằng một lượng nhỏ.\nCác dẫn xuất tiểu học có thể được kết hợp bằng cách sử dụng các quy\ntắc phái sinh để tạo ra các dẫn xuất phức tạp tùy ý.\nCác dẫn xuất có thể được lặp lại để có được các dẫn xuất bậc hai hoặc\ncao hơn. Mỗi sự gia tăng theo thứ tự cung cấp thông tin hạt mịn hơn\nvề hành vi của chức năng.\nSử dụng thông tin trong các dẫn xuất của một ví dụ dữ liệu duy nhất,\nchúng ta có thể xấp xỉ các hàm hoạt động tốt bằng các đa thức thu\nđược từ chuỗi Taylor.\n18.3.4. Bài tập\nĐạo hàm của \\(x^3-4x+1\\) là gì?\nĐạo hàm của \\(\\log(\\frac{1}{x})\\) là gì?\nĐúng hay Sai: Nếu \\(f'(x) = 0\\) thì \\(f\\) có tối đa hoặc tối\nthiểu là \\(x\\) ?\nNơi tối thiểu là \\(f(x) = x\\log(x)\\) cho \\(x\\ge0\\) (trong đó\nchúng tôi giả định rằng \\(f\\) có giá trị giới hạn là \\(0\\) tại \\(f(0)\\) )?\nDiscussions\nDiscussions\nDiscussions"
+}

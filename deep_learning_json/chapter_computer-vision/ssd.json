@@ -1,0 +1,783 @@
+{
+  "url": "https://vi.d2l.ai/chapter_computer-vision/ssd.html",
+  "chapter": "chapter_computer-vision",
+  "title": "13.7. Phát hiện Multibox Shot đơn",
+  "crawled_at": "2026-07-20T12:40:44.752538+00:00",
+  "headings": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "phat-hien-multibox-shot-don",
+      "text": "13.7. Phát hiện Multibox Shot đơn"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "mo-hinh",
+      "text": "13.7.1. Mô hình"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "lop-du-doan-lop",
+      "text": "13.7.1.1. Lớp dự đoán lớp"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "lop-du-doan-hop-gioi-hop",
+      "text": "13.7.1.2. Lớp dự đoán hộp giới hộp"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "concatenating-du-doan-cho-nhieu-quy-mo",
+      "text": "13.7.1.3. Concatenating dự đoán cho nhiều quy mô"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "khoi-lay-mau-xuong",
+      "text": "13.7.1.4. Khối lấy mẫu xuống"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "khoi-mang-co-so",
+      "text": "13.7.1.5. Khối mạng cơ sở"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "mo-hinh-hoan-chinh",
+      "text": "13.7.1.6. Mô hình hoàn chỉnh"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "dao-tao",
+      "text": "13.7.2. Đào tạo"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "doc-tap-du-lieu-va-khoi-tao-mo-hinh",
+      "text": "13.7.2.1. Đọc tập dữ liệu và khởi tạo mô hình"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "xac-dinh-mat-va-danh-gia-chuc-nang",
+      "text": "13.7.2.2. Xác định mất và đánh giá chức năng"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "dao-tao-mo-hinh",
+      "text": "13.7.2.3. Đào tạo mô hình"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "prediction",
+      "text": "13.7.3. Prediction"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tom-tat",
+      "text": "13.7.4. Tóm tắt"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bai-tap",
+      "text": "13.7.5. Bài tập"
+    }
+  ],
+  "content": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "phat-hien-multibox-shot-don",
+      "text": "13.7. Phát hiện Multibox Shot đơn"
+    },
+    {
+      "type": "paragraph",
+      "text": "Trong Section 13.3 — Section 13.6 ,\nchúng tôi giới thiệu các hộp giới hạn, hộp neo, phát hiện đối tượng đa\nquy mô và bộ dữ liệu để phát hiện đối tượng. Bây giờ chúng tôi đã sẵn\nsàng để sử dụng kiến thức nền như vậy để thiết kế một mô hình phát hiện\nđối tượng: phát hiện multibox shot đơn (SSD) [Liu et al., 2016] . Mô hình này đơn giản, nhanh chóng\nvà được sử dụng rộng rãi. Mặc dù đây chỉ là một trong số lượng lớn các\nmô hình phát hiện đối tượng, một số nguyên tắc thiết kế và chi tiết\ntriển khai trong phần này cũng được áp dụng cho các mô hình khác."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "mo-hinh",
+      "text": "13.7.1. Mô hình"
+    },
+    {
+      "type": "paragraph",
+      "text": "Fig. 13.7.1 cung cấp một cái nhìn tổng quan về thiết kế phát\nhiện multibox một shot. Mô hình này chủ yếu bao gồm một mạng cơ sở theo\nsau là một số khối bản đồ tính năng đa thang. Mạng cơ sở là để trích\nxuất các tính năng từ hình ảnh đầu vào, vì vậy nó có thể sử dụng CNN\nsâu. Ví dụ, giấy phát hiện multibox một shot ban đầu sử dụng một mạng\nVGG cắt ngắn trước lớp phân loại [Liu et al., 2016] ,\ntrong khi ResNet cũng đã được sử dụng phổ biến. Thông qua thiết kế của\nchúng tôi, chúng tôi có thể làm cho các bản đồ tính năng đầu ra mạng cơ\nsở lớn hơn để tạo ra nhiều hộp neo hơn để phát hiện các đối tượng nhỏ\nhơn. Sau đó, mỗi khối bản đồ tính năng đa thang giảm (ví dụ, bằng một\nnửa) chiều cao và chiều rộng của bản đồ tính năng từ khối trước đó và\ncho phép mỗi đơn vị của bản đồ tính năng tăng trường tiếp nhận của nó\ntrên hình ảnh đầu vào."
+    },
+    {
+      "type": "paragraph",
+      "text": "Nhớ lại thiết kế phát hiện đối tượng đa quy mô thông qua các biểu diễn\ntheo lớp của hình ảnh bằng các mạng thần kinh sâu trong Section 13.5 . Vì bản đồ tính năng đa quy\nmô gần với đỉnh Fig. 13.7.1 nhỏ hơn nhưng có các trường tiếp\nnhận lớn hơn, chúng phù hợp để phát hiện các vật thể ít hơn nhưng lớn\nhơn."
+    },
+    {
+      "type": "paragraph",
+      "text": "Tóm lại, thông qua mạng cơ sở của nó và một số khối bản đồ tính năng đa\nquy mô, phát hiện multibox single-shot tạo ra một số lượng khác nhau của\ncác hộp neo với kích thước khác nhau, và phát hiện các đối tượng kích\nthước khác nhau bằng cách dự đoán các lớp và bù đắp của các hộp neo (do\nđó các hộp giới hạn); do đó, đây là một mô hình phát hiện đối tượng đa\nquy mô."
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/ssd.svg",
+      "local_path": "_images/ssd.svg",
+      "alt": "../_images/ssd.svg"
+    },
+    {
+      "type": "paragraph",
+      "text": "Fig. 13.7.1 As a multiscale object detection model, single-shot multibox\ndetection mainly consists of a base network followed by several\nmultiscale feature map blocks. ¶"
+    },
+    {
+      "type": "paragraph",
+      "text": "Sau đây, chúng tôi sẽ mô tả các chi tiết triển khai của các khối khác\nnhau trong Fig. 13.7.1 . Để bắt đầu, chúng tôi thảo luận về cách\nthực hiện dự đoán lớp và hộp giới hạn."
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "lop-du-doan-lop",
+      "text": "13.7.1.1. Lớp dự đoán lớp"
+    },
+    {
+      "type": "paragraph",
+      "text": "Hãy để số lượng các lớp đối tượng là \\(q\\) . Sau đó, hộp neo có \\(q+1\\) lớp, trong đó lớp 0 là nền. Ở một số quy mô, giả sử rằng\nchiều cao và chiều rộng của bản đồ tính năng lần lượt là \\(h\\) và \\(w\\) . Khi \\(a\\) hộp neo được tạo ra với mỗi vị trí không gian\ncủa các bản đồ tính năng này làm trung tâm của chúng, tổng cộng \\(hwa\\) hộp neo cần được phân loại. Điều này thường làm cho việc\nphân loại với các lớp kết nối hoàn toàn không khả thi do chi phí tham số\nhóa nặng. Nhớ lại cách chúng ta sử dụng các kênh của các lớp phức tạp để\ndự đoán các lớp trong Section 7.3 . Phát hiện multibox\nSingle-shot sử dụng cùng một kỹ thuật để giảm độ phức tạp của mô hình."
+    },
+    {
+      "type": "paragraph",
+      "text": "Cụ thể, lớp dự đoán lớp sử dụng một lớp phức tạp mà không làm thay đổi\nchiều rộng hoặc chiều cao của bản đồ đối tượng. Bằng cách này, có thể có\nsự tương ứng một-một giữa các đầu ra và đầu vào ở cùng một kích thước\nkhông gian (chiều rộng và chiều cao) của bản đồ tính năng. Cụ thể hơn,\ncác kênh của bản đồ tính năng đầu ra ở bất kỳ vị trí không gian nào\n( \\(x\\) , \\(y\\) ) đại diện cho các dự đoán lớp cho tất cả các hộp\nneo tập trung vào ( \\(x\\) , \\(y\\) ) của bản đồ tính năng đầu vào.\nĐể tạo ra các dự đoán hợp lệ, phải có \\(a(q+1)\\) kênh đầu ra, trong\nđó cho cùng một vị trí không gian kênh đầu ra với chỉ số \\(i(q+1) + j\\) đại diện cho dự đoán của lớp \\(j\\) ( \\(0 \\leq j \\leq q\\) ) cho hộp neo \\(i\\) ( \\(0 \\leq i < a\\) )."
+    },
+    {
+      "type": "paragraph",
+      "text": "Dưới đây chúng ta xác định một lớp dự đoán lớp như vậy, chỉ định \\(a\\) và \\(q\\) thông qua các đối số num_anchors và num_classes , tương ứng. Lớp này sử dụng một lớp ghép \\(3\\times3\\) với lớp đệm là 1. Chiều rộng và chiều cao của đầu vào\nvà đầu ra của lớp phức tạp này vẫn không thay đổi."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "%matplotlib inline\nfrom mxnet import autograd, gluon, image, init, np, npx\nfrom mxnet.gluon import nn\nfrom d2l import mxnet as d2l\n\nnpx.set_np()\n\ndef cls_predictor(num_anchors, num_classes):\n    return nn.Conv2D(num_anchors * (num_classes + 1), kernel_size=3,\n                     padding=1)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "%matplotlib inline\nimport torch\nimport torchvision\nfrom torch import nn\nfrom torch.nn import functional as F\nfrom d2l import torch as d2l\n\n\ndef cls_predictor(num_inputs, num_anchors, num_classes):\n    return nn.Conv2d(num_inputs, num_anchors * (num_classes + 1),\n                     kernel_size=3, padding=1)"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "lop-du-doan-hop-gioi-hop",
+      "text": "13.7.1.2. Lớp dự đoán hộp giới hộp"
+    },
+    {
+      "type": "paragraph",
+      "text": "Thiết kế của lớp dự đoán hộp giới hạn tương tự như của lớp dự đoán lớp.\nSự khác biệt duy nhất nằm ở số lượng đầu ra cho mỗi hộp neo: ở đây chúng\nta cần dự đoán bốn bù đắp hơn là \\(q+1\\) lớp."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def bbox_predictor(num_anchors):\n    return nn.Conv2D(num_anchors * 4, kernel_size=3, padding=1)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def bbox_predictor(num_inputs, num_anchors):\n    return nn.Conv2d(num_inputs, num_anchors * 4, kernel_size=3, padding=1)"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "concatenating-du-doan-cho-nhieu-quy-mo",
+      "text": "13.7.1.3. Concatenating dự đoán cho nhiều quy mô"
+    },
+    {
+      "type": "paragraph",
+      "text": "Như chúng tôi đã đề cập, phát hiện multibox single shot sử dụng bản đồ\ntính năng đa thang để tạo ra các hộp neo và dự đoán các lớp và bù đắp\ncủa chúng. Ở các thang đo khác nhau, hình dạng của bản đồ tính năng hoặc\nsố lượng hộp neo tập trung vào cùng một đơn vị có thể khác nhau. Do đó,\nhình dạng của đầu ra dự đoán ở các thang đo khác nhau có thể khác nhau."
+    },
+    {
+      "type": "paragraph",
+      "text": "Trong ví dụ sau, chúng tôi xây dựng các bản đồ tính năng ở hai thang\nkhác nhau, Y1 và Y2 , cho cùng một minibatch, trong đó chiều cao\nvà chiều rộng của Y2 là một nửa so với Y1 . Hãy để chúng tôi lấy\ndự đoán lớp học như một ví dụ. Giả sử rằng 5 và 3 hộp neo được tạo ra\ncho mỗi đơn vị trong Y1 và Y2 , tương ứng. Giả sử thêm rằng số\nlượng lớp đối tượng là 10. Đối với bản đồ tính năng Y1 và Y2 số\nkênh trong đầu ra dự đoán lớp là \\(5\\times(10+1)=55\\) và \\(3\\times(10+1)=33\\) , tương ứng, trong đó một trong hai hình dạng\nđầu ra là (kích thước lô, số kênh, chiều cao, chiều rộng)."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def forward(x, block):\n    block.initialize()\n    return block(x)\n\nY1 = forward(np.zeros((2, 8, 20, 20)), cls_predictor(5, 10))\nY2 = forward(np.zeros((2, 16, 10, 10)), cls_predictor(3, 10))\nY1.shape, Y2.shape"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "((2, 55, 20, 20), (2, 33, 10, 10))"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def forward(x, block):\n    return block(x)\n\nY1 = forward(torch.zeros((2, 8, 20, 20)), cls_predictor(8, 5, 10))\nY2 = forward(torch.zeros((2, 16, 10, 10)), cls_predictor(16, 3, 10))\nY1.shape, Y2.shape"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "(torch.Size([2, 55, 20, 20]), torch.Size([2, 33, 10, 10]))"
+    },
+    {
+      "type": "paragraph",
+      "text": "Như chúng ta có thể thấy, ngoại trừ kích thước kích thước lô, ba chiều\ncòn lại đều có kích thước khác nhau. Để nối hai đầu ra dự đoán này để\ntính toán hiệu quả hơn, chúng tôi sẽ chuyển đổi các tenors này thành một\nđịnh dạng nhất quán hơn."
+    },
+    {
+      "type": "paragraph",
+      "text": "Lưu ý rằng kích thước kênh giữ các dự đoán cho các hộp neo có cùng tâm.\nĐầu tiên chúng ta di chuyển kích thước này đến trong cùng. Vì kích thước\nlô vẫn giữ nguyên đối với các thang đo khác nhau, chúng ta có thể chuyển\nđổi đầu ra dự đoán thành tensor hai chiều với hình dạng (kích thước lô,\nchiều cao \\(\\times\\) chiều rộng \\(\\times\\) số kênh). Sau đó,\nchúng ta có thể nối các đầu ra như vậy ở các quy mô khác nhau dọc theo\nkích thước 1."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def flatten_pred(pred):\n    return npx.batch_flatten(pred.transpose(0, 2, 3, 1))\n\ndef concat_preds(preds):\n    return np.concatenate([flatten_pred(p) for p in preds], axis=1)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def flatten_pred(pred):\n    return torch.flatten(pred.permute(0, 2, 3, 1), start_dim=1)\n\ndef concat_preds(preds):\n    return torch.cat([flatten_pred(p) for p in preds], dim=1)"
+    },
+    {
+      "type": "paragraph",
+      "text": "Bằng cách này, mặc dù Y1 và Y2 có kích thước khác nhau về các\nkênh, chiều cao và chiều rộng, chúng ta vẫn có thể nối hai đầu ra dự\nđoán này ở hai thang đo khác nhau cho cùng một minibatch."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "concat_preds([Y1, Y2]).shape"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "(2, 25300)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "concat_preds([Y1, Y2]).shape"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "torch.Size([2, 25300])"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "khoi-lay-mau-xuong",
+      "text": "13.7.1.4. Khối lấy mẫu xuống"
+    },
+    {
+      "type": "paragraph",
+      "text": "Để phát hiện các đối tượng ở nhiều thang đo, chúng tôi xác định khối lấy\nmẫu xuống sau down_sample_blk làm giảm một nửa chiều cao và chiều\nrộng của bản đồ tính năng đầu vào. Trên thực tế, khối này áp dụng thiết\nkế các khối VGG trong Section 7.2.1 . Cụ thể hơn, mỗi\nkhối lấy mẫu downsampling bao gồm hai \\(3\\times3\\) lớp ghép với lớp\nđệm 1 tiếp theo là một lớp tổng hợp tối đa \\(2\\times2\\) với sải chân\nlà 2. Như chúng ta đã biết, \\(3\\times3\\) lớp ghép với lớp đệm 1\nkhông thay đổi hình dạng của bản đồ tính năng. Tuy nhiên, tổng hợp tối\nđa \\(2\\times2\\) tiếp theo làm giảm chiều cao và chiều rộng của bản\nđồ tính năng đầu vào xuống một nửa. Đối với cả bản đồ tính năng đầu vào\nvà đầu ra của khối lấy mẫu xuống này, vì \\(1\\times 2+(3-1)+(3-1)=6\\) , mỗi đơn vị trong đầu ra có một trường\ntiếp nhận \\(6\\times6\\) trên đầu vào. Do đó, khối lấy mẫu xuống mở\nrộng trường tiếp nhận của mỗi đơn vị trong bản đồ tính năng đầu ra của\nnó."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def down_sample_blk(num_channels):\n    blk = nn.Sequential()\n    for _ in range(2):\n        blk.add(nn.Conv2D(num_channels, kernel_size=3, padding=1),\n                nn.BatchNorm(in_channels=num_channels),\n                nn.Activation('relu'))\n    blk.add(nn.MaxPool2D(2))\n    return blk"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def down_sample_blk(in_channels, out_channels):\n    blk = []\n    for _ in range(2):\n        blk.append(nn.Conv2d(in_channels, out_channels,\n                             kernel_size=3, padding=1))\n        blk.append(nn.BatchNorm2d(out_channels))\n        blk.append(nn.ReLU())\n        in_channels = out_channels\n    blk.append(nn.MaxPool2d(2))\n    return nn.Sequential(*blk)"
+    },
+    {
+      "type": "paragraph",
+      "text": "Trong ví dụ sau, khối lấy mẫu downsampling xây dựng của chúng tôi thay\nđổi số kênh đầu vào và giảm một nửa chiều cao và chiều rộng của bản đồ\ntính năng đầu vào."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "forward(np.zeros((2, 3, 20, 20)), down_sample_blk(10)).shape"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "(2, 10, 10, 10)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "forward(torch.zeros((2, 3, 20, 20)), down_sample_blk(3, 10)).shape"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "torch.Size([2, 10, 10, 10])"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "khoi-mang-co-so",
+      "text": "13.7.1.5. Khối mạng cơ sở"
+    },
+    {
+      "type": "paragraph",
+      "text": "Khối mạng cơ sở được sử dụng để trích xuất các tính năng từ hình ảnh đầu\nvào. Để đơn giản, chúng tôi xây dựng một mạng cơ sở nhỏ bao gồm ba khối\nlấy mẫu giảm gấp đôi số kênh tại mỗi khối. Với hình ảnh đầu vào \\(256\\times256\\) , khối mạng cơ sở này xuất bản đồ tính năng \\(32 \\times 32\\) ( \\(256/2^3=32\\) )."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def base_net():\n    blk = nn.Sequential()\n    for num_filters in [16, 32, 64]:\n        blk.add(down_sample_blk(num_filters))\n    return blk\n\nforward(np.zeros((2, 3, 256, 256)), base_net()).shape"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "(2, 64, 32, 32)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def base_net():\n    blk = []\n    num_filters = [3, 16, 32, 64]\n    for i in range(len(num_filters) - 1):\n        blk.append(down_sample_blk(num_filters[i], num_filters[i+1]))\n    return nn.Sequential(*blk)\n\nforward(torch.zeros((2, 3, 256, 256)), base_net()).shape"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "torch.Size([2, 64, 32, 32])"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "mo-hinh-hoan-chinh",
+      "text": "13.7.1.6. Mô hình hoàn chỉnh"
+    },
+    {
+      "type": "paragraph",
+      "text": "Mô hình phát hiện multibox bắn hoàn chỉnh bao gồm năm khối. Các bản đồ\ntính năng được tạo ra bởi mỗi khối được sử dụng cho cả (i) tạo hộp neo\nvà (ii) dự đoán các lớp và bù đắp của các hộp neo này. Trong số năm khối\nnày, khối đầu tiên là khối mạng cơ sở, khối thứ hai đến thứ tư là các\nkhối lấy mẫu xuống và khối cuối cùng sử dụng tổng hợp tối đa toàn cầu để\ngiảm cả chiều cao và chiều rộng xuống 1. Về mặt kỹ thuật, khối thứ hai\nđến thứ năm là tất cả các khối bản đồ tính năng đa quy mô trong Fig. 13.7.1 ."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def get_blk(i):\n    if i == 0:\n        blk = base_net()\n    elif i == 4:\n        blk = nn.GlobalMaxPool2D()\n    else:\n        blk = down_sample_blk(128)\n    return blk"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def get_blk(i):\n    if i == 0:\n        blk = base_net()\n    elif i == 1:\n        blk = down_sample_blk(64, 128)\n    elif i == 4:\n        blk = nn.AdaptiveMaxPool2d((1,1))\n    else:\n        blk = down_sample_blk(128, 128)\n    return blk"
+    },
+    {
+      "type": "paragraph",
+      "text": "Bây giờ chúng ta xác định tuyên truyền chuyển tiếp cho mỗi khối. Khác\nvới các tác vụ phân loại hình ảnh, đầu ra ở đây bao gồm (i) bản đồ tính\nnăng CNN Y , (ii) hộp neo được tạo ra bằng cách sử dụng Y ở thang\nđo hiện tại, và (iii) lớp và bù dự đoán (dựa trên Y ) cho các hộp neo\nnày."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def blk_forward(X, blk, size, ratio, cls_predictor, bbox_predictor):\n    Y = blk(X)\n    anchors = d2l.multibox_prior(Y, sizes=size, ratios=ratio)\n    cls_preds = cls_predictor(Y)\n    bbox_preds = bbox_predictor(Y)\n    return (Y, anchors, cls_preds, bbox_preds)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def blk_forward(X, blk, size, ratio, cls_predictor, bbox_predictor):\n    Y = blk(X)\n    anchors = d2l.multibox_prior(Y, sizes=size, ratios=ratio)\n    cls_preds = cls_predictor(Y)\n    bbox_preds = bbox_predictor(Y)\n    return (Y, anchors, cls_preds, bbox_preds)"
+    },
+    {
+      "type": "paragraph",
+      "text": "Nhớ lại rằng trong Fig. 13.7.1 một khối bản đồ tính năng đa quy\nmô gần với đỉnh là để phát hiện các đối tượng lớn hơn; do đó, nó cần\nphải tạo ra các hộp neo lớn hơn. Trong tuyên truyền chuyển tiếp ở trên,\ntại mỗi khối bản đồ tính năng đa thang chúng ta truyền trong một danh\nsách hai giá trị tỷ lệ thông qua đối số sizes của hàm multibox_prior được gọi (được mô tả trong Section 13.4 ).\nSau đây, khoảng cách giữa 0,2 và 1,05 được chia đều thành năm phần để\nxác định các giá trị quy mô nhỏ hơn tại năm khối: 0.2, 0,37, 0,54, 0,71\nvà 0,88. Sau đó, các giá trị quy mô lớn hơn của chúng được đưa ra bởi \\(\\sqrt{0.2 \\times 0.37} = 0.272\\) , \\(\\sqrt{0.37 \\times 0.54} = 0.447\\) , v.v."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "sizes = [[0.2, 0.272], [0.37, 0.447], [0.54, 0.619], [0.71, 0.79],\n         [0.88, 0.961]]\nratios = [[1, 2, 0.5]] * 5\nnum_anchors = len(sizes[0]) + len(ratios[0]) - 1"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "sizes = [[0.2, 0.272], [0.37, 0.447], [0.54, 0.619], [0.71, 0.79],\n         [0.88, 0.961]]\nratios = [[1, 2, 0.5]] * 5\nnum_anchors = len(sizes[0]) + len(ratios[0]) - 1"
+    },
+    {
+      "type": "paragraph",
+      "text": "Bây giờ chúng ta có thể xác định mô hình hoàn chỉnh TinySSD như sau."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "class TinySSD(nn.Block):\n    def __init__(self, num_classes, **kwargs):\n        super(TinySSD, self).__init__(**kwargs)\n        self.num_classes = num_classes\n        for i in range(5):\n            # Equivalent to the assignment statement `self.blk_i = get_blk(i)`\n            setattr(self, f'blk_{i}', get_blk(i))\n            setattr(self, f'cls_{i}', cls_predictor(num_anchors, num_classes))\n            setattr(self, f'bbox_{i}', bbox_predictor(num_anchors))\n\n    def forward(self, X):\n        anchors, cls_preds, bbox_preds = [None] * 5, [None] * 5, [None] * 5\n        for i in range(5):\n            # Here `getattr(self, 'blk_%d' % i)` accesses `self.blk_i`\n            X, anchors[i], cls_preds[i], bbox_preds[i] = blk_forward(\n                X, getattr(self, f'blk_{i}'), sizes[i], ratios[i],\n                getattr(self, f'cls_{i}'), getattr(self, f'bbox_{i}'))\n        anchors = np.concatenate(anchors, axis=1)\n        cls_preds = concat_preds(cls_preds)\n        cls_preds = cls_preds.reshape(\n            cls_preds.shape[0], -1, self.num_classes + 1)\n        bbox_preds = concat_preds(bbox_preds)\n        return anchors, cls_preds, bbox_preds"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "class TinySSD(nn.Module):\n    def __init__(self, num_classes, **kwargs):\n        super(TinySSD, self).__init__(**kwargs)\n        self.num_classes = num_classes\n        idx_to_in_channels = [64, 128, 128, 128, 128]\n        for i in range(5):\n            # Equivalent to the assignment statement `self.blk_i = get_blk(i)`\n            setattr(self, f'blk_{i}', get_blk(i))\n            setattr(self, f'cls_{i}', cls_predictor(idx_to_in_channels[i],\n                                                    num_anchors, num_classes))\n            setattr(self, f'bbox_{i}', bbox_predictor(idx_to_in_channels[i],\n                                                      num_anchors))\n\n    def forward(self, X):\n        anchors, cls_preds, bbox_preds = [None] * 5, [None] * 5, [None] * 5\n        for i in range(5):\n            # Here `getattr(self, 'blk_%d' % i)` accesses `self.blk_i`\n            X, anchors[i], cls_preds[i], bbox_preds[i] = blk_forward(\n                X, getattr(self, f'blk_{i}'), sizes[i], ratios[i],\n                getattr(self, f'cls_{i}'), getattr(self, f'bbox_{i}'))\n        anchors = torch.cat(anchors, dim=1)\n        cls_preds = concat_preds(cls_preds)\n        cls_preds = cls_preds.reshape(\n            cls_preds.shape[0], -1, self.num_classes + 1)\n        bbox_preds = concat_preds(bbox_preds)\n        return anchors, cls_preds, bbox_preds"
+    },
+    {
+      "type": "paragraph",
+      "text": "Chúng tôi tạo ra một ví dụ mô hình và sử dụng nó để thực hiện tuyên\ntruyền chuyển tiếp trên một minibatch \\(256 \\times 256\\) hình ảnh X ."
+    },
+    {
+      "type": "paragraph",
+      "text": "Như được hiển thị trước đó trong phần này, khối đầu tiên xuất bản đồ\ntính năng \\(32 \\times 32\\) . Nhớ lại rằng khối lấy mẫu thứ hai đến\nthứ tư giảm một nửa chiều cao và chiều rộng và khối thứ năm sử dụng tổng\nhợp toàn cầu. Vì 4 hộp neo được tạo ra cho mỗi đơn vị dọc theo kích\nthước không gian của bản đồ tính năng, tại tất cả năm thang đo tổng cộng \\((32^2 + 16^2 + 8^2 + 4^2 + 1)\\times 4 = 5444\\) hộp neo được tạo ra\ncho mỗi hình ảnh."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "net = TinySSD(num_classes=1)\nnet.initialize()\nX = np.zeros((32, 3, 256, 256))\nanchors, cls_preds, bbox_preds = net(X)\n\nprint('output anchors:', anchors.shape)\nprint('output class preds:', cls_preds.shape)\nprint('output bbox preds:', bbox_preds.shape)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "output anchors: (1, 5444, 4)\noutput class preds: (32, 5444, 2)\noutput bbox preds: (32, 21776)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "net = TinySSD(num_classes=1)\nX = torch.zeros((32, 3, 256, 256))\nanchors, cls_preds, bbox_preds = net(X)\n\nprint('output anchors:', anchors.shape)\nprint('output class preds:', cls_preds.shape)\nprint('output bbox preds:', bbox_preds.shape)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "output anchors: torch.Size([1, 5444, 4])\noutput class preds: torch.Size([32, 5444, 2])\noutput bbox preds: torch.Size([32, 21776])\n/home/d2l-worker/miniconda3/envs/d2l-vi-release-1/lib/python3.8/site-packages/torch/functional.py:568: UserWarning: torch.meshgrid: in an upcoming release, it will be required to pass the indexing argument. (Triggered internally at  ../aten/src/ATen/native/TensorShape.cpp:2228.)\n  return _VF.meshgrid(tensors, **kwargs)  # type: ignore[attr-defined]"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "dao-tao",
+      "text": "13.7.2. Đào tạo"
+    },
+    {
+      "type": "paragraph",
+      "text": "Bây giờ chúng tôi sẽ giải thích cách huấn luyện mô hình phát hiện\nmultibox shot đơn để phát hiện đối tượng."
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "doc-tap-du-lieu-va-khoi-tao-mo-hinh",
+      "text": "13.7.2.1. Đọc tập dữ liệu và khởi tạo mô hình"
+    },
+    {
+      "type": "paragraph",
+      "text": "Để bắt đầu, chúng ta hãy đọc dữ liệu phát hiện chuối được mô tả trong Section 13.6 ."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "batch_size = 32\ntrain_iter, _ = d2l.load_data_bananas(batch_size)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "read 1000 training examples\nread 100 validation examples"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "batch_size = 32\ntrain_iter, _ = d2l.load_data_bananas(batch_size)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "read 1000 training examples\nread 100 validation examples"
+    },
+    {
+      "type": "paragraph",
+      "text": "Chỉ có một lớp trong bộ dữ liệu phát hiện chuối. Sau khi xác định mô\nhình, chúng ta cần phải khởi tạo các tham số của nó và xác định thuật\ntoán tối ưu hoạt."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "device, net = d2l.try_gpu(), TinySSD(num_classes=1)\nnet.initialize(init=init.Xavier(), ctx=device)\ntrainer = gluon.Trainer(net.collect_params(), 'sgd',\n                        {'learning_rate': 0.2, 'wd': 5e-4})"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "device, net = d2l.try_gpu(), TinySSD(num_classes=1)\ntrainer = torch.optim.SGD(net.parameters(), lr=0.2, weight_decay=5e-4)"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "xac-dinh-mat-va-danh-gia-chuc-nang",
+      "text": "13.7.2.2. Xác định mất và đánh giá chức năng"
+    },
+    {
+      "type": "paragraph",
+      "text": "Phát hiện đối tượng có hai loại tổn thất. Sự mất mát đầu tiên liên quan\nđến các lớp của hộp neo: tính toán của nó có thể chỉ đơn giản là tái sử\ndụng hàm mất chéo entropy mà chúng ta sử dụng để phân loại hình ảnh. Tổn\nthất thứ hai liên quan đến bù đắp các hộp neo tích cực (không nền): đây\nlà một vấn đề hồi quy. Tuy nhiên, đối với vấn đề hồi quy này, ở đây\nchúng tôi không sử dụng tổn thất bình phương được mô tả trong Section 3.1.3 . Thay vào đó,\nchúng ta sử dụng mức mất định mức \\(L_1\\) , giá trị tuyệt đối của sự\nkhác biệt giữa dự đoán và sự thật mặt đất. Biến mặt nạ bbox_masks lọc ra các hộp neo âm và các hộp neo bất hợp pháp (đệm) trong tính toán\ntổn thất. Cuối cùng, chúng tôi tổng hợp mất lớp hộp neo và tổn thất bù\nđắp hộp neo để có được chức năng mất mát cho mô hình."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "cls_loss = gluon.loss.SoftmaxCrossEntropyLoss()\nbbox_loss = gluon.loss.L1Loss()\n\ndef calc_loss(cls_preds, cls_labels, bbox_preds, bbox_labels, bbox_masks):\n    cls = cls_loss(cls_preds, cls_labels)\n    bbox = bbox_loss(bbox_preds * bbox_masks, bbox_labels * bbox_masks)\n    return cls + bbox"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "cls_loss = nn.CrossEntropyLoss(reduction='none')\nbbox_loss = nn.L1Loss(reduction='none')\n\ndef calc_loss(cls_preds, cls_labels, bbox_preds, bbox_labels, bbox_masks):\n    batch_size, num_classes = cls_preds.shape[0], cls_preds.shape[2]\n    cls = cls_loss(cls_preds.reshape(-1, num_classes),\n                   cls_labels.reshape(-1)).reshape(batch_size, -1).mean(dim=1)\n    bbox = bbox_loss(bbox_preds * bbox_masks,\n                     bbox_labels * bbox_masks).mean(dim=1)\n    return cls + bbox"
+    },
+    {
+      "type": "paragraph",
+      "text": "Chúng ta có thể sử dụng độ chính xác để đánh giá kết quả phân loại. Do\ntổn thất định mức \\(L_1\\) đã sử dụng cho các bù trừ, chúng tôi sử\ndụng lỗi tuyệt đối *trung bình để đánh giá các hộp giới hạn dự đoán.\nNhững kết quả dự đoán này thu được từ các hộp neo được tạo ra và các bù\nđắp dự đoán cho chúng."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def cls_eval(cls_preds, cls_labels):\n    # Because the class prediction results are on the final dimension,\n    # `argmax` needs to specify this dimension\n    return float((cls_preds.argmax(axis=-1).astype(\n        cls_labels.dtype) == cls_labels).sum())\n\ndef bbox_eval(bbox_preds, bbox_labels, bbox_masks):\n    return float((np.abs((bbox_labels - bbox_preds) * bbox_masks)).sum())"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def cls_eval(cls_preds, cls_labels):\n    # Because the class prediction results are on the final dimension,\n    # `argmax` needs to specify this dimension\n    return float((cls_preds.argmax(dim=-1).type(\n        cls_labels.dtype) == cls_labels).sum())\n\ndef bbox_eval(bbox_preds, bbox_labels, bbox_masks):\n    return float((torch.abs((bbox_labels - bbox_preds) * bbox_masks)).sum())"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "dao-tao-mo-hinh",
+      "text": "13.7.2.3. Đào tạo mô hình"
+    },
+    {
+      "type": "paragraph",
+      "text": "Khi đào tạo mô hình, chúng ta cần tạo ra các hộp neo đa quy mô\n( anchors ) và dự đoán các lớp của chúng ( cls_preds ) và bù đắp\n( bbox_preds ) trong tuyên truyền về phía trước. Sau đó, chúng tôi dán\nnhãn các lớp ( cls_labels ) và bù đắp ( bbox_labels ) của các hộp\nneo được tạo ra như vậy dựa trên thông tin nhãn Y . Cuối cùng, chúng\nta tính toán hàm mất bằng cách sử dụng các giá trị dự đoán và dán nhãn\ncủa các lớp và bù đắp. Để triển khai ngắn gọn, đánh giá tập dữ liệu thử\nnghiệm được bỏ qua ở đây."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "num_epochs, timer = 20, d2l.Timer()\nanimator = d2l.Animator(xlabel='epoch', xlim=[1, num_epochs],\n                        legend=['class error', 'bbox mae'])\nfor epoch in range(num_epochs):\n    # Sum of training accuracy, no. of examples in sum of training accuracy,\n    # Sum of absolute error, no. of examples in sum of absolute error\n    metric = d2l.Accumulator(4)\n    for features, target in train_iter:\n        timer.start()\n        X = features.as_in_ctx(device)\n        Y = target.as_in_ctx(device)\n        with autograd.record():\n            # Generate multiscale anchor boxes and predict their classes and\n            # offsets\n            anchors, cls_preds, bbox_preds = net(X)\n            # Label the classes and offsets of these anchor boxes\n            bbox_labels, bbox_masks, cls_labels = d2l.multibox_target(anchors,\n                                                                      Y)\n            # Calculate the loss function using the predicted and labeled\n            # values of the classes and offsets\n            l = calc_loss(cls_preds, cls_labels, bbox_preds, bbox_labels,\n                          bbox_masks)\n        l.backward()\n        trainer.step(batch_size)\n        metric.add(cls_eval(cls_preds, cls_labels), cls_labels.size,\n                   bbox_eval(bbox_preds, bbox_labels, bbox_masks),\n                   bbox_labels.size)\n    cls_err, bbox_mae = 1 - metric[0] / metric[1], metric[2] / metric[3]\n    animator.add(epoch + 1, (cls_err, bbox_mae))\nprint(f'class err {cls_err:.2e}, bbox mae {bbox_mae:.2e}')\nprint(f'{len(train_iter._dataset) / timer.stop():.1f} examples/sec on '\n      f'{str(device)}')"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "class err 3.51e-03, bbox mae 3.81e-03\n2722.6 examples/sec on gpu(0)"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_ssd_739e1b_156_1.svg",
+      "local_path": "_images/output_ssd_739e1b_156_1.svg",
+      "alt": "../_images/output_ssd_739e1b_156_1.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "num_epochs, timer = 20, d2l.Timer()\nanimator = d2l.Animator(xlabel='epoch', xlim=[1, num_epochs],\n                        legend=['class error', 'bbox mae'])\nnet = net.to(device)\nfor epoch in range(num_epochs):\n    # Sum of training accuracy, no. of examples in sum of training accuracy,\n    # Sum of absolute error, no. of examples in sum of absolute error\n    metric = d2l.Accumulator(4)\n    net.train()\n    for features, target in train_iter:\n        timer.start()\n        trainer.zero_grad()\n        X, Y = features.to(device), target.to(device)\n        # Generate multiscale anchor boxes and predict their classes and\n        # offsets\n        anchors, cls_preds, bbox_preds = net(X)\n        # Label the classes and offsets of these anchor boxes\n        bbox_labels, bbox_masks, cls_labels = d2l.multibox_target(anchors, Y)\n        # Calculate the loss function using the predicted and labeled values\n        # of the classes and offsets\n        l = calc_loss(cls_preds, cls_labels, bbox_preds, bbox_labels,\n                      bbox_masks)\n        l.mean().backward()\n        trainer.step()\n        metric.add(cls_eval(cls_preds, cls_labels), cls_labels.numel(),\n                   bbox_eval(bbox_preds, bbox_labels, bbox_masks),\n                   bbox_labels.numel())\n    cls_err, bbox_mae = 1 - metric[0] / metric[1], metric[2] / metric[3]\n    animator.add(epoch + 1, (cls_err, bbox_mae))\nprint(f'class err {cls_err:.2e}, bbox mae {bbox_mae:.2e}')\nprint(f'{len(train_iter.dataset) / timer.stop():.1f} examples/sec on '\n      f'{str(device)}')"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "class err 3.37e-03, bbox mae 3.00e-03\n6317.1 examples/sec on cuda:0"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_ssd_739e1b_159_1.svg",
+      "local_path": "_images/output_ssd_739e1b_159_1.svg",
+      "alt": "../_images/output_ssd_739e1b_159_1.svg"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "prediction",
+      "text": "13.7.3. Prediction"
+    },
+    {
+      "type": "paragraph",
+      "text": "Trong quá trình dự đoán, mục tiêu là phát hiện tất cả các đối tượng quan\ntâm trên hình ảnh. Dưới đây chúng tôi đọc và thay đổi kích thước một\nhình ảnh thử nghiệm, chuyển đổi nó thành tensor bốn chiều được yêu cầu\nbởi các lớp phức tạp."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "img = image.imread('../img/banana.jpg')\nfeature = image.imresize(img, 256, 256).astype('float32')\nX = np.expand_dims(feature.transpose(2, 0, 1), axis=0)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "X = torchvision.io.read_image('../img/banana.jpg').unsqueeze(0).float()\nimg = X.squeeze(0).permute(1, 2, 0).long()"
+    },
+    {
+      "type": "paragraph",
+      "text": "Sử dụng hàm multibox_detection bên dưới, các hộp giới hạn dự đoán\nđược lấy từ các hộp neo và bù đắp dự đoán của chúng. Sau đó, ức chế\nkhông tối đa được sử dụng để loại bỏ các hộp giới hạn dự đoán tương tự."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def predict(X):\n    anchors, cls_preds, bbox_preds = net(X.as_in_ctx(device))\n    cls_probs = npx.softmax(cls_preds).transpose(0, 2, 1)\n    output = d2l.multibox_detection(cls_probs, bbox_preds, anchors)\n    idx = [i for i, row in enumerate(output[0]) if row[0] != -1]\n    return output[0, idx]\n\noutput = predict(X)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "[11:59:21] src/operator/nn/./cudnn/./cudnn_algoreg-inl.h:97: Running performance tests to find the best convolution algorithm, this can take a while... (set the environment variable MXNET_CUDNN_AUTOTUNE_DEFAULT to 0 to disable)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def predict(X):\n    net.eval()\n    anchors, cls_preds, bbox_preds = net(X.to(device))\n    cls_probs = F.softmax(cls_preds, dim=2).permute(0, 2, 1)\n    output = d2l.multibox_detection(cls_probs, bbox_preds, anchors)\n    idx = [i for i, row in enumerate(output[0]) if row[0] != -1]\n    return output[0, idx]\n\noutput = predict(X)"
+    },
+    {
+      "type": "paragraph",
+      "text": "Cuối cùng, chúng ta hiển thị tất cả các hộp giới hạn dự đoán với sự tự\ntin 0.9 trở lên làm đầu ra."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def display(img, output, threshold):\n    d2l.set_figsize((5, 5))\n    fig = d2l.plt.imshow(img.asnumpy())\n    for row in output:\n        score = float(row[1])\n        if score < threshold:\n            continue\n        h, w = img.shape[0:2]\n        bbox = [row[2:6] * np.array((w, h, w, h), ctx=row.ctx)]\n        d2l.show_bboxes(fig.axes, bbox, '%.2f' % score, 'w')\n\ndisplay(img, output, threshold=0.9)"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_ssd_739e1b_183_0.svg",
+      "local_path": "_images/output_ssd_739e1b_183_0.svg",
+      "alt": "../_images/output_ssd_739e1b_183_0.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def display(img, output, threshold):\n    d2l.set_figsize((5, 5))\n    fig = d2l.plt.imshow(img)\n    for row in output:\n        score = float(row[1])\n        if score < threshold:\n            continue\n        h, w = img.shape[0:2]\n        bbox = [row[2:6] * torch.tensor((w, h, w, h), device=row.device)]\n        d2l.show_bboxes(fig.axes, bbox, '%.2f' % score, 'w')\n\ndisplay(img, output.cpu(), threshold=0.9)"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_ssd_739e1b_186_0.svg",
+      "local_path": "_images/output_ssd_739e1b_186_0.svg",
+      "alt": "../_images/output_ssd_739e1b_186_0.svg"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tom-tat",
+      "text": "13.7.4. Tóm tắt"
+    },
+    {
+      "type": "list",
+      "ordered": false,
+      "items": [
+        "Phát hiện multibox shot đơn là một mô hình phát hiện đối tượng đa quy\nmô. Thông qua mạng cơ sở của nó và một số khối bản đồ tính năng đa\nquy mô, phát hiện multibox single shot tạo ra một số lượng khác nhau\ncủa các hộp neo với kích thước khác nhau, và phát hiện các đối tượng\nkích thước khác nhau bằng cách dự đoán các lớp và bù đắp của các hộp\nneo (do đó các hộp giới hạn).",
+        "Khi đào tạo mô hình phát hiện multibox single shot, chức năng mất mát\nđược tính toán dựa trên các giá trị dự đoán và gắn nhãn của các lớp\nvà bù đắp hộp neo."
+      ]
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bai-tap",
+      "text": "13.7.5. Bài tập"
+    },
+    {
+      "type": "list",
+      "ordered": true,
+      "items": [
+        "Bạn có thể cải thiện phát hiện multibox một lần bằng cách cải thiện\nchức năng mất mát? Ví dụ, thay thế mất tiêu chuẩn \\(L_1\\) với tổn\nthất định mức \\(L_1\\) trơn tru cho các bù đắp dự đoán. Hàm mất\nnày sử dụng một hàm vuông khoảng 0 cho độ mịn, được điều khiển bởi\nsiêu tham số \\(\\sigma\\) :"
+      ]
+    },
+    {
+      "type": "math",
+      "latex": "(13.7.1)¶\\[\\begin{split}f(x) =\n    \\begin{cases}\n    (\\sigma x)^2/2,& \\text{if }|x| < 1/\\sigma^2\\\\\n    |x|-0.5/\\sigma^2,& \\text{otherwise}\n    \\end{cases}\\end{split}\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Khi \\(\\sigma\\) rất lớn, tổn thất này tương tự như mức mất định mức \\(L_1\\) . Khi giá trị của nó nhỏ hơn, chức năng mất mát mượt mà hơn."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "sigmas = [10, 1, 0.5]\nlines = ['-', '--', '-.']\nx = np.arange(-2, 2, 0.1)\nd2l.set_figsize()\n\nfor l, s in zip(lines, sigmas):\n    y = npx.smooth_l1(x, scalar=s)\n    d2l.plt.plot(x.asnumpy(), y.asnumpy(), l, label='sigma=%.1f' % s)\nd2l.plt.legend();"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_ssd_739e1b_192_0.svg",
+      "local_path": "_images/output_ssd_739e1b_192_0.svg",
+      "alt": "../_images/output_ssd_739e1b_192_0.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def smooth_l1(data, scalar):\n    out = []\n    for i in data:\n        if abs(i) < 1 / (scalar ** 2):\n            out.append(((scalar * i) ** 2) / 2)\n        else:\n            out.append(abs(i) - 0.5 / (scalar ** 2))\n    return torch.tensor(out)\n\nsigmas = [10, 1, 0.5]\nlines = ['-', '--', '-.']\nx = torch.arange(-2, 2, 0.1)\nd2l.set_figsize()\n\nfor l, s in zip(lines, sigmas):\n    y = smooth_l1(x, scalar=s)\n    d2l.plt.plot(x, y, l, label='sigma=%.1f' % s)\nd2l.plt.legend();"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_ssd_739e1b_195_0.svg",
+      "local_path": "_images/output_ssd_739e1b_195_0.svg",
+      "alt": "../_images/output_ssd_739e1b_195_0.svg"
+    },
+    {
+      "type": "paragraph",
+      "text": "Bên cạnh đó, trong thí nghiệm, chúng tôi đã sử dụng mất chéo entropy cho\ndự đoán lớp: biểu thị bằng \\(p_j\\) xác suất dự đoán cho lớp chân lý\nmặt đất \\(j\\) , tổn thất chéo entropy là \\(-\\log p_j\\) . Chúng ta\ncũng có thể sử dụng tổn thất tiêu cự [Lin et al., 2017] : cho các siêu tham số \\(\\gamma > 0\\) và \\(\\alpha > 0\\) , sự mất mát này được định nghĩa\nlà:"
+    },
+    {
+      "type": "math",
+      "latex": "(13.7.2)¶\\[- \\alpha (1-p_j)^{\\gamma} \\log p_j.\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Như chúng ta có thể thấy, tăng \\(\\gamma\\) có thể làm giảm hiệu quả\ntổn thất tương đối cho các ví dụ được phân loại tốt (ví dụ, \\(p_j > 0.5\\) ) để đào tạo có thể tập trung nhiều hơn vào những ví dụ\nkhó khăn bị phân loại sai."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def focal_loss(gamma, x):\n    return -(1 - x) ** gamma * np.log(x)\n\nx = np.arange(0.01, 1, 0.01)\nfor l, gamma in zip(lines, [0, 1, 5]):\n    y = d2l.plt.plot(x.asnumpy(), focal_loss(gamma, x).asnumpy(), l,\n                     label='gamma=%.1f' % gamma)\nd2l.plt.legend();"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_ssd_739e1b_201_0.svg",
+      "local_path": "_images/output_ssd_739e1b_201_0.svg",
+      "alt": "../_images/output_ssd_739e1b_201_0.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def focal_loss(gamma, x):\n    return -(1 - x) ** gamma * torch.log(x)\n\nx = torch.arange(0.01, 1, 0.01)\nfor l, gamma in zip(lines, [0, 1, 5]):\n    y = d2l.plt.plot(x, focal_loss(gamma, x), l, label='gamma=%.1f' % gamma)\nd2l.plt.legend();"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_ssd_739e1b_204_0.svg",
+      "local_path": "_images/output_ssd_739e1b_204_0.svg",
+      "alt": "../_images/output_ssd_739e1b_204_0.svg"
+    },
+    {
+      "type": "list",
+      "ordered": true,
+      "items": [
+        "Do hạn chế về không gian, chúng tôi đã bỏ qua một số chi tiết triển\nkhai của mô hình phát hiện multibox một shot trong phần này. Bạn có\nthể cải thiện thêm mô hình trong các khía cạnh sau: Khi một đối tượng nhỏ hơn nhiều so với hình ảnh, mô hình có thể\nthay đổi kích thước hình ảnh đầu vào lớn hơn. Thường có một số lượng lớn các hộp neo âm. Để làm cho phân phối\nlớp cân bằng hơn, chúng ta có thể hạ mẫu các hộp neo âm. Trong chức năng mất, gán các siêu tham số trọng lượng khác nhau\ncho việc mất lớp và mất bù. Sử dụng các phương pháp khác để đánh giá mô hình phát hiện đối\ntượng, chẳng hạn như các phương pháp trong một shot multibox phát\nhiện giấy [Liu et al., 2016] .",
+        "Khi một đối tượng nhỏ hơn nhiều so với hình ảnh, mô hình có thể\nthay đổi kích thước hình ảnh đầu vào lớn hơn.",
+        "Thường có một số lượng lớn các hộp neo âm. Để làm cho phân phối\nlớp cân bằng hơn, chúng ta có thể hạ mẫu các hộp neo âm.",
+        "Trong chức năng mất, gán các siêu tham số trọng lượng khác nhau\ncho việc mất lớp và mất bù.",
+        "Sử dụng các phương pháp khác để đánh giá mô hình phát hiện đối\ntượng, chẳng hạn như các phương pháp trong một shot multibox phát\nhiện giấy [Liu et al., 2016] ."
+      ]
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    }
+  ],
+  "images": [
+    {
+      "original_url": "https://vi.d2l.ai/_images/ssd.svg",
+      "local_path": "_images/ssd.svg",
+      "alt": "../_images/ssd.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_ssd_739e1b_156_1.svg",
+      "local_path": "_images/output_ssd_739e1b_156_1.svg",
+      "alt": "../_images/output_ssd_739e1b_156_1.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_ssd_739e1b_159_1.svg",
+      "local_path": "_images/output_ssd_739e1b_159_1.svg",
+      "alt": "../_images/output_ssd_739e1b_159_1.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_ssd_739e1b_183_0.svg",
+      "local_path": "_images/output_ssd_739e1b_183_0.svg",
+      "alt": "../_images/output_ssd_739e1b_183_0.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_ssd_739e1b_186_0.svg",
+      "local_path": "_images/output_ssd_739e1b_186_0.svg",
+      "alt": "../_images/output_ssd_739e1b_186_0.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_ssd_739e1b_192_0.svg",
+      "local_path": "_images/output_ssd_739e1b_192_0.svg",
+      "alt": "../_images/output_ssd_739e1b_192_0.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_ssd_739e1b_195_0.svg",
+      "local_path": "_images/output_ssd_739e1b_195_0.svg",
+      "alt": "../_images/output_ssd_739e1b_195_0.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_ssd_739e1b_201_0.svg",
+      "local_path": "_images/output_ssd_739e1b_201_0.svg",
+      "alt": "../_images/output_ssd_739e1b_201_0.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_ssd_739e1b_204_0.svg",
+      "local_path": "_images/output_ssd_739e1b_204_0.svg",
+      "alt": "../_images/output_ssd_739e1b_204_0.svg"
+    }
+  ],
+  "text": "13.7. Phát hiện Multibox Shot đơn\nTrong Section 13.3 — Section 13.6 ,\nchúng tôi giới thiệu các hộp giới hạn, hộp neo, phát hiện đối tượng đa\nquy mô và bộ dữ liệu để phát hiện đối tượng. Bây giờ chúng tôi đã sẵn\nsàng để sử dụng kiến thức nền như vậy để thiết kế một mô hình phát hiện\nđối tượng: phát hiện multibox shot đơn (SSD) [Liu et al., 2016] . Mô hình này đơn giản, nhanh chóng\nvà được sử dụng rộng rãi. Mặc dù đây chỉ là một trong số lượng lớn các\nmô hình phát hiện đối tượng, một số nguyên tắc thiết kế và chi tiết\ntriển khai trong phần này cũng được áp dụng cho các mô hình khác.\n13.7.1. Mô hình\nFig. 13.7.1 cung cấp một cái nhìn tổng quan về thiết kế phát\nhiện multibox một shot. Mô hình này chủ yếu bao gồm một mạng cơ sở theo\nsau là một số khối bản đồ tính năng đa thang. Mạng cơ sở là để trích\nxuất các tính năng từ hình ảnh đầu vào, vì vậy nó có thể sử dụng CNN\nsâu. Ví dụ, giấy phát hiện multibox một shot ban đầu sử dụng một mạng\nVGG cắt ngắn trước lớp phân loại [Liu et al., 2016] ,\ntrong khi ResNet cũng đã được sử dụng phổ biến. Thông qua thiết kế của\nchúng tôi, chúng tôi có thể làm cho các bản đồ tính năng đầu ra mạng cơ\nsở lớn hơn để tạo ra nhiều hộp neo hơn để phát hiện các đối tượng nhỏ\nhơn. Sau đó, mỗi khối bản đồ tính năng đa thang giảm (ví dụ, bằng một\nnửa) chiều cao và chiều rộng của bản đồ tính năng từ khối trước đó và\ncho phép mỗi đơn vị của bản đồ tính năng tăng trường tiếp nhận của nó\ntrên hình ảnh đầu vào.\nNhớ lại thiết kế phát hiện đối tượng đa quy mô thông qua các biểu diễn\ntheo lớp của hình ảnh bằng các mạng thần kinh sâu trong Section 13.5 . Vì bản đồ tính năng đa quy\nmô gần với đỉnh Fig. 13.7.1 nhỏ hơn nhưng có các trường tiếp\nnhận lớn hơn, chúng phù hợp để phát hiện các vật thể ít hơn nhưng lớn\nhơn.\nTóm lại, thông qua mạng cơ sở của nó và một số khối bản đồ tính năng đa\nquy mô, phát hiện multibox single-shot tạo ra một số lượng khác nhau của\ncác hộp neo với kích thước khác nhau, và phát hiện các đối tượng kích\nthước khác nhau bằng cách dự đoán các lớp và bù đắp của các hộp neo (do\nđó các hộp giới hạn); do đó, đây là một mô hình phát hiện đối tượng đa\nquy mô.\nFig. 13.7.1 As a multiscale object detection model, single-shot multibox\ndetection mainly consists of a base network followed by several\nmultiscale feature map blocks. ¶\nSau đây, chúng tôi sẽ mô tả các chi tiết triển khai của các khối khác\nnhau trong Fig. 13.7.1 . Để bắt đầu, chúng tôi thảo luận về cách\nthực hiện dự đoán lớp và hộp giới hạn.\n13.7.1.1. Lớp dự đoán lớp\nHãy để số lượng các lớp đối tượng là \\(q\\) . Sau đó, hộp neo có \\(q+1\\) lớp, trong đó lớp 0 là nền. Ở một số quy mô, giả sử rằng\nchiều cao và chiều rộng của bản đồ tính năng lần lượt là \\(h\\) và \\(w\\) . Khi \\(a\\) hộp neo được tạo ra với mỗi vị trí không gian\ncủa các bản đồ tính năng này làm trung tâm của chúng, tổng cộng \\(hwa\\) hộp neo cần được phân loại. Điều này thường làm cho việc\nphân loại với các lớp kết nối hoàn toàn không khả thi do chi phí tham số\nhóa nặng. Nhớ lại cách chúng ta sử dụng các kênh của các lớp phức tạp để\ndự đoán các lớp trong Section 7.3 . Phát hiện multibox\nSingle-shot sử dụng cùng một kỹ thuật để giảm độ phức tạp của mô hình.\nCụ thể, lớp dự đoán lớp sử dụng một lớp phức tạp mà không làm thay đổi\nchiều rộng hoặc chiều cao của bản đồ đối tượng. Bằng cách này, có thể có\nsự tương ứng một-một giữa các đầu ra và đầu vào ở cùng một kích thước\nkhông gian (chiều rộng và chiều cao) của bản đồ tính năng. Cụ thể hơn,\ncác kênh của bản đồ tính năng đầu ra ở bất kỳ vị trí không gian nào\n( \\(x\\) , \\(y\\) ) đại diện cho các dự đoán lớp cho tất cả các hộp\nneo tập trung vào ( \\(x\\) , \\(y\\) ) của bản đồ tính năng đầu vào.\nĐể tạo ra các dự đoán hợp lệ, phải có \\(a(q+1)\\) kênh đầu ra, trong\nđó cho cùng một vị trí không gian kênh đầu ra với chỉ số \\(i(q+1) + j\\) đại diện cho dự đoán của lớp \\(j\\) ( \\(0 \\leq j \\leq q\\) ) cho hộp neo \\(i\\) ( \\(0 \\leq i < a\\) ).\nDưới đây chúng ta xác định một lớp dự đoán lớp như vậy, chỉ định \\(a\\) và \\(q\\) thông qua các đối số num_anchors và num_classes , tương ứng. Lớp này sử dụng một lớp ghép \\(3\\times3\\) với lớp đệm là 1. Chiều rộng và chiều cao của đầu vào\nvà đầu ra của lớp phức tạp này vẫn không thay đổi.\n13.7.1.2. Lớp dự đoán hộp giới hộp\nThiết kế của lớp dự đoán hộp giới hạn tương tự như của lớp dự đoán lớp.\nSự khác biệt duy nhất nằm ở số lượng đầu ra cho mỗi hộp neo: ở đây chúng\nta cần dự đoán bốn bù đắp hơn là \\(q+1\\) lớp.\n13.7.1.3. Concatenating dự đoán cho nhiều quy mô\nNhư chúng tôi đã đề cập, phát hiện multibox single shot sử dụng bản đồ\ntính năng đa thang để tạo ra các hộp neo và dự đoán các lớp và bù đắp\ncủa chúng. Ở các thang đo khác nhau, hình dạng của bản đồ tính năng hoặc\nsố lượng hộp neo tập trung vào cùng một đơn vị có thể khác nhau. Do đó,\nhình dạng của đầu ra dự đoán ở các thang đo khác nhau có thể khác nhau.\nTrong ví dụ sau, chúng tôi xây dựng các bản đồ tính năng ở hai thang\nkhác nhau, Y1 và Y2 , cho cùng một minibatch, trong đó chiều cao\nvà chiều rộng của Y2 là một nửa so với Y1 . Hãy để chúng tôi lấy\ndự đoán lớp học như một ví dụ. Giả sử rằng 5 và 3 hộp neo được tạo ra\ncho mỗi đơn vị trong Y1 và Y2 , tương ứng. Giả sử thêm rằng số\nlượng lớp đối tượng là 10. Đối với bản đồ tính năng Y1 và Y2 số\nkênh trong đầu ra dự đoán lớp là \\(5\\times(10+1)=55\\) và \\(3\\times(10+1)=33\\) , tương ứng, trong đó một trong hai hình dạng\nđầu ra là (kích thước lô, số kênh, chiều cao, chiều rộng).\nNhư chúng ta có thể thấy, ngoại trừ kích thước kích thước lô, ba chiều\ncòn lại đều có kích thước khác nhau. Để nối hai đầu ra dự đoán này để\ntính toán hiệu quả hơn, chúng tôi sẽ chuyển đổi các tenors này thành một\nđịnh dạng nhất quán hơn.\nLưu ý rằng kích thước kênh giữ các dự đoán cho các hộp neo có cùng tâm.\nĐầu tiên chúng ta di chuyển kích thước này đến trong cùng. Vì kích thước\nlô vẫn giữ nguyên đối với các thang đo khác nhau, chúng ta có thể chuyển\nđổi đầu ra dự đoán thành tensor hai chiều với hình dạng (kích thước lô,\nchiều cao \\(\\times\\) chiều rộng \\(\\times\\) số kênh). Sau đó,\nchúng ta có thể nối các đầu ra như vậy ở các quy mô khác nhau dọc theo\nkích thước 1.\nBằng cách này, mặc dù Y1 và Y2 có kích thước khác nhau về các\nkênh, chiều cao và chiều rộng, chúng ta vẫn có thể nối hai đầu ra dự\nđoán này ở hai thang đo khác nhau cho cùng một minibatch.\n13.7.1.4. Khối lấy mẫu xuống\nĐể phát hiện các đối tượng ở nhiều thang đo, chúng tôi xác định khối lấy\nmẫu xuống sau down_sample_blk làm giảm một nửa chiều cao và chiều\nrộng của bản đồ tính năng đầu vào. Trên thực tế, khối này áp dụng thiết\nkế các khối VGG trong Section 7.2.1 . Cụ thể hơn, mỗi\nkhối lấy mẫu downsampling bao gồm hai \\(3\\times3\\) lớp ghép với lớp\nđệm 1 tiếp theo là một lớp tổng hợp tối đa \\(2\\times2\\) với sải chân\nlà 2. Như chúng ta đã biết, \\(3\\times3\\) lớp ghép với lớp đệm 1\nkhông thay đổi hình dạng của bản đồ tính năng. Tuy nhiên, tổng hợp tối\nđa \\(2\\times2\\) tiếp theo làm giảm chiều cao và chiều rộng của bản\nđồ tính năng đầu vào xuống một nửa. Đối với cả bản đồ tính năng đầu vào\nvà đầu ra của khối lấy mẫu xuống này, vì \\(1\\times 2+(3-1)+(3-1)=6\\) , mỗi đơn vị trong đầu ra có một trường\ntiếp nhận \\(6\\times6\\) trên đầu vào. Do đó, khối lấy mẫu xuống mở\nrộng trường tiếp nhận của mỗi đơn vị trong bản đồ tính năng đầu ra của\nnó.\nTrong ví dụ sau, khối lấy mẫu downsampling xây dựng của chúng tôi thay\nđổi số kênh đầu vào và giảm một nửa chiều cao và chiều rộng của bản đồ\ntính năng đầu vào.\n13.7.1.5. Khối mạng cơ sở\nKhối mạng cơ sở được sử dụng để trích xuất các tính năng từ hình ảnh đầu\nvào. Để đơn giản, chúng tôi xây dựng một mạng cơ sở nhỏ bao gồm ba khối\nlấy mẫu giảm gấp đôi số kênh tại mỗi khối. Với hình ảnh đầu vào \\(256\\times256\\) , khối mạng cơ sở này xuất bản đồ tính năng \\(32 \\times 32\\) ( \\(256/2^3=32\\) ).\n13.7.1.6. Mô hình hoàn chỉnh\nMô hình phát hiện multibox bắn hoàn chỉnh bao gồm năm khối. Các bản đồ\ntính năng được tạo ra bởi mỗi khối được sử dụng cho cả (i) tạo hộp neo\nvà (ii) dự đoán các lớp và bù đắp của các hộp neo này. Trong số năm khối\nnày, khối đầu tiên là khối mạng cơ sở, khối thứ hai đến thứ tư là các\nkhối lấy mẫu xuống và khối cuối cùng sử dụng tổng hợp tối đa toàn cầu để\ngiảm cả chiều cao và chiều rộng xuống 1. Về mặt kỹ thuật, khối thứ hai\nđến thứ năm là tất cả các khối bản đồ tính năng đa quy mô trong Fig. 13.7.1 .\nBây giờ chúng ta xác định tuyên truyền chuyển tiếp cho mỗi khối. Khác\nvới các tác vụ phân loại hình ảnh, đầu ra ở đây bao gồm (i) bản đồ tính\nnăng CNN Y , (ii) hộp neo được tạo ra bằng cách sử dụng Y ở thang\nđo hiện tại, và (iii) lớp và bù dự đoán (dựa trên Y ) cho các hộp neo\nnày.\nNhớ lại rằng trong Fig. 13.7.1 một khối bản đồ tính năng đa quy\nmô gần với đỉnh là để phát hiện các đối tượng lớn hơn; do đó, nó cần\nphải tạo ra các hộp neo lớn hơn. Trong tuyên truyền chuyển tiếp ở trên,\ntại mỗi khối bản đồ tính năng đa thang chúng ta truyền trong một danh\nsách hai giá trị tỷ lệ thông qua đối số sizes của hàm multibox_prior được gọi (được mô tả trong Section 13.4 ).\nSau đây, khoảng cách giữa 0,2 và 1,05 được chia đều thành năm phần để\nxác định các giá trị quy mô nhỏ hơn tại năm khối: 0.2, 0,37, 0,54, 0,71\nvà 0,88. Sau đó, các giá trị quy mô lớn hơn của chúng được đưa ra bởi \\(\\sqrt{0.2 \\times 0.37} = 0.272\\) , \\(\\sqrt{0.37 \\times 0.54} = 0.447\\) , v.v.\nBây giờ chúng ta có thể xác định mô hình hoàn chỉnh TinySSD như sau.\nChúng tôi tạo ra một ví dụ mô hình và sử dụng nó để thực hiện tuyên\ntruyền chuyển tiếp trên một minibatch \\(256 \\times 256\\) hình ảnh X .\nNhư được hiển thị trước đó trong phần này, khối đầu tiên xuất bản đồ\ntính năng \\(32 \\times 32\\) . Nhớ lại rằng khối lấy mẫu thứ hai đến\nthứ tư giảm một nửa chiều cao và chiều rộng và khối thứ năm sử dụng tổng\nhợp toàn cầu. Vì 4 hộp neo được tạo ra cho mỗi đơn vị dọc theo kích\nthước không gian của bản đồ tính năng, tại tất cả năm thang đo tổng cộng \\((32^2 + 16^2 + 8^2 + 4^2 + 1)\\times 4 = 5444\\) hộp neo được tạo ra\ncho mỗi hình ảnh.\n13.7.2. Đào tạo\nBây giờ chúng tôi sẽ giải thích cách huấn luyện mô hình phát hiện\nmultibox shot đơn để phát hiện đối tượng.\n13.7.2.1. Đọc tập dữ liệu và khởi tạo mô hình\nĐể bắt đầu, chúng ta hãy đọc dữ liệu phát hiện chuối được mô tả trong Section 13.6 .\nChỉ có một lớp trong bộ dữ liệu phát hiện chuối. Sau khi xác định mô\nhình, chúng ta cần phải khởi tạo các tham số của nó và xác định thuật\ntoán tối ưu hoạt.\n13.7.2.2. Xác định mất và đánh giá chức năng\nPhát hiện đối tượng có hai loại tổn thất. Sự mất mát đầu tiên liên quan\nđến các lớp của hộp neo: tính toán của nó có thể chỉ đơn giản là tái sử\ndụng hàm mất chéo entropy mà chúng ta sử dụng để phân loại hình ảnh. Tổn\nthất thứ hai liên quan đến bù đắp các hộp neo tích cực (không nền): đây\nlà một vấn đề hồi quy. Tuy nhiên, đối với vấn đề hồi quy này, ở đây\nchúng tôi không sử dụng tổn thất bình phương được mô tả trong Section 3.1.3 . Thay vào đó,\nchúng ta sử dụng mức mất định mức \\(L_1\\) , giá trị tuyệt đối của sự\nkhác biệt giữa dự đoán và sự thật mặt đất. Biến mặt nạ bbox_masks lọc ra các hộp neo âm và các hộp neo bất hợp pháp (đệm) trong tính toán\ntổn thất. Cuối cùng, chúng tôi tổng hợp mất lớp hộp neo và tổn thất bù\nđắp hộp neo để có được chức năng mất mát cho mô hình.\nChúng ta có thể sử dụng độ chính xác để đánh giá kết quả phân loại. Do\ntổn thất định mức \\(L_1\\) đã sử dụng cho các bù trừ, chúng tôi sử\ndụng lỗi tuyệt đối *trung bình để đánh giá các hộp giới hạn dự đoán.\nNhững kết quả dự đoán này thu được từ các hộp neo được tạo ra và các bù\nđắp dự đoán cho chúng.\n13.7.2.3. Đào tạo mô hình\nKhi đào tạo mô hình, chúng ta cần tạo ra các hộp neo đa quy mô\n( anchors ) và dự đoán các lớp của chúng ( cls_preds ) và bù đắp\n( bbox_preds ) trong tuyên truyền về phía trước. Sau đó, chúng tôi dán\nnhãn các lớp ( cls_labels ) và bù đắp ( bbox_labels ) của các hộp\nneo được tạo ra như vậy dựa trên thông tin nhãn Y . Cuối cùng, chúng\nta tính toán hàm mất bằng cách sử dụng các giá trị dự đoán và dán nhãn\ncủa các lớp và bù đắp. Để triển khai ngắn gọn, đánh giá tập dữ liệu thử\nnghiệm được bỏ qua ở đây.\n13.7.3. Prediction\nTrong quá trình dự đoán, mục tiêu là phát hiện tất cả các đối tượng quan\ntâm trên hình ảnh. Dưới đây chúng tôi đọc và thay đổi kích thước một\nhình ảnh thử nghiệm, chuyển đổi nó thành tensor bốn chiều được yêu cầu\nbởi các lớp phức tạp.\nSử dụng hàm multibox_detection bên dưới, các hộp giới hạn dự đoán\nđược lấy từ các hộp neo và bù đắp dự đoán của chúng. Sau đó, ức chế\nkhông tối đa được sử dụng để loại bỏ các hộp giới hạn dự đoán tương tự.\nCuối cùng, chúng ta hiển thị tất cả các hộp giới hạn dự đoán với sự tự\ntin 0.9 trở lên làm đầu ra.\n13.7.4. Tóm tắt\nPhát hiện multibox shot đơn là một mô hình phát hiện đối tượng đa quy\nmô. Thông qua mạng cơ sở của nó và một số khối bản đồ tính năng đa\nquy mô, phát hiện multibox single shot tạo ra một số lượng khác nhau\ncủa các hộp neo với kích thước khác nhau, và phát hiện các đối tượng\nkích thước khác nhau bằng cách dự đoán các lớp và bù đắp của các hộp\nneo (do đó các hộp giới hạn).\nKhi đào tạo mô hình phát hiện multibox single shot, chức năng mất mát\nđược tính toán dựa trên các giá trị dự đoán và gắn nhãn của các lớp\nvà bù đắp hộp neo.\n13.7.5. Bài tập\nBạn có thể cải thiện phát hiện multibox một lần bằng cách cải thiện\nchức năng mất mát? Ví dụ, thay thế mất tiêu chuẩn \\(L_1\\) với tổn\nthất định mức \\(L_1\\) trơn tru cho các bù đắp dự đoán. Hàm mất\nnày sử dụng một hàm vuông khoảng 0 cho độ mịn, được điều khiển bởi\nsiêu tham số \\(\\sigma\\) :\nKhi \\(\\sigma\\) rất lớn, tổn thất này tương tự như mức mất định mức \\(L_1\\) . Khi giá trị của nó nhỏ hơn, chức năng mất mát mượt mà hơn.\nBên cạnh đó, trong thí nghiệm, chúng tôi đã sử dụng mất chéo entropy cho\ndự đoán lớp: biểu thị bằng \\(p_j\\) xác suất dự đoán cho lớp chân lý\nmặt đất \\(j\\) , tổn thất chéo entropy là \\(-\\log p_j\\) . Chúng ta\ncũng có thể sử dụng tổn thất tiêu cự [Lin et al., 2017] : cho các siêu tham số \\(\\gamma > 0\\) và \\(\\alpha > 0\\) , sự mất mát này được định nghĩa\nlà:\nNhư chúng ta có thể thấy, tăng \\(\\gamma\\) có thể làm giảm hiệu quả\ntổn thất tương đối cho các ví dụ được phân loại tốt (ví dụ, \\(p_j > 0.5\\) ) để đào tạo có thể tập trung nhiều hơn vào những ví dụ\nkhó khăn bị phân loại sai.\nDo hạn chế về không gian, chúng tôi đã bỏ qua một số chi tiết triển\nkhai của mô hình phát hiện multibox một shot trong phần này. Bạn có\nthể cải thiện thêm mô hình trong các khía cạnh sau: Khi một đối tượng nhỏ hơn nhiều so với hình ảnh, mô hình có thể\nthay đổi kích thước hình ảnh đầu vào lớn hơn. Thường có một số lượng lớn các hộp neo âm. Để làm cho phân phối\nlớp cân bằng hơn, chúng ta có thể hạ mẫu các hộp neo âm. Trong chức năng mất, gán các siêu tham số trọng lượng khác nhau\ncho việc mất lớp và mất bù. Sử dụng các phương pháp khác để đánh giá mô hình phát hiện đối\ntượng, chẳng hạn như các phương pháp trong một shot multibox phát\nhiện giấy [Liu et al., 2016] .\nKhi một đối tượng nhỏ hơn nhiều so với hình ảnh, mô hình có thể\nthay đổi kích thước hình ảnh đầu vào lớn hơn.\nThường có một số lượng lớn các hộp neo âm. Để làm cho phân phối\nlớp cân bằng hơn, chúng ta có thể hạ mẫu các hộp neo âm.\nTrong chức năng mất, gán các siêu tham số trọng lượng khác nhau\ncho việc mất lớp và mất bù.\nSử dụng các phương pháp khác để đánh giá mô hình phát hiện đối\ntượng, chẳng hạn như các phương pháp trong một shot multibox phát\nhiện giấy [Liu et al., 2016] .\nDiscussions\nDiscussions"
+}

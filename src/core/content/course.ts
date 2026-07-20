@@ -164,6 +164,65 @@ const CHAPTER_SEED: ChapterSeed[] = [
       { id: 'conic', title: 'Đường & mặt bậc hai', skills: ['conic_sections'] },
     ],
   },
+
+  // =========================================================================
+  // NHÁNH DEEP LEARNING (ch10–ch13) — nối tiếp tuyến tính sau ch9.
+  // Deep Learning = Đại số tuyến tính được áp dụng; prerequisite bắc cầu
+  // từ chương LA liền trước để giữ Learning Path liền mạch.
+  // =========================================================================
+  {
+    id: 'ch10-ml',
+    num: 10,
+    title: 'Học máy & Hồi quy',
+    en: 'Machine Learning & Regression',
+    subtitle: 'Từ Least Squares đến mô hình học máy',
+    lessons: [
+      { id: 'linear-regression', title: 'Hồi quy tuyến tính = Least Squares', skills: ['linear_regression_ml'] },
+      { id: 'gradient-descent', title: 'Gradient Descent', skills: ['gradient_descent'] },
+      { id: 'softmax', title: 'Hồi quy Softmax & phân loại', skills: ['softmax_regression'] },
+      { id: 'generalization', title: 'Overfitting & Regularization', skills: ['generalization'] },
+    ],
+  },
+  {
+    id: 'ch11-neural-nets',
+    num: 11,
+    title: 'Mạng nơ-ron',
+    en: 'Neural Networks',
+    subtitle: 'Neuron, MLP, lan truyền xuôi/ngược',
+    lessons: [
+      { id: 'neuron', title: 'Neuron = Dot product + Activation', skills: ['neuron'] },
+      { id: 'mlp', title: 'Multilayer Perceptron', skills: ['mlp'] },
+      { id: 'forward', title: 'Lan truyền xuôi (Forward)', skills: ['forward_prop'] },
+      { id: 'backprop', title: 'Lan truyền ngược (Backprop)', skills: ['backprop'] },
+      { id: 'activations', title: 'Hàm kích hoạt', skills: ['activation_functions'] },
+    ],
+  },
+  {
+    id: 'ch12-modern-dl',
+    num: 12,
+    title: 'Học sâu hiện đại',
+    en: 'Modern Deep Learning',
+    subtitle: 'CNN, RNN, Attention/Transformer, Embeddings',
+    lessons: [
+      { id: 'cnn', title: 'CNN — Tích chập', skills: ['cnn'] },
+      { id: 'rnn', title: 'RNN — Chuỗi & trạng thái ẩn', skills: ['rnn'] },
+      { id: 'attention', title: 'Attention & Transformer', skills: ['attention', 'transformer'] },
+      { id: 'embeddings', title: 'Word Embeddings', skills: ['word_embedding'] },
+    ],
+  },
+  {
+    id: 'ch13-optimization-apps',
+    num: 13,
+    title: 'Tối ưu & Ứng dụng',
+    en: 'Optimization & Applications',
+    subtitle: 'SGD/Adam, Batch Norm, CV, NLP',
+    lessons: [
+      { id: 'optimizers', title: 'SGD, Momentum, Adam', skills: ['sgd_optimizers'] },
+      { id: 'batchnorm', title: 'Batch Norm & khởi tạo', skills: ['batch_norm'] },
+      { id: 'cv', title: 'Thị giác máy tính (tổng quan)', skills: ['computer_vision'] },
+      { id: 'nlp', title: 'NLP & mô hình ngôn ngữ (tổng quan)', skills: ['nlp_lm'] },
+    ],
+  },
 ];
 
 // ---------------------------------------------------------------------------

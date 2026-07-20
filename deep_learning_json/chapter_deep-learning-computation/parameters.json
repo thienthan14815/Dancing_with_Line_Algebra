@@ -1,0 +1,761 @@
+{
+  "url": "https://vi.d2l.ai/chapter_deep-learning-computation/parameters.html",
+  "chapter": "chapter_deep-learning-computation",
+  "title": "5.2. Quản lý tham số",
+  "crawled_at": "2026-07-20T12:39:36.347078+00:00",
+  "headings": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "quan-ly-tham-so",
+      "text": "5.2. Quản lý tham số"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "truy-cap-tham-so",
+      "text": "5.2.1. Truy cập tham số"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "tham-so-duoc-nham-muc-tieu",
+      "text": "5.2.1.1. Tham số được nhắm mục tiêu"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "tat-ca-cac-thong-so-tai-mot-lan",
+      "text": "5.2.1.2. Tất cả các thông số tại một lần"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "thu-thap-cac-thong-so-tu-cac-khoi-long-nhua",
+      "text": "5.2.1.3. Thu thập các thông số từ các khối lồng nhựa"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "khoi-tao-tham-so",
+      "text": "5.2.2. Khởi tạo tham số"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "khoi-tao-tich-hop",
+      "text": "5.2.2.1. Khởi tạo tích hợp"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "initializationtuy-chinh",
+      "text": "5.2.2.2. Initializationtùy chỉnh"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tham-so-tied",
+      "text": "5.2.3. Tham số Tied"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tom-tat",
+      "text": "5.2.4. Tóm tắt"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bai-tap",
+      "text": "5.2.5. Bài tập"
+    }
+  ],
+  "content": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "quan-ly-tham-so",
+      "text": "5.2. Quản lý tham số"
+    },
+    {
+      "type": "paragraph",
+      "text": "Khi chúng tôi đã chọn một kiến trúc và đặt các siêu tham số của mình,\nchúng tôi tiến hành vòng đào tạo, nơi mục tiêu của chúng tôi là tìm các\ngiá trị tham số giảm thiểu chức năng mất mát của chúng tôi. Sau khi đào\ntạo, chúng tôi sẽ cần các thông số này để đưa ra dự đoán trong tương\nlai. Ngoài ra, đôi khi chúng tôi sẽ muốn trích xuất các tham số để sử\ndụng lại chúng trong một số bối cảnh khác, để lưu mô hình của chúng tôi\nvào đĩa để nó có thể được thực thi trong phần mềm khác hoặc để kiểm tra\nvới hy vọng đạt được sự hiểu biết khoa học."
+    },
+    {
+      "type": "paragraph",
+      "text": "Hầu hết thời gian, chúng ta sẽ có thể bỏ qua các chi tiết nitty-gritty\nvề cách các tham số được khai báo và thao tác, dựa vào các khuôn khổ học\nsâu để thực hiện việc nâng nặng. Tuy nhiên, khi chúng ta di chuyển ra\nkhỏi các kiến trúc xếp chồng lên nhau với các lớp tiêu chuẩn, đôi khi\nchúng ta sẽ cần phải vào cỏ dại khai báo và thao tác các tham số. Trong\nphần này, chúng tôi đề cập đến những điều sau:"
+    },
+    {
+      "type": "list",
+      "ordered": false,
+      "items": [
+        "Truy cập các tham số để gỡ lỗi, chẩn đoán và trực quan hóa.",
+        "Khởi tạo tham số.",
+        "Chia sẻ các thông số trên các thành phần mô hình khác nhau."
+      ]
+    },
+    {
+      "type": "paragraph",
+      "text": "Chúng tôi bắt đầu bằng cách tập trung vào MLP với một lớp ẩn."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "from mxnet import init, np, npx\nfrom mxnet.gluon import nn\n\nnpx.set_np()\n\nnet = nn.Sequential()\nnet.add(nn.Dense(8, activation='relu'))\nnet.add(nn.Dense(1))\nnet.initialize()  # Use the default initialization method\n\nX = np.random.uniform(size=(2, 4))\nnet(X)  # Forward computation"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "array([[0.0054572 ],\n       [0.00488594]])"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "import torch\nfrom torch import nn\n\nnet = nn.Sequential(nn.Linear(4, 8), nn.ReLU(), nn.Linear(8, 1))\nX = torch.rand(size=(2, 4))\nnet(X)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "tensor([[0.0251],\n        [0.0025]], grad_fn=<AddmmBackward0>)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "import tensorflow as tf\n\nnet = tf.keras.models.Sequential([\n    tf.keras.layers.Flatten(),\n    tf.keras.layers.Dense(4, activation=tf.nn.relu),\n    tf.keras.layers.Dense(1),\n])\n\nX = tf.random.uniform((2, 4))\nnet(X)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "<tf.Tensor: shape=(2, 1), dtype=float32, numpy=\narray([[-1.0827482],\n       [-1.6669033]], dtype=float32)>"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "truy-cap-tham-so",
+      "text": "5.2.1. Truy cập tham số"
+    },
+    {
+      "type": "paragraph",
+      "text": "Hãy để chúng tôi bắt đầu với cách truy cập các tham số từ các mô hình mà\nbạn đã biết. Khi một mô hình được định nghĩa thông qua lớp Sequential , trước tiên chúng ta có thể truy cập bất kỳ lớp nào bằng\ncách lập chỉ mục vào mô hình như thể nó là một danh sách. Các tham số\ncủa mỗi lớp được đặt thuận tiện trong thuộc tính của nó. Chúng ta có thể\nkiểm tra các tham số của lớp được kết nối hoàn toàn thứ hai như sau."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "print(net[1].params)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "dense1_ (\n  Parameter dense1_weight (shape=(1, 8), dtype=float32)\n  Parameter dense1_bias (shape=(1,), dtype=float32)\n)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "print(net[2].state_dict())"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "OrderedDict([('weight', tensor([[-0.1270,  0.2448,  0.3073, -0.3091,  0.0385, -0.2082,  0.2561, -0.1132]])), ('bias', tensor([-0.1036]))])"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "print(net.layers[2].weights)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "[<tf.Variable 'dense_1/kernel:0' shape=(4, 1) dtype=float32, numpy=\narray([[-0.8811922 ],\n       [ 0.5014286 ],\n       [-1.0506117 ],\n       [ 0.52643347]], dtype=float32)>, <tf.Variable 'dense_1/bias:0' shape=(1,) dtype=float32, numpy=array([0.], dtype=float32)>]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Đầu ra cho chúng ta biết một vài điều quan trọng. Đầu tiên, lớp kết nối\nhoàn toàn này chứa hai tham số, tương ứng với trọng lượng và thành kiến\ncủa lớp đó, tương ứng. Cả hai đều được lưu trữ dưới dạng phao chính xác\nđơn (float32). Lưu ý rằng tên của các tham số cho phép chúng ta xác định\nduy nhất các tham số của từng lớp, ngay cả trong một mạng chứa hàng trăm\nlớp."
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "tham-so-duoc-nham-muc-tieu",
+      "text": "5.2.1.1. Tham số được nhắm mục tiêu"
+    },
+    {
+      "type": "paragraph",
+      "text": "Lưu ý rằng mỗi tham số được biểu diễn dưới dạng một đối tượng của lớp\ntham số. Để làm bất cứ điều gì hữu ích với các tham số, trước tiên chúng\nta cần truy cập các giá trị số cơ bản. Có một số cách để làm điều này.\nMột số đơn giản hơn trong khi những người khác nói chung hơn. Đoạn code\nsau trích xuất sự thiên vị từ lớp mạng nơ-ron thứ hai, nó trả về một đối\ntượng lớp tham số, và truy cập thêm giá trị của tham số đó."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "print(type(net[1].bias))\nprint(net[1].bias)\nprint(net[1].bias.data())"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "<class 'mxnet.gluon.parameter.Parameter'>\nParameter dense1_bias (shape=(1,), dtype=float32)\n[0.]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Tham số là các đối tượng phức tạp, chứa các giá trị, độ dốc và thông tin\nbổ sung. Đó là lý do tại sao chúng ta cần yêu cầu giá trị một cách rõ\nràng."
+    },
+    {
+      "type": "paragraph",
+      "text": "Ngoài giá trị, mỗi tham số cũng cho phép chúng ta truy cập gradient. Bởi\nvì chúng tôi chưa gọi backpropagation cho mạng này được nêu ra, nó ở\ntrạng thái ban đầu của nó."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "net[1].weight.grad()"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "array([[0., 0., 0., 0., 0., 0., 0., 0.]])"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "print(type(net[2].bias))\nprint(net[2].bias)\nprint(net[2].bias.data)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "<class 'torch.nn.parameter.Parameter'>\nParameter containing:\ntensor([-0.1036], requires_grad=True)\ntensor([-0.1036])"
+    },
+    {
+      "type": "paragraph",
+      "text": "Tham số là các đối tượng phức tạp, chứa các giá trị, độ dốc và thông tin\nbổ sung. Đó là lý do tại sao chúng ta cần yêu cầu giá trị một cách rõ\nràng."
+    },
+    {
+      "type": "paragraph",
+      "text": "Ngoài giá trị, mỗi tham số cũng cho phép chúng ta truy cập gradient. Bởi\nvì chúng tôi chưa gọi backpropagation cho mạng này được nêu ra, nó ở\ntrạng thái ban đầu của nó."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "net[2].weight.grad == None"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "True"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "print(type(net.layers[2].weights[1]))\nprint(net.layers[2].weights[1])\nprint(tf.convert_to_tensor(net.layers[2].weights[1]))"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "<class 'tensorflow.python.ops.resource_variable_ops.ResourceVariable'>\n<tf.Variable 'dense_1/bias:0' shape=(1,) dtype=float32, numpy=array([0.], dtype=float32)>\ntf.Tensor([0.], shape=(1,), dtype=float32)"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "tat-ca-cac-thong-so-tai-mot-lan",
+      "text": "5.2.1.2. Tất cả các thông số tại một lần"
+    },
+    {
+      "type": "paragraph",
+      "text": "Khi chúng ta cần thực hiện các thao tác trên tất cả các tham số, truy\ncập chúng từng cái một có thể phát triển tẻ nhạt. Tình hình có thể phát\ntriển đặc biệt khó sử dụng khi chúng ta làm việc với các khối phức tạp\nhơn (ví dụ, các khối lồng nhau), vì chúng ta cần đệ quy qua toàn bộ cây\nđể trích xuất các tham số của từng khối phụ. Dưới đây chúng tôi chứng\nminh việc truy cập các tham số của lớp được kết nối hoàn toàn đầu tiên\nso với truy cập tất cả các lớp."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "print(net[0].collect_params())\nprint(net.collect_params())"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "dense0_ (\n  Parameter dense0_weight (shape=(8, 4), dtype=float32)\n  Parameter dense0_bias (shape=(8,), dtype=float32)\n)\nsequential0_ (\n  Parameter dense0_weight (shape=(8, 4), dtype=float32)\n  Parameter dense0_bias (shape=(8,), dtype=float32)\n  Parameter dense1_weight (shape=(1, 8), dtype=float32)\n  Parameter dense1_bias (shape=(1,), dtype=float32)\n)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "print(*[(name, param.shape) for name, param in net[0].named_parameters()])\nprint(*[(name, param.shape) for name, param in net.named_parameters()])"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "('weight', torch.Size([8, 4])) ('bias', torch.Size([8]))\n('0.weight', torch.Size([8, 4])) ('0.bias', torch.Size([8])) ('2.weight', torch.Size([1, 8])) ('2.bias', torch.Size([1]))"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "print(net.layers[1].weights)\nprint(net.get_weights())"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "[<tf.Variable 'dense/kernel:0' shape=(4, 4) dtype=float32, numpy=\narray([[ 0.7232258 ,  0.78331023,  0.60271305,  0.8582216 ],\n       [-0.5968576 ,  0.2452305 ,  0.8569761 , -0.8358928 ],\n       [-0.29286593, -0.29781765,  0.63798755, -0.49257767],\n       [ 0.49835342, -0.22738558,  0.41689676, -0.38474053]],\n      dtype=float32)>, <tf.Variable 'dense/bias:0' shape=(4,) dtype=float32, numpy=array([0., 0., 0., 0.], dtype=float32)>]\n[array([[ 0.7232258 ,  0.78331023,  0.60271305,  0.8582216 ],\n       [-0.5968576 ,  0.2452305 ,  0.8569761 , -0.8358928 ],\n       [-0.29286593, -0.29781765,  0.63798755, -0.49257767],\n       [ 0.49835342, -0.22738558,  0.41689676, -0.38474053]],\n      dtype=float32), array([0., 0., 0., 0.], dtype=float32), array([[-0.8811922 ],\n       [ 0.5014286 ],\n       [-1.0506117 ],\n       [ 0.52643347]], dtype=float32), array([0.], dtype=float32)]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Điều này cung cấp cho chúng tôi một cách khác để truy cập các tham số\ncủa mạng như sau."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "net.collect_params()['dense1_bias'].data()"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "array([0.])"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "net.state_dict()['2.bias'].data"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "tensor([-0.1036])"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "net.get_weights()[1]"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "array([0., 0., 0., 0.], dtype=float32)"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "thu-thap-cac-thong-so-tu-cac-khoi-long-nhua",
+      "text": "5.2.1.3. Thu thập các thông số từ các khối lồng nhựa"
+    },
+    {
+      "type": "paragraph",
+      "text": "Chúng ta hãy xem làm thế nào các quy ước đặt tên tham số hoạt động nếu\nchúng ta tổ nhiều khối bên trong nhau. Đối với điều đó đầu tiên chúng ta\nxác định một hàm tạo ra các khối (một nhà máy khối, có thể nói) và sau\nđó kết hợp các khối bên trong nhưng lớn hơn."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def block1():\n    net = nn.Sequential()\n    net.add(nn.Dense(32, activation='relu'))\n    net.add(nn.Dense(16, activation='relu'))\n    return net\n\ndef block2():\n    net = nn.Sequential()\n    for _ in range(4):\n        # Nested here\n        net.add(block1())\n    return net\n\nrgnet = nn.Sequential()\nrgnet.add(block2())\nrgnet.add(nn.Dense(10))\nrgnet.initialize()\nrgnet(X)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "array([[-6.3465846e-09, -1.1096752e-09,  6.4161787e-09,  6.6354140e-09,\n        -1.1265507e-09,  1.3284951e-10,  9.3619388e-09,  3.2229084e-09,\n         5.9429879e-09,  8.8181435e-09],\n       [-8.6219423e-09, -7.5150686e-10,  8.3133251e-09,  8.9321128e-09,\n        -1.6740003e-09,  3.2405989e-10,  1.2115976e-08,  4.4926449e-09,\n         8.0741742e-09,  1.2075874e-08]])"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def block1():\n    return nn.Sequential(nn.Linear(4, 8), nn.ReLU(),\n                         nn.Linear(8, 4), nn.ReLU())\n\ndef block2():\n    net = nn.Sequential()\n    for i in range(4):\n        # Nested here\n        net.add_module(f'block {i}', block1())\n    return net\n\nrgnet = nn.Sequential(block2(), nn.Linear(4, 1))\nrgnet(X)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "tensor([[-0.5720],\n        [-0.5720]], grad_fn=<AddmmBackward0>)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def block1(name):\n    return tf.keras.Sequential([\n        tf.keras.layers.Flatten(),\n        tf.keras.layers.Dense(4, activation=tf.nn.relu)],\n        name=name)\n\ndef block2():\n    net = tf.keras.Sequential()\n    for i in range(4):\n        # Nested here\n        net.add(block1(name=f'block-{i}'))\n    return net\n\nrgnet = tf.keras.Sequential()\nrgnet.add(block2())\nrgnet.add(tf.keras.layers.Dense(1))\nrgnet(X)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "<tf.Tensor: shape=(2, 1), dtype=float32, numpy=\narray([[-0.19846833],\n       [-0.05882511]], dtype=float32)>"
+    },
+    {
+      "type": "paragraph",
+      "text": "Bây giờ chúng tôi đã thiết kế mạng, chúng ta hãy xem nó được tổ chức như\nthế nào."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "print(rgnet.collect_params)\nprint(rgnet.collect_params())"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "<bound method Block.collect_params of Sequential(\n  (0): Sequential(\n    (0): Sequential(\n      (0): Dense(4 -> 32, Activation(relu))\n      (1): Dense(32 -> 16, Activation(relu))\n    )\n    (1): Sequential(\n      (0): Dense(16 -> 32, Activation(relu))\n      (1): Dense(32 -> 16, Activation(relu))\n    )\n    (2): Sequential(\n      (0): Dense(16 -> 32, Activation(relu))\n      (1): Dense(32 -> 16, Activation(relu))\n    )\n    (3): Sequential(\n      (0): Dense(16 -> 32, Activation(relu))\n      (1): Dense(32 -> 16, Activation(relu))\n    )\n  )\n  (1): Dense(16 -> 10, linear)\n)>\nsequential1_ (\n  Parameter dense2_weight (shape=(32, 4), dtype=float32)\n  Parameter dense2_bias (shape=(32,), dtype=float32)\n  Parameter dense3_weight (shape=(16, 32), dtype=float32)\n  Parameter dense3_bias (shape=(16,), dtype=float32)\n  Parameter dense4_weight (shape=(32, 16), dtype=float32)\n  Parameter dense4_bias (shape=(32,), dtype=float32)\n  Parameter dense5_weight (shape=(16, 32), dtype=float32)\n  Parameter dense5_bias (shape=(16,), dtype=float32)\n  Parameter dense6_weight (shape=(32, 16), dtype=float32)\n  Parameter dense6_bias (shape=(32,), dtype=float32)\n  Parameter dense7_weight (shape=(16, 32), dtype=float32)\n  Parameter dense7_bias (shape=(16,), dtype=float32)\n  Parameter dense8_weight (shape=(32, 16), dtype=float32)\n  Parameter dense8_bias (shape=(32,), dtype=float32)\n  Parameter dense9_weight (shape=(16, 32), dtype=float32)\n  Parameter dense9_bias (shape=(16,), dtype=float32)\n  Parameter dense10_weight (shape=(10, 16), dtype=float32)\n  Parameter dense10_bias (shape=(10,), dtype=float32)\n)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "print(rgnet)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "Sequential(\n  (0): Sequential(\n    (block 0): Sequential(\n      (0): Linear(in_features=4, out_features=8, bias=True)\n      (1): ReLU()\n      (2): Linear(in_features=8, out_features=4, bias=True)\n      (3): ReLU()\n    )\n    (block 1): Sequential(\n      (0): Linear(in_features=4, out_features=8, bias=True)\n      (1): ReLU()\n      (2): Linear(in_features=8, out_features=4, bias=True)\n      (3): ReLU()\n    )\n    (block 2): Sequential(\n      (0): Linear(in_features=4, out_features=8, bias=True)\n      (1): ReLU()\n      (2): Linear(in_features=8, out_features=4, bias=True)\n      (3): ReLU()\n    )\n    (block 3): Sequential(\n      (0): Linear(in_features=4, out_features=8, bias=True)\n      (1): ReLU()\n      (2): Linear(in_features=8, out_features=4, bias=True)\n      (3): ReLU()\n    )\n  )\n  (1): Linear(in_features=4, out_features=1, bias=True)\n)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "print(rgnet.summary())"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "Model: \"sequential_1\"\n_________________________________________________________________\n Layer (type)                Output Shape              Param #\n=================================================================\n sequential_2 (Sequential)   (2, 4)                    80\n\n dense_6 (Dense)             (2, 1)                    5\n\n=================================================================\nTotal params: 85\nTrainable params: 85\nNon-trainable params: 0\n_________________________________________________________________\nNone"
+    },
+    {
+      "type": "paragraph",
+      "text": "Kể từ khi các lớp được phân cấp lồng nhau, chúng ta cũng có thể truy cập\nchúng như thể lập chỉ mục thông qua các danh sách lồng nhau. Ví dụ,\nchúng ta có thể truy cập khối chính đầu tiên, bên trong đó khối phụ thứ\nhai và trong đó sự thiên vị của lớp đầu tiên, với như sau."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "rgnet[0][1][0].bias.data()"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "array([0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.,\n       0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.])"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "rgnet[0][1][0].bias.data"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "tensor([-0.0210,  0.2743,  0.0433, -0.1879, -0.3919, -0.1085,  0.0300, -0.4445])"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "rgnet.layers[0].layers[1].layers[1].weights[1]"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "<tf.Variable 'dense_3/bias:0' shape=(4,) dtype=float32, numpy=array([0., 0., 0., 0.], dtype=float32)>"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "khoi-tao-tham-so",
+      "text": "5.2.2. Khởi tạo tham số"
+    },
+    {
+      "type": "paragraph",
+      "text": "Bây giờ chúng ta đã biết cách truy cập các tham số, chúng ta hãy xem\ncách khởi tạo chúng đúng cách. Chúng tôi đã thảo luận về sự cần thiết\nphải khởi tạo thích hợp trong Section 4.8 . Khung\nhọc sâu cung cấp các khởi tạo ngẫu nhiên mặc định cho các lớp của nó.\nTuy nhiên, chúng tôi thường muốn khởi tạo trọng lượng của mình theo các\ngiao thức khác nhau. Khung cung cấp các giao thức được sử dụng phổ biến\nnhất và cũng cho phép tạo một trình khởi tạo tùy chỉnh."
+    },
+    {
+      "type": "paragraph",
+      "text": "Theo mặc định, MXNet khởi tạo các tham số trọng lượng bằng cách vẽ ngẫu\nnhiên từ một phân phối thống nhất \\(U(-0.07, 0.07)\\) , xóa các tham\nsố thiên vị về 0. mô-đun init của MXNet cung cấp nhiều phương pháp\nkhởi tạo cài sẵn."
+    },
+    {
+      "type": "paragraph",
+      "text": "Theo mặc định, PyTorch khởi tạo các ma trận trọng lượng và thiên vị đồng\nđều bằng cách vẽ từ một phạm vi được tính toán theo kích thước đầu vào\nvà đầu ra. mô-đun nn.init của PyTorch cung cấp một loạt các phương\npháp khởi tạo cài sẵn."
+    },
+    {
+      "type": "paragraph",
+      "text": "Theo mặc định, Keras khởi tạo các ma trận trọng lượng đồng đều bằng cách\nvẽ từ một phạm vi được tính theo kích thước đầu vào và đầu ra, và các\ntham số thiên vị đều được đặt thành 0. TensorFlow cung cấp một loạt các\nphương pháp khởi tạo cả trong mô-đun gốc và mô-đun keras.initializers ."
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "khoi-tao-tich-hop",
+      "text": "5.2.2.1. Khởi tạo tích hợp"
+    },
+    {
+      "type": "paragraph",
+      "text": "Hãy để chúng tôi bắt đầu bằng cách gọi trên built-in initializers. Mã\ndưới đây khởi tạo tất cả các tham số trọng lượng dưới dạng biến ngẫu\nnhiên Gaussian với độ lệch chuẩn 0,01, trong khi các tham số thiên vị bị\nxóa về 0."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "# Here `force_reinit` ensures that parameters are freshly initialized even if\n# they were already initialized previously\nnet.initialize(init=init.Normal(sigma=0.01), force_reinit=True)\nnet[0].weight.data()[0]"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "array([-0.00324057, -0.00895028, -0.00698632,  0.01030831])"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def init_normal(m):\n    if type(m) == nn.Linear:\n        nn.init.normal_(m.weight, mean=0, std=0.01)\n        nn.init.zeros_(m.bias)\nnet.apply(init_normal)\nnet[0].weight.data[0], net[0].bias.data[0]"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "(tensor([-0.0152, -0.0023, -0.0003,  0.0055]), tensor(0.))"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "net = tf.keras.models.Sequential([\n    tf.keras.layers.Flatten(),\n    tf.keras.layers.Dense(\n        4, activation=tf.nn.relu,\n        kernel_initializer=tf.random_normal_initializer(mean=0, stddev=0.01),\n        bias_initializer=tf.zeros_initializer()),\n    tf.keras.layers.Dense(1)])\n\nnet(X)\nnet.weights[0], net.weights[1]"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "(<tf.Variable 'dense_7/kernel:0' shape=(4, 4) dtype=float32, numpy=\n array([[ 0.00249219,  0.00448302, -0.01549828,  0.01431368],\n        [-0.0055955 , -0.0049019 ,  0.00653713, -0.01390231],\n        [ 0.00815553, -0.01509462,  0.00757438, -0.00974615],\n        [-0.01126563, -0.01033413, -0.00955058, -0.01465968]],\n       dtype=float32)>,\n <tf.Variable 'dense_7/bias:0' shape=(4,) dtype=float32, numpy=array([0., 0., 0., 0.], dtype=float32)>)"
+    },
+    {
+      "type": "paragraph",
+      "text": "Chúng ta cũng có thể khởi tạo tất cả các tham số thành một giá trị không\nđổi cho trước (ví dụ, 1)."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "net.initialize(init=init.Constant(1), force_reinit=True)\nnet[0].weight.data()[0]"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "array([1., 1., 1., 1.])"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def init_constant(m):\n    if type(m) == nn.Linear:\n        nn.init.constant_(m.weight, 1)\n        nn.init.zeros_(m.bias)\nnet.apply(init_constant)\nnet[0].weight.data[0], net[0].bias.data[0]"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "(tensor([1., 1., 1., 1.]), tensor(0.))"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "net = tf.keras.models.Sequential([\n    tf.keras.layers.Flatten(),\n    tf.keras.layers.Dense(\n        4, activation=tf.nn.relu,\n        kernel_initializer=tf.keras.initializers.Constant(1),\n        bias_initializer=tf.zeros_initializer()),\n    tf.keras.layers.Dense(1),\n])\n\nnet(X)\nnet.weights[0], net.weights[1]"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "(<tf.Variable 'dense_9/kernel:0' shape=(4, 4) dtype=float32, numpy=\n array([[1., 1., 1., 1.],\n        [1., 1., 1., 1.],\n        [1., 1., 1., 1.],\n        [1., 1., 1., 1.]], dtype=float32)>,\n <tf.Variable 'dense_9/bias:0' shape=(4,) dtype=float32, numpy=array([0., 0., 0., 0.], dtype=float32)>)"
+    },
+    {
+      "type": "paragraph",
+      "text": "Chúng tôi cũng có thể áp dụng các trình khởi tạo khác nhau cho các khối\nnhất định Ví dụ, bên dưới chúng ta khởi tạo lớp đầu tiên với trình khởi\ntạo Xavier và khởi tạo lớp thứ hai thành giá trị không đổi là 42."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "net[0].weight.initialize(init=init.Xavier(), force_reinit=True)\nnet[1].initialize(init=init.Constant(42), force_reinit=True)\nprint(net[0].weight.data()[0])\nprint(net[1].weight.data())"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "[-0.17594433  0.02314097 -0.1992535   0.09509248]\n[[42. 42. 42. 42. 42. 42. 42. 42.]]"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def xavier(m):\n    if type(m) == nn.Linear:\n        nn.init.xavier_uniform_(m.weight)\ndef init_42(m):\n    if type(m) == nn.Linear:\n        nn.init.constant_(m.weight, 42)\n\nnet[0].apply(xavier)\nnet[2].apply(init_42)\nprint(net[0].weight.data[0])\nprint(net[2].weight.data)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "tensor([ 0.1975,  0.2599, -0.1798,  0.4012])\ntensor([[42., 42., 42., 42., 42., 42., 42., 42.]])"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "net = tf.keras.models.Sequential([\n    tf.keras.layers.Flatten(),\n    tf.keras.layers.Dense(\n        4,\n        activation=tf.nn.relu,\n        kernel_initializer=tf.keras.initializers.GlorotUniform()),\n    tf.keras.layers.Dense(\n        1, kernel_initializer=tf.keras.initializers.Constant(42)),\n])\n\nnet(X)\nprint(net.layers[1].weights[0])\nprint(net.layers[2].weights[0])"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "<tf.Variable 'dense_11/kernel:0' shape=(4, 4) dtype=float32, numpy=\narray([[-0.21554333, -0.35347915,  0.12952995,  0.07046962],\n       [-0.8507839 ,  0.2636276 , -0.12331295,  0.22391492],\n       [-0.6698353 , -0.58321923, -0.27298802, -0.788726  ],\n       [-0.39176962, -0.7421781 , -0.03715998,  0.16875058]],\n      dtype=float32)>\n<tf.Variable 'dense_12/kernel:0' shape=(4, 1) dtype=float32, numpy=\narray([[42.],\n       [42.],\n       [42.],\n       [42.]], dtype=float32)>"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "initializationtuy-chinh",
+      "text": "5.2.2.2. Initializationtùy chỉnh"
+    },
+    {
+      "type": "paragraph",
+      "text": "Đôi khi, các phương pháp khởi tạo chúng ta cần không được cung cấp bởi\nkhung học sâu. Trong ví dụ dưới đây, chúng ta định nghĩa một bộ khởi tạo\ncho bất kỳ tham số trọng lượng nào \\(w\\) bằng cách sử dụng phân phối\nlạ sau:"
+    },
+    {
+      "type": "math",
+      "latex": "(5.2.1)¶\\[\\begin{split}\\begin{aligned}\n    w \\sim \\begin{cases}\n        U(5, 10) & \\text{ with probability } \\frac{1}{4} \\\\\n            0    & \\text{ with probability } \\frac{1}{2} \\\\\n        U(-10, -5) & \\text{ with probability } \\frac{1}{4}\n    \\end{cases}\n\\end{aligned}\\end{split}\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Ở đây chúng ta định nghĩa một lớp con của lớp Initializer . Thông\nthường, chúng ta chỉ cần thực hiện hàm _init_weight mà lấy một đối\nsố tensor ( data ) và gán cho nó các giá trị khởi tạo mong muốn."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "class MyInit(init.Initializer):\n    def _init_weight(self, name, data):\n        print('Init', name, data.shape)\n        data[:] = np.random.uniform(-10, 10, data.shape)\n        data *= np.abs(data) >= 5\n\nnet.initialize(MyInit(), force_reinit=True)\nnet[0].weight.data()[:2]"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "Init dense0_weight (8, 4)\nInit dense1_weight (1, 8)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "array([[ 0.       , -0.       , -0.       ,  8.522827 ],\n       [ 0.       , -8.828651 , -0.       , -5.6012006]])"
+    },
+    {
+      "type": "paragraph",
+      "text": "Một lần nữa, chúng tôi triển khai một hàm my_init để áp dụng cho net ."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def my_init(m):\n    if type(m) == nn.Linear:\n        print(\"Init\", *[(name, param.shape)\n                        for name, param in m.named_parameters()][0])\n        nn.init.uniform_(m.weight, -10, 10)\n        m.weight.data *= m.weight.data.abs() >= 5\n\nnet.apply(my_init)\nnet[0].weight[:2]"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "Init weight torch.Size([8, 4])\nInit weight torch.Size([1, 8])"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "tensor([[-9.0877, -7.0061,  0.0000,  0.0000],\n        [ 0.0000,  0.0000,  5.4938, -0.0000]], grad_fn=<SliceBackward0>)"
+    },
+    {
+      "type": "paragraph",
+      "text": "Ở đây chúng ta định nghĩa một lớp con của Initializer và thực hiện\nhàm __call__ trả về một tensor mong muốn cho hình dạng và kiểu dữ\nliệu."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "class MyInit(tf.keras.initializers.Initializer):\n    def __call__(self, shape, dtype=None):\n        data=tf.random.uniform(shape, -10, 10, dtype=dtype)\n        factor=(tf.abs(data) >= 5)\n        factor=tf.cast(factor, tf.float32)\n        return data * factor\n\nnet = tf.keras.models.Sequential([\n    tf.keras.layers.Flatten(),\n    tf.keras.layers.Dense(\n        4,\n        activation=tf.nn.relu,\n        kernel_initializer=MyInit()),\n    tf.keras.layers.Dense(1),\n])\n\nnet(X)\nprint(net.layers[1].weights[0])"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "<tf.Variable 'dense_13/kernel:0' shape=(4, 4) dtype=float32, numpy=\narray([[ 8.091192 , -0.       , -0.       , -0.       ],\n       [ 0.       , -8.235128 , -0.       ,  0.       ],\n       [ 0.       , -6.736901 , -0.       , -5.679114 ],\n       [ 0.       ,  8.851505 , -7.3003507, -9.423661 ]], dtype=float32)>"
+    },
+    {
+      "type": "paragraph",
+      "text": "Lưu ý rằng chúng tôi luôn có tùy chọn đặt tham số trực tiếp."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "net[0].weight.data()[:] += 1\nnet[0].weight.data()[0, 0] = 42\nnet[0].weight.data()[0]"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "array([42.      ,  1.      ,  1.      ,  9.522827])"
+    },
+    {
+      "type": "paragraph",
+      "text": "Lưu ý cho người dùng nâng cao: nếu bạn muốn điều chỉnh các tham số trong\nphạm vi autograd , bạn cần sử dụng set_data để tránh nhầm lẫn cơ\nchế phân biệt tự động."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "net[0].weight.data[:] += 1\nnet[0].weight.data[0, 0] = 42\nnet[0].weight.data[0]"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "tensor([42.0000, -6.0061,  1.0000,  1.0000])"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "net.layers[1].weights[0][:].assign(net.layers[1].weights[0] + 1)\nnet.layers[1].weights[0][0, 0].assign(42)\nnet.layers[1].weights[0]"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "<tf.Variable 'dense_13/kernel:0' shape=(4, 4) dtype=float32, numpy=\narray([[42.       ,  1.       ,  1.       ,  1.       ],\n       [ 1.       , -7.2351284,  1.       ,  1.       ],\n       [ 1.       , -5.736901 ,  1.       , -4.679114 ],\n       [ 1.       ,  9.851505 , -6.3003507, -8.423661 ]], dtype=float32)>"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tham-so-tied",
+      "text": "5.2.3. Tham số Tied"
+    },
+    {
+      "type": "paragraph",
+      "text": "Thông thường, chúng tôi muốn chia sẻ các tham số trên nhiều lớp. Hãy để\nchúng tôi xem làm thế nào để làm điều này một cách thanh lịch. Sau đây,\nchúng tôi phân bổ một lớp dày đặc và sau đó sử dụng các tham số của nó\nđặc biệt để đặt các thông số của một lớp khác."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "net = nn.Sequential()\n# We need to give the shared layer a name so that we can refer to its\n# parameters\nshared = nn.Dense(8, activation='relu')\nnet.add(nn.Dense(8, activation='relu'),\n        shared,\n        nn.Dense(8, activation='relu', params=shared.params),\n        nn.Dense(10))\nnet.initialize()\n\nX = np.random.uniform(size=(2, 20))\nnet(X)\n\n# Check whether the parameters are the same\nprint(net[1].weight.data()[0] == net[2].weight.data()[0])\nnet[1].weight.data()[0, 0] = 100\n# Make sure that they are actually the same object rather than just having the\n# same value\nprint(net[1].weight.data()[0] == net[2].weight.data()[0])"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "[ True  True  True  True  True  True  True  True]\n[ True  True  True  True  True  True  True  True]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Ví dụ này cho thấy các tham số của lớp thứ hai và thứ ba được gắn. Chúng\nkhông chỉ bằng nhau, chúng được đại diện bởi cùng một tensor chính xác.\nDo đó, nếu chúng ta thay đổi một trong các tham số, cái kia cũng thay\nđổi. Bạn có thể tự hỏi, khi tham số được gắn những gì sẽ xảy ra với\ngradient? Vì các tham số mô hình chứa gradient, các gradient của lớp ẩn\nthứ hai và lớp ẩn thứ ba được thêm vào với nhau trong quá trình truyền\nngược."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "# We need to give the shared layer a name so that we can refer to its\n# parameters\nshared = nn.Linear(8, 8)\nnet = nn.Sequential(nn.Linear(4, 8), nn.ReLU(),\n                    shared, nn.ReLU(),\n                    shared, nn.ReLU(),\n                    nn.Linear(8, 1))\nnet(X)\n# Check whether the parameters are the same\nprint(net[2].weight.data[0] == net[4].weight.data[0])\nnet[2].weight.data[0, 0] = 100\n# Make sure that they are actually the same object rather than just having the\n# same value\nprint(net[2].weight.data[0] == net[4].weight.data[0])"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "tensor([True, True, True, True, True, True, True, True])\ntensor([True, True, True, True, True, True, True, True])"
+    },
+    {
+      "type": "paragraph",
+      "text": "Ví dụ này cho thấy các tham số của lớp thứ hai và thứ ba được gắn. Chúng\nkhông chỉ bằng nhau, chúng được đại diện bởi cùng một tensor chính xác.\nDo đó, nếu chúng ta thay đổi một trong các tham số, cái kia cũng thay\nđổi. Bạn có thể tự hỏi, khi tham số được gắn những gì sẽ xảy ra với\ngradient? Vì các tham số mô hình chứa gradient, các gradient của lớp ẩn\nthứ hai và lớp ẩn thứ ba được thêm vào với nhau trong quá trình truyền\nngược."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "# tf.keras behaves a bit differently. It removes the duplicate layer\n# automatically\nshared = tf.keras.layers.Dense(4, activation=tf.nn.relu)\nnet = tf.keras.models.Sequential([\n    tf.keras.layers.Flatten(),\n    shared,\n    shared,\n    tf.keras.layers.Dense(1),\n])\n\nnet(X)\n# Check whether the parameters are different\nprint(len(net.layers) == 3)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "True"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tom-tat",
+      "text": "5.2.4. Tóm tắt"
+    },
+    {
+      "type": "list",
+      "ordered": false,
+      "items": [
+        "Chúng tôi có một số cách để truy cập, khởi tạo và buộc các tham số mô\nhình.",
+        "Chúng ta có thể sử dụng khởi tạo tùy chỉnh."
+      ]
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bai-tap",
+      "text": "5.2.5. Bài tập"
+    },
+    {
+      "type": "list",
+      "ordered": true,
+      "items": [
+        "Sử dụng mô hình FancyMLP được xác định trong Section 5.1 và truy cập các tham số của các\nlớp khác nhau.",
+        "Nhìn vào tài liệu mô-đun khởi tạo để khám phá các trình khởi tạo khác\nnhau.",
+        "Xây dựng một MLP chứa một lớp tham số được chia sẻ và đào tạo nó.\nTrong quá trình đào tạo, quan sát các thông số mô hình và gradient\ncủa mỗi lớp.",
+        "Tại sao chia sẻ các thông số là một ý tưởng tốt?"
+      ]
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    }
+  ],
+  "images": [],
+  "text": "5.2. Quản lý tham số\nKhi chúng tôi đã chọn một kiến trúc và đặt các siêu tham số của mình,\nchúng tôi tiến hành vòng đào tạo, nơi mục tiêu của chúng tôi là tìm các\ngiá trị tham số giảm thiểu chức năng mất mát của chúng tôi. Sau khi đào\ntạo, chúng tôi sẽ cần các thông số này để đưa ra dự đoán trong tương\nlai. Ngoài ra, đôi khi chúng tôi sẽ muốn trích xuất các tham số để sử\ndụng lại chúng trong một số bối cảnh khác, để lưu mô hình của chúng tôi\nvào đĩa để nó có thể được thực thi trong phần mềm khác hoặc để kiểm tra\nvới hy vọng đạt được sự hiểu biết khoa học.\nHầu hết thời gian, chúng ta sẽ có thể bỏ qua các chi tiết nitty-gritty\nvề cách các tham số được khai báo và thao tác, dựa vào các khuôn khổ học\nsâu để thực hiện việc nâng nặng. Tuy nhiên, khi chúng ta di chuyển ra\nkhỏi các kiến trúc xếp chồng lên nhau với các lớp tiêu chuẩn, đôi khi\nchúng ta sẽ cần phải vào cỏ dại khai báo và thao tác các tham số. Trong\nphần này, chúng tôi đề cập đến những điều sau:\nTruy cập các tham số để gỡ lỗi, chẩn đoán và trực quan hóa.\nKhởi tạo tham số.\nChia sẻ các thông số trên các thành phần mô hình khác nhau.\nChúng tôi bắt đầu bằng cách tập trung vào MLP với một lớp ẩn.\n5.2.1. Truy cập tham số\nHãy để chúng tôi bắt đầu với cách truy cập các tham số từ các mô hình mà\nbạn đã biết. Khi một mô hình được định nghĩa thông qua lớp Sequential , trước tiên chúng ta có thể truy cập bất kỳ lớp nào bằng\ncách lập chỉ mục vào mô hình như thể nó là một danh sách. Các tham số\ncủa mỗi lớp được đặt thuận tiện trong thuộc tính của nó. Chúng ta có thể\nkiểm tra các tham số của lớp được kết nối hoàn toàn thứ hai như sau.\nĐầu ra cho chúng ta biết một vài điều quan trọng. Đầu tiên, lớp kết nối\nhoàn toàn này chứa hai tham số, tương ứng với trọng lượng và thành kiến\ncủa lớp đó, tương ứng. Cả hai đều được lưu trữ dưới dạng phao chính xác\nđơn (float32). Lưu ý rằng tên của các tham số cho phép chúng ta xác định\nduy nhất các tham số của từng lớp, ngay cả trong một mạng chứa hàng trăm\nlớp.\n5.2.1.1. Tham số được nhắm mục tiêu\nLưu ý rằng mỗi tham số được biểu diễn dưới dạng một đối tượng của lớp\ntham số. Để làm bất cứ điều gì hữu ích với các tham số, trước tiên chúng\nta cần truy cập các giá trị số cơ bản. Có một số cách để làm điều này.\nMột số đơn giản hơn trong khi những người khác nói chung hơn. Đoạn code\nsau trích xuất sự thiên vị từ lớp mạng nơ-ron thứ hai, nó trả về một đối\ntượng lớp tham số, và truy cập thêm giá trị của tham số đó.\nTham số là các đối tượng phức tạp, chứa các giá trị, độ dốc và thông tin\nbổ sung. Đó là lý do tại sao chúng ta cần yêu cầu giá trị một cách rõ\nràng.\nNgoài giá trị, mỗi tham số cũng cho phép chúng ta truy cập gradient. Bởi\nvì chúng tôi chưa gọi backpropagation cho mạng này được nêu ra, nó ở\ntrạng thái ban đầu của nó.\nTham số là các đối tượng phức tạp, chứa các giá trị, độ dốc và thông tin\nbổ sung. Đó là lý do tại sao chúng ta cần yêu cầu giá trị một cách rõ\nràng.\nNgoài giá trị, mỗi tham số cũng cho phép chúng ta truy cập gradient. Bởi\nvì chúng tôi chưa gọi backpropagation cho mạng này được nêu ra, nó ở\ntrạng thái ban đầu của nó.\n5.2.1.2. Tất cả các thông số tại một lần\nKhi chúng ta cần thực hiện các thao tác trên tất cả các tham số, truy\ncập chúng từng cái một có thể phát triển tẻ nhạt. Tình hình có thể phát\ntriển đặc biệt khó sử dụng khi chúng ta làm việc với các khối phức tạp\nhơn (ví dụ, các khối lồng nhau), vì chúng ta cần đệ quy qua toàn bộ cây\nđể trích xuất các tham số của từng khối phụ. Dưới đây chúng tôi chứng\nminh việc truy cập các tham số của lớp được kết nối hoàn toàn đầu tiên\nso với truy cập tất cả các lớp.\nĐiều này cung cấp cho chúng tôi một cách khác để truy cập các tham số\ncủa mạng như sau.\n5.2.1.3. Thu thập các thông số từ các khối lồng nhựa\nChúng ta hãy xem làm thế nào các quy ước đặt tên tham số hoạt động nếu\nchúng ta tổ nhiều khối bên trong nhau. Đối với điều đó đầu tiên chúng ta\nxác định một hàm tạo ra các khối (một nhà máy khối, có thể nói) và sau\nđó kết hợp các khối bên trong nhưng lớn hơn.\nBây giờ chúng tôi đã thiết kế mạng, chúng ta hãy xem nó được tổ chức như\nthế nào.\nKể từ khi các lớp được phân cấp lồng nhau, chúng ta cũng có thể truy cập\nchúng như thể lập chỉ mục thông qua các danh sách lồng nhau. Ví dụ,\nchúng ta có thể truy cập khối chính đầu tiên, bên trong đó khối phụ thứ\nhai và trong đó sự thiên vị của lớp đầu tiên, với như sau.\n5.2.2. Khởi tạo tham số\nBây giờ chúng ta đã biết cách truy cập các tham số, chúng ta hãy xem\ncách khởi tạo chúng đúng cách. Chúng tôi đã thảo luận về sự cần thiết\nphải khởi tạo thích hợp trong Section 4.8 . Khung\nhọc sâu cung cấp các khởi tạo ngẫu nhiên mặc định cho các lớp của nó.\nTuy nhiên, chúng tôi thường muốn khởi tạo trọng lượng của mình theo các\ngiao thức khác nhau. Khung cung cấp các giao thức được sử dụng phổ biến\nnhất và cũng cho phép tạo một trình khởi tạo tùy chỉnh.\nTheo mặc định, MXNet khởi tạo các tham số trọng lượng bằng cách vẽ ngẫu\nnhiên từ một phân phối thống nhất \\(U(-0.07, 0.07)\\) , xóa các tham\nsố thiên vị về 0. mô-đun init của MXNet cung cấp nhiều phương pháp\nkhởi tạo cài sẵn.\nTheo mặc định, PyTorch khởi tạo các ma trận trọng lượng và thiên vị đồng\nđều bằng cách vẽ từ một phạm vi được tính toán theo kích thước đầu vào\nvà đầu ra. mô-đun nn.init của PyTorch cung cấp một loạt các phương\npháp khởi tạo cài sẵn.\nTheo mặc định, Keras khởi tạo các ma trận trọng lượng đồng đều bằng cách\nvẽ từ một phạm vi được tính theo kích thước đầu vào và đầu ra, và các\ntham số thiên vị đều được đặt thành 0. TensorFlow cung cấp một loạt các\nphương pháp khởi tạo cả trong mô-đun gốc và mô-đun keras.initializers .\n5.2.2.1. Khởi tạo tích hợp\nHãy để chúng tôi bắt đầu bằng cách gọi trên built-in initializers. Mã\ndưới đây khởi tạo tất cả các tham số trọng lượng dưới dạng biến ngẫu\nnhiên Gaussian với độ lệch chuẩn 0,01, trong khi các tham số thiên vị bị\nxóa về 0.\nChúng ta cũng có thể khởi tạo tất cả các tham số thành một giá trị không\nđổi cho trước (ví dụ, 1).\nChúng tôi cũng có thể áp dụng các trình khởi tạo khác nhau cho các khối\nnhất định Ví dụ, bên dưới chúng ta khởi tạo lớp đầu tiên với trình khởi\ntạo Xavier và khởi tạo lớp thứ hai thành giá trị không đổi là 42.\n5.2.2.2. Initializationtùy chỉnh\nĐôi khi, các phương pháp khởi tạo chúng ta cần không được cung cấp bởi\nkhung học sâu. Trong ví dụ dưới đây, chúng ta định nghĩa một bộ khởi tạo\ncho bất kỳ tham số trọng lượng nào \\(w\\) bằng cách sử dụng phân phối\nlạ sau:\nỞ đây chúng ta định nghĩa một lớp con của lớp Initializer . Thông\nthường, chúng ta chỉ cần thực hiện hàm _init_weight mà lấy một đối\nsố tensor ( data ) và gán cho nó các giá trị khởi tạo mong muốn.\nMột lần nữa, chúng tôi triển khai một hàm my_init để áp dụng cho net .\nỞ đây chúng ta định nghĩa một lớp con của Initializer và thực hiện\nhàm __call__ trả về một tensor mong muốn cho hình dạng và kiểu dữ\nliệu.\nLưu ý rằng chúng tôi luôn có tùy chọn đặt tham số trực tiếp.\nLưu ý cho người dùng nâng cao: nếu bạn muốn điều chỉnh các tham số trong\nphạm vi autograd , bạn cần sử dụng set_data để tránh nhầm lẫn cơ\nchế phân biệt tự động.\n5.2.3. Tham số Tied\nThông thường, chúng tôi muốn chia sẻ các tham số trên nhiều lớp. Hãy để\nchúng tôi xem làm thế nào để làm điều này một cách thanh lịch. Sau đây,\nchúng tôi phân bổ một lớp dày đặc và sau đó sử dụng các tham số của nó\nđặc biệt để đặt các thông số của một lớp khác.\nVí dụ này cho thấy các tham số của lớp thứ hai và thứ ba được gắn. Chúng\nkhông chỉ bằng nhau, chúng được đại diện bởi cùng một tensor chính xác.\nDo đó, nếu chúng ta thay đổi một trong các tham số, cái kia cũng thay\nđổi. Bạn có thể tự hỏi, khi tham số được gắn những gì sẽ xảy ra với\ngradient? Vì các tham số mô hình chứa gradient, các gradient của lớp ẩn\nthứ hai và lớp ẩn thứ ba được thêm vào với nhau trong quá trình truyền\nngược.\nVí dụ này cho thấy các tham số của lớp thứ hai và thứ ba được gắn. Chúng\nkhông chỉ bằng nhau, chúng được đại diện bởi cùng một tensor chính xác.\nDo đó, nếu chúng ta thay đổi một trong các tham số, cái kia cũng thay\nđổi. Bạn có thể tự hỏi, khi tham số được gắn những gì sẽ xảy ra với\ngradient? Vì các tham số mô hình chứa gradient, các gradient của lớp ẩn\nthứ hai và lớp ẩn thứ ba được thêm vào với nhau trong quá trình truyền\nngược.\n5.2.4. Tóm tắt\nChúng tôi có một số cách để truy cập, khởi tạo và buộc các tham số mô\nhình.\nChúng ta có thể sử dụng khởi tạo tùy chỉnh.\n5.2.5. Bài tập\nSử dụng mô hình FancyMLP được xác định trong Section 5.1 và truy cập các tham số của các\nlớp khác nhau.\nNhìn vào tài liệu mô-đun khởi tạo để khám phá các trình khởi tạo khác\nnhau.\nXây dựng một MLP chứa một lớp tham số được chia sẻ và đào tạo nó.\nTrong quá trình đào tạo, quan sát các thông số mô hình và gradient\ncủa mỗi lớp.\nTại sao chia sẻ các thông số là một ý tưởng tốt?\nDiscussions\nDiscussions\nDiscussions"
+}

@@ -1,0 +1,213 @@
+{
+  "url": "https://vi.d2l.ai/chapter_natural-language-processing-pretraining/approx-training.html",
+  "chapter": "chapter_natural-language-processing-pretraining",
+  "title": "14.2. Đào tạo gần đúng",
+  "crawled_at": "2026-07-20T12:40:54.211315+00:00",
+  "headings": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "dao-tao-gan-dung",
+      "text": "14.2. Đào tạo gần đúng"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "lay-mau-am",
+      "text": "14.2.1. Lấy mẫu âm"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "phan-cap-softmax",
+      "text": "14.2.2. Phân cấp Softmax"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tom-tat",
+      "text": "14.2.3. Tóm tắt"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bai-tap",
+      "text": "14.2.4. Bài tập"
+    }
+  ],
+  "content": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "dao-tao-gan-dung",
+      "text": "14.2. Đào tạo gần đúng"
+    },
+    {
+      "type": "paragraph",
+      "text": "Nhớ lại các cuộc thảo luận của chúng tôi trong Section 14.1 .\nÝ tưởng chính của mô hình skip-gram là sử dụng các phép toán softmax để\ntính xác suất có điều kiện tạo ra một từ ngữ cảnh \\(w_o\\) dựa trên\ntừ trung tâm đã cho \\(w_c\\) trong (14.1.4) ,\ncó tổn thất logarit tương ứng được đưa ra bởi ngược lại (14.1.7) ."
+    },
+    {
+      "type": "paragraph",
+      "text": "Do tính chất của hoạt động softmax, vì một từ ngữ cảnh có thể là bất cứ\nai trong từ điển \\(\\mathcal{V}\\) , ngược lại với (14.1.7) chứa tổng các mục nhiều như toàn bộ kích\nthước của từ vựng. Do đó, tính toán gradient cho mô hình skip-gram trong (14.1.8) và cho mô hình túi-từ liên tục trong (14.1.15) cả hai đều chứa tổng. Thật không may, chi\nphí tính toán cho gradient như vậy tổng hợp trên một từ điển lớn (thường\nvới hàng trăm ngàn hoặc hàng triệu từ) là rất lớn!"
+    },
+    {
+      "type": "paragraph",
+      "text": "Để giảm độ phức tạp tính toán nói trên, phần này sẽ giới thiệu hai\nphương pháp đào tạo gần đúng: lấy mẫu tiêu cực và * phân cấp\nsoftmax*. Do sự giống nhau giữa mô hình skip-gram và mô hình túi từ\nliên tục, chúng tôi sẽ chỉ lấy mô hình skip-gram làm ví dụ để mô tả hai\nphương pháp đào tạo gần đúng này."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "lay-mau-am",
+      "text": "14.2.1. Lấy mẫu âm"
+    },
+    {
+      "type": "paragraph",
+      "text": "Lấy mẫu âm sửa đổi chức năng mục tiêu ban đầu. Với cửa sổ ngữ cảnh của\nmột từ trung tâm \\(w_c\\) , thực tế là bất kỳ từ nào (ngữ cảnh) \\(w_o\\) xuất phát từ cửa sổ ngữ cảnh này được coi là một sự kiện với\nxác suất được mô hình hóa bởi"
+    },
+    {
+      "type": "math",
+      "latex": "(14.2.1)¶\\[P(D=1\\mid w_c, w_o) = \\sigma(\\mathbf{u}_o^\\top \\mathbf{v}_c),\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "trong đó \\(\\sigma\\) sử dụng định nghĩa của hàm kích hoạt sigmoid:"
+    },
+    {
+      "type": "math",
+      "latex": "(14.2.2)¶\\[\\sigma(x) = \\frac{1}{1+\\exp(-x)}.\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Chúng ta hãy bắt đầu bằng cách tối đa hóa xác suất chung của tất cả các\nsự kiện như vậy trong chuỗi văn bản để đào tạo nhúng từ. Cụ thể, đưa ra\nmột chuỗi văn bản chiều dài \\(T\\) , biểu thị bằng \\(w^{(t)}\\) từ\ntại bước thời điểm \\(t\\) và để cho kích thước cửa sổ ngữ cảnh là \\(m\\) , xem xét tối đa hóa xác suất chung"
+    },
+    {
+      "type": "math",
+      "latex": "(14.2.3)¶\\[\\prod_{t=1}^{T} \\prod_{-m \\leq j \\leq m,\\ j \\neq 0} P(D=1\\mid w^{(t)}, w^{(t+j)}).\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Tuy nhiên, (14.2.3) chỉ xem xét những sự kiện\nliên quan đến các ví dụ tích cực. Kết quả là, xác suất chung trong (14.2.3) được tối đa hóa đến 1 chỉ khi tất cả\ncác vectơ từ bằng vô cực. Tất nhiên, kết quả như vậy là vô nghĩa. To\nmake the objective mục tiêu function chức năng more meaningfulý nghĩa, lấy mẫu tiêu cực thêm các ví dụ tiêu cực lấy mẫu từ một phân phối được\nxác định trước."
+    },
+    {
+      "type": "paragraph",
+      "text": "Biểu thị bởi \\(S\\) sự kiện mà một từ ngữ cảnh \\(w_o\\) xuất phát\ntừ cửa sổ ngữ cảnh của một từ trung tâm \\(w_c\\) . Đối với sự kiện này\nliên quan đến \\(w_o\\) , từ một phân phối được xác định trước \\(P(w)\\) mẫu \\(K\\) * tiếng ồn từ * không phải từ cửa sổ ngữ\ncảnh này. Biểu thị bởi \\(N_k\\) sự kiện rằng một từ tiếng ồn \\(w_k\\) ( \\(k=1, \\ldots, K\\) ) không đến từ cửa sổ ngữ cảnh của \\(w_c\\) . Giả sử rằng những sự kiện này liên quan đến cả ví dụ tích\ncực và các ví dụ tiêu cực \\(S, N_1, \\ldots, N_K\\) là độc lập lẫn\nnhau. Lấy mẫu âm viết lại xác suất chung (chỉ liên quan đến các ví dụ\ntích cực) trong (14.2.3) như"
+    },
+    {
+      "type": "math",
+      "latex": "(14.2.4)¶\\[\\prod_{t=1}^{T} \\prod_{-m \\leq j \\leq m,\\ j \\neq 0} P(w^{(t+j)} \\mid w^{(t)}),\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "trong đó xác suất có điều kiện được xấp xỉ thông qua các sự kiện \\(S, N_1, \\ldots, N_K\\) :"
+    },
+    {
+      "type": "math",
+      "latex": "(14.2.5)¶\\[P(w^{(t+j)} \\mid w^{(t)}) =P(D=1\\mid w^{(t)}, w^{(t+j)})\\prod_{k=1,\\ w_k \\sim P(w)}^K P(D=0\\mid w^{(t)}, w_k).\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Biểu thị bởi \\(i_t\\) và \\(h_k\\) các chỉ số của một từ \\(w^{(t)}\\) tại bước thời gian \\(t\\) của một chuỗi văn bản và\nmột từ tiếng ồn \\(w_k\\) , tương ứng. Sự mất mát logarit đối với xác\nsuất có điều kiện trong (14.2.5) là"
+    },
+    {
+      "type": "math",
+      "latex": "(14.2.6)¶\\[\\begin{split}\\begin{aligned}\n-\\log P(w^{(t+j)} \\mid w^{(t)})\n=& -\\log P(D=1\\mid w^{(t)}, w^{(t+j)}) - \\sum_{k=1,\\ w_k \\sim P(w)}^K \\log P(D=0\\mid w^{(t)}, w_k)\\\\\n=&-  \\log\\, \\sigma\\left(\\mathbf{u}_{i_{t+j}}^\\top \\mathbf{v}_{i_t}\\right) - \\sum_{k=1,\\ w_k \\sim P(w)}^K \\log\\left(1-\\sigma\\left(\\mathbf{u}_{h_k}^\\top \\mathbf{v}_{i_t}\\right)\\right)\\\\\n=&-  \\log\\, \\sigma\\left(\\mathbf{u}_{i_{t+j}}^\\top \\mathbf{v}_{i_t}\\right) - \\sum_{k=1,\\ w_k \\sim P(w)}^K \\log\\sigma\\left(-\\mathbf{u}_{h_k}^\\top \\mathbf{v}_{i_t}\\right).\n\\end{aligned}\\end{split}\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Chúng ta có thể thấy rằng bây giờ chi phí tính toán cho gradient ở mỗi\nbước đào tạo không liên quan gì đến kích thước từ điển, nhưng tuyến tính\nphụ thuộc vào \\(K\\) . Khi đặt siêu tham số \\(K\\) thành một giá\ntrị nhỏ hơn, chi phí tính toán cho gradient ở mỗi bước đào tạo với lấy\nmẫu âm nhỏ hơn."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "phan-cap-softmax",
+      "text": "14.2.2. Phân cấp Softmax"
+    },
+    {
+      "type": "paragraph",
+      "text": "Như một phương pháp đào tạo gần đúng thay thế, softmaxphân học sử dụng\ncây nhị phân, một cấu trúc dữ liệu minh họa trong Fig. 14.2.1 , trong đó mỗi nút lá của cây đại diện cho một\ntừ trong từ điển \\(\\mathcal{V}\\) ."
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/hi-softmax.svg",
+      "local_path": "_images/hi-softmax.svg",
+      "alt": "../_images/hi-softmax.svg"
+    },
+    {
+      "type": "paragraph",
+      "text": "Fig. 14.2.1 Hierarchical softmax for approximate training, where each leaf node\nof the tree represents a word in the dictionary. ¶"
+    },
+    {
+      "type": "paragraph",
+      "text": "Biểu thị bằng \\(L(w)\\) số nút (bao gồm cả hai đầu) trên đường dẫn từ\nnút gốc đến nút lá biểu diễn từ \\(w\\) trong cây nhị phân. Hãy để \\(n(w,j)\\) là nút \\(j^\\mathrm{th}\\) trên đường dẫn này, với\nvector từ ngữ cảnh của nó là \\(\\mathbf{u}_{n(w, j)}\\) . Ví dụ, \\(L(w_3) = 4\\) trong Fig. 14.2.1 . Softmax phân cấp\nxấp xỉ xác suất có điều kiện trong (14.1.4) như"
+    },
+    {
+      "type": "math",
+      "latex": "(14.2.7)¶\\[P(w_o \\mid w_c) = \\prod_{j=1}^{L(w_o)-1} \\sigma\\left( [\\![  n(w_o, j+1) = \\text{leftChild}(n(w_o, j)) ]\\!] \\cdot \\mathbf{u}_{n(w_o, j)}^\\top \\mathbf{v}_c\\right),\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "trong đó hàm \\(\\sigma\\) được định nghĩa trong (14.2.2) ,\nvà \\(\\text{leftChild}(n)\\) là nút con trái của nút \\(n\\) : nếu \\(x\\) là đúng, $ [! [x]!] = 1$; otherwise $ [! [x]!] = -1$."
+    },
+    {
+      "type": "paragraph",
+      "text": "Để minh họa, chúng ta hãy tính toán xác suất có điều kiện tạo từ \\(w_3\\) cho từ \\(w_c\\) trong Fig. 14.2.1 . Điều\nnày đòi hỏi các sản phẩm chấm giữa từ vector \\(\\mathbf{v}_c\\) của \\(w_c\\) và vectơ nút không lá trên đường đi (đường dẫn in đậm trong Fig. 14.2.1 ) từ gốc đến \\(w_3\\) , được đi qua trái,\nphải, sau đó trái:"
+    },
+    {
+      "type": "math",
+      "latex": "(14.2.8)¶\\[P(w_3 \\mid w_c) = \\sigma(\\mathbf{u}_{n(w_3, 1)}^\\top \\mathbf{v}_c) \\cdot \\sigma(-\\mathbf{u}_{n(w_3, 2)}^\\top \\mathbf{v}_c) \\cdot \\sigma(\\mathbf{u}_{n(w_3, 3)}^\\top \\mathbf{v}_c).\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Kể từ \\(\\sigma(x)+\\sigma(-x) = 1\\) , nó cho rằng xác suất có điều\nkiện của việc tạo ra tất cả các từ trong từ điển \\(\\mathcal{V}\\) dựa\ntrên bất kỳ từ nào \\(w_c\\) tổng hợp lên đến một:"
+    },
+    {
+      "type": "math",
+      "latex": "(14.2.9)¶\\[\\sum_{w \\in \\mathcal{V}} P(w \\mid w_c) = 1.\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "May mắn thay, vì \\(L(w_o)-1\\) theo thứ tự \\(\\mathcal{O}(\\text{log}_2|\\mathcal{V}|)\\) do cấu trúc cây nhị phân,\nkhi kích thước từ điển \\(\\mathcal{V}\\) rất lớn, chi phí tính toán\ncho mỗi bước đào tạo sử dụng softmax phân cấp được giảm đáng kể so với\nđiều đó mà không cần đào tạo gần đúng."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tom-tat",
+      "text": "14.2.3. Tóm tắt"
+    },
+    {
+      "type": "list",
+      "ordered": false,
+      "items": [
+        "Lấy mẫu âm xây dựng hàm mất bằng cách xem xét các sự kiện độc lập lẫn\nnhau liên quan đến cả ví dụ tích cực và tiêu cực. Chi phí tính toán\nđể đào tạo phụ thuộc tuyến tính vào số lượng từ tiếng ồn ở mỗi bước.",
+        "Phân cấp softmax cấu tạo hàm mất bằng cách sử dụng đường dẫn từ nút\ngốc đến nút lá trong cây nhị phân. Chi phí tính toán cho đào tạo phụ\nthuộc vào logarit của kích thước từ điển ở mỗi bước."
+      ]
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bai-tap",
+      "text": "14.2.4. Bài tập"
+    },
+    {
+      "type": "list",
+      "ordered": true,
+      "items": [
+        "Làm thế nào chúng ta có thể lấy mẫu từ tiếng ồn trong lấy mẫu tiêu\ncực?",
+        "Xác minh rằng (14.2.9) nắm giữ.",
+        "Làm thế nào để đào tạo mô hình túi từ liên tục bằng cách sử dụng lấy\nmẫu âm và softmax phân cấp, tương ứng?"
+      ]
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    }
+  ],
+  "images": [
+    {
+      "original_url": "https://vi.d2l.ai/_images/hi-softmax.svg",
+      "local_path": "_images/hi-softmax.svg",
+      "alt": "../_images/hi-softmax.svg"
+    }
+  ],
+  "text": "14.2. Đào tạo gần đúng\nNhớ lại các cuộc thảo luận của chúng tôi trong Section 14.1 .\nÝ tưởng chính của mô hình skip-gram là sử dụng các phép toán softmax để\ntính xác suất có điều kiện tạo ra một từ ngữ cảnh \\(w_o\\) dựa trên\ntừ trung tâm đã cho \\(w_c\\) trong (14.1.4) ,\ncó tổn thất logarit tương ứng được đưa ra bởi ngược lại (14.1.7) .\nDo tính chất của hoạt động softmax, vì một từ ngữ cảnh có thể là bất cứ\nai trong từ điển \\(\\mathcal{V}\\) , ngược lại với (14.1.7) chứa tổng các mục nhiều như toàn bộ kích\nthước của từ vựng. Do đó, tính toán gradient cho mô hình skip-gram trong (14.1.8) và cho mô hình túi-từ liên tục trong (14.1.15) cả hai đều chứa tổng. Thật không may, chi\nphí tính toán cho gradient như vậy tổng hợp trên một từ điển lớn (thường\nvới hàng trăm ngàn hoặc hàng triệu từ) là rất lớn!\nĐể giảm độ phức tạp tính toán nói trên, phần này sẽ giới thiệu hai\nphương pháp đào tạo gần đúng: lấy mẫu tiêu cực và * phân cấp\nsoftmax*. Do sự giống nhau giữa mô hình skip-gram và mô hình túi từ\nliên tục, chúng tôi sẽ chỉ lấy mô hình skip-gram làm ví dụ để mô tả hai\nphương pháp đào tạo gần đúng này.\n14.2.1. Lấy mẫu âm\nLấy mẫu âm sửa đổi chức năng mục tiêu ban đầu. Với cửa sổ ngữ cảnh của\nmột từ trung tâm \\(w_c\\) , thực tế là bất kỳ từ nào (ngữ cảnh) \\(w_o\\) xuất phát từ cửa sổ ngữ cảnh này được coi là một sự kiện với\nxác suất được mô hình hóa bởi\ntrong đó \\(\\sigma\\) sử dụng định nghĩa của hàm kích hoạt sigmoid:\nChúng ta hãy bắt đầu bằng cách tối đa hóa xác suất chung của tất cả các\nsự kiện như vậy trong chuỗi văn bản để đào tạo nhúng từ. Cụ thể, đưa ra\nmột chuỗi văn bản chiều dài \\(T\\) , biểu thị bằng \\(w^{(t)}\\) từ\ntại bước thời điểm \\(t\\) và để cho kích thước cửa sổ ngữ cảnh là \\(m\\) , xem xét tối đa hóa xác suất chung\nTuy nhiên, (14.2.3) chỉ xem xét những sự kiện\nliên quan đến các ví dụ tích cực. Kết quả là, xác suất chung trong (14.2.3) được tối đa hóa đến 1 chỉ khi tất cả\ncác vectơ từ bằng vô cực. Tất nhiên, kết quả như vậy là vô nghĩa. To\nmake the objective mục tiêu function chức năng more meaningfulý nghĩa, lấy mẫu tiêu cực thêm các ví dụ tiêu cực lấy mẫu từ một phân phối được\nxác định trước.\nBiểu thị bởi \\(S\\) sự kiện mà một từ ngữ cảnh \\(w_o\\) xuất phát\ntừ cửa sổ ngữ cảnh của một từ trung tâm \\(w_c\\) . Đối với sự kiện này\nliên quan đến \\(w_o\\) , từ một phân phối được xác định trước \\(P(w)\\) mẫu \\(K\\) * tiếng ồn từ * không phải từ cửa sổ ngữ\ncảnh này. Biểu thị bởi \\(N_k\\) sự kiện rằng một từ tiếng ồn \\(w_k\\) ( \\(k=1, \\ldots, K\\) ) không đến từ cửa sổ ngữ cảnh của \\(w_c\\) . Giả sử rằng những sự kiện này liên quan đến cả ví dụ tích\ncực và các ví dụ tiêu cực \\(S, N_1, \\ldots, N_K\\) là độc lập lẫn\nnhau. Lấy mẫu âm viết lại xác suất chung (chỉ liên quan đến các ví dụ\ntích cực) trong (14.2.3) như\ntrong đó xác suất có điều kiện được xấp xỉ thông qua các sự kiện \\(S, N_1, \\ldots, N_K\\) :\nBiểu thị bởi \\(i_t\\) và \\(h_k\\) các chỉ số của một từ \\(w^{(t)}\\) tại bước thời gian \\(t\\) của một chuỗi văn bản và\nmột từ tiếng ồn \\(w_k\\) , tương ứng. Sự mất mát logarit đối với xác\nsuất có điều kiện trong (14.2.5) là\nChúng ta có thể thấy rằng bây giờ chi phí tính toán cho gradient ở mỗi\nbước đào tạo không liên quan gì đến kích thước từ điển, nhưng tuyến tính\nphụ thuộc vào \\(K\\) . Khi đặt siêu tham số \\(K\\) thành một giá\ntrị nhỏ hơn, chi phí tính toán cho gradient ở mỗi bước đào tạo với lấy\nmẫu âm nhỏ hơn.\n14.2.2. Phân cấp Softmax\nNhư một phương pháp đào tạo gần đúng thay thế, softmaxphân học sử dụng\ncây nhị phân, một cấu trúc dữ liệu minh họa trong Fig. 14.2.1 , trong đó mỗi nút lá của cây đại diện cho một\ntừ trong từ điển \\(\\mathcal{V}\\) .\nFig. 14.2.1 Hierarchical softmax for approximate training, where each leaf node\nof the tree represents a word in the dictionary. ¶\nBiểu thị bằng \\(L(w)\\) số nút (bao gồm cả hai đầu) trên đường dẫn từ\nnút gốc đến nút lá biểu diễn từ \\(w\\) trong cây nhị phân. Hãy để \\(n(w,j)\\) là nút \\(j^\\mathrm{th}\\) trên đường dẫn này, với\nvector từ ngữ cảnh của nó là \\(\\mathbf{u}_{n(w, j)}\\) . Ví dụ, \\(L(w_3) = 4\\) trong Fig. 14.2.1 . Softmax phân cấp\nxấp xỉ xác suất có điều kiện trong (14.1.4) như\ntrong đó hàm \\(\\sigma\\) được định nghĩa trong (14.2.2) ,\nvà \\(\\text{leftChild}(n)\\) là nút con trái của nút \\(n\\) : nếu \\(x\\) là đúng, $ [! [x]!] = 1$; otherwise $ [! [x]!] = -1$.\nĐể minh họa, chúng ta hãy tính toán xác suất có điều kiện tạo từ \\(w_3\\) cho từ \\(w_c\\) trong Fig. 14.2.1 . Điều\nnày đòi hỏi các sản phẩm chấm giữa từ vector \\(\\mathbf{v}_c\\) của \\(w_c\\) và vectơ nút không lá trên đường đi (đường dẫn in đậm trong Fig. 14.2.1 ) từ gốc đến \\(w_3\\) , được đi qua trái,\nphải, sau đó trái:\nKể từ \\(\\sigma(x)+\\sigma(-x) = 1\\) , nó cho rằng xác suất có điều\nkiện của việc tạo ra tất cả các từ trong từ điển \\(\\mathcal{V}\\) dựa\ntrên bất kỳ từ nào \\(w_c\\) tổng hợp lên đến một:\nMay mắn thay, vì \\(L(w_o)-1\\) theo thứ tự \\(\\mathcal{O}(\\text{log}_2|\\mathcal{V}|)\\) do cấu trúc cây nhị phân,\nkhi kích thước từ điển \\(\\mathcal{V}\\) rất lớn, chi phí tính toán\ncho mỗi bước đào tạo sử dụng softmax phân cấp được giảm đáng kể so với\nđiều đó mà không cần đào tạo gần đúng.\n14.2.3. Tóm tắt\nLấy mẫu âm xây dựng hàm mất bằng cách xem xét các sự kiện độc lập lẫn\nnhau liên quan đến cả ví dụ tích cực và tiêu cực. Chi phí tính toán\nđể đào tạo phụ thuộc tuyến tính vào số lượng từ tiếng ồn ở mỗi bước.\nPhân cấp softmax cấu tạo hàm mất bằng cách sử dụng đường dẫn từ nút\ngốc đến nút lá trong cây nhị phân. Chi phí tính toán cho đào tạo phụ\nthuộc vào logarit của kích thước từ điển ở mỗi bước.\n14.2.4. Bài tập\nLàm thế nào chúng ta có thể lấy mẫu từ tiếng ồn trong lấy mẫu tiêu\ncực?\nXác minh rằng (14.2.9) nắm giữ.\nLàm thế nào để đào tạo mô hình túi từ liên tục bằng cách sử dụng lấy\nmẫu âm và softmax phân cấp, tương ứng?\nDiscussions"
+}

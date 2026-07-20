@@ -1,6 +1,9 @@
 /* ============================================================
-   LỘ TRÌNH HỌC — Roadmap page
-   Dùng lại design tokens từ global.css. Mọi class prefix `rm-`.
+   LỘ TRÌNH SỐNG — Roadmap page
+   Design system v2 (contract): nền calm, thẻ trắng phẳng, MỘT màu
+   nhấn (--primary) cho tương tác / tiến trình. Trạng thái theo ngữ
+   nghĩa: xong = --good, đang học/mở = --primary, khóa = --text-disabled.
+   Dùng token — KHÔNG hex trần → tự động dark-mode-aware. Prefix `rm-`.
    ============================================================ */
 
 .rm-page {
@@ -9,225 +12,463 @@
 
 /* ---- Section chung ---- */
 .rm-section {
-  margin-bottom: 26px;
+  margin-bottom: var(--sp-4);
 }
 .rm-head {
-  margin-bottom: 16px;
+  margin-bottom: var(--sp-2);
 }
 .rm-kicker {
   display: inline-block;
-  font-size: 12px;
+  font-size: var(--fs-caption);
   font-weight: 700;
   letter-spacing: 1.4px;
   text-transform: uppercase;
-  color: var(--accent);
-  margin-bottom: 6px;
+  color: var(--text-hint);
+  margin-bottom: var(--sp-1);
 }
 .rm-title {
-  font-size: 21px;
+  font-size: var(--fs-title);
+  font-weight: 650;
+  letter-spacing: -0.02em;
+  color: var(--text);
   margin: 0 0 4px;
 }
 .rm-lead {
-  color: var(--text-muted);
+  color: var(--text-secondary);
   font-size: 14px;
+  line-height: 1.6;
   margin: 0;
   max-width: 720px;
 }
 
-/* ---- Hero ---- */
+/* ============================================================
+   1. HERO — Bước tiếp theo nên học
+   ============================================================ */
 .rm-hero {
-  background:
-    radial-gradient(1200px 300px at 12% -30%, rgba(56, 189, 248, 0.16), transparent 60%),
-    radial-gradient(900px 300px at 100% -40%, rgba(232, 121, 249, 0.14), transparent 55%),
-    var(--panel);
+  background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 32px 28px;
-  margin: 8px 0 30px;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--elev-1);
+  padding: var(--sp-4);
+  margin: var(--sp-1) 0 var(--sp-4);
+}
+.rm-hero-kicker {
+  display: inline-block;
+  font-size: var(--fs-caption);
+  font-weight: 700;
+  letter-spacing: 1.4px;
+  text-transform: uppercase;
+  color: var(--primary);
+  margin-bottom: var(--sp-1);
 }
 .rm-hero-title {
-  font-size: 32px;
-  margin: 0 0 10px;
+  font-size: var(--fs-display);
+  font-weight: 700;
+  letter-spacing: -0.02em;
   line-height: 1.15;
+  color: var(--text);
+  margin: 0 0 var(--sp-2);
 }
-.rm-hero-grad {
-  background: linear-gradient(90deg, var(--accent), var(--vec-result));
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-.rm-hero p {
-  color: var(--text-muted);
-  max-width: 680px;
-  margin: 0 0 20px;
-  font-size: 15px;
-}
-.rm-hero-tags {
+.rm-hero-sub {
   display: flex;
+  align-items: center;
   flex-wrap: wrap;
   gap: 8px;
-  margin-bottom: 22px;
+  color: var(--text-secondary);
+  font-size: var(--fs-body);
+  line-height: 1.5;
+  margin: 0 0 var(--sp-3);
 }
-.rm-tag {
-  font-size: 12px;
-  padding: 5px 12px;
-  border-radius: 99px;
+.rm-hero-chip {
+  font-size: var(--fs-caption);
+  padding: 4px 10px;
+  border-radius: var(--radius-chip);
   background: var(--panel-2);
   border: 1px solid var(--border);
-  color: var(--text-muted);
+  color: var(--text-secondary);
+  font-variant-numeric: tabular-nums;
+}
+.rm-hero-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: var(--fs-body);
+  font-weight: 700;
+  color: white;
+  background: var(--primary);
+  padding: 12px 22px;
+  border-radius: var(--radius-btn);
+  text-decoration: none;
+  box-shadow: var(--elev-1);
+  transition: background var(--dur-2) var(--ease), transform var(--dur-2) var(--ease),
+    box-shadow var(--dur-2) var(--ease);
+}
+.rm-hero-cta:hover {
+  text-decoration: none;
+  color: white;
+  background: var(--accent-strong);
+  transform: translateY(-1px);
+  box-shadow: var(--elev-2);
 }
 
-/* ---- Total progress bar ---- */
+/* ---- Total progress bar (dùng chung) ---- */
 .rm-total {
-  background: var(--bg-elevated);
+  background: var(--panel-2);
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
-  padding: 14px 16px;
+  padding: var(--sp-2);
+  margin-top: var(--sp-3);
 }
 .rm-total-top {
   display: flex;
   justify-content: space-between;
   align-items: baseline;
-  margin-bottom: 10px;
+  margin-bottom: 12px;
   gap: 12px;
   flex-wrap: wrap;
 }
 .rm-total-label {
   font-size: 13px;
-  color: var(--text-muted);
+  color: var(--text-secondary);
 }
 .rm-total-num {
   font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
   font-size: 14px;
-  color: var(--accent);
+  color: var(--text);
   font-weight: 650;
 }
 .rm-bar {
   height: 9px;
-  background: var(--panel-2);
-  border-radius: 99px;
+  background: var(--primary-soft);
+  border-radius: var(--radius-chip);
   overflow: hidden;
 }
 .rm-bar > span {
   display: block;
   height: 100%;
-  border-radius: 99px;
-  background: linear-gradient(90deg, var(--accent), var(--vec-result));
-  transition: width 0.5s ease;
+  border-radius: var(--radius-chip);
+  background: var(--primary);
+  transition: width var(--dur-3) var(--ease);
 }
 
-/* ---- Timeline 14 bước ---- */
-.rm-timeline {
-  position: relative;
-  margin-top: 4px;
-}
-.rm-node {
-  position: relative;
-  display: grid;
-  grid-template-columns: 46px 1fr;
-  gap: 14px;
-  padding-bottom: 14px;
-}
-/* đường nối dọc */
-.rm-node::before {
-  content: '';
-  position: absolute;
-  left: 22px;
-  top: 40px;
-  bottom: -6px;
-  width: 2px;
-  background: linear-gradient(var(--border), var(--border-soft));
-}
-.rm-node:last-child::before {
-  display: none;
-}
-.rm-node-num {
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
+/* ---- Ghi chú cá nhân hóa ---- */
+.rm-pnotes {
   display: flex;
-  align-items: center;
-  justify-content: center;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: var(--sp-3);
+}
+.rm-pnote {
+  margin: 0;
+  padding: 10px 14px;
+  border-radius: var(--radius-sm);
+  background: var(--panel-2);
+  border: 1px dashed var(--border);
+  color: var(--text-secondary);
+  font-size: 13px;
+  line-height: 1.6;
+}
+.rm-pnote strong {
+  color: var(--text);
   font-weight: 700;
-  font-size: 16px;
-  color: var(--text-muted);
+}
+
+/* ============================================================
+   2. GỢI Ý ÔN TẬP THEO MASTERY
+   ============================================================ */
+.rm-review-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 10px;
+}
+.rm-review-item {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px 14px;
   background: var(--panel-2);
   border: 1px solid var(--border);
-  z-index: 1;
+  border-radius: var(--radius-sm);
+  text-decoration: none;
+  transition: border-color var(--dur-2) var(--ease), transform var(--dur-2) var(--ease);
+}
+.rm-review-item:hover {
+  text-decoration: none;
+  border-color: var(--primary);
+  transform: translateY(-1px);
+}
+.rm-review-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+  line-height: 1.4;
+}
+.rm-review-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.rm-review-bar {
+  flex: 1;
+  height: 6px;
+  background: var(--warn-soft);
+  border-radius: var(--radius-chip);
+  overflow: hidden;
+}
+.rm-review-bar > span {
+  display: block;
+  height: 100%;
+  border-radius: var(--radius-chip);
+  background: var(--warn);
+  transition: width var(--dur-3) var(--ease);
+}
+.rm-review-pct {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 12px;
+  font-weight: 650;
+  color: var(--warn);
   flex-shrink: 0;
 }
-.rm-node.done .rm-node-num {
-  color: #04121b;
-  background: linear-gradient(135deg, var(--good), #4ade80);
-  border-color: transparent;
+
+/* ============================================================
+   3–4. TRACK (cụm chương)
+   ============================================================ */
+.rm-track {
+  transition: opacity var(--dur-2) var(--ease);
 }
-.rm-node-body {
-  background: var(--panel);
+.rm-track.is-dim {
+  opacity: 0.7;
+}
+.rm-track.is-featured {
+  padding: var(--sp-2);
+  margin-left: calc(-1 * var(--sp-2));
+  margin-right: calc(-1 * var(--sp-2));
+  border-radius: var(--radius);
+  background: var(--primary-soft);
+}
+.rm-track-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--sp-2);
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+}
+.rm-track-tag {
+  display: inline-block;
+  font-size: var(--fs-caption);
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--text-hint);
+  margin-bottom: 2px;
+}
+.rm-track-name {
+  font-size: var(--fs-title);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--text);
+  margin: 0;
+}
+.rm-track-desc {
+  font-size: 13px;
+  color: var(--text-secondary);
+  margin: 4px 0 0;
+  max-width: 560px;
+}
+.rm-track-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+}
+.rm-track-count {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 14px;
+  font-weight: 650;
+  color: var(--text);
+}
+.rm-track-time {
+  font-size: 12px;
+  color: var(--text-hint);
+  font-variant-numeric: tabular-nums;
+}
+.rm-track-note {
+  margin: 0 0 10px;
+  font-size: 13px;
+  color: var(--text-secondary);
+  padding-left: 12px;
+  border-left: 3px solid var(--primary);
+}
+.rm-track-bar {
+  margin-bottom: var(--sp-2);
+}
+
+/* ---- Lưới các bước (Section) ---- */
+.rm-steps {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: var(--sp-2);
+}
+.rm-step {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  padding: 14px 16px;
-  transition: border 0.15s ease, transform 0.15s ease;
+  box-shadow: var(--elev-1);
+  padding: var(--sp-3);
+  transition: transform var(--dur-2) var(--ease), box-shadow var(--dur-2) var(--ease),
+    border-color var(--dur-2) var(--ease);
 }
-.rm-node-body:hover {
-  border-color: var(--accent);
+.rm-step:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--elev-2);
 }
-.rm-node.done .rm-node-body {
-  border-color: rgba(34, 197, 94, 0.4);
+/* Bước ĐANG XONG */
+.rm-step.is-done {
+  border-color: var(--good-soft);
 }
-.rm-node-titlerow {
+/* Bước KHÓA — làm mờ nhẹ, không nhấn */
+.rm-step.is-locked {
+  box-shadow: none;
+  background: var(--panel-2);
+}
+.rm-step.is-locked:hover {
+  transform: none;
+  box-shadow: none;
+}
+/* Bước TIẾP THEO NÊN HỌC — viền accent nổi bật */
+.rm-step.is-current {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px var(--primary-soft), var(--elev-1);
+}
+.rm-step-flag {
+  position: absolute;
+  top: -9px;
+  left: var(--sp-3);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+  color: white;
+  background: var(--primary);
+  padding: 2px 10px;
+  border-radius: var(--radius-chip);
+}
+.rm-step-top {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.rm-step-ringpct {
+  font-size: 11px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--text);
+}
+.rm-step-meta {
+  min-width: 0;
+  flex: 1;
+}
+.rm-step-titlerow {
   display: flex;
   align-items: center;
   gap: 8px;
   flex-wrap: wrap;
-  margin-bottom: 6px;
+  margin-bottom: 2px;
 }
-.rm-node-title {
-  font-size: 16px;
+.rm-step-num {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-hint);
+}
+.rm-step-badge {
+  font-size: 11px;
   font-weight: 650;
+  padding: 2px 8px;
+  border-radius: var(--radius-chip);
+}
+.rm-step-badge.is-done {
+  background: var(--good-soft);
+  color: var(--good);
+}
+.rm-step-badge.is-progress {
+  background: var(--primary-soft);
+  color: var(--primary);
+}
+.rm-step-badge.is-open {
+  background: var(--panel-2);
+  color: var(--text-secondary);
+}
+.rm-step-badge.is-locked {
+  background: var(--panel-2);
+  color: var(--text-disabled);
+}
+.rm-step-title {
+  font-size: var(--fs-body);
+  font-weight: 650;
+  letter-spacing: -0.01em;
+  color: var(--text);
   margin: 0;
 }
-.rm-node-check {
-  color: var(--good);
-  font-weight: 700;
-  font-size: 14px;
-}
-.rm-node-summary {
-  color: var(--text-muted);
-  font-size: 13.5px;
-  margin: 0 0 10px;
-}
-.rm-node-foot {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  flex-wrap: wrap;
-}
-.rm-node-formula {
-  padding: 3px 10px;
-  background: var(--bg-elevated);
-  border: 1px solid var(--border-soft);
-  border-radius: var(--radius-sm);
+.rm-step-sub {
   font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin: 0;
+  flex: 1;
 }
-.rm-cta {
+.rm-step-foot {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  flex-wrap: wrap;
+  font-size: 12px;
+  color: var(--text-hint);
+  font-variant-numeric: tabular-nums;
+}
+.rm-step-count {
+  font-weight: 650;
+  color: var(--text-secondary);
+}
+.rm-step-cta {
   display: inline-flex;
+  align-self: flex-start;
   align-items: center;
   gap: 4px;
   font-size: 13px;
   font-weight: 650;
-  color: var(--accent);
-  padding: 5px 12px;
-  border-radius: 99px;
-  border: 1px solid rgba(56, 189, 248, 0.35);
-  background: rgba(56, 189, 248, 0.08);
-  white-space: nowrap;
-}
-.rm-cta:hover {
+  color: var(--primary);
+  padding: 6px 14px;
+  border-radius: var(--radius-chip);
+  background: var(--primary-soft);
   text-decoration: none;
-  background: rgba(56, 189, 248, 0.16);
+  transition: color var(--dur-2) var(--ease);
+}
+.rm-step-cta:hover {
+  text-decoration: none;
+  color: var(--accent-strong);
+}
+.rm-step-lock {
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--text-disabled);
+  padding: 8px 12px;
+  background: var(--surface);
+  border: 1px dashed var(--border);
+  border-radius: var(--radius-sm);
 }
 
-/* ---- Vòng lặp thực hành (stepper ngang) ---- */
+/* ============================================================
+   5. Vòng lặp thực hành (stepper ngang)
+   ============================================================ */
 .rm-loop {
   display: flex;
   align-items: stretch;
@@ -236,7 +477,7 @@
 }
 .rm-loop-step {
   flex: 1 1 130px;
-  background: var(--bg-elevated);
+  background: var(--panel-2);
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
   padding: 12px;
@@ -249,10 +490,11 @@
   width: 24px;
   height: 24px;
   border-radius: 50%;
-  background: var(--panel-2);
-  color: var(--accent);
+  background: var(--primary-soft);
+  color: var(--primary);
   font-size: 12px;
   font-weight: 700;
+  font-variant-numeric: tabular-nums;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -265,276 +507,96 @@
 .rm-loop-arrow {
   display: flex;
   align-items: center;
-  color: var(--text-dim);
+  color: var(--text-hint);
   font-size: 18px;
 }
 .rm-loop-note {
   margin: 12px 0 0;
-  font-size: 12.5px;
-  color: var(--text-dim);
+  font-size: 13px;
+  color: var(--text-hint);
 }
 
-/* ---- Kế hoạch 8 tuần ---- */
-.rm-weeks {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(228px, 1fr));
-  gap: 14px;
-}
-.rm-week {
-  background: var(--panel);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 14px 15px;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  transition: transform 0.15s ease, border 0.15s ease;
-}
-.rm-week:hover {
-  transform: translateY(-2px);
-  border-color: var(--accent);
-}
-.rm-week-top {
-  display: flex;
-  align-items: baseline;
-  gap: 8px;
-}
-.rm-week-num {
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.6px;
-  color: var(--accent);
-}
-.rm-week-title {
-  font-size: 15px;
-  font-weight: 650;
-  margin: 0;
-}
-.rm-week-topics {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-  flex: 1;
-}
-.rm-week-topics li {
-  font-size: 12.5px;
-  color: var(--text-muted);
-  padding-left: 14px;
-  position: relative;
-}
-.rm-week-topics li::before {
-  content: '›';
-  position: absolute;
-  left: 2px;
-  color: var(--text-dim);
-}
-.rm-week-foot {
-  margin-top: 2px;
-}
-.rm-mini-top {
-  display: flex;
-  justify-content: space-between;
-  font-size: 11px;
-  color: var(--text-dim);
-  margin-bottom: 5px;
-}
-.rm-week-link {
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--accent);
-}
-
-/* ---- Cách học mỗi ngày ---- */
+/* ============================================================
+   6. Nhịp học mỗi ngày
+   ============================================================ */
 .rm-daily-cards {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
   gap: 12px;
-  margin-bottom: 14px;
+  margin-bottom: var(--sp-2);
 }
 .rm-daily-card {
-  background: var(--bg-elevated);
+  background: var(--panel-2);
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
-  padding: 13px 14px;
+  padding: var(--sp-2);
 }
 .rm-daily-min {
   font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
   font-size: 20px;
   font-weight: 700;
-  color: var(--accent);
+  color: var(--text);
 }
 .rm-daily-title {
-  font-size: 13.5px;
+  font-size: 14px;
   font-weight: 650;
-  margin: 4px 0 4px;
+  color: var(--text);
+  margin: 4px 0;
 }
 .rm-daily-desc {
   font-size: 12px;
-  color: var(--text-muted);
-  margin: 0 0 10px;
+  color: var(--text-secondary);
+  margin: 0 0 12px;
 }
 .rm-daily-bar {
   height: 6px;
-  background: var(--panel-2);
-  border-radius: 99px;
+  background: var(--primary-soft);
+  border-radius: var(--radius-chip);
   overflow: hidden;
 }
 .rm-daily-bar > span {
   display: block;
   height: 100%;
-  border-radius: 99px;
-  background: linear-gradient(90deg, var(--accent-2), var(--accent));
+  border-radius: var(--radius-chip);
+  background: var(--primary);
+  transition: width var(--dur-3) var(--ease);
 }
 .rm-quote {
   margin: 0;
-  padding: 14px 16px;
-  border-left: 3px solid var(--accent);
-  background: var(--bg-elevated);
+  padding: var(--sp-2) var(--sp-3);
+  border-left: 3px solid var(--primary);
+  background: var(--panel-2);
   border-radius: var(--radius-sm);
   color: var(--text);
   font-size: 14px;
+  line-height: 1.6;
 }
 .rm-quote b {
-  color: var(--accent);
-}
-
-/* ---- 7 Project ---- */
-.rm-projects {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-.rm-project {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  background: var(--bg-elevated);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  padding: 12px 14px;
-}
-.rm-project-idx {
-  width: 30px;
-  height: 30px;
-  border-radius: 8px;
-  flex-shrink: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 700;
-  font-size: 14px;
-  color: var(--vec-2);
-  background: rgba(249, 115, 22, 0.14);
-  border: 1px solid rgba(249, 115, 22, 0.3);
-}
-.rm-project-body {
-  flex: 1;
-  min-width: 0;
-}
-.rm-project-name {
-  font-size: 14px;
-  font-weight: 650;
-}
-.rm-project-desc {
-  font-size: 12.5px;
-  color: var(--text-muted);
-}
-.rm-project-link {
-  font-size: 12.5px;
-  font-weight: 600;
-  color: var(--accent);
-  white-space: nowrap;
-}
-
-/* ---- Công cụ ---- */
-.rm-tools {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-  gap: 10px;
-  margin-bottom: 14px;
-}
-.rm-tool {
-  display: flex;
-  gap: 10px;
-  align-items: baseline;
-  background: var(--bg-elevated);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  padding: 10px 13px;
-}
-.rm-tool-name {
-  font-family: var(--font-mono);
-  font-size: 13px;
-  font-weight: 700;
-  color: var(--vec-3);
-  flex-shrink: 0;
-}
-.rm-tool-role {
-  font-size: 12.5px;
-  color: var(--text-muted);
-}
-.rm-install {
-  font-family: var(--font-mono);
-  font-size: 13px;
-  background: #0b0d13;
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  padding: 12px 14px;
   color: var(--text);
-  overflow-x: auto;
-  white-space: pre;
-}
-.rm-install .rm-prompt {
-  color: var(--text-dim);
-  user-select: none;
+  font-weight: 700;
 }
 
-/* ---- Flowchart xử lý ảnh ---- */
-.rm-flow {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0;
-}
-.rm-flow-pill {
-  padding: 9px 18px;
-  border-radius: 99px;
-  background: var(--panel-2);
-  border: 1px solid var(--border);
-  color: var(--text);
-  font-size: 13.5px;
-  font-weight: 600;
-  text-align: center;
-}
-a.rm-flow-pill:hover {
-  text-decoration: none;
-  border-color: var(--accent);
-  color: var(--accent);
-}
-.rm-flow-pill.rm-flow-hi {
-  background: linear-gradient(90deg, rgba(56, 189, 248, 0.18), rgba(232, 121, 249, 0.18));
-  border-color: rgba(56, 189, 248, 0.4);
-}
-.rm-flow-arrow {
-  color: var(--text-dim);
-  font-size: 17px;
-  line-height: 1;
-  padding: 5px 0;
-}
-.rm-flow-note {
-  margin: 16px 0 0;
-  padding: 12px 14px;
-  border-radius: var(--radius-sm);
-  background: rgba(56, 189, 248, 0.07);
-  border: 1px dashed rgba(56, 189, 248, 0.35);
-  color: var(--text-muted);
-  font-size: 13px;
-}
-
+/* ============================================================
+   Responsive
+   ============================================================ */
 @media (max-width: 640px) {
-  .rm-node-body { padding: 12px 13px; }
-  .rm-loop-arrow { transform: rotate(90deg); }
+  .rm-hero {
+    padding: var(--sp-3);
+  }
+  .rm-hero-title {
+    font-size: var(--fs-heading);
+  }
+  .rm-step {
+    padding: var(--sp-2);
+  }
+  .rm-track-head {
+    align-items: flex-start;
+  }
+  .rm-track-stat {
+    align-items: flex-start;
+  }
+  .rm-loop-arrow {
+    transform: rotate(90deg);
+  }
 }

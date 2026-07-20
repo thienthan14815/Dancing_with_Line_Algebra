@@ -1,0 +1,221 @@
+{
+  "url": "https://vi.d2l.ai/chapter_preliminaries/lookup-api.html",
+  "chapter": "chapter_preliminaries",
+  "title": "2.7. Documentation",
+  "crawled_at": "2026-07-20T12:39:17.225102+00:00",
+  "headings": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "documentation",
+      "text": "2.7. Documentation"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tim-tat-ca-cac-ham-va-lop-hoc-trong-mot-mo-dun",
+      "text": "2.7.1. Tìm tất cả các hàm và lớp học trong một mô-đun"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tim-cach-su-dung-cac-ham-va-lop-cu-the",
+      "text": "2.7.2. Tìm cách sử dụng các hàm và lớp cụ thể"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tom-tat",
+      "text": "2.7.3. Tóm tắt"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bai-tap",
+      "text": "2.7.4. Bài tập"
+    }
+  ],
+  "content": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "documentation",
+      "text": "2.7. Documentation"
+    },
+    {
+      "type": "paragraph",
+      "text": "Do những hạn chế về độ dài của cuốn sách này, chúng tôi không thể giới\nthiệu mọi chức năng và lớp MXNet duy nhất (và có lẽ bạn sẽ không muốn\nchúng tôi). Các tài liệu API và các hướng dẫn bổ sung và ví dụ cung cấp\nnhiều tài liệu ngoài cuốn sách. Trong phần này, chúng tôi cung cấp cho\nbạn một số hướng dẫn để khám phá API MXNet."
+    },
+    {
+      "type": "paragraph",
+      "text": "Do những hạn chế về độ dài của cuốn sách này, chúng ta không thể giới\nthiệu mọi hàm và lớp PyTorch (và có lẽ bạn sẽ không muốn chúng tôi). Các\ntài liệu API và các hướng dẫn bổ sung và ví dụ cung cấp nhiều tài liệu\nngoài cuốn sách. Trong phần này, chúng tôi cung cấp cho bạn một số hướng\ndẫn để khám phá API PyTorch."
+    },
+    {
+      "type": "paragraph",
+      "text": "Do những hạn chế về độ dài của cuốn sách này, chúng ta không thể giới\nthiệu mọi hàm và lớp TensorFlow (và có lẽ bạn sẽ không muốn chúng tôi).\nCác tài liệu API và các hướng dẫn bổ sung và ví dụ cung cấp nhiều tài\nliệu ngoài cuốn sách. Trong phần này, chúng tôi cung cấp cho bạn một số\nhướng dẫn để khám phá API TensorFlow."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tim-tat-ca-cac-ham-va-lop-hoc-trong-mot-mo-dun",
+      "text": "2.7.1. Tìm tất cả các hàm và lớp học trong một mô-đun"
+    },
+    {
+      "type": "paragraph",
+      "text": "Để biết các hàm và lớp nào có thể được gọi trong một mô-đun, chúng ta\ngọi hàm dir . Ví dụ, chúng ta có thể truy vấn tất cả các thuộc tính\ntrong mô-đun để tạo ra số ngẫu nhiên:"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "from mxnet import np\n\nprint(dir(np.random))"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "['__all__', '__builtins__', '__cached__', '__doc__', '__file__', '__loader__', '__name__', '__package__', '__spec__', '_mx_nd_np', 'beta', 'chisquare', 'choice', 'exponential', 'gamma', 'gumbel', 'logistic', 'lognormal', 'multinomial', 'multivariate_normal', 'normal', 'pareto', 'power', 'rand', 'randint', 'randn', 'rayleigh', 'shuffle', 'uniform', 'weibull']"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "import torch\n\nprint(dir(torch.distributions))"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "['AbsTransform', 'AffineTransform', 'Bernoulli', 'Beta', 'Binomial', 'CatTransform', 'Categorical', 'Cauchy', 'Chi2', 'ComposeTransform', 'ContinuousBernoulli', 'CorrCholeskyTransform', 'Dirichlet', 'Distribution', 'ExpTransform', 'Exponential', 'ExponentialFamily', 'FisherSnedecor', 'Gamma', 'Geometric', 'Gumbel', 'HalfCauchy', 'HalfNormal', 'Independent', 'IndependentTransform', 'Kumaraswamy', 'LKJCholesky', 'Laplace', 'LogNormal', 'LogisticNormal', 'LowRankMultivariateNormal', 'LowerCholeskyTransform', 'MixtureSameFamily', 'Multinomial', 'MultivariateNormal', 'NegativeBinomial', 'Normal', 'OneHotCategorical', 'OneHotCategoricalStraightThrough', 'Pareto', 'Poisson', 'PowerTransform', 'RelaxedBernoulli', 'RelaxedOneHotCategorical', 'ReshapeTransform', 'SigmoidTransform', 'SoftmaxTransform', 'StackTransform', 'StickBreakingTransform', 'StudentT', 'TanhTransform', 'Transform', 'TransformedDistribution', 'Uniform', 'VonMises', 'Weibull', 'Wishart', '__all__', '__builtins__', '__cached__', '__doc__', '__file__', '__loader__', '__name__', '__package__', '__path__', '__spec__', 'bernoulli', 'beta', 'biject_to', 'binomial', 'categorical', 'cauchy', 'chi2', 'constraint_registry', 'constraints', 'continuous_bernoulli', 'dirichlet', 'distribution', 'exp_family', 'exponential', 'fishersnedecor', 'gamma', 'geometric', 'gumbel', 'half_cauchy', 'half_normal', 'identity_transform', 'independent', 'kl', 'kl_divergence', 'kumaraswamy', 'laplace', 'lkj_cholesky', 'log_normal', 'logistic_normal', 'lowrank_multivariate_normal', 'mixture_same_family', 'multinomial', 'multivariate_normal', 'negative_binomial', 'normal', 'one_hot_categorical', 'pareto', 'poisson', 'register_kl', 'relaxed_bernoulli', 'relaxed_categorical', 'studentT', 'transform_to', 'transformed_distribution', 'transforms', 'uniform', 'utils', 'von_mises', 'weibull', 'wishart']"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "import tensorflow as tf\n\nprint(dir(tf.random))"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "['Algorithm', 'Generator', '__builtins__', '__cached__', '__doc__', '__file__', '__loader__', '__name__', '__package__', '__path__', '__spec__', '_sys', 'all_candidate_sampler', 'categorical', 'create_rng_state', 'experimental', 'fixed_unigram_candidate_sampler', 'gamma', 'get_global_generator', 'learned_unigram_candidate_sampler', 'log_uniform_candidate_sampler', 'normal', 'poisson', 'set_global_generator', 'set_seed', 'shuffle', 'stateless_binomial', 'stateless_categorical', 'stateless_gamma', 'stateless_normal', 'stateless_parameterized_truncated_normal', 'stateless_poisson', 'stateless_truncated_normal', 'stateless_uniform', 'truncated_normal', 'uniform', 'uniform_candidate_sampler']"
+    },
+    {
+      "type": "paragraph",
+      "text": "Nói chung, chúng ta có thể bỏ qua các hàm bắt đầu và kết thúc bằng __ (các đối tượng đặc biệt trong Python) hoặc các hàm bắt đầu bằng\nmột _ duy nhất (thường là hàm nội bộ). Dựa trên hàm hoặc tên thuộc\ntính còn lại, chúng ta có thể nguy hiểm đoán rằng mô-đun này cung cấp\ncác phương pháp khác nhau để tạo ra các số ngẫu nhiên, bao gồm lấy mẫu\ntừ phân phối thống nhất ( uniform ), phân phối bình thường\n( normal ), và phân phối đa phương thức ( multinomial )."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tim-cach-su-dung-cac-ham-va-lop-cu-the",
+      "text": "2.7.2. Tìm cách sử dụng các hàm và lớp cụ thể"
+    },
+    {
+      "type": "paragraph",
+      "text": "Đối với các hướng dẫn cụ thể hơn về cách sử dụng một hàm hoặc lớp nhất\nđịnh, chúng ta có thể gọi hàm help . Ví dụ, chúng ta hãy khám phá các\nhướng dẫn sử dụng cho hàm ones của tensor."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "help(np.ones)"
+    },
+    {
+      "type": "code",
+      "language": null,
+      "text": "Help on function ones in module mxnet.numpy:\n\nones(shape, dtype=<class 'numpy.float32'>, order='C', ctx=None)\n    Return a new array of given shape and type, filled with ones.\n    This function currently only supports storing multi-dimensional data\n    in row-major (C-style).\n\n    Parameters\n    ----------\n    shape : int or tuple of int\n        The shape of the empty array.\n    dtype : str or numpy.dtype, optional\n        An optional value type. Default is numpy.float32. Note that this\n        behavior is different from NumPy's ones function where float64\n        is the default value, because float32 is considered as the default\n        data type in deep learning.\n    order : {'C'}, optional, default: 'C'\n        How to store multi-dimensional data in memory, currently only row-major\n        (C-style) is supported.\n    ctx : Context, optional\n        An optional device context (default is the current default context).\n\n    Returns\n    -------\n    out : ndarray\n        Array of ones with the given shape, dtype, and ctx.\n\n    Examples\n    --------\n    >>> np.ones(5)\n    array([1., 1., 1., 1., 1.])\n\n    >>> np.ones((5,), dtype=int)\n    array([1, 1, 1, 1, 1], dtype=int64)\n\n    >>> np.ones((2, 1))\n    array([[1.],\n           [1.]])\n\n    >>> s = (2,2)\n    >>> np.ones(s)\n    array([[1., 1.],\n           [1., 1.]])"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "help(torch.ones)"
+    },
+    {
+      "type": "code",
+      "language": null,
+      "text": "Help on built-in function ones:\n\nones(...)\n    ones(*size, *, out=None, dtype=None, layout=torch.strided, device=None, requires_grad=False) -> Tensor\n\n    Returns a tensor filled with the scalar value 1, with the shape defined\n    by the variable argument size.\n\n    Args:\n        size (int...): a sequence of integers defining the shape of the output tensor.\n            Can be a variable number of arguments or a collection like a list or tuple.\n\n    Keyword arguments:\n        out (Tensor, optional): the output tensor.\n        dtype (torch.dtype, optional): the desired data type of returned tensor.\n            Default: if None, uses a global default (see torch.set_default_tensor_type()).\n        layout (torch.layout, optional): the desired layout of returned Tensor.\n            Default: torch.strided.\n        device (torch.device, optional): the desired device of returned tensor.\n            Default: if None, uses the current device for the default tensor type\n            (see torch.set_default_tensor_type()). device will be the CPU\n            for CPU tensor types and the current CUDA device for CUDA tensor types.\n        requires_grad (bool, optional): If autograd should record operations on the\n            returned tensor. Default: False.\n\n    Example::\n\n        >>> torch.ones(2, 3)\n        tensor([[ 1.,  1.,  1.],\n                [ 1.,  1.,  1.]])\n\n        >>> torch.ones(5)\n        tensor([ 1.,  1.,  1.,  1.,  1.])"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "help(tf.ones)"
+    },
+    {
+      "type": "code",
+      "language": null,
+      "text": "Help on function ones in module tensorflow.python.ops.array_ops:\n\nones(shape, dtype=tf.float32, name=None)\n    Creates a tensor with all elements set to one (1).\n\n    See also tf.ones_like, tf.zeros, tf.fill, tf.eye.\n\n    This operation returns a tensor of type dtype with shape shape and\n    all elements set to one.\n\n    >>> tf.ones([3, 4], tf.int32)\n    <tf.Tensor: shape=(3, 4), dtype=int32, numpy=\n    array([[1, 1, 1, 1],\n           [1, 1, 1, 1],\n           [1, 1, 1, 1]], dtype=int32)>\n\n    Args:\n      shape: A list of integers, a tuple of integers, or\n        a 1-D Tensor of type int32.\n      dtype: Optional DType of an element in the resulting Tensor. Default is\n        tf.float32.\n      name: Optional string. A name for the operation.\n\n    Returns:\n      A Tensor with all elements set to one (1)."
+    },
+    {
+      "type": "paragraph",
+      "text": "Từ tài liệu, chúng ta có thể thấy rằng hàm ones tạo ra một tensor\nmới với hình dạng được chỉ định và đặt tất cả các phần tử thành giá trị\ncủa 1. Bất cứ khi nào có thể, bạn nên chạy một bài kiểm tra nhanh để xác\nnhận giải thích của bạn:"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "np.ones(4)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "array([1., 1., 1., 1.])"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "torch.ones(4)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "tensor([1., 1., 1., 1.])"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "tf.ones(4)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "<tf.Tensor: shape=(4,), dtype=float32, numpy=array([1., 1., 1., 1.], dtype=float32)>"
+    },
+    {
+      "type": "paragraph",
+      "text": "Trong sổ ghi chép Jupyter, chúng ta có thể sử dụng ? để hiển thị\ntài liệu trong một cửa sổ khác. Ví dụ: list? sẽ tạo nội dung gần\ngiống với help(list) , hiển thị nó trong một cửa sổ trình duyệt mới.\nNgoài ra, nếu chúng ta sử dụng hai dấu hỏi, chẳng hạn như list?? , mã\nPython thực hiện hàm cũng sẽ được hiển thị."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tom-tat",
+      "text": "2.7.3. Tóm tắt"
+    },
+    {
+      "type": "list",
+      "ordered": false,
+      "items": [
+        "Tài liệu chính thức cung cấp rất nhiều mô tả và ví dụ vượt ra ngoài\ncuốn sách này.",
+        "Chúng ta có thể tra cứu tài liệu cho việc sử dụng API bằng cách gọi\ncác hàm dir và help , hoặc ? and ?? trong máy tính\nxách tay Jupyter."
+      ]
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bai-tap",
+      "text": "2.7.4. Bài tập"
+    },
+    {
+      "type": "list",
+      "ordered": true,
+      "items": [
+        "Tra cứu tài liệu cho bất kỳ chức năng hoặc lớp học nào trong khuôn\nkhổ học sâu. Bạn cũng có thể tìm thấy tài liệu trên trang web chính\nthức của khuôn khổ?"
+      ]
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    }
+  ],
+  "images": [],
+  "text": "2.7. Documentation\nDo những hạn chế về độ dài của cuốn sách này, chúng tôi không thể giới\nthiệu mọi chức năng và lớp MXNet duy nhất (và có lẽ bạn sẽ không muốn\nchúng tôi). Các tài liệu API và các hướng dẫn bổ sung và ví dụ cung cấp\nnhiều tài liệu ngoài cuốn sách. Trong phần này, chúng tôi cung cấp cho\nbạn một số hướng dẫn để khám phá API MXNet.\nDo những hạn chế về độ dài của cuốn sách này, chúng ta không thể giới\nthiệu mọi hàm và lớp PyTorch (và có lẽ bạn sẽ không muốn chúng tôi). Các\ntài liệu API và các hướng dẫn bổ sung và ví dụ cung cấp nhiều tài liệu\nngoài cuốn sách. Trong phần này, chúng tôi cung cấp cho bạn một số hướng\ndẫn để khám phá API PyTorch.\nDo những hạn chế về độ dài của cuốn sách này, chúng ta không thể giới\nthiệu mọi hàm và lớp TensorFlow (và có lẽ bạn sẽ không muốn chúng tôi).\nCác tài liệu API và các hướng dẫn bổ sung và ví dụ cung cấp nhiều tài\nliệu ngoài cuốn sách. Trong phần này, chúng tôi cung cấp cho bạn một số\nhướng dẫn để khám phá API TensorFlow.\n2.7.1. Tìm tất cả các hàm và lớp học trong một mô-đun\nĐể biết các hàm và lớp nào có thể được gọi trong một mô-đun, chúng ta\ngọi hàm dir . Ví dụ, chúng ta có thể truy vấn tất cả các thuộc tính\ntrong mô-đun để tạo ra số ngẫu nhiên:\nNói chung, chúng ta có thể bỏ qua các hàm bắt đầu và kết thúc bằng __ (các đối tượng đặc biệt trong Python) hoặc các hàm bắt đầu bằng\nmột _ duy nhất (thường là hàm nội bộ). Dựa trên hàm hoặc tên thuộc\ntính còn lại, chúng ta có thể nguy hiểm đoán rằng mô-đun này cung cấp\ncác phương pháp khác nhau để tạo ra các số ngẫu nhiên, bao gồm lấy mẫu\ntừ phân phối thống nhất ( uniform ), phân phối bình thường\n( normal ), và phân phối đa phương thức ( multinomial ).\n2.7.2. Tìm cách sử dụng các hàm và lớp cụ thể\nĐối với các hướng dẫn cụ thể hơn về cách sử dụng một hàm hoặc lớp nhất\nđịnh, chúng ta có thể gọi hàm help . Ví dụ, chúng ta hãy khám phá các\nhướng dẫn sử dụng cho hàm ones của tensor.\nTừ tài liệu, chúng ta có thể thấy rằng hàm ones tạo ra một tensor\nmới với hình dạng được chỉ định và đặt tất cả các phần tử thành giá trị\ncủa 1. Bất cứ khi nào có thể, bạn nên chạy một bài kiểm tra nhanh để xác\nnhận giải thích của bạn:\nTrong sổ ghi chép Jupyter, chúng ta có thể sử dụng ? để hiển thị\ntài liệu trong một cửa sổ khác. Ví dụ: list? sẽ tạo nội dung gần\ngiống với help(list) , hiển thị nó trong một cửa sổ trình duyệt mới.\nNgoài ra, nếu chúng ta sử dụng hai dấu hỏi, chẳng hạn như list?? , mã\nPython thực hiện hàm cũng sẽ được hiển thị.\n2.7.3. Tóm tắt\nTài liệu chính thức cung cấp rất nhiều mô tả và ví dụ vượt ra ngoài\ncuốn sách này.\nChúng ta có thể tra cứu tài liệu cho việc sử dụng API bằng cách gọi\ncác hàm dir và help , hoặc ? and ?? trong máy tính\nxách tay Jupyter.\n2.7.4. Bài tập\nTra cứu tài liệu cho bất kỳ chức năng hoặc lớp học nào trong khuôn\nkhổ học sâu. Bạn cũng có thể tìm thấy tài liệu trên trang web chính\nthức của khuôn khổ?\nDiscussions\nDiscussions\nDiscussions"
+}

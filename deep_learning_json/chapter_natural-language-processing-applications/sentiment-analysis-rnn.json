@@ -1,0 +1,333 @@
+{
+  "url": "https://vi.d2l.ai/chapter_natural-language-processing-applications/sentiment-analysis-rnn.html",
+  "chapter": "chapter_natural-language-processing-applications",
+  "title": "15.2. Phân tích tình cảm: Sử dụng mạng nơ-ron tái phát",
+  "crawled_at": "2026-07-20T12:41:04.581454+00:00",
+  "headings": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "phan-tich-tinh-cam-su-dung-mang-no-ron-tai-phat",
+      "text": "15.2. Phân tích tình cảm: Sử dụng mạng nơ-ron tái phát"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "dai-dien-cho-van-ban-don-voi-rnns",
+      "text": "15.2.1. Đại diện cho văn bản đơn với RNNs"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "dang-tai-pretrained-word-vecto",
+      "text": "15.2.2. Đang tải Pretrained Word Vectơ"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "dao-tao-va-danh-gia-mo-hinh",
+      "text": "15.2.3. Đào tạo và đánh giá mô hình"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tom-tat",
+      "text": "15.2.4. Tóm tắt"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bai-tap",
+      "text": "15.2.5. Bài tập"
+    }
+  ],
+  "content": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "phan-tich-tinh-cam-su-dung-mang-no-ron-tai-phat",
+      "text": "15.2. Phân tích tình cảm: Sử dụng mạng nơ-ron tái phát"
+    },
+    {
+      "type": "paragraph",
+      "text": "Giống như sự tương đồng từ và các nhiệm vụ tương tự, chúng ta cũng có\nthể áp dụng các vectơ từ được đào tạo trước vào phân tích tình cảm. Vì\ntập dữ liệu đánh giá IMDb trong Section 15.1 không lớn lắm,\nsử dụng các đại diện văn bản đã được đào tạo trước trên corpora quy mô\nlớn có thể làm giảm quá mức của mô hình. Như một ví dụ cụ thể được minh\nhọa trong Fig. 15.2.1 , chúng tôi sẽ đại diện cho mỗi\nmã thông báo bằng cách sử dụng mô hình Glove được đào tạo trước và đưa\ncác biểu diễn token này thành RNN hai chiều nhiều lớp để có được biểu\ndiễn chuỗi văn bản, sẽ được chuyển thành đầu ra phân tích tình cảm [Maas et al., 2011] . Đối với cùng một ứng dụng hạ lưu,\nchúng tôi sẽ xem xét một sự lựa chọn kiến trúc khác nhau sau này."
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/nlp-map-sa-rnn.svg",
+      "local_path": "_images/nlp-map-sa-rnn.svg",
+      "alt": "../_images/nlp-map-sa-rnn.svg"
+    },
+    {
+      "type": "paragraph",
+      "text": "Fig. 15.2.1 This section feeds pretrained GloVe to an RNN-based architecture for\nsentiment analysis. ¶"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "from mxnet import gluon, init, np, npx\nfrom mxnet.gluon import nn, rnn\nfrom d2l import mxnet as d2l\n\nnpx.set_np()\n\nbatch_size = 64\ntrain_iter, test_iter, vocab = d2l.load_data_imdb(batch_size)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "import torch\nfrom torch import nn\nfrom d2l import torch as d2l\n\nbatch_size = 64\ntrain_iter, test_iter, vocab = d2l.load_data_imdb(batch_size)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "Downloading ../data/aclImdb_v1.tar.gz from http://ai.stanford.edu/~amaas/data/sentiment/aclImdb_v1.tar.gz..."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "dai-dien-cho-van-ban-don-voi-rnns",
+      "text": "15.2.1. Đại diện cho văn bản đơn với RNNs"
+    },
+    {
+      "type": "paragraph",
+      "text": "Trong các tác vụ phân loại văn bản, chẳng hạn như phân tích tình cảm,\nmột chuỗi văn bản có độ dài khác nhau sẽ được chuyển đổi thành các loại\ncó độ dài cố định. Trong lớp BiRNN sau, trong khi mỗi token của một\nchuỗi văn bản được biểu diễn Glove trước riêng lẻ của nó thông qua lớp\nnhúng ( self.embedding ), toàn bộ chuỗi được mã hóa bởi một RNN hai\nchiều ( self.encoder ). Cụ thể hơn, các trạng thái ẩn (ở lớp cuối\ncùng) của LSTM hai chiều ở cả hai bước thời gian ban đầu và cuối cùng\nđược nối như là biểu diễn của chuỗi văn bản. Biểu diễn văn bản đơn này\nsau đó được chuyển đổi thành các loại đầu ra bởi một lớp kết nối hoàn\ntoàn ( self.decoder ) với hai đầu ra (“dương” và “âm”)."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "class BiRNN(nn.Block):\n    def __init__(self, vocab_size, embed_size, num_hiddens,\n                 num_layers, **kwargs):\n        super(BiRNN, self).__init__(**kwargs)\n        self.embedding = nn.Embedding(vocab_size, embed_size)\n        # Set `bidirectional` to True to get a bidirectional RNN\n        self.encoder = rnn.LSTM(num_hiddens, num_layers=num_layers,\n                                bidirectional=True, input_size=embed_size)\n        self.decoder = nn.Dense(2)\n\n    def forward(self, inputs):\n        # The shape of `inputs` is (batch size, no. of time steps). Because\n        # LSTM requires its input's first dimension to be the temporal\n        # dimension, the input is transposed before obtaining token\n        # representations. The output shape is (no. of time steps, batch size,\n        # word vector dimension)\n        embeddings = self.embedding(inputs.T)\n        # Returns hidden states of the last hidden layer at different time\n        # steps. The shape of `outputs` is (no. of time steps, batch size,\n        # 2 * no. of hidden units)\n        outputs = self.encoder(embeddings)\n        # Concatenate the hidden states at the initial and final time steps as\n        # the input of the fully-connected layer. Its shape is (batch size,\n        # 4 * no. of hidden units)\n        encoding = np.concatenate((outputs[0], outputs[-1]), axis=1)\n        outs = self.decoder(encoding)\n        return outs"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "class BiRNN(nn.Module):\n    def __init__(self, vocab_size, embed_size, num_hiddens,\n                 num_layers, **kwargs):\n        super(BiRNN, self).__init__(**kwargs)\n        self.embedding = nn.Embedding(vocab_size, embed_size)\n        # Set `bidirectional` to True to get a bidirectional RNN\n        self.encoder = nn.LSTM(embed_size, num_hiddens, num_layers=num_layers,\n                                bidirectional=True)\n        self.decoder = nn.Linear(4 * num_hiddens, 2)\n\n    def forward(self, inputs):\n        # The shape of `inputs` is (batch size, no. of time steps). Because\n        # LSTM requires its input's first dimension to be the temporal\n        # dimension, the input is transposed before obtaining token\n        # representations. The output shape is (no. of time steps, batch size,\n        # word vector dimension)\n        embeddings = self.embedding(inputs.T)\n        self.encoder.flatten_parameters()\n        # Returns hidden states of the last hidden layer at different time\n        # steps. The shape of `outputs` is (no. of time steps, batch size,\n        # 2 * no. of hidden units)\n        outputs, _ = self.encoder(embeddings)\n        # Concatenate the hidden states of the initial time step and final\n        # time step to use as the input of the fully connected layer. Its\n        # shape is (batch size, 4 * no. of hidden units)\n        encoding = torch.cat((outputs[0], outputs[-1]), dim=1)\n        # Concatenate the hidden states at the initial and final time steps as\n        # the input of the fully-connected layer. Its shape is (batch size,\n        # 4 * no. of hidden units)\n        outs = self.decoder(encoding)\n        return outs"
+    },
+    {
+      "type": "paragraph",
+      "text": "Chúng ta hãy xây dựng một RNN hai chiều với hai lớp ẩn để đại diện cho\nvăn bản duy nhất để phân tích tình cảm."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "embed_size, num_hiddens, num_layers, devices = 100, 100, 2, d2l.try_all_gpus()\nnet = BiRNN(len(vocab), embed_size, num_hiddens, num_layers)\n\nnet.initialize(init.Xavier(), ctx=devices)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "embed_size, num_hiddens, num_layers, devices = 100, 100, 2, d2l.try_all_gpus()\nnet = BiRNN(len(vocab), embed_size, num_hiddens, num_layers)\n\ndef init_weights(m):\n    if type(m) == nn.Linear:\n        nn.init.xavier_uniform_(m.weight)\n    if type(m) == nn.LSTM:\n        for param in m._flat_weights_names:\n            if \"weight\" in param:\n                nn.init.xavier_uniform_(m._parameters[param])\nnet.apply(init_weights);"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "dang-tai-pretrained-word-vecto",
+      "text": "15.2.2. Đang tải Pretrained Word Vectơ"
+    },
+    {
+      "type": "paragraph",
+      "text": "Dưới đây chúng tôi tải các bản nhúng Glove 100 chiều được đào tạo trước\n(cần phải phù hợp với embed_size ) Glove cho các mã thông báo trong\ntừ vựng."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "glove_embedding = d2l.TokenEmbedding('glove.6b.100d')"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "glove_embedding = d2l.TokenEmbedding('glove.6b.100d')"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "Downloading ../data/glove.6B.100d.zip from http://d2l-data.s3-accelerate.amazonaws.com/glove.6B.100d.zip..."
+    },
+    {
+      "type": "paragraph",
+      "text": "In hình dạng của các vectơ cho tất cả các mã thông báo trong từ vựng."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "embeds = glove_embedding[vocab.idx_to_token]\nembeds.shape"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "(49346, 100)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "embeds = glove_embedding[vocab.idx_to_token]\nembeds.shape"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "torch.Size([49346, 100])"
+    },
+    {
+      "type": "paragraph",
+      "text": "Chúng tôi sử dụng các vectơ từ được đào tạo trước này để đại diện cho\ncác mã thông báo trong các đánh giá và sẽ không cập nhật các vectơ này\ntrong quá trình đào tạo."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "net.embedding.weight.set_data(embeds)\nnet.embedding.collect_params().setattr('grad_req', 'null')"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "net.embedding.weight.data.copy_(embeds)\nnet.embedding.weight.requires_grad = False"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "dao-tao-va-danh-gia-mo-hinh",
+      "text": "15.2.3. Đào tạo và đánh giá mô hình"
+    },
+    {
+      "type": "paragraph",
+      "text": "Bây giờ chúng ta có thể đào tạo RNN hai chiều để phân tích tình cảm."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "lr, num_epochs = 0.01, 5\ntrainer = gluon.Trainer(net.collect_params(), 'adam', {'learning_rate': lr})\nloss = gluon.loss.SoftmaxCrossEntropyLoss()\nd2l.train_ch13(net, train_iter, test_iter, loss, trainer, num_epochs, devices)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "loss 0.297, train acc 0.872, test acc 0.846\n707.2 examples/sec on [gpu(0), gpu(1)]"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_sentiment-analysis-rnn_6199ad_57_1.svg",
+      "local_path": "_images/output_sentiment-analysis-rnn_6199ad_57_1.svg",
+      "alt": "../_images/output_sentiment-analysis-rnn_6199ad_57_1.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "lr, num_epochs = 0.01, 5\ntrainer = torch.optim.Adam(net.parameters(), lr=lr)\nloss = nn.CrossEntropyLoss(reduction=\"none\")\nd2l.train_ch13(net, train_iter, test_iter, loss, trainer, num_epochs, devices)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "loss 0.304, train acc 0.875, test acc 0.849\n709.9 examples/sec on [device(type='cuda', index=0), device(type='cuda', index=1)]"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_sentiment-analysis-rnn_6199ad_60_1.svg",
+      "local_path": "_images/output_sentiment-analysis-rnn_6199ad_60_1.svg",
+      "alt": "../_images/output_sentiment-analysis-rnn_6199ad_60_1.svg"
+    },
+    {
+      "type": "paragraph",
+      "text": "Chúng tôi xác định hàm sau để dự đoán tình cảm của một chuỗi văn bản\nbằng cách sử dụng mô hình được đào tạo net ."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "#@save\ndef predict_sentiment(net, vocab, sequence):\n    \"\"\"Predict the sentiment of a text sequence.\"\"\"\n    sequence = np.array(vocab[sequence.split()], ctx=d2l.try_gpu())\n    label = np.argmax(net(sequence.reshape(1, -1)), axis=1)\n    return 'positive' if label == 1 else 'negative'"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "#@save\ndef predict_sentiment(net, vocab, sequence):\n    \"\"\"Predict the sentiment of a text sequence.\"\"\"\n    sequence = torch.tensor(vocab[sequence.split()], device=d2l.try_gpu())\n    label = torch.argmax(net(sequence.reshape(1, -1)), dim=1)\n    return 'positive' if label == 1 else 'negative'"
+    },
+    {
+      "type": "paragraph",
+      "text": "Cuối cùng, chúng ta hãy sử dụng mô hình được đào tạo để dự đoán tình cảm\ncho hai câu đơn giản."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "predict_sentiment(net, vocab, 'this movie is so great')"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "'positive'"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "predict_sentiment(net, vocab, 'this movie is so bad')"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "'negative'"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "predict_sentiment(net, vocab, 'this movie is so great')"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "'positive'"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "predict_sentiment(net, vocab, 'this movie is so bad')"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "'negative'"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tom-tat",
+      "text": "15.2.4. Tóm tắt"
+    },
+    {
+      "type": "list",
+      "ordered": false,
+      "items": [
+        "Vectơ từ được đào tạo trước có thể đại diện cho các mã thông báo\nriêng lẻ trong một chuỗi văn bản.",
+        "Các RNN hai chiều có thể đại diện cho một chuỗi văn bản, chẳng hạn\nnhư thông qua việc nối các trạng thái ẩn của nó ở các bước thời gian\nban đầu và cuối cùng. Biểu diễn văn bản đơn này có thể được chuyển\nđổi thành các danh mục bằng cách sử dụng một lớp được kết nối hoàn\ntoàn."
+      ]
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bai-tap",
+      "text": "15.2.5. Bài tập"
+    },
+    {
+      "type": "list",
+      "ordered": true,
+      "items": [
+        "Tăng số lượng kỷ nguyên. Bạn có thể cải thiện việc đào tạo và kiểm\ntra độ chính xác? Làm thế nào về điều chỉnh các siêu tham số khác?",
+        "Sử dụng các vectơ từ được đào tạo trước lớn hơn, chẳng hạn như nhúng\ngăng tay 300 chiều. Nó có cải thiện độ chính xác phân loại không?",
+        "Chúng ta có thể cải thiện độ chính xác phân loại bằng cách sử dụng\ntoken hóa spacy không? Bạn cần cài đặt spacy ( pip install spacy )\nvà cài đặt gói tiếng Anh ( python -m spacy download en ). Trong mã,\nđầu tiên, nhập khẩu spacy ( import spacy ). Sau đó, tải gói spacy\ntiếng Anh ( spacy_en = spacy.load('en') ). Cuối cùng, xác định hàm def tokenizer(text): return [tok.text for tok in spacy_en.tokenizer(text)] và thay thế hàm tokenizer ban đầu. Lưu ý các dạng mã thông báo\ncụm từ khác nhau trong Glove và spacy. Ví dụ, cụm từ token “new york”\ncó dạng “new-york” trong Glove và dạng “new york” sau khi mã hóa\nspacy."
+      ]
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    }
+  ],
+  "images": [
+    {
+      "original_url": "https://vi.d2l.ai/_images/nlp-map-sa-rnn.svg",
+      "local_path": "_images/nlp-map-sa-rnn.svg",
+      "alt": "../_images/nlp-map-sa-rnn.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_sentiment-analysis-rnn_6199ad_57_1.svg",
+      "local_path": "_images/output_sentiment-analysis-rnn_6199ad_57_1.svg",
+      "alt": "../_images/output_sentiment-analysis-rnn_6199ad_57_1.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_sentiment-analysis-rnn_6199ad_60_1.svg",
+      "local_path": "_images/output_sentiment-analysis-rnn_6199ad_60_1.svg",
+      "alt": "../_images/output_sentiment-analysis-rnn_6199ad_60_1.svg"
+    }
+  ],
+  "text": "15.2. Phân tích tình cảm: Sử dụng mạng nơ-ron tái phát\nGiống như sự tương đồng từ và các nhiệm vụ tương tự, chúng ta cũng có\nthể áp dụng các vectơ từ được đào tạo trước vào phân tích tình cảm. Vì\ntập dữ liệu đánh giá IMDb trong Section 15.1 không lớn lắm,\nsử dụng các đại diện văn bản đã được đào tạo trước trên corpora quy mô\nlớn có thể làm giảm quá mức của mô hình. Như một ví dụ cụ thể được minh\nhọa trong Fig. 15.2.1 , chúng tôi sẽ đại diện cho mỗi\nmã thông báo bằng cách sử dụng mô hình Glove được đào tạo trước và đưa\ncác biểu diễn token này thành RNN hai chiều nhiều lớp để có được biểu\ndiễn chuỗi văn bản, sẽ được chuyển thành đầu ra phân tích tình cảm [Maas et al., 2011] . Đối với cùng một ứng dụng hạ lưu,\nchúng tôi sẽ xem xét một sự lựa chọn kiến trúc khác nhau sau này.\nFig. 15.2.1 This section feeds pretrained GloVe to an RNN-based architecture for\nsentiment analysis. ¶\n15.2.1. Đại diện cho văn bản đơn với RNNs\nTrong các tác vụ phân loại văn bản, chẳng hạn như phân tích tình cảm,\nmột chuỗi văn bản có độ dài khác nhau sẽ được chuyển đổi thành các loại\ncó độ dài cố định. Trong lớp BiRNN sau, trong khi mỗi token của một\nchuỗi văn bản được biểu diễn Glove trước riêng lẻ của nó thông qua lớp\nnhúng ( self.embedding ), toàn bộ chuỗi được mã hóa bởi một RNN hai\nchiều ( self.encoder ). Cụ thể hơn, các trạng thái ẩn (ở lớp cuối\ncùng) của LSTM hai chiều ở cả hai bước thời gian ban đầu và cuối cùng\nđược nối như là biểu diễn của chuỗi văn bản. Biểu diễn văn bản đơn này\nsau đó được chuyển đổi thành các loại đầu ra bởi một lớp kết nối hoàn\ntoàn ( self.decoder ) với hai đầu ra (“dương” và “âm”).\nChúng ta hãy xây dựng một RNN hai chiều với hai lớp ẩn để đại diện cho\nvăn bản duy nhất để phân tích tình cảm.\n15.2.2. Đang tải Pretrained Word Vectơ\nDưới đây chúng tôi tải các bản nhúng Glove 100 chiều được đào tạo trước\n(cần phải phù hợp với embed_size ) Glove cho các mã thông báo trong\ntừ vựng.\nIn hình dạng của các vectơ cho tất cả các mã thông báo trong từ vựng.\nChúng tôi sử dụng các vectơ từ được đào tạo trước này để đại diện cho\ncác mã thông báo trong các đánh giá và sẽ không cập nhật các vectơ này\ntrong quá trình đào tạo.\n15.2.3. Đào tạo và đánh giá mô hình\nBây giờ chúng ta có thể đào tạo RNN hai chiều để phân tích tình cảm.\nChúng tôi xác định hàm sau để dự đoán tình cảm của một chuỗi văn bản\nbằng cách sử dụng mô hình được đào tạo net .\nCuối cùng, chúng ta hãy sử dụng mô hình được đào tạo để dự đoán tình cảm\ncho hai câu đơn giản.\n15.2.4. Tóm tắt\nVectơ từ được đào tạo trước có thể đại diện cho các mã thông báo\nriêng lẻ trong một chuỗi văn bản.\nCác RNN hai chiều có thể đại diện cho một chuỗi văn bản, chẳng hạn\nnhư thông qua việc nối các trạng thái ẩn của nó ở các bước thời gian\nban đầu và cuối cùng. Biểu diễn văn bản đơn này có thể được chuyển\nđổi thành các danh mục bằng cách sử dụng một lớp được kết nối hoàn\ntoàn.\n15.2.5. Bài tập\nTăng số lượng kỷ nguyên. Bạn có thể cải thiện việc đào tạo và kiểm\ntra độ chính xác? Làm thế nào về điều chỉnh các siêu tham số khác?\nSử dụng các vectơ từ được đào tạo trước lớn hơn, chẳng hạn như nhúng\ngăng tay 300 chiều. Nó có cải thiện độ chính xác phân loại không?\nChúng ta có thể cải thiện độ chính xác phân loại bằng cách sử dụng\ntoken hóa spacy không? Bạn cần cài đặt spacy ( pip install spacy )\nvà cài đặt gói tiếng Anh ( python -m spacy download en ). Trong mã,\nđầu tiên, nhập khẩu spacy ( import spacy ). Sau đó, tải gói spacy\ntiếng Anh ( spacy_en = spacy.load('en') ). Cuối cùng, xác định hàm def tokenizer(text): return [tok.text for tok in spacy_en.tokenizer(text)] và thay thế hàm tokenizer ban đầu. Lưu ý các dạng mã thông báo\ncụm từ khác nhau trong Glove và spacy. Ví dụ, cụm từ token “new york”\ncó dạng “new-york” trong Glove và dạng “new york” sau khi mã hóa\nspacy.\nDiscussions\nDiscussions"
+}

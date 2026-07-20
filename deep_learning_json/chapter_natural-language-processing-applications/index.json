@@ -1,0 +1,108 @@
+{
+  "url": "https://vi.d2l.ai/chapter_natural-language-processing-applications/index.html",
+  "chapter": "chapter_natural-language-processing-applications",
+  "title": "15. Xử lý ngôn ngữ tự nhiên: Ứng dụng",
+  "crawled_at": "2026-07-20T12:41:02.633881+00:00",
+  "headings": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "xu-ly-ngon-ngu-tu-nhien-ung-dung",
+      "text": "15. Xử lý ngôn ngữ tự nhiên: Ứng dụng"
+    }
+  ],
+  "content": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "xu-ly-ngon-ngu-tu-nhien-ung-dung",
+      "text": "15. Xử lý ngôn ngữ tự nhiên: Ứng dụng"
+    },
+    {
+      "type": "paragraph",
+      "text": "Chúng tôi đã thấy cách đại diện cho thẻ trong chuỗi văn bản và đào tạo\ncác đại diện của chúng trong Section 14 . Các đại diện\nvăn bản được đào tạo trước như vậy có thể được đưa vào các mô hình khác\nnhau cho các nhiệm vụ xử lý ngôn ngữ tự nhiên hạ nguồn khác nhau."
+    },
+    {
+      "type": "paragraph",
+      "text": "Trên thực tế, các chương trước đó đã thảo luận về một số ứng dụng xử lý\nngôn ngữ tự nhiên mà không cần pretraining , just for explaining giải\nthích deepsâu learning học tập architectures kiến trúc. Ví dụ, trong Section 8 , chúng tôi đã dựa vào RNN để thiết kế các mô hình\nngôn ngữ để tạo ra văn bản giống như tiểu thuyết. Trong Section 9 và Section 10 , chúng tôi\ncũng đã thiết kế các mô hình dựa trên RNNs và cơ chế chú ý cho dịch máy."
+    },
+    {
+      "type": "paragraph",
+      "text": "Tuy nhiên, cuốn sách này không có ý định bao gồm tất cả các ứng dụng như\nvậy một cách toàn diện. Thay vào đó, trọng tâm của chúng tôi là * làm\nthế nào để áp dụng (sâu) đại diện học ngôn ngữ để giải quyết các vấn đề\nxử lý ngôn ngữ tự nhiên*. Với các đại diện văn bản được đào tạo trước,\nchương này sẽ khám phá hai nhiệm vụ xử lý ngôn ngữ tự nhiên ở hạ nguồn\nphổ biến và đại diện: phân tích tình cảm và suy luận ngôn ngữ tự nhiên,\nphân tích văn bản đơn lẻ và mối quan hệ của các cặp văn bản, tương ứng."
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/nlp-map-app.svg",
+      "local_path": "_images/nlp-map-app.svg",
+      "alt": "../_images/nlp-map-app.svg"
+    },
+    {
+      "type": "paragraph",
+      "text": "Fig. 15.1 Pretrained text representations can be fed to various deep learning\narchitectures for different downstream natural language processing\napplications. This chapter focuses on how to design models for\ndifferent downstream natural language processing applications. ¶"
+    },
+    {
+      "type": "paragraph",
+      "text": "Như được mô tả trong Fig. 15.1 , chương này tập trung\nvào việc mô tả các ý tưởng cơ bản của việc thiết kế các mô hình xử lý\nngôn ngữ tự nhiên sử dụng các loại kiến trúc học sâu khác nhau, chẳng\nhạn như MLP, CNN, RNN s, và sự chú ý. Mặc dù có thể kết hợp bất kỳ biểu\ndiễn văn bản được đào tạo trước với bất kỳ kiến trúc nào cho một trong\nhai ứng dụng trong Fig. 15.1 , chúng tôi chọn một vài\nkết hợp đại diện. Cụ thể, chúng tôi sẽ khám phá các kiến trúc phổ biến\ndựa trên RNNs và CNN để phân tích tình cảm. Đối với suy luận ngôn ngữ tự\nnhiên, chúng tôi chọn sự chú ý và MLP để chứng minh cách phân tích các\ncặp văn bản. Cuối cùng, chúng tôi giới thiệu cách tinh chỉnh mô hình\nBERT được đào tạo trước cho một loạt các ứng dụng xử lý ngôn ngữ tự\nnhiên, chẳng hạn như ở cấp độ trình tự (phân loại văn bản đơn và phân\nloại cặp văn bản) và mức mã thông báo (gắn thẻ văn bản và trả lời câu\nhỏi). Là một trường hợp thực nghiệm cụ thể, chúng tôi sẽ tinh chỉnh BERT\ncho suy luận ngôn ngữ tự nhiên."
+    },
+    {
+      "type": "paragraph",
+      "text": "Như chúng tôi đã giới thiệu trong Section 14.8 , BERT đòi hỏi\nnhững thay đổi kiến trúc tối thiểu cho một loạt các ứng dụng xử lý ngôn\nngữ tự nhiên. Tuy nhiên, lợi ích này đi kèm với chi phí tinh chỉnh một\nsố lượng lớn các thông số BERT cho các ứng dụng hạ lưu. Khi không gian\nhoặc thời gian bị hạn chế, những mô hình được chế tạo dựa trên MLP, CNN,\nRNN và sự chú ý sẽ khả thi hơn. Sau đây, chúng ta bắt đầu bằng ứng dụng\nphân tích tình cảm và minh họa thiết kế mô hình dựa trên RNN và CNN,\ntương ứng."
+    },
+    {
+      "type": "list",
+      "ordered": false,
+      "items": [
+        "15.1. Phân tích tình cảm và tập dữ liệu 15.1.1. Đọc tập dữ liệu 15.1.2. Xử lý trước bộ dữ liệu 15.1.3. Tạo bộ lặp dữ liệu 15.1.4. Đặt tất cả mọi thứ lại với nhau 15.1.5. Tóm tắt 15.1.6. Bài tập",
+        "15.1.1. Đọc tập dữ liệu",
+        "15.1.2. Xử lý trước bộ dữ liệu",
+        "15.1.3. Tạo bộ lặp dữ liệu",
+        "15.1.4. Đặt tất cả mọi thứ lại với nhau",
+        "15.1.5. Tóm tắt",
+        "15.1.6. Bài tập",
+        "15.2. Phân tích tình cảm: Sử dụng mạng nơ-ron tái phát 15.2.1. Đại diện cho văn bản đơn với RNNs 15.2.2. Đang tải Pretrained Word Vectơ 15.2.3. Đào tạo và đánh giá mô hình 15.2.4. Tóm tắt 15.2.5. Bài tập",
+        "15.2.1. Đại diện cho văn bản đơn với RNNs",
+        "15.2.2. Đang tải Pretrained Word Vectơ",
+        "15.2.3. Đào tạo và đánh giá mô hình",
+        "15.2.4. Tóm tắt",
+        "15.2.5. Bài tập",
+        "15.3. Phân tích tình cảm: Sử dụng mạng thần kinh phức tạp 15.3.1. Một chiều Convolutions 15.3.2. Max-Over-Time Pooling 15.3.3. Mô hình textCNN 15.3.4. Tóm tắt 15.3.5. Bài tập",
+        "15.3.1. Một chiều Convolutions",
+        "15.3.2. Max-Over-Time Pooling",
+        "15.3.3. Mô hình textCNN",
+        "15.3.4. Tóm tắt",
+        "15.3.5. Bài tập",
+        "15.4. Suy luận ngôn ngữ tự nhiên và tập dữ liệu 15.4.1. Suy luận ngôn ngữ tự nhiên 15.4.2. Bộ dữ liệu Suy luận ngôn ngữ tự nhiên Stanford (SNLI) 15.4.3. Tóm tắt 15.4.4. Bài tập",
+        "15.4.1. Suy luận ngôn ngữ tự nhiên",
+        "15.4.2. Bộ dữ liệu Suy luận ngôn ngữ tự nhiên Stanford (SNLI)",
+        "15.4.3. Tóm tắt",
+        "15.4.4. Bài tập",
+        "15.5. Suy luận ngôn ngữ tự nhiên: Sử dụng sự chú ý 15.5.1. Mô hình 15.5.2. Đào tạo và đánh giá mô hình 15.5.3. Tóm tắt 15.5.4. Bài tập",
+        "15.5.1. Mô hình",
+        "15.5.2. Đào tạo và đánh giá mô hình",
+        "15.5.3. Tóm tắt",
+        "15.5.4. Bài tập",
+        "15.6. Tinh chỉnh BERT cho các ứng dụng cấp Sequence-Level và Token-Level 15.6.1. Phân loại văn bản đơn 15.6.2. Phân loại cặp văn bản hoặc hồi quy 15.6.3. Gắn thẻ văn bản 15.6.4. Câu hỏi trả lời 15.6.5. Tóm tắt 15.6.6. Bài tập",
+        "15.6.1. Phân loại văn bản đơn",
+        "15.6.2. Phân loại cặp văn bản hoặc hồi quy",
+        "15.6.3. Gắn thẻ văn bản",
+        "15.6.4. Câu hỏi trả lời",
+        "15.6.5. Tóm tắt",
+        "15.6.6. Bài tập",
+        "15.7. Suy luận ngôn ngữ tự nhiên: Tinh chỉnh BERT 15.7.1. Đang tải BERT Pretrained 15.7.2. Tập dữ liệu cho tinh chỉnh BERT 15.7.3. Tinh chỉnh BERT 15.7.4. Tóm tắt 15.7.5. Bài tập",
+        "15.7.1. Đang tải BERT Pretrained",
+        "15.7.2. Tập dữ liệu cho tinh chỉnh BERT",
+        "15.7.3. Tinh chỉnh BERT",
+        "15.7.4. Tóm tắt",
+        "15.7.5. Bài tập"
+      ]
+    }
+  ],
+  "images": [
+    {
+      "original_url": "https://vi.d2l.ai/_images/nlp-map-app.svg",
+      "local_path": "_images/nlp-map-app.svg",
+      "alt": "../_images/nlp-map-app.svg"
+    }
+  ],
+  "text": "15. Xử lý ngôn ngữ tự nhiên: Ứng dụng\nChúng tôi đã thấy cách đại diện cho thẻ trong chuỗi văn bản và đào tạo\ncác đại diện của chúng trong Section 14 . Các đại diện\nvăn bản được đào tạo trước như vậy có thể được đưa vào các mô hình khác\nnhau cho các nhiệm vụ xử lý ngôn ngữ tự nhiên hạ nguồn khác nhau.\nTrên thực tế, các chương trước đó đã thảo luận về một số ứng dụng xử lý\nngôn ngữ tự nhiên mà không cần pretraining , just for explaining giải\nthích deepsâu learning học tập architectures kiến trúc. Ví dụ, trong Section 8 , chúng tôi đã dựa vào RNN để thiết kế các mô hình\nngôn ngữ để tạo ra văn bản giống như tiểu thuyết. Trong Section 9 và Section 10 , chúng tôi\ncũng đã thiết kế các mô hình dựa trên RNNs và cơ chế chú ý cho dịch máy.\nTuy nhiên, cuốn sách này không có ý định bao gồm tất cả các ứng dụng như\nvậy một cách toàn diện. Thay vào đó, trọng tâm của chúng tôi là * làm\nthế nào để áp dụng (sâu) đại diện học ngôn ngữ để giải quyết các vấn đề\nxử lý ngôn ngữ tự nhiên*. Với các đại diện văn bản được đào tạo trước,\nchương này sẽ khám phá hai nhiệm vụ xử lý ngôn ngữ tự nhiên ở hạ nguồn\nphổ biến và đại diện: phân tích tình cảm và suy luận ngôn ngữ tự nhiên,\nphân tích văn bản đơn lẻ và mối quan hệ của các cặp văn bản, tương ứng.\nFig. 15.1 Pretrained text representations can be fed to various deep learning\narchitectures for different downstream natural language processing\napplications. This chapter focuses on how to design models for\ndifferent downstream natural language processing applications. ¶\nNhư được mô tả trong Fig. 15.1 , chương này tập trung\nvào việc mô tả các ý tưởng cơ bản của việc thiết kế các mô hình xử lý\nngôn ngữ tự nhiên sử dụng các loại kiến trúc học sâu khác nhau, chẳng\nhạn như MLP, CNN, RNN s, và sự chú ý. Mặc dù có thể kết hợp bất kỳ biểu\ndiễn văn bản được đào tạo trước với bất kỳ kiến trúc nào cho một trong\nhai ứng dụng trong Fig. 15.1 , chúng tôi chọn một vài\nkết hợp đại diện. Cụ thể, chúng tôi sẽ khám phá các kiến trúc phổ biến\ndựa trên RNNs và CNN để phân tích tình cảm. Đối với suy luận ngôn ngữ tự\nnhiên, chúng tôi chọn sự chú ý và MLP để chứng minh cách phân tích các\ncặp văn bản. Cuối cùng, chúng tôi giới thiệu cách tinh chỉnh mô hình\nBERT được đào tạo trước cho một loạt các ứng dụng xử lý ngôn ngữ tự\nnhiên, chẳng hạn như ở cấp độ trình tự (phân loại văn bản đơn và phân\nloại cặp văn bản) và mức mã thông báo (gắn thẻ văn bản và trả lời câu\nhỏi). Là một trường hợp thực nghiệm cụ thể, chúng tôi sẽ tinh chỉnh BERT\ncho suy luận ngôn ngữ tự nhiên.\nNhư chúng tôi đã giới thiệu trong Section 14.8 , BERT đòi hỏi\nnhững thay đổi kiến trúc tối thiểu cho một loạt các ứng dụng xử lý ngôn\nngữ tự nhiên. Tuy nhiên, lợi ích này đi kèm với chi phí tinh chỉnh một\nsố lượng lớn các thông số BERT cho các ứng dụng hạ lưu. Khi không gian\nhoặc thời gian bị hạn chế, những mô hình được chế tạo dựa trên MLP, CNN,\nRNN và sự chú ý sẽ khả thi hơn. Sau đây, chúng ta bắt đầu bằng ứng dụng\nphân tích tình cảm và minh họa thiết kế mô hình dựa trên RNN và CNN,\ntương ứng.\n15.1. Phân tích tình cảm và tập dữ liệu 15.1.1. Đọc tập dữ liệu 15.1.2. Xử lý trước bộ dữ liệu 15.1.3. Tạo bộ lặp dữ liệu 15.1.4. Đặt tất cả mọi thứ lại với nhau 15.1.5. Tóm tắt 15.1.6. Bài tập\n15.1.1. Đọc tập dữ liệu\n15.1.2. Xử lý trước bộ dữ liệu\n15.1.3. Tạo bộ lặp dữ liệu\n15.1.4. Đặt tất cả mọi thứ lại với nhau\n15.1.5. Tóm tắt\n15.1.6. Bài tập\n15.2. Phân tích tình cảm: Sử dụng mạng nơ-ron tái phát 15.2.1. Đại diện cho văn bản đơn với RNNs 15.2.2. Đang tải Pretrained Word Vectơ 15.2.3. Đào tạo và đánh giá mô hình 15.2.4. Tóm tắt 15.2.5. Bài tập\n15.2.1. Đại diện cho văn bản đơn với RNNs\n15.2.2. Đang tải Pretrained Word Vectơ\n15.2.3. Đào tạo và đánh giá mô hình\n15.2.4. Tóm tắt\n15.2.5. Bài tập\n15.3. Phân tích tình cảm: Sử dụng mạng thần kinh phức tạp 15.3.1. Một chiều Convolutions 15.3.2. Max-Over-Time Pooling 15.3.3. Mô hình textCNN 15.3.4. Tóm tắt 15.3.5. Bài tập\n15.3.1. Một chiều Convolutions\n15.3.2. Max-Over-Time Pooling\n15.3.3. Mô hình textCNN\n15.3.4. Tóm tắt\n15.3.5. Bài tập\n15.4. Suy luận ngôn ngữ tự nhiên và tập dữ liệu 15.4.1. Suy luận ngôn ngữ tự nhiên 15.4.2. Bộ dữ liệu Suy luận ngôn ngữ tự nhiên Stanford (SNLI) 15.4.3. Tóm tắt 15.4.4. Bài tập\n15.4.1. Suy luận ngôn ngữ tự nhiên\n15.4.2. Bộ dữ liệu Suy luận ngôn ngữ tự nhiên Stanford (SNLI)\n15.4.3. Tóm tắt\n15.4.4. Bài tập\n15.5. Suy luận ngôn ngữ tự nhiên: Sử dụng sự chú ý 15.5.1. Mô hình 15.5.2. Đào tạo và đánh giá mô hình 15.5.3. Tóm tắt 15.5.4. Bài tập\n15.5.1. Mô hình\n15.5.2. Đào tạo và đánh giá mô hình\n15.5.3. Tóm tắt\n15.5.4. Bài tập\n15.6. Tinh chỉnh BERT cho các ứng dụng cấp Sequence-Level và Token-Level 15.6.1. Phân loại văn bản đơn 15.6.2. Phân loại cặp văn bản hoặc hồi quy 15.6.3. Gắn thẻ văn bản 15.6.4. Câu hỏi trả lời 15.6.5. Tóm tắt 15.6.6. Bài tập\n15.6.1. Phân loại văn bản đơn\n15.6.2. Phân loại cặp văn bản hoặc hồi quy\n15.6.3. Gắn thẻ văn bản\n15.6.4. Câu hỏi trả lời\n15.6.5. Tóm tắt\n15.6.6. Bài tập\n15.7. Suy luận ngôn ngữ tự nhiên: Tinh chỉnh BERT 15.7.1. Đang tải BERT Pretrained 15.7.2. Tập dữ liệu cho tinh chỉnh BERT 15.7.3. Tinh chỉnh BERT 15.7.4. Tóm tắt 15.7.5. Bài tập\n15.7.1. Đang tải BERT Pretrained\n15.7.2. Tập dữ liệu cho tinh chỉnh BERT\n15.7.3. Tinh chỉnh BERT\n15.7.4. Tóm tắt\n15.7.5. Bài tập"
+}

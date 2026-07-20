@@ -1,0 +1,289 @@
+{
+  "url": "https://vi.d2l.ai/chapter_natural-language-processing-applications/sentiment-analysis-and-dataset.html",
+  "chapter": "chapter_natural-language-processing-applications",
+  "title": "15.1. Phân tích tình cảm và tập dữ liệu",
+  "crawled_at": "2026-07-20T12:41:03.647426+00:00",
+  "headings": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "phan-tich-tinh-cam-va-tap-du-lieu",
+      "text": "15.1. Phân tích tình cảm và tập dữ liệu"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "doc-tap-du-lieu",
+      "text": "15.1.1. Đọc tập dữ liệu"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "xu-ly-truoc-bo-du-lieu",
+      "text": "15.1.2. Xử lý trước bộ dữ liệu"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tao-bo-lap-du-lieu",
+      "text": "15.1.3. Tạo bộ lặp dữ liệu"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "dat-tat-ca-moi-thu-lai-voi-nhau",
+      "text": "15.1.4. Đặt tất cả mọi thứ lại với nhau"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tom-tat",
+      "text": "15.1.5. Tóm tắt"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bai-tap",
+      "text": "15.1.6. Bài tập"
+    }
+  ],
+  "content": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "phan-tich-tinh-cam-va-tap-du-lieu",
+      "text": "15.1. Phân tích tình cảm và tập dữ liệu"
+    },
+    {
+      "type": "paragraph",
+      "text": "Với sự gia tăng của mạng xã hội trực tuyến và các nền tảng đánh giá, rất\nnhiều dữ liệu có ý kiến đã được ghi lại, mang tiềm năng lớn trong việc\nhỗ trợ các quy trình ra quyết định. Phân tích tâm học nghiên cứu tình\ncảm của mọi người trong văn bản được sản xuất của họ, chẳng hạn như đánh\ngiá sản phẩm, bình luận blog và các cuộc thảo luận diễn đàn. Nó thích\nứng dụng rộng rãi cho các lĩnh vực đa dạng như chính trị (ví dụ: phân\ntích tình cảm công cộng đối với các chính sách), tài chính (ví dụ: phân\ntích tình cảm của thị trường) và tiếp thị (ví dụ: nghiên cứu sản phẩm và\nquản lý thương hiệu)."
+    },
+    {
+      "type": "paragraph",
+      "text": "Vì tình cảm có thể được phân loại là phân cực hoặc thang đo rời rạc (ví\ndụ: dương và âm), chúng ta có thể coi phân tích tình cảm như một nhiệm\nvụ phân loại văn bản, chuyển đổi một chuỗi văn bản có độ dài khác nhau\nthành một danh mục văn bản có độ dài cố định. Trong chương này, chúng ta\nsẽ sử dụng [tập dữ liệu xem xét phim lớn] của Stanford\n( https://ai.stanford.edu/~amaas/data/sentiment/ ) để phân tích tình cảm.\nNó bao gồm một bộ đào tạo và một bộ thử nghiệm, có chứa 25000 đánh giá\nphim được tải xuống từ IMDb. Trong cả hai bộ dữ liệu, có số lượng nhãn\n“dương” và “tiêu cực” bằng nhau, cho thấy các cực tâm lý khác nhau."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "import os\nfrom mxnet import np, npx\nfrom d2l import mxnet as d2l\n\nnpx.set_np()"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "import os\nimport torch\nfrom torch import nn\nfrom d2l import torch as d2l"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "doc-tap-du-lieu",
+      "text": "15.1.1. Đọc tập dữ liệu"
+    },
+    {
+      "type": "paragraph",
+      "text": "Đầu tiên, tải xuống và trích xuất tập dữ liệu xem xét IMDb này trong\nđường dẫn ../data/aclImdb ."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "#@save\nd2l.DATA_HUB['aclImdb'] = (\n    'http://ai.stanford.edu/~amaas/data/sentiment/aclImdb_v1.tar.gz',\n    '01ada507287d82875905620988597833ad4e0903')\n\ndata_dir = d2l.download_extract('aclImdb', 'aclImdb')"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "#@save\nd2l.DATA_HUB['aclImdb'] = (\n    'http://ai.stanford.edu/~amaas/data/sentiment/aclImdb_v1.tar.gz',\n    '01ada507287d82875905620988597833ad4e0903')\n\ndata_dir = d2l.download_extract('aclImdb', 'aclImdb')"
+    },
+    {
+      "type": "paragraph",
+      "text": "Tiếp theo, đọc các tập dữ liệu đào tạo và kiểm tra. Mỗi ví dụ là một\nđánh giá và nhãn của nó: 1 cho “tích cực” và 0 cho “tiêu cực”."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "#@save\ndef read_imdb(data_dir, is_train):\n    \"\"\"Read the IMDb review dataset text sequences and labels.\"\"\"\n    data, labels = [], []\n    for label in ('pos', 'neg'):\n        folder_name = os.path.join(data_dir, 'train' if is_train else 'test',\n                                   label)\n        for file in os.listdir(folder_name):\n            with open(os.path.join(folder_name, file), 'rb') as f:\n                review = f.read().decode('utf-8').replace('\\n', '')\n                data.append(review)\n                labels.append(1 if label == 'pos' else 0)\n    return data, labels\n\ntrain_data = read_imdb(data_dir, is_train=True)\nprint('# trainings:', len(train_data[0]))\nfor x, y in zip(train_data[0][:3], train_data[1][:3]):\n    print('label:', y, 'review:', x[0:60])"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "# trainings: 25000\nlabel: 1 review: Henry Hathaway was daring, as well as enthusiastic, for his\nlabel: 1 review: An unassuming, subtle and lean film, \"The Man in the White S\nlabel: 1 review: Eddie Murphy really made me laugh my ass off on this HBO sta"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "#@save\ndef read_imdb(data_dir, is_train):\n    \"\"\"Read the IMDb review dataset text sequences and labels.\"\"\"\n    data, labels = [], []\n    for label in ('pos', 'neg'):\n        folder_name = os.path.join(data_dir, 'train' if is_train else 'test',\n                                   label)\n        for file in os.listdir(folder_name):\n            with open(os.path.join(folder_name, file), 'rb') as f:\n                review = f.read().decode('utf-8').replace('\\n', '')\n                data.append(review)\n                labels.append(1 if label == 'pos' else 0)\n    return data, labels\n\ntrain_data = read_imdb(data_dir, is_train=True)\nprint('# trainings:', len(train_data[0]))\nfor x, y in zip(train_data[0][:3], train_data[1][:3]):\n    print('label:', y, 'review:', x[0:60])"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "# trainings: 25000\nlabel: 1 review: Henry Hathaway was daring, as well as enthusiastic, for his\nlabel: 1 review: An unassuming, subtle and lean film, \"The Man in the White S\nlabel: 1 review: Eddie Murphy really made me laugh my ass off on this HBO sta"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "xu-ly-truoc-bo-du-lieu",
+      "text": "15.1.2. Xử lý trước bộ dữ liệu"
+    },
+    {
+      "type": "paragraph",
+      "text": "Đối xử với từng từ như một mã thông báo và lọc ra các từ xuất hiện dưới\n5 lần, chúng tôi tạo ra một từ vựng ra khỏi tập dữ liệu đào tạo."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "train_tokens = d2l.tokenize(train_data[0], token='word')\nvocab = d2l.Vocab(train_tokens, min_freq=5, reserved_tokens=['<pad>'])"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "train_tokens = d2l.tokenize(train_data[0], token='word')\nvocab = d2l.Vocab(train_tokens, min_freq=5, reserved_tokens=['<pad>'])"
+    },
+    {
+      "type": "paragraph",
+      "text": "Sau khi token hóa, chúng ta hãy vẽ biểu đồ của độ dài xem xét trong các\nmã thông báo."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "d2l.set_figsize()\nd2l.plt.xlabel('# tokens per review')\nd2l.plt.ylabel('count')\nd2l.plt.hist([len(line) for line in train_tokens], bins=range(0, 1000, 50));"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_sentiment-analysis-and-dataset_70179c_39_0.svg",
+      "local_path": "_images/output_sentiment-analysis-and-dataset_70179c_39_0.svg",
+      "alt": "../_images/output_sentiment-analysis-and-dataset_70179c_39_0.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "d2l.set_figsize()\nd2l.plt.xlabel('# tokens per review')\nd2l.plt.ylabel('count')\nd2l.plt.hist([len(line) for line in train_tokens], bins=range(0, 1000, 50));"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_sentiment-analysis-and-dataset_70179c_42_0.svg",
+      "local_path": "_images/output_sentiment-analysis-and-dataset_70179c_42_0.svg",
+      "alt": "../_images/output_sentiment-analysis-and-dataset_70179c_42_0.svg"
+    },
+    {
+      "type": "paragraph",
+      "text": "Như chúng tôi mong đợi, các đánh giá có độ dài khác nhau. Để xử lý một\nminibatch các đánh giá như vậy tại mỗi thời điểm, chúng tôi đặt độ dài\ncủa mỗi bài đánh giá là 500 với cắt ngắn và đệm, tương tự như bước tiền\nxử lý cho bộ dữ liệu dịch máy trong Section 9.5 ."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "num_steps = 500  # sequence length\ntrain_features = np.array([d2l.truncate_pad(\n    vocab[line], num_steps, vocab['<pad>']) for line in train_tokens])\nprint(train_features.shape)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "(25000, 500)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "num_steps = 500  # sequence length\ntrain_features = torch.tensor([d2l.truncate_pad(\n    vocab[line], num_steps, vocab['<pad>']) for line in train_tokens])\nprint(train_features.shape)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "torch.Size([25000, 500])"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tao-bo-lap-du-lieu",
+      "text": "15.1.3. Tạo bộ lặp dữ liệu"
+    },
+    {
+      "type": "paragraph",
+      "text": "Bây giờ chúng ta có thể tạo ra các bộ lặp dữ liệu. Tại mỗi lần lặp lại,\nmột minibatch các ví dụ được trả về."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "train_iter = d2l.load_array((train_features, train_data[1]), 64)\n\nfor X, y in train_iter:\n    print('X:', X.shape, ', y:', y.shape)\n    break\nprint('# batches:', len(train_iter))"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "X: (64, 500) , y: (64,)\n# batches: 391"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "train_iter = d2l.load_array((train_features, torch.tensor(train_data[1])), 64)\n\nfor X, y in train_iter:\n    print('X:', X.shape, ', y:', y.shape)\n    break\nprint('# batches:', len(train_iter))"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "X: torch.Size([64, 500]) , y: torch.Size([64])\n# batches: 391"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "dat-tat-ca-moi-thu-lai-voi-nhau",
+      "text": "15.1.4. Đặt tất cả mọi thứ lại với nhau"
+    },
+    {
+      "type": "paragraph",
+      "text": "Cuối cùng, chúng ta kết hợp các bước trên vào hàm load_data_imdb . Nó\ntrả về trình lặp dữ liệu đào tạo và kiểm tra và từ vựng của tập dữ liệu\nxem xét IMDb."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "#@save\ndef load_data_imdb(batch_size, num_steps=500):\n    \"\"\"Return data iterators and the vocabulary of the IMDb review dataset.\"\"\"\n    data_dir = d2l.download_extract('aclImdb', 'aclImdb')\n    train_data = read_imdb(data_dir, True)\n    test_data = read_imdb(data_dir, False)\n    train_tokens = d2l.tokenize(train_data[0], token='word')\n    test_tokens = d2l.tokenize(test_data[0], token='word')\n    vocab = d2l.Vocab(train_tokens, min_freq=5)\n    train_features = np.array([d2l.truncate_pad(\n        vocab[line], num_steps, vocab['<pad>']) for line in train_tokens])\n    test_features = np.array([d2l.truncate_pad(\n        vocab[line], num_steps, vocab['<pad>']) for line in test_tokens])\n    train_iter = d2l.load_array((train_features, train_data[1]), batch_size)\n    test_iter = d2l.load_array((test_features, test_data[1]), batch_size,\n                               is_train=False)\n    return train_iter, test_iter, vocab"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "#@save\ndef load_data_imdb(batch_size, num_steps=500):\n    \"\"\"Return data iterators and the vocabulary of the IMDb review dataset.\"\"\"\n    data_dir = d2l.download_extract('aclImdb', 'aclImdb')\n    train_data = read_imdb(data_dir, True)\n    test_data = read_imdb(data_dir, False)\n    train_tokens = d2l.tokenize(train_data[0], token='word')\n    test_tokens = d2l.tokenize(test_data[0], token='word')\n    vocab = d2l.Vocab(train_tokens, min_freq=5)\n    train_features = torch.tensor([d2l.truncate_pad(\n        vocab[line], num_steps, vocab['<pad>']) for line in train_tokens])\n    test_features = torch.tensor([d2l.truncate_pad(\n        vocab[line], num_steps, vocab['<pad>']) for line in test_tokens])\n    train_iter = d2l.load_array((train_features, torch.tensor(train_data[1])),\n                                batch_size)\n    test_iter = d2l.load_array((test_features, torch.tensor(test_data[1])),\n                               batch_size,\n                               is_train=False)\n    return train_iter, test_iter, vocab"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tom-tat",
+      "text": "15.1.5. Tóm tắt"
+    },
+    {
+      "type": "list",
+      "ordered": false,
+      "items": [
+        "Phân tích tình cảm nghiên cứu tình cảm của mọi người trong văn bản\nđược sản xuất của họ, được coi là một vấn đề phân loại văn bản biến\nđổi một chuỗi văn bản có độ dài khác nhau into a fixed-length cố định\nchiều dài text văn bản category thể loại.",
+        "Sau khi xử lý trước, chúng ta có thể tải tập dữ liệu xem xét phim lớn\ncủa Stanford (tập dữ liệu đánh giá IMDb) vào các bộ lặp dữ liệu bằng\ntừ vựng."
+      ]
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bai-tap",
+      "text": "15.1.6. Bài tập"
+    },
+    {
+      "type": "list",
+      "ordered": true,
+      "items": [
+        "Những siêu tham số trong phần này chúng ta có thể sửa đổi để đẩy\nnhanh các mô hình phân tích tâm lý đào tạo?",
+        "Bạn có thể triển khai một hàm để tải tập dữ liệu của Amazon\nreviews vào bộ\nlặp dữ liệu và nhãn để phân tích tình cảm không?"
+      ]
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    }
+  ],
+  "images": [
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_sentiment-analysis-and-dataset_70179c_39_0.svg",
+      "local_path": "_images/output_sentiment-analysis-and-dataset_70179c_39_0.svg",
+      "alt": "../_images/output_sentiment-analysis-and-dataset_70179c_39_0.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_sentiment-analysis-and-dataset_70179c_42_0.svg",
+      "local_path": "_images/output_sentiment-analysis-and-dataset_70179c_42_0.svg",
+      "alt": "../_images/output_sentiment-analysis-and-dataset_70179c_42_0.svg"
+    }
+  ],
+  "text": "15.1. Phân tích tình cảm và tập dữ liệu\nVới sự gia tăng của mạng xã hội trực tuyến và các nền tảng đánh giá, rất\nnhiều dữ liệu có ý kiến đã được ghi lại, mang tiềm năng lớn trong việc\nhỗ trợ các quy trình ra quyết định. Phân tích tâm học nghiên cứu tình\ncảm của mọi người trong văn bản được sản xuất của họ, chẳng hạn như đánh\ngiá sản phẩm, bình luận blog và các cuộc thảo luận diễn đàn. Nó thích\nứng dụng rộng rãi cho các lĩnh vực đa dạng như chính trị (ví dụ: phân\ntích tình cảm công cộng đối với các chính sách), tài chính (ví dụ: phân\ntích tình cảm của thị trường) và tiếp thị (ví dụ: nghiên cứu sản phẩm và\nquản lý thương hiệu).\nVì tình cảm có thể được phân loại là phân cực hoặc thang đo rời rạc (ví\ndụ: dương và âm), chúng ta có thể coi phân tích tình cảm như một nhiệm\nvụ phân loại văn bản, chuyển đổi một chuỗi văn bản có độ dài khác nhau\nthành một danh mục văn bản có độ dài cố định. Trong chương này, chúng ta\nsẽ sử dụng [tập dữ liệu xem xét phim lớn] của Stanford\n( https://ai.stanford.edu/~amaas/data/sentiment/ ) để phân tích tình cảm.\nNó bao gồm một bộ đào tạo và một bộ thử nghiệm, có chứa 25000 đánh giá\nphim được tải xuống từ IMDb. Trong cả hai bộ dữ liệu, có số lượng nhãn\n“dương” và “tiêu cực” bằng nhau, cho thấy các cực tâm lý khác nhau.\n15.1.1. Đọc tập dữ liệu\nĐầu tiên, tải xuống và trích xuất tập dữ liệu xem xét IMDb này trong\nđường dẫn ../data/aclImdb .\nTiếp theo, đọc các tập dữ liệu đào tạo và kiểm tra. Mỗi ví dụ là một\nđánh giá và nhãn của nó: 1 cho “tích cực” và 0 cho “tiêu cực”.\n15.1.2. Xử lý trước bộ dữ liệu\nĐối xử với từng từ như một mã thông báo và lọc ra các từ xuất hiện dưới\n5 lần, chúng tôi tạo ra một từ vựng ra khỏi tập dữ liệu đào tạo.\nSau khi token hóa, chúng ta hãy vẽ biểu đồ của độ dài xem xét trong các\nmã thông báo.\nNhư chúng tôi mong đợi, các đánh giá có độ dài khác nhau. Để xử lý một\nminibatch các đánh giá như vậy tại mỗi thời điểm, chúng tôi đặt độ dài\ncủa mỗi bài đánh giá là 500 với cắt ngắn và đệm, tương tự như bước tiền\nxử lý cho bộ dữ liệu dịch máy trong Section 9.5 .\n15.1.3. Tạo bộ lặp dữ liệu\nBây giờ chúng ta có thể tạo ra các bộ lặp dữ liệu. Tại mỗi lần lặp lại,\nmột minibatch các ví dụ được trả về.\n15.1.4. Đặt tất cả mọi thứ lại với nhau\nCuối cùng, chúng ta kết hợp các bước trên vào hàm load_data_imdb . Nó\ntrả về trình lặp dữ liệu đào tạo và kiểm tra và từ vựng của tập dữ liệu\nxem xét IMDb.\n15.1.5. Tóm tắt\nPhân tích tình cảm nghiên cứu tình cảm của mọi người trong văn bản\nđược sản xuất của họ, được coi là một vấn đề phân loại văn bản biến\nđổi một chuỗi văn bản có độ dài khác nhau into a fixed-length cố định\nchiều dài text văn bản category thể loại.\nSau khi xử lý trước, chúng ta có thể tải tập dữ liệu xem xét phim lớn\ncủa Stanford (tập dữ liệu đánh giá IMDb) vào các bộ lặp dữ liệu bằng\ntừ vựng.\n15.1.6. Bài tập\nNhững siêu tham số trong phần này chúng ta có thể sửa đổi để đẩy\nnhanh các mô hình phân tích tâm lý đào tạo?\nBạn có thể triển khai một hàm để tải tập dữ liệu của Amazon\nreviews vào bộ\nlặp dữ liệu và nhãn để phân tích tình cảm không?\nDiscussions\nDiscussions"
+}

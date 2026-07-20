@@ -1,0 +1,361 @@
+{
+  "url": "https://vi.d2l.ai/chapter_multilayer-perceptrons/numerical-stability-and-init.html",
+  "chapter": "chapter_multilayer-perceptrons",
+  "title": "4.8. Tính ổn định số và khởi tạo",
+  "crawled_at": "2026-07-20T12:39:31.665933+00:00",
+  "headings": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "tinh-on-dinh-so-va-khoi-tao",
+      "text": "4.8. Tính ổn định số và khởi tạo"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bien-mat-va-bung-no-gradient",
+      "text": "4.8.1. Biến mất và bùng nổ Gradient"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "vanishing-gradients",
+      "text": "4.8.1.1. Vanishing Gradients"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "bung-no-gradients",
+      "text": "4.8.1.2. Bùng nổ Gradients"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "pha-vo-doi-xung",
+      "text": "4.8.1.3. Phá vỡ đối xứng"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "khoi-tao-tham-so",
+      "text": "4.8.2. Khởi tạo tham số"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "khoi-tao-mac-dinh",
+      "text": "4.8.2.1. Khởi tạo mặc định"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "khoi-tao-xavier",
+      "text": "4.8.2.2. Khởi tạo Xavier"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "beyond",
+      "text": "4.8.2.3. Beyond"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tom-tat",
+      "text": "4.8.3. Tóm tắt"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bai-tap",
+      "text": "4.8.4. Bài tập"
+    }
+  ],
+  "content": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "tinh-on-dinh-so-va-khoi-tao",
+      "text": "4.8. Tính ổn định số và khởi tạo"
+    },
+    {
+      "type": "paragraph",
+      "text": "Cho đến nay, mọi mô hình mà chúng tôi đã thực hiện đều yêu cầu chúng tôi\nkhởi tạo các tham số của nó theo một số phân phối được chỉ định trước.\nCho đến bây giờ, chúng tôi đã thực hiện sơ đồ khởi tạo là điều hiển\nnhiên, nêu rõ các chi tiết về cách các lựa chọn này được thực hiện. Bạn\nthậm chí có thể đã nhận được ấn tượng rằng những lựa chọn này không đặc\nbiệt quan trọng. Ngược lại, việc lựa chọn sơ đồ khởi tạo đóng một vai\ntrò quan trọng trong việc học mạng thần kinh, và nó có thể rất quan\ntrọng để duy trì sự ổn định số. Hơn nữa, những lựa chọn này có thể được\ngắn lên theo những cách thú vị với sự lựa chọn của chức năng kích hoạt\nphi tuyến. Chức năng nào chúng ta chọn và cách chúng ta khởi tạo các\ntham số có thể xác định thuật toán tối ưu hóa của chúng ta hội tụ nhanh\nnhư thế nào. Những lựa chọn kém ở đây có thể khiến chúng ta gặp phải sự\nbùng nổ hoặc biến mất gradient trong khi đào tạo. Trong phần này, chúng\ntôi đi sâu vào các chủ đề này với chi tiết hơn và thảo luận về một số\nheuristics hữu ích mà bạn sẽ thấy hữu ích trong suốt sự nghiệp của mình\ntrong việc học sâu."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bien-mat-va-bung-no-gradient",
+      "text": "4.8.1. Biến mất và bùng nổ Gradient"
+    },
+    {
+      "type": "paragraph",
+      "text": "Hãy xem xét một mạng sâu với \\(L\\) lớp, đầu vào \\(\\mathbf{x}\\) và đầu ra \\(\\mathbf{o}\\) . Với mỗi lớp \\(l\\) được xác định bởi\nmột biến đổi \\(f_l\\) tham số hóa bởi trọng lượng \\(\\mathbf{W}^{(l)}\\) , có biến ẩn là \\(\\mathbf{h}^{(l)}\\) (để \\(\\mathbf{h}^{(0)} = \\mathbf{x}\\) ), mạng của chúng tôi có thể được\nbiểu thị như:"
+    },
+    {
+      "type": "math",
+      "latex": "(4.8.1)¶\\[\\mathbf{h}^{(l)} = f_l (\\mathbf{h}^{(l-1)}) \\text{ and thus } \\mathbf{o} = f_L \\circ \\ldots \\circ f_1(\\mathbf{x}).\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Nếu tất cả các biến ẩn và đầu vào là vectơ, chúng ta có thể viết\ngradient của \\(\\mathbf{o}\\) đối với bất kỳ tập hợp các tham số \\(\\mathbf{W}^{(l)}\\) như sau:"
+    },
+    {
+      "type": "math",
+      "latex": "(4.8.2)¶\\[\\partial_{\\mathbf{W}^{(l)}} \\mathbf{o} = \\underbrace{\\partial_{\\mathbf{h}^{(L-1)}} \\mathbf{h}^{(L)}}_{ \\mathbf{M}^{(L)} \\stackrel{\\mathrm{def}}{=}} \\cdot \\ldots \\cdot \\underbrace{\\partial_{\\mathbf{h}^{(l)}} \\mathbf{h}^{(l+1)}}_{ \\mathbf{M}^{(l+1)} \\stackrel{\\mathrm{def}}{=}} \\underbrace{\\partial_{\\mathbf{W}^{(l)}} \\mathbf{h}^{(l)}}_{ \\mathbf{v}^{(l)} \\stackrel{\\mathrm{def}}{=}}.\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Nói cách khác, gradient này là sản phẩm của ma trận \\(L-l\\) \\(\\mathbf{M}^{(L)} \\cdot \\ldots \\cdot \\mathbf{M}^{(l+1)}\\) và vector\ngradient \\(\\mathbf{v}^{(l)}\\) . Do đó, chúng ta dễ bị các vấn đề\ntương tự của dòng chảy số thường cắt lên khi nhân với nhau quá nhiều xác\nsuất. Khi đối phó với xác suất, một mẹo phổ biến là chuyển sang không\ngian đăng nhập, tức là, chuyển áp lực từ mantissa sang số mũ của biểu\ndiễn số. Thật không may, vấn đề của chúng tôi ở trên nghiêm trọng hơn:\nban đầu các ma trận \\(\\mathbf{M}^{(l)}\\) có thể có nhiều\neigenvalues. Chúng có thể nhỏ hoặc lớn, và sản phẩm của họ có thể là *\nrất lớn* hoặc * rất nhỏ*."
+    },
+    {
+      "type": "paragraph",
+      "text": "Các rủi ro gây ra bởi gradient không ổn định vượt ra ngoài biểu diễn số.\nĐộ dốc có độ lớn không thể đoán trước cũng đe dọa sự ổn định của các\nthuật toán tối ưu hóa của chúng tôi. Chúng ta có thể phải đối mặt với\ncác bản cập nhật tham số (i) quá lớn, phá hủy mô hình của chúng tôi (vấn\nđề * exploding gradient * ); hoặc (ii) quá nhỏ (vấn đề * vanishing\ngradient*), khiến việc học không thể như các tham số hầu như không di\nchuyển trên mỗi bản cập nhật."
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "vanishing-gradients",
+      "text": "4.8.1.1. Vanishing Gradients"
+    },
+    {
+      "type": "paragraph",
+      "text": "Một thủ phạm thường xuyên gây ra vấn đề gradient biến mất là sự lựa chọn\ncủa hàm kích hoạt \\(\\sigma\\) được nối sau các phép toán tuyến tính\ncủa mỗi lớp. Trong lịch sử, hàm sigmoid \\(1/(1 + \\exp(-x))\\) (được\ngiới thiệu vào năm Section 4.1 ) rất phổ biến vì nó giống như một\nhàm ngưỡng. Vì các mạng thần kinh nhân tạo ban đầu được lấy cảm hứng từ\ncác mạng thần kinh sinh học, ý tưởng về các tế bào thần kinh bắn * đầy\nđủ* hoặc * không* (như tế bào thần kinh sinh học) dường như hấp dẫn.\nChúng ta hãy xem xét kỹ hơn sigmoid để xem lý do tại sao nó có thể gây\nra gradient biến mất."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "%matplotlib inline\nfrom mxnet import autograd, np, npx\nfrom d2l import mxnet as d2l\n\nnpx.set_np()\n\nx = np.arange(-8.0, 8.0, 0.1)\nx.attach_grad()\nwith autograd.record():\n    y = npx.sigmoid(x)\ny.backward()\n\nd2l.plot(x, [y, x.grad], legend=['sigmoid', 'gradient'], figsize=(4.5, 2.5))"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "[10:59:02] src/base.cc:49: GPU context requested, but no GPUs found."
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_numerical-stability-and-init_e60514_3_1.svg",
+      "local_path": "_images/output_numerical-stability-and-init_e60514_3_1.svg",
+      "alt": "../_images/output_numerical-stability-and-init_e60514_3_1.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "%matplotlib inline\nimport torch\nfrom d2l import torch as d2l\n\nx = torch.arange(-8.0, 8.0, 0.1, requires_grad=True)\ny = torch.sigmoid(x)\ny.backward(torch.ones_like(x))\n\nd2l.plot(x.detach().numpy(), [y.detach().numpy(), x.grad.numpy()],\n         legend=['sigmoid', 'gradient'], figsize=(4.5, 2.5))"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_numerical-stability-and-init_e60514_6_0.svg",
+      "local_path": "_images/output_numerical-stability-and-init_e60514_6_0.svg",
+      "alt": "../_images/output_numerical-stability-and-init_e60514_6_0.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "%matplotlib inline\nimport tensorflow as tf\nfrom d2l import tensorflow as d2l\n\nx = tf.Variable(tf.range(-8.0, 8.0, 0.1))\nwith tf.GradientTape() as t:\n    y = tf.nn.sigmoid(x)\nd2l.plot(x.numpy(), [y.numpy(), t.gradient(y, x).numpy()],\n         legend=['sigmoid', 'gradient'], figsize=(4.5, 2.5))"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_numerical-stability-and-init_e60514_9_0.svg",
+      "local_path": "_images/output_numerical-stability-and-init_e60514_9_0.svg",
+      "alt": "../_images/output_numerical-stability-and-init_e60514_9_0.svg"
+    },
+    {
+      "type": "paragraph",
+      "text": "Như bạn có thể thấy, gradient của sigmoid biến mất cả khi đầu vào của nó\nlớn và khi chúng nhỏ. Hơn nữa, khi truyền ngược qua nhiều lớp, trừ khi\nchúng ta ở trong vùng Goldilocks, nơi các đầu vào cho nhiều sigmoids gần\nbằng 0, độ dốc của sản phẩm tổng thể có thể biến mất. Khi mạng của chúng\ntôi tự hào có nhiều lớp, trừ khi chúng tôi cẩn thận, gradient có thể sẽ\nbị cắt ở một số lớp. Thật vậy, vấn đề này được sử dụng để đào tạo mạng\nsâu bệnh dịch hạch. Do đó, ReLUs, ổn định hơn (nhưng ít hợp lý về mặt\nthần kinh), đã nổi lên như là lựa chọn mặc định cho các học viên."
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "bung-no-gradients",
+      "text": "4.8.1.2. Bùng nổ Gradients"
+    },
+    {
+      "type": "paragraph",
+      "text": "Vấn đề ngược lại, khi gradient nổ tung, có thể tương tự như vexing. Để\nminh họa điều này tốt hơn một chút, chúng tôi vẽ 100 ma trận ngẫu nhiên\nGaussian và nhân chúng với một số ma trận ban đầu. Đối với thang đo mà\nchúng tôi đã chọn (sự lựa chọn của phương sai \\(\\sigma^2=1\\) ), sản\nphẩm ma trận phát nổ. Khi điều này xảy ra do khởi tạo một mạng sâu,\nchúng ta không có cơ hội nhận được trình tối ưu hóa gradient descent để\nhội tụ."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "M = np.random.normal(size=(4, 4))\nprint('a single matrix', M)\nfor i in range(100):\n    M = np.dot(M, np.random.normal(size=(4, 4)))\n\nprint('after multiplying 100 matrices', M)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "a single matrix [[ 2.2122064   1.1630787   0.7740038   0.4838046 ]\n [ 1.0434403   0.29956347  1.1839255   0.15302546]\n [ 1.8917114  -1.1688148  -1.2347414   1.5580711 ]\n [-1.771029   -0.5459446  -0.45138445 -2.3556297 ]]\nafter multiplying 100 matrices [[ 3.4459747e+23 -7.8040759e+23  5.9973355e+23  4.5230040e+23]\n [ 2.5275059e+23 -5.7240258e+23  4.3988419e+23  3.3174704e+23]\n [ 1.3731275e+24 -3.1097129e+24  2.3897754e+24  1.8022945e+24]\n [-4.4951091e+23  1.0180045e+24 -7.8232368e+23 -5.9000419e+23]]"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "M = torch.normal(0, 1, size=(4,4))\nprint('a single matrix \\n',M)\nfor i in range(100):\n    M = torch.mm(M,torch.normal(0, 1, size=(4, 4)))\n\nprint('after multiplying 100 matrices\\n', M)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "a single matrix\n tensor([[-0.1369, -0.3347, -0.3115, -1.6260],\n        [ 1.4966,  1.0600, -1.2315, -0.5771],\n        [ 1.4038, -0.4152,  0.4013,  0.1608],\n        [ 1.3121,  0.5267, -1.3593,  1.8891]])\nafter multiplying 100 matrices\n tensor([[ 4.8421e+26, -1.6528e+27,  8.2065e+26,  2.0016e+26],\n        [-2.2945e+25,  7.8321e+25, -3.8888e+25, -9.4848e+24],\n        [ 9.6323e+26, -3.2878e+27,  1.6325e+27,  3.9816e+26],\n        [-6.7803e+26,  2.3144e+27, -1.1491e+27, -2.8027e+26]])"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "M = tf.random.normal((4, 4))\nprint('a single matrix \\n', M)\nfor i in range(100):\n    M = tf.matmul(M, tf.random.normal((4, 4)))\n\nprint('after multiplying 100 matrices\\n', M.numpy())"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "a single matrix\n tf.Tensor(\n[[-0.81764966 -0.6388111  -0.7956995  -0.06097547]\n [-0.5625472   1.4293599   1.0845371   0.63393086]\n [-0.7946199   1.1947473  -1.8844342   0.5015046 ]\n [-0.34884164  1.1833507  -0.18977627 -2.1358628 ]], shape=(4, 4), dtype=float32)\nafter multiplying 100 matrices\n [[-2.09438741e+24 -3.01407779e+24  5.36797082e+23 -3.22808971e+24]\n [ 3.24418910e+24  4.66878157e+24 -8.31494627e+23  5.00028513e+24]\n [-4.46538950e+24 -6.42623805e+24  1.14449105e+24 -6.88252806e+24]\n [-2.53543839e+24 -3.64880402e+24  6.49839594e+23 -3.90788422e+24]]"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "pha-vo-doi-xung",
+      "text": "4.8.1.3. Phá vỡ đối xứng"
+    },
+    {
+      "type": "paragraph",
+      "text": "Một vấn đề khác trong thiết kế mạng thần kinh là sự đối xứng vốn có\ntrong tham số hóa của chúng. Giả sử rằng chúng ta có một MLP đơn giản\nvới một lớp ẩn và hai đơn vị. Trong trường hợp này, chúng ta có thể hoán\nvị trọng lượng \\(\\mathbf{W}^{(1)}\\) của lớp đầu tiên và tương tự như\nvậy hoán vị trọng lượng của lớp đầu ra để có được chức năng tương tự.\nKhông có gì đặc biệt phân biệt đơn vị ẩn đầu tiên so với đơn vị ẩn thứ\nhai. Nói cách khác, chúng ta có sự đối xứng hoán vị giữa các đơn vị ẩn\ncủa mỗi lớp."
+    },
+    {
+      "type": "paragraph",
+      "text": "Đây không chỉ là một phiền toái lý thuyết. Hãy xem xét MLP một lớp ẩn đã\nnói ở trên với hai đơn vị ẩn. Để minh họa, giả sử lớp đầu ra biến đổi\nhai đơn vị ẩn thành chỉ một đơn vị đầu ra. Hãy tưởng tượng điều gì sẽ\nxảy ra nếu chúng ta khởi tạo tất cả các tham số của lớp ẩn là \\(\\mathbf{W}^{(1)} = c\\) cho một số hằng số \\(c\\) . Trong trường\nhợp này, trong quá trình tuyên truyền chuyển tiếp hoặc đơn vị ẩn có cùng\nmột đầu vào và tham số, tạo ra cùng một kích hoạt, được đưa vào đơn vị\nđầu ra. Trong quá trình lan truyền ngược, phân biệt đơn vị đầu ra đối\nvới các tham số \\(\\mathbf{W}^{(1)}\\) cho một gradient có các phần tử\ncó cùng giá trị. Do đó, sau khi lặp lại dựa trên gradient (ví dụ,\nminibatch stochastic gradient descent), tất cả các phần tử của \\(\\mathbf{W}^{(1)}\\) vẫn có cùng giá trị. Các lần lặp như vậy sẽ\nkhông bao giờ * tự phá vỡ đối xưởng* và chúng ta có thể không bao giờ\ncó thể nhận ra sức mạnh biểu cảm của mạng. Lớp ẩn sẽ hoạt động như thể\nnó chỉ có một đơn vị duy nhất. Lưu ý rằng trong khi minibatch stochastic\ngradient gốc sẽ không phá vỡ đối xứng này, việc bỏ học thường xuyên sẽ!"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "khoi-tao-tham-so",
+      "text": "4.8.2. Khởi tạo tham số"
+    },
+    {
+      "type": "paragraph",
+      "text": "Một cách để giải quyết - hoặc ít nhất là giảm thiểu - các vấn đề nêu\ntrên là thông qua việc khởi tạo cẩn thận. Chăm sóc bổ sung trong quá\ntrình tối ưu hóa và chính quy hóa phù hợp có thể tăng cường hơn nữa sự\nổn định."
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "khoi-tao-mac-dinh",
+      "text": "4.8.2.1. Khởi tạo mặc định"
+    },
+    {
+      "type": "paragraph",
+      "text": "Trong các phần trước, ví dụ, trong Section 3.3 , chúng\ntôi đã sử dụng một phân phối bình thường để khởi tạo các giá trị của\ntrọng lượng của chúng tôi. Nếu chúng ta không chỉ định phương thức khởi\ntạo, framework sẽ sử dụng phương thức khởi tạo ngẫu nhiên mặc định,\nthường hoạt động tốt trong thực tế cho kích thước vấn đề vừa phải."
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "khoi-tao-xavier",
+      "text": "4.8.2.2. Khởi tạo Xavier"
+    },
+    {
+      "type": "paragraph",
+      "text": "Chúng ta hãy xem xét phân phối tỷ lệ của một đầu ra (ví dụ, một biến ẩn) \\(o_{i}\\) cho một số lớp được kết nối hoàn toàn không có phi tuyến\ntính . Với \\(n_\\mathrm{in}\\) đầu vào \\(x_j\\) và trọng lượng liên\nquan của chúng \\(w_{ij}\\) cho lớp này, một đầu ra được đưa ra bởi"
+    },
+    {
+      "type": "math",
+      "latex": "(4.8.3)¶\\[o_{i} = \\sum_{j=1}^{n_\\mathrm{in}} w_{ij} x_j.\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Các trọng lượng \\(w_{ij}\\) đều được vẽ độc lập từ cùng một phân\nphối. Hơn nữa, chúng ta hãy giả định rằng phân phối này có 0 trung bình\nvà phương sai \\(\\sigma^2\\) . Lưu ý rằng điều này không có nghĩa là\nphân phối phải là Gaussian, chỉ là trung bình và phương sai cần phải tồn\ntại. Hiện tại, chúng ta hãy giả định rằng các đầu vào cho lớp \\(x_j\\) cũng có 0 trung bình và phương sai \\(\\gamma^2\\) và chúng\nđộc lập với \\(w_{ij}\\) và độc lập với nhau. Trong trường hợp này,\nchúng ta có thể tính toán trung bình và phương sai của \\(o_i\\) như\nsau:"
+    },
+    {
+      "type": "math",
+      "latex": "(4.8.4)¶\\[\\begin{split}\\begin{aligned}\n    E[o_i] & = \\sum_{j=1}^{n_\\mathrm{in}} E[w_{ij} x_j] \\\\&= \\sum_{j=1}^{n_\\mathrm{in}} E[w_{ij}] E[x_j] \\\\&= 0, \\\\\n    \\mathrm{Var}[o_i] & = E[o_i^2] - (E[o_i])^2 \\\\\n        & = \\sum_{j=1}^{n_\\mathrm{in}} E[w^2_{ij} x^2_j] - 0 \\\\\n        & = \\sum_{j=1}^{n_\\mathrm{in}} E[w^2_{ij}] E[x^2_j] \\\\\n        & = n_\\mathrm{in} \\sigma^2 \\gamma^2.\n\\end{aligned}\\end{split}\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Một cách để giữ phương sai cố định là đặt \\(n_\\mathrm{in} \\sigma^2 = 1\\) . Bây giờ hãy xem xét backpropagation.\nỞ đó chúng ta phải đối mặt với một vấn đề tương tự, mặc dù với gradient\nđược truyền từ các lớp gần đầu ra hơn. Sử dụng lý luận tương tự như đối\nvới tuyên truyền chuyển tiếp, chúng ta thấy rằng phương sai của gradient\ncó thể thổi lên trừ khi \\(n_\\mathrm{out} \\sigma^2 = 1\\) , trong đó \\(n_\\mathrm{out}\\) là số lượng đầu ra của lớp này. Điều này khiến\nchúng ta gặp khó xử: chúng ta không thể thỏa mãn cả hai điều kiện cùng\nmột lúc. Thay vào đó, chúng tôi chỉ đơn giản là cố gắng thỏa mãn:"
+    },
+    {
+      "type": "math",
+      "latex": "(4.8.5)¶\\[\\begin{aligned}\n\\frac{1}{2} (n_\\mathrm{in} + n_\\mathrm{out}) \\sigma^2 = 1 \\text{ or equivalently }\n\\sigma = \\sqrt{\\frac{2}{n_\\mathrm{in} + n_\\mathrm{out}}}.\n\\end{aligned}\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Đây là lý do dựa trên chuẩn hiện nay và thực tế có lợi * Xavier khởi\nhóa*, được đặt tên theo tác giả đầu tiên của người tạo ra nó [Glorot & Bengio, 2010] . Thông thường, các mẫu khởi tạo Xavier\ntrọng lượng từ phân phối Gaussian với 0 trung bình và phương sai \\(\\sigma^2 = \\frac{2}{n_\\mathrm{in} + n_\\mathrm{out}}\\) . Chúng ta\ncũng có thể điều chỉnh trực giác của Xavier để chọn phương sai khi lấy\nmẫu trọng lượng từ phân phối đồng đều. Lưu ý rằng sự phân bố thống nhất \\(U(-a, a)\\) có phương sai \\(\\frac{a^2}{3}\\) . Cắm \\(\\frac{a^2}{3}\\) vào điều kiện của chúng tôi trên \\(\\sigma^2\\) mang lại gợi ý khởi tạo theo"
+    },
+    {
+      "type": "math",
+      "latex": "(4.8.6)¶\\[U\\left(-\\sqrt{\\frac{6}{n_\\mathrm{in} + n_\\mathrm{out}}}, \\sqrt{\\frac{6}{n_\\mathrm{in} + n_\\mathrm{out}}}\\right).\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Mặc dù giả định cho sự không tồn tại của phi tuyến tính trong lý luận\ntoán học trên có thể dễ dàng vi phạm trong các mạng thần kinh, phương\npháp khởi tạo Xavier hóa ra hoạt động tốt trong thực tế."
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "beyond",
+      "text": "4.8.2.3. Beyond"
+    },
+    {
+      "type": "paragraph",
+      "text": "Lý do trên hầu như không làm trầy xước bề mặt của các phương pháp tiếp\ncận hiện đại để khởi tạo tham số. Một khuôn khổ học sâu thường thực hiện\nhơn một chục heuristics khác nhau. Hơn nữa, khởi tạo tham số tiếp tục là\nmột lĩnh vực nóng của nghiên cứu cơ bản trong học sâu. Trong số này có\nheuristics chuyên cho các tham số gắn (chia sẻ), siêu phân giải, mô hình\ntrình tự và các tình huống khác. Ví dụ, Xiao et al. đã chứng minh khả\nnăng đào tạo mạng thần kinh 10000 lớp mà không cần thủ thuật kiến trúc\nbằng cách sử dụng phương pháp khởi tạo được thiết kế cẩn thận [Xiao et al., 2018] ."
+    },
+    {
+      "type": "paragraph",
+      "text": "Nếu chủ đề mà bạn quan tâm, chúng tôi đề nghị đi sâu vào các dịch vụ của\nmô-đun này, đọc các bài báo đề xuất và phân tích từng heuristic, sau đó\nkhám phá các ấn phẩm mới nhất về chủ đề này. Có lẽ bạn sẽ vấp ngã hoặc\nthậm chí phát minh ra một ý tưởng thông minh và đóng góp thực hiện cho\ncác khuôn khổ học sâu."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tom-tat",
+      "text": "4.8.3. Tóm tắt"
+    },
+    {
+      "type": "list",
+      "ordered": false,
+      "items": [
+        "Biến mất và bùng nổ gradient là những vấn đề phổ biến trong các mạng\nsâu. Chăm sóc tuyệt vời trong khởi tạo tham số là cần thiết để đảm\nbảo rằng độ dốc và tham số vẫn được kiểm soát tốt.",
+        "Khởi tạo heuristics là cần thiết để đảm bảo rằng các gradient ban đầu\nkhông quá lớn cũng không quá nhỏ.",
+        "Chức năng kích hoạt ReLU giảm thiểu vấn đề gradient biến mất. Điều\nnày có thể đẩy nhanh sự hội tụ.",
+        "Khởi tạo ngẫu nhiên là chìa khóa để đảm bảo rằng đối xứng bị phá vỡ\ntrước khi tối ưu hóa.",
+        "Khởi tạo Xavier gợi ý rằng, đối với mỗi lớp, phương sai của bất kỳ\nđầu ra nào không bị ảnh hưởng bởi số lượng đầu vào và phương sai của\nbất kỳ gradient nào không bị ảnh hưởng bởi số lượng đầu ra."
+      ]
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bai-tap",
+      "text": "4.8.4. Bài tập"
+    },
+    {
+      "type": "list",
+      "ordered": true,
+      "items": [
+        "Bạn có thể thiết kế các trường hợp khác trong đó một mạng thần kinh\ncó thể thể hiện đối xứng đòi hỏi phải phá vỡ bên cạnh sự đối xứng\nhoán vị trong các lớp của MLP?",
+        "Chúng ta có thể khởi tạo tất cả các tham số trọng lượng trong hồi quy\ntuyến tính hoặc hồi quy softmax đến cùng một giá trị?",
+        "Tra cứu giới hạn phân tích trên eigenvalues của sản phẩm của hai ma\ntrận. Điều này cho bạn biết gì về việc đảm bảo rằng độ dốc được điều\nhòa tốt?",
+        "Nếu chúng ta biết rằng một số thuật ngữ phân kỳ, chúng ta có thể khắc\nphục điều này sau khi thực tế? Nhìn vào bài báo về tỷ lệ thích ứng\nlayerwise tỷ lệ cho cảm hứng [You et al., 2017] ."
+      ]
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    }
+  ],
+  "images": [
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_numerical-stability-and-init_e60514_3_1.svg",
+      "local_path": "_images/output_numerical-stability-and-init_e60514_3_1.svg",
+      "alt": "../_images/output_numerical-stability-and-init_e60514_3_1.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_numerical-stability-and-init_e60514_6_0.svg",
+      "local_path": "_images/output_numerical-stability-and-init_e60514_6_0.svg",
+      "alt": "../_images/output_numerical-stability-and-init_e60514_6_0.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_numerical-stability-and-init_e60514_9_0.svg",
+      "local_path": "_images/output_numerical-stability-and-init_e60514_9_0.svg",
+      "alt": "../_images/output_numerical-stability-and-init_e60514_9_0.svg"
+    }
+  ],
+  "text": "4.8. Tính ổn định số và khởi tạo\nCho đến nay, mọi mô hình mà chúng tôi đã thực hiện đều yêu cầu chúng tôi\nkhởi tạo các tham số của nó theo một số phân phối được chỉ định trước.\nCho đến bây giờ, chúng tôi đã thực hiện sơ đồ khởi tạo là điều hiển\nnhiên, nêu rõ các chi tiết về cách các lựa chọn này được thực hiện. Bạn\nthậm chí có thể đã nhận được ấn tượng rằng những lựa chọn này không đặc\nbiệt quan trọng. Ngược lại, việc lựa chọn sơ đồ khởi tạo đóng một vai\ntrò quan trọng trong việc học mạng thần kinh, và nó có thể rất quan\ntrọng để duy trì sự ổn định số. Hơn nữa, những lựa chọn này có thể được\ngắn lên theo những cách thú vị với sự lựa chọn của chức năng kích hoạt\nphi tuyến. Chức năng nào chúng ta chọn và cách chúng ta khởi tạo các\ntham số có thể xác định thuật toán tối ưu hóa của chúng ta hội tụ nhanh\nnhư thế nào. Những lựa chọn kém ở đây có thể khiến chúng ta gặp phải sự\nbùng nổ hoặc biến mất gradient trong khi đào tạo. Trong phần này, chúng\ntôi đi sâu vào các chủ đề này với chi tiết hơn và thảo luận về một số\nheuristics hữu ích mà bạn sẽ thấy hữu ích trong suốt sự nghiệp của mình\ntrong việc học sâu.\n4.8.1. Biến mất và bùng nổ Gradient\nHãy xem xét một mạng sâu với \\(L\\) lớp, đầu vào \\(\\mathbf{x}\\) và đầu ra \\(\\mathbf{o}\\) . Với mỗi lớp \\(l\\) được xác định bởi\nmột biến đổi \\(f_l\\) tham số hóa bởi trọng lượng \\(\\mathbf{W}^{(l)}\\) , có biến ẩn là \\(\\mathbf{h}^{(l)}\\) (để \\(\\mathbf{h}^{(0)} = \\mathbf{x}\\) ), mạng của chúng tôi có thể được\nbiểu thị như:\nNếu tất cả các biến ẩn và đầu vào là vectơ, chúng ta có thể viết\ngradient của \\(\\mathbf{o}\\) đối với bất kỳ tập hợp các tham số \\(\\mathbf{W}^{(l)}\\) như sau:\nNói cách khác, gradient này là sản phẩm của ma trận \\(L-l\\) \\(\\mathbf{M}^{(L)} \\cdot \\ldots \\cdot \\mathbf{M}^{(l+1)}\\) và vector\ngradient \\(\\mathbf{v}^{(l)}\\) . Do đó, chúng ta dễ bị các vấn đề\ntương tự của dòng chảy số thường cắt lên khi nhân với nhau quá nhiều xác\nsuất. Khi đối phó với xác suất, một mẹo phổ biến là chuyển sang không\ngian đăng nhập, tức là, chuyển áp lực từ mantissa sang số mũ của biểu\ndiễn số. Thật không may, vấn đề của chúng tôi ở trên nghiêm trọng hơn:\nban đầu các ma trận \\(\\mathbf{M}^{(l)}\\) có thể có nhiều\neigenvalues. Chúng có thể nhỏ hoặc lớn, và sản phẩm của họ có thể là *\nrất lớn* hoặc * rất nhỏ*.\nCác rủi ro gây ra bởi gradient không ổn định vượt ra ngoài biểu diễn số.\nĐộ dốc có độ lớn không thể đoán trước cũng đe dọa sự ổn định của các\nthuật toán tối ưu hóa của chúng tôi. Chúng ta có thể phải đối mặt với\ncác bản cập nhật tham số (i) quá lớn, phá hủy mô hình của chúng tôi (vấn\nđề * exploding gradient * ); hoặc (ii) quá nhỏ (vấn đề * vanishing\ngradient*), khiến việc học không thể như các tham số hầu như không di\nchuyển trên mỗi bản cập nhật.\n4.8.1.1. Vanishing Gradients\nMột thủ phạm thường xuyên gây ra vấn đề gradient biến mất là sự lựa chọn\ncủa hàm kích hoạt \\(\\sigma\\) được nối sau các phép toán tuyến tính\ncủa mỗi lớp. Trong lịch sử, hàm sigmoid \\(1/(1 + \\exp(-x))\\) (được\ngiới thiệu vào năm Section 4.1 ) rất phổ biến vì nó giống như một\nhàm ngưỡng. Vì các mạng thần kinh nhân tạo ban đầu được lấy cảm hứng từ\ncác mạng thần kinh sinh học, ý tưởng về các tế bào thần kinh bắn * đầy\nđủ* hoặc * không* (như tế bào thần kinh sinh học) dường như hấp dẫn.\nChúng ta hãy xem xét kỹ hơn sigmoid để xem lý do tại sao nó có thể gây\nra gradient biến mất.\nNhư bạn có thể thấy, gradient của sigmoid biến mất cả khi đầu vào của nó\nlớn và khi chúng nhỏ. Hơn nữa, khi truyền ngược qua nhiều lớp, trừ khi\nchúng ta ở trong vùng Goldilocks, nơi các đầu vào cho nhiều sigmoids gần\nbằng 0, độ dốc của sản phẩm tổng thể có thể biến mất. Khi mạng của chúng\ntôi tự hào có nhiều lớp, trừ khi chúng tôi cẩn thận, gradient có thể sẽ\nbị cắt ở một số lớp. Thật vậy, vấn đề này được sử dụng để đào tạo mạng\nsâu bệnh dịch hạch. Do đó, ReLUs, ổn định hơn (nhưng ít hợp lý về mặt\nthần kinh), đã nổi lên như là lựa chọn mặc định cho các học viên.\n4.8.1.2. Bùng nổ Gradients\nVấn đề ngược lại, khi gradient nổ tung, có thể tương tự như vexing. Để\nminh họa điều này tốt hơn một chút, chúng tôi vẽ 100 ma trận ngẫu nhiên\nGaussian và nhân chúng với một số ma trận ban đầu. Đối với thang đo mà\nchúng tôi đã chọn (sự lựa chọn của phương sai \\(\\sigma^2=1\\) ), sản\nphẩm ma trận phát nổ. Khi điều này xảy ra do khởi tạo một mạng sâu,\nchúng ta không có cơ hội nhận được trình tối ưu hóa gradient descent để\nhội tụ.\n4.8.1.3. Phá vỡ đối xứng\nMột vấn đề khác trong thiết kế mạng thần kinh là sự đối xứng vốn có\ntrong tham số hóa của chúng. Giả sử rằng chúng ta có một MLP đơn giản\nvới một lớp ẩn và hai đơn vị. Trong trường hợp này, chúng ta có thể hoán\nvị trọng lượng \\(\\mathbf{W}^{(1)}\\) của lớp đầu tiên và tương tự như\nvậy hoán vị trọng lượng của lớp đầu ra để có được chức năng tương tự.\nKhông có gì đặc biệt phân biệt đơn vị ẩn đầu tiên so với đơn vị ẩn thứ\nhai. Nói cách khác, chúng ta có sự đối xứng hoán vị giữa các đơn vị ẩn\ncủa mỗi lớp.\nĐây không chỉ là một phiền toái lý thuyết. Hãy xem xét MLP một lớp ẩn đã\nnói ở trên với hai đơn vị ẩn. Để minh họa, giả sử lớp đầu ra biến đổi\nhai đơn vị ẩn thành chỉ một đơn vị đầu ra. Hãy tưởng tượng điều gì sẽ\nxảy ra nếu chúng ta khởi tạo tất cả các tham số của lớp ẩn là \\(\\mathbf{W}^{(1)} = c\\) cho một số hằng số \\(c\\) . Trong trường\nhợp này, trong quá trình tuyên truyền chuyển tiếp hoặc đơn vị ẩn có cùng\nmột đầu vào và tham số, tạo ra cùng một kích hoạt, được đưa vào đơn vị\nđầu ra. Trong quá trình lan truyền ngược, phân biệt đơn vị đầu ra đối\nvới các tham số \\(\\mathbf{W}^{(1)}\\) cho một gradient có các phần tử\ncó cùng giá trị. Do đó, sau khi lặp lại dựa trên gradient (ví dụ,\nminibatch stochastic gradient descent), tất cả các phần tử của \\(\\mathbf{W}^{(1)}\\) vẫn có cùng giá trị. Các lần lặp như vậy sẽ\nkhông bao giờ * tự phá vỡ đối xưởng* và chúng ta có thể không bao giờ\ncó thể nhận ra sức mạnh biểu cảm của mạng. Lớp ẩn sẽ hoạt động như thể\nnó chỉ có một đơn vị duy nhất. Lưu ý rằng trong khi minibatch stochastic\ngradient gốc sẽ không phá vỡ đối xứng này, việc bỏ học thường xuyên sẽ!\n4.8.2. Khởi tạo tham số\nMột cách để giải quyết - hoặc ít nhất là giảm thiểu - các vấn đề nêu\ntrên là thông qua việc khởi tạo cẩn thận. Chăm sóc bổ sung trong quá\ntrình tối ưu hóa và chính quy hóa phù hợp có thể tăng cường hơn nữa sự\nổn định.\n4.8.2.1. Khởi tạo mặc định\nTrong các phần trước, ví dụ, trong Section 3.3 , chúng\ntôi đã sử dụng một phân phối bình thường để khởi tạo các giá trị của\ntrọng lượng của chúng tôi. Nếu chúng ta không chỉ định phương thức khởi\ntạo, framework sẽ sử dụng phương thức khởi tạo ngẫu nhiên mặc định,\nthường hoạt động tốt trong thực tế cho kích thước vấn đề vừa phải.\n4.8.2.2. Khởi tạo Xavier\nChúng ta hãy xem xét phân phối tỷ lệ của một đầu ra (ví dụ, một biến ẩn) \\(o_{i}\\) cho một số lớp được kết nối hoàn toàn không có phi tuyến\ntính . Với \\(n_\\mathrm{in}\\) đầu vào \\(x_j\\) và trọng lượng liên\nquan của chúng \\(w_{ij}\\) cho lớp này, một đầu ra được đưa ra bởi\nCác trọng lượng \\(w_{ij}\\) đều được vẽ độc lập từ cùng một phân\nphối. Hơn nữa, chúng ta hãy giả định rằng phân phối này có 0 trung bình\nvà phương sai \\(\\sigma^2\\) . Lưu ý rằng điều này không có nghĩa là\nphân phối phải là Gaussian, chỉ là trung bình và phương sai cần phải tồn\ntại. Hiện tại, chúng ta hãy giả định rằng các đầu vào cho lớp \\(x_j\\) cũng có 0 trung bình và phương sai \\(\\gamma^2\\) và chúng\nđộc lập với \\(w_{ij}\\) và độc lập với nhau. Trong trường hợp này,\nchúng ta có thể tính toán trung bình và phương sai của \\(o_i\\) như\nsau:\nMột cách để giữ phương sai cố định là đặt \\(n_\\mathrm{in} \\sigma^2 = 1\\) . Bây giờ hãy xem xét backpropagation.\nỞ đó chúng ta phải đối mặt với một vấn đề tương tự, mặc dù với gradient\nđược truyền từ các lớp gần đầu ra hơn. Sử dụng lý luận tương tự như đối\nvới tuyên truyền chuyển tiếp, chúng ta thấy rằng phương sai của gradient\ncó thể thổi lên trừ khi \\(n_\\mathrm{out} \\sigma^2 = 1\\) , trong đó \\(n_\\mathrm{out}\\) là số lượng đầu ra của lớp này. Điều này khiến\nchúng ta gặp khó xử: chúng ta không thể thỏa mãn cả hai điều kiện cùng\nmột lúc. Thay vào đó, chúng tôi chỉ đơn giản là cố gắng thỏa mãn:\nĐây là lý do dựa trên chuẩn hiện nay và thực tế có lợi * Xavier khởi\nhóa*, được đặt tên theo tác giả đầu tiên của người tạo ra nó [Glorot & Bengio, 2010] . Thông thường, các mẫu khởi tạo Xavier\ntrọng lượng từ phân phối Gaussian với 0 trung bình và phương sai \\(\\sigma^2 = \\frac{2}{n_\\mathrm{in} + n_\\mathrm{out}}\\) . Chúng ta\ncũng có thể điều chỉnh trực giác của Xavier để chọn phương sai khi lấy\nmẫu trọng lượng từ phân phối đồng đều. Lưu ý rằng sự phân bố thống nhất \\(U(-a, a)\\) có phương sai \\(\\frac{a^2}{3}\\) . Cắm \\(\\frac{a^2}{3}\\) vào điều kiện của chúng tôi trên \\(\\sigma^2\\) mang lại gợi ý khởi tạo theo\nMặc dù giả định cho sự không tồn tại của phi tuyến tính trong lý luận\ntoán học trên có thể dễ dàng vi phạm trong các mạng thần kinh, phương\npháp khởi tạo Xavier hóa ra hoạt động tốt trong thực tế.\n4.8.2.3. Beyond\nLý do trên hầu như không làm trầy xước bề mặt của các phương pháp tiếp\ncận hiện đại để khởi tạo tham số. Một khuôn khổ học sâu thường thực hiện\nhơn một chục heuristics khác nhau. Hơn nữa, khởi tạo tham số tiếp tục là\nmột lĩnh vực nóng của nghiên cứu cơ bản trong học sâu. Trong số này có\nheuristics chuyên cho các tham số gắn (chia sẻ), siêu phân giải, mô hình\ntrình tự và các tình huống khác. Ví dụ, Xiao et al. đã chứng minh khả\nnăng đào tạo mạng thần kinh 10000 lớp mà không cần thủ thuật kiến trúc\nbằng cách sử dụng phương pháp khởi tạo được thiết kế cẩn thận [Xiao et al., 2018] .\nNếu chủ đề mà bạn quan tâm, chúng tôi đề nghị đi sâu vào các dịch vụ của\nmô-đun này, đọc các bài báo đề xuất và phân tích từng heuristic, sau đó\nkhám phá các ấn phẩm mới nhất về chủ đề này. Có lẽ bạn sẽ vấp ngã hoặc\nthậm chí phát minh ra một ý tưởng thông minh và đóng góp thực hiện cho\ncác khuôn khổ học sâu.\n4.8.3. Tóm tắt\nBiến mất và bùng nổ gradient là những vấn đề phổ biến trong các mạng\nsâu. Chăm sóc tuyệt vời trong khởi tạo tham số là cần thiết để đảm\nbảo rằng độ dốc và tham số vẫn được kiểm soát tốt.\nKhởi tạo heuristics là cần thiết để đảm bảo rằng các gradient ban đầu\nkhông quá lớn cũng không quá nhỏ.\nChức năng kích hoạt ReLU giảm thiểu vấn đề gradient biến mất. Điều\nnày có thể đẩy nhanh sự hội tụ.\nKhởi tạo ngẫu nhiên là chìa khóa để đảm bảo rằng đối xứng bị phá vỡ\ntrước khi tối ưu hóa.\nKhởi tạo Xavier gợi ý rằng, đối với mỗi lớp, phương sai của bất kỳ\nđầu ra nào không bị ảnh hưởng bởi số lượng đầu vào và phương sai của\nbất kỳ gradient nào không bị ảnh hưởng bởi số lượng đầu ra.\n4.8.4. Bài tập\nBạn có thể thiết kế các trường hợp khác trong đó một mạng thần kinh\ncó thể thể hiện đối xứng đòi hỏi phải phá vỡ bên cạnh sự đối xứng\nhoán vị trong các lớp của MLP?\nChúng ta có thể khởi tạo tất cả các tham số trọng lượng trong hồi quy\ntuyến tính hoặc hồi quy softmax đến cùng một giá trị?\nTra cứu giới hạn phân tích trên eigenvalues của sản phẩm của hai ma\ntrận. Điều này cho bạn biết gì về việc đảm bảo rằng độ dốc được điều\nhòa tốt?\nNếu chúng ta biết rằng một số thuật ngữ phân kỳ, chúng ta có thể khắc\nphục điều này sau khi thực tế? Nhìn vào bài báo về tỷ lệ thích ứng\nlayerwise tỷ lệ cho cảm hứng [You et al., 2017] .\nDiscussions\nDiscussions\nDiscussions"
+}

@@ -1,5 +1,8 @@
 /* AI TUTOR — style trợ giảng. Mọi class prefix "tt-".
-   Dùng lại design token của app (var(--panel)…) kèm fallback để an toàn. */
+   Redesign v2 "AI là người hướng dẫn": panel nhẹ nhàng nền --surface (Card),
+   gợi ý theo cấp dùng nền soft đúng status, khối "Phân tích lỗi" tint --bad.
+   AI không lấn át nội dung — không hiệu ứng lặp vô hạn.
+   RIÊNG .tt-diagram-body (Canvas2D) GIỮ NỀN NAVY. Token của global.css qua var(). */
 
 .tt-tutor {
   display: flex;
@@ -16,34 +19,36 @@
 .tt-title {
   font-weight: 700;
   font-size: 1rem;
-  color: var(--text, #f5f5f5);
+  letter-spacing: -0.01em;
+  color: var(--text);
 }
 
 .tt-sub {
   font-size: 0.78rem;
-  color: var(--text-muted, #9aa0aa);
+  color: var(--text-secondary);
 }
 
 .tt-count {
   margin-left: auto;
   font-size: 0.78rem;
   font-variant-numeric: tabular-nums;
-  color: var(--text-dim, #c7ccd4);
+  color: var(--text-hint);
 }
 
 .tt-empty {
   margin: 0;
   font-size: 0.9rem;
-  color: var(--text-muted, #9aa0aa);
+  color: var(--text-secondary);
   line-height: 1.5;
 }
 
-/* --- Phân tích lỗi --- */
+/* --- Phân tích lỗi (tint --bad nhạt) --- */
 .tt-analysis {
-  border: 1px solid var(--bad, #ef4444);
+  border: 1px solid color-mix(in srgb, var(--bad) 30%, transparent);
   border-left-width: 4px;
-  border-radius: var(--radius-sm, 8px);
-  background: color-mix(in srgb, var(--bad, #ef4444) 10%, transparent);
+  border-left-color: var(--bad);
+  border-radius: var(--radius-sm);
+  background: var(--bad-soft);
   padding: 10px 12px;
 }
 
@@ -57,16 +62,16 @@
 .tt-analysis-title {
   font-weight: 700;
   font-size: 0.9rem;
-  color: var(--text, #f5f5f5);
+  color: var(--bad);
 }
 
 .tt-analysis-body {
   font-size: 0.9rem;
   line-height: 1.55;
-  color: var(--text-dim, #d5d9e0);
+  color: var(--text);
 }
 
-/* --- Danh sách gợi ý --- */
+/* --- Danh sách gợi ý (badge cấp theo màu, nền soft) --- */
 .tt-hints {
   list-style: none;
   margin: 0;
@@ -81,21 +86,34 @@
   flex-direction: column;
   gap: 6px;
   padding: 10px 12px;
-  border: 1px solid var(--border, #2b2f38);
+  border: 1px solid var(--border);
   border-left-width: 4px;
-  border-radius: var(--radius-sm, 8px);
-  background: var(--panel-2, var(--bg-elevated, #1b1e25));
+  border-radius: var(--radius-sm);
+  background: var(--panel-2);
 }
 
-.tt-hint-l1 { border-left-color: var(--text-muted, #9aa0aa); }
-.tt-hint-l2 { border-left-color: var(--accent, #22c55e); }
-.tt-hint-l3 { border-left-color: var(--warn, #f59e0b); }
-.tt-hint-l4 { border-left-color: var(--good, #22c55e); }
+/* Cấp 1: trung tính · Cấp 2: --primary · Cấp 3: --warn · Cấp 4: --good */
+.tt-hint-l1 {
+  border-left-color: var(--text-hint);
+  background: var(--panel-2);
+}
+.tt-hint-l2 {
+  border-left-color: var(--primary);
+  background: var(--primary-soft);
+}
+.tt-hint-l3 {
+  border-left-color: var(--warn);
+  background: var(--warn-soft);
+}
+.tt-hint-l4 {
+  border-left-color: var(--good);
+  background: var(--good-soft);
+}
 
 .tt-hint-text {
   font-size: 0.9rem;
   line-height: 1.55;
-  color: var(--text, #eef0f3);
+  color: var(--text);
 }
 
 .tt-line {
@@ -112,4 +130,45 @@
 
 .tt-actions-spacer {
   flex: 1 1 auto;
+}
+
+/* --- Hình minh họa đồ thị (Canvas2D) — GIỮ NỀN NAVY, KHÔNG ép sáng --- */
+.tt-diagram {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  border-top: 1px dashed var(--border);
+  padding-top: 12px;
+}
+
+.tt-diagram-body {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px 12px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-left-width: 4px;
+  border-left-color: var(--vec-1);
+  border-radius: var(--radius-sm);
+  background: var(--navy);
+}
+
+.tt-diagram-figure {
+  width: 100%;
+  overflow-x: auto;
+}
+
+/* Caption/note nằm TRÊN nền navy → dùng overlay trắng để đủ tương phản. */
+.tt-diagram-caption {
+  margin: 0;
+  font-size: 0.86rem;
+  line-height: 1.5;
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.tt-diagram-note {
+  margin: 0;
+  font-size: 0.78rem;
+  line-height: 1.45;
+  color: rgba(255, 255, 255, 0.55);
 }

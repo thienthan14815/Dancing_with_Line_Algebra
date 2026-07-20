@@ -1,0 +1,140 @@
+{
+  "url": "https://vi.d2l.ai/chapter_recommender-systems/recsys-intro.html",
+  "chapter": "chapter_recommender-systems",
+  "title": "16.1. Tổng quan về hệ thống Recommender",
+  "crawled_at": "2026-07-20T12:41:09.917955+00:00",
+  "headings": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "tong-quan-ve-he-thong-recommender",
+      "text": "16.1. Tổng quan về hệ thống Recommender"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "loc-hop-tac",
+      "text": "16.1.1. Lọc hợp tác"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "phan-hoi-ro-rang-va-phan-hoi-tiem-an",
+      "text": "16.1.2. Phản hồi rõ ràng và phản hồi tiềm ẩn"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tac-vu-de-xuat",
+      "text": "16.1.3. Tác vụ đề xuất"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tom-tat",
+      "text": "16.1.4. Tóm tắt"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bai-tap",
+      "text": "16.1.5. Bài tập"
+    }
+  ],
+  "content": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "tong-quan-ve-he-thong-recommender",
+      "text": "16.1. Tổng quan về hệ thống Recommender"
+    },
+    {
+      "type": "paragraph",
+      "text": "Trong thập kỷ qua, Internet đã phát triển thành một nền tảng cho các\ndịch vụ trực tuyến quy mô lớn, điều này đã thay đổi sâu sắc cách chúng\nta giao tiếp, đọc tin tức, mua sản phẩm và xem phim. Trong khi đó, số\nlượng mặt hàng chưa từng có (chúng tôi sử dụng thuật ngữ item để chỉ\nphim, tin tức, sách và sản phẩm.) được cung cấp trực tuyến đòi hỏi một\nhệ thống có thể giúp chúng tôi khám phá các mặt hàng mà chúng tôi ưa\nthích. Do đó, hệ thống giới thiệu là các công cụ lọc thông tin mạnh mẽ\ncó thể tạo điều kiện thuận lợi cho các dịch vụ được cá nhân hóa và cung\ncấp trải nghiệm phù hợp cho từng người dùng Nói tóm lại, các hệ thống\ngiới thiệu đóng một vai trò quan trọng trong việc sử dụng sự giàu có của\ndữ liệu có sẵn để làm cho các lựa chọn có thể quản lý được. Ngày nay,\ncác hệ thống giới thiệu là cốt lõi của một số nhà cung cấp dịch vụ trực\ntuyến như Amazon, Netflix và YouTube. Nhớ lại ví dụ về sách học sâu được\nAmazon đề xuất trong Fig. 1.3.3 . Lợi ích của\nviệc sử dụng các hệ thống giới thiệu là hai lần: Một mặt, nó chủ yếu có\nthể làm giảm nỗ lực của người dùng trong việc tìm kiếm các mục và giảm\nbớt vấn đề quá tải thông tin. Mặt khác, nó có thể thêm giá trị kinh\ndoanh cho các nhà cung cấp dịch vụ trực tuyến và là một nguồn doanh thu\nquan trọng. Chương này sẽ giới thiệu các khái niệm cơ bản, mô hình cổ\nđiển và những tiến bộ gần đây với học sâu trong lĩnh vực hệ thống giới\nthiệu, cùng với các ví dụ được thực hiện."
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/rec-intro.svg",
+      "local_path": "_images/rec-intro.svg",
+      "alt": "../_images/rec-intro.svg"
+    },
+    {
+      "type": "paragraph",
+      "text": "Fig. 16.1.1 Illustration of the Recommendation Process ¶"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "loc-hop-tac",
+      "text": "16.1.1. Lọc hợp tác"
+    },
+    {
+      "type": "paragraph",
+      "text": "Chúng tôi bắt đầu hành trình với khái niệm quan trọng trong hệ thống\ngiới thiệu — lọc hợp tác (CF), lần đầu tiên được đặt ra bởi hệ thống\nTapestry [Goldberg et al., 1992] , đề cập đến “mọi người\ncộng tác để giúp đỡ lẫn nhau thực hiện quá trình lọc để xử lý một lượng\nlớn email và tin nhắn được đăng lên nhóm tin tức”. Thuật ngữ này đã được\nlàm giàu với nhiều giác quan hơn. Theo nghĩa rộng, đó là quá trình lọc\nthông tin hoặc mẫu bằng cách sử dụng các kỹ thuật liên quan đến sự cộng\ntác giữa nhiều người dùng, đại lý và nguồn dữ liệu. CF có nhiều hình\nthức và nhiều phương pháp CF được đề xuất kể từ khi ra đời."
+    },
+    {
+      "type": "paragraph",
+      "text": "Nhìn chung, kỹ thuật CF có thể được phân loại into: memory-based CF,\nmodel-based CF, and their hybrid [Su & Khoshgoftaar, 2009] . Các kỹ\nthuật CF dựa trên bộ nhớ đại diện là CF dựa trên lân cận gần nhất như CF\ndựa trên người dùng và CF [Sarwar et al., 2001] dựa\ntrên mặt hàng. Các mô hình yếu tố tiềm ẩn như factorization ma trận là\nví dụ về CF dựa trên mô hình. CF dựa trên bộ nhớ có những hạn chế trong\nviệc xử lý dữ liệu thưa thớt và quy mô lớn vì nó tính toán các giá trị\ntương đồng dựa trên các mục phổ biến. Các phương pháp dựa trên mô hình\ntrở nên phổ biến hơn với khả năng tốt hơn trong việc đối phó với sự thưa\nthớt và khả năng mở rộng. Nhiều phương pháp tiếp cận CF dựa trên mô hình\ncó thể được mở rộng với các mạng thần kinh, dẫn đến các mô hình linh\nhoạt và có thể mở rộng hơn với khả năng tăng tốc tính toán trong deep\nlearning [Zhang et al., 2019] . Nói chung, CF chỉ sử dụng dữ\nliệu tương tác mục người dùng để đưa ra dự đoán và khuyến nghị. Bên cạnh\nCF, các hệ thống giới thiệu dựa trên nội dung và bối cảnh cũng hữu ích\ntrong việc kết hợp các mô tả nội dung của các mục/người dùng và các tín\nhiệu theo ngữ cảnh như dấu thời gian và địa điểm. Rõ ràng, chúng ta có\nthể cần phải điều chỉnh các loại/cấu trúc mô hình khi dữ liệu đầu vào\nkhác nhau có sẵn."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "phan-hoi-ro-rang-va-phan-hoi-tiem-an",
+      "text": "16.1.2. Phản hồi rõ ràng và phản hồi tiềm ẩn"
+    },
+    {
+      "type": "paragraph",
+      "text": "Để tìm hiểu sở thích của người dùng, hệ thống sẽ thu thập phản hồi từ\nhọ. Phản hồi có thể là rõ ràng hoặc ngầm [Hu et al., 2008] . Ví dụ, IMDB thu thập xếp hạng sao khác nhau, từ một\nđến mười sao cho phim. YouTube cung cấp các nút thu nhỏ và ngón tay cái\nđể người dùng hiển thị tùy chọn của họ. Rõ ràng là thu thập phản hồi rõ\nràng đòi hỏi người dùng phải chủ động chỉ ra lợi ích của họ. Tuy nhiên,\nphản hồi rõ ràng không phải lúc nào cũng có sẵn vì nhiều người dùng có\nthể miễn cưỡng đánh giá sản phẩm. Tương đối nói, phản hồi ngầm thường có\nsẵn vì nó chủ yếu liên quan đến mô hình hóa hành vi ngầm như nhấp chuột\ncủa người dùng. Do đó, nhiều hệ thống giới thiệu tập trung vào phản hồi\nngầm mà gián tiếp phản ánh ý kiến của người dùng thông qua việc quan sát\nhành vi của người dùng. Có nhiều hình thức phản hồi tiềm ẩn đa dạng bao\ngồm lịch sử mua hàng, lịch sử duyệt web, đồng hồ và thậm chí cả chuyển\nđộng chuột. Ví dụ, một người dùng đã mua nhiều cuốn sách của cùng một\ntác giả có thể thích tác giả đó. Lưu ý rằng phản hồi ngầm vốn là ồn ào.\nChúng tôi chỉ có thể * đoán * sở thích và động cơ thực sự của họ. Một\nngười dùng đã xem một bộ phim không nhất thiết phải chỉ ra một cái nhìn\ntích cực của bộ phim đó."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tac-vu-de-xuat",
+      "text": "16.1.3. Tác vụ đề xuất"
+    },
+    {
+      "type": "paragraph",
+      "text": "Một số nhiệm vụ đề xuất đã được điều tra trong những thập kỷ qua. Dựa\ntrên tên miền của các ứng dụng, có giới thiệu phim, khuyến nghị tin tức,\nđề xuất điểm quan tâm [Ye et al., 2011] và vân vân. Cũng có\nthể phân biệt các nhiệm vụ dựa trên các loại phản hồi và dữ liệu đầu\nvào, ví dụ, nhiệm vụ dự đoán xếp hạng nhằm dự đoán xếp hạng rõ ràng. Đề\nxuất Top- \\(n\\) (xếp hạng mục) xếp hạng tất cả các mục cho mỗi\nngười dùng cá nhân dựa trên phản hồi ngầm. Nếu thông tin tem thời gian\ncũng được bao gồm, chúng tôi có thể xây dựng đề xuất nhận thức trình tự [Quadrana et al., 2018] . Một nhiệm vụ phổ biến khác\nđược gọi là dự đoán tỷ lệ nhấp, cũng dựa trên phản hồi ngầm, nhưng các\ntính năng phân loại khác nhau có thể được sử dụng. Đề xuất cho người\ndùng mới và đề xuất các mặt hàng mới cho người dùng hiện có được gọi là\nkhuyến nghị khởi động lạnh [Schein et al., 2002] ."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tom-tat",
+      "text": "16.1.4. Tóm tắt"
+    },
+    {
+      "type": "list",
+      "ordered": false,
+      "items": [
+        "Hệ thống giới thiệu rất quan trọng đối với người dùng cá nhân và\nngành công nghiệp. Lọc hợp tác là một khái niệm chính trong đề xuất.",
+        "Có hai loại phản hồi: phản hồi ngầm và phản hồi rõ ràng. Một số nhiệm\nvụ đề xuất đã được khám phá trong thập kỷ qua."
+      ]
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bai-tap",
+      "text": "16.1.5. Bài tập"
+    },
+    {
+      "type": "list",
+      "ordered": true,
+      "items": [
+        "Bạn có thể giải thích cách các hệ thống giới thiệu ảnh hưởng đến cuộc\nsống hàng ngày của bạn?",
+        "Những nhiệm vụ đề xuất thú vị nào bạn nghĩ có thể được điều tra?"
+      ]
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    }
+  ],
+  "images": [
+    {
+      "original_url": "https://vi.d2l.ai/_images/rec-intro.svg",
+      "local_path": "_images/rec-intro.svg",
+      "alt": "../_images/rec-intro.svg"
+    }
+  ],
+  "text": "16.1. Tổng quan về hệ thống Recommender\nTrong thập kỷ qua, Internet đã phát triển thành một nền tảng cho các\ndịch vụ trực tuyến quy mô lớn, điều này đã thay đổi sâu sắc cách chúng\nta giao tiếp, đọc tin tức, mua sản phẩm và xem phim. Trong khi đó, số\nlượng mặt hàng chưa từng có (chúng tôi sử dụng thuật ngữ item để chỉ\nphim, tin tức, sách và sản phẩm.) được cung cấp trực tuyến đòi hỏi một\nhệ thống có thể giúp chúng tôi khám phá các mặt hàng mà chúng tôi ưa\nthích. Do đó, hệ thống giới thiệu là các công cụ lọc thông tin mạnh mẽ\ncó thể tạo điều kiện thuận lợi cho các dịch vụ được cá nhân hóa và cung\ncấp trải nghiệm phù hợp cho từng người dùng Nói tóm lại, các hệ thống\ngiới thiệu đóng một vai trò quan trọng trong việc sử dụng sự giàu có của\ndữ liệu có sẵn để làm cho các lựa chọn có thể quản lý được. Ngày nay,\ncác hệ thống giới thiệu là cốt lõi của một số nhà cung cấp dịch vụ trực\ntuyến như Amazon, Netflix và YouTube. Nhớ lại ví dụ về sách học sâu được\nAmazon đề xuất trong Fig. 1.3.3 . Lợi ích của\nviệc sử dụng các hệ thống giới thiệu là hai lần: Một mặt, nó chủ yếu có\nthể làm giảm nỗ lực của người dùng trong việc tìm kiếm các mục và giảm\nbớt vấn đề quá tải thông tin. Mặt khác, nó có thể thêm giá trị kinh\ndoanh cho các nhà cung cấp dịch vụ trực tuyến và là một nguồn doanh thu\nquan trọng. Chương này sẽ giới thiệu các khái niệm cơ bản, mô hình cổ\nđiển và những tiến bộ gần đây với học sâu trong lĩnh vực hệ thống giới\nthiệu, cùng với các ví dụ được thực hiện.\nFig. 16.1.1 Illustration of the Recommendation Process ¶\n16.1.1. Lọc hợp tác\nChúng tôi bắt đầu hành trình với khái niệm quan trọng trong hệ thống\ngiới thiệu — lọc hợp tác (CF), lần đầu tiên được đặt ra bởi hệ thống\nTapestry [Goldberg et al., 1992] , đề cập đến “mọi người\ncộng tác để giúp đỡ lẫn nhau thực hiện quá trình lọc để xử lý một lượng\nlớn email và tin nhắn được đăng lên nhóm tin tức”. Thuật ngữ này đã được\nlàm giàu với nhiều giác quan hơn. Theo nghĩa rộng, đó là quá trình lọc\nthông tin hoặc mẫu bằng cách sử dụng các kỹ thuật liên quan đến sự cộng\ntác giữa nhiều người dùng, đại lý và nguồn dữ liệu. CF có nhiều hình\nthức và nhiều phương pháp CF được đề xuất kể từ khi ra đời.\nNhìn chung, kỹ thuật CF có thể được phân loại into: memory-based CF,\nmodel-based CF, and their hybrid [Su & Khoshgoftaar, 2009] . Các kỹ\nthuật CF dựa trên bộ nhớ đại diện là CF dựa trên lân cận gần nhất như CF\ndựa trên người dùng và CF [Sarwar et al., 2001] dựa\ntrên mặt hàng. Các mô hình yếu tố tiềm ẩn như factorization ma trận là\nví dụ về CF dựa trên mô hình. CF dựa trên bộ nhớ có những hạn chế trong\nviệc xử lý dữ liệu thưa thớt và quy mô lớn vì nó tính toán các giá trị\ntương đồng dựa trên các mục phổ biến. Các phương pháp dựa trên mô hình\ntrở nên phổ biến hơn với khả năng tốt hơn trong việc đối phó với sự thưa\nthớt và khả năng mở rộng. Nhiều phương pháp tiếp cận CF dựa trên mô hình\ncó thể được mở rộng với các mạng thần kinh, dẫn đến các mô hình linh\nhoạt và có thể mở rộng hơn với khả năng tăng tốc tính toán trong deep\nlearning [Zhang et al., 2019] . Nói chung, CF chỉ sử dụng dữ\nliệu tương tác mục người dùng để đưa ra dự đoán và khuyến nghị. Bên cạnh\nCF, các hệ thống giới thiệu dựa trên nội dung và bối cảnh cũng hữu ích\ntrong việc kết hợp các mô tả nội dung của các mục/người dùng và các tín\nhiệu theo ngữ cảnh như dấu thời gian và địa điểm. Rõ ràng, chúng ta có\nthể cần phải điều chỉnh các loại/cấu trúc mô hình khi dữ liệu đầu vào\nkhác nhau có sẵn.\n16.1.2. Phản hồi rõ ràng và phản hồi tiềm ẩn\nĐể tìm hiểu sở thích của người dùng, hệ thống sẽ thu thập phản hồi từ\nhọ. Phản hồi có thể là rõ ràng hoặc ngầm [Hu et al., 2008] . Ví dụ, IMDB thu thập xếp hạng sao khác nhau, từ một\nđến mười sao cho phim. YouTube cung cấp các nút thu nhỏ và ngón tay cái\nđể người dùng hiển thị tùy chọn của họ. Rõ ràng là thu thập phản hồi rõ\nràng đòi hỏi người dùng phải chủ động chỉ ra lợi ích của họ. Tuy nhiên,\nphản hồi rõ ràng không phải lúc nào cũng có sẵn vì nhiều người dùng có\nthể miễn cưỡng đánh giá sản phẩm. Tương đối nói, phản hồi ngầm thường có\nsẵn vì nó chủ yếu liên quan đến mô hình hóa hành vi ngầm như nhấp chuột\ncủa người dùng. Do đó, nhiều hệ thống giới thiệu tập trung vào phản hồi\nngầm mà gián tiếp phản ánh ý kiến của người dùng thông qua việc quan sát\nhành vi của người dùng. Có nhiều hình thức phản hồi tiềm ẩn đa dạng bao\ngồm lịch sử mua hàng, lịch sử duyệt web, đồng hồ và thậm chí cả chuyển\nđộng chuột. Ví dụ, một người dùng đã mua nhiều cuốn sách của cùng một\ntác giả có thể thích tác giả đó. Lưu ý rằng phản hồi ngầm vốn là ồn ào.\nChúng tôi chỉ có thể * đoán * sở thích và động cơ thực sự của họ. Một\nngười dùng đã xem một bộ phim không nhất thiết phải chỉ ra một cái nhìn\ntích cực của bộ phim đó.\n16.1.3. Tác vụ đề xuất\nMột số nhiệm vụ đề xuất đã được điều tra trong những thập kỷ qua. Dựa\ntrên tên miền của các ứng dụng, có giới thiệu phim, khuyến nghị tin tức,\nđề xuất điểm quan tâm [Ye et al., 2011] và vân vân. Cũng có\nthể phân biệt các nhiệm vụ dựa trên các loại phản hồi và dữ liệu đầu\nvào, ví dụ, nhiệm vụ dự đoán xếp hạng nhằm dự đoán xếp hạng rõ ràng. Đề\nxuất Top- \\(n\\) (xếp hạng mục) xếp hạng tất cả các mục cho mỗi\nngười dùng cá nhân dựa trên phản hồi ngầm. Nếu thông tin tem thời gian\ncũng được bao gồm, chúng tôi có thể xây dựng đề xuất nhận thức trình tự [Quadrana et al., 2018] . Một nhiệm vụ phổ biến khác\nđược gọi là dự đoán tỷ lệ nhấp, cũng dựa trên phản hồi ngầm, nhưng các\ntính năng phân loại khác nhau có thể được sử dụng. Đề xuất cho người\ndùng mới và đề xuất các mặt hàng mới cho người dùng hiện có được gọi là\nkhuyến nghị khởi động lạnh [Schein et al., 2002] .\n16.1.4. Tóm tắt\nHệ thống giới thiệu rất quan trọng đối với người dùng cá nhân và\nngành công nghiệp. Lọc hợp tác là một khái niệm chính trong đề xuất.\nCó hai loại phản hồi: phản hồi ngầm và phản hồi rõ ràng. Một số nhiệm\nvụ đề xuất đã được khám phá trong thập kỷ qua.\n16.1.5. Bài tập\nBạn có thể giải thích cách các hệ thống giới thiệu ảnh hưởng đến cuộc\nsống hàng ngày của bạn?\nNhững nhiệm vụ đề xuất thú vị nào bạn nghĩ có thể được điều tra?\nDiscussions"
+}

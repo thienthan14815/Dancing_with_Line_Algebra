@@ -1,6 +1,13 @@
 /* =====================================================================
-   LinAlgLab — SHELL kiểu Duolingo (thiết kế gốc, KHÔNG dùng thương hiệu).
-   Dùng lại token màu trong src/styles/global.css. Mọi class prefix `dl-`.
+   LinAlgLab — SHELL "LA App v2" (calm, intelligent workspace).
+   Design system: Linear 40% / Apple HIG 25% / Notion 20% / Duolingo 15%.
+   Chỉ dùng token trong src/styles/global.css (contract v2). Prefix `dl-`.
+   Nguyên tắc:
+     - page = var(--bg); card = var(--surface) + 1px var(--border) + var(--elev-1)
+     - MỘT màu nhấn/màn: var(--primary) cho CTA + active + link
+     - status color đúng ngữ nghĩa: --warn (streak), --good (hoàn thành), --bad (lỗi)
+     - KHÔNG dải màu trang trí; typography tạo hierarchy, không phải màu
+     - panel toán (--navy/--vec-*) giữ nguyên; chữ trên nền màu dùng `white`/`--navy`
    ===================================================================== */
 
 /* ---------- Layout khung ---------- */
@@ -22,10 +29,10 @@
 .dl-page {
   max-width: 760px;
   margin: 0 auto;
-  padding: 24px 20px 96px;
+  padding: 24px 24px 64px;
 }
 .dl-loading {
-  padding: 60px;
+  padding: 64px;
   text-align: center;
   color: var(--text-muted);
 }
@@ -33,12 +40,12 @@
   color: var(--text-muted);
 }
 
-/* ---------- SideNav ---------- */
+/* ---------- SideNav (IA v2 — 6 mục, nhóm section, kiểu Linear.app) ---------- */
 .dl-sidenav {
-  width: 232px;
+  width: 240px;
   flex-shrink: 0;
-  background: var(--bg-elevated);
-  border-right: 1px solid var(--border);
+  background: var(--surface);
+  border-right: 1px solid var(--divider);
   padding: 16px 12px;
   position: sticky;
   top: 0;
@@ -46,55 +53,95 @@
   display: flex;
   flex-direction: column;
   gap: 8px;
-  transition: width 0.2s ease;
+  transition: width var(--dur-2) var(--ease);
   overflow: hidden;
 }
 .dl-sidenav.collapsed {
-  width: 72px;
+  width: 76px;
 }
 .dl-sidenav-items {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 8px;
+}
+.dl-nav-section {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.dl-nav-section-label {
+  padding: 0 12px;
+  margin: var(--sp-3) 0 4px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-hint);
+  white-space: nowrap;
+}
+/* Thu gọn: nhãn section biến thành divider mảnh */
+.dl-sidenav.collapsed .dl-nav-section-label {
+  height: 1px;
+  margin: 12px 8px;
+  padding: 0;
+  font-size: 0;
+  color: transparent;
+  background: var(--divider);
+  overflow: hidden;
 }
 .dl-sidenav-foot {
   margin-top: auto;
-  padding-top: 10px;
-  border-top: 1px solid var(--border);
+  padding-top: 8px;
+  border-top: 1px solid var(--divider);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 }
 .dl-nav-item {
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 11px 12px;
-  border-radius: 14px;
-  color: var(--text-muted);
-  font-weight: 700;
+  min-height: 44px;
+  padding: 10px 12px;
+  border-radius: 20px;
+  color: var(--text-secondary);
+  font-weight: 600;
   font-size: 15px;
   cursor: pointer;
   text-decoration: none;
-  border: 2px solid transparent;
   white-space: nowrap;
+  transition: background var(--dur-1) var(--ease), color var(--dur-1) var(--ease);
 }
 .dl-nav-item:hover {
-  background: var(--panel);
+  background: var(--panel-2);
   color: var(--text);
   text-decoration: none;
 }
+/* Active: nền soft + chữ/icon primary (icon lucide dùng currentColor) */
 .dl-nav-item.active {
-  background: rgba(56, 189, 248, 0.12);
-  border-color: rgba(56, 189, 248, 0.45);
-  color: var(--accent);
+  background: var(--primary-soft);
+  color: var(--primary);
+  font-weight: 700;
 }
 .dl-nav-icon {
-  font-size: 20px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   width: 24px;
-  text-align: center;
+  height: 20px;
   flex-shrink: 0;
+}
+.dl-nav-label {
+  transition: opacity var(--dur-1) var(--ease);
+}
+.dl-sidenav.collapsed .dl-nav-item {
+  justify-content: center;
+  gap: 0;
 }
 .dl-sidenav.collapsed .dl-nav-label {
   display: none;
 }
+/* Legacy — không còn dùng sau IA v2 nhưng giữ selector cho an toàn */
 .dl-nav-classic {
   font-size: 13px;
   font-weight: 600;
@@ -106,42 +153,51 @@
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 12px 20px;
+  padding: 12px 24px;
   position: sticky;
   top: 0;
   z-index: 20;
-  background: rgba(15, 17, 23, 0.85);
-  backdrop-filter: blur(10px);
-  border-bottom: 1px solid var(--border);
+  background: var(--surface);
+  border-bottom: 1px solid var(--divider);
 }
 .dl-menu-btn {
-  background: var(--panel);
-  border: 1px solid var(--border);
-  color: var(--text);
-  border-radius: 12px;
-  width: 38px;
-  height: 38px;
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--text-muted);
+  border-radius: var(--radius-sm);
+  width: 40px;
+  height: 40px;
   cursor: pointer;
   font-size: 17px;
+  transition: background var(--dur-1) var(--ease), color var(--dur-1) var(--ease);
 }
 .dl-menu-btn:hover {
   background: var(--panel-2);
+  color: var(--text);
+}
+.dl-menu-btn:active {
+  transform: scale(0.97);
 }
 .dl-brand {
   font-size: 19px;
-  font-weight: 800;
-  letter-spacing: 0.3px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--text);
   cursor: pointer;
-  background: linear-gradient(90deg, var(--accent), var(--vec-result));
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
 }
 .dl-topbar-spacer {
   flex: 1;
 }
+/* Chip thống kê ở TopBar — số dùng tabular-nums */
 .dl-topbar-stat {
-  font-size: 15px;
+  font-size: 14px;
+  font-variant-numeric: tabular-nums;
+}
+/* Streak (lửa) mang ngữ nghĩa "warn" khi ở TopBar, không phải "bad" */
+.dl-badge-bad.dl-topbar-stat {
+  background: var(--warn-soft);
+  color: var(--warn);
+  border-color: transparent;
 }
 .dl-goal {
   background: none;
@@ -149,50 +205,54 @@
   padding: 0;
   cursor: pointer;
   display: inline-flex;
+  border-radius: 50%;
+}
+.dl-goal:active {
+  transform: scale(0.97);
 }
 .dl-goal-label {
   font-size: 11px;
   font-weight: 800;
-  color: var(--warn);
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
 }
 
-/* ---------- Button (chunky, bấm 3D) ---------- */
+/* ---------- Button ---------- */
 .dl-btn {
-  --btn-shadow: rgba(0, 0, 0, 0.35);
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
-  border: none;
-  border-radius: 14px;
+  min-height: 44px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-btn);
   font-family: var(--font);
-  font-weight: 800;
-  letter-spacing: 0.2px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
   cursor: pointer;
-  color: #04121b;
-  background: var(--panel-2);
-  box-shadow: 0 4px 0 var(--btn-shadow);
-  transition: transform 0.05s ease, box-shadow 0.05s ease, filter 0.15s ease;
+  color: var(--text);
+  background: var(--surface);
+  box-shadow: var(--elev-0);
+  transition: background var(--dur-1) var(--ease), border-color var(--dur-1) var(--ease),
+    color var(--dur-1) var(--ease), transform var(--dur-1) var(--ease);
   text-decoration: none;
   user-select: none;
 }
 .dl-btn:hover {
-  filter: brightness(1.06);
+  background: var(--panel-2);
   text-decoration: none;
 }
 .dl-btn:active {
-  transform: translateY(4px);
-  box-shadow: 0 0 0 var(--btn-shadow);
+  transform: scale(0.97);
 }
 .dl-btn:disabled {
   opacity: 0.45;
   cursor: not-allowed;
   transform: none;
-  box-shadow: 0 4px 0 var(--btn-shadow);
-  filter: none;
 }
 .dl-btn-sm {
-  padding: 7px 14px;
+  min-height: 36px;
+  padding: 6px 14px;
   font-size: 13px;
 }
 .dl-btn-md {
@@ -201,96 +261,102 @@
 }
 .dl-btn-lg {
   padding: 15px 28px;
-  font-size: 17px;
+  font-size: 16px;
 }
 .dl-btn-block {
   width: 100%;
 }
+/* CTA chính — không shadow màu, hover = accent-strong */
 .dl-btn-primary {
-  background: var(--accent);
-  --btn-shadow: #0b6c93;
-  color: #04121b;
+  background: var(--primary);
+  border-color: transparent;
+  color: white;
+}
+.dl-btn-primary:hover {
+  background: var(--accent-strong);
 }
 .dl-btn-good {
   background: var(--good);
-  --btn-shadow: #15803d;
-  color: #04220f;
+  border-color: transparent;
+  color: var(--navy);
 }
 .dl-btn-danger {
   background: var(--bad);
-  --btn-shadow: #991b1b;
-  color: #fff;
+  border-color: transparent;
+  color: white;
+}
+.dl-btn-danger:hover {
+  background: var(--bad);
 }
 .dl-btn-ghost {
   background: transparent;
   color: var(--text);
-  border: 2px solid var(--border);
-  box-shadow: 0 4px 0 rgba(0, 0, 0, 0.25);
+  border: 1px solid var(--border);
 }
 .dl-btn-ghost:hover {
-  border-color: var(--accent);
-  color: var(--accent);
+  background: var(--panel-2);
+  border-color: var(--border);
+  color: var(--text);
 }
 
 /* ---------- Card ---------- */
 .dl-card {
-  background: var(--panel);
+  background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: 18px;
-  padding: 20px;
+  border-radius: var(--radius);
+  padding: 24px;
+  box-shadow: var(--elev-1);
 }
 .dl-card-interactive {
   cursor: pointer;
-  transition: transform 0.12s ease, border-color 0.12s ease;
+  transition: transform var(--dur-2) var(--ease), border-color var(--dur-2) var(--ease),
+    box-shadow var(--dur-2) var(--ease);
 }
 .dl-card-interactive:hover {
-  transform: translateY(-2px);
-  border-color: var(--accent);
+  transform: translateY(-1px);
+  border-color: var(--border);
+  box-shadow: var(--elev-2);
 }
 
-/* ---------- Badge ---------- */
+/* ---------- Badge / Chip ---------- */
 .dl-badge {
   display: inline-flex;
   align-items: center;
   gap: 5px;
   padding: 4px 11px;
-  border-radius: 999px;
+  border-radius: var(--radius-chip);
   font-size: 13px;
-  font-weight: 800;
+  font-weight: 700;
   border: 1px solid transparent;
+  font-variant-numeric: tabular-nums;
 }
 .dl-badge-icon {
   font-size: 14px;
 }
 .dl-badge-good {
-  background: rgba(34, 197, 94, 0.15);
+  background: var(--good-soft);
   color: var(--good);
-  border-color: rgba(34, 197, 94, 0.35);
 }
 .dl-badge-accent {
-  background: rgba(56, 189, 248, 0.14);
-  color: var(--accent);
-  border-color: rgba(56, 189, 248, 0.35);
+  background: var(--primary-soft);
+  color: var(--primary);
 }
+/* XP dùng màu nhấn primary */
 .dl-badge-xp {
-  background: rgba(245, 197, 24, 0.15);
-  color: #f5c518;
-  border-color: rgba(245, 197, 24, 0.35);
+  background: var(--primary-soft);
+  color: var(--primary);
 }
 .dl-badge-bad {
-  background: rgba(239, 68, 68, 0.14);
+  background: var(--bad-soft);
   color: var(--bad);
-  border-color: rgba(239, 68, 68, 0.35);
 }
 .dl-badge-warn {
-  background: rgba(245, 158, 11, 0.14);
+  background: var(--warn-soft);
   color: var(--warn);
-  border-color: rgba(245, 158, 11, 0.35);
 }
 .dl-badge-muted {
   background: var(--panel-2);
   color: var(--text-muted);
-  border-color: var(--border);
 }
 
 /* ---------- ProgressRing ---------- */
@@ -309,9 +375,10 @@
   align-items: center;
   justify-content: center;
   font-size: 12px;
-  font-weight: 800;
+  font-weight: 700;
   color: var(--text);
   line-height: 1.1;
+  font-variant-numeric: tabular-nums;
 }
 
 /* ---------- PathNode ---------- */
@@ -319,25 +386,24 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 4px;
-  transition: transform 0.2s ease;
+  gap: 6px;
+  transition: transform var(--dur-2) var(--ease);
 }
 .dl-node {
   position: relative;
-  width: 70px;
-  height: 70px;
+  width: 60px;
+  height: 60px;
   border-radius: 50%;
   border: none;
   cursor: pointer;
-  font-size: 27px;
+  font-size: 24px;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: transform 0.06s ease, box-shadow 0.06s ease;
+  transition: transform var(--dur-1) var(--ease), box-shadow var(--dur-2) var(--ease);
 }
 .dl-node:active {
-  transform: translateY(5px);
-  box-shadow: 0 0 0 !important;
+  transform: scale(0.96);
 }
 .dl-node-face {
   position: relative;
@@ -345,48 +411,45 @@
 }
 .dl-node-done {
   background: var(--good);
-  color: #04220f;
-  box-shadow: 0 6px 0 #15803d;
+  color: white;
+  box-shadow: var(--elev-1);
 }
 .dl-node-current {
-  background: var(--accent);
-  color: #04121b;
-  box-shadow: 0 6px 0 #0b6c93;
+  background: var(--primary);
+  color: white;
+  box-shadow: 0 0 0 4px var(--primary-soft);
 }
 .dl-node-available {
-  background: var(--panel-2);
-  color: var(--text);
-  border: 2px solid var(--border);
-  box-shadow: 0 6px 0 rgba(0, 0, 0, 0.4);
+  background: var(--primary-soft);
+  color: var(--primary);
+  border: 1px solid var(--primary-soft);
 }
 .dl-node-locked {
-  background: var(--panel);
-  color: var(--text-dim);
-  border: 2px solid var(--border-soft);
-  box-shadow: 0 6px 0 rgba(0, 0, 0, 0.3);
-  opacity: 0.7;
+  background: var(--panel-2);
+  color: var(--text-disabled);
+  border: 1px solid var(--border);
 }
+/* Vòng nhấn tĩnh quanh node hiện tại (không animation vô hạn) */
 .dl-node-pulse {
   position: absolute;
-  inset: -6px;
+  inset: -5px;
   border-radius: 50%;
-  border: 3px solid var(--accent);
-  animation: dl-pulse 1.6s ease-out infinite;
+  border: 2px solid var(--primary-soft);
   z-index: 1;
 }
 @keyframes dl-pulse {
   0% {
     transform: scale(1);
-    opacity: 0.7;
+    opacity: 0.6;
   }
   100% {
-    transform: scale(1.35);
+    transform: scale(1.3);
     opacity: 0;
   }
 }
 .dl-node-label {
   font-size: 12.5px;
-  font-weight: 700;
+  font-weight: 600;
   color: var(--text);
   text-align: center;
   max-width: 150px;
@@ -398,57 +461,107 @@
 }
 
 /* ---------- LearningPath ---------- */
+/* Thẻ TIẾP TỤC — card trắng thoáng, kicker màu primary, không dải màu */
 .dl-continue {
   display: flex;
   align-items: center;
   gap: 16px;
   flex-wrap: wrap;
-  background: linear-gradient(135deg, rgba(56, 189, 248, 0.12), rgba(232, 121, 249, 0.08));
-  border-color: rgba(56, 189, 248, 0.3);
-  margin-bottom: 26px;
+  margin-bottom: 32px;
 }
 .dl-continue-info {
   flex: 1;
-  min-width: 200px;
+  min-width: 0;
 }
 .dl-continue-kicker {
+  display: inline-block;
   font-size: 11px;
-  font-weight: 800;
-  letter-spacing: 1.5px;
-  color: var(--accent);
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  color: var(--primary);
 }
+/* Rút còn 1 dòng tên bài (bubble tối giản) */
 .dl-continue-title {
-  font-size: 22px;
-  margin: 4px 0 4px;
+  font-size: var(--fs-title);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 .dl-section {
-  margin-bottom: 34px;
+  margin-bottom: 16px;
+  /* Chừa chỗ cho TopBar (~64px) + mini-map sticky khi scrollIntoView. */
+  scroll-margin-top: 140px;
 }
 .dl-section-head {
   display: flex;
   align-items: center;
-  gap: 14px;
-  background: var(--panel);
+  gap: 16px;
+  background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: 18px;
-  padding: 14px 18px;
+  border-radius: var(--radius);
+  padding: 16px 24px;
   margin-bottom: 8px;
+  box-shadow: var(--elev-1);
+  cursor: pointer;
+  transition: border-color var(--dur-2) var(--ease), box-shadow var(--dur-2) var(--ease);
+}
+.dl-section-head:hover {
+  border-color: var(--primary-soft);
+}
+.dl-section-head:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+.dl-section-head.open {
+  border-color: var(--primary-soft);
 }
 .dl-section-head.locked {
-  opacity: 0.75;
+  opacity: 0.7;
 }
+/* Cụm bên phải header: vòng % + số bài */
+.dl-section-aside {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  flex-shrink: 0;
+}
+.dl-section-count {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.dl-section-lock {
+  font-size: 15px;
+  line-height: 1;
+  flex-shrink: 0;
+}
+.dl-section-chevron {
+  font-size: 13px;
+  color: var(--text-hint);
+  flex-shrink: 0;
+  width: 14px;
+  text-align: center;
+}
+/* Số chương — soft-square primary, không khối dải màu */
 .dl-section-num {
   width: 44px;
   height: 44px;
   flex-shrink: 0;
-  border-radius: 14px;
-  background: linear-gradient(135deg, var(--accent), var(--accent-2));
-  color: #04121b;
-  font-weight: 900;
+  border-radius: var(--radius-sm);
+  background: var(--primary-soft);
+  color: var(--primary);
+  font-weight: 800;
   font-size: 20px;
   display: flex;
   align-items: center;
   justify-content: center;
+  font-variant-numeric: tabular-nums;
 }
 .dl-section-meta {
   flex: 1;
@@ -456,42 +569,147 @@
 }
 .dl-section-title {
   font-size: 17px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
   margin: 0;
 }
 .dl-section-sub {
-  font-size: 12.5px;
+  font-size: 13px;
   color: var(--text-muted);
   margin: 2px 0 0;
 }
 .dl-section-pct {
   font-size: 12px;
+  font-weight: 700;
+  color: var(--primary);
+  font-variant-numeric: tabular-nums;
 }
 .dl-track {
   position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 22px;
-  padding: 26px 0 8px;
+  gap: 14px;
+  padding: 16px 0 8px;
 }
+/* Đường nối mảnh, nét đứt bằng border (không dải màu) */
 .dl-track::before {
   content: '';
   position: absolute;
   top: 10px;
   bottom: 10px;
   left: 50%;
-  width: 3px;
+  width: 0;
   transform: translateX(-50%);
-  background: repeating-linear-gradient(
-    to bottom,
-    var(--border) 0 8px,
-    transparent 8px 16px
-  );
+  border-left: 2px dashed var(--border);
   z-index: 0;
 }
 .dl-track > * {
   position: relative;
   z-index: 1;
+}
+/* Bọc mỗi node để gắn tooltip khóa + làm nổi node đang học */
+.dl-node-slot {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.dl-node-slot.locked {
+  cursor: not-allowed;
+}
+.dl-node-slot.current .dl-node-sub {
+  color: var(--primary);
+  font-weight: 700;
+}
+.dl-node-slot.current .dl-node-label {
+  color: var(--primary);
+}
+
+/* ---------- Mini-map chương (sticky) ---------- */
+.dl-minimap {
+  position: sticky;
+  top: 64px; /* ngay dưới TopBar */
+  z-index: 15;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0 -24px 24px;
+  padding: 10px 24px;
+  background: var(--surface);
+  background: color-mix(in srgb, var(--surface) 86%, transparent);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--divider);
+}
+.dl-minimap-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.dl-minimap-group-label {
+  flex-shrink: 0;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-hint);
+  white-space: nowrap;
+}
+.dl-minimap-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.dl-mini-chip {
+  width: 26px;
+  height: 26px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  border: 1px solid transparent;
+  font-size: 11px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform var(--dur-1) var(--ease), box-shadow var(--dur-2) var(--ease);
+}
+.dl-mini-chip:hover {
+  transform: translateY(-1px);
+}
+.dl-mini-chip:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+.dl-mini-done {
+  background: var(--good);
+  color: white;
+}
+.dl-mini-current {
+  background: var(--primary);
+  color: white;
+}
+.dl-mini-available {
+  background: var(--primary-soft);
+  color: var(--primary);
+}
+.dl-mini-locked {
+  background: var(--panel-2);
+  color: var(--text-hint);
+  border-color: var(--border);
+}
+/* Chip của section đang mở — vòng nhấn accent (giữ nguyên màu nền chip) */
+.dl-mini-chip.active {
+  box-shadow: 0 0 0 2px var(--surface), 0 0 0 4px var(--primary);
+}
+@media (max-width: 768px) {
+  .dl-minimap {
+    margin-left: -16px;
+    margin-right: -16px;
+    padding-left: 16px;
+    padding-right: 16px;
+  }
 }
 
 /* ---------- LessonPlayer ---------- */
@@ -501,80 +719,103 @@
 .dl-player-top {
   display: flex;
   align-items: center;
-  gap: 14px;
-  margin-bottom: 22px;
+  gap: 16px;
+  margin-bottom: 24px;
 }
 .dl-close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
   background: none;
   border: none;
   color: var(--text-muted);
-  font-size: 22px;
   cursor: pointer;
   line-height: 1;
-  padding: 4px;
+  border-radius: var(--radius-sm);
+  transition: color var(--dur-1) var(--ease), background var(--dur-1) var(--ease);
 }
 .dl-close:hover {
   color: var(--text);
+  background: var(--panel-2);
 }
+/* Thanh tiến độ trên cùng — track soft, fill primary flat, mượt */
 .dl-progress {
   flex: 1;
-  height: 14px;
-  background: var(--panel-2);
-  border-radius: 999px;
+  height: 12px;
+  background: var(--primary-soft);
+  border-radius: var(--radius-chip);
   overflow: hidden;
 }
 .dl-progress-fill {
   display: block;
   height: 100%;
-  background: linear-gradient(90deg, var(--good), #4ade80);
-  border-radius: 999px;
-  transition: width 0.35s ease;
+  background: var(--primary);
+  border-radius: var(--radius-chip);
+  transition: width var(--dur-3) var(--ease);
 }
 .dl-progress-count {
   font-size: 13px;
-  font-weight: 800;
+  font-weight: 700;
   color: var(--text-muted);
   min-width: 42px;
   text-align: right;
+  font-variant-numeric: tabular-nums;
 }
 .dl-question {
-  border-radius: 18px;
+  border-radius: var(--radius);
 }
 .dl-question-head {
   display: flex;
   gap: 8px;
-  margin-bottom: 14px;
+  margin-bottom: 16px;
   flex-wrap: wrap;
 }
 .dl-prompt {
   font-size: 19px;
-  font-weight: 700;
+  font-weight: 600;
   line-height: 1.5;
-  margin-bottom: 20px;
+  margin-bottom: 24px;
+  color: var(--text);
 }
 .dl-hintbox {
   margin-top: 16px;
-  padding: 12px 14px;
-  border-radius: 12px;
-  background: rgba(245, 197, 24, 0.1);
-  border-left: 3px solid #f5c518;
+  padding: 12px 16px;
+  border-radius: var(--radius-sm);
+  background: var(--warn-soft);
+  border-left: 3px solid var(--warn);
   font-size: 14px;
   color: var(--text);
 }
 
-/* feedback */
+/* feedback — slide-up nhẹ */
 .dl-feedback {
   margin-top: 16px;
-  border-radius: 16px;
-  padding: 16px 18px;
+  border-radius: var(--radius);
+  padding: 16px 24px;
+  animation: dl-slide-up var(--dur-3) var(--ease);
+}
+@keyframes dl-slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
 }
 .dl-feedback.good {
-  background: rgba(34, 197, 94, 0.12);
-  border: 1px solid rgba(34, 197, 94, 0.4);
+  background: var(--good-soft);
+  border: 1px solid var(--good-soft);
+  border-left: 3px solid var(--good);
 }
 .dl-feedback.bad {
-  background: rgba(239, 68, 68, 0.1);
-  border: 1px solid rgba(239, 68, 68, 0.4);
+  background: var(--bad-soft);
+  border: 1px solid var(--bad-soft);
+  border-left: 3px solid var(--bad);
 }
 .dl-feedback-head {
   display: flex;
@@ -589,19 +830,19 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-weight: 900;
+  font-weight: 800;
   flex-shrink: 0;
 }
 .dl-feedback.good .dl-feedback-icon {
   background: var(--good);
-  color: #04220f;
+  color: white;
 }
 .dl-feedback.bad .dl-feedback-icon {
   background: var(--bad);
-  color: #fff;
+  color: white;
 }
 .dl-feedback-title {
-  font-weight: 800;
+  font-weight: 700;
   font-size: 16px;
 }
 .dl-feedback.good .dl-feedback-title {
@@ -630,50 +871,60 @@
   display: flex;
   align-items: center;
   gap: 12px;
-  margin-top: 20px;
+  margin-top: 24px;
   flex-wrap: wrap;
 }
 .dl-actions-spacer {
   flex: 1;
 }
 .dl-report {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
   background: none;
   border: none;
   color: var(--text-dim);
-  font-size: 13px;
   cursor: pointer;
-  font-family: var(--font);
+  border-radius: var(--radius-sm);
+  transition: color var(--dur-1) var(--ease), background var(--dur-1) var(--ease);
 }
 .dl-report:hover {
-  color: var(--warn);
+  color: var(--bad);
+  background: var(--panel-2);
 }
 
-/* toast */
+/* toast — slide-up */
 .dl-toast {
   position: fixed;
-  bottom: 26px;
+  bottom: 24px;
   left: 50%;
   transform: translateX(-50%);
-  background: var(--panel-2);
+  background: var(--surface);
   border: 1px solid var(--border);
   color: var(--text);
-  padding: 12px 20px;
-  border-radius: 14px;
+  padding: 12px 24px;
+  border-radius: var(--radius);
   font-size: 14px;
   font-weight: 600;
-  box-shadow: var(--shadow);
+  box-shadow: var(--elev-2);
   z-index: 50;
+  animation: dl-slide-up var(--dur-3) var(--ease);
 }
 
 /* intro */
 .dl-intro-title {
-  font-size: 26px;
-  margin: 6px 0 8px;
+  font-size: var(--fs-heading);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin: 8px 0;
 }
 .dl-intro-actions {
   display: flex;
   gap: 12px;
-  margin-top: 20px;
+  margin-top: 24px;
   flex-wrap: wrap;
 }
 
@@ -685,32 +936,35 @@
   font-size: 56px;
 }
 .dl-summary-title {
-  font-size: 26px;
-  margin: 6px 0 2px;
+  font-size: var(--fs-heading);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin: 8px 0 2px;
 }
 .dl-summary-stats {
   display: flex;
   justify-content: center;
-  gap: 14px;
-  margin: 22px 0;
+  gap: 16px;
+  margin: 24px 0;
   flex-wrap: wrap;
 }
 .dl-summary-stat {
   background: var(--panel-2);
   border: 1px solid var(--border);
-  border-radius: 14px;
-  padding: 14px 22px;
+  border-radius: var(--radius-sm);
+  padding: 16px 24px;
   display: flex;
   flex-direction: column;
-  gap: 3px;
+  gap: 4px;
   min-width: 96px;
 }
 .dl-summary-val {
   font-size: 22px;
-  font-weight: 900;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
 }
 .dl-summary-val.dl-xp {
-  color: #f5c518;
+  color: var(--primary);
 }
 .dl-summary-val.dl-fire {
   color: var(--warn);
@@ -721,7 +975,8 @@
 }
 
 /* ---------- Variant: multiple-choice / error-detection ---------- */
-.dl-choices {
+.dl-choices,
+.dl-errlines {
   display: flex;
   flex-direction: column;
   gap: 12px;
@@ -733,24 +988,29 @@
   gap: 14px;
   text-align: left;
   padding: 14px 16px;
-  border-radius: 14px;
-  border: 2px solid var(--border);
-  background: var(--bg-elevated);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: var(--surface);
   color: var(--text);
   cursor: pointer;
   font-size: 15px;
   font-family: var(--font);
-  box-shadow: 0 3px 0 rgba(0, 0, 0, 0.25);
-  transition: border-color 0.12s ease, transform 0.05s ease;
+  box-shadow: none;
+  transition: border-color var(--dur-1) var(--ease), background var(--dur-1) var(--ease),
+    transform var(--dur-1) var(--ease);
 }
 .dl-choice:hover:not(:disabled),
 .dl-errline:hover:not(:disabled) {
-  border-color: var(--accent);
+  border-color: var(--primary);
+}
+.dl-choice:active:not(:disabled),
+.dl-errline:active:not(:disabled) {
+  transform: scale(0.99);
 }
 .dl-choice.selected,
 .dl-errline.selected {
-  border-color: var(--accent);
-  background: rgba(56, 189, 248, 0.12);
+  border-color: var(--primary);
+  background: var(--primary-soft);
 }
 .dl-choice:disabled,
 .dl-errline:disabled {
@@ -762,16 +1022,18 @@
   flex-shrink: 0;
   border-radius: 8px;
   background: var(--panel-2);
+  border: 1px solid var(--border);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-weight: 800;
+  font-weight: 700;
   font-size: 13px;
   color: var(--text-muted);
 }
 .dl-choice.selected .dl-choice-key {
-  background: var(--accent);
-  color: #04121b;
+  background: var(--primary);
+  border-color: transparent;
+  color: white;
 }
 .dl-errline {
   font-family: var(--font-mono);
@@ -782,13 +1044,14 @@
   flex-shrink: 0;
   color: var(--text-dim);
   font-weight: 700;
+  font-variant-numeric: tabular-nums;
 }
 
 /* ---------- Variant: numeric-input ---------- */
 .dl-num {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 16px;
   max-width: 320px;
 }
 .dl-num-field {
@@ -802,14 +1065,15 @@
   font-size: 22px;
   font-family: var(--font-mono);
   text-align: center;
-  background: var(--bg-elevated);
-  border: 2px solid var(--border);
-  border-radius: 14px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
   color: var(--text);
+  font-variant-numeric: tabular-nums;
+  transition: border-color var(--dur-1) var(--ease);
 }
 .dl-num-input:focus {
-  outline: none;
-  border-color: var(--accent);
+  border-color: var(--primary);
 }
 .dl-num-unit {
   color: var(--text-muted);
@@ -822,22 +1086,24 @@
 }
 .dl-key {
   padding: 12px 0;
+  min-height: 44px;
   font-size: 18px;
-  font-weight: 700;
+  font-weight: 600;
   font-family: var(--font-mono);
-  background: var(--panel-2);
+  background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: 12px;
+  border-radius: var(--radius-sm);
   color: var(--text);
   cursor: pointer;
-  box-shadow: 0 3px 0 rgba(0, 0, 0, 0.3);
+  transition: background var(--dur-1) var(--ease), border-color var(--dur-1) var(--ease),
+    transform var(--dur-1) var(--ease);
 }
 .dl-key:hover {
-  border-color: var(--accent);
+  border-color: var(--primary);
 }
 .dl-key:active {
-  transform: translateY(3px);
-  box-shadow: 0 0 0;
+  transform: scale(0.97);
+  background: var(--panel-2);
 }
 .dl-key-wide {
   font-size: 15px;
@@ -852,7 +1118,7 @@
 .dl-match {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 14px;
+  gap: 16px;
 }
 .dl-match-col {
   display: flex;
@@ -860,26 +1126,29 @@
   gap: 10px;
 }
 .dl-match-item {
-  padding: 12px 14px;
-  border-radius: 12px;
-  border: 2px solid var(--border);
-  background: var(--bg-elevated);
+  padding: 12px 16px;
+  min-height: 44px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: var(--surface);
   color: var(--text);
   cursor: pointer;
   font-size: 14px;
   text-align: left;
   font-family: var(--font);
-  transition: border-color 0.12s ease;
+  transition: border-color var(--dur-1) var(--ease), background var(--dur-1) var(--ease);
 }
 .dl-match-item:hover:not(:disabled) {
-  border-color: var(--accent);
+  border-color: var(--primary);
 }
 .dl-match-item.active {
-  border-color: var(--accent);
-  background: rgba(56, 189, 248, 0.14);
+  border-color: var(--primary);
+  background: var(--primary-soft);
 }
 .dl-match-item.matched {
-  background: var(--panel-2);
+  background: var(--good-soft);
+  border-color: var(--good-soft);
+  color: var(--text-muted);
 }
 
 /* ---------- Variant: step-ordering ---------- */
@@ -895,23 +1164,24 @@
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 12px 14px;
-  border-radius: 12px;
-  border: 2px solid var(--border);
-  background: var(--bg-elevated);
+  padding: 12px 16px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: var(--surface);
 }
 .dl-step-num {
   width: 26px;
   height: 26px;
   flex-shrink: 0;
   border-radius: 8px;
-  background: var(--accent);
-  color: #04121b;
-  font-weight: 800;
+  background: var(--primary);
+  color: white;
+  font-weight: 700;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 13px;
+  font-variant-numeric: tabular-nums;
 }
 .dl-step-text {
   flex: 1;
@@ -927,15 +1197,16 @@
   height: 22px;
   border-radius: 7px;
   border: 1px solid var(--border);
-  background: var(--panel-2);
+  background: var(--surface);
   color: var(--text);
   cursor: pointer;
   font-size: 12px;
   line-height: 1;
+  transition: border-color var(--dur-1) var(--ease), color var(--dur-1) var(--ease);
 }
 .dl-step-btn:hover:not(:disabled) {
-  border-color: var(--accent);
-  color: var(--accent);
+  border-color: var(--primary);
+  color: var(--primary);
 }
 .dl-step-btn:disabled {
   opacity: 0.35;
@@ -964,34 +1235,41 @@
   font-size: 16px;
   line-height: 1.5;
   padding: 14px 16px;
-  background: var(--bg-elevated);
-  border-radius: 14px;
+  background: var(--panel-2);
+  border-radius: var(--radius-sm);
   border: 1px solid var(--border);
+  color: var(--text);
 }
 .dl-tf-btns {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 14px;
+  gap: 16px;
 }
 .dl-tf-btn {
   padding: 18px 0;
-  border-radius: 14px;
-  border: 2px solid var(--border);
-  background: var(--bg-elevated);
+  min-height: 44px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: var(--surface);
   color: var(--text);
   font-size: 17px;
-  font-weight: 800;
+  font-weight: 700;
   cursor: pointer;
-  box-shadow: 0 3px 0 rgba(0, 0, 0, 0.25);
+  box-shadow: none;
+  transition: border-color var(--dur-1) var(--ease), background var(--dur-1) var(--ease),
+    transform var(--dur-1) var(--ease);
+}
+.dl-tf-btn:active:not(:disabled) {
+  transform: scale(0.98);
 }
 .dl-tf-true.selected {
   border-color: var(--good);
-  background: rgba(34, 197, 94, 0.14);
+  background: var(--good-soft);
   color: var(--good);
 }
 .dl-tf-false.selected {
   border-color: var(--bad);
-  background: rgba(239, 68, 68, 0.12);
+  background: var(--bad-soft);
   color: var(--bad);
 }
 .dl-tf-btn:disabled {
@@ -1007,12 +1285,94 @@
   align-items: center;
   justify-content: space-between;
   gap: 16px;
-  margin-bottom: 22px;
+  margin-bottom: 32px;
   flex-wrap: wrap;
 }
 .dl-dash-title {
-  font-size: 26px;
+  font-size: var(--fs-heading);
+  font-weight: 700;
+  letter-spacing: -0.02em;
   margin: 0 0 4px;
+}
+
+/* ---------- Bubble số liệu + navi-trong-trang (dùng chung: Dashboard) ---------- */
+.dl-bubbles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin: 24px 0;
+}
+.dl-bubble {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  flex: 1 1 0;
+  min-width: 96px;
+}
+.dl-bubble-circle {
+  width: 112px;
+  height: 112px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  box-shadow: var(--elev-1);
+}
+.dl-bubble-num {
+  font-size: var(--fs-heading);
+  font-weight: 700;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+}
+.dl-bubble-lbl {
+  font-size: var(--fs-caption);
+  color: var(--text-secondary);
+  font-weight: 600;
+}
+/* Chip segmented — mỗi lần chỉ 1 khối nội dung */
+.dl-tabs {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 24px;
+}
+.dl-tab {
+  min-height: 44px;
+  padding: 8px 20px;
+  border-radius: var(--radius-chip);
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text-secondary);
+  font-family: var(--font);
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background var(--dur-1) var(--ease), color var(--dur-1) var(--ease),
+    border-color var(--dur-1) var(--ease);
+}
+.dl-tab:hover {
+  background: var(--panel-2);
+  color: var(--text);
+}
+.dl-tab.active {
+  background: var(--primary-soft);
+  border-color: transparent;
+  color: var(--primary);
+}
+.dl-tab-panel {
+  animation: dl-fade var(--dur-2) var(--ease);
+}
+@keyframes dl-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 .dl-dash-ringlabel {
   display: flex;
@@ -1022,6 +1382,7 @@
 }
 .dl-dash-ringlabel b {
   font-size: 18px;
+  font-variant-numeric: tabular-nums;
 }
 .dl-dash-ringlabel span {
   font-size: 9px;
@@ -1031,8 +1392,8 @@
 .dl-stat-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-  gap: 14px;
-  margin-bottom: 22px;
+  gap: 16px;
+  margin-bottom: 32px;
 }
 .dl-stat-card {
   display: flex;
@@ -1045,8 +1406,9 @@
 }
 .dl-stat-num {
   font-size: 26px;
-  font-weight: 900;
+  font-weight: 800;
   color: var(--text);
+  font-variant-numeric: tabular-nums;
 }
 .dl-stat-lbl {
   font-size: 12.5px;
@@ -1056,12 +1418,14 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 10px;
+  gap: 12px;
   margin-bottom: 16px;
   flex-wrap: wrap;
 }
 .dl-skills-head h2 {
   font-size: 18px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
   margin: 0;
 }
 .dl-skill-list {
@@ -1086,25 +1450,27 @@
   flex: 1;
   height: 12px;
   background: var(--panel-2);
-  border-radius: 999px;
+  border-radius: var(--radius-chip);
   overflow: hidden;
 }
 .dl-skill-fill {
   display: block;
   height: 100%;
-  border-radius: 999px;
-  transition: width 0.4s ease;
+  border-radius: var(--radius-chip);
+  background: var(--primary);
+  transition: width var(--dur-3) var(--ease);
 }
 .dl-skill-pct {
   flex: 0 0 40px;
   text-align: right;
   font-size: 12px;
-  font-weight: 800;
+  font-weight: 700;
   color: var(--text-muted);
   font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
 }
 .dl-dash-foot {
-  margin-top: 22px;
+  margin-top: 24px;
   display: flex;
   justify-content: flex-end;
 }
@@ -1114,61 +1480,554 @@
   max-width: 560px;
 }
 .dl-onb-title {
-  font-size: 24px;
-  margin: 6px 0 4px;
+  font-size: var(--fs-heading);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin: 8px 0 4px;
 }
 .dl-onb-group {
-  margin-top: 22px;
+  margin-top: 24px;
 }
 .dl-onb-group h3 {
   font-size: 15px;
-  margin: 0 0 10px;
+  font-weight: 700;
+  margin: 0 0 12px;
 }
 .dl-onb-opts {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 8px;
 }
 .dl-onb-opt {
-  padding: 13px 16px;
-  border-radius: 14px;
-  border: 2px solid var(--border);
-  background: var(--bg-elevated);
+  padding: 14px 16px;
+  min-height: 44px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: var(--surface);
   color: var(--text);
   font-size: 15px;
   font-weight: 600;
   text-align: left;
   cursor: pointer;
   font-family: var(--font);
-  transition: border-color 0.12s ease;
+  transition: border-color var(--dur-1) var(--ease), background var(--dur-1) var(--ease),
+    color var(--dur-1) var(--ease);
 }
 .dl-onb-opt:hover {
-  border-color: var(--accent);
+  border-color: var(--primary);
 }
 .dl-onb-opt.selected {
-  border-color: var(--accent);
-  background: rgba(56, 189, 248, 0.12);
-  color: var(--accent);
+  border-color: var(--primary);
+  background: var(--primary-soft);
+  color: var(--primary);
 }
 .dl-onb-actions {
   display: flex;
   justify-content: space-between;
   gap: 12px;
-  margin-top: 28px;
+  margin-top: 32px;
 }
 
-/* ---------- Responsive ---------- */
-@media (max-width: 720px) {
-  .dl-sidenav {
-    width: 72px;
+/* ---------- TutorHub (trang /tutor host TutorPanel) ---------- */
+.dl-tutorhub {
+  max-width: 720px;
+}
+.dl-tutorhub-head {
+  margin-bottom: 24px;
+}
+.dl-tutorhub-title {
+  font-size: var(--fs-heading);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin: 0 0 8px;
+}
+.dl-tutorhub-mistakes {
+  margin-bottom: 24px;
+}
+.dl-tutorhub-label {
+  display: block;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-hint);
+  margin-bottom: 12px;
+}
+.dl-tutorhub-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.dl-tutorhub-chip {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  align-items: flex-start;
+  text-align: left;
+  padding: 10px 16px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  cursor: pointer;
+  font-family: var(--font);
+  max-width: 100%;
+  transition: border-color var(--dur-1) var(--ease), background var(--dur-1) var(--ease);
+}
+.dl-tutorhub-chip:hover {
+  border-color: var(--primary);
+}
+.dl-tutorhub-chip.active {
+  border-color: var(--primary);
+  background: var(--primary-soft);
+}
+.dl-tutorhub-chip-skill {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--primary);
+}
+.dl-tutorhub-chip-prompt {
+  font-size: 13px;
+  color: var(--text-secondary);
+  max-width: 260px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.dl-tutorhub-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+.dl-tutorhub-empty-text {
+  margin: 0;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+/* ---------- LessonPlayer QUIZ — relayout v2 (block-based) ---------- */
+/* PC (mặc định): 1 cột giữa; bài có hình = 2 cột (text trái / hình phải). */
+.dl-player-quiz {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 24px 24px 48px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+.dl-player-quiz.has-visual {
+  max-width: 1000px;
+}
+.dl-quiz-bar {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.dl-quiz-main {
+  display: block;
+}
+.dl-player-quiz.has-visual .dl-quiz-main {
+  display: grid;
+  grid-template-columns: 1.15fr 1fr;
+  gap: var(--sp-4);
+  align-items: start;
+}
+.dl-quiz-visual {
+  order: 1; /* PC: hình bên phải */
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px;
+  box-shadow: var(--elev-1);
+  position: sticky;
+  top: 16px;
+  overflow: hidden;
+}
+.dl-quiz-panel {
+  order: 0;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.dl-quiz-content {
+  min-width: 0;
+}
+.dl-quiz-meta {
+  font-size: var(--fs-caption);
+  color: var(--text-hint);
+  margin: 0 0 12px;
+}
+.dl-quiz-prompt {
+  font-size: var(--fs-title);
+  font-weight: 700;
+  line-height: 1.45;
+  letter-spacing: -0.01em;
+  color: var(--text);
+  margin-bottom: 24px;
+}
+.dl-quiz-answer {
+  margin-bottom: 8px;
+}
+.dl-quiz-foot {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 24px;
+  flex-wrap: wrap;
+}
+
+/* 2 nút tròn trợ giảng */
+.dl-tutor-btns {
+  display: flex;
+  gap: 8px;
+}
+.dl-tutor-btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+  box-shadow: var(--elev-1);
+  cursor: pointer;
+  transition: transform var(--dur-1) var(--ease), border-color var(--dur-1) var(--ease),
+    color var(--dur-1) var(--ease);
+}
+.dl-tutor-btn:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+.dl-tutor-btn:active {
+  transform: scale(0.97);
+}
+.dl-tutor-badge {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: var(--radius-chip);
+  background: var(--primary);
+  color: white;
+  font-size: 11px;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Bottom sheet (mobile) / popover nổi (PC) */
+.dl-tutor-scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  background: transparent; /* PC: chỉ bắt click-ngoài; mobile tô tối */
+}
+.dl-tutor-sheet {
+  position: fixed;
+  z-index: 61;
+  left: 24px;
+  bottom: 24px;
+  width: 380px;
+  max-width: calc(100vw - 48px);
+  max-height: min(60vh, 520px);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--elev-3);
+  display: flex;
+  flex-direction: column;
+  animation: dl-slide-up var(--dur-3) var(--ease);
+}
+.dl-tutor-sheet-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 16px 16px 8px;
+}
+.dl-tutor-sheet-title {
+  font-weight: 700;
+  font-size: 15px;
+}
+.dl-tutor-sheet-count {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-hint);
+  font-variant-numeric: tabular-nums;
+}
+.dl-tutor-sheet-close {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-sm);
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: background var(--dur-1) var(--ease), color var(--dur-1) var(--ease);
+}
+.dl-tutor-sheet-close:hover {
+  background: var(--panel-2);
+  color: var(--text);
+}
+.dl-tutor-sheet-body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 8px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.dl-tutor-sheet-foot {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px 16px;
+  border-top: 1px solid var(--divider);
+}
+.dl-tutor-analysis {
+  background: var(--bad-soft);
+  border-radius: var(--radius-sm);
+  padding: 12px 14px;
+}
+.dl-tutor-analysis-title {
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--bad);
+  margin-bottom: 6px;
+}
+.dl-tutor-hints {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.dl-tutor-hint {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 12px 14px;
+  background: var(--panel-2);
+  border-radius: var(--radius-sm);
+}
+.dl-tutor-hint-badge {
+  align-self: flex-start;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--primary);
+  background: var(--primary-soft);
+  padding: 3px 10px;
+  border-radius: var(--radius-chip);
+}
+.dl-tutor-hint-text {
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--text);
+}
+.dl-tutor-line {
+  margin: 2px 0;
+}
+.dl-tutor-sheet-diagram {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 8px;
+}
+
+/* ---------- Focus mode + màn làm bài 1-màn-hình (mobile) ---------- */
+@media (max-width: 768px) {
+  /* Focus mode: dọn chrome, khoá scroll trang cho màn làm bài */
+  body.dl-focus {
+    overflow: hidden;
   }
-  .dl-sidenav .dl-nav-label {
+  body.dl-focus .dl-topbar {
     display: none;
+  }
+  body.dl-focus .dl-sidenav {
+    display: none;
+  }
+  body.dl-focus .dl-content {
+    padding-bottom: 0;
+  }
+
+  /* Quiz gói trong ĐÚNG 1 màn hình, không scroll trang */
+  .dl-player-quiz,
+  .dl-player-quiz.has-visual {
+    max-width: none;
+    height: 100vh;
+    height: 100dvh;
+    margin: 0;
+    padding: 8px 12px calc(8px + env(safe-area-inset-bottom));
+    gap: 8px;
+    overflow: hidden;
+  }
+  .dl-quiz-bar {
+    gap: 12px;
+  }
+  .dl-quiz-main,
+  .dl-player-quiz.has-visual .dl-quiz-main {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
+    gap: 8px;
+  }
+  .dl-quiz-visual {
+    order: 0; /* mobile: hình lên trên */
+    flex: 0 1 auto;
+    max-height: 38vh;
+    padding: 8px;
+    position: static;
+    overflow: auto;
+  }
+  .dl-quiz-panel {
+    order: 1;
+    flex: 1;
+    min-height: 0;
+  }
+  .dl-quiz-content {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+  }
+  .dl-quiz-meta {
+    display: none; /* bỏ caption dạng bài trên mobile */
+  }
+  .dl-quiz-prompt {
+    margin-bottom: 16px;
+  }
+  .dl-quiz-foot {
+    margin-top: 8px;
+    gap: 8px;
+  }
+  /* Feedback không đẩy trang: cuộn nội bộ nếu quá dài */
+  .dl-quiz-panel .dl-feedback {
+    margin-top: 8px;
+    max-height: 40dvh;
+    overflow-y: auto;
+  }
+  /* Bottom sheet full-width */
+  .dl-tutor-scrim {
+    background: rgba(0, 0, 0, 0.4);
+  }
+  .dl-tutor-sheet {
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    max-width: none;
+    max-height: 80vh;
+    border-radius: var(--radius-sheet) var(--radius-sheet) 0 0;
+    border-left: none;
+    border-right: none;
+    border-bottom: none;
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+}
+
+/* ---------- Bottom navigation (mobile) ---------- */
+/* Ở mobile, SideNav thành thanh điều hướng cố định đáy màn hình.
+   Đúng 5 tab (design-v2): Trang chủ · Bài học · Gia sư AI · Tiến độ · Hồ sơ.
+   Ẩn: Luyện tập (.dl-nav-hide-mobile), Cài đặt (foot), và nhãn section. */
+@media (max-width: 768px) {
+  .dl-sidenav,
+  .dl-sidenav.collapsed {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    top: auto;
+    width: 100%;
+    height: calc(64px + env(safe-area-inset-bottom));
+    flex-direction: row;
+    align-items: stretch;
+    gap: 0;
+    padding: 0 8px env(safe-area-inset-bottom);
+    background: var(--surface);
+    border-right: none;
+    border-top: 1px solid var(--divider);
+    z-index: 40;
+    overflow: visible;
+  }
+  .dl-sidenav-items {
+    flex: 1;
+    flex-direction: row;
+    gap: 0;
+    justify-content: space-around;
+    align-items: stretch;
+  }
+  /* Dàn phẳng các item của mọi section thành một hàng */
+  .dl-nav-section {
+    display: contents;
+  }
+  .dl-nav-section-label,
+  .dl-sidenav.collapsed .dl-nav-section-label {
+    display: none;
+  }
+  /* Ẩn foot (Cài đặt) + các mục đánh dấu ẩn (Luyện tập) */
+  .dl-sidenav-foot {
+    display: none;
+  }
+  .dl-nav-hide-mobile {
+    display: none;
+  }
+  .dl-nav-item,
+  .dl-sidenav.collapsed .dl-nav-item {
+    flex: 1;
+    flex-direction: column;
+    justify-content: center;
+    gap: 2px;
+    min-height: 56px;
+    padding: 6px 4px;
+    border-radius: var(--radius-sm);
+  }
+  .dl-nav-item:hover {
+    background: transparent;
+    color: var(--text-secondary);
+  }
+  /* Active: chỉ đổi màu icon/label, không nền khối */
+  .dl-nav-item.active {
+    background: transparent;
+    color: var(--primary);
+  }
+  .dl-nav-icon {
+    width: auto;
+  }
+  /* Luôn hiện label (ghi đè quy tắc collapsed) */
+  .dl-sidenav .dl-nav-label,
+  .dl-sidenav.collapsed .dl-nav-label {
+    display: block;
+    font-size: 11px;
+    font-weight: 600;
+    line-height: 1;
+  }
+  /* Chừa chỗ cho thanh đáy, không để nội dung bị che */
+  .dl-content {
+    padding-bottom: calc(64px + env(safe-area-inset-bottom));
+  }
+  .dl-toast {
+    bottom: calc(72px + env(safe-area-inset-bottom));
+  }
+  .dl-page {
+    padding: 16px 16px 24px;
   }
   .dl-match {
     grid-template-columns: 1fr;
-  }
-  .dl-page {
-    padding: 18px 14px 96px;
   }
 }

@@ -1,0 +1,520 @@
+{
+  "url": "https://vi.d2l.ai/chapter_preliminaries/autograd.html",
+  "chapter": "chapter_preliminaries",
+  "title": "2.5. Sự khác biệt tự động",
+  "crawled_at": "2026-07-20T12:39:15.682342+00:00",
+  "headings": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "su-khac-biet-tu-dong",
+      "text": "2.5. Sự khác biệt tự động"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "mot-vi-du-don-gian",
+      "text": "2.5.1. Một ví dụ đơn giản"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "lui-cho-cac-bien-khong-vo-huong",
+      "text": "2.5.2. Lùi cho các biến không vô hướng"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tach-tinh-toan",
+      "text": "2.5.3. Tách tính toán"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tinh-toan-gradient-cua-python-control-flow",
+      "text": "2.5.4. Tính toán Gradient của Python Control Flow"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tom-tat",
+      "text": "2.5.5. Tóm tắt"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bai-tap",
+      "text": "2.5.6. Bài tập"
+    }
+  ],
+  "content": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "su-khac-biet-tu-dong",
+      "text": "2.5. Sự khác biệt tự động"
+    },
+    {
+      "type": "paragraph",
+      "text": "Như chúng tôi đã giải thích trong Section 2.4 , sự khác biệt\nlà một bước quan trọng trong gần như tất cả các thuật toán tối ưu hóa\nhọc tập sâu. Trong khi các tính toán để lấy các dẫn xuất này rất đơn\ngiản, chỉ đòi hỏi một số phép tính cơ bản, đối với các mô hình phức tạp,\nlàm việc các bản cập nhật bằng tay có thể là một nỗi đau (và thường dễ\nbị lỗi)."
+    },
+    {
+      "type": "paragraph",
+      "text": "Các khung học sâu đẩy nhanh công việc này bằng cách tự động tính toán\ncác dẫn xuất, tức là phân biệt tự động . Trong thực tế, dựa trên mô\nhình được thiết kế của chúng tôi, hệ thống xây dựng một biểu đồ tính\ntoán * , theo dõi dữ liệu kết hợp thông qua đó các hoạt động để tạo ra\nđầu ra. Sự khác biệt tự động cho phép hệ thống để sau đó backpropagate\ngradients. Ở đây, * backpropagate* chỉ đơn giản là có nghĩa là theo dõi\nthông qua biểu đồ tính toán, điền vào các dẫn xuất từng phần đối với mỗi\ntham số."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "mot-vi-du-don-gian",
+      "text": "2.5.1. Một ví dụ đơn giản"
+    },
+    {
+      "type": "paragraph",
+      "text": "Như một ví dụ đồ chơi, nói rằng chúng ta quan tâm đến phân biệt chức\nnăng \\(y = 2\\mathbf{x}^{\\top}\\mathbf{x}\\) đối với vector cột \\(\\mathbf{x}\\) . Để bắt đầu, chúng ta hãy tạo biến x và gán cho\nnó một giá trị ban đầu."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "from mxnet import autograd, np, npx\n\nnpx.set_np()\n\nx = np.arange(4.0)\nx"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "array([0., 1., 2., 3.])"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "import torch\n\nx = torch.arange(4.0)\nx"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "tensor([0., 1., 2., 3.])"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "import tensorflow as tf\n\nx = tf.range(4, dtype=tf.float32)\nx"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "<tf.Tensor: shape=(4,), dtype=float32, numpy=array([0., 1., 2., 3.], dtype=float32)>"
+    },
+    {
+      "type": "paragraph",
+      "text": "Trước khi chúng tôi thậm chí tính toán gradient của \\(y\\) đối với \\(\\mathbf{x}\\) , chúng ta sẽ cần một nơi để lưu trữ nó. Điều quan\ntrọng là chúng ta không phân bổ bộ nhớ mới mỗi khi chúng ta lấy một dẫn\nxuất đối với một tham số vì chúng ta thường sẽ cập nhật các tham số\ntương tự hàng ngàn hoặc hàng triệu lần và could quickly Nhanh chóng run\nchạy out of memory bộ nhớ. Lưu ý rằng một gradient của một hàm có giá\ntrị vô hướng đối với một vector \\(\\mathbf{x}\\) chính nó có giá trị\nvectơ và có hình dạng tương tự như \\(\\mathbf{x}\\) ."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "# We allocate memory for a tensor's gradient by invoking `attach_grad`\nx.attach_grad()\n# After we calculate a gradient taken with respect to `x`, we will be able to\n# access it via the `grad` attribute, whose values are initialized with 0s\nx.grad"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "array([0., 0., 0., 0.])"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "x.requires_grad_(True)  # Same as `x = torch.arange(4.0, requires_grad=True)`\nx.grad  # The default value is None"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "x = tf.Variable(x)"
+    },
+    {
+      "type": "paragraph",
+      "text": "Bây giờ chúng ta hãy tính \\(y\\) ."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "# Place our code inside an `autograd.record` scope to build the computational\n# graph\nwith autograd.record():\n    y = 2 * np.dot(x, x)\ny"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "array(28.)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "y = 2 * torch.dot(x, x)\ny"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "tensor(28., grad_fn=<MulBackward0>)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "# Record all computations onto a tape\nwith tf.GradientTape() as t:\n    y = 2 * tf.tensordot(x, x, axes=1)\ny"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "<tf.Tensor: shape=(), dtype=float32, numpy=28.0>"
+    },
+    {
+      "type": "paragraph",
+      "text": "Vì x là một vectơ có chiều dài 4, một tích chấm của x và x được thực hiện, mang lại đầu ra vô hướng mà chúng ta gán cho y . Tiếp\ntheo, chúng ta có thể tự động tính toán gradient của y đối với mỗi\nthành phần của x bằng cách gọi hàm để truyền ngược và in gradient."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "y.backward()\nx.grad"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "[10:57:46] src/base.cc:49: GPU context requested, but no GPUs found."
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "array([ 0.,  4.,  8., 12.])"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "y.backward()\nx.grad"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "tensor([ 0.,  4.,  8., 12.])"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "x_grad = t.gradient(y, x)\nx_grad"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "<tf.Tensor: shape=(4,), dtype=float32, numpy=array([ 0.,  4.,  8., 12.], dtype=float32)>"
+    },
+    {
+      "type": "paragraph",
+      "text": "Độ dốc của hàm \\(y = 2\\mathbf{x}^{\\top}\\mathbf{x}\\) đối với \\(\\mathbf{x}\\) nên là \\(4\\mathbf{x}\\) . Hãy để chúng tôi nhanh\nchóng xác minh rằng gradient mong muốn của chúng tôi đã được tính chính\nxác."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "x.grad == 4 * x"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "array([ True,  True,  True,  True])"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "x.grad == 4 * x"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "tensor([True, True, True, True])"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "x_grad == 4 * x"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "<tf.Tensor: shape=(4,), dtype=bool, numpy=array([ True,  True,  True,  True])>"
+    },
+    {
+      "type": "paragraph",
+      "text": "Bây giờ chúng ta hãy tính một hàm khác của x ."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "with autograd.record():\n    y = x.sum()\ny.backward()\nx.grad  # Overwritten by the newly calculated gradient"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "array([1., 1., 1., 1.])"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "# PyTorch accumulates the gradient in default, we need to clear the previous\n# values\nx.grad.zero_()\ny = x.sum()\ny.backward()\nx.grad"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "tensor([1., 1., 1., 1.])"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "with tf.GradientTape() as t:\n    y = tf.reduce_sum(x)\nt.gradient(y, x)  # Overwritten by the newly calculated gradient"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "<tf.Tensor: shape=(4,), dtype=float32, numpy=array([1., 1., 1., 1.], dtype=float32)>"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "lui-cho-cac-bien-khong-vo-huong",
+      "text": "2.5.2. Lùi cho các biến không vô hướng"
+    },
+    {
+      "type": "paragraph",
+      "text": "Về mặt kỹ thuật, khi y không phải là vô hướng, cách giải thích tự\nnhiên nhất về sự khác biệt của một vectơ y đối với một vectơ x là một ma trận. Đối với bậc cao hơn và chiều cao hơn y và x , kết\nquả khác biệt có thể là một tensor bậc cao."
+    },
+    {
+      "type": "paragraph",
+      "text": "Tuy nhiên, trong khi những đối tượng kỳ lạ hơn này xuất hiện trong học\nmáy nâng cao (bao gồm trong học sâu ), thường xuyên hơn khi chúng ta gọi\nngược trên một vectơ, , chúng ta đang cố gắng tính toán các dẫn xuất của\ncác hàm mất mát cho mỗi thành phần của một * lô* ví dụ đào tạo. Ở đây,\ný định của chúng tôi là không tính toán ma trận phân biệt mà thay vào đó\ntổng của các dẫn xuất từng phần được tính riêng cho mỗi ví dụ trong lô."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "# When we invoke `backward` on a vector-valued variable `y` (function of `x`),\n# a new scalar variable is created by summing the elements in `y`. Then the\n# gradient of that scalar variable with respect to `x` is computed\nwith autograd.record():\n    y = x * x  # `y` is a vector\ny.backward()\nx.grad  # Equals to y = sum(x * x)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "array([0., 2., 4., 6.])"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "# Invoking `backward` on a non-scalar requires passing in a `gradient` argument\n# which specifies the gradient of the differentiated function w.r.t `self`.\n# In our case, we simply want to sum the partial derivatives, so passing\n# in a gradient of ones is appropriate\nx.grad.zero_()\ny = x * x\n# y.backward(torch.ones(len(x))) equivalent to the below\ny.sum().backward()\nx.grad"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "tensor([0., 2., 4., 6.])"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "with tf.GradientTape() as t:\n    y = x * x\nt.gradient(y, x)  # Same as `y = tf.reduce_sum(x * x)`"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "<tf.Tensor: shape=(4,), dtype=float32, numpy=array([0., 2., 4., 6.], dtype=float32)>"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tach-tinh-toan",
+      "text": "2.5.3. Tách tính toán"
+    },
+    {
+      "type": "paragraph",
+      "text": "Đôi khi, chúng tôi muốn di chuyển một số tính toán bên ngoài đồ thị tính\ntoán đã ghi lại. Ví dụ, nói rằng y được tính như một hàm x , và\nsau đó z được tính như một hàm của cả y và x . Bây giờ, hãy\ntưởng tượng rằng chúng tôi muốn tính toán gradient của z đối với x , nhưng muốn vì một lý do nào đó để đối xử với y như một hằng\nsố, và chỉ tính đến vai trò mà x chơi sau khi y được tính toán."
+    },
+    {
+      "type": "paragraph",
+      "text": "Ở đây, chúng ta có thể tách y để trả về một biến mới u có cùng\ngiá trị như y nhưng loại bỏ bất kỳ thông tin nào về cách y được\ntính toán trong biểu đồ tính toán. Nói cách khác, gradient sẽ không chảy\nngược qua u đến x . Như vậy, hàm truyền ngược sau đây tính toán\nđạo hàm từng phần của z = u * x đối với x trong khi xử lý u như một hằng số, thay vì đạo hàm từng phần của z = x * x * x đối với x ."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "with autograd.record():\n    y = x * x\n    u = y.detach()\n    z = u * x\nz.backward()\nx.grad == u"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "array([ True,  True,  True,  True])"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "x.grad.zero_()\ny = x * x\nu = y.detach()\nz = u * x\n\nz.sum().backward()\nx.grad == u"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "tensor([True, True, True, True])"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "# Set `persistent=True` to run `t.gradient` more than once\nwith tf.GradientTape(persistent=True) as t:\n    y = x * x\n    u = tf.stop_gradient(y)\n    z = u * x\n\nx_grad = t.gradient(z, x)\nx_grad == u"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "<tf.Tensor: shape=(4,), dtype=bool, numpy=array([ True,  True,  True,  True])>"
+    },
+    {
+      "type": "paragraph",
+      "text": "Kể từ khi tính toán y đã được ghi lại, sau đó chúng ta có thể gọi\ntruyền ngược trên y để có được dẫn xuất của y = x * x đối với x , đó là 2 * x ."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "y.backward()\nx.grad == 2 * x"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "array([ True,  True,  True,  True])"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "x.grad.zero_()\ny.sum().backward()\nx.grad == 2 * x"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "tensor([True, True, True, True])"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "t.gradient(y, x) == 2 * x"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "<tf.Tensor: shape=(4,), dtype=bool, numpy=array([ True,  True,  True,  True])>"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tinh-toan-gradient-cua-python-control-flow",
+      "text": "2.5.4. Tính toán Gradient của Python Control Flow"
+    },
+    {
+      "type": "paragraph",
+      "text": "Một lợi ích của việc sử dụng sự khác biệt tự động là thậm chí nếu xây\ndựng biểu đồ tính toán của một hàm yêu cầu đi qua một mê cung của dòng\nđiều khiển Python (ví dụ, điều kiện, vòng lặp và các cuộc gọi hàm tùy\ný), chúng ta vẫn có thể tính toán gradient của biến thể kết quả. Trong\nđoạn sau, lưu ý rằng số lần lặp của vòng lặp while và đánh giá câu\nlệnh if cả phụ thuộc vào giá trị của đầu vào a ."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def f(a):\n    b = a * 2\n    while np.linalg.norm(b) < 1000:\n        b = b * 2\n    if b.sum() > 0:\n        c = b\n    else:\n        c = 100 * b\n    return c"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def f(a):\n    b = a * 2\n    while b.norm() < 1000:\n        b = b * 2\n    if b.sum() > 0:\n        c = b\n    else:\n        c = 100 * b\n    return c"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def f(a):\n    b = a * 2\n    while tf.norm(b) < 1000:\n        b = b * 2\n    if tf.reduce_sum(b) > 0:\n        c = b\n    else:\n        c = 100 * b\n    return c"
+    },
+    {
+      "type": "paragraph",
+      "text": "Hãy để chúng tôi tính toán gradient."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "a = np.random.normal()\na.attach_grad()\nwith autograd.record():\n    d = f(a)\nd.backward()"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "a = torch.randn(size=(), requires_grad=True)\nd = f(a)\nd.backward()"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "a = tf.Variable(tf.random.normal(shape=()))\nwith tf.GradientTape() as t:\n    d = f(a)\nd_grad = t.gradient(d, a)\nd_grad"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "<tf.Tensor: shape=(), dtype=float32, numpy=3276800.0>"
+    },
+    {
+      "type": "paragraph",
+      "text": "Bây giờ chúng ta có thể phân tích hàm f được xác định ở trên. Lưu ý\nrằng nó là piecewise tuyến tính trong đầu vào của nó a . Nói cách\nkhác, đối với bất kỳ a có tồn tại một số vô hướng không đổi k sao cho f(a) = k * a , trong đó giá trị của k phụ thuộc vào a đầu vào. Do đó d / a cho phép chúng tôi xác minh rằng gradient là\nchính xác."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "a.grad == d / a"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "array(True)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "a.grad == d / a"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "tensor(True)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "d_grad == d / a"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "<tf.Tensor: shape=(), dtype=bool, numpy=True>"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tom-tat",
+      "text": "2.5.5. Tóm tắt"
+    },
+    {
+      "type": "list",
+      "ordered": false,
+      "items": [
+        "Các khuôn khổ học sâu có thể tự động hóa việc tính toán các dẫn xuất.\nĐể sử dụng nó, trước tiên chúng ta đính kèm gradient vào các biến đó\nđối với mà chúng ta mong muốn các dẫn xuất một phần. Sau đó, chúng\ntôi ghi lại tính toán giá trị mục tiêu của chúng tôi, thực hiện chức\nnăng của nó để truyền ngược và truy cập gradient kết quả."
+      ]
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bai-tap",
+      "text": "2.5.6. Bài tập"
+    },
+    {
+      "type": "list",
+      "ordered": true,
+      "items": [
+        "Tại sao đạo hàm thứ hai đắt hơn nhiều để tính toán so với đạo hàm đầu\ntiên?",
+        "Sau khi chạy chức năng để truyền ngược, ngay lập tức chạy lại và xem\nđiều gì sẽ xảy ra.",
+        "Trong ví dụ dòng điều khiển, nơi chúng ta tính toán đạo hàm của d đối với a , điều gì sẽ xảy ra nếu chúng ta thay đổi biến a thành vectơ hoặc ma trận ngẫu nhiên. Tại thời điểm này, kết quả của\nphép tính f(a) không còn là vô hướng. Điều gì xảy ra với kết quả?\nLàm thế nào để chúng ta phân tích điều này?",
+        "Thiết kế lại một ví dụ về việc tìm gradient của luồng điều khiển.\nChạy và phân tích kết quả.",
+        "Hãy để \\(f(x) = \\sin(x)\\) . Lô \\(f(x)\\) và \\(\\frac{df(x)}{dx}\\) , nơi sau này được tính toán mà không cần\nkhai thác \\(f'(x) = \\cos(x)\\) đó."
+      ]
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    }
+  ],
+  "images": [],
+  "text": "2.5. Sự khác biệt tự động\nNhư chúng tôi đã giải thích trong Section 2.4 , sự khác biệt\nlà một bước quan trọng trong gần như tất cả các thuật toán tối ưu hóa\nhọc tập sâu. Trong khi các tính toán để lấy các dẫn xuất này rất đơn\ngiản, chỉ đòi hỏi một số phép tính cơ bản, đối với các mô hình phức tạp,\nlàm việc các bản cập nhật bằng tay có thể là một nỗi đau (và thường dễ\nbị lỗi).\nCác khung học sâu đẩy nhanh công việc này bằng cách tự động tính toán\ncác dẫn xuất, tức là phân biệt tự động . Trong thực tế, dựa trên mô\nhình được thiết kế của chúng tôi, hệ thống xây dựng một biểu đồ tính\ntoán * , theo dõi dữ liệu kết hợp thông qua đó các hoạt động để tạo ra\nđầu ra. Sự khác biệt tự động cho phép hệ thống để sau đó backpropagate\ngradients. Ở đây, * backpropagate* chỉ đơn giản là có nghĩa là theo dõi\nthông qua biểu đồ tính toán, điền vào các dẫn xuất từng phần đối với mỗi\ntham số.\n2.5.1. Một ví dụ đơn giản\nNhư một ví dụ đồ chơi, nói rằng chúng ta quan tâm đến phân biệt chức\nnăng \\(y = 2\\mathbf{x}^{\\top}\\mathbf{x}\\) đối với vector cột \\(\\mathbf{x}\\) . Để bắt đầu, chúng ta hãy tạo biến x và gán cho\nnó một giá trị ban đầu.\nTrước khi chúng tôi thậm chí tính toán gradient của \\(y\\) đối với \\(\\mathbf{x}\\) , chúng ta sẽ cần một nơi để lưu trữ nó. Điều quan\ntrọng là chúng ta không phân bổ bộ nhớ mới mỗi khi chúng ta lấy một dẫn\nxuất đối với một tham số vì chúng ta thường sẽ cập nhật các tham số\ntương tự hàng ngàn hoặc hàng triệu lần và could quickly Nhanh chóng run\nchạy out of memory bộ nhớ. Lưu ý rằng một gradient của một hàm có giá\ntrị vô hướng đối với một vector \\(\\mathbf{x}\\) chính nó có giá trị\nvectơ và có hình dạng tương tự như \\(\\mathbf{x}\\) .\nBây giờ chúng ta hãy tính \\(y\\) .\nVì x là một vectơ có chiều dài 4, một tích chấm của x và x được thực hiện, mang lại đầu ra vô hướng mà chúng ta gán cho y . Tiếp\ntheo, chúng ta có thể tự động tính toán gradient của y đối với mỗi\nthành phần của x bằng cách gọi hàm để truyền ngược và in gradient.\nĐộ dốc của hàm \\(y = 2\\mathbf{x}^{\\top}\\mathbf{x}\\) đối với \\(\\mathbf{x}\\) nên là \\(4\\mathbf{x}\\) . Hãy để chúng tôi nhanh\nchóng xác minh rằng gradient mong muốn của chúng tôi đã được tính chính\nxác.\nBây giờ chúng ta hãy tính một hàm khác của x .\n2.5.2. Lùi cho các biến không vô hướng\nVề mặt kỹ thuật, khi y không phải là vô hướng, cách giải thích tự\nnhiên nhất về sự khác biệt của một vectơ y đối với một vectơ x là một ma trận. Đối với bậc cao hơn và chiều cao hơn y và x , kết\nquả khác biệt có thể là một tensor bậc cao.\nTuy nhiên, trong khi những đối tượng kỳ lạ hơn này xuất hiện trong học\nmáy nâng cao (bao gồm trong học sâu ), thường xuyên hơn khi chúng ta gọi\nngược trên một vectơ, , chúng ta đang cố gắng tính toán các dẫn xuất của\ncác hàm mất mát cho mỗi thành phần của một * lô* ví dụ đào tạo. Ở đây,\ný định của chúng tôi là không tính toán ma trận phân biệt mà thay vào đó\ntổng của các dẫn xuất từng phần được tính riêng cho mỗi ví dụ trong lô.\n2.5.3. Tách tính toán\nĐôi khi, chúng tôi muốn di chuyển một số tính toán bên ngoài đồ thị tính\ntoán đã ghi lại. Ví dụ, nói rằng y được tính như một hàm x , và\nsau đó z được tính như một hàm của cả y và x . Bây giờ, hãy\ntưởng tượng rằng chúng tôi muốn tính toán gradient của z đối với x , nhưng muốn vì một lý do nào đó để đối xử với y như một hằng\nsố, và chỉ tính đến vai trò mà x chơi sau khi y được tính toán.\nỞ đây, chúng ta có thể tách y để trả về một biến mới u có cùng\ngiá trị như y nhưng loại bỏ bất kỳ thông tin nào về cách y được\ntính toán trong biểu đồ tính toán. Nói cách khác, gradient sẽ không chảy\nngược qua u đến x . Như vậy, hàm truyền ngược sau đây tính toán\nđạo hàm từng phần của z = u * x đối với x trong khi xử lý u như một hằng số, thay vì đạo hàm từng phần của z = x * x * x đối với x .\nKể từ khi tính toán y đã được ghi lại, sau đó chúng ta có thể gọi\ntruyền ngược trên y để có được dẫn xuất của y = x * x đối với x , đó là 2 * x .\n2.5.4. Tính toán Gradient của Python Control Flow\nMột lợi ích của việc sử dụng sự khác biệt tự động là thậm chí nếu xây\ndựng biểu đồ tính toán của một hàm yêu cầu đi qua một mê cung của dòng\nđiều khiển Python (ví dụ, điều kiện, vòng lặp và các cuộc gọi hàm tùy\ný), chúng ta vẫn có thể tính toán gradient của biến thể kết quả. Trong\nđoạn sau, lưu ý rằng số lần lặp của vòng lặp while và đánh giá câu\nlệnh if cả phụ thuộc vào giá trị của đầu vào a .\nHãy để chúng tôi tính toán gradient.\nBây giờ chúng ta có thể phân tích hàm f được xác định ở trên. Lưu ý\nrằng nó là piecewise tuyến tính trong đầu vào của nó a . Nói cách\nkhác, đối với bất kỳ a có tồn tại một số vô hướng không đổi k sao cho f(a) = k * a , trong đó giá trị của k phụ thuộc vào a đầu vào. Do đó d / a cho phép chúng tôi xác minh rằng gradient là\nchính xác.\n2.5.5. Tóm tắt\nCác khuôn khổ học sâu có thể tự động hóa việc tính toán các dẫn xuất.\nĐể sử dụng nó, trước tiên chúng ta đính kèm gradient vào các biến đó\nđối với mà chúng ta mong muốn các dẫn xuất một phần. Sau đó, chúng\ntôi ghi lại tính toán giá trị mục tiêu của chúng tôi, thực hiện chức\nnăng của nó để truyền ngược và truy cập gradient kết quả.\n2.5.6. Bài tập\nTại sao đạo hàm thứ hai đắt hơn nhiều để tính toán so với đạo hàm đầu\ntiên?\nSau khi chạy chức năng để truyền ngược, ngay lập tức chạy lại và xem\nđiều gì sẽ xảy ra.\nTrong ví dụ dòng điều khiển, nơi chúng ta tính toán đạo hàm của d đối với a , điều gì sẽ xảy ra nếu chúng ta thay đổi biến a thành vectơ hoặc ma trận ngẫu nhiên. Tại thời điểm này, kết quả của\nphép tính f(a) không còn là vô hướng. Điều gì xảy ra với kết quả?\nLàm thế nào để chúng ta phân tích điều này?\nThiết kế lại một ví dụ về việc tìm gradient của luồng điều khiển.\nChạy và phân tích kết quả.\nHãy để \\(f(x) = \\sin(x)\\) . Lô \\(f(x)\\) và \\(\\frac{df(x)}{dx}\\) , nơi sau này được tính toán mà không cần\nkhai thác \\(f'(x) = \\cos(x)\\) đó.\nDiscussions\nDiscussions\nDiscussions"
+}

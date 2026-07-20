@@ -1,0 +1,202 @@
+{
+  "url": "https://vi.d2l.ai/chapter_recommender-systems/fm.html",
+  "chapter": "chapter_recommender-systems",
+  "title": "16.9. Máy Factorization",
+  "crawled_at": "2026-07-20T12:41:16.889746+00:00",
+  "headings": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "may-factorization",
+      "text": "16.9. Máy Factorization"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "way-factorization-may-moc",
+      "text": "16.9.1. 2-Way Factorization Máy móc"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "mot-tieu-chi-toi-uu-hoa-hieu-qua",
+      "text": "16.9.2. Một tiêu chí tối ưu hóa hiệu quả"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "mo-hinh-trien-khai-ma-sau-day-thuc-hien-cac-may-tinh-factorization-ro-rang-la-thay-rang-fm-bao-gom-mot-khoi-hoi-quy-tuyen-tinh-va-mot-khoi-tuong-tac-tinh-nang-hieu-qua-chung-toi-ap-dung-mot-ham-sigmoid-tren-diem-so-cuoi-cung-vi-chung-toi-coi-du-doan-ctr-nhu-mot-nhiem-vu-phan-loai",
+      "text": "16.9.3. Mô hình triển khai Mã sau đây thực hiện các máy tính factorization. Rõ ràng là thấy rằng FM bao gồm một khối hồi quy tuyến tính và một khối tương tác tính năng hiệu quả. Chúng tôi áp dụng một hàm sigmoid trên điểm số cuối cùng vì chúng tôi coi dự đoán CTR như một nhiệm vụ phân loại."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tai-tap-du-lieu-quang-cao-chung-toi-su-dung-trinh-bao-boc-du-lieu-ctr-tu-phan-cuoi-de-tai-tap-du-lieu-quang-cao-truc-tuyen",
+      "text": "16.9.4. Tải tập dữ liệu quảng cáo Chúng tôi sử dụng trình bao bọc dữ liệu CTR từ phần cuối để tải tập dữ liệu quảng cáo trực tuyến."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "dao-tao-mo-hinh-sau-do-chung-toi-dao-tao-mo-hinh-ty-le-hoc-tap-duoc-dat-thanh-0-02-va-kich-thuoc-nhung-duoc-dat-thanh-20-theo-mac-dinh-trinh-toi-uu-hoa-adam-va-ton-that-sigmoidbinarycrossentropyloss-duoc-su-dung-de-dao-tao-mo-hinh",
+      "text": "16.9.5. Đào tạo mô hình Sau đó, chúng tôi đào tạo mô hình. Tỷ lệ học tập được đặt thành 0,02 và kích thước nhúng được đặt thành 20 theo mặc định. Trình tối ưu hóa Adam và tổn thất SigmoidBinaryCrossEntropyLoss được sử dụng để đào tạo mô hình."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tom-tat",
+      "text": "16.9.6. Tóm tắt"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bai-tap",
+      "text": "16.9.7. Bài tập"
+    }
+  ],
+  "content": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "may-factorization",
+      "text": "16.9. Máy Factorization"
+    },
+    {
+      "type": "paragraph",
+      "text": "Máy factorization (FM) [Rendle, 2010] , được đề xuất bởi Steffen\nRendle năm 2010, là một thuật toán được giám sát có thể được sử dụng để\nphân loại, hồi quy, và xếp hạng nhiệm vụ. Nó nhanh chóng chú ý và trở\nthành một phương pháp phổ biến và có tác động để đưa ra dự đoán và\nkhuyến nghị. Đặc biệt, nó là một khái quát hóa của mô hình hồi quy tuyến\ntính và mô hình factorization ma trận. Hơn nữa, nó gợi nhớ đến các máy\nvector hỗ trợ với một hạt nhân đa thức. Điểm mạnh của máy factorization\nso với hồi quy tuyến tính và tính toán ma trận là: (1) nó có thể mô hình\ntương tác biến \\(\\chi\\) -chiều, trong đó \\(\\chi\\) là số thứ tự đa\nthức và thường được đặt thành hai. (2) Một thuật toán tối ưu hóa nhanh\nliên quan đến máy factorization có thể làm giảm thời gian tính toán đa\nthức đến độ phức tạp tuyến tính, làm cho nó cực kỳ hiệu quả đặc biệt là\nđối với các đầu vào thưa thớt chiều cao. Vì những lý do này, máy\nfactorization được sử dụng rộng rãi trong các khuyến nghị quảng cáo và\nsản phẩm hiện đại. Các chi tiết kỹ thuật và triển khai được mô tả dưới\nđây."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "way-factorization-may-moc",
+      "text": "16.9.1. 2-Way Factorization Máy móc"
+    },
+    {
+      "type": "paragraph",
+      "text": "Chính thức, hãy để \\(x \\in \\mathbb{R}^d\\) biểu thị các vectơ tính\nnăng của một mẫu và \\(y\\) biểu thị nhãn tương ứng có thể là nhãn có\ngiá trị thực hoặc nhãn lớp như lớp nhị phân “click/non-click”. Mô hình\ncho một máy factorization độ hai được định nghĩa là:"
+    },
+    {
+      "type": "math",
+      "latex": "(16.9.1)¶\\[\\hat{y}(x) = \\mathbf{w}_0 + \\sum_{i=1}^d \\mathbf{w}_i x_i + \\sum_{i=1}^d\\sum_{j=i+1}^d \\langle\\mathbf{v}_i, \\mathbf{v}_j\\rangle x_i x_j\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "trong đó \\(\\mathbf{w}_0 \\in \\mathbb{R}\\) là thiên vị toàn cầu; \\(\\mathbf{w} \\in \\mathbb{R}^d\\) biểu thị trọng lượng của biến thứ i; \\(\\mathbf{V} \\in \\mathbb{R}^{d\\times k}\\) đại diện cho các tính năng\nnhúng; \\(\\mathbf{v}_i\\) đại diện cho hàng \\(i^\\mathrm{th}\\) của \\(\\mathbf{V}\\) ; \\(k\\) là chiều của các yếu tố tiềm ẩn; \\(\\langle\\cdot, \\cdot \\rangle\\) là tích chấm của hai vectơ. 3620 mô\nhình sự tương tác giữa tính năng \\(i^\\mathrm{th}\\) và \\(j^\\mathrm{th}\\) . Một số tương tác tính năng có thể dễ hiểu để\nchúng có thể được thiết kế bởi các chuyên gia. Tuy nhiên, hầu hết các\ntương tác tính năng khác đều ẩn trong dữ liệu và khó xác định. Vì vậy,\nmô hình hóa tính năng tương tác tự động có thể làm giảm đáng kể những nỗ\nlực trong kỹ thuật tính năng. Rõ ràng là hai thuật ngữ đầu tiên tương\nứng với mô hình hồi quy tuyến tính và thuật ngữ cuối cùng là một phần mở\nrộng của mô hình factorization ma trận. Nếu tính năng \\(i\\) đại diện\ncho một mục và tính năng \\(j\\) đại diện cho người dùng, thuật ngữ\nthứ ba chính xác là sản phẩm chấm giữa nhúng người dùng và mục. Điều\nđáng chú ý là FM cũng có thể khái quát hóa với các đơn đặt hàng cao hơn\n(độ> 2). Tuy nhiên, sự ổn định số có thể làm suy yếu sự tổng quát hóa."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "mot-tieu-chi-toi-uu-hoa-hieu-qua",
+      "text": "16.9.2. Một tiêu chí tối ưu hóa hiệu quả"
+    },
+    {
+      "type": "paragraph",
+      "text": "Tối ưu hóa các máy factorization trong một phương pháp thẳng về phía\ntrước dẫn đến độ phức tạp của \\(\\mathcal{O}(kd^2)\\) vì tất cả các\ntương tác cặp yêu cầu phải được tính toán. Để giải quyết vấn đề kém hiệu\nquả này, chúng ta có thể tổ chức lại nhiệm kỳ thứ ba của FM có thể làm\ngiảm đáng kể chi phí tính toán, dẫn đến độ phức tạp thời gian tuyến tính\n( \\(\\mathcal{O}(kd)\\) ). Việc cải cách thuật ngữ tương tác cặp như\nsau:"
+    },
+    {
+      "type": "math",
+      "latex": "(16.9.2)¶\\[\\begin{split}\\begin{aligned}\n&\\sum_{i=1}^d \\sum_{j=i+1}^d \\langle\\mathbf{v}_i, \\mathbf{v}_j\\rangle x_i x_j \\\\\n &= \\frac{1}{2} \\sum_{i=1}^d \\sum_{j=1}^d\\langle\\mathbf{v}_i, \\mathbf{v}_j\\rangle x_i x_j - \\frac{1}{2}\\sum_{i=1}^d \\langle\\mathbf{v}_i, \\mathbf{v}_i\\rangle x_i x_i \\\\\n &= \\frac{1}{2} \\big (\\sum_{i=1}^d \\sum_{j=1}^d \\sum_{l=1}^k\\mathbf{v}_{i, l} \\mathbf{v}_{j, l} x_i x_j - \\sum_{i=1}^d \\sum_{l=1}^k \\mathbf{v}_{i, l} \\mathbf{v}_{i, l} x_i x_i \\big)\\\\\n &=  \\frac{1}{2} \\sum_{l=1}^k \\big ((\\sum_{i=1}^d \\mathbf{v}_{i, l} x_i) (\\sum_{j=1}^d \\mathbf{v}_{j, l}x_j) - \\sum_{i=1}^d \\mathbf{v}_{i, l}^2 x_i^2 \\big ) \\\\\n &= \\frac{1}{2} \\sum_{l=1}^k \\big ((\\sum_{i=1}^d \\mathbf{v}_{i, l} x_i)^2 - \\sum_{i=1}^d \\mathbf{v}_{i, l}^2 x_i^2)\n \\end{aligned}\\end{split}\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Với sự cải cách này, độ phức tạp của mô hình được giảm đáng kể. Hơn nữa,\nđối với các tính năng thưa thớt, chỉ các phần tử không phải bằng không\ncần được tính toán sao cho độ phức tạp tổng thể là tuyến tính với số\nlượng các tính năng không phải bằng không."
+    },
+    {
+      "type": "paragraph",
+      "text": "Để tìm hiểu mô hình FM, chúng ta có thể sử dụng mất MSE cho nhiệm vụ hồi\nquy, mất chéo entropy cho các nhiệm vụ phân loại và mất BPR cho nhiệm vụ\nxếp hạng. Các trình tối ưu hóa tiêu chuẩn như gốc gradient ngẫu nhiên và\nAdam là khả thi để tối ưu hóa."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "import os\nfrom mxnet import gluon, init, np, npx\nfrom mxnet.gluon import nn\nfrom d2l import mxnet as d2l\n\nnpx.set_np()"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "mo-hinh-trien-khai-ma-sau-day-thuc-hien-cac-may-tinh-factorization-ro-rang-la-thay-rang-fm-bao-gom-mot-khoi-hoi-quy-tuyen-tinh-va-mot-khoi-tuong-tac-tinh-nang-hieu-qua-chung-toi-ap-dung-mot-ham-sigmoid-tren-diem-so-cuoi-cung-vi-chung-toi-coi-du-doan-ctr-nhu-mot-nhiem-vu-phan-loai",
+      "text": "16.9.3. Mô hình triển khai Mã sau đây thực hiện các máy tính factorization. Rõ ràng là thấy rằng FM bao gồm một khối hồi quy tuyến tính và một khối tương tác tính năng hiệu quả. Chúng tôi áp dụng một hàm sigmoid trên điểm số cuối cùng vì chúng tôi coi dự đoán CTR như một nhiệm vụ phân loại."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "class FM(nn.Block):\n    def __init__(self, field_dims, num_factors):\n        super(FM, self).__init__()\n        num_inputs = int(sum(field_dims))\n        self.embedding = nn.Embedding(num_inputs, num_factors)\n        self.fc = nn.Embedding(num_inputs, 1)\n        self.linear_layer = nn.Dense(1, use_bias=True)\n\n    def forward(self, x):\n        square_of_sum = np.sum(self.embedding(x), axis=1) ** 2\n        sum_of_square = np.sum(self.embedding(x) ** 2, axis=1)\n        x = self.linear_layer(self.fc(x).sum(1)) \\\n            + 0.5 * (square_of_sum - sum_of_square).sum(1, keepdims=True)\n        x = npx.sigmoid(x)\n        return x"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tai-tap-du-lieu-quang-cao-chung-toi-su-dung-trinh-bao-boc-du-lieu-ctr-tu-phan-cuoi-de-tai-tap-du-lieu-quang-cao-truc-tuyen",
+      "text": "16.9.4. Tải tập dữ liệu quảng cáo Chúng tôi sử dụng trình bao bọc dữ liệu CTR từ phần cuối để tải tập dữ liệu quảng cáo trực tuyến."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "batch_size = 2048\ndata_dir = d2l.download_extract('ctr')\ntrain_data = d2l.CTRDataset(os.path.join(data_dir, 'train.csv'))\ntest_data = d2l.CTRDataset(os.path.join(data_dir, 'test.csv'),\n                           feat_mapper=train_data.feat_mapper,\n                           defaults=train_data.defaults)\ntrain_iter = gluon.data.DataLoader(\n    train_data, shuffle=True, last_batch='rollover', batch_size=batch_size,\n    num_workers=d2l.get_dataloader_workers())\ntest_iter = gluon.data.DataLoader(\n    test_data, shuffle=False, last_batch='rollover', batch_size=batch_size,\n    num_workers=d2l.get_dataloader_workers())"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "Downloading ../data/ctr.zip from http://d2l-data.s3-accelerate.amazonaws.com/ctr.zip..."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "dao-tao-mo-hinh-sau-do-chung-toi-dao-tao-mo-hinh-ty-le-hoc-tap-duoc-dat-thanh-0-02-va-kich-thuoc-nhung-duoc-dat-thanh-20-theo-mac-dinh-trinh-toi-uu-hoa-adam-va-ton-that-sigmoidbinarycrossentropyloss-duoc-su-dung-de-dao-tao-mo-hinh",
+      "text": "16.9.5. Đào tạo mô hình Sau đó, chúng tôi đào tạo mô hình. Tỷ lệ học tập được đặt thành 0,02 và kích thước nhúng được đặt thành 20 theo mặc định. Trình tối ưu hóa Adam và tổn thất SigmoidBinaryCrossEntropyLoss được sử dụng để đào tạo mô hình."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "devices = d2l.try_all_gpus()\nnet = FM(train_data.field_dims, num_factors=20)\nnet.initialize(init.Xavier(), ctx=devices)\nlr, num_epochs, optimizer = 0.02, 30, 'adam'\ntrainer = gluon.Trainer(net.collect_params(), optimizer,\n                        {'learning_rate': lr})\nloss = gluon.loss.SigmoidBinaryCrossEntropyLoss()\nd2l.train_ch13(net, train_iter, test_iter, loss, trainer, num_epochs, devices)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "loss 0.505, train acc 0.263, test acc 0.271\n129245.4 examples/sec on [gpu(0), gpu(1)]"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_fm_94490b_7_1.svg",
+      "local_path": "_images/output_fm_94490b_7_1.svg",
+      "alt": "../_images/output_fm_94490b_7_1.svg"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tom-tat",
+      "text": "16.9.6. Tóm tắt"
+    },
+    {
+      "type": "list",
+      "ordered": false,
+      "items": [
+        "FM là một khuôn khổ chung có thể được áp dụng trên nhiều nhiệm vụ\nkhác nhau như hồi quy, phân loại và xếp hạng.",
+        "Tương tự/vượt qua tính năng rất quan trọng đối với các nhiệm vụ dự\nđoán và tương tác 2 chiều có thể được mô hình hóa hiệu quả với FM."
+      ]
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bai-tap",
+      "text": "16.9.7. Bài tập"
+    },
+    {
+      "type": "list",
+      "ordered": false,
+      "items": [
+        "Bạn có thể kiểm tra FM trên các tập dữ liệu khác như Avazu, MovieLens\nvà Criteo bộ dữ liệu không?",
+        "Thay đổi kích thước nhúng để kiểm tra tác động của nó đối với hiệu\nsuất, bạn có thể quan sát một mô hình tương tự như của factorization\nma trận?"
+      ]
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    }
+  ],
+  "images": [
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_fm_94490b_7_1.svg",
+      "local_path": "_images/output_fm_94490b_7_1.svg",
+      "alt": "../_images/output_fm_94490b_7_1.svg"
+    }
+  ],
+  "text": "16.9. Máy Factorization\nMáy factorization (FM) [Rendle, 2010] , được đề xuất bởi Steffen\nRendle năm 2010, là một thuật toán được giám sát có thể được sử dụng để\nphân loại, hồi quy, và xếp hạng nhiệm vụ. Nó nhanh chóng chú ý và trở\nthành một phương pháp phổ biến và có tác động để đưa ra dự đoán và\nkhuyến nghị. Đặc biệt, nó là một khái quát hóa của mô hình hồi quy tuyến\ntính và mô hình factorization ma trận. Hơn nữa, nó gợi nhớ đến các máy\nvector hỗ trợ với một hạt nhân đa thức. Điểm mạnh của máy factorization\nso với hồi quy tuyến tính và tính toán ma trận là: (1) nó có thể mô hình\ntương tác biến \\(\\chi\\) -chiều, trong đó \\(\\chi\\) là số thứ tự đa\nthức và thường được đặt thành hai. (2) Một thuật toán tối ưu hóa nhanh\nliên quan đến máy factorization có thể làm giảm thời gian tính toán đa\nthức đến độ phức tạp tuyến tính, làm cho nó cực kỳ hiệu quả đặc biệt là\nđối với các đầu vào thưa thớt chiều cao. Vì những lý do này, máy\nfactorization được sử dụng rộng rãi trong các khuyến nghị quảng cáo và\nsản phẩm hiện đại. Các chi tiết kỹ thuật và triển khai được mô tả dưới\nđây.\n16.9.1. 2-Way Factorization Máy móc\nChính thức, hãy để \\(x \\in \\mathbb{R}^d\\) biểu thị các vectơ tính\nnăng của một mẫu và \\(y\\) biểu thị nhãn tương ứng có thể là nhãn có\ngiá trị thực hoặc nhãn lớp như lớp nhị phân “click/non-click”. Mô hình\ncho một máy factorization độ hai được định nghĩa là:\ntrong đó \\(\\mathbf{w}_0 \\in \\mathbb{R}\\) là thiên vị toàn cầu; \\(\\mathbf{w} \\in \\mathbb{R}^d\\) biểu thị trọng lượng của biến thứ i; \\(\\mathbf{V} \\in \\mathbb{R}^{d\\times k}\\) đại diện cho các tính năng\nnhúng; \\(\\mathbf{v}_i\\) đại diện cho hàng \\(i^\\mathrm{th}\\) của \\(\\mathbf{V}\\) ; \\(k\\) là chiều của các yếu tố tiềm ẩn; \\(\\langle\\cdot, \\cdot \\rangle\\) là tích chấm của hai vectơ. 3620 mô\nhình sự tương tác giữa tính năng \\(i^\\mathrm{th}\\) và \\(j^\\mathrm{th}\\) . Một số tương tác tính năng có thể dễ hiểu để\nchúng có thể được thiết kế bởi các chuyên gia. Tuy nhiên, hầu hết các\ntương tác tính năng khác đều ẩn trong dữ liệu và khó xác định. Vì vậy,\nmô hình hóa tính năng tương tác tự động có thể làm giảm đáng kể những nỗ\nlực trong kỹ thuật tính năng. Rõ ràng là hai thuật ngữ đầu tiên tương\nứng với mô hình hồi quy tuyến tính và thuật ngữ cuối cùng là một phần mở\nrộng của mô hình factorization ma trận. Nếu tính năng \\(i\\) đại diện\ncho một mục và tính năng \\(j\\) đại diện cho người dùng, thuật ngữ\nthứ ba chính xác là sản phẩm chấm giữa nhúng người dùng và mục. Điều\nđáng chú ý là FM cũng có thể khái quát hóa với các đơn đặt hàng cao hơn\n(độ> 2). Tuy nhiên, sự ổn định số có thể làm suy yếu sự tổng quát hóa.\n16.9.2. Một tiêu chí tối ưu hóa hiệu quả\nTối ưu hóa các máy factorization trong một phương pháp thẳng về phía\ntrước dẫn đến độ phức tạp của \\(\\mathcal{O}(kd^2)\\) vì tất cả các\ntương tác cặp yêu cầu phải được tính toán. Để giải quyết vấn đề kém hiệu\nquả này, chúng ta có thể tổ chức lại nhiệm kỳ thứ ba của FM có thể làm\ngiảm đáng kể chi phí tính toán, dẫn đến độ phức tạp thời gian tuyến tính\n( \\(\\mathcal{O}(kd)\\) ). Việc cải cách thuật ngữ tương tác cặp như\nsau:\nVới sự cải cách này, độ phức tạp của mô hình được giảm đáng kể. Hơn nữa,\nđối với các tính năng thưa thớt, chỉ các phần tử không phải bằng không\ncần được tính toán sao cho độ phức tạp tổng thể là tuyến tính với số\nlượng các tính năng không phải bằng không.\nĐể tìm hiểu mô hình FM, chúng ta có thể sử dụng mất MSE cho nhiệm vụ hồi\nquy, mất chéo entropy cho các nhiệm vụ phân loại và mất BPR cho nhiệm vụ\nxếp hạng. Các trình tối ưu hóa tiêu chuẩn như gốc gradient ngẫu nhiên và\nAdam là khả thi để tối ưu hóa.\n16.9.3. Mô hình triển khai Mã sau đây thực hiện các máy tính factorization. Rõ ràng là thấy rằng FM bao gồm một khối hồi quy tuyến tính và một khối tương tác tính năng hiệu quả. Chúng tôi áp dụng một hàm sigmoid trên điểm số cuối cùng vì chúng tôi coi dự đoán CTR như một nhiệm vụ phân loại.\n16.9.4. Tải tập dữ liệu quảng cáo Chúng tôi sử dụng trình bao bọc dữ liệu CTR từ phần cuối để tải tập dữ liệu quảng cáo trực tuyến.\n16.9.5. Đào tạo mô hình Sau đó, chúng tôi đào tạo mô hình. Tỷ lệ học tập được đặt thành 0,02 và kích thước nhúng được đặt thành 20 theo mặc định. Trình tối ưu hóa Adam và tổn thất SigmoidBinaryCrossEntropyLoss được sử dụng để đào tạo mô hình.\n16.9.6. Tóm tắt\nFM là một khuôn khổ chung có thể được áp dụng trên nhiều nhiệm vụ\nkhác nhau như hồi quy, phân loại và xếp hạng.\nTương tự/vượt qua tính năng rất quan trọng đối với các nhiệm vụ dự\nđoán và tương tác 2 chiều có thể được mô hình hóa hiệu quả với FM.\n16.9.7. Bài tập\nBạn có thể kiểm tra FM trên các tập dữ liệu khác như Avazu, MovieLens\nvà Criteo bộ dữ liệu không?\nThay đổi kích thước nhúng để kiểm tra tác động của nó đối với hiệu\nsuất, bạn có thể quan sát một mô hình tương tự như của factorization\nma trận?\nDiscussions"
+}

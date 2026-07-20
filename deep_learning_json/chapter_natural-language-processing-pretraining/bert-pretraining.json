@@ -1,0 +1,280 @@
+{
+  "url": "https://vi.d2l.ai/chapter_natural-language-processing-pretraining/bert-pretraining.html",
+  "chapter": "chapter_natural-language-processing-pretraining",
+  "title": "14.10. Pretraining BERT",
+  "crawled_at": "2026-07-20T12:41:01.821727+00:00",
+  "headings": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "pretraining-bert",
+      "text": "14.10. Pretraining BERT"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "id1",
+      "text": "14.10.1. Pretraining BERT"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "dai-dien-cho-van-ban-voi-bert",
+      "text": "14.10.2. Đại diện cho văn bản với BERT"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tom-tat",
+      "text": "14.10.3. Tóm tắt"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bai-tap",
+      "text": "14.10.4. Bài tập"
+    }
+  ],
+  "content": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "pretraining-bert",
+      "text": "14.10. Pretraining BERT"
+    },
+    {
+      "type": "paragraph",
+      "text": "Với mô hình BERT được triển khai trong Section 14.8 và các ví dụ\nđào tạo trước được tạo ra từ tập dữ liệu WikiText-2 trong Section 14.9 , chúng tôi sẽ pretrain BERT trên tập dữ\nliệu WikiText-2 trong phần này."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "from mxnet import autograd, gluon, init, np, npx\nfrom d2l import mxnet as d2l\n\nnpx.set_np()"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "import torch\nfrom torch import nn\nfrom d2l import torch as d2l"
+    },
+    {
+      "type": "paragraph",
+      "text": "Để bắt đầu, chúng tôi tải tập dữ liệu WikiText-2 dưới dạng các ví dụ đào\ntạo trước cho mô hình ngôn ngữ được đeo mặt nạ và dự đoán câu tiếp theo.\nKích thước lô là 512 và độ dài tối đa của chuỗi đầu vào BERT là 64. Lưu\ný rằng trong mô hình BERT ban đầu, chiều dài tối đa là 512."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "batch_size, max_len = 512, 64\ntrain_iter, vocab = d2l.load_data_wiki(batch_size, max_len)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "batch_size, max_len = 512, 64\ntrain_iter, vocab = d2l.load_data_wiki(batch_size, max_len)"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "id1",
+      "text": "14.10.1. Pretraining BERT"
+    },
+    {
+      "type": "paragraph",
+      "text": "BERT ban đầu có hai phiên bản của các kích cỡ mô hình khác nhau [Devlin et al., 2018] . Mô hình cơ sở\n( \\(\\text{BERT}_{\\text{BASE}}\\) ) sử dụng 12 lớp (khối mã hóa biến áp)\nvới 768 đơn vị ẩn (kích thước ẩn) và 12 đầu tự chú ý. Mô hình lớn\n( \\(\\text{BERT}_{\\text{LARGE}}\\) ) sử dụng 24 lớp với 1024 đơn vị ẩn\nvà 16 đầu tự chú ý. Đáng chú ý, trước đây có 110 triệu tham số trong khi\nsau này có 340 triệu tham số. Để trình diễn một cách dễ dàng, chúng tôi\nxác định một BERT nhỏ, sử dụng 2 lớp, 128 đơn vị ẩn và 2 đầu tự chú ý."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "net = d2l.BERTModel(len(vocab), num_hiddens=128, ffn_num_hiddens=256,\n                    num_heads=2, num_layers=2, dropout=0.2)\ndevices = d2l.try_all_gpus()\nnet.initialize(init.Xavier(), ctx=devices)\nloss = gluon.loss.SoftmaxCELoss()"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "net = d2l.BERTModel(len(vocab), num_hiddens=128, norm_shape=[128],\n                    ffn_num_input=128, ffn_num_hiddens=256, num_heads=2,\n                    num_layers=2, dropout=0.2, key_size=128, query_size=128,\n                    value_size=128, hid_in_features=128, mlm_in_features=128,\n                    nsp_in_features=128)\ndevices = d2l.try_all_gpus()\nloss = nn.CrossEntropyLoss()"
+    },
+    {
+      "type": "paragraph",
+      "text": "Trước khi xác định vòng đào tạo, chúng tôi xác định một hàm trợ giúp _get_batch_loss_bert . Với phần nhỏ của các ví dụ đào tạo, chức năng\nnày tính toán sự mất mát cho cả mô hình ngôn ngữ đeo mặt nạ và nhiệm vụ\ndự đoán câu tiếp theo. Lưu ý rằng sự mất mát cuối cùng của đào tạo trước\nBERT chỉ là tổng của cả sự mất mát mô hình hóa ngôn ngữ đeo mặt nạ và\nmất dự đoán câu tiếp theo."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "#@save\ndef _get_batch_loss_bert(net, loss, vocab_size, tokens_X_shards,\n                         segments_X_shards, valid_lens_x_shards,\n                         pred_positions_X_shards, mlm_weights_X_shards,\n                         mlm_Y_shards, nsp_y_shards):\n    mlm_ls, nsp_ls, ls = [], [], []\n    for (tokens_X_shard, segments_X_shard, valid_lens_x_shard,\n         pred_positions_X_shard, mlm_weights_X_shard, mlm_Y_shard,\n         nsp_y_shard) in zip(\n        tokens_X_shards, segments_X_shards, valid_lens_x_shards,\n        pred_positions_X_shards, mlm_weights_X_shards, mlm_Y_shards,\n        nsp_y_shards):\n        # Forward pass\n        _, mlm_Y_hat, nsp_Y_hat = net(\n            tokens_X_shard, segments_X_shard, valid_lens_x_shard.reshape(-1),\n            pred_positions_X_shard)\n        # Compute masked language model loss\n        mlm_l = loss(\n            mlm_Y_hat.reshape((-1, vocab_size)), mlm_Y_shard.reshape(-1),\n            mlm_weights_X_shard.reshape((-1, 1)))\n        mlm_l = mlm_l.sum() / (mlm_weights_X_shard.sum() + 1e-8)\n        # Compute next sentence prediction loss\n        nsp_l = loss(nsp_Y_hat, nsp_y_shard)\n        nsp_l = nsp_l.mean()\n        mlm_ls.append(mlm_l)\n        nsp_ls.append(nsp_l)\n        ls.append(mlm_l + nsp_l)\n        npx.waitall()\n    return mlm_ls, nsp_ls, ls"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "#@save\ndef _get_batch_loss_bert(net, loss, vocab_size, tokens_X,\n                         segments_X, valid_lens_x,\n                         pred_positions_X, mlm_weights_X,\n                         mlm_Y, nsp_y):\n    # Forward pass\n    _, mlm_Y_hat, nsp_Y_hat = net(tokens_X, segments_X,\n                                  valid_lens_x.reshape(-1),\n                                  pred_positions_X)\n    # Compute masked language model loss\n    mlm_l = loss(mlm_Y_hat.reshape(-1, vocab_size), mlm_Y.reshape(-1)) *\\\n    mlm_weights_X.reshape(-1, 1)\n    mlm_l = mlm_l.sum() / (mlm_weights_X.sum() + 1e-8)\n    # Compute next sentence prediction loss\n    nsp_l = loss(nsp_Y_hat, nsp_y)\n    l = mlm_l + nsp_l\n    return mlm_l, nsp_l, l"
+    },
+    {
+      "type": "paragraph",
+      "text": "Gọi hai hàm helper nói trên, hàm train_bert sau đây xác định quy\ntrình chuẩn bị BERT ( net ) trên tập dữ liệu WikiText-2\n( train_iter ). Đào tạo BERT có thể mất rất nhiều thời gian. Thay vì\nchỉ định số epochs để đào tạo như trong hàm train_ch13 (xem Section 13.1 ), đầu vào num_steps của hàm sau\nchỉ định số bước lặp lại để đào tạo."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def train_bert(train_iter, net, loss, vocab_size, devices, num_steps):\n    trainer = gluon.Trainer(net.collect_params(), 'adam',\n                            {'learning_rate': 0.01})\n    step, timer = 0, d2l.Timer()\n    animator = d2l.Animator(xlabel='step', ylabel='loss',\n                            xlim=[1, num_steps], legend=['mlm', 'nsp'])\n    # Sum of masked language modeling losses, sum of next sentence prediction\n    # losses, no. of sentence pairs, count\n    metric = d2l.Accumulator(4)\n    num_steps_reached = False\n    while step < num_steps and not num_steps_reached:\n        for batch in train_iter:\n            (tokens_X_shards, segments_X_shards, valid_lens_x_shards,\n             pred_positions_X_shards, mlm_weights_X_shards,\n             mlm_Y_shards, nsp_y_shards) = [gluon.utils.split_and_load(\n                elem, devices, even_split=False) for elem in batch]\n            timer.start()\n            with autograd.record():\n                mlm_ls, nsp_ls, ls = _get_batch_loss_bert(\n                    net, loss, vocab_size, tokens_X_shards, segments_X_shards,\n                    valid_lens_x_shards, pred_positions_X_shards,\n                    mlm_weights_X_shards, mlm_Y_shards, nsp_y_shards)\n            for l in ls:\n                l.backward()\n            trainer.step(1)\n            mlm_l_mean = sum([float(l) for l in mlm_ls]) / len(mlm_ls)\n            nsp_l_mean = sum([float(l) for l in nsp_ls]) / len(nsp_ls)\n            metric.add(mlm_l_mean, nsp_l_mean, batch[0].shape[0], 1)\n            timer.stop()\n            animator.add(step + 1,\n                         (metric[0] / metric[3], metric[1] / metric[3]))\n            step += 1\n            if step == num_steps:\n                num_steps_reached = True\n                break\n\n    print(f'MLM loss {metric[0] / metric[3]:.3f}, '\n          f'NSP loss {metric[1] / metric[3]:.3f}')\n    print(f'{metric[2] / timer.sum():.1f} sentence pairs/sec on '\n          f'{str(devices)}')"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def train_bert(train_iter, net, loss, vocab_size, devices, num_steps):\n    net = nn.DataParallel(net, device_ids=devices).to(devices[0])\n    trainer = torch.optim.Adam(net.parameters(), lr=0.01)\n    step, timer = 0, d2l.Timer()\n    animator = d2l.Animator(xlabel='step', ylabel='loss',\n                            xlim=[1, num_steps], legend=['mlm', 'nsp'])\n    # Sum of masked language modeling losses, sum of next sentence prediction\n    # losses, no. of sentence pairs, count\n    metric = d2l.Accumulator(4)\n    num_steps_reached = False\n    while step < num_steps and not num_steps_reached:\n        for tokens_X, segments_X, valid_lens_x, pred_positions_X,\\\n            mlm_weights_X, mlm_Y, nsp_y in train_iter:\n            tokens_X = tokens_X.to(devices[0])\n            segments_X = segments_X.to(devices[0])\n            valid_lens_x = valid_lens_x.to(devices[0])\n            pred_positions_X = pred_positions_X.to(devices[0])\n            mlm_weights_X = mlm_weights_X.to(devices[0])\n            mlm_Y, nsp_y = mlm_Y.to(devices[0]), nsp_y.to(devices[0])\n            trainer.zero_grad()\n            timer.start()\n            mlm_l, nsp_l, l = _get_batch_loss_bert(\n                net, loss, vocab_size, tokens_X, segments_X, valid_lens_x,\n                pred_positions_X, mlm_weights_X, mlm_Y, nsp_y)\n            l.backward()\n            trainer.step()\n            metric.add(mlm_l, nsp_l, tokens_X.shape[0], 1)\n            timer.stop()\n            animator.add(step + 1,\n                         (metric[0] / metric[3], metric[1] / metric[3]))\n            step += 1\n            if step == num_steps:\n                num_steps_reached = True\n                break\n\n    print(f'MLM loss {metric[0] / metric[3]:.3f}, '\n          f'NSP loss {metric[1] / metric[3]:.3f}')\n    print(f'{metric[2] / timer.sum():.1f} sentence pairs/sec on '\n          f'{str(devices)}')"
+    },
+    {
+      "type": "paragraph",
+      "text": "Chúng ta có thể vẽ cả sự mất mát mô hình hóa ngôn ngữ đeo mặt nạ và mất\ndự đoán câu tiếp theo trong quá trình đào tạo trước BERT."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "train_bert(train_iter, net, loss, len(vocab), devices, 50)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "MLM loss 7.303, NSP loss 0.820\n5852.9 sentence pairs/sec on [gpu(0), gpu(1)]"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_bert-pretraining_41429c_48_1.svg",
+      "local_path": "_images/output_bert-pretraining_41429c_48_1.svg",
+      "alt": "../_images/output_bert-pretraining_41429c_48_1.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "train_bert(train_iter, net, loss, len(vocab), devices, 50)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "MLM loss 5.232, NSP loss 0.764\n4220.6 sentence pairs/sec on [device(type='cuda', index=0), device(type='cuda', index=1)]"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_bert-pretraining_41429c_51_1.svg",
+      "local_path": "_images/output_bert-pretraining_41429c_51_1.svg",
+      "alt": "../_images/output_bert-pretraining_41429c_51_1.svg"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "dai-dien-cho-van-ban-voi-bert",
+      "text": "14.10.2. Đại diện cho văn bản với BERT"
+    },
+    {
+      "type": "paragraph",
+      "text": "Sau khi đào tạo trước BERT, chúng ta có thể sử dụng nó để đại diện cho\nvăn bản duy nhất, cặp văn bản hoặc bất kỳ mã thông báo nào trong đó. Hàm\nsau trả về các đại diện BERT ( net ) cho tất cả các token trong tokens_a và tokens_b ."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def get_bert_encoding(net, tokens_a, tokens_b=None):\n    tokens, segments = d2l.get_tokens_and_segments(tokens_a, tokens_b)\n    token_ids = np.expand_dims(np.array(vocab[tokens], ctx=devices[0]),\n                               axis=0)\n    segments = np.expand_dims(np.array(segments, ctx=devices[0]), axis=0)\n    valid_len = np.expand_dims(np.array(len(tokens), ctx=devices[0]), axis=0)\n    encoded_X, _, _ = net(token_ids, segments, valid_len)\n    return encoded_X"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def get_bert_encoding(net, tokens_a, tokens_b=None):\n    tokens, segments = d2l.get_tokens_and_segments(tokens_a, tokens_b)\n    token_ids = torch.tensor(vocab[tokens], device=devices[0]).unsqueeze(0)\n    segments = torch.tensor(segments, device=devices[0]).unsqueeze(0)\n    valid_len = torch.tensor(len(tokens), device=devices[0]).unsqueeze(0)\n    encoded_X, _, _ = net(token_ids, segments, valid_len)\n    return encoded_X"
+    },
+    {
+      "type": "paragraph",
+      "text": "Hãy xem xét câu “một cần cẩu đang bay”. Nhớ lại đại diện đầu vào của\nBERT như đã thảo luận trong Section 14.8.4 . Sau khi\nchèn các token đặc biệt “” (dùng để phân loại) và “” (dùng để tách), dãy\nđầu vào BERT có độ dài sáu. Vì số không là chỉ số của token “”, encoded_text[:, 0, :] là đại diện BERT của toàn bộ câu đầu vào. Để\nđánh giá mã thông báo polysemy “crane”, chúng tôi cũng in ra ba yếu tố\nđầu tiên của đại diện BERT của mã thông báo."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "tokens_a = ['a', 'crane', 'is', 'flying']\nencoded_text = get_bert_encoding(net, tokens_a)\n# Tokens: '<cls>', 'a', 'crane', 'is', 'flying', '<sep>'\nencoded_text_cls = encoded_text[:, 0, :]\nencoded_text_crane = encoded_text[:, 2, :]\nencoded_text.shape, encoded_text_cls.shape, encoded_text_crane[0][:3]"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "((1, 6, 128),\n (1, 128),\n array([ 0.43019116,  0.8597702 , -2.0794945 ], ctx=gpu(0)))"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "tokens_a = ['a', 'crane', 'is', 'flying']\nencoded_text = get_bert_encoding(net, tokens_a)\n# Tokens: '<cls>', 'a', 'crane', 'is', 'flying', '<sep>'\nencoded_text_cls = encoded_text[:, 0, :]\nencoded_text_crane = encoded_text[:, 2, :]\nencoded_text.shape, encoded_text_cls.shape, encoded_text_crane[0][:3]"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "(torch.Size([1, 6, 128]),\n torch.Size([1, 128]),\n tensor([-0.0576, -0.0149, -1.0962], device='cuda:0', grad_fn=<SliceBackward0>))"
+    },
+    {
+      "type": "paragraph",
+      "text": "Bây giờ hãy xem xét một cặp câu “một người lái xe cần cẩu đến” và “anh\nta vừa rời đi”. Tương tự, encoded_pair[:, 0, :] là kết quả được mã\nhóa của toàn bộ cặp câu từ BERT được đào tạo trước. Lưu ý rằng ba yếu tố\nđầu tiên của mã thông báo polysemy “crane” khác với những yếu tố khi ngữ\ncảnh khác nhau. Điều này hỗ trợ rằng các đại diện BERT là nhạy cảm với\nngữ cảnh."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "tokens_a, tokens_b = ['a', 'crane', 'driver', 'came'], ['he', 'just', 'left']\nencoded_pair = get_bert_encoding(net, tokens_a, tokens_b)\n# Tokens: '<cls>', 'a', 'crane', 'driver', 'came', '<sep>', 'he', 'just',\n# 'left', '<sep>'\nencoded_pair_cls = encoded_pair[:, 0, :]\nencoded_pair_crane = encoded_pair[:, 2, :]\nencoded_pair.shape, encoded_pair_cls.shape, encoded_pair_crane[0][:3]"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "((1, 10, 128),\n (1, 128),\n array([ 0.42729163,  0.8609396 , -2.0792778 ], ctx=gpu(0)))"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "tokens_a, tokens_b = ['a', 'crane', 'driver', 'came'], ['he', 'just', 'left']\nencoded_pair = get_bert_encoding(net, tokens_a, tokens_b)\n# Tokens: '<cls>', 'a', 'crane', 'driver', 'came', '<sep>', 'he', 'just',\n# 'left', '<sep>'\nencoded_pair_cls = encoded_pair[:, 0, :]\nencoded_pair_crane = encoded_pair[:, 2, :]\nencoded_pair.shape, encoded_pair_cls.shape, encoded_pair_crane[0][:3]"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "(torch.Size([1, 10, 128]),\n torch.Size([1, 128]),\n tensor([-0.1011, -0.9376, -1.2522], device='cuda:0', grad_fn=<SliceBackward0>))"
+    },
+    {
+      "type": "paragraph",
+      "text": "Trong Section 15 , chúng tôi sẽ tinh chỉnh một mô hình BERT\nđược đào tạo trước cho các ứng dụng xử lý ngôn ngữ tự nhiên ở hạ nguồn."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tom-tat",
+      "text": "14.10.3. Tóm tắt"
+    },
+    {
+      "type": "list",
+      "ordered": false,
+      "items": [
+        "BERT ban đầu có hai phiên bản, trong đó mô hình cơ sở có 110 triệu\ntham số và model lớn có 340 triệu tham số.",
+        "Sau khi đào tạo trước BERT, chúng ta có thể sử dụng nó để đại diện\ncho văn bản duy nhất, cặp văn bản hoặc bất kỳ mã thông báo nào trong\nđó.",
+        "Trong thí nghiệm, cùng một mã thông báo có đại diện BERT khác nhau\nkhi ngữ cảnh của chúng khác nhau. Điều này hỗ trợ rằng các đại diện\nBERT là nhạy cảm với ngữ cảnh."
+      ]
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bai-tap",
+      "text": "14.10.4. Bài tập"
+    },
+    {
+      "type": "list",
+      "ordered": true,
+      "items": [
+        "Trong thí nghiệm, chúng ta có thể thấy rằng mất mô hình hóa ngôn ngữ\nđeo mặt nạ cao hơn đáng kể so với mất dự đoán câu tiếp theo. Tại sao?",
+        "Đặt độ dài tối đa của chuỗi đầu vào BERT là 512 (giống như mô hình\nBERT ban đầu). Sử dụng các cấu hình của mô hình BERT ban đầu như \\(\\text{BERT}_{\\text{LARGE}}\\) . Bạn có gặp bất kỳ lỗi nào khi\nchạy phần này không? Tại sao?"
+      ]
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    }
+  ],
+  "images": [
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_bert-pretraining_41429c_48_1.svg",
+      "local_path": "_images/output_bert-pretraining_41429c_48_1.svg",
+      "alt": "../_images/output_bert-pretraining_41429c_48_1.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_bert-pretraining_41429c_51_1.svg",
+      "local_path": "_images/output_bert-pretraining_41429c_51_1.svg",
+      "alt": "../_images/output_bert-pretraining_41429c_51_1.svg"
+    }
+  ],
+  "text": "14.10. Pretraining BERT\nVới mô hình BERT được triển khai trong Section 14.8 và các ví dụ\nđào tạo trước được tạo ra từ tập dữ liệu WikiText-2 trong Section 14.9 , chúng tôi sẽ pretrain BERT trên tập dữ\nliệu WikiText-2 trong phần này.\nĐể bắt đầu, chúng tôi tải tập dữ liệu WikiText-2 dưới dạng các ví dụ đào\ntạo trước cho mô hình ngôn ngữ được đeo mặt nạ và dự đoán câu tiếp theo.\nKích thước lô là 512 và độ dài tối đa của chuỗi đầu vào BERT là 64. Lưu\ný rằng trong mô hình BERT ban đầu, chiều dài tối đa là 512.\n14.10.1. Pretraining BERT\nBERT ban đầu có hai phiên bản của các kích cỡ mô hình khác nhau [Devlin et al., 2018] . Mô hình cơ sở\n( \\(\\text{BERT}_{\\text{BASE}}\\) ) sử dụng 12 lớp (khối mã hóa biến áp)\nvới 768 đơn vị ẩn (kích thước ẩn) và 12 đầu tự chú ý. Mô hình lớn\n( \\(\\text{BERT}_{\\text{LARGE}}\\) ) sử dụng 24 lớp với 1024 đơn vị ẩn\nvà 16 đầu tự chú ý. Đáng chú ý, trước đây có 110 triệu tham số trong khi\nsau này có 340 triệu tham số. Để trình diễn một cách dễ dàng, chúng tôi\nxác định một BERT nhỏ, sử dụng 2 lớp, 128 đơn vị ẩn và 2 đầu tự chú ý.\nTrước khi xác định vòng đào tạo, chúng tôi xác định một hàm trợ giúp _get_batch_loss_bert . Với phần nhỏ của các ví dụ đào tạo, chức năng\nnày tính toán sự mất mát cho cả mô hình ngôn ngữ đeo mặt nạ và nhiệm vụ\ndự đoán câu tiếp theo. Lưu ý rằng sự mất mát cuối cùng của đào tạo trước\nBERT chỉ là tổng của cả sự mất mát mô hình hóa ngôn ngữ đeo mặt nạ và\nmất dự đoán câu tiếp theo.\nGọi hai hàm helper nói trên, hàm train_bert sau đây xác định quy\ntrình chuẩn bị BERT ( net ) trên tập dữ liệu WikiText-2\n( train_iter ). Đào tạo BERT có thể mất rất nhiều thời gian. Thay vì\nchỉ định số epochs để đào tạo như trong hàm train_ch13 (xem Section 13.1 ), đầu vào num_steps của hàm sau\nchỉ định số bước lặp lại để đào tạo.\nChúng ta có thể vẽ cả sự mất mát mô hình hóa ngôn ngữ đeo mặt nạ và mất\ndự đoán câu tiếp theo trong quá trình đào tạo trước BERT.\n14.10.2. Đại diện cho văn bản với BERT\nSau khi đào tạo trước BERT, chúng ta có thể sử dụng nó để đại diện cho\nvăn bản duy nhất, cặp văn bản hoặc bất kỳ mã thông báo nào trong đó. Hàm\nsau trả về các đại diện BERT ( net ) cho tất cả các token trong tokens_a và tokens_b .\nHãy xem xét câu “một cần cẩu đang bay”. Nhớ lại đại diện đầu vào của\nBERT như đã thảo luận trong Section 14.8.4 . Sau khi\nchèn các token đặc biệt “” (dùng để phân loại) và “” (dùng để tách), dãy\nđầu vào BERT có độ dài sáu. Vì số không là chỉ số của token “”, encoded_text[:, 0, :] là đại diện BERT của toàn bộ câu đầu vào. Để\nđánh giá mã thông báo polysemy “crane”, chúng tôi cũng in ra ba yếu tố\nđầu tiên của đại diện BERT của mã thông báo.\nBây giờ hãy xem xét một cặp câu “một người lái xe cần cẩu đến” và “anh\nta vừa rời đi”. Tương tự, encoded_pair[:, 0, :] là kết quả được mã\nhóa của toàn bộ cặp câu từ BERT được đào tạo trước. Lưu ý rằng ba yếu tố\nđầu tiên của mã thông báo polysemy “crane” khác với những yếu tố khi ngữ\ncảnh khác nhau. Điều này hỗ trợ rằng các đại diện BERT là nhạy cảm với\nngữ cảnh.\nTrong Section 15 , chúng tôi sẽ tinh chỉnh một mô hình BERT\nđược đào tạo trước cho các ứng dụng xử lý ngôn ngữ tự nhiên ở hạ nguồn.\n14.10.3. Tóm tắt\nBERT ban đầu có hai phiên bản, trong đó mô hình cơ sở có 110 triệu\ntham số và model lớn có 340 triệu tham số.\nSau khi đào tạo trước BERT, chúng ta có thể sử dụng nó để đại diện\ncho văn bản duy nhất, cặp văn bản hoặc bất kỳ mã thông báo nào trong\nđó.\nTrong thí nghiệm, cùng một mã thông báo có đại diện BERT khác nhau\nkhi ngữ cảnh của chúng khác nhau. Điều này hỗ trợ rằng các đại diện\nBERT là nhạy cảm với ngữ cảnh.\n14.10.4. Bài tập\nTrong thí nghiệm, chúng ta có thể thấy rằng mất mô hình hóa ngôn ngữ\nđeo mặt nạ cao hơn đáng kể so với mất dự đoán câu tiếp theo. Tại sao?\nĐặt độ dài tối đa của chuỗi đầu vào BERT là 512 (giống như mô hình\nBERT ban đầu). Sử dụng các cấu hình của mô hình BERT ban đầu như \\(\\text{BERT}_{\\text{LARGE}}\\) . Bạn có gặp bất kỳ lỗi nào khi\nchạy phần này không? Tại sao?\nDiscussions\nDiscussions"
+}

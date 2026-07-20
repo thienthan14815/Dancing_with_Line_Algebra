@@ -1,23 +1,24 @@
 import { useMemo, useState } from 'react';
 import { useLearnStore } from '../../core/progress/store';
 import { Button, Card, Badge } from '../ui';
-import {
-  buildCategories,
-  skillLabel,
-  type PracticeCategory,
-} from './categories';
+import { buildCategories, type PracticeCategory } from './categories';
 import PracticeSession from './PracticeSession';
 import './practice.css';
 
-/** Số chip skill tối đa hiển thị trên mỗi thẻ danh mục. */
-const MAX_CHIPS = 3;
+/** Tab nội dung — mỗi lúc chỉ hiện MỘT khối. */
+type PracticeTab = 'smart' | 'topic';
+const PRACTICE_TABS: { id: PracticeTab; label: string }[] = [
+  { id: 'smart', label: 'Ôn thông minh' },
+  { id: 'topic', label: 'Theo chủ đề' },
+];
 
 /**
- * TRUNG TÂM LUYỆN TẬP — trang chính (route `#/luyen`).
+ * TRUNG TÂM LUYỆN TẬP — trang chính (route `#/luyen`), kiến trúc "bubble".
  *
- * Hiển thị 6 thẻ danh mục ôn tập cá nhân hoá (lỗi sai, kỹ năng yếu, spaced
- * repetition, ma trận, trực quan, trộn chủ đề). Bấm "Luyện" ở một thẻ sẽ mở
- * PracticeSession ngay tại chỗ; thoát/kết phiên quay lại lưới danh mục.
+ * Mặc định (tab "Ôn thông minh"): 3 bubble hành động to — Ôn lỗi sai / Kỹ năng
+ * yếu / Sắp quên — hiện số đếm, bấm là vào phiên luôn (bubble mờ nếu đếm = 0).
+ * Tab "Theo chủ đề": 3 thẻ gọn (ma trận / trực quan / trộn) chỉ tên + số + nút.
+ * Bấm bắt đầu → mở PracticeSession tại chỗ; thoát/kết phiên quay lại.
  */
 export default function PracticeCenter() {
   const attempts = useLearnStore((s) => s.attempts);
@@ -30,92 +31,97 @@ export default function PracticeCenter() {
   );
 
   const [active, setActive] = useState<PracticeCategory | null>(null);
+  const [tab, setTab] = useState<PracticeTab>('smart');
 
   if (active) {
     return (
       <div className="pc-page">
-        <PracticeSession
-          key={active.id}
-          category={active}
-          onExit={() => setActive(null)}
-        />
+        <PracticeSession key={active.id} category={active} onExit={() => setActive(null)} />
       </div>
     );
   }
 
-  const count = (id: PracticeCategory['id']) =>
-    categories.find((c) => c.id === id)?.exercises.length ?? 0;
+  // buildCategories luôn trả đúng thứ tự: [mistakes, weak, due, matrix, visual, mixed].
+  const smart = categories.slice(0, 3);
+  const topic = categories.slice(3, 6);
 
   return (
     <div className="pc-page">
-      <header className="pc-hero">
-        <div className="pc-hero-main">
-          <span className="pc-hero-kicker">Ôn tập cá nhân hoá</span>
-          <h1 className="pc-hero-title">Trung tâm luyện tập</h1>
-          <p className="pc-hero-sub">
-            Ôn đúng thứ bạn cần: sửa lỗi sai, gia cố kỹ năng yếu và nhắc lại
-            đúng lúc trước khi quên.
-          </p>
-        </div>
-        <div className="pc-hero-stats">
-          <div className="pc-stat">
-            <span className="pc-stat-val">{count('mistakes')}</span>
-            <span className="pc-stat-lbl">Lỗi cần ôn</span>
-          </div>
-          <div className="pc-stat">
-            <span className="pc-stat-val">{count('weak')}</span>
-            <span className="pc-stat-lbl">Kỹ năng yếu</span>
-          </div>
-          <div className="pc-stat">
-            <span className="pc-stat-val">{count('due')}</span>
-            <span className="pc-stat-lbl">Sắp quên</span>
-          </div>
-        </div>
-      </header>
+      <h1 className="pc-hero-title pc-page-title">Luyện tập</h1>
 
-      <div className="pc-grid">
-        {categories.map((cat) => (
-          <CategoryCard key={cat.id} category={cat} onStart={() => setActive(cat)} />
+      <div className="pc-nav" role="tablist" aria-label="Chế độ luyện">
+        {PRACTICE_TABS.map((t) => (
+          <button
+            key={t.id}
+            type="button"
+            role="tab"
+            aria-selected={tab === t.id}
+            className={`pc-nav-chip${tab === t.id ? ' is-active' : ''}`}
+            onClick={() => setTab(t.id)}
+          >
+            {t.label}
+          </button>
         ))}
       </div>
+
+      {tab === 'smart' && (
+        <div className="pc-tab" key="smart">
+          <div className="pc-bubbles">
+            {smart.map((cat) => (
+              <ActionBubble key={cat.id} category={cat} onStart={() => setActive(cat)} />
+            ))}
+          </div>
+        </div>
+      )}
+
+      {tab === 'topic' && (
+        <div className="pc-tab" key="topic">
+          <div className="pc-grid">
+            {topic.map((cat) => (
+              <CompactCategoryCard key={cat.id} category={cat} onStart={() => setActive(cat)} />
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
 
-interface CategoryCardProps {
+interface BubbleProps {
   category: PracticeCategory;
   onStart: () => void;
 }
 
-function CategoryCard({ category, onStart }: CategoryCardProps) {
+/** Bubble hành động to: icon + số đếm + tên; đếm 0 → disabled. */
+function ActionBubble({ category, onStart }: BubbleProps) {
   const n = category.exercises.length;
   const empty = n === 0;
-  const chips = category.skillIds.slice(0, MAX_CHIPS);
-  const moreChips = category.skillIds.length - chips.length;
-
   return (
-    <Card className="pc-cat" interactive={!empty}>
+    <button type="button" className="pc-bubble" disabled={empty} onClick={onStart}>
+      <span className="pc-bubble-icon" aria-hidden>
+        {category.icon}
+      </span>
+      <span className="pc-bubble-count">{n}</span>
+      <span className="pc-bubble-title">{category.title}</span>
+      <span className="pc-bubble-sub">{empty ? 'Chưa có bài' : 'bài · bấm để luyện'}</span>
+    </button>
+  );
+}
+
+/** Thẻ chủ đề gọn: icon + tên + số bài + nút Luyện. */
+function CompactCategoryCard({ category, onStart }: BubbleProps) {
+  const n = category.exercises.length;
+  const empty = n === 0;
+  return (
+    <Card className="pc-cat pc-cat-compact" interactive={!empty}>
       <div className="pc-cat-top">
         <span className="pc-cat-icon" aria-hidden>
           {category.icon}
         </span>
         <div className="pc-cat-heads">
           <h2 className="pc-cat-title">{category.title}</h2>
-          <p className="pc-cat-sub">{category.subtitle}</p>
         </div>
       </div>
-
-      {!empty && chips.length > 0 && (
-        <div className="pc-cat-chips">
-          {chips.map((sid) => (
-            <span key={sid} className="pc-chip" title={skillLabel(sid)}>
-              {skillLabel(sid)}
-            </span>
-          ))}
-          {moreChips > 0 && <span className="pc-chip">+{moreChips}</span>}
-        </div>
-      )}
-
       <div className="pc-cat-foot">
         {empty ? (
           <span className="pc-empty">{category.emptyHint}</span>
@@ -124,11 +130,7 @@ function CategoryCard({ category, onStart }: CategoryCardProps) {
             <b>{n}</b> bài khả dụng
           </span>
         )}
-        {empty ? (
-          <Badge tone="muted">Trống</Badge>
-        ) : (
-          <Button onClick={onStart}>Luyện →</Button>
-        )}
+        {empty ? <Badge tone="muted">Trống</Badge> : <Button onClick={onStart}>Luyện →</Button>}
       </div>
     </Card>
   );

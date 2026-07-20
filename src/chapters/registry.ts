@@ -150,6 +150,65 @@ export const chapters: ChapterMeta[] = [
     ],
     load: () => import('./ch9-quadratic/index'),
   },
+
+  // =========================================================================
+  // NHÁNH DEEP LEARNING — nối tiếp và bắc cầu từ Đại số tuyến tính (ch0–ch9).
+  // Deep Learning = LA được áp dụng: neuron ↔ dot product, lớp mạng ↔ matMul,
+  // hồi quy ↔ least squares, GD ↔ gradient của dạng toàn phương.
+  // =========================================================================
+  {
+    id: 'ch10-ml',
+    num: 10,
+    title: 'Học máy & Hồi quy',
+    subtitle: 'Từ Least Squares đến mô hình học máy',
+    lessons: [
+      { id: 'linear-regression', title: 'Hồi quy tuyến tính = Least Squares' },
+      { id: 'gradient-descent', title: 'Gradient Descent' },
+      { id: 'softmax', title: 'Hồi quy Softmax & phân loại' },
+      { id: 'generalization', title: 'Overfitting & Regularization' },
+    ],
+    load: () => import('./ch10-ml/index'),
+  },
+  {
+    id: 'ch11-neural-nets',
+    num: 11,
+    title: 'Mạng nơ-ron',
+    subtitle: 'Neuron, MLP, lan truyền xuôi/ngược',
+    lessons: [
+      { id: 'neuron', title: 'Neuron = Dot product + Activation' },
+      { id: 'mlp', title: 'Multilayer Perceptron' },
+      { id: 'forward', title: 'Lan truyền xuôi (Forward)' },
+      { id: 'backprop', title: 'Lan truyền ngược (Backprop)' },
+      { id: 'activations', title: 'Hàm kích hoạt' },
+    ],
+    load: () => import('./ch11-neural-nets/index'),
+  },
+  {
+    id: 'ch12-modern-dl',
+    num: 12,
+    title: 'Học sâu hiện đại',
+    subtitle: 'CNN, RNN, Attention/Transformer, Embeddings',
+    lessons: [
+      { id: 'cnn', title: 'CNN — Tích chập' },
+      { id: 'rnn', title: 'RNN — Chuỗi & trạng thái ẩn' },
+      { id: 'attention', title: 'Attention & Transformer' },
+      { id: 'embeddings', title: 'Word Embeddings' },
+    ],
+    load: () => import('./ch12-modern-dl/index'),
+  },
+  {
+    id: 'ch13-optimization-apps',
+    num: 13,
+    title: 'Tối ưu & Ứng dụng',
+    subtitle: 'SGD/Adam, Batch Norm, CV, NLP',
+    lessons: [
+      { id: 'optimizers', title: 'SGD, Momentum, Adam' },
+      { id: 'batchnorm', title: 'Batch Norm & khởi tạo' },
+      { id: 'cv', title: 'Thị giác máy tính (tổng quan)' },
+      { id: 'nlp', title: 'NLP & mô hình ngôn ngữ (tổng quan)' },
+    ],
+    load: () => import('./ch13-optimization-apps/index'),
+  },
 ];
 
 export function findChapter(chapterId: string): ChapterMeta | undefined {

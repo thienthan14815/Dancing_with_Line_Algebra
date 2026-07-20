@@ -1,0 +1,373 @@
+{
+  "url": "https://vi.d2l.ai/chapter_convolutional-neural-networks/channels.html",
+  "chapter": "chapter_convolutional-neural-networks",
+  "title": "6.4. Nhiều kênh đầu vào và nhiều đầu ra",
+  "crawled_at": "2026-07-20T12:39:44.081535+00:00",
+  "headings": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "nhieu-kenh-dau-vao-va-nhieu-dau-ra",
+      "text": "6.4. Nhiều kênh đầu vào và nhiều đầu ra"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "nhieu-kenh-dau-vao",
+      "text": "6.4.1. Nhiều kênh đầu vào"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "nhieu-kenh-dau-ra",
+      "text": "6.4.2. Nhiều kênh đầu ra"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "times-1-lop-phuc-tap",
+      "text": "6.4.3. \\(1\\times 1\\) Lớp phức tạp"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tom-tat",
+      "text": "6.4.4. Tóm tắt"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bai-tap",
+      "text": "6.4.5. Bài tập"
+    }
+  ],
+  "content": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "nhieu-kenh-dau-vao-va-nhieu-dau-ra",
+      "text": "6.4. Nhiều kênh đầu vào và nhiều đầu ra"
+    },
+    {
+      "type": "paragraph",
+      "text": "Mặc dù chúng tôi đã mô tả nhiều kênh bao gồm mỗi hình ảnh (ví dụ: hình\nảnh màu có các kênh RGB tiêu chuẩn để chỉ số lượng màu đỏ, xanh lá cây\nvà xanh dương) và các lớp phức tạp cho nhiều kênh trong Section 6.1.4.1 , cho đến bây giờ, chúng tôi đã đơn\ngiản hóa tất cả các ví dụ số của mình bằng cách làm việc với chỉ một đầu\nvào và một kênh đầu ra duy nhất. Điều này đã cho phép chúng tôi nghĩ về\ncác đầu vào của chúng tôi, hạt nhân phức tạp, và đầu ra mỗi cái là hàng\nchục hai chiều."
+    },
+    {
+      "type": "paragraph",
+      "text": "Khi chúng tôi thêm các kênh vào hỗn hợp, các đầu vào và biểu diễn ẩn của\nchúng tôi đều trở thành hàng chục ba chiều. Ví dụ, mỗi hình ảnh đầu vào\nRGB có hình dạng \\(3\\times h\\times w\\) . Chúng tôi đề cập đến trục\nnày, với kích thước 3, như kích thước * kênh*. Trong phần này, chúng\nta sẽ xem xét sâu hơn về các hạt nhân phức tạp với nhiều kênh đầu vào và\nnhiều kênh đầu ra."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "nhieu-kenh-dau-vao",
+      "text": "6.4.1. Nhiều kênh đầu vào"
+    },
+    {
+      "type": "paragraph",
+      "text": "Khi dữ liệu đầu vào chứa nhiều kênh, chúng ta cần xây dựng một hạt nhân\nphức tạp có cùng số kênh đầu vào với dữ liệu đầu vào, để nó có thể thực\nhiện tương quan chéo với dữ liệu đầu vào. Giả sử rằng số kênh cho dữ\nliệu đầu vào là \\(c_i\\) , số kênh đầu vào của hạt nhân covolution\ncũng cần phải là \\(c_i\\) . Nếu hình dạng cửa sổ của hạt nhân phức tạp\ncủa chúng ta là \\(k_h\\times k_w\\) , thì khi \\(c_i=1\\) , chúng ta\ncó thể nghĩ về hạt nhân phức tạp của chúng ta như chỉ là một tensor hai\nchiều của hình dạng \\(k_h\\times k_w\\) ."
+    },
+    {
+      "type": "paragraph",
+      "text": "Tuy nhiên, khi \\(c_i>1\\) , chúng ta cần một hạt nhân chứa một tensor\ncủa hình dạng \\(k_h\\times k_w\\) cho every kênh đầu vào. Nối các số\nlượng \\(c_i\\) này lại với nhau mang lại một hạt nhân phức tạp của\nhình dạng \\(c_i\\times k_h\\times k_w\\) . Vì hạt nhân đầu vào và\nconvolution mỗi kênh có \\(c_i\\) kênh, chúng ta có thể thực hiện một\nhoạt động tương quan chéo trên tensor hai chiều của đầu vào và tensor\nhai chiều của hạt nhân phức tạp cho mỗi kênh, thêm các kết quả \\(c_i\\) với nhau (tổng hợp qua các kênh) để mang lại một hai- tensor\nchiều. Đây là kết quả của mối tương quan chéo hai chiều giữa đầu vào đa\nkênh và hạt nhân phức tạp đa đầu vào kênh."
+    },
+    {
+      "type": "paragraph",
+      "text": "Trong Fig. 6.4.1 , chúng tôi chứng minh một ví dụ về\nmối tương quan chéo hai chiều với hai kênh đầu vào. Các phần bóng mờ là\nphần tử đầu ra đầu tiên cũng như các phần tử tensor đầu vào và hạt nhân\nđược sử dụng cho tính toán đầu ra: \\((1\\times1+2\\times2+4\\times3+5\\times4)+(0\\times0+1\\times1+3\\times2+4\\times3)=56\\) ."
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/conv-multi-in.svg",
+      "local_path": "_images/conv-multi-in.svg",
+      "alt": "../_images/conv-multi-in.svg"
+    },
+    {
+      "type": "paragraph",
+      "text": "Fig. 6.4.1 Cross-correlation computation with 2 input channels. ¶"
+    },
+    {
+      "type": "paragraph",
+      "text": "Để đảm bảo rằng chúng ta thực sự hiểu những gì đang xảy ra ở đây, chúng\nta có thể thực hiện các hoạt động tương quan chéo với nhiều kênh đầu vào\nchính mình. Lưu ý rằng tất cả những gì chúng tôi đang làm là thực hiện\nmột hoạt động tương quan chéo trên mỗi kênh và sau đó thêm kết quả."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "from mxnet import np, npx\nfrom d2l import mxnet as d2l\n\nnpx.set_np()\n\ndef corr2d_multi_in(X, K):\n    # First, iterate through the 0th dimension (channel dimension) of `X` and\n    # `K`. Then, add them together\n    return sum(d2l.corr2d(x, k) for x, k in zip(X, K))"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "import torch\nfrom d2l import torch as d2l\n\ndef corr2d_multi_in(X, K):\n    # First, iterate through the 0th dimension (channel dimension) of `X` and\n    # `K`. Then, add them together\n    return sum(d2l.corr2d(x, k) for x, k in zip(X, K))"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "import tensorflow as tf\nfrom d2l import tensorflow as d2l\n\n\ndef corr2d_multi_in(X, K):\n    # First, iterate through the 0th dimension (channel dimension) of `X` and\n    # `K`. Then, add them together\n    return tf.reduce_sum([d2l.corr2d(x, k) for x, k in zip(X, K)], axis=0)"
+    },
+    {
+      "type": "paragraph",
+      "text": "Chúng ta có thể xây dựng tensor đầu vào X và tensor kernel K tương ứng với các giá trị trong Fig. 6.4.1 đến xác\nnhận đầu ra của hoạt động tương quan chéo."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "X = np.array([[[0.0, 1.0, 2.0], [3.0, 4.0, 5.0], [6.0, 7.0, 8.0]],\n               [[1.0, 2.0, 3.0], [4.0, 5.0, 6.0], [7.0, 8.0, 9.0]]])\nK = np.array([[[0.0, 1.0], [2.0, 3.0]], [[1.0, 2.0], [3.0, 4.0]]])\n\ncorr2d_multi_in(X, K)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "array([[ 56.,  72.],\n       [104., 120.]])"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "X = torch.tensor([[[0.0, 1.0, 2.0], [3.0, 4.0, 5.0], [6.0, 7.0, 8.0]],\n               [[1.0, 2.0, 3.0], [4.0, 5.0, 6.0], [7.0, 8.0, 9.0]]])\nK = torch.tensor([[[0.0, 1.0], [2.0, 3.0]], [[1.0, 2.0], [3.0, 4.0]]])\n\ncorr2d_multi_in(X, K)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "tensor([[ 56.,  72.],\n        [104., 120.]])"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "X = tf.constant([[[0.0, 1.0, 2.0], [3.0, 4.0, 5.0], [6.0, 7.0, 8.0]],\n               [[1.0, 2.0, 3.0], [4.0, 5.0, 6.0], [7.0, 8.0, 9.0]]])\nK = tf.constant([[[0.0, 1.0], [2.0, 3.0]], [[1.0, 2.0], [3.0, 4.0]]])\n\ncorr2d_multi_in(X, K)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "<tf.Tensor: shape=(2, 2), dtype=float32, numpy=\narray([[ 56.,  72.],\n       [104., 120.]], dtype=float32)>"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "nhieu-kenh-dau-ra",
+      "text": "6.4.2. Nhiều kênh đầu ra"
+    },
+    {
+      "type": "paragraph",
+      "text": "Bất kể số lượng kênh đầu vào, cho đến nay chúng tôi luôn kết thúc với\nmột kênh đầu ra. Tuy nhiên, như chúng ta đã thảo luận trong Section 6.1.4.1 , hóa ra là điều cần thiết để có\nnhiều kênh ở mỗi lớp. Trong các kiến trúc mạng thần kinh phổ biến nhất,\nchúng tôi thực sự tăng kích thước kênh khi chúng tôi tăng cao hơn trong\nmạng thần kinh, thường là lấy mẫu xuống để giảm độ phân giải không gian\ncho độ sâu kênh * lớn hơn*. Trực giác, bạn có thể nghĩ về từng kênh là\nphản hồi một số bộ tính năng khác nhau. Thực tế phức tạp hơn một chút so\nvới những giải thích ngây thơ nhất của trực giác này vì các đại diện\nkhông được học độc lập nhưng khá tối ưu hóa để cùng hữu ích. Vì vậy, có\nthể không phải là một kênh duy nhất học một máy dò cạnh mà là một số\nhướng trong không gian kênh tương ứng với việc phát hiện các cạnh."
+    },
+    {
+      "type": "paragraph",
+      "text": "Biểu thị bởi \\(c_i\\) và \\(c_o\\) số lượng các kênh đầu vào và đầu\nra, tương ứng, và để \\(k_h\\) và \\(k_w\\) là chiều cao và chiều\nrộng của hạt nhân. Để có được một đầu ra với nhiều kênh, chúng ta có thể\ntạo một tensor hạt nhân của hình dạng \\(c_i\\times k_h\\times k_w\\) cho * mỗi kênh đầu ra. Chúng tôi nối chúng trên kích thước kênh đầu ra,\nđể hình dạng của hạt nhân phức tạp là \\(c_o\\times c_i\\times k_h\\times k_w\\) . Trong các hoạt động tương\nquan chéo, kết quả trên mỗi kênh đầu ra được tính từ hạt nhân tích lũy\ntương ứng với kênh đầu ra đó và lấy đầu vào từ tất cả các kênh trong\ntensor đầu vào."
+    },
+    {
+      "type": "paragraph",
+      "text": "Chúng tôi thực hiện một hàm tương quan chéo để tính toán đầu ra của\nnhiều kênh như hình dưới đây."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def corr2d_multi_in_out(X, K):\n    # Iterate through the 0th dimension of `K`, and each time, perform\n    # cross-correlation operations with input `X`. All of the results are\n    # stacked together\n    return np.stack([corr2d_multi_in(X, k) for k in K], 0)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def corr2d_multi_in_out(X, K):\n    # Iterate through the 0th dimension of `K`, and each time, perform\n    # cross-correlation operations with input `X`. All of the results are\n    # stacked together\n    return torch.stack([corr2d_multi_in(X, k) for k in K], 0)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def corr2d_multi_in_out(X, K):\n    # Iterate through the 0th dimension of `K`, and each time, perform\n    # cross-correlation operations with input `X`. All of the results are\n    # stacked together\n    return tf.stack([corr2d_multi_in(X, k) for k in K], 0)"
+    },
+    {
+      "type": "paragraph",
+      "text": "Chúng tôi xây dựng một hạt nhân phức tạp với 3 kênh đầu ra bằng cách nối\ntensor kernel K với K+1 (cộng với một cho mỗi phần tử trong K ) và K+2 ."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "K = np.stack((K, K + 1, K + 2), 0)\nK.shape"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "(3, 2, 2, 2)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "K = torch.stack((K, K + 1, K + 2), 0)\nK.shape"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "torch.Size([3, 2, 2, 2])"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "K = tf.stack((K, K + 1, K + 2), 0)\nK.shape"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "TensorShape([3, 2, 2, 2])"
+    },
+    {
+      "type": "paragraph",
+      "text": "Dưới đây, chúng tôi thực hiện các thao tác tương quan chéo trên tensor\nđầu vào X với tensor kernel K . Bây giờ đầu ra chứa 3 kênh. Kết\nquả của kênh đầu tiên phù hợp với kết quả của tensor đầu vào trước X và kênh đa đầu vào, hạt nhân kênh đơn đầu ra."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "corr2d_multi_in_out(X, K)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "array([[[ 56.,  72.],\n        [104., 120.]],\n\n       [[ 76., 100.],\n        [148., 172.]],\n\n       [[ 96., 128.],\n        [192., 224.]]])"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "corr2d_multi_in_out(X, K)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "tensor([[[ 56.,  72.],\n         [104., 120.]],\n\n        [[ 76., 100.],\n         [148., 172.]],\n\n        [[ 96., 128.],\n         [192., 224.]]])"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "corr2d_multi_in_out(X, K)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "<tf.Tensor: shape=(3, 2, 2), dtype=float32, numpy=\narray([[[ 56.,  72.],\n        [104., 120.]],\n\n       [[ 76., 100.],\n        [148., 172.]],\n\n       [[ 96., 128.],\n        [192., 224.]]], dtype=float32)>"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "times-1-lop-phuc-tap",
+      "text": "6.4.3. \\(1\\times 1\\) Lớp phức tạp"
+    },
+    {
+      "type": "paragraph",
+      "text": "Lúc đầu, một \\(1 \\times 1\\) convolution, tức là, \\(k_h = k_w = 1\\) , dường như không có ý nghĩa nhiều. Rốt cuộc, một\nsự covolution tương quan các pixel liền kề. Một sự phức tạp \\(1 \\times 1\\) rõ ràng là không. Tuy nhiên, chúng là những hoạt động\nphổ biến đôi khi được bao gồm trong các thiết kế của các mạng sâu phức\ntạp. Hãy để chúng tôi xem một số chi tiết những gì nó thực sự làm."
+    },
+    {
+      "type": "paragraph",
+      "text": "Bởi vì cửa sổ tối thiểu được sử dụng, sự phức tạp \\(1\\times 1\\) mất\nkhả năng của các lớp phức tạp lớn hơn để nhận ra các mẫu bao gồm các\ntương tác giữa các phần tử liền kề trong chiều cao và chiều rộng. Tính\ntoán duy nhất của sự phức tạp \\(1\\times 1\\) xảy ra trên kích thước\nkênh."
+    },
+    {
+      "type": "paragraph",
+      "text": "Fig. 6.4.2 cho thấy tính toán tương quan chéo bằng cách sử\ndụng hạt nhân phức tạp \\(1\\times 1\\) với 3 kênh đầu vào và 2 kênh\nđầu ra. Lưu ý rằng các đầu vào và đầu ra có cùng chiều cao và chiều\nrộng. Mỗi phần tử trong đầu ra được bắt nguồn từ sự kết hợp tuyến tính\ncủa các phần tử * ở cùng một vị trí* trong hình ảnh đầu vào. Bạn có\nthể nghĩ về lớp ghép \\(1\\times 1\\) là cấu thành một lớp kết nối hoàn\ntoàn được áp dụng tại mọi vị trí pixel duy nhất để chuyển đổi các giá\ntrị đầu vào tương ứng \\(c_i\\) thành các giá trị đầu ra \\(c_o\\) .\nBởi vì đây vẫn là một lớp phức tạp, các trọng lượng được gắn trên vị trí\npixel. Do đó lớp phức tạp \\(1\\times 1\\) đòi hỏi \\(c_o\\times c_i\\) trọng lượng (cộng với sự thiên vị)."
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/conv-1x1.svg",
+      "local_path": "_images/conv-1x1.svg",
+      "alt": "../_images/conv-1x1.svg"
+    },
+    {
+      "type": "paragraph",
+      "text": "Fig. 6.4.2 The cross-correlation computation uses the \\(1\\times 1\\) convolution kernel with 3 input channels and 2 output channels. The\ninput and output have the same height and width. ¶"
+    },
+    {
+      "type": "paragraph",
+      "text": "Hãy để chúng tôi kiểm tra xem điều này có hoạt động trong thực tế hay\nkhông: chúng tôi thực hiện một sự phức tạp \\(1 \\times 1\\) bằng cách\nsử dụng một lớp được kết nối hoàn toàn. Điều duy nhất là chúng ta cần\nthực hiện một số điều chỉnh đối với hình dạng dữ liệu trước và sau khi\nnhân ma trận."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def corr2d_multi_in_out_1x1(X, K):\n    c_i, h, w = X.shape\n    c_o = K.shape[0]\n    X = X.reshape((c_i, h * w))\n    K = K.reshape((c_o, c_i))\n    # Matrix multiplication in the fully-connected layer\n    Y = np.dot(K, X)\n    return Y.reshape((c_o, h, w))"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def corr2d_multi_in_out_1x1(X, K):\n    c_i, h, w = X.shape\n    c_o = K.shape[0]\n    X = X.reshape((c_i, h * w))\n    K = K.reshape((c_o, c_i))\n    # Matrix multiplication in the fully-connected layer\n    Y = torch.matmul(K, X)\n    return Y.reshape((c_o, h, w))"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def corr2d_multi_in_out_1x1(X, K):\n    c_i, h, w = X.shape\n    c_o = K.shape[0]\n    X = tf.reshape(X, (c_i, h * w))\n    K = tf.reshape(K, (c_o, c_i))\n    # Matrix multiplication in the fully-connected layer\n    Y = tf.matmul(K, X)\n    return tf.reshape(Y, (c_o, h, w))"
+    },
+    {
+      "type": "paragraph",
+      "text": "Khi thực hiện sự phức tạp \\(1\\times 1\\) , hàm trên tương đương với\nhàm tương quan chéo được triển khai trước đó corr2d_multi_in_out .\nHãy để chúng tôi kiểm tra điều này với một số dữ liệu mẫu."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "X = np.random.normal(0, 1, (3, 3, 3))\nK = np.random.normal(0, 1, (2, 3, 1, 1))\n\nY1 = corr2d_multi_in_out_1x1(X, K)\nY2 = corr2d_multi_in_out(X, K)\nassert float(np.abs(Y1 - Y2).sum()) < 1e-6"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "X = torch.normal(0, 1, (3, 3, 3))\nK = torch.normal(0, 1, (2, 3, 1, 1))\n\nY1 = corr2d_multi_in_out_1x1(X, K)\nY2 = corr2d_multi_in_out(X, K)\nassert float(torch.abs(Y1 - Y2).sum()) < 1e-6"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "X = tf.random.normal((3, 3, 3), 0, 1)\nK = tf.random.normal((2, 3, 1, 1), 0, 1)\n\nY1 = corr2d_multi_in_out_1x1(X, K)\nY2 = corr2d_multi_in_out(X, K)\nassert float(tf.reduce_sum(tf.abs(Y1 - Y2))) < 1e-6"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tom-tat",
+      "text": "6.4.4. Tóm tắt"
+    },
+    {
+      "type": "list",
+      "ordered": false,
+      "items": [
+        "Nhiều kênh có thể được sử dụng để mở rộng các tham số mô hình của lớp\nphức tạp.",
+        "Lớp kết nối \\(1\\times 1\\) tương đương với lớp kết nối hoàn toàn,\nkhi được áp dụng trên cơ sở trên mỗi pixel.",
+        "Lớp phức tạp \\(1\\times 1\\) thường được sử dụng để điều chỉnh số\nkênh giữa các lớp mạng và để kiểm soát độ phức tạp của mô hình."
+      ]
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bai-tap",
+      "text": "6.4.5. Bài tập"
+    },
+    {
+      "type": "list",
+      "ordered": true,
+      "items": [
+        "Giả sử rằng chúng ta có hai hạt nhân phức tạp có kích thước \\(k_1\\) và \\(k_2\\) , tương ứng (không có phi tuyến tính ở\ngiữa). Chứng minh rằng kết quả của hoạt động có thể được thể hiện bằng\nmột sự phức tạp duy nhất. Chiều của sự phức tạp đơn tương đương là gì? Cuộc trò chuyện có đúng không?",
+        "Chứng minh rằng kết quả của hoạt động có thể được thể hiện bằng\nmột sự phức tạp duy nhất.",
+        "Chiều của sự phức tạp đơn tương đương là gì?",
+        "Cuộc trò chuyện có đúng không?",
+        "Giả sử một đầu vào của hình \\(c_i\\times h\\times w\\) và một hạt\nnhân phức tạp của hình \\(c_o\\times c_i\\times k_h\\times k_w\\) , đệm\ncủa \\((p_h, p_w)\\) , và sải chân của \\((s_h, s_w)\\) . Chi phí tính toán (nhân và bổ sung) cho việc tuyên truyền chuyển\ntiếp là bao nhiêu? Dấu chân bộ nhớ là gì? Dấu chân bộ nhớ cho tính toán ngược là gì? Chi phí tính toán cho việc truyền ngược là bao nhiêu?",
+        "Chi phí tính toán (nhân và bổ sung) cho việc tuyên truyền chuyển\ntiếp là bao nhiêu?",
+        "Dấu chân bộ nhớ là gì?",
+        "Dấu chân bộ nhớ cho tính toán ngược là gì?",
+        "Chi phí tính toán cho việc truyền ngược là bao nhiêu?",
+        "Theo yếu tố nào số lượng tính toán tăng lên nếu chúng ta tăng gấp đôi\nsố lượng kênh đầu vào \\(c_i\\) và số lượng kênh đầu ra \\(c_o\\) ? Điều gì sẽ xảy ra nếu chúng ta tăng gấp đôi đệm?",
+        "Nếu chiều cao và chiều rộng của một hạt nhân phức tạp là \\(k_h=k_w=1\\) , độ phức tạp tính toán của sự lan truyền về phía\ntrước là gì?",
+        "Các biến Y1 và Y2 trong ví dụ cuối cùng của phần này có giống\nhệt nhau không? Tại sao?",
+        "Làm thế nào bạn sẽ thực hiện các phức tạp bằng cách sử dụng phép nhân\nma trận khi cửa sổ phức tạp không phải là \\(1\\times 1\\) ?"
+      ]
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    }
+  ],
+  "images": [
+    {
+      "original_url": "https://vi.d2l.ai/_images/conv-multi-in.svg",
+      "local_path": "_images/conv-multi-in.svg",
+      "alt": "../_images/conv-multi-in.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/conv-1x1.svg",
+      "local_path": "_images/conv-1x1.svg",
+      "alt": "../_images/conv-1x1.svg"
+    }
+  ],
+  "text": "6.4. Nhiều kênh đầu vào và nhiều đầu ra\nMặc dù chúng tôi đã mô tả nhiều kênh bao gồm mỗi hình ảnh (ví dụ: hình\nảnh màu có các kênh RGB tiêu chuẩn để chỉ số lượng màu đỏ, xanh lá cây\nvà xanh dương) và các lớp phức tạp cho nhiều kênh trong Section 6.1.4.1 , cho đến bây giờ, chúng tôi đã đơn\ngiản hóa tất cả các ví dụ số của mình bằng cách làm việc với chỉ một đầu\nvào và một kênh đầu ra duy nhất. Điều này đã cho phép chúng tôi nghĩ về\ncác đầu vào của chúng tôi, hạt nhân phức tạp, và đầu ra mỗi cái là hàng\nchục hai chiều.\nKhi chúng tôi thêm các kênh vào hỗn hợp, các đầu vào và biểu diễn ẩn của\nchúng tôi đều trở thành hàng chục ba chiều. Ví dụ, mỗi hình ảnh đầu vào\nRGB có hình dạng \\(3\\times h\\times w\\) . Chúng tôi đề cập đến trục\nnày, với kích thước 3, như kích thước * kênh*. Trong phần này, chúng\nta sẽ xem xét sâu hơn về các hạt nhân phức tạp với nhiều kênh đầu vào và\nnhiều kênh đầu ra.\n6.4.1. Nhiều kênh đầu vào\nKhi dữ liệu đầu vào chứa nhiều kênh, chúng ta cần xây dựng một hạt nhân\nphức tạp có cùng số kênh đầu vào với dữ liệu đầu vào, để nó có thể thực\nhiện tương quan chéo với dữ liệu đầu vào. Giả sử rằng số kênh cho dữ\nliệu đầu vào là \\(c_i\\) , số kênh đầu vào của hạt nhân covolution\ncũng cần phải là \\(c_i\\) . Nếu hình dạng cửa sổ của hạt nhân phức tạp\ncủa chúng ta là \\(k_h\\times k_w\\) , thì khi \\(c_i=1\\) , chúng ta\ncó thể nghĩ về hạt nhân phức tạp của chúng ta như chỉ là một tensor hai\nchiều của hình dạng \\(k_h\\times k_w\\) .\nTuy nhiên, khi \\(c_i>1\\) , chúng ta cần một hạt nhân chứa một tensor\ncủa hình dạng \\(k_h\\times k_w\\) cho every kênh đầu vào. Nối các số\nlượng \\(c_i\\) này lại với nhau mang lại một hạt nhân phức tạp của\nhình dạng \\(c_i\\times k_h\\times k_w\\) . Vì hạt nhân đầu vào và\nconvolution mỗi kênh có \\(c_i\\) kênh, chúng ta có thể thực hiện một\nhoạt động tương quan chéo trên tensor hai chiều của đầu vào và tensor\nhai chiều của hạt nhân phức tạp cho mỗi kênh, thêm các kết quả \\(c_i\\) với nhau (tổng hợp qua các kênh) để mang lại một hai- tensor\nchiều. Đây là kết quả của mối tương quan chéo hai chiều giữa đầu vào đa\nkênh và hạt nhân phức tạp đa đầu vào kênh.\nTrong Fig. 6.4.1 , chúng tôi chứng minh một ví dụ về\nmối tương quan chéo hai chiều với hai kênh đầu vào. Các phần bóng mờ là\nphần tử đầu ra đầu tiên cũng như các phần tử tensor đầu vào và hạt nhân\nđược sử dụng cho tính toán đầu ra: \\((1\\times1+2\\times2+4\\times3+5\\times4)+(0\\times0+1\\times1+3\\times2+4\\times3)=56\\) .\nFig. 6.4.1 Cross-correlation computation with 2 input channels. ¶\nĐể đảm bảo rằng chúng ta thực sự hiểu những gì đang xảy ra ở đây, chúng\nta có thể thực hiện các hoạt động tương quan chéo với nhiều kênh đầu vào\nchính mình. Lưu ý rằng tất cả những gì chúng tôi đang làm là thực hiện\nmột hoạt động tương quan chéo trên mỗi kênh và sau đó thêm kết quả.\nChúng ta có thể xây dựng tensor đầu vào X và tensor kernel K tương ứng với các giá trị trong Fig. 6.4.1 đến xác\nnhận đầu ra của hoạt động tương quan chéo.\n6.4.2. Nhiều kênh đầu ra\nBất kể số lượng kênh đầu vào, cho đến nay chúng tôi luôn kết thúc với\nmột kênh đầu ra. Tuy nhiên, như chúng ta đã thảo luận trong Section 6.1.4.1 , hóa ra là điều cần thiết để có\nnhiều kênh ở mỗi lớp. Trong các kiến trúc mạng thần kinh phổ biến nhất,\nchúng tôi thực sự tăng kích thước kênh khi chúng tôi tăng cao hơn trong\nmạng thần kinh, thường là lấy mẫu xuống để giảm độ phân giải không gian\ncho độ sâu kênh * lớn hơn*. Trực giác, bạn có thể nghĩ về từng kênh là\nphản hồi một số bộ tính năng khác nhau. Thực tế phức tạp hơn một chút so\nvới những giải thích ngây thơ nhất của trực giác này vì các đại diện\nkhông được học độc lập nhưng khá tối ưu hóa để cùng hữu ích. Vì vậy, có\nthể không phải là một kênh duy nhất học một máy dò cạnh mà là một số\nhướng trong không gian kênh tương ứng với việc phát hiện các cạnh.\nBiểu thị bởi \\(c_i\\) và \\(c_o\\) số lượng các kênh đầu vào và đầu\nra, tương ứng, và để \\(k_h\\) và \\(k_w\\) là chiều cao và chiều\nrộng của hạt nhân. Để có được một đầu ra với nhiều kênh, chúng ta có thể\ntạo một tensor hạt nhân của hình dạng \\(c_i\\times k_h\\times k_w\\) cho * mỗi kênh đầu ra. Chúng tôi nối chúng trên kích thước kênh đầu ra,\nđể hình dạng của hạt nhân phức tạp là \\(c_o\\times c_i\\times k_h\\times k_w\\) . Trong các hoạt động tương\nquan chéo, kết quả trên mỗi kênh đầu ra được tính từ hạt nhân tích lũy\ntương ứng với kênh đầu ra đó và lấy đầu vào từ tất cả các kênh trong\ntensor đầu vào.\nChúng tôi thực hiện một hàm tương quan chéo để tính toán đầu ra của\nnhiều kênh như hình dưới đây.\nChúng tôi xây dựng một hạt nhân phức tạp với 3 kênh đầu ra bằng cách nối\ntensor kernel K với K+1 (cộng với một cho mỗi phần tử trong K ) và K+2 .\nDưới đây, chúng tôi thực hiện các thao tác tương quan chéo trên tensor\nđầu vào X với tensor kernel K . Bây giờ đầu ra chứa 3 kênh. Kết\nquả của kênh đầu tiên phù hợp với kết quả của tensor đầu vào trước X và kênh đa đầu vào, hạt nhân kênh đơn đầu ra.\n6.4.3. \\(1\\times 1\\) Lớp phức tạp\nLúc đầu, một \\(1 \\times 1\\) convolution, tức là, \\(k_h = k_w = 1\\) , dường như không có ý nghĩa nhiều. Rốt cuộc, một\nsự covolution tương quan các pixel liền kề. Một sự phức tạp \\(1 \\times 1\\) rõ ràng là không. Tuy nhiên, chúng là những hoạt động\nphổ biến đôi khi được bao gồm trong các thiết kế của các mạng sâu phức\ntạp. Hãy để chúng tôi xem một số chi tiết những gì nó thực sự làm.\nBởi vì cửa sổ tối thiểu được sử dụng, sự phức tạp \\(1\\times 1\\) mất\nkhả năng của các lớp phức tạp lớn hơn để nhận ra các mẫu bao gồm các\ntương tác giữa các phần tử liền kề trong chiều cao và chiều rộng. Tính\ntoán duy nhất của sự phức tạp \\(1\\times 1\\) xảy ra trên kích thước\nkênh.\nFig. 6.4.2 cho thấy tính toán tương quan chéo bằng cách sử\ndụng hạt nhân phức tạp \\(1\\times 1\\) với 3 kênh đầu vào và 2 kênh\nđầu ra. Lưu ý rằng các đầu vào và đầu ra có cùng chiều cao và chiều\nrộng. Mỗi phần tử trong đầu ra được bắt nguồn từ sự kết hợp tuyến tính\ncủa các phần tử * ở cùng một vị trí* trong hình ảnh đầu vào. Bạn có\nthể nghĩ về lớp ghép \\(1\\times 1\\) là cấu thành một lớp kết nối hoàn\ntoàn được áp dụng tại mọi vị trí pixel duy nhất để chuyển đổi các giá\ntrị đầu vào tương ứng \\(c_i\\) thành các giá trị đầu ra \\(c_o\\) .\nBởi vì đây vẫn là một lớp phức tạp, các trọng lượng được gắn trên vị trí\npixel. Do đó lớp phức tạp \\(1\\times 1\\) đòi hỏi \\(c_o\\times c_i\\) trọng lượng (cộng với sự thiên vị).\nFig. 6.4.2 The cross-correlation computation uses the \\(1\\times 1\\) convolution kernel with 3 input channels and 2 output channels. The\ninput and output have the same height and width. ¶\nHãy để chúng tôi kiểm tra xem điều này có hoạt động trong thực tế hay\nkhông: chúng tôi thực hiện một sự phức tạp \\(1 \\times 1\\) bằng cách\nsử dụng một lớp được kết nối hoàn toàn. Điều duy nhất là chúng ta cần\nthực hiện một số điều chỉnh đối với hình dạng dữ liệu trước và sau khi\nnhân ma trận.\nKhi thực hiện sự phức tạp \\(1\\times 1\\) , hàm trên tương đương với\nhàm tương quan chéo được triển khai trước đó corr2d_multi_in_out .\nHãy để chúng tôi kiểm tra điều này với một số dữ liệu mẫu.\n6.4.4. Tóm tắt\nNhiều kênh có thể được sử dụng để mở rộng các tham số mô hình của lớp\nphức tạp.\nLớp kết nối \\(1\\times 1\\) tương đương với lớp kết nối hoàn toàn,\nkhi được áp dụng trên cơ sở trên mỗi pixel.\nLớp phức tạp \\(1\\times 1\\) thường được sử dụng để điều chỉnh số\nkênh giữa các lớp mạng và để kiểm soát độ phức tạp của mô hình.\n6.4.5. Bài tập\nGiả sử rằng chúng ta có hai hạt nhân phức tạp có kích thước \\(k_1\\) và \\(k_2\\) , tương ứng (không có phi tuyến tính ở\ngiữa). Chứng minh rằng kết quả của hoạt động có thể được thể hiện bằng\nmột sự phức tạp duy nhất. Chiều của sự phức tạp đơn tương đương là gì? Cuộc trò chuyện có đúng không?\nChứng minh rằng kết quả của hoạt động có thể được thể hiện bằng\nmột sự phức tạp duy nhất.\nChiều của sự phức tạp đơn tương đương là gì?\nCuộc trò chuyện có đúng không?\nGiả sử một đầu vào của hình \\(c_i\\times h\\times w\\) và một hạt\nnhân phức tạp của hình \\(c_o\\times c_i\\times k_h\\times k_w\\) , đệm\ncủa \\((p_h, p_w)\\) , và sải chân của \\((s_h, s_w)\\) . Chi phí tính toán (nhân và bổ sung) cho việc tuyên truyền chuyển\ntiếp là bao nhiêu? Dấu chân bộ nhớ là gì? Dấu chân bộ nhớ cho tính toán ngược là gì? Chi phí tính toán cho việc truyền ngược là bao nhiêu?\nChi phí tính toán (nhân và bổ sung) cho việc tuyên truyền chuyển\ntiếp là bao nhiêu?\nDấu chân bộ nhớ là gì?\nDấu chân bộ nhớ cho tính toán ngược là gì?\nChi phí tính toán cho việc truyền ngược là bao nhiêu?\nTheo yếu tố nào số lượng tính toán tăng lên nếu chúng ta tăng gấp đôi\nsố lượng kênh đầu vào \\(c_i\\) và số lượng kênh đầu ra \\(c_o\\) ? Điều gì sẽ xảy ra nếu chúng ta tăng gấp đôi đệm?\nNếu chiều cao và chiều rộng của một hạt nhân phức tạp là \\(k_h=k_w=1\\) , độ phức tạp tính toán của sự lan truyền về phía\ntrước là gì?\nCác biến Y1 và Y2 trong ví dụ cuối cùng của phần này có giống\nhệt nhau không? Tại sao?\nLàm thế nào bạn sẽ thực hiện các phức tạp bằng cách sử dụng phép nhân\nma trận khi cửa sổ phức tạp không phải là \\(1\\times 1\\) ?\nDiscussions\nDiscussions\nDiscussions"
+}

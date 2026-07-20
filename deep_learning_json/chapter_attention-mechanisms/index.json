@@ -1,0 +1,91 @@
+{
+  "url": "https://vi.d2l.ai/chapter_attention-mechanisms/index.html",
+  "chapter": "chapter_attention-mechanisms",
+  "title": "10. Cơ chế chú ý",
+  "crawled_at": "2026-07-20T12:40:09.969721+00:00",
+  "headings": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "co-che-chu-y",
+      "text": "10. Cơ chế chú ý"
+    }
+  ],
+  "content": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "co-che-chu-y",
+      "text": "10. Cơ chế chú ý"
+    },
+    {
+      "type": "paragraph",
+      "text": "Dây thần kinh thị giác của hệ thống thị giác của linh trưởng nhận được\nđầu vào cảm giác lớn, vượt xa những gì não có thể xử lý hoàn toàn. May\nmắn thay, không phải tất cả các kích thích đều được tạo ra bằng nhau. Sự\ntập trung và tập trung ý thức đã cho phép các loài linh trưởng chú ý\ntrực tiếp đến các đối tượng quan tâm, chẳng hạn như săn mồi và động vật\năn thịt, trong môi trường thị giác phức tạp. Khả năng chú ý đến chỉ một\nphần nhỏ của thông tin có ý nghĩa tiến hóa, cho phép con người sống và\nthành công."
+    },
+    {
+      "type": "paragraph",
+      "text": "Các nhà khoa học đã nghiên cứu sự chú ý trong lĩnh vực khoa học thần\nkinh nhận thức từ thế kỷ 19. Trong chương này, chúng ta sẽ bắt đầu bằng\ncách xem xét một khuôn khổ phổ biến giải thích cách sự chú ý được triển\nkhai trong một cảnh trực quan. Lấy cảm hứng từ các tín hiệu chú ý trong\nkhuôn khổ này, chúng tôi sẽ thiết kế các mô hình tận dụng các tín hiệu\nchú ý như vậy. Đáng chú ý là hồi quy hạt nhân Nadaraya-Waston vào năm\n1964 là một minh chứng đơn giản về học máy với cơ chế chú ý*."
+    },
+    {
+      "type": "paragraph",
+      "text": "Tiếp theo, chúng tôi sẽ tiếp tục giới thiệu các chức năng chú ý đã được\nsử dụng rộng rãi trong thiết kế các mô hình chú ý trong học sâu. Cụ thể,\nchúng tôi sẽ chỉ ra cách sử dụng các chức năng này để thiết kế sự chú ý\n* Bahdanau*, một mô hình chú ý đột phá trong học sâu có thể sắp xếp\nhai chiều và có thể khác biệt."
+    },
+    {
+      "type": "paragraph",
+      "text": "Cuối cùng, được trang bị gần đây hơn sự chú ý nhiều đầu và self-attention thiết kế, chúng tôi sẽ mô tả kiến trúc * transformer*\nchỉ dựa trên cơ chế chú ý. Kể từ khi đề xuất của họ vào năm 2017, các\nmáy biến áp đã phổ biến trong các ứng dụng học sâu hiện đại, chẳng hạn\nnhư trong các lĩnh vực ngôn ngữ, tầm nhìn, lời nói và học tập củng cố."
+    },
+    {
+      "type": "list",
+      "ordered": false,
+      "items": [
+        "10.1. Chú ý tín hiệu 10.1.1. Các tín hiệu chú ý trong sinh học 10.1.2. Truy vấn, Khóa và Giá trị 10.1.3. Hình dung của sự chú ý 10.1.4. Tóm tắt 10.1.5. Bài tập",
+        "10.1.1. Các tín hiệu chú ý trong sinh học",
+        "10.1.2. Truy vấn, Khóa và Giá trị",
+        "10.1.3. Hình dung của sự chú ý",
+        "10.1.4. Tóm tắt",
+        "10.1.5. Bài tập",
+        "10.2. Chú ý Pooling: Hồi quy hạt nhân Nadaraya-Watson 10.2.1. Tạo ra bộ dữ liệu 10.2.2. Pooling trung bình 10.2.3. Không tham số Chú ý Pooling 10.2.4. ** Tham số chú ý Pooling** 10.2.5. Tóm tắt 10.2.6. Bài tập",
+        "10.2.1. Tạo ra bộ dữ liệu",
+        "10.2.2. Pooling trung bình",
+        "10.2.3. Không tham số Chú ý Pooling",
+        "10.2.4. ** Tham số chú ý Pooling**",
+        "10.2.5. Tóm tắt",
+        "10.2.6. Bài tập",
+        "10.3. Chức năng chấm điểm chú ý 10.3.1. Masked Softmax Operation 10.3.2. Phụ gia chú ý 10.3.3. Quy mô Dot-Product Attention 10.3.4. Tóm tắt 10.3.5. Bài tập",
+        "10.3.1. Masked Softmax Operation",
+        "10.3.2. Phụ gia chú ý",
+        "10.3.3. Quy mô Dot-Product Attention",
+        "10.3.4. Tóm tắt",
+        "10.3.5. Bài tập",
+        "10.4. Bahdanau Chú ý 10.4.1. Mô hình 10.4.2. Xác định bộ giải mã với sự chú ý 10.4.3. Đào tạo 10.4.4. Tóm tắt 10.4.5. Bài tập",
+        "10.4.1. Mô hình",
+        "10.4.2. Xác định bộ giải mã với sự chú ý",
+        "10.4.3. Đào tạo",
+        "10.4.4. Tóm tắt",
+        "10.4.5. Bài tập",
+        "10.5. Chú ý nhiều đầu 10.5.1. Mô hình 10.5.2. Thực hiện 10.5.3. Tóm tắt 10.5.4. Bài tập",
+        "10.5.1. Mô hình",
+        "10.5.2. Thực hiện",
+        "10.5.3. Tóm tắt",
+        "10.5.4. Bài tập",
+        "10.6. Tự ghi nhận và mã hóa vị trí 10.6.1. Self-Attention 10.6.2. So sánh CNN s, RNNs, và Self-Attention 10.6.3. Mã hóa vị trí 10.6.4. Tóm tắt 10.6.5. Bài tập",
+        "10.6.1. Self-Attention",
+        "10.6.2. So sánh CNN s, RNNs, và Self-Attention",
+        "10.6.3. Mã hóa vị trí",
+        "10.6.4. Tóm tắt",
+        "10.6.5. Bài tập",
+        "10.7. Máy biến áp 10.7.1. Mô hình 10.7.2. Các mạng thức ăn chuyển tiếp vị trí 10.7.3. Kết nối còn lại và chuẩn hóa lớp 10.7.4. Bộ mã hóa 10.7.5. Bộ giải mã 10.7.6. Đào tạo 10.7.7. Tóm tắt 10.7.8. Bài tập",
+        "10.7.1. Mô hình",
+        "10.7.2. Các mạng thức ăn chuyển tiếp vị trí",
+        "10.7.3. Kết nối còn lại và chuẩn hóa lớp",
+        "10.7.4. Bộ mã hóa",
+        "10.7.5. Bộ giải mã",
+        "10.7.6. Đào tạo",
+        "10.7.7. Tóm tắt",
+        "10.7.8. Bài tập"
+      ]
+    }
+  ],
+  "images": [],
+  "text": "10. Cơ chế chú ý\nDây thần kinh thị giác của hệ thống thị giác của linh trưởng nhận được\nđầu vào cảm giác lớn, vượt xa những gì não có thể xử lý hoàn toàn. May\nmắn thay, không phải tất cả các kích thích đều được tạo ra bằng nhau. Sự\ntập trung và tập trung ý thức đã cho phép các loài linh trưởng chú ý\ntrực tiếp đến các đối tượng quan tâm, chẳng hạn như săn mồi và động vật\năn thịt, trong môi trường thị giác phức tạp. Khả năng chú ý đến chỉ một\nphần nhỏ của thông tin có ý nghĩa tiến hóa, cho phép con người sống và\nthành công.\nCác nhà khoa học đã nghiên cứu sự chú ý trong lĩnh vực khoa học thần\nkinh nhận thức từ thế kỷ 19. Trong chương này, chúng ta sẽ bắt đầu bằng\ncách xem xét một khuôn khổ phổ biến giải thích cách sự chú ý được triển\nkhai trong một cảnh trực quan. Lấy cảm hứng từ các tín hiệu chú ý trong\nkhuôn khổ này, chúng tôi sẽ thiết kế các mô hình tận dụng các tín hiệu\nchú ý như vậy. Đáng chú ý là hồi quy hạt nhân Nadaraya-Waston vào năm\n1964 là một minh chứng đơn giản về học máy với cơ chế chú ý*.\nTiếp theo, chúng tôi sẽ tiếp tục giới thiệu các chức năng chú ý đã được\nsử dụng rộng rãi trong thiết kế các mô hình chú ý trong học sâu. Cụ thể,\nchúng tôi sẽ chỉ ra cách sử dụng các chức năng này để thiết kế sự chú ý\n* Bahdanau*, một mô hình chú ý đột phá trong học sâu có thể sắp xếp\nhai chiều và có thể khác biệt.\nCuối cùng, được trang bị gần đây hơn sự chú ý nhiều đầu và self-attention thiết kế, chúng tôi sẽ mô tả kiến trúc * transformer*\nchỉ dựa trên cơ chế chú ý. Kể từ khi đề xuất của họ vào năm 2017, các\nmáy biến áp đã phổ biến trong các ứng dụng học sâu hiện đại, chẳng hạn\nnhư trong các lĩnh vực ngôn ngữ, tầm nhìn, lời nói và học tập củng cố.\n10.1. Chú ý tín hiệu 10.1.1. Các tín hiệu chú ý trong sinh học 10.1.2. Truy vấn, Khóa và Giá trị 10.1.3. Hình dung của sự chú ý 10.1.4. Tóm tắt 10.1.5. Bài tập\n10.1.1. Các tín hiệu chú ý trong sinh học\n10.1.2. Truy vấn, Khóa và Giá trị\n10.1.3. Hình dung của sự chú ý\n10.1.4. Tóm tắt\n10.1.5. Bài tập\n10.2. Chú ý Pooling: Hồi quy hạt nhân Nadaraya-Watson 10.2.1. Tạo ra bộ dữ liệu 10.2.2. Pooling trung bình 10.2.3. Không tham số Chú ý Pooling 10.2.4. ** Tham số chú ý Pooling** 10.2.5. Tóm tắt 10.2.6. Bài tập\n10.2.1. Tạo ra bộ dữ liệu\n10.2.2. Pooling trung bình\n10.2.3. Không tham số Chú ý Pooling\n10.2.4. ** Tham số chú ý Pooling**\n10.2.5. Tóm tắt\n10.2.6. Bài tập\n10.3. Chức năng chấm điểm chú ý 10.3.1. Masked Softmax Operation 10.3.2. Phụ gia chú ý 10.3.3. Quy mô Dot-Product Attention 10.3.4. Tóm tắt 10.3.5. Bài tập\n10.3.1. Masked Softmax Operation\n10.3.2. Phụ gia chú ý\n10.3.3. Quy mô Dot-Product Attention\n10.3.4. Tóm tắt\n10.3.5. Bài tập\n10.4. Bahdanau Chú ý 10.4.1. Mô hình 10.4.2. Xác định bộ giải mã với sự chú ý 10.4.3. Đào tạo 10.4.4. Tóm tắt 10.4.5. Bài tập\n10.4.1. Mô hình\n10.4.2. Xác định bộ giải mã với sự chú ý\n10.4.3. Đào tạo\n10.4.4. Tóm tắt\n10.4.5. Bài tập\n10.5. Chú ý nhiều đầu 10.5.1. Mô hình 10.5.2. Thực hiện 10.5.3. Tóm tắt 10.5.4. Bài tập\n10.5.1. Mô hình\n10.5.2. Thực hiện\n10.5.3. Tóm tắt\n10.5.4. Bài tập\n10.6. Tự ghi nhận và mã hóa vị trí 10.6.1. Self-Attention 10.6.2. So sánh CNN s, RNNs, và Self-Attention 10.6.3. Mã hóa vị trí 10.6.4. Tóm tắt 10.6.5. Bài tập\n10.6.1. Self-Attention\n10.6.2. So sánh CNN s, RNNs, và Self-Attention\n10.6.3. Mã hóa vị trí\n10.6.4. Tóm tắt\n10.6.5. Bài tập\n10.7. Máy biến áp 10.7.1. Mô hình 10.7.2. Các mạng thức ăn chuyển tiếp vị trí 10.7.3. Kết nối còn lại và chuẩn hóa lớp 10.7.4. Bộ mã hóa 10.7.5. Bộ giải mã 10.7.6. Đào tạo 10.7.7. Tóm tắt 10.7.8. Bài tập\n10.7.1. Mô hình\n10.7.2. Các mạng thức ăn chuyển tiếp vị trí\n10.7.3. Kết nối còn lại và chuẩn hóa lớp\n10.7.4. Bộ mã hóa\n10.7.5. Bộ giải mã\n10.7.6. Đào tạo\n10.7.7. Tóm tắt\n10.7.8. Bài tập"
+}

@@ -1,0 +1,285 @@
+{
+  "url": "https://vi.d2l.ai/chapter_linear-networks/softmax-regression-concise.html",
+  "chapter": "chapter_linear-networks",
+  "title": "3.7. Thực hiện ngắn gọn về hồi quy Softmax",
+  "crawled_at": "2026-07-20T12:39:23.726752+00:00",
+  "headings": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "thuc-hien-ngan-gon-ve-hoi-quy-softmax",
+      "text": "3.7. Thực hiện ngắn gọn về hồi quy Softmax"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "khoi-tao-cac-tham-so-mo-hinh",
+      "text": "3.7.1. Khởi tạo các tham số mô hình"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "trien-khai-softmax-revisited",
+      "text": "3.7.2. Triển khai Softmax Revisited"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "thuat-toan-toi-uu-hoa",
+      "text": "3.7.3. Thuật toán tối ưu hóa"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "dao-tao",
+      "text": "3.7.4. Đào tạo"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tom-tat",
+      "text": "3.7.5. Tóm tắt"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bai-tap",
+      "text": "3.7.6. Bài tập"
+    }
+  ],
+  "content": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "thuc-hien-ngan-gon-ve-hoi-quy-softmax",
+      "text": "3.7. Thực hiện ngắn gọn về hồi quy Softmax"
+    },
+    {
+      "type": "paragraph",
+      "text": "Cũng giống như APIs cấp cao của các khuôn khổ học sâu làm cho nó dễ dàng\nhơn nhiều để thực hiện hồi quy tuyến tính trong Section 3.3 , chúng tôi sẽ tìm thấy nó tương tự (hoặc\ncó thể nhiều hơn) thuận tiện cho việc thực hiện các mô hình phân loại.\nHãy để chúng tôi gắn bó với tập dữ liệu Fashion-MNIST và giữ kích thước\nlô ở mức 256 như trong Section 3.6 ."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "from mxnet import gluon, init, npx\nfrom mxnet.gluon import nn\nfrom d2l import mxnet as d2l\n\nnpx.set_np()\n\nbatch_size = 256\ntrain_iter, test_iter = d2l.load_data_fashion_mnist(batch_size)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "import torch\nfrom torch import nn\nfrom d2l import torch as d2l\n\nbatch_size = 256\ntrain_iter, test_iter = d2l.load_data_fashion_mnist(batch_size)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "import tensorflow as tf\nfrom d2l import tensorflow as d2l\n\nbatch_size = 256\ntrain_iter, test_iter = d2l.load_data_fashion_mnist(batch_size)"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "khoi-tao-cac-tham-so-mo-hinh",
+      "text": "3.7.1. Khởi tạo các tham số mô hình"
+    },
+    {
+      "type": "paragraph",
+      "text": "Như đã đề cập trong Section 3.4 , lớp đầu ra của hồi quy\nsoftmax là một lớp kết nối đầy đủ Do đó, để thực hiện mô hình của chúng\ntôi, chúng ta chỉ cần thêm một lớp kết nối hoàn toàn với 10 đầu ra vào Sequential của chúng tôi. Một lần nữa, ở đây, Sequential không\nthực sự cần thiết, nhưng chúng ta cũng có thể hình thành thói quen vì nó\nsẽ phổ biến khi thực hiện các mô hình sâu. Một lần nữa, chúng tôi khởi\ntạo các trọng lượng một cách ngẫu nhiên với 0 trung bình và độ lệch\nchuẩn 0,01."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "net = nn.Sequential()\nnet.add(nn.Dense(10))\nnet.initialize(init.Normal(sigma=0.01))"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "# PyTorch does not implicitly reshape the inputs. Thus we define the flatten\n# layer to reshape the inputs before the linear layer in our network\nnet = nn.Sequential(nn.Flatten(), nn.Linear(784, 10))\n\ndef init_weights(m):\n    if type(m) == nn.Linear:\n        nn.init.normal_(m.weight, std=0.01)\n\nnet.apply(init_weights);"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "net = tf.keras.models.Sequential()\nnet.add(tf.keras.layers.Flatten(input_shape=(28, 28)))\nweight_initializer = tf.keras.initializers.RandomNormal(mean=0.0, stddev=0.01)\nnet.add(tf.keras.layers.Dense(10, kernel_initializer=weight_initializer))"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "trien-khai-softmax-revisited",
+      "text": "3.7.2. Triển khai Softmax Revisited"
+    },
+    {
+      "type": "paragraph",
+      "text": "Trong ví dụ trước của Section 3.6 , chúng tôi đã tính\ntoán đầu ra của mô hình và sau đó chạy đầu ra này thông qua tổn thất\nngẫu nhiên chéo. Về mặt toán học, đó là một điều hoàn toàn hợp lý để\nlàm. Tuy nhiên, từ góc độ tính toán, số mũ có thể là một nguồn của các\nvấn đề ổn định số."
+    },
+    {
+      "type": "paragraph",
+      "text": "Nhớ lại rằng hàm softmax tính toán \\(\\hat y_j = \\frac{\\exp(o_j)}{\\sum_k \\exp(o_k)}\\) , trong đó \\(\\hat y_j\\) là phần tử \\(j^\\mathrm{th}\\) của phân phối xác suất\ndự đoán \\(\\hat{\\mathbf{y}}\\) và \\(o_j\\) là phần tử \\(j^\\mathrm{th}\\) của logits \\(\\mathbf{o}\\) . Nếu một số \\(o_k\\) rất lớn (tức là rất tích cực), thì \\(\\exp(o_k)\\) có thể\nlớn hơn số lớn nhất chúng ta có thể có cho một số loại dữ liệu nhất định\n(tức là * đầu*). Điều này sẽ làm cho mẫu số (và/hoặc tử số) inf (vô cùng) và chúng tôi gặp phải 0, inf hoặc nan (không phải là\nmột số) cho \\(\\hat y_j\\) . Trong những tình huống này, chúng ta không\nnhận được giá trị trả về được xác định rõ cho cross-entropy."
+    },
+    {
+      "type": "paragraph",
+      "text": "Một mẹo để giải quyết vấn đề này là lần đầu tiên trừ \\(\\max(o_k)\\) khỏi tất cả \\(o_k\\) trước khi tiến hành tính toán softmax. Bạn có\nthể thấy rằng sự dịch chuyển này của mỗi \\(o_k\\) theo hệ số không\nđổi không thay đổi giá trị trả về của softmax:"
+    },
+    {
+      "type": "math",
+      "latex": "(3.7.1)¶\\[\\begin{split}\\begin{aligned}\n\\hat y_j & =  \\frac{\\exp(o_j - \\max(o_k))\\exp(\\max(o_k))}{\\sum_k \\exp(o_k - \\max(o_k))\\exp(\\max(o_k))} \\\\\n& = \\frac{\\exp(o_j - \\max(o_k))}{\\sum_k \\exp(o_k - \\max(o_k))}.\n\\end{aligned}\\end{split}\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Sau bước trừ và bình thường hóa, có thể một số \\(o_j - \\max(o_k)\\) có giá trị âm lớn và do đó \\(\\exp(o_j - \\max(o_k))\\) tương ứng sẽ\nlấy giá trị gần bằng 0. Chúng có thể được làm tròn thành 0 do độ chính\nxác hữu hạn (ví dụ: * underflow*), làm cho \\(\\hat y_j\\) không và\ncho chúng tôi -inf cho \\(\\log(\\hat y_j)\\) . Một vài bước xuống\ncon đường trong backpropagation, chúng ta có thể thấy mình phải đối mặt\nvới một màn hình của đáng sợ nan kết quả."
+    },
+    {
+      "type": "paragraph",
+      "text": "May mắn thay, chúng tôi được lưu bởi thực tế là mặc dù chúng tôi đang\ntính toán các hàm mũ, cuối cùng chúng tôi có ý định lấy nhật ký của\nchúng (khi tính toán mất chéo entropy). Bằng cách kết hợp hai toán tử\nsoftmax và cross-entropy với nhau, chúng ta có thể thoát khỏi các vấn đề\nổn định số mà nếu không có thể gây ra chúng ta trong quá trình truyền\nngược. Như thể hiện trong phương trình dưới đây, chúng ta tránh tính\ntoán \\(\\exp(o_j - \\max(o_k))\\) và có thể sử dụng thay thế \\(o_j - \\max(o_k)\\) trực tiếp do việc hủy bỏ trong \\(\\log(\\exp(\\cdot))\\) :"
+    },
+    {
+      "type": "math",
+      "latex": "(3.7.2)¶\\[\\begin{split}\\begin{aligned}\n\\log{(\\hat y_j)} & = \\log\\left( \\frac{\\exp(o_j - \\max(o_k))}{\\sum_k \\exp(o_k - \\max(o_k))}\\right) \\\\\n& = \\log{(\\exp(o_j - \\max(o_k)))}-\\log{\\left( \\sum_k \\exp(o_k - \\max(o_k)) \\right)} \\\\\n& = o_j - \\max(o_k) -\\log{\\left( \\sum_k \\exp(o_k - \\max(o_k)) \\right)}.\n\\end{aligned}\\end{split}\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Chúng tôi sẽ muốn giữ chức năng softmax thông thường tiện dụng trong\ntrường hợp chúng tôi muốn đánh giá xác suất đầu ra theo mô hình của\nchúng tôi. Nhưng thay vì truyền xác suất softmax vào chức năng mất mát\nmới của chúng ta, chúng ta sẽ chỉ vượt qua các logits và tính toán\nsoftmax và nhật ký của nó cùng một lúc bên trong hàm loss cross-entropy,\nmà thực hiện những điều thông minh như “LogSumExp\ntrick” ."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "loss = gluon.loss.SoftmaxCrossEntropyLoss()"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "loss = nn.CrossEntropyLoss(reduction='none')"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "loss = tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True)"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "thuat-toan-toi-uu-hoa",
+      "text": "3.7.3. Thuật toán tối ưu hóa"
+    },
+    {
+      "type": "paragraph",
+      "text": "Ở đây, chúng ta sử dụng minibatch stochastic gradient descent với tốc độ\nhọc tập là 0.1 làm thuật toán tối ưu hóa. Lưu ý rằng điều này giống như\nchúng ta đã áp dụng trong ví dụ hồi quy tuyến tính và nó minh họa khả\nnăng ứng dụng chung của các trình tối ưu hóa."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "trainer = gluon.Trainer(net.collect_params(), 'sgd', {'learning_rate': 0.1})"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "trainer = torch.optim.SGD(net.parameters(), lr=0.1)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "trainer = tf.keras.optimizers.SGD(learning_rate=.1)"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "dao-tao",
+      "text": "3.7.4. Đào tạo"
+    },
+    {
+      "type": "paragraph",
+      "text": "Tiếp theo chúng ta [ gọi hàm đào tạo ] trong Section 3.6 để đào tạo mô hình."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "num_epochs = 10\nd2l.train_ch3(net, train_iter, test_iter, loss, num_epochs, trainer)"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_softmax-regression-concise_75d138_51_0.svg",
+      "local_path": "_images/output_softmax-regression-concise_75d138_51_0.svg",
+      "alt": "../_images/output_softmax-regression-concise_75d138_51_0.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "num_epochs = 10\nd2l.train_ch3(net, train_iter, test_iter, loss, num_epochs, trainer)"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_softmax-regression-concise_75d138_54_0.svg",
+      "local_path": "_images/output_softmax-regression-concise_75d138_54_0.svg",
+      "alt": "../_images/output_softmax-regression-concise_75d138_54_0.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "num_epochs = 10\nd2l.train_ch3(net, train_iter, test_iter, loss, num_epochs, trainer)"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_softmax-regression-concise_75d138_57_0.svg",
+      "local_path": "_images/output_softmax-regression-concise_75d138_57_0.svg",
+      "alt": "../_images/output_softmax-regression-concise_75d138_57_0.svg"
+    },
+    {
+      "type": "paragraph",
+      "text": "Như trước đây, thuật toán này hội tụ thành một giải pháp đạt được độ\nchính xác khá, mặc dù lần này với ít dòng mã hơn trước."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tom-tat",
+      "text": "3.7.5. Tóm tắt"
+    },
+    {
+      "type": "list",
+      "ordered": false,
+      "items": [
+        "Sử dụng API cấp cao, chúng ta có thể thực hiện hồi quy softmax chính\nxác hơn nhiều.",
+        "Từ góc độ tính toán, việc thực hiện hồi quy softmax có những phức\ntạp. Lưu ý rằng trong nhiều trường hợp, một khuôn khổ học sâu thực\nhiện các biện pháp phòng ngừa bổ sung ngoài các thủ thuật nổi tiếng\nnhất này để đảm bảo sự ổn định về số, cứu chúng ta khỏi những cạm bẫy\nhơn nữa mà chúng ta sẽ gặp phải nếu chúng ta cố gắng mã hóa tất cả\ncác mô hình của mình từ đầu trong thực tế."
+      ]
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bai-tap",
+      "text": "3.7.6. Bài tập"
+    },
+    {
+      "type": "list",
+      "ordered": true,
+      "items": [
+        "Hãy thử điều chỉnh các siêu tham số, chẳng hạn như kích thước lô, số\nkỷ nguyên và tốc độ học tập, để xem kết quả là gì.",
+        "Tăng số lượng kỷ nguyên để đào tạo. Tại sao độ chính xác thử nghiệm\ncó thể giảm sau một thời gian? Làm thế nào chúng ta có thể sửa chữa\nđiều này?"
+      ]
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    }
+  ],
+  "images": [
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_softmax-regression-concise_75d138_51_0.svg",
+      "local_path": "_images/output_softmax-regression-concise_75d138_51_0.svg",
+      "alt": "../_images/output_softmax-regression-concise_75d138_51_0.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_softmax-regression-concise_75d138_54_0.svg",
+      "local_path": "_images/output_softmax-regression-concise_75d138_54_0.svg",
+      "alt": "../_images/output_softmax-regression-concise_75d138_54_0.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_softmax-regression-concise_75d138_57_0.svg",
+      "local_path": "_images/output_softmax-regression-concise_75d138_57_0.svg",
+      "alt": "../_images/output_softmax-regression-concise_75d138_57_0.svg"
+    }
+  ],
+  "text": "3.7. Thực hiện ngắn gọn về hồi quy Softmax\nCũng giống như APIs cấp cao của các khuôn khổ học sâu làm cho nó dễ dàng\nhơn nhiều để thực hiện hồi quy tuyến tính trong Section 3.3 , chúng tôi sẽ tìm thấy nó tương tự (hoặc\ncó thể nhiều hơn) thuận tiện cho việc thực hiện các mô hình phân loại.\nHãy để chúng tôi gắn bó với tập dữ liệu Fashion-MNIST và giữ kích thước\nlô ở mức 256 như trong Section 3.6 .\n3.7.1. Khởi tạo các tham số mô hình\nNhư đã đề cập trong Section 3.4 , lớp đầu ra của hồi quy\nsoftmax là một lớp kết nối đầy đủ Do đó, để thực hiện mô hình của chúng\ntôi, chúng ta chỉ cần thêm một lớp kết nối hoàn toàn với 10 đầu ra vào Sequential của chúng tôi. Một lần nữa, ở đây, Sequential không\nthực sự cần thiết, nhưng chúng ta cũng có thể hình thành thói quen vì nó\nsẽ phổ biến khi thực hiện các mô hình sâu. Một lần nữa, chúng tôi khởi\ntạo các trọng lượng một cách ngẫu nhiên với 0 trung bình và độ lệch\nchuẩn 0,01.\n3.7.2. Triển khai Softmax Revisited\nTrong ví dụ trước của Section 3.6 , chúng tôi đã tính\ntoán đầu ra của mô hình và sau đó chạy đầu ra này thông qua tổn thất\nngẫu nhiên chéo. Về mặt toán học, đó là một điều hoàn toàn hợp lý để\nlàm. Tuy nhiên, từ góc độ tính toán, số mũ có thể là một nguồn của các\nvấn đề ổn định số.\nNhớ lại rằng hàm softmax tính toán \\(\\hat y_j = \\frac{\\exp(o_j)}{\\sum_k \\exp(o_k)}\\) , trong đó \\(\\hat y_j\\) là phần tử \\(j^\\mathrm{th}\\) của phân phối xác suất\ndự đoán \\(\\hat{\\mathbf{y}}\\) và \\(o_j\\) là phần tử \\(j^\\mathrm{th}\\) của logits \\(\\mathbf{o}\\) . Nếu một số \\(o_k\\) rất lớn (tức là rất tích cực), thì \\(\\exp(o_k)\\) có thể\nlớn hơn số lớn nhất chúng ta có thể có cho một số loại dữ liệu nhất định\n(tức là * đầu*). Điều này sẽ làm cho mẫu số (và/hoặc tử số) inf (vô cùng) và chúng tôi gặp phải 0, inf hoặc nan (không phải là\nmột số) cho \\(\\hat y_j\\) . Trong những tình huống này, chúng ta không\nnhận được giá trị trả về được xác định rõ cho cross-entropy.\nMột mẹo để giải quyết vấn đề này là lần đầu tiên trừ \\(\\max(o_k)\\) khỏi tất cả \\(o_k\\) trước khi tiến hành tính toán softmax. Bạn có\nthể thấy rằng sự dịch chuyển này của mỗi \\(o_k\\) theo hệ số không\nđổi không thay đổi giá trị trả về của softmax:\nSau bước trừ và bình thường hóa, có thể một số \\(o_j - \\max(o_k)\\) có giá trị âm lớn và do đó \\(\\exp(o_j - \\max(o_k))\\) tương ứng sẽ\nlấy giá trị gần bằng 0. Chúng có thể được làm tròn thành 0 do độ chính\nxác hữu hạn (ví dụ: * underflow*), làm cho \\(\\hat y_j\\) không và\ncho chúng tôi -inf cho \\(\\log(\\hat y_j)\\) . Một vài bước xuống\ncon đường trong backpropagation, chúng ta có thể thấy mình phải đối mặt\nvới một màn hình của đáng sợ nan kết quả.\nMay mắn thay, chúng tôi được lưu bởi thực tế là mặc dù chúng tôi đang\ntính toán các hàm mũ, cuối cùng chúng tôi có ý định lấy nhật ký của\nchúng (khi tính toán mất chéo entropy). Bằng cách kết hợp hai toán tử\nsoftmax và cross-entropy với nhau, chúng ta có thể thoát khỏi các vấn đề\nổn định số mà nếu không có thể gây ra chúng ta trong quá trình truyền\nngược. Như thể hiện trong phương trình dưới đây, chúng ta tránh tính\ntoán \\(\\exp(o_j - \\max(o_k))\\) và có thể sử dụng thay thế \\(o_j - \\max(o_k)\\) trực tiếp do việc hủy bỏ trong \\(\\log(\\exp(\\cdot))\\) :\nChúng tôi sẽ muốn giữ chức năng softmax thông thường tiện dụng trong\ntrường hợp chúng tôi muốn đánh giá xác suất đầu ra theo mô hình của\nchúng tôi. Nhưng thay vì truyền xác suất softmax vào chức năng mất mát\nmới của chúng ta, chúng ta sẽ chỉ vượt qua các logits và tính toán\nsoftmax và nhật ký của nó cùng một lúc bên trong hàm loss cross-entropy,\nmà thực hiện những điều thông minh như “LogSumExp\ntrick” .\n3.7.3. Thuật toán tối ưu hóa\nỞ đây, chúng ta sử dụng minibatch stochastic gradient descent với tốc độ\nhọc tập là 0.1 làm thuật toán tối ưu hóa. Lưu ý rằng điều này giống như\nchúng ta đã áp dụng trong ví dụ hồi quy tuyến tính và nó minh họa khả\nnăng ứng dụng chung của các trình tối ưu hóa.\n3.7.4. Đào tạo\nTiếp theo chúng ta [ gọi hàm đào tạo ] trong Section 3.6 để đào tạo mô hình.\nNhư trước đây, thuật toán này hội tụ thành một giải pháp đạt được độ\nchính xác khá, mặc dù lần này với ít dòng mã hơn trước.\n3.7.5. Tóm tắt\nSử dụng API cấp cao, chúng ta có thể thực hiện hồi quy softmax chính\nxác hơn nhiều.\nTừ góc độ tính toán, việc thực hiện hồi quy softmax có những phức\ntạp. Lưu ý rằng trong nhiều trường hợp, một khuôn khổ học sâu thực\nhiện các biện pháp phòng ngừa bổ sung ngoài các thủ thuật nổi tiếng\nnhất này để đảm bảo sự ổn định về số, cứu chúng ta khỏi những cạm bẫy\nhơn nữa mà chúng ta sẽ gặp phải nếu chúng ta cố gắng mã hóa tất cả\ncác mô hình của mình từ đầu trong thực tế.\n3.7.6. Bài tập\nHãy thử điều chỉnh các siêu tham số, chẳng hạn như kích thước lô, số\nkỷ nguyên và tốc độ học tập, để xem kết quả là gì.\nTăng số lượng kỷ nguyên để đào tạo. Tại sao độ chính xác thử nghiệm\ncó thể giảm sau một thời gian? Làm thế nào chúng ta có thể sửa chữa\nđiều này?\nDiscussions\nDiscussions\nDiscussions"
+}

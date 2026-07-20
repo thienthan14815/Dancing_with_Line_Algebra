@@ -68,6 +68,32 @@ export const SKILLS: Skill[] = [
   { id: 'definiteness', name: 'Xác định dấu (Definiteness)' },
   { id: 'spectral_theorem', name: 'Định lý phổ (Spectral theorem)' },
   { id: 'conic_sections', name: 'Đường & mặt bậc hai (Conics & quadrics)' },
+
+  // Ch10 — Học máy & Hồi quy
+  { id: 'linear_regression_ml', name: 'Hồi quy tuyến tính (Linear regression)' },
+  { id: 'gradient_descent', name: 'Hạ gradient (Gradient descent)' },
+  { id: 'softmax_regression', name: 'Hồi quy Softmax (Softmax regression)' },
+  { id: 'generalization', name: 'Tổng quát hóa & Điều chuẩn (Generalization & regularization)' },
+
+  // Ch11 — Mạng nơ-ron
+  { id: 'neuron', name: 'Nơ-ron nhân tạo (Artificial neuron)' },
+  { id: 'mlp', name: 'Perceptron nhiều lớp (Multilayer perceptron)' },
+  { id: 'forward_prop', name: 'Lan truyền xuôi (Forward propagation)' },
+  { id: 'backprop', name: 'Lan truyền ngược (Backpropagation)' },
+  { id: 'activation_functions', name: 'Hàm kích hoạt (Activation functions)' },
+
+  // Ch12 — Học sâu hiện đại
+  { id: 'cnn', name: 'Mạng tích chập (Convolutional neural network)' },
+  { id: 'rnn', name: 'Mạng hồi tiếp (Recurrent neural network)' },
+  { id: 'attention', name: 'Cơ chế chú ý (Attention mechanism)' },
+  { id: 'transformer', name: 'Transformer' },
+  { id: 'word_embedding', name: 'Nhúng từ (Word embedding)' },
+
+  // Ch13 — Tối ưu & Ứng dụng
+  { id: 'sgd_optimizers', name: 'SGD, Momentum, Adam (Optimizers)' },
+  { id: 'batch_norm', name: 'Chuẩn hóa theo batch & khởi tạo (Batch norm & init)' },
+  { id: 'computer_vision', name: 'Thị giác máy tính (Computer vision)' },
+  { id: 'nlp_lm', name: 'NLP & mô hình ngôn ngữ (NLP & language models)' },
 ];
 
 /** Tra cứu nhanh skill theo id. */

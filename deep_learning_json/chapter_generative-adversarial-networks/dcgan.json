@@ -1,0 +1,650 @@
+{
+  "url": "https://vi.d2l.ai/chapter_generative-adversarial-networks/dcgan.html",
+  "chapter": "chapter_generative-adversarial-networks",
+  "title": "17.2. Mạng đối thủ tạo phức tạp sâu",
+  "crawled_at": "2026-07-20T12:41:20.662385+00:00",
+  "headings": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "mang-doi-thu-tao-phuc-tap-sau",
+      "text": "17.2. Mạng đối thủ tạo phức tạp sâu"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "cac-pokemon-dataset",
+      "text": "17.2.1. Các Pokemon Dataset"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "cac-may-phat-dien",
+      "text": "17.2.2. Các máy phát điện"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "phan-biet-doi-xu",
+      "text": "17.2.3. Phân biệt đối xử"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "dao-tao",
+      "text": "17.2.4. Đào tạo"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tom-tat",
+      "text": "17.2.5. Tóm tắt"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bai-tap",
+      "text": "17.2.6. Bài tập"
+    }
+  ],
+  "content": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "mang-doi-thu-tao-phuc-tap-sau",
+      "text": "17.2. Mạng đối thủ tạo phức tạp sâu"
+    },
+    {
+      "type": "paragraph",
+      "text": "Trong Section 17.1 , chúng tôi đã giới thiệu những ý tưởng\ncơ bản đằng sau cách GAN hoạt động. Chúng tôi đã chỉ ra rằng chúng có\nthể vẽ các mẫu từ một số phân phối đơn giản, dễ lấy mẫu, như phân phối\nthống nhất hoặc bình thường, và biến đổi chúng thành các mẫu dường như\nphù hợp với sự phân bố của một số tập dữ liệu. Và trong khi ví dụ của\nchúng tôi về việc phù hợp với phân phối 2D Gaussian đã vượt qua điểm, nó\nkhông đặc biệt thú vị."
+    },
+    {
+      "type": "paragraph",
+      "text": "Trong phần này, chúng tôi sẽ chứng minh cách bạn có thể sử dụng GAN để\ntạo ra hình ảnh thực tế. Chúng tôi sẽ dựa trên các mô hình của chúng tôi\ntrên GAN phức tạp sâu (DCGAN) được giới thiệu trong [Radford et al., 2015] . Chúng tôi sẽ mượn kiến trúc phức\ntạp đã chứng minh thành công cho các vấn đề thị giác máy tính phân biệt\nđối xử và cho thấy cách thông qua GAN, chúng có thể được tận dụng để tạo\nra hình ảnh thực tế."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "from mxnet import gluon, init, np, npx\nfrom mxnet.gluon import nn\nfrom d2l import mxnet as d2l\n\nnpx.set_np()"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "import warnings\nimport torch\nimport torchvision\nfrom torch import nn\nfrom d2l import torch as d2l"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "import tensorflow as tf\nfrom d2l import tensorflow as d2l"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "cac-pokemon-dataset",
+      "text": "17.2.1. Các Pokemon Dataset"
+    },
+    {
+      "type": "paragraph",
+      "text": "Tập dữ liệu chúng tôi sẽ sử dụng là một bộ sưu tập các sprites Pokemon\nthu được từ pokemondb . Đầu tiên tải\nxuống, trích xuất và tải tập dữ liệu này."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "#@save\nd2l.DATA_HUB['pokemon'] = (d2l.DATA_URL + 'pokemon.zip',\n                           'c065c0e2593b8b161a2d7873e42418bf6a21106c')\n\ndata_dir = d2l.download_extract('pokemon')\npokemon = gluon.data.vision.datasets.ImageFolderDataset(data_dir)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "Downloading ../data/pokemon.zip from http://d2l-data.s3-accelerate.amazonaws.com/pokemon.zip..."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "#@save\nd2l.DATA_HUB['pokemon'] = (d2l.DATA_URL + 'pokemon.zip',\n                           'c065c0e2593b8b161a2d7873e42418bf6a21106c')\n\ndata_dir = d2l.download_extract('pokemon')\npokemon = torchvision.datasets.ImageFolder(data_dir)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "Downloading ../data/pokemon.zip from http://d2l-data.s3-accelerate.amazonaws.com/pokemon.zip..."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "#@save\nd2l.DATA_HUB['pokemon'] = (d2l.DATA_URL + 'pokemon.zip',\n                           'c065c0e2593b8b161a2d7873e42418bf6a21106c')\n\ndata_dir = d2l.download_extract('pokemon')\nbatch_size = 256\npokemon = tf.keras.preprocessing.image_dataset_from_directory(\n    data_dir, batch_size=batch_size, image_size=(64, 64))"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "Downloading ../data/pokemon.zip from http://d2l-data.s3-accelerate.amazonaws.com/pokemon.zip...\nFound 40597 files belonging to 721 classes."
+    },
+    {
+      "type": "paragraph",
+      "text": "Chúng tôi thay đổi kích thước mỗi hình ảnh thành \\(64\\times 64\\) .\nViệc chuyển đổi ToTensor sẽ chiếu giá trị pixel thành \\([0, 1]\\) , trong khi trình tạo của chúng tôi sẽ sử dụng hàm tánh để\ncó được đầu ra trong \\([-1, 1]\\) . Do đó, chúng tôi bình thường hóa\ndữ liệu với \\(0.5\\) trung bình và độ lệch chuẩn \\(0.5\\) để phù\nhợp với phạm vi giá trị."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "batch_size = 256\ntransformer = gluon.data.vision.transforms.Compose([\n    gluon.data.vision.transforms.Resize(64),\n    gluon.data.vision.transforms.ToTensor(),\n    gluon.data.vision.transforms.Normalize(0.5, 0.5)\n])\ndata_iter = gluon.data.DataLoader(\n    pokemon.transform_first(transformer), batch_size=batch_size,\n    shuffle=True, num_workers=d2l.get_dataloader_workers())"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "batch_size = 256\ntransformer = torchvision.transforms.Compose([\n    torchvision.transforms.Resize((64, 64)),\n    torchvision.transforms.ToTensor(),\n    torchvision.transforms.Normalize(0.5, 0.5)\n])\npokemon.transform = transformer\ndata_iter = torch.utils.data.DataLoader(\n    pokemon, batch_size=batch_size,\n    shuffle=True, num_workers=d2l.get_dataloader_workers())"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def transform_func(X):\n    X = X / 255.\n    X = (X - 0.5) / (0.5)\n    return X\n\n# For TF>=2.4 use `num_parallel_calls = tf.data.AUTOTUNE`\ndata_iter = pokemon.map(lambda x, y: (transform_func(x), y),\n                        num_parallel_calls=tf.data.experimental.AUTOTUNE)\ndata_iter = data_iter.cache().shuffle(buffer_size=1000).prefetch(\n    buffer_size=tf.data.experimental.AUTOTUNE)"
+    },
+    {
+      "type": "paragraph",
+      "text": "Hãy để chúng tôi hình dung 20 hình ảnh đầu tiên."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "d2l.set_figsize((4, 4))\nfor X, y in data_iter:\n    imgs = X[0:20,:,:,:].transpose(0, 2, 3, 1)/2+0.5\n    d2l.show_images(imgs, num_rows=4, num_cols=5)\n    break"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_dcgan_2541de_39_0.svg",
+      "local_path": "_images/output_dcgan_2541de_39_0.svg",
+      "alt": "../_images/output_dcgan_2541de_39_0.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "warnings.filterwarnings('ignore')\nd2l.set_figsize((4, 4))\nfor X, y in data_iter:\n    imgs = X[0:20,:,:,:].permute(0, 2, 3, 1)/2+0.5\n    d2l.show_images(imgs, num_rows=4, num_cols=5)\n    break"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_dcgan_2541de_42_0.svg",
+      "local_path": "_images/output_dcgan_2541de_42_0.svg",
+      "alt": "../_images/output_dcgan_2541de_42_0.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "d2l.set_figsize(figsize=(4, 4))\nfor X, y in data_iter.take(1):\n    imgs = X[:20, :, :, :] / 2 + 0.5\n    d2l.show_images(imgs, num_rows=4, num_cols=5)"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_dcgan_2541de_45_0.svg",
+      "local_path": "_images/output_dcgan_2541de_45_0.svg",
+      "alt": "../_images/output_dcgan_2541de_45_0.svg"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "cac-may-phat-dien",
+      "text": "17.2.2. Các máy phát điện"
+    },
+    {
+      "type": "paragraph",
+      "text": "Máy phát điện cần ánh xạ biến nhiễu \\(\\mathbf z\\in\\mathbb R^d\\) , một\nvector chiều dài- \\(d\\) , đến một hình ảnh RGB với chiều rộng và\nchiều cao là \\(64\\times 64\\) . Trong Section 13.11 , chúng tôi\nđã giới thiệu mạng phức tạp hoàn toàn sử dụng lớp ghép chuyển tiếp (tham\nkhảo Section 13.10 ) để phóng to kích thước đầu vào.\nKhối cơ bản của máy phát điện chứa một lớp phức tạp chuyển tiếp theo là\nchuẩn hóa hàng loạt và kích hoạt ReLU."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "class G_block(nn.Block):\n    def __init__(self, channels, kernel_size=4,\n                 strides=2, padding=1, **kwargs):\n        super(G_block, self).__init__(**kwargs)\n        self.conv2d_trans = nn.Conv2DTranspose(\n            channels, kernel_size, strides, padding, use_bias=False)\n        self.batch_norm = nn.BatchNorm()\n        self.activation = nn.Activation('relu')\n\n    def forward(self, X):\n        return self.activation(self.batch_norm(self.conv2d_trans(X)))"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "class G_block(nn.Module):\n    def __init__(self, out_channels, in_channels=3, kernel_size=4, strides=2,\n                 padding=1, **kwargs):\n        super(G_block, self).__init__(**kwargs)\n        self.conv2d_trans = nn.ConvTranspose2d(in_channels, out_channels,\n                                kernel_size, strides, padding, bias=False)\n        self.batch_norm = nn.BatchNorm2d(out_channels)\n        self.activation = nn.ReLU()\n\n    def forward(self, X):\n        return self.activation(self.batch_norm(self.conv2d_trans(X)))"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "class G_block(tf.keras.layers.Layer):\n    def __init__(self, out_channels, kernel_size=4, strides=2, padding=\"same\",\n                 **kwargs):\n        super().__init__(**kwargs)\n        self.conv2d_trans = tf.keras.layers.Conv2DTranspose(\n            out_channels, kernel_size, strides, padding, use_bias=False)\n        self.batch_norm = tf.keras.layers.BatchNormalization()\n        self.activation = tf.keras.layers.ReLU()\n\n    def call(self, X):\n        return self.activation(self.batch_norm(self.conv2d_trans(X)))"
+    },
+    {
+      "type": "paragraph",
+      "text": "Mặc định, lớp ghép chuyển tiếp sử dụng hạt nhân \\(k_h = k_w = 4\\) ,\nmột bước tiến \\(s_h = s_w = 2\\) và đệm \\(p_h = p_w = 1\\) . Với\nhình dạng đầu vào là \\(n_h^{'} \\times n_w^{'} = 16 \\times 16\\) , khối\nmáy phát sẽ tăng gấp đôi chiều rộng và chiều cao của đầu vào."
+    },
+    {
+      "type": "math",
+      "latex": "(17.2.1)¶\\[\\begin{split}\\begin{aligned}\nn_h^{'} \\times n_w^{'} &= [(n_h k_h - (n_h-1)(k_h-s_h)- 2p_h] \\times [(n_w k_w - (n_w-1)(k_w-s_w)- 2p_w]\\\\\n  &= [(k_h + s_h (n_h-1)- 2p_h] \\times [(k_w + s_w (n_w-1)- 2p_w]\\\\\n  &= [(4 + 2 \\times (16-1)- 2 \\times 1] \\times [(4 + 2 \\times (16-1)- 2 \\times 1]\\\\\n  &= 32 \\times 32 .\\\\\n\\end{aligned}\\end{split}\\]"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "x = np.zeros((2, 3, 16, 16))\ng_blk = G_block(20)\ng_blk.initialize()\ng_blk(x).shape"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "(2, 20, 32, 32)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "x = torch.zeros((2, 3, 16, 16))\ng_blk = G_block(20)\ng_blk(x).shape"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "torch.Size([2, 20, 32, 32])"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "x = tf.zeros((2, 16, 16, 3))  # Channel last convention\ng_blk = G_block(20)\ng_blk(x).shape"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "TensorShape([2, 32, 32, 20])"
+    },
+    {
+      "type": "paragraph",
+      "text": "Nếu thay đổi lớp phức tạp chuyển tiếp thành hạt nhân \\(4\\times 4\\) , \\(1\\times 1\\) sải bước và không đệm. Với kích thước đầu vào là \\(1 \\times 1\\) , đầu ra sẽ có chiều rộng và chiều cao của nó tăng 3\nlần lượt."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "x = np.zeros((2, 3, 1, 1))\ng_blk = G_block(20, strides=1, padding=0)\ng_blk.initialize()\ng_blk(x).shape"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "(2, 20, 4, 4)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "x = torch.zeros((2, 3, 1, 1))\ng_blk = G_block(20, strides=1, padding=0)\ng_blk(x).shape"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "torch.Size([2, 20, 4, 4])"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "x = tf.zeros((2, 1, 1, 3))\n# `padding=\"valid\"` corresponds to no padding\ng_blk = G_block(20, strides=1, padding=\"valid\")\ng_blk(x).shape"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "TensorShape([2, 4, 4, 20])"
+    },
+    {
+      "type": "paragraph",
+      "text": "Máy phát điện bao gồm bốn khối cơ bản giúp tăng cả chiều rộng và chiều\ncao đầu vào từ 1 lên 32. Đồng thời, đầu tiên nó chiếu biến tiềm ẩn thành \\(64\\times 8\\) kênh, sau đó giảm một nửa các kênh mỗi lần. Cuối\ncùng, một lớp covolution được chuyển đổi được sử dụng để tạo ra đầu ra.\nNó tiếp tục tăng gấp đôi chiều rộng và chiều cao để phù hợp với hình\ndạng \\(64\\times 64\\) mong muốn và giảm kích thước kênh xuống \\(3\\) . Hàm kích hoạt tanh được áp dụng cho các giá trị đầu ra dự án\nvào phạm vi \\((-1, 1)\\) ."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "n_G = 64\nnet_G = nn.Sequential()\nnet_G.add(G_block(n_G*8, strides=1, padding=0),  # Output: (64 * 8, 4, 4)\n          G_block(n_G*4),  # Output: (64 * 4, 8, 8)\n          G_block(n_G*2),  # Output: (64 * 2, 16, 16)\n          G_block(n_G),    # Output: (64, 32, 32)\n          nn.Conv2DTranspose(\n              3, kernel_size=4, strides=2, padding=1, use_bias=False,\n              activation='tanh'))  # Output: (3, 64, 64)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "n_G = 64\nnet_G = nn.Sequential(\n    G_block(in_channels=100, out_channels=n_G*8,\n            strides=1, padding=0),                  # Output: (64 * 8, 4, 4)\n    G_block(in_channels=n_G*8, out_channels=n_G*4), # Output: (64 * 4, 8, 8)\n    G_block(in_channels=n_G*4, out_channels=n_G*2), # Output: (64 * 2, 16, 16)\n    G_block(in_channels=n_G*2, out_channels=n_G),   # Output: (64, 32, 32)\n    nn.ConvTranspose2d(in_channels=n_G, out_channels=3,\n                       kernel_size=4, stride=2, padding=1, bias=False),\n    nn.Tanh())  # Output: (3, 64, 64)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "n_G = 64\nnet_G = tf.keras.Sequential([\n    # Output: (4, 4, 64 * 8)\n    G_block(out_channels=n_G*8, strides=1, padding=\"valid\"),\n    G_block(out_channels=n_G*4), # Output: (8, 8, 64 * 4)\n    G_block(out_channels=n_G*2), # Output: (16, 16, 64 * 2)\n    G_block(out_channels=n_G), # Output: (32, 32, 64)\n    # Output: (64, 64, 3)\n    tf.keras.layers.Conv2DTranspose(\n        3, kernel_size=4, strides=2, padding=\"same\", use_bias=False,\n        activation=\"tanh\")\n])"
+    },
+    {
+      "type": "paragraph",
+      "text": "Tạo ra một biến tiềm ẩn 100 chiều để xác minh hình dạng đầu ra của máy\nphát điện."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "x = np.zeros((1, 100, 1, 1))\nnet_G.initialize()\nnet_G(x).shape"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "(1, 3, 64, 64)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "x = torch.zeros((1, 100, 1, 1))\nnet_G(x).shape"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "torch.Size([1, 3, 64, 64])"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "x = tf.zeros((1, 1, 1, 100))\nnet_G(x).shape"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "TensorShape([1, 64, 64, 3])"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "phan-biet-doi-xu",
+      "text": "17.2.3. Phân biệt đối xử"
+    },
+    {
+      "type": "paragraph",
+      "text": "Người phân biệt đối xử là một mạng mạng phức tạp bình thường ngoại trừ\nviệc nó sử dụng ReLU bị rò rỉ làm chức năng kích hoạt của nó. Đưa ra \\(\\alpha \\in[0, 1]\\) , định nghĩa của nó là"
+    },
+    {
+      "type": "math",
+      "latex": "(17.2.2)¶\\[\\begin{split}\\textrm{leaky ReLU}(x) = \\begin{cases}x & \\text{if}\\ x > 0\\\\ \\alpha x &\\text{otherwise}\\end{cases}.\\end{split}\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Như có thể thấy, nó là bình thường ReLU nếu \\(\\alpha=0\\) , và một\nchức năng nhận dạng nếu \\(\\alpha=1\\) . Đối với \\(\\alpha \\in (0, 1)\\) , ReLU bị rò rỉ là một hàm phi tuyến cung cấp\nđầu ra không phải bằng không cho đầu vào âm. Nó nhằm mục đích khắc phục\nvấn đề ReLU đang chết mà một tế bào thần kinh luôn có thể tạo ra một giá\ntrị âm và do đó không thể thực hiện bất kỳ tiến bộ nào vì gradient của\nReLU là 0."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "alphas = [0, .2, .4, .6, .8, 1]\nx = np.arange(-2, 1, 0.1)\nY = [nn.LeakyReLU(alpha)(x).asnumpy() for alpha in alphas]\nd2l.plot(x.asnumpy(), Y, 'x', 'y', alphas)"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_dcgan_2541de_111_0.svg",
+      "local_path": "_images/output_dcgan_2541de_111_0.svg",
+      "alt": "../_images/output_dcgan_2541de_111_0.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "alphas = [0, .2, .4, .6, .8, 1]\nx = torch.arange(-2, 1, 0.1)\nY = [nn.LeakyReLU(alpha)(x).detach().numpy() for alpha in alphas]\nd2l.plot(x.detach().numpy(), Y, 'x', 'y', alphas)"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_dcgan_2541de_114_0.svg",
+      "local_path": "_images/output_dcgan_2541de_114_0.svg",
+      "alt": "../_images/output_dcgan_2541de_114_0.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "alphas = [0, .2, .4, .6, .8, 1]\nx = tf.range(-2, 1, 0.1)\nY = [tf.keras.layers.LeakyReLU(alpha)(x).numpy() for alpha in alphas]\nd2l.plot(x.numpy(), Y, 'x', 'y', alphas)"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_dcgan_2541de_117_0.svg",
+      "local_path": "_images/output_dcgan_2541de_117_0.svg",
+      "alt": "../_images/output_dcgan_2541de_117_0.svg"
+    },
+    {
+      "type": "paragraph",
+      "text": "Khối cơ bản của phân biệt đối xử là một lớp phức tạp tiếp theo là một\nlớp chuẩn hóa hàng loạt và kích hoạt ReLU bị rò rỉ. Các siêu tham số của\nlớp covolution tương tự như lớp covolution transpose trong khối máy\nphát."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "class D_block(nn.Block):\n    def __init__(self, channels, kernel_size=4, strides=2,\n                 padding=1, alpha=0.2, **kwargs):\n        super(D_block, self).__init__(**kwargs)\n        self.conv2d = nn.Conv2D(\n            channels, kernel_size, strides, padding, use_bias=False)\n        self.batch_norm = nn.BatchNorm()\n        self.activation = nn.LeakyReLU(alpha)\n\n    def forward(self, X):\n        return self.activation(self.batch_norm(self.conv2d(X)))"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "class D_block(nn.Module):\n    def __init__(self, out_channels, in_channels=3, kernel_size=4, strides=2,\n                padding=1, alpha=0.2, **kwargs):\n        super(D_block, self).__init__(**kwargs)\n        self.conv2d = nn.Conv2d(in_channels, out_channels, kernel_size,\n                                strides, padding, bias=False)\n        self.batch_norm = nn.BatchNorm2d(out_channels)\n        self.activation = nn.LeakyReLU(alpha, inplace=True)\n\n    def forward(self, X):\n        return self.activation(self.batch_norm(self.conv2d(X)))"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "class D_block(tf.keras.layers.Layer):\n    def __init__(self, out_channels, kernel_size=4, strides=2, padding=\"same\",\n                 alpha=0.2, **kwargs):\n        super().__init__(**kwargs)\n        self.conv2d = tf.keras.layers.Conv2D(out_channels, kernel_size,\n                                             strides, padding, use_bias=False)\n        self.batch_norm = tf.keras.layers.BatchNormalization()\n        self.activation = tf.keras.layers.LeakyReLU(alpha)\n\n    def call(self, X):\n        return self.activation(self.batch_norm(self.conv2d(X)))"
+    },
+    {
+      "type": "paragraph",
+      "text": "Một khối cơ bản với cài đặt mặc định sẽ giảm một nửa chiều rộng và chiều\ncao của các đầu vào, như chúng ta đã chứng minh trong Section 6.3 . Ví dụ, cho một hình dạng đầu vào \\(n_h = n_w = 16\\) , với một hình dạng hạt nhân \\(k_h = k_w = 4\\) , một hình sải chân \\(s_h = s_w = 2\\) , và một\nhình dạng đệm \\(p_h = p_w = 1\\) , hình dạng đầu ra sẽ là:"
+    },
+    {
+      "type": "math",
+      "latex": "(17.2.3)¶\\[\\begin{split}\\begin{aligned}\nn_h^{'} \\times n_w^{'} &= \\lfloor(n_h-k_h+2p_h+s_h)/s_h\\rfloor \\times \\lfloor(n_w-k_w+2p_w+s_w)/s_w\\rfloor\\\\\n  &= \\lfloor(16-4+2\\times 1+2)/2\\rfloor \\times \\lfloor(16-4+2\\times 1+2)/2\\rfloor\\\\\n  &= 8 \\times 8 .\\\\\n\\end{aligned}\\end{split}\\]"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "x = np.zeros((2, 3, 16, 16))\nd_blk = D_block(20)\nd_blk.initialize()\nd_blk(x).shape"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "(2, 20, 8, 8)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "x = torch.zeros((2, 3, 16, 16))\nd_blk = D_block(20)\nd_blk(x).shape"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "torch.Size([2, 20, 8, 8])"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "x = tf.zeros((2, 16, 16, 3))\nd_blk = D_block(20)\nd_blk(x).shape"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "TensorShape([2, 8, 8, 20])"
+    },
+    {
+      "type": "paragraph",
+      "text": "Người phân biệt đối xử là một tấm gương của máy phát điện."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "n_D = 64\nnet_D = nn.Sequential()\nnet_D.add(D_block(n_D),   # Output: (64, 32, 32)\n          D_block(n_D*2),  # Output: (64 * 2, 16, 16)\n          D_block(n_D*4),  # Output: (64 * 4, 8, 8)\n          D_block(n_D*8),  # Output: (64 * 8, 4, 4)\n          nn.Conv2D(1, kernel_size=4, use_bias=False))  # Output: (1, 1, 1)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "n_D = 64\nnet_D = nn.Sequential(\n    D_block(n_D),  # Output: (64, 32, 32)\n    D_block(in_channels=n_D, out_channels=n_D*2),  # Output: (64 * 2, 16, 16)\n    D_block(in_channels=n_D*2, out_channels=n_D*4),  # Output: (64 * 4, 8, 8)\n    D_block(in_channels=n_D*4, out_channels=n_D*8),  # Output: (64 * 8, 4, 4)\n    nn.Conv2d(in_channels=n_D*8, out_channels=1,\n              kernel_size=4, bias=False))  # Output: (1, 1, 1)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "n_D = 64\nnet_D = tf.keras.Sequential([\n    D_block(n_D), # Output: (32, 32, 64)\n    D_block(out_channels=n_D*2), # Output: (16, 16, 64 * 2)\n    D_block(out_channels=n_D*4), # Output: (8, 8, 64 * 4)\n    D_block(out_channels=n_D*8), # Outupt: (4, 4, 64 * 64)\n    # Output: (1, 1, 1)\n    tf.keras.layers.Conv2D(1, kernel_size=4, use_bias=False)\n])"
+    },
+    {
+      "type": "paragraph",
+      "text": "Nó sử dụng một lớp phức tạp với kênh đầu ra \\(1\\) làm lớp cuối cùng\nđể có được một giá trị dự đoán duy nhất."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "x = np.zeros((1, 3, 64, 64))\nnet_D.initialize()\nnet_D(x).shape"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "(1, 1, 1, 1)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "x = torch.zeros((1, 3, 64, 64))\nnet_D(x).shape"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "torch.Size([1, 1, 1, 1])"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "x = tf.zeros((1, 64, 64, 3))\nnet_D(x).shape"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "TensorShape([1, 1, 1, 1])"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "dao-tao",
+      "text": "17.2.4. Đào tạo"
+    },
+    {
+      "type": "paragraph",
+      "text": "So với GAN cơ bản trong Section 17.1 , chúng tôi sử dụng\ncùng một tốc độ học tập cho cả máy phát điện và phân biệt đối xử vì\nchúng tương tự nhau. Ngoài ra, chúng tôi thay đổi \\(\\beta_1\\) trong\nAdam ( Section 11.10 ) từ \\(0.9\\) thành \\(0.5\\) . Nó làm\ngiảm độ mịn của động lượng, trung bình động có trọng số theo cấp số nhân\ncủa gradient trong quá khứ, để chăm sóc các gradient thay đổi nhanh\nchóng vì máy phát điện và người phân biệt đối xử chiến đấu với nhau. Bên\ncạnh đó, tiếng ồn tạo ngẫu nhiên Z , là một tensor 4-D và chúng tôi\nđang sử dụng GPU để tăng tốc tính toán."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def train(net_D, net_G, data_iter, num_epochs, lr, latent_dim,\n          device=d2l.try_gpu()):\n    loss = gluon.loss.SigmoidBCELoss()\n    net_D.initialize(init=init.Normal(0.02), force_reinit=True, ctx=device)\n    net_G.initialize(init=init.Normal(0.02), force_reinit=True, ctx=device)\n    trainer_hp = {'learning_rate': lr, 'beta1': 0.5}\n    trainer_D = gluon.Trainer(net_D.collect_params(), 'adam', trainer_hp)\n    trainer_G = gluon.Trainer(net_G.collect_params(), 'adam', trainer_hp)\n    animator = d2l.Animator(xlabel='epoch', ylabel='loss',\n                            xlim=[1, num_epochs], nrows=2, figsize=(5, 5),\n                            legend=['discriminator', 'generator'])\n    animator.fig.subplots_adjust(hspace=0.3)\n    for epoch in range(1, num_epochs + 1):\n        # Train one epoch\n        timer = d2l.Timer()\n        metric = d2l.Accumulator(3)  # loss_D, loss_G, num_examples\n        for X, _ in data_iter:\n            batch_size = X.shape[0]\n            Z = np.random.normal(0, 1, size=(batch_size, latent_dim, 1, 1))\n            X, Z = X.as_in_ctx(device), Z.as_in_ctx(device),\n            metric.add(d2l.update_D(X, Z, net_D, net_G, loss, trainer_D),\n                       d2l.update_G(Z, net_D, net_G, loss, trainer_G),\n                       batch_size)\n        # Show generated examples\n        Z = np.random.normal(0, 1, size=(21, latent_dim, 1, 1), ctx=device)\n        # Normalize the synthetic data to N(0, 1)\n        fake_x = net_G(Z).transpose(0, 2, 3, 1) / 2 + 0.5\n        imgs = np.concatenate(\n            [np.concatenate([fake_x[i * 7 + j] for j in range(7)], axis=1)\n             for i in range(len(fake_x)//7)], axis=0)\n        animator.axes[1].cla()\n        animator.axes[1].imshow(imgs.asnumpy())\n        # Show the losses\n        loss_D, loss_G = metric[0] / metric[2], metric[1] / metric[2]\n        animator.add(epoch, (loss_D, loss_G))\n    print(f'loss_D {loss_D:.3f}, loss_G {loss_G:.3f}, '\n          f'{metric[2] / timer.stop():.1f} examples/sec on {str(device)}')"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def train(net_D, net_G, data_iter, num_epochs, lr, latent_dim,\n          device=d2l.try_gpu()):\n    loss = nn.BCEWithLogitsLoss(reduction='sum')\n    for w in net_D.parameters():\n        nn.init.normal_(w, 0, 0.02)\n    for w in net_G.parameters():\n        nn.init.normal_(w, 0, 0.02)\n    net_D, net_G = net_D.to(device), net_G.to(device)\n    trainer_hp = {'lr': lr, 'betas': [0.5,0.999]}\n    trainer_D = torch.optim.Adam(net_D.parameters(), **trainer_hp)\n    trainer_G = torch.optim.Adam(net_G.parameters(), **trainer_hp)\n    animator = d2l.Animator(xlabel='epoch', ylabel='loss',\n                            xlim=[1, num_epochs], nrows=2, figsize=(5, 5),\n                            legend=['discriminator', 'generator'])\n    animator.fig.subplots_adjust(hspace=0.3)\n    for epoch in range(1, num_epochs + 1):\n        # Train one epoch\n        timer = d2l.Timer()\n        metric = d2l.Accumulator(3)  # loss_D, loss_G, num_examples\n        for X, _ in data_iter:\n            batch_size = X.shape[0]\n            Z = torch.normal(0, 1, size=(batch_size, latent_dim, 1, 1))\n            X, Z = X.to(device), Z.to(device)\n            metric.add(d2l.update_D(X, Z, net_D, net_G, loss, trainer_D),\n                       d2l.update_G(Z, net_D, net_G, loss, trainer_G),\n                       batch_size)\n        # Show generated examples\n        Z = torch.normal(0, 1, size=(21, latent_dim, 1, 1), device=device)\n        # Normalize the synthetic data to N(0, 1)\n        fake_x = net_G(Z).permute(0, 2, 3, 1) / 2 + 0.5\n        imgs = torch.cat(\n            [torch.cat([\n                fake_x[i * 7 + j].cpu().detach() for j in range(7)], dim=1)\n             for i in range(len(fake_x)//7)], dim=0)\n        animator.axes[1].cla()\n        animator.axes[1].imshow(imgs)\n        # Show the losses\n        loss_D, loss_G = metric[0] / metric[2], metric[1] / metric[2]\n        animator.add(epoch, (loss_D, loss_G))\n    print(f'loss_D {loss_D:.3f}, loss_G {loss_G:.3f}, '\n          f'{metric[2] / timer.stop():.1f} examples/sec on {str(device)}')"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def train(net_D, net_G, data_iter, num_epochs, lr, latent_dim,\n          device=d2l.try_gpu()):\n    loss = tf.keras.losses.BinaryCrossentropy(\n        from_logits=True, reduction=tf.keras.losses.Reduction.SUM)\n\n    for w in net_D.trainable_variables:\n        w.assign(tf.random.normal(mean=0, stddev=0.02, shape=w.shape))\n    for w in net_G.trainable_variables:\n        w.assign(tf.random.normal(mean=0, stddev=0.02, shape=w.shape))\n\n    optimizer_hp = {\"lr\": lr, \"beta_1\": 0.5, \"beta_2\": 0.999}\n    optimizer_D = tf.keras.optimizers.Adam(**optimizer_hp)\n    optimizer_G = tf.keras.optimizers.Adam(**optimizer_hp)\n\n    animator = d2l.Animator(xlabel='epoch', ylabel='loss',\n                            xlim=[1, num_epochs], nrows=2, figsize=(5, 5),\n                            legend=['discriminator', 'generator'])\n    animator.fig.subplots_adjust(hspace=0.3)\n\n    for epoch in range(1, num_epochs + 1):\n        # Train one epoch\n        timer = d2l.Timer()\n        metric = d2l.Accumulator(3) # loss_D, loss_G, num_examples\n        for X, _ in data_iter:\n            batch_size = X.shape[0]\n            Z = tf.random.normal(mean=0, stddev=1,\n                                 shape=(batch_size, 1, 1, latent_dim))\n            metric.add(d2l.update_D(X, Z, net_D, net_G, loss, optimizer_D),\n                       d2l.update_G(Z, net_D, net_G, loss, optimizer_G),\n                       batch_size)\n\n        # Show generated examples\n        Z = tf.random.normal(mean=0, stddev=1, shape=(21, 1, 1, latent_dim))\n        # Normalize the synthetic data to N(0, 1)\n        fake_x = net_G(Z) / 2 + 0.5\n        imgs = tf.concat([tf.concat([fake_x[i * 7 + j] for j in range(7)],\n                                    axis=1)\n                          for i in range(len(fake_x) // 7)], axis=0)\n        animator.axes[1].cla()\n        animator.axes[1].imshow(imgs)\n        # Show the losses\n        loss_D, loss_G = metric[0] / metric[2], metric[1] / metric[2]\n        animator.add(epoch, (loss_D, loss_G))\n    print(f'loss_D {loss_D:.3f}, loss_G {loss_G:.3f}, '\n          f'{metric[2] / timer.stop():.1f} examples/sec on {str(device)}')"
+    },
+    {
+      "type": "paragraph",
+      "text": "Chúng tôi đào tạo mô hình với một số lượng nhỏ các kỷ nguyên chỉ để\ntrình diễn. Để có hiệu suất tốt hơn, biến num_epochs có thể được đặt\nthành một số lớn hơn."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "latent_dim, lr, num_epochs = 100, 0.005, 20\ntrain(net_D, net_G, data_iter, num_epochs, lr, latent_dim)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "loss_D 0.383, loss_G 3.322, 2592.6 examples/sec on gpu(0)"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_dcgan_2541de_183_1.svg",
+      "local_path": "_images/output_dcgan_2541de_183_1.svg",
+      "alt": "../_images/output_dcgan_2541de_183_1.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "latent_dim, lr, num_epochs = 100, 0.005, 20\ntrain(net_D, net_G, data_iter, num_epochs, lr, latent_dim)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "loss_D 0.154, loss_G 7.906, 1062.5 examples/sec on cuda:0"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_dcgan_2541de_186_1.svg",
+      "local_path": "_images/output_dcgan_2541de_186_1.svg",
+      "alt": "../_images/output_dcgan_2541de_186_1.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "latent_dim, lr, num_epochs = 100, 0.0005, 40\ntrain(net_D, net_G, data_iter, num_epochs, lr, latent_dim)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "loss_D 0.223, loss_G 3.809, 2240.4 examples/sec on <tensorflow.python.eager.context._EagerDeviceContext object at 0x7f310c08ad40>"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_dcgan_2541de_189_1.svg",
+      "local_path": "_images/output_dcgan_2541de_189_1.svg",
+      "alt": "../_images/output_dcgan_2541de_189_1.svg"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tom-tat",
+      "text": "17.2.5. Tóm tắt"
+    },
+    {
+      "type": "list",
+      "ordered": false,
+      "items": [
+        "Kiến trúc DCGAN có bốn lớp phức tạp cho Discriminator và bốn lớp phức\ntạp “phân đoạn strided” cho Generator.",
+        "Discriminator là một sự phức tạp 4 lớp với chuẩn hóa hàng loạt (ngoại\ntrừ lớp đầu vào của nó) và các kích hoạt ReLU bị rò rỉ.",
+        "Leaky ReLU là một hàm phi tuyến cung cấp một đầu ra không phải bằng\nkhông cho một đầu vào âm. Nó nhằm mục đích khắc phục vấn đề “sắp chết\nReLU” và giúp các gradient chảy dễ dàng hơn thông qua kiến trúc."
+      ]
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bai-tap",
+      "text": "17.2.6. Bài tập"
+    },
+    {
+      "type": "list",
+      "ordered": true,
+      "items": [
+        "Điều gì sẽ xảy ra nếu chúng ta sử dụng kích hoạt ReLU tiêu chuẩn thay\nvì ReLU bị rò rỉ?",
+        "Áp dụng DCGAN trên Fashion-MNIST và xem danh mục nào hoạt động tốt và\nloại nào không."
+      ]
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    }
+  ],
+  "images": [
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_dcgan_2541de_39_0.svg",
+      "local_path": "_images/output_dcgan_2541de_39_0.svg",
+      "alt": "../_images/output_dcgan_2541de_39_0.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_dcgan_2541de_42_0.svg",
+      "local_path": "_images/output_dcgan_2541de_42_0.svg",
+      "alt": "../_images/output_dcgan_2541de_42_0.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_dcgan_2541de_45_0.svg",
+      "local_path": "_images/output_dcgan_2541de_45_0.svg",
+      "alt": "../_images/output_dcgan_2541de_45_0.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_dcgan_2541de_111_0.svg",
+      "local_path": "_images/output_dcgan_2541de_111_0.svg",
+      "alt": "../_images/output_dcgan_2541de_111_0.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_dcgan_2541de_114_0.svg",
+      "local_path": "_images/output_dcgan_2541de_114_0.svg",
+      "alt": "../_images/output_dcgan_2541de_114_0.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_dcgan_2541de_117_0.svg",
+      "local_path": "_images/output_dcgan_2541de_117_0.svg",
+      "alt": "../_images/output_dcgan_2541de_117_0.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_dcgan_2541de_183_1.svg",
+      "local_path": "_images/output_dcgan_2541de_183_1.svg",
+      "alt": "../_images/output_dcgan_2541de_183_1.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_dcgan_2541de_186_1.svg",
+      "local_path": "_images/output_dcgan_2541de_186_1.svg",
+      "alt": "../_images/output_dcgan_2541de_186_1.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_dcgan_2541de_189_1.svg",
+      "local_path": "_images/output_dcgan_2541de_189_1.svg",
+      "alt": "../_images/output_dcgan_2541de_189_1.svg"
+    }
+  ],
+  "text": "17.2. Mạng đối thủ tạo phức tạp sâu\nTrong Section 17.1 , chúng tôi đã giới thiệu những ý tưởng\ncơ bản đằng sau cách GAN hoạt động. Chúng tôi đã chỉ ra rằng chúng có\nthể vẽ các mẫu từ một số phân phối đơn giản, dễ lấy mẫu, như phân phối\nthống nhất hoặc bình thường, và biến đổi chúng thành các mẫu dường như\nphù hợp với sự phân bố của một số tập dữ liệu. Và trong khi ví dụ của\nchúng tôi về việc phù hợp với phân phối 2D Gaussian đã vượt qua điểm, nó\nkhông đặc biệt thú vị.\nTrong phần này, chúng tôi sẽ chứng minh cách bạn có thể sử dụng GAN để\ntạo ra hình ảnh thực tế. Chúng tôi sẽ dựa trên các mô hình của chúng tôi\ntrên GAN phức tạp sâu (DCGAN) được giới thiệu trong [Radford et al., 2015] . Chúng tôi sẽ mượn kiến trúc phức\ntạp đã chứng minh thành công cho các vấn đề thị giác máy tính phân biệt\nđối xử và cho thấy cách thông qua GAN, chúng có thể được tận dụng để tạo\nra hình ảnh thực tế.\n17.2.1. Các Pokemon Dataset\nTập dữ liệu chúng tôi sẽ sử dụng là một bộ sưu tập các sprites Pokemon\nthu được từ pokemondb . Đầu tiên tải\nxuống, trích xuất và tải tập dữ liệu này.\nChúng tôi thay đổi kích thước mỗi hình ảnh thành \\(64\\times 64\\) .\nViệc chuyển đổi ToTensor sẽ chiếu giá trị pixel thành \\([0, 1]\\) , trong khi trình tạo của chúng tôi sẽ sử dụng hàm tánh để\ncó được đầu ra trong \\([-1, 1]\\) . Do đó, chúng tôi bình thường hóa\ndữ liệu với \\(0.5\\) trung bình và độ lệch chuẩn \\(0.5\\) để phù\nhợp với phạm vi giá trị.\nHãy để chúng tôi hình dung 20 hình ảnh đầu tiên.\n17.2.2. Các máy phát điện\nMáy phát điện cần ánh xạ biến nhiễu \\(\\mathbf z\\in\\mathbb R^d\\) , một\nvector chiều dài- \\(d\\) , đến một hình ảnh RGB với chiều rộng và\nchiều cao là \\(64\\times 64\\) . Trong Section 13.11 , chúng tôi\nđã giới thiệu mạng phức tạp hoàn toàn sử dụng lớp ghép chuyển tiếp (tham\nkhảo Section 13.10 ) để phóng to kích thước đầu vào.\nKhối cơ bản của máy phát điện chứa một lớp phức tạp chuyển tiếp theo là\nchuẩn hóa hàng loạt và kích hoạt ReLU.\nMặc định, lớp ghép chuyển tiếp sử dụng hạt nhân \\(k_h = k_w = 4\\) ,\nmột bước tiến \\(s_h = s_w = 2\\) và đệm \\(p_h = p_w = 1\\) . Với\nhình dạng đầu vào là \\(n_h^{'} \\times n_w^{'} = 16 \\times 16\\) , khối\nmáy phát sẽ tăng gấp đôi chiều rộng và chiều cao của đầu vào.\nNếu thay đổi lớp phức tạp chuyển tiếp thành hạt nhân \\(4\\times 4\\) , \\(1\\times 1\\) sải bước và không đệm. Với kích thước đầu vào là \\(1 \\times 1\\) , đầu ra sẽ có chiều rộng và chiều cao của nó tăng 3\nlần lượt.\nMáy phát điện bao gồm bốn khối cơ bản giúp tăng cả chiều rộng và chiều\ncao đầu vào từ 1 lên 32. Đồng thời, đầu tiên nó chiếu biến tiềm ẩn thành \\(64\\times 8\\) kênh, sau đó giảm một nửa các kênh mỗi lần. Cuối\ncùng, một lớp covolution được chuyển đổi được sử dụng để tạo ra đầu ra.\nNó tiếp tục tăng gấp đôi chiều rộng và chiều cao để phù hợp với hình\ndạng \\(64\\times 64\\) mong muốn và giảm kích thước kênh xuống \\(3\\) . Hàm kích hoạt tanh được áp dụng cho các giá trị đầu ra dự án\nvào phạm vi \\((-1, 1)\\) .\nTạo ra một biến tiềm ẩn 100 chiều để xác minh hình dạng đầu ra của máy\nphát điện.\n17.2.3. Phân biệt đối xử\nNgười phân biệt đối xử là một mạng mạng phức tạp bình thường ngoại trừ\nviệc nó sử dụng ReLU bị rò rỉ làm chức năng kích hoạt của nó. Đưa ra \\(\\alpha \\in[0, 1]\\) , định nghĩa của nó là\nNhư có thể thấy, nó là bình thường ReLU nếu \\(\\alpha=0\\) , và một\nchức năng nhận dạng nếu \\(\\alpha=1\\) . Đối với \\(\\alpha \\in (0, 1)\\) , ReLU bị rò rỉ là một hàm phi tuyến cung cấp\nđầu ra không phải bằng không cho đầu vào âm. Nó nhằm mục đích khắc phục\nvấn đề ReLU đang chết mà một tế bào thần kinh luôn có thể tạo ra một giá\ntrị âm và do đó không thể thực hiện bất kỳ tiến bộ nào vì gradient của\nReLU là 0.\nKhối cơ bản của phân biệt đối xử là một lớp phức tạp tiếp theo là một\nlớp chuẩn hóa hàng loạt và kích hoạt ReLU bị rò rỉ. Các siêu tham số của\nlớp covolution tương tự như lớp covolution transpose trong khối máy\nphát.\nMột khối cơ bản với cài đặt mặc định sẽ giảm một nửa chiều rộng và chiều\ncao của các đầu vào, như chúng ta đã chứng minh trong Section 6.3 . Ví dụ, cho một hình dạng đầu vào \\(n_h = n_w = 16\\) , với một hình dạng hạt nhân \\(k_h = k_w = 4\\) , một hình sải chân \\(s_h = s_w = 2\\) , và một\nhình dạng đệm \\(p_h = p_w = 1\\) , hình dạng đầu ra sẽ là:\nNgười phân biệt đối xử là một tấm gương của máy phát điện.\nNó sử dụng một lớp phức tạp với kênh đầu ra \\(1\\) làm lớp cuối cùng\nđể có được một giá trị dự đoán duy nhất.\n17.2.4. Đào tạo\nSo với GAN cơ bản trong Section 17.1 , chúng tôi sử dụng\ncùng một tốc độ học tập cho cả máy phát điện và phân biệt đối xử vì\nchúng tương tự nhau. Ngoài ra, chúng tôi thay đổi \\(\\beta_1\\) trong\nAdam ( Section 11.10 ) từ \\(0.9\\) thành \\(0.5\\) . Nó làm\ngiảm độ mịn của động lượng, trung bình động có trọng số theo cấp số nhân\ncủa gradient trong quá khứ, để chăm sóc các gradient thay đổi nhanh\nchóng vì máy phát điện và người phân biệt đối xử chiến đấu với nhau. Bên\ncạnh đó, tiếng ồn tạo ngẫu nhiên Z , là một tensor 4-D và chúng tôi\nđang sử dụng GPU để tăng tốc tính toán.\nChúng tôi đào tạo mô hình với một số lượng nhỏ các kỷ nguyên chỉ để\ntrình diễn. Để có hiệu suất tốt hơn, biến num_epochs có thể được đặt\nthành một số lớn hơn.\n17.2.5. Tóm tắt\nKiến trúc DCGAN có bốn lớp phức tạp cho Discriminator và bốn lớp phức\ntạp “phân đoạn strided” cho Generator.\nDiscriminator là một sự phức tạp 4 lớp với chuẩn hóa hàng loạt (ngoại\ntrừ lớp đầu vào của nó) và các kích hoạt ReLU bị rò rỉ.\nLeaky ReLU là một hàm phi tuyến cung cấp một đầu ra không phải bằng\nkhông cho một đầu vào âm. Nó nhằm mục đích khắc phục vấn đề “sắp chết\nReLU” và giúp các gradient chảy dễ dàng hơn thông qua kiến trúc.\n17.2.6. Bài tập\nĐiều gì sẽ xảy ra nếu chúng ta sử dụng kích hoạt ReLU tiêu chuẩn thay\nvì ReLU bị rò rỉ?\nÁp dụng DCGAN trên Fashion-MNIST và xem danh mục nào hoạt động tốt và\nloại nào không.\nDiscussions\nDiscussions"
+}

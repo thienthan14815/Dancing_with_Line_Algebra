@@ -1,0 +1,1014 @@
+{
+  "url": "https://vi.d2l.ai/chapter_optimization/momentum.html",
+  "chapter": "chapter_optimization",
+  "title": "11.6. Đà",
+  "crawled_at": "2026-07-20T12:40:24.665581+00:00",
+  "headings": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "da",
+      "text": "11.6. Đà"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "khai-niem-co-ban",
+      "text": "11.6.1. Khái niệm cơ bản"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "duong-trung-binh-bi-ro-ri",
+      "text": "11.6.1.1. Đường trung bình bị rò rỉ"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "mot-van-de-ill-conditioned",
+      "text": "11.6.1.2. Một vấn đề Ill-conditioned"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "phuong-phap-momentum",
+      "text": "11.6.1.3. Phương pháp Momentum"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "trong-luong-mau-hieu-qua",
+      "text": "11.6.1.4. Trọng lượng mẫu hiệu quả"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "cac-thi-nghiem-thuc-te",
+      "text": "11.6.2. Các thí nghiệm thực tế"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "thuc-hien-tu-dau",
+      "text": "11.6.2.1. Thực hiện từ đầu"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "thuc-hien-ngan-gon",
+      "text": "11.6.2.2. Thực hiện ngắn gọn"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "phan-tich-ly-thuyet",
+      "text": "11.6.3. Phân tích lý thuyết"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "ham-loi-bac-hai",
+      "text": "11.6.3.1. Hàm lồi bậc hai"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "ham-vo-huong",
+      "text": "11.6.3.2. Hàm vô hướng"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tom-tat",
+      "text": "11.6.4. Tóm tắt"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bai-tap",
+      "text": "11.6.5. Bài tập"
+    }
+  ],
+  "content": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "da",
+      "text": "11.6. Đà"
+    },
+    {
+      "type": "paragraph",
+      "text": "Trong Section 11.4 , chúng tôi đã xem xét những gì xảy ra khi thực\nhiện gốc gradient ngẫu nhiên, tức là khi thực hiện tối ưu hóa, nơi chỉ\ncó một biến thể ồn ào của gradient có sẵn. Đặc biệt, chúng tôi nhận thấy\nrằng đối với độ dốc ồn ào, chúng ta cần phải thận trọng hơn khi chọn tốc\nđộ học tập khi đối mặt với tiếng ồn. Nếu chúng ta giảm nó quá nhanh, hội\ntụ quầy hàng. Nếu chúng ta quá khoan dung, chúng ta không hội tụ thành\nmột giải pháp đủ tốt vì tiếng ồn tiếp tục khiến chúng ta tránh xa sự tối\nưu."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "khai-niem-co-ban",
+      "text": "11.6.1. Khái niệm cơ bản"
+    },
+    {
+      "type": "paragraph",
+      "text": "Trong phần này, chúng ta sẽ khám phá các thuật toán tối ưu hóa hiệu quả\nhơn, đặc biệt là đối với một số loại vấn đề tối ưu hóa phổ biến trong\nthực tế."
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "duong-trung-binh-bi-ro-ri",
+      "text": "11.6.1.1. Đường trung bình bị rò rỉ"
+    },
+    {
+      "type": "paragraph",
+      "text": "Phần trước đã thấy chúng tôi thảo luận về minibatch SGD như một phương\ntiện để tăng tốc tính toán. Nó cũng có tác dụng phụ tốt đẹp mà độ dốc\ntrung bình làm giảm lượng phương sai. Các minibatch stochastic gradient\ndescent có thể được tính bằng cách:"
+    },
+    {
+      "type": "math",
+      "latex": "(11.6.1)¶\\[\\mathbf{g}_{t, t-1} = \\partial_{\\mathbf{w}} \\frac{1}{|\\mathcal{B}_t|} \\sum_{i \\in \\mathcal{B}_t} f(\\mathbf{x}_{i}, \\mathbf{w}_{t-1}) = \\frac{1}{|\\mathcal{B}_t|} \\sum_{i \\in \\mathcal{B}_t} \\mathbf{h}_{i, t-1}.\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Để giữ cho ký hiệu đơn giản, ở đây chúng tôi đã sử dụng \\(\\mathbf{h}_{i, t-1} = \\partial_{\\mathbf{w}} f(\\mathbf{x}_i, \\mathbf{w}_{t-1})\\) làm gốc gradient ngẫu nhiên cho mẫu \\(i\\) bằng cách sử dụng các\ntrọng lượng được cập nhật tại thời điểm \\(t-1\\) . Sẽ thật tuyệt nếu\nchúng ta có thể hưởng lợi từ ảnh hưởng của việc giảm phương sai ngay cả\nngoài độ dốc trung bình trên một minibatch. Một lựa chọn để thực hiện\nnhiệm vụ này là thay thế tính toán gradient bằng một “trung bình rò rỉ”:"
+    },
+    {
+      "type": "math",
+      "latex": "(11.6.2)¶\\[\\mathbf{v}_t = \\beta \\mathbf{v}_{t-1} + \\mathbf{g}_{t, t-1}\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "for some \\(\\beta \\in (0, 1)\\) . Điều này thay thế hiệu quả gradient\ntức thời bằng một gradient được trung bình trên nhiều độ dốc * past * . \\(\\mathbf{v}\\) được gọi là * momentum*. Nó tích lũy gradient trong\nquá khứ tương tự như cách một quả bóng nặng lăn xuống cảnh quan chức\nnăng mục tiêu tích hợp trên các lực trong quá khứ. Để xem những gì đang\nxảy ra chi tiết hơn, chúng ta hãy mở rộng \\(\\mathbf{v}_t\\) đệ quy\nvào"
+    },
+    {
+      "type": "math",
+      "latex": "(11.6.3)¶\\[\\begin{aligned}\n\\mathbf{v}_t = \\beta^2 \\mathbf{v}_{t-2} + \\beta \\mathbf{g}_{t-1, t-2} + \\mathbf{g}_{t, t-1}\n= \\ldots, = \\sum_{\\tau = 0}^{t-1} \\beta^{\\tau} \\mathbf{g}_{t-\\tau, t-\\tau-1}.\n\\end{aligned}\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "\\(\\beta\\) lớn lên tới mức trung bình tầm xa, trong khi \\(\\beta\\) nhỏ chỉ có một sự điều chỉnh nhẹ so với phương pháp gradient. Sự thay\nthế gradient mới không còn trỏ vào hướng dốc nhất trên một trường hợp cụ\nthể nữa mà theo hướng trung bình có trọng số của các gradient trong quá\nkhứ. Điều này cho phép chúng tôi nhận ra hầu hết các lợi ích của việc\ntrung bình trong một lô mà không có chi phí thực sự tính toán độ dốc\ntrên đó. Chúng tôi sẽ xem lại quy trình trung bình này chi tiết hơn sau."
+    },
+    {
+      "type": "paragraph",
+      "text": "Lý luận trên hình thành cơ sở cho những gì bây giờ được gọi là phương\npháp gradient accelerated , chẳng hạn như gradient với đà. Họ tận hưởng\nlợi ích bổ sung là hiệu quả hơn nhiều trong trường hợp vấn đề tối ưu hóa\nlà không điều kiện (tức là, nơi có một số hướng mà sự tiến bộ chậm hơn\nnhiều so với những người khác, giống như một hẻm núi hẹp). Hơn nữa,\nchúng cho phép chúng ta trung bình trên các gradient tiếp theo để có\nđược hướng xuống ổn định hơn. Thật vậy, khía cạnh của khả năng tăng tốc\nngay cả đối với các vấn đề lồi không ồn là một trong những lý do chính\nkhiến động lượng hoạt động và tại sao nó hoạt động tốt như vậy."
+    },
+    {
+      "type": "paragraph",
+      "text": "Như người ta mong đợi, do động lực hiệu quả của nó là một môn học được\nnghiên cứu tốt trong tối ưu hóa cho học sâu và hơn thế nữa. Xem ví dụ,\nđẹp bài viết expository by [Goh, 2017] để phân tích chuyên sâu và hoạt hình tương tác. Nó\nđược đề xuất bởi [Polyak, 1964] . [Nesterov, 2018] có một\ncuộc thảo luận lý thuyết chi tiết trong bối cảnh tối ưu hóa lồi. Đà\ntrong học sâu đã được biết đến là có lợi trong một thời gian dài. Xem ví\ndụ, cuộc thảo luận của [Sutskever et al., 2013] để biết\nchi tiết."
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "mot-van-de-ill-conditioned",
+      "text": "11.6.1.2. Một vấn đề Ill-conditioned"
+    },
+    {
+      "type": "paragraph",
+      "text": "Để hiểu rõ hơn về các thuộc tính hình học của phương pháp động lượng,\nchúng tôi xem lại gradient descent, mặc dù với một chức năng khách quan\nít dễ chịu hơn đáng kể. Nhớ lại rằng trong Section 11.3 , chúng tôi\nđã sử dụng \\(f(\\mathbf{x}) = x_1^2 + 2 x_2^2\\) , tức là, một mục tiêu\nellipsoid biến dạng vừa phải. Chúng tôi làm biến dạng chức năng này hơn\nnữa bằng cách kéo dài nó theo hướng \\(x_1\\) thông qua"
+    },
+    {
+      "type": "math",
+      "latex": "(11.6.4)¶\\[f(\\mathbf{x}) = 0.1 x_1^2 + 2 x_2^2.\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Như trước \\(f\\) có mức tối thiểu là \\((0, 0)\\) . Chức năng này là\n* rấy* phẳng theo hướng \\(x_1\\) . Chúng ta hãy xem những gì sẽ xảy\nra khi chúng ta thực hiện gradient gốc như trước đây trên chức năng mới\nnày. Chúng tôi chọn một tỷ lệ học tập là \\(0.4\\) ."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "%matplotlib inline\nfrom mxnet import np, npx\nfrom d2l import mxnet as d2l\n\nnpx.set_np()\n\neta = 0.4\ndef f_2d(x1, x2):\n    return 0.1 * x1 ** 2 + 2 * x2 ** 2\ndef gd_2d(x1, x2, s1, s2):\n    return (x1 - eta * 0.2 * x1, x2 - eta * 4 * x2, 0, 0)\n\nd2l.show_trace_2d(f_2d, d2l.train_2d(gd_2d))"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "epoch 20, x1: -0.943467, x2: -0.000073"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_momentum_e3683f_3_1.svg",
+      "local_path": "_images/output_momentum_e3683f_3_1.svg",
+      "alt": "../_images/output_momentum_e3683f_3_1.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "%matplotlib inline\nimport torch\nfrom d2l import torch as d2l\n\neta = 0.4\ndef f_2d(x1, x2):\n    return 0.1 * x1 ** 2 + 2 * x2 ** 2\ndef gd_2d(x1, x2, s1, s2):\n    return (x1 - eta * 0.2 * x1, x2 - eta * 4 * x2, 0, 0)\n\nd2l.show_trace_2d(f_2d, d2l.train_2d(gd_2d))"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "epoch 20, x1: -0.943467, x2: -0.000073\n/home/d2l-worker/miniconda3/envs/d2l-vi-release-1/lib/python3.8/site-packages/torch/functional.py:568: UserWarning: torch.meshgrid: in an upcoming release, it will be required to pass the indexing argument. (Triggered internally at  ../aten/src/ATen/native/TensorShape.cpp:2228.)\n  return _VF.meshgrid(tensors, **kwargs)  # type: ignore[attr-defined]"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_momentum_e3683f_6_1.svg",
+      "local_path": "_images/output_momentum_e3683f_6_1.svg",
+      "alt": "../_images/output_momentum_e3683f_6_1.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "%matplotlib inline\nimport tensorflow as tf\nfrom d2l import tensorflow as d2l\n\neta = 0.4\ndef f_2d(x1, x2):\n    return 0.1 * x1 ** 2 + 2 * x2 ** 2\ndef gd_2d(x1, x2, s1, s2):\n    return (x1 - eta * 0.2 * x1, x2 - eta * 4 * x2, 0, 0)\n\nd2l.show_trace_2d(f_2d, d2l.train_2d(gd_2d))"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "epoch 20, x1: -0.943467, x2: -0.000073"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_momentum_e3683f_9_1.svg",
+      "local_path": "_images/output_momentum_e3683f_9_1.svg",
+      "alt": "../_images/output_momentum_e3683f_9_1.svg"
+    },
+    {
+      "type": "paragraph",
+      "text": "Bằng cách xây dựng, gradient theo hướng \\(x_2\\) là * nhiều* cao\nhơn và thay đổi nhanh hơn nhiều so với theo chiều ngang \\(x_1\\) . Do\nđó, chúng tôi đang bị mắc kẹt giữa hai lựa chọn không mong muốn: nếu\nchúng tôi chọn một tốc độ học tập nhỏ, chúng tôi đảm bảo rằng giải pháp\nkhông phân kỳ theo hướng \\(x_2\\) nhưng chúng tôi đang yên tâm với sự\nhội tụ chậm theo hướng \\(x_1\\) . Ngược lại, với tốc độ học tập lớn,\nchúng tôi tiến bộ nhanh chóng theo hướng \\(x_1\\) nhưng phân kỳ trong \\(x_2\\) . Ví dụ dưới đây minh họa những gì xảy ra ngay cả sau khi\ntăng nhẹ tỷ lệ học tập từ \\(0.4\\) lên \\(0.6\\) . Sự hội tụ theo\nhướng \\(x_1\\) được cải thiện nhưng chất lượng giải pháp tổng thể tồi\ntệ hơn nhiều."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "eta = 0.6\nd2l.show_trace_2d(f_2d, d2l.train_2d(gd_2d))"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "epoch 20, x1: -0.387814, x2: -1673.365109"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_momentum_e3683f_15_1.svg",
+      "local_path": "_images/output_momentum_e3683f_15_1.svg",
+      "alt": "../_images/output_momentum_e3683f_15_1.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "eta = 0.6\nd2l.show_trace_2d(f_2d, d2l.train_2d(gd_2d))"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "epoch 20, x1: -0.387814, x2: -1673.365109"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_momentum_e3683f_18_1.svg",
+      "local_path": "_images/output_momentum_e3683f_18_1.svg",
+      "alt": "../_images/output_momentum_e3683f_18_1.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "eta = 0.6\nd2l.show_trace_2d(f_2d, d2l.train_2d(gd_2d))"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "epoch 20, x1: -0.387814, x2: -1673.365109"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_momentum_e3683f_21_1.svg",
+      "local_path": "_images/output_momentum_e3683f_21_1.svg",
+      "alt": "../_images/output_momentum_e3683f_21_1.svg"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "phuong-phap-momentum",
+      "text": "11.6.1.3. Phương pháp Momentum"
+    },
+    {
+      "type": "paragraph",
+      "text": "Phương pháp động lượng cho phép chúng ta giải quyết vấn đề gốc gradient\nđược mô tả ở trên. Nhìn vào dấu vết tối ưu hóa ở trên, chúng ta có thể\ncảm thấy rằng độ dốc trung bình trong quá khứ sẽ hoạt động tốt. Rốt\ncuộc, theo hướng \\(x_1\\) , điều này sẽ tổng hợp các gradient được căn\nchỉnh tốt, do đó làm tăng khoảng cách chúng ta bao gồm mỗi bước. Ngược\nlại, theo hướng \\(x_2\\) nơi gradient dao động, một gradient tổng hợp\nsẽ làm giảm kích thước bước do dao động hủy bỏ lẫn nhau ra. Sử dụng \\(\\mathbf{v}_t\\) thay vì gradient \\(\\mathbf{g}_t\\) mang lại các\nphương trình cập nhật sau:"
+    },
+    {
+      "type": "math",
+      "latex": "(11.6.5)¶\\[\\begin{split}\\begin{aligned}\n\\mathbf{v}_t &\\leftarrow \\beta \\mathbf{v}_{t-1} + \\mathbf{g}_{t, t-1}, \\\\\n\\mathbf{x}_t &\\leftarrow \\mathbf{x}_{t-1} - \\eta_t \\mathbf{v}_t.\n\\end{aligned}\\end{split}\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Lưu ý rằng đối với \\(\\beta = 0\\) , chúng tôi phục hồi độ dốc thường\nxuyên. Trước khi nghiên cứu sâu hơn vào các thuộc tính toán học, chúng\nta hãy nhìn nhanh cách thuật toán hoạt động trong thực tế."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def momentum_2d(x1, x2, v1, v2):\n    v1 = beta * v1 + 0.2 * x1\n    v2 = beta * v2 + 4 * x2\n    return x1 - eta * v1, x2 - eta * v2, v1, v2\n\neta, beta = 0.6, 0.5\nd2l.show_trace_2d(f_2d, d2l.train_2d(momentum_2d))"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "epoch 20, x1: 0.007188, x2: 0.002553"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_momentum_e3683f_27_1.svg",
+      "local_path": "_images/output_momentum_e3683f_27_1.svg",
+      "alt": "../_images/output_momentum_e3683f_27_1.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def momentum_2d(x1, x2, v1, v2):\n    v1 = beta * v1 + 0.2 * x1\n    v2 = beta * v2 + 4 * x2\n    return x1 - eta * v1, x2 - eta * v2, v1, v2\n\neta, beta = 0.6, 0.5\nd2l.show_trace_2d(f_2d, d2l.train_2d(momentum_2d))"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "epoch 20, x1: 0.007188, x2: 0.002553"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_momentum_e3683f_30_1.svg",
+      "local_path": "_images/output_momentum_e3683f_30_1.svg",
+      "alt": "../_images/output_momentum_e3683f_30_1.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def momentum_2d(x1, x2, v1, v2):\n    v1 = beta * v1 + 0.2 * x1\n    v2 = beta * v2 + 4 * x2\n    return x1 - eta * v1, x2 - eta * v2, v1, v2\n\neta, beta = 0.6, 0.5\nd2l.show_trace_2d(f_2d, d2l.train_2d(momentum_2d))"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "epoch 20, x1: 0.007188, x2: 0.002553"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_momentum_e3683f_33_1.svg",
+      "local_path": "_images/output_momentum_e3683f_33_1.svg",
+      "alt": "../_images/output_momentum_e3683f_33_1.svg"
+    },
+    {
+      "type": "paragraph",
+      "text": "Như chúng ta có thể thấy, ngay cả với cùng tốc độ học tập mà chúng ta đã\nsử dụng trước đây, đà vẫn hội tụ tốt. Hãy để chúng tôi xem những gì xảy\nra khi chúng ta giảm tham số động lượng. Giảm một nửa nó xuống \\(\\beta = 0.25\\) dẫn đến một quỹ đạo hầu như không hội tụ ở tất cả.\nTuy nhiên, nó tốt hơn rất nhiều so với không có đà (khi giải pháp phân\nkỳ)."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "eta, beta = 0.6, 0.25\nd2l.show_trace_2d(f_2d, d2l.train_2d(momentum_2d))"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "epoch 20, x1: -0.126340, x2: -0.186632"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_momentum_e3683f_39_1.svg",
+      "local_path": "_images/output_momentum_e3683f_39_1.svg",
+      "alt": "../_images/output_momentum_e3683f_39_1.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "eta, beta = 0.6, 0.25\nd2l.show_trace_2d(f_2d, d2l.train_2d(momentum_2d))"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "epoch 20, x1: -0.126340, x2: -0.186632"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_momentum_e3683f_42_1.svg",
+      "local_path": "_images/output_momentum_e3683f_42_1.svg",
+      "alt": "../_images/output_momentum_e3683f_42_1.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "eta, beta = 0.6, 0.25\nd2l.show_trace_2d(f_2d, d2l.train_2d(momentum_2d))"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "epoch 20, x1: -0.126340, x2: -0.186632"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_momentum_e3683f_45_1.svg",
+      "local_path": "_images/output_momentum_e3683f_45_1.svg",
+      "alt": "../_images/output_momentum_e3683f_45_1.svg"
+    },
+    {
+      "type": "paragraph",
+      "text": "Lưu ý rằng chúng ta có thể kết hợp động lượng với gốc gradient ngẫu\nnhiên và đặc biệt, minibatch stochastic gradient descent. Thay đổi duy\nnhất là trong trường hợp đó, chúng tôi thay thế gradient \\(\\mathbf{g}_{t, t-1}\\) bằng \\(\\mathbf{g}_t\\) . Cuối cùng, để\nthuận tiện, chúng tôi khởi tạo \\(\\mathbf{v}_0 = 0\\) tại thời điểm \\(t=0\\) . Chúng ta hãy nhìn vào những gì rò rỉ trung bình thực sự làm\ncho các bản cập nhật."
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "trong-luong-mau-hieu-qua",
+      "text": "11.6.1.4. Trọng lượng mẫu hiệu quả"
+    },
+    {
+      "type": "paragraph",
+      "text": "Nhớ lại rằng \\(\\mathbf{v}_t = \\sum_{\\tau = 0}^{t-1} \\beta^{\\tau} \\mathbf{g}_{t-\\tau, t-\\tau-1}\\) .\nTrong giới hạn, các điều khoản thêm lên đến \\(\\sum_{\\tau=0}^\\infty \\beta^\\tau = \\frac{1}{1-\\beta}\\) . Nói cách\nkhác, thay vì thực hiện một bước có kích thước \\(\\eta\\) trong\ngradient gốc hoặc gốc gradient ngẫu nhiên, chúng tôi thực hiện một bước\ncó kích thước \\(\\frac{\\eta}{1-\\beta}\\) trong khi đồng thời, đối phó\nvới một hướng gốc có khả năng tốt hơn nhiều. Đây là hai lợi ích trong\nmột. Để minh họa cách thức hoạt động của trọng số cho các lựa chọn khác\nnhau của \\(\\beta\\) hãy xem xét sơ đồ dưới đây."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "d2l.set_figsize()\nbetas = [0.95, 0.9, 0.6, 0]\nfor beta in betas:\n    x = np.arange(40).asnumpy()\n    d2l.plt.plot(x, beta ** x, label=f'beta = {beta:.2f}')\nd2l.plt.xlabel('time')\nd2l.plt.legend();"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_momentum_e3683f_51_0.svg",
+      "local_path": "_images/output_momentum_e3683f_51_0.svg",
+      "alt": "../_images/output_momentum_e3683f_51_0.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "d2l.set_figsize()\nbetas = [0.95, 0.9, 0.6, 0]\nfor beta in betas:\n    x = torch.arange(40).detach().numpy()\n    d2l.plt.plot(x, beta ** x, label=f'beta = {beta:.2f}')\nd2l.plt.xlabel('time')\nd2l.plt.legend();"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_momentum_e3683f_54_0.svg",
+      "local_path": "_images/output_momentum_e3683f_54_0.svg",
+      "alt": "../_images/output_momentum_e3683f_54_0.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "d2l.set_figsize()\nbetas = [0.95, 0.9, 0.6, 0]\nfor beta in betas:\n    x = tf.range(40).numpy()\n    d2l.plt.plot(x, beta ** x, label=f'beta = {beta:.2f}')\nd2l.plt.xlabel('time')\nd2l.plt.legend();"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_momentum_e3683f_57_0.svg",
+      "local_path": "_images/output_momentum_e3683f_57_0.svg",
+      "alt": "../_images/output_momentum_e3683f_57_0.svg"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "cac-thi-nghiem-thuc-te",
+      "text": "11.6.2. Các thí nghiệm thực tế"
+    },
+    {
+      "type": "paragraph",
+      "text": "Chúng ta hãy xem động lượng hoạt động như thế nào trong thực tế, tức là,\nkhi được sử dụng trong bối cảnh của một trình tối ưu hóa thích hợp. Đối\nvới điều này, chúng ta cần một triển khai có thể mở rộng hơn một chút."
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "thuc-hien-tu-dau",
+      "text": "11.6.2.1. Thực hiện từ đầu"
+    },
+    {
+      "type": "paragraph",
+      "text": "So với (minibatch) stochastic gradient gốc phương pháp động lượng cần\nduy trì một tập hợp các biến phụ trợ, tức là vận tốc. Nó có hình dạng\ntương tự như gradient (và các biến của bài toán tối ưu hóa). Trong việc\nthực hiện dưới đây, chúng tôi gọi các biến này là states ."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def init_momentum_states(feature_dim):\n    v_w = np.zeros((feature_dim, 1))\n    v_b = np.zeros(1)\n    return (v_w, v_b)\n\ndef sgd_momentum(params, states, hyperparams):\n    for p, v in zip(params, states):\n        v[:] = hyperparams['momentum'] * v + p.grad\n        p[:] -= hyperparams['lr'] * v"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def init_momentum_states(feature_dim):\n    v_w = torch.zeros((feature_dim, 1))\n    v_b = torch.zeros(1)\n    return (v_w, v_b)\n\ndef sgd_momentum(params, states, hyperparams):\n    for p, v in zip(params, states):\n        with torch.no_grad():\n            v[:] = hyperparams['momentum'] * v + p.grad\n            p[:] -= hyperparams['lr'] * v\n        p.grad.data.zero_()"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def init_momentum_states(features_dim):\n    v_w = tf.Variable(tf.zeros((features_dim, 1)))\n    v_b = tf.Variable(tf.zeros(1))\n    return (v_w, v_b)\n\ndef sgd_momentum(params, grads, states, hyperparams):\n    for p, v, g in zip(params, states, grads):\n            v[:].assign(hyperparams['momentum'] * v + g)\n            p[:].assign(p - hyperparams['lr'] * v)"
+    },
+    {
+      "type": "paragraph",
+      "text": "Hãy để chúng tôi xem làm thế nào điều này hoạt động trong thực tế."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def train_momentum(lr, momentum, num_epochs=2):\n    d2l.train_ch11(sgd_momentum, init_momentum_states(feature_dim),\n                   {'lr': lr, 'momentum': momentum}, data_iter,\n                   feature_dim, num_epochs)\n\ndata_iter, feature_dim = d2l.get_data_ch11(batch_size=10)\ntrain_momentum(0.02, 0.5)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "loss: 0.246, 0.105 sec/epoch"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_momentum_e3683f_75_1.svg",
+      "local_path": "_images/output_momentum_e3683f_75_1.svg",
+      "alt": "../_images/output_momentum_e3683f_75_1.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def train_momentum(lr, momentum, num_epochs=2):\n    d2l.train_ch11(sgd_momentum, init_momentum_states(feature_dim),\n                   {'lr': lr, 'momentum': momentum}, data_iter,\n                   feature_dim, num_epochs)\n\ndata_iter, feature_dim = d2l.get_data_ch11(batch_size=10)\ntrain_momentum(0.02, 0.5)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "loss: 0.243, 0.013 sec/epoch"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_momentum_e3683f_78_1.svg",
+      "local_path": "_images/output_momentum_e3683f_78_1.svg",
+      "alt": "../_images/output_momentum_e3683f_78_1.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def train_momentum(lr, momentum, num_epochs=2):\n    d2l.train_ch11(sgd_momentum, init_momentum_states(feature_dim),\n                   {'lr': lr, 'momentum': momentum}, data_iter,\n                   feature_dim, num_epochs)\n\ndata_iter, feature_dim = d2l.get_data_ch11(batch_size=10)\ntrain_momentum(0.02, 0.5)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "loss: 0.243, 0.108 sec/epoch"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_momentum_e3683f_81_1.svg",
+      "local_path": "_images/output_momentum_e3683f_81_1.svg",
+      "alt": "../_images/output_momentum_e3683f_81_1.svg"
+    },
+    {
+      "type": "paragraph",
+      "text": "Khi chúng ta tăng siêu tham số động lượng momentum lên 0,9, nó sẽ\nlên tới kích thước mẫu hiệu quả lớn hơn đáng kể là \\(\\frac{1}{1 - 0.9} = 10\\) . Chúng tôi giảm tỷ lệ học tập một chút\nxuống \\(0.01\\) để kiểm soát các vấn đề."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "train_momentum(0.01, 0.9)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "loss: 0.250, 0.088 sec/epoch"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_momentum_e3683f_87_1.svg",
+      "local_path": "_images/output_momentum_e3683f_87_1.svg",
+      "alt": "../_images/output_momentum_e3683f_87_1.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "train_momentum(0.01, 0.9)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "loss: 0.249, 0.012 sec/epoch"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_momentum_e3683f_90_1.svg",
+      "local_path": "_images/output_momentum_e3683f_90_1.svg",
+      "alt": "../_images/output_momentum_e3683f_90_1.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "train_momentum(0.01, 0.9)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "loss: 0.248, 0.106 sec/epoch"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_momentum_e3683f_93_1.svg",
+      "local_path": "_images/output_momentum_e3683f_93_1.svg",
+      "alt": "../_images/output_momentum_e3683f_93_1.svg"
+    },
+    {
+      "type": "paragraph",
+      "text": "Giảm tỷ lệ học tập tiếp tục giải quyết bất kỳ vấn đề nào về các vấn đề\ntối ưu hóa không trơn tru. Đặt nó thành \\(0.005\\) mang lại các đặc\ntính hội tụ tốt."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "train_momentum(0.005, 0.9)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "loss: 0.243, 0.087 sec/epoch"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_momentum_e3683f_99_1.svg",
+      "local_path": "_images/output_momentum_e3683f_99_1.svg",
+      "alt": "../_images/output_momentum_e3683f_99_1.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "train_momentum(0.005, 0.9)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "loss: 0.244, 0.012 sec/epoch"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_momentum_e3683f_102_1.svg",
+      "local_path": "_images/output_momentum_e3683f_102_1.svg",
+      "alt": "../_images/output_momentum_e3683f_102_1.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "train_momentum(0.005, 0.9)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "loss: 0.245, 0.106 sec/epoch"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_momentum_e3683f_105_1.svg",
+      "local_path": "_images/output_momentum_e3683f_105_1.svg",
+      "alt": "../_images/output_momentum_e3683f_105_1.svg"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "thuc-hien-ngan-gon",
+      "text": "11.6.2.2. Thực hiện ngắn gọn"
+    },
+    {
+      "type": "paragraph",
+      "text": "Có rất ít việc phải làm trong Gluon kể từ khi bộ giải sgd tiêu chuẩn\nđã có động lực tích hợp. Thiết lập các tham số phù hợp mang lại một quỹ\nđạo rất giống nhau."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "d2l.train_concise_ch11('sgd', {'learning_rate': 0.005, 'momentum': 0.9},\n                       data_iter)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "loss: 0.243, 0.070 sec/epoch"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_momentum_e3683f_111_1.svg",
+      "local_path": "_images/output_momentum_e3683f_111_1.svg",
+      "alt": "../_images/output_momentum_e3683f_111_1.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "trainer = torch.optim.SGD\nd2l.train_concise_ch11(trainer, {'lr': 0.005, 'momentum': 0.9}, data_iter)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "loss: 0.258, 0.012 sec/epoch"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_momentum_e3683f_114_1.svg",
+      "local_path": "_images/output_momentum_e3683f_114_1.svg",
+      "alt": "../_images/output_momentum_e3683f_114_1.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "trainer = tf.keras.optimizers.SGD\nd2l.train_concise_ch11(trainer, {'learning_rate': 0.005, 'momentum': 0.9},\n                       data_iter)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "loss: 0.245, 0.105 sec/epoch"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_momentum_e3683f_117_1.svg",
+      "local_path": "_images/output_momentum_e3683f_117_1.svg",
+      "alt": "../_images/output_momentum_e3683f_117_1.svg"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "phan-tich-ly-thuyet",
+      "text": "11.6.3. Phân tích lý thuyết"
+    },
+    {
+      "type": "paragraph",
+      "text": "Cho đến nay, ví dụ 2D của \\(f(x) = 0.1 x_1^2 + 2 x_2^2\\) dường như\nkhá contrived. Bây giờ chúng ta sẽ thấy rằng điều này thực sự khá đại\ndiện cho các loại vấn đề mà người ta có thể gặp phải, ít nhất là trong\ntrường hợp giảm thiểu các hàm khách quan bậc hai lồi."
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "ham-loi-bac-hai",
+      "text": "11.6.3.1. Hàm lồi bậc hai"
+    },
+    {
+      "type": "paragraph",
+      "text": "Xem xét các chức năng"
+    },
+    {
+      "type": "math",
+      "latex": "(11.6.6)¶\\[h(\\mathbf{x}) = \\frac{1}{2} \\mathbf{x}^\\top \\mathbf{Q} \\mathbf{x} + \\mathbf{x}^\\top \\mathbf{c} + b.\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Đây là một hàm bậc hai chung. Đối với ma trận xác định dương \\(\\mathbf{Q} \\succ 0\\) , tức là, đối với ma trận có giá trị\neigenvalues dương, điều này có bộ giảm thiểu ở \\(\\mathbf{x}^* = -\\mathbf{Q}^{-1} \\mathbf{c}\\) với giá trị tối thiểu \\(b - \\frac{1}{2} \\mathbf{c}^\\top \\mathbf{Q}^{-1} \\mathbf{c}\\) . Do\nđó chúng tôi có thể viết lại \\(h\\) như"
+    },
+    {
+      "type": "math",
+      "latex": "(11.6.7)¶\\[h(\\mathbf{x}) = \\frac{1}{2} (\\mathbf{x} - \\mathbf{Q}^{-1} \\mathbf{c})^\\top \\mathbf{Q} (\\mathbf{x} - \\mathbf{Q}^{-1} \\mathbf{c}) + b - \\frac{1}{2} \\mathbf{c}^\\top \\mathbf{Q}^{-1} \\mathbf{c}.\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Gradient được đưa ra bởi \\(\\partial_{\\mathbf{x}} f(\\mathbf{x}) = \\mathbf{Q} (\\mathbf{x} - \\mathbf{Q}^{-1} \\mathbf{c})\\) .\nĐó là, nó được đưa ra bởi khoảng cách giữa \\(\\mathbf{x}\\) và bộ thu\nnhỏ, nhân với \\(\\mathbf{Q}\\) . Do đó, động lượng cũng là sự kết hợp\ntuyến tính của các thuật ngữ \\(\\mathbf{Q} (\\mathbf{x}_t - \\mathbf{Q}^{-1} \\mathbf{c})\\) ."
+    },
+    {
+      "type": "paragraph",
+      "text": "Kể từ \\(\\mathbf{Q}\\) là xác định dương, nó có thể được phân hủy\nthành hệ thống eigencủa nó thông qua \\(\\mathbf{Q} = \\mathbf{O}^\\top \\boldsymbol{\\Lambda} \\mathbf{O}\\) cho\nmột ma trận trực giao (xoay) \\(\\mathbf{O}\\) và một ma trận chéo \\(\\boldsymbol{\\Lambda}\\) của eigenvalues dương. Điều này cho phép\nchúng ta thực hiện thay đổi các biến từ \\(\\mathbf{x}\\) thành \\(\\mathbf{z} := \\mathbf{O} (\\mathbf{x} - \\mathbf{Q}^{-1} \\mathbf{c})\\) để có được một biểu thức đơn giản hóa nhiều:"
+    },
+    {
+      "type": "math",
+      "latex": "(11.6.8)¶\\[h(\\mathbf{z}) = \\frac{1}{2} \\mathbf{z}^\\top \\boldsymbol{\\Lambda} \\mathbf{z} + b'.\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "đây \\(b' = b - \\frac{1}{2} \\mathbf{c}^\\top \\mathbf{Q}^{-1} \\mathbf{c}\\) .\nVì \\(\\mathbf{O}\\) chỉ là một ma trận trực giao, điều này không làm\nxáo trộn độ dốc một cách có ý nghĩa. Thể hiện trong điều khoản của \\(\\mathbf{z}\\) gradient gốc trở thành"
+    },
+    {
+      "type": "math",
+      "latex": "(11.6.9)¶\\[\\mathbf{z}_t = \\mathbf{z}_{t-1} - \\boldsymbol{\\Lambda} \\mathbf{z}_{t-1} = (\\mathbf{I} - \\boldsymbol{\\Lambda}) \\mathbf{z}_{t-1}.\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Thực tế quan trọng trong biểu thức này là gradient descent * không trộn\nxúc* giữa các eigenspace khác nhau. Đó là, khi được thể hiện theo hệ\nthống eigensystem của \\(\\mathbf{Q}\\) , vấn đề tối ưu hóa tiến hành\ntheo cách phối hợp khôn ngoan. Điều này cũng giữ cho đà."
+    },
+    {
+      "type": "math",
+      "latex": "(11.6.10)¶\\[\\begin{split}\\begin{aligned}\n\\mathbf{v}_t & = \\beta \\mathbf{v}_{t-1} + \\boldsymbol{\\Lambda} \\mathbf{z}_{t-1} \\\\\n\\mathbf{z}_t & = \\mathbf{z}_{t-1} - \\eta \\left(\\beta \\mathbf{v}_{t-1} + \\boldsymbol{\\Lambda} \\mathbf{z}_{t-1}\\right) \\\\\n    & = (\\mathbf{I} - \\eta \\boldsymbol{\\Lambda}) \\mathbf{z}_{t-1} - \\eta \\beta \\mathbf{v}_{t-1}.\n\\end{aligned}\\end{split}\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Khi làm điều này chúng ta chỉ chứng minh định lý sau: Gradient Descent\ncó và không có động lượng cho một hàm bậc hai lồi phân hủy thành tối ưu\nhóa phối hợp khôn ngoan theo hướng của eigenvectors của ma trận bậc hai."
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "ham-vo-huong",
+      "text": "11.6.3.2. Hàm vô hướng"
+    },
+    {
+      "type": "paragraph",
+      "text": "Với kết quả trên chúng ta hãy xem những gì sẽ xảy ra khi chúng ta giảm\nthiểu chức năng \\(f(x) = \\frac{\\lambda}{2} x^2\\) . Đối với gradient\ndescent chúng tôi có"
+    },
+    {
+      "type": "math",
+      "latex": "(11.6.11)¶\\[x_{t+1} = x_t - \\eta \\lambda x_t = (1 - \\eta \\lambda) x_t.\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Bất cứ khi nào \\(|1 - \\eta \\lambda| < 1\\) tối ưu hóa này hội tụ với\ntốc độ theo cấp số nhân kể từ sau \\(t\\) bước, chúng tôi có \\(x_t = (1 - \\eta \\lambda)^t x_0\\) . Điều này cho thấy tốc độ hội tụ\nđược cải thiện ban đầu như thế nào khi chúng ta tăng tỷ lệ học tập \\(\\eta\\) cho đến \\(\\eta \\lambda = 1\\) . Ngoài ra, mọi thứ phân kỳ\nvà cho \\(\\eta \\lambda > 2\\) vấn đề tối ưu hóa phân kỳ."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "lambdas = [0.1, 1, 10, 19]\neta = 0.1\nd2l.set_figsize((6, 4))\nfor lam in lambdas:\n    t = np.arange(20).asnumpy()\n    d2l.plt.plot(t, (1 - eta * lam) ** t, label=f'lambda = {lam:.2f}')\nd2l.plt.xlabel('time')\nd2l.plt.legend();"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_momentum_e3683f_123_0.svg",
+      "local_path": "_images/output_momentum_e3683f_123_0.svg",
+      "alt": "../_images/output_momentum_e3683f_123_0.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "lambdas = [0.1, 1, 10, 19]\neta = 0.1\nd2l.set_figsize((6, 4))\nfor lam in lambdas:\n    t = torch.arange(20).detach().numpy()\n    d2l.plt.plot(t, (1 - eta * lam) ** t, label=f'lambda = {lam:.2f}')\nd2l.plt.xlabel('time')\nd2l.plt.legend();"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_momentum_e3683f_126_0.svg",
+      "local_path": "_images/output_momentum_e3683f_126_0.svg",
+      "alt": "../_images/output_momentum_e3683f_126_0.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "lambdas = [0.1, 1, 10, 19]\neta = 0.1\nd2l.set_figsize((6, 4))\nfor lam in lambdas:\n    t = tf.range(20).numpy()\n    d2l.plt.plot(t, (1 - eta * lam) ** t, label=f'lambda = {lam:.2f}')\nd2l.plt.xlabel('time')\nd2l.plt.legend();"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_momentum_e3683f_129_0.svg",
+      "local_path": "_images/output_momentum_e3683f_129_0.svg",
+      "alt": "../_images/output_momentum_e3683f_129_0.svg"
+    },
+    {
+      "type": "paragraph",
+      "text": "Để phân tích sự hội tụ trong trường hợp động lượng, chúng ta bắt đầu\nbằng cách viết lại phương trình cập nhật theo hai vô hướng: một cho \\(x\\) và một cho động lượng \\(v\\) . Điều này mang lại:"
+    },
+    {
+      "type": "math",
+      "latex": "(11.6.12)¶\\[\\begin{split}\\begin{bmatrix} v_{t+1} \\\\ x_{t+1} \\end{bmatrix} =\n\\begin{bmatrix} \\beta & \\lambda \\\\ -\\eta \\beta & (1 - \\eta \\lambda) \\end{bmatrix}\n\\begin{bmatrix} v_{t} \\\\ x_{t} \\end{bmatrix} = \\mathbf{R}(\\beta, \\eta, \\lambda) \\begin{bmatrix} v_{t} \\\\ x_{t} \\end{bmatrix}.\\end{split}\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Chúng tôi đã sử dụng \\(\\mathbf{R}\\) để biểu thị \\(2 \\times 2\\) điều chỉnh hành vi hội tụ. Sau \\(t\\) bước sự lựa chọn ban đầu \\([v_0, x_0]\\) trở thành \\(\\mathbf{R}(\\beta, \\eta, \\lambda)^t [v_0, x_0]\\) . Do đó, tùy thuộc\nvào giá trị eigenvalues của \\(\\mathbf{R}\\) để xác định tốc độ hội\ntụ. Xem Distill post of [Goh, 2017] cho một hình ảnh động tuyệt vời và [Flammarion & Bach, 2015] để phân tích chi tiết. Người ta có thể\ncho thấy đà \\(0 < \\eta \\lambda < 2 + 2 \\beta\\) hội tụ. Đây là một\nphạm vi lớn hơn của các thông số khả thi khi so sánh với \\(0 < \\eta \\lambda < 2\\) cho gradient gốc. Nó cũng cho thấy rằng nói\nchung các giá trị lớn của \\(\\beta\\) là mong muốn. Thêm chi tiết yêu\ncầu một số lượng hợp lý của chi tiết kỹ thuật và chúng tôi đề nghị người\nđọc quan tâm tham khảo ý kiến các ấn phẩm gốc."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tom-tat",
+      "text": "11.6.4. Tóm tắt"
+    },
+    {
+      "type": "list",
+      "ordered": false,
+      "items": [
+        "Momentum thay thế gradient với một trung bình bị rò rỉ trên gradient\ntrong quá khứ. Điều này tăng tốc sự hội tụ đáng kể.",
+        "Đó là mong muốn cho cả hai gốc gradient không có tiếng ồn và (ồn ào)\nstochastic gradient gốc.",
+        "Momentum ngăn chặn sự trì trệ của quá trình tối ưu hóa có nhiều khả\nnăng xảy ra cho gốc gradient ngẫu nhiên.",
+        "Số gradient hiệu quả được đưa ra bởi \\(\\frac{1}{1-\\beta}\\) do\ngiảm trọng lượng theo cấp số của dữ liệu trong quá khứ.",
+        "Trong trường hợp các bài toán bậc hai lồi, điều này có thể được phân\ntích một cách rõ ràng một cách chi tiết.",
+        "Việc thực hiện khá đơn giản nhưng nó đòi hỏi chúng ta phải lưu trữ\nmột vector trạng thái bổ sung (đà \\(\\mathbf{v}\\) )."
+      ]
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bai-tap",
+      "text": "11.6.5. Bài tập"
+    },
+    {
+      "type": "list",
+      "ordered": true,
+      "items": [
+        "Sử dụng các kết hợp khác của các siêu tham số động lượng và tỷ lệ học\ntập và quan sát và phân tích các kết quả thử nghiệm khác nhau.",
+        "Hãy thử GD và đà cho một vấn đề bậc hai nơi bạn có nhiều eigenvalues,\ntức là, \\(f(x) = \\frac{1}{2} \\sum_i \\lambda_i x_i^2\\) , ví dụ, \\(\\lambda_i = 2^{-i}\\) . Vẽ cách các giá trị của \\(x\\) giảm\ncho khởi tạo \\(x_i = 1\\) .",
+        "Lấy giá trị tối thiểu và minimizer cho \\(h(\\mathbf{x}) = \\frac{1}{2} \\mathbf{x}^\\top \\mathbf{Q} \\mathbf{x} + \\mathbf{x}^\\top \\mathbf{c} + b\\) .",
+        "Điều gì thay đổi khi chúng ta thực hiện chuyển đổi ngẫu nhiên\ngradient với đà? Điều gì xảy ra khi chúng ta sử dụng minibatch\nstochastic gradient descent với đà? Thử nghiệm với các thông số?"
+      ]
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    }
+  ],
+  "images": [
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_momentum_e3683f_3_1.svg",
+      "local_path": "_images/output_momentum_e3683f_3_1.svg",
+      "alt": "../_images/output_momentum_e3683f_3_1.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_momentum_e3683f_6_1.svg",
+      "local_path": "_images/output_momentum_e3683f_6_1.svg",
+      "alt": "../_images/output_momentum_e3683f_6_1.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_momentum_e3683f_9_1.svg",
+      "local_path": "_images/output_momentum_e3683f_9_1.svg",
+      "alt": "../_images/output_momentum_e3683f_9_1.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_momentum_e3683f_15_1.svg",
+      "local_path": "_images/output_momentum_e3683f_15_1.svg",
+      "alt": "../_images/output_momentum_e3683f_15_1.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_momentum_e3683f_18_1.svg",
+      "local_path": "_images/output_momentum_e3683f_18_1.svg",
+      "alt": "../_images/output_momentum_e3683f_18_1.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_momentum_e3683f_21_1.svg",
+      "local_path": "_images/output_momentum_e3683f_21_1.svg",
+      "alt": "../_images/output_momentum_e3683f_21_1.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_momentum_e3683f_27_1.svg",
+      "local_path": "_images/output_momentum_e3683f_27_1.svg",
+      "alt": "../_images/output_momentum_e3683f_27_1.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_momentum_e3683f_30_1.svg",
+      "local_path": "_images/output_momentum_e3683f_30_1.svg",
+      "alt": "../_images/output_momentum_e3683f_30_1.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_momentum_e3683f_33_1.svg",
+      "local_path": "_images/output_momentum_e3683f_33_1.svg",
+      "alt": "../_images/output_momentum_e3683f_33_1.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_momentum_e3683f_39_1.svg",
+      "local_path": "_images/output_momentum_e3683f_39_1.svg",
+      "alt": "../_images/output_momentum_e3683f_39_1.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_momentum_e3683f_42_1.svg",
+      "local_path": "_images/output_momentum_e3683f_42_1.svg",
+      "alt": "../_images/output_momentum_e3683f_42_1.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_momentum_e3683f_45_1.svg",
+      "local_path": "_images/output_momentum_e3683f_45_1.svg",
+      "alt": "../_images/output_momentum_e3683f_45_1.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_momentum_e3683f_51_0.svg",
+      "local_path": "_images/output_momentum_e3683f_51_0.svg",
+      "alt": "../_images/output_momentum_e3683f_51_0.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_momentum_e3683f_54_0.svg",
+      "local_path": "_images/output_momentum_e3683f_54_0.svg",
+      "alt": "../_images/output_momentum_e3683f_54_0.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_momentum_e3683f_57_0.svg",
+      "local_path": "_images/output_momentum_e3683f_57_0.svg",
+      "alt": "../_images/output_momentum_e3683f_57_0.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_momentum_e3683f_75_1.svg",
+      "local_path": "_images/output_momentum_e3683f_75_1.svg",
+      "alt": "../_images/output_momentum_e3683f_75_1.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_momentum_e3683f_78_1.svg",
+      "local_path": "_images/output_momentum_e3683f_78_1.svg",
+      "alt": "../_images/output_momentum_e3683f_78_1.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_momentum_e3683f_81_1.svg",
+      "local_path": "_images/output_momentum_e3683f_81_1.svg",
+      "alt": "../_images/output_momentum_e3683f_81_1.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_momentum_e3683f_87_1.svg",
+      "local_path": "_images/output_momentum_e3683f_87_1.svg",
+      "alt": "../_images/output_momentum_e3683f_87_1.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_momentum_e3683f_90_1.svg",
+      "local_path": "_images/output_momentum_e3683f_90_1.svg",
+      "alt": "../_images/output_momentum_e3683f_90_1.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_momentum_e3683f_93_1.svg",
+      "local_path": "_images/output_momentum_e3683f_93_1.svg",
+      "alt": "../_images/output_momentum_e3683f_93_1.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_momentum_e3683f_99_1.svg",
+      "local_path": "_images/output_momentum_e3683f_99_1.svg",
+      "alt": "../_images/output_momentum_e3683f_99_1.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_momentum_e3683f_102_1.svg",
+      "local_path": "_images/output_momentum_e3683f_102_1.svg",
+      "alt": "../_images/output_momentum_e3683f_102_1.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_momentum_e3683f_105_1.svg",
+      "local_path": "_images/output_momentum_e3683f_105_1.svg",
+      "alt": "../_images/output_momentum_e3683f_105_1.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_momentum_e3683f_111_1.svg",
+      "local_path": "_images/output_momentum_e3683f_111_1.svg",
+      "alt": "../_images/output_momentum_e3683f_111_1.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_momentum_e3683f_114_1.svg",
+      "local_path": "_images/output_momentum_e3683f_114_1.svg",
+      "alt": "../_images/output_momentum_e3683f_114_1.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_momentum_e3683f_117_1.svg",
+      "local_path": "_images/output_momentum_e3683f_117_1.svg",
+      "alt": "../_images/output_momentum_e3683f_117_1.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_momentum_e3683f_123_0.svg",
+      "local_path": "_images/output_momentum_e3683f_123_0.svg",
+      "alt": "../_images/output_momentum_e3683f_123_0.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_momentum_e3683f_126_0.svg",
+      "local_path": "_images/output_momentum_e3683f_126_0.svg",
+      "alt": "../_images/output_momentum_e3683f_126_0.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_momentum_e3683f_129_0.svg",
+      "local_path": "_images/output_momentum_e3683f_129_0.svg",
+      "alt": "../_images/output_momentum_e3683f_129_0.svg"
+    }
+  ],
+  "text": "11.6. Đà\nTrong Section 11.4 , chúng tôi đã xem xét những gì xảy ra khi thực\nhiện gốc gradient ngẫu nhiên, tức là khi thực hiện tối ưu hóa, nơi chỉ\ncó một biến thể ồn ào của gradient có sẵn. Đặc biệt, chúng tôi nhận thấy\nrằng đối với độ dốc ồn ào, chúng ta cần phải thận trọng hơn khi chọn tốc\nđộ học tập khi đối mặt với tiếng ồn. Nếu chúng ta giảm nó quá nhanh, hội\ntụ quầy hàng. Nếu chúng ta quá khoan dung, chúng ta không hội tụ thành\nmột giải pháp đủ tốt vì tiếng ồn tiếp tục khiến chúng ta tránh xa sự tối\nưu.\n11.6.1. Khái niệm cơ bản\nTrong phần này, chúng ta sẽ khám phá các thuật toán tối ưu hóa hiệu quả\nhơn, đặc biệt là đối với một số loại vấn đề tối ưu hóa phổ biến trong\nthực tế.\n11.6.1.1. Đường trung bình bị rò rỉ\nPhần trước đã thấy chúng tôi thảo luận về minibatch SGD như một phương\ntiện để tăng tốc tính toán. Nó cũng có tác dụng phụ tốt đẹp mà độ dốc\ntrung bình làm giảm lượng phương sai. Các minibatch stochastic gradient\ndescent có thể được tính bằng cách:\nĐể giữ cho ký hiệu đơn giản, ở đây chúng tôi đã sử dụng \\(\\mathbf{h}_{i, t-1} = \\partial_{\\mathbf{w}} f(\\mathbf{x}_i, \\mathbf{w}_{t-1})\\) làm gốc gradient ngẫu nhiên cho mẫu \\(i\\) bằng cách sử dụng các\ntrọng lượng được cập nhật tại thời điểm \\(t-1\\) . Sẽ thật tuyệt nếu\nchúng ta có thể hưởng lợi từ ảnh hưởng của việc giảm phương sai ngay cả\nngoài độ dốc trung bình trên một minibatch. Một lựa chọn để thực hiện\nnhiệm vụ này là thay thế tính toán gradient bằng một “trung bình rò rỉ”:\nfor some \\(\\beta \\in (0, 1)\\) . Điều này thay thế hiệu quả gradient\ntức thời bằng một gradient được trung bình trên nhiều độ dốc * past * . \\(\\mathbf{v}\\) được gọi là * momentum*. Nó tích lũy gradient trong\nquá khứ tương tự như cách một quả bóng nặng lăn xuống cảnh quan chức\nnăng mục tiêu tích hợp trên các lực trong quá khứ. Để xem những gì đang\nxảy ra chi tiết hơn, chúng ta hãy mở rộng \\(\\mathbf{v}_t\\) đệ quy\nvào\n\\(\\beta\\) lớn lên tới mức trung bình tầm xa, trong khi \\(\\beta\\) nhỏ chỉ có một sự điều chỉnh nhẹ so với phương pháp gradient. Sự thay\nthế gradient mới không còn trỏ vào hướng dốc nhất trên một trường hợp cụ\nthể nữa mà theo hướng trung bình có trọng số của các gradient trong quá\nkhứ. Điều này cho phép chúng tôi nhận ra hầu hết các lợi ích của việc\ntrung bình trong một lô mà không có chi phí thực sự tính toán độ dốc\ntrên đó. Chúng tôi sẽ xem lại quy trình trung bình này chi tiết hơn sau.\nLý luận trên hình thành cơ sở cho những gì bây giờ được gọi là phương\npháp gradient accelerated , chẳng hạn như gradient với đà. Họ tận hưởng\nlợi ích bổ sung là hiệu quả hơn nhiều trong trường hợp vấn đề tối ưu hóa\nlà không điều kiện (tức là, nơi có một số hướng mà sự tiến bộ chậm hơn\nnhiều so với những người khác, giống như một hẻm núi hẹp). Hơn nữa,\nchúng cho phép chúng ta trung bình trên các gradient tiếp theo để có\nđược hướng xuống ổn định hơn. Thật vậy, khía cạnh của khả năng tăng tốc\nngay cả đối với các vấn đề lồi không ồn là một trong những lý do chính\nkhiến động lượng hoạt động và tại sao nó hoạt động tốt như vậy.\nNhư người ta mong đợi, do động lực hiệu quả của nó là một môn học được\nnghiên cứu tốt trong tối ưu hóa cho học sâu và hơn thế nữa. Xem ví dụ,\nđẹp bài viết expository by [Goh, 2017] để phân tích chuyên sâu và hoạt hình tương tác. Nó\nđược đề xuất bởi [Polyak, 1964] . [Nesterov, 2018] có một\ncuộc thảo luận lý thuyết chi tiết trong bối cảnh tối ưu hóa lồi. Đà\ntrong học sâu đã được biết đến là có lợi trong một thời gian dài. Xem ví\ndụ, cuộc thảo luận của [Sutskever et al., 2013] để biết\nchi tiết.\n11.6.1.2. Một vấn đề Ill-conditioned\nĐể hiểu rõ hơn về các thuộc tính hình học của phương pháp động lượng,\nchúng tôi xem lại gradient descent, mặc dù với một chức năng khách quan\nít dễ chịu hơn đáng kể. Nhớ lại rằng trong Section 11.3 , chúng tôi\nđã sử dụng \\(f(\\mathbf{x}) = x_1^2 + 2 x_2^2\\) , tức là, một mục tiêu\nellipsoid biến dạng vừa phải. Chúng tôi làm biến dạng chức năng này hơn\nnữa bằng cách kéo dài nó theo hướng \\(x_1\\) thông qua\nNhư trước \\(f\\) có mức tối thiểu là \\((0, 0)\\) . Chức năng này là\n* rấy* phẳng theo hướng \\(x_1\\) . Chúng ta hãy xem những gì sẽ xảy\nra khi chúng ta thực hiện gradient gốc như trước đây trên chức năng mới\nnày. Chúng tôi chọn một tỷ lệ học tập là \\(0.4\\) .\nBằng cách xây dựng, gradient theo hướng \\(x_2\\) là * nhiều* cao\nhơn và thay đổi nhanh hơn nhiều so với theo chiều ngang \\(x_1\\) . Do\nđó, chúng tôi đang bị mắc kẹt giữa hai lựa chọn không mong muốn: nếu\nchúng tôi chọn một tốc độ học tập nhỏ, chúng tôi đảm bảo rằng giải pháp\nkhông phân kỳ theo hướng \\(x_2\\) nhưng chúng tôi đang yên tâm với sự\nhội tụ chậm theo hướng \\(x_1\\) . Ngược lại, với tốc độ học tập lớn,\nchúng tôi tiến bộ nhanh chóng theo hướng \\(x_1\\) nhưng phân kỳ trong \\(x_2\\) . Ví dụ dưới đây minh họa những gì xảy ra ngay cả sau khi\ntăng nhẹ tỷ lệ học tập từ \\(0.4\\) lên \\(0.6\\) . Sự hội tụ theo\nhướng \\(x_1\\) được cải thiện nhưng chất lượng giải pháp tổng thể tồi\ntệ hơn nhiều.\n11.6.1.3. Phương pháp Momentum\nPhương pháp động lượng cho phép chúng ta giải quyết vấn đề gốc gradient\nđược mô tả ở trên. Nhìn vào dấu vết tối ưu hóa ở trên, chúng ta có thể\ncảm thấy rằng độ dốc trung bình trong quá khứ sẽ hoạt động tốt. Rốt\ncuộc, theo hướng \\(x_1\\) , điều này sẽ tổng hợp các gradient được căn\nchỉnh tốt, do đó làm tăng khoảng cách chúng ta bao gồm mỗi bước. Ngược\nlại, theo hướng \\(x_2\\) nơi gradient dao động, một gradient tổng hợp\nsẽ làm giảm kích thước bước do dao động hủy bỏ lẫn nhau ra. Sử dụng \\(\\mathbf{v}_t\\) thay vì gradient \\(\\mathbf{g}_t\\) mang lại các\nphương trình cập nhật sau:\nLưu ý rằng đối với \\(\\beta = 0\\) , chúng tôi phục hồi độ dốc thường\nxuyên. Trước khi nghiên cứu sâu hơn vào các thuộc tính toán học, chúng\nta hãy nhìn nhanh cách thuật toán hoạt động trong thực tế.\nNhư chúng ta có thể thấy, ngay cả với cùng tốc độ học tập mà chúng ta đã\nsử dụng trước đây, đà vẫn hội tụ tốt. Hãy để chúng tôi xem những gì xảy\nra khi chúng ta giảm tham số động lượng. Giảm một nửa nó xuống \\(\\beta = 0.25\\) dẫn đến một quỹ đạo hầu như không hội tụ ở tất cả.\nTuy nhiên, nó tốt hơn rất nhiều so với không có đà (khi giải pháp phân\nkỳ).\nLưu ý rằng chúng ta có thể kết hợp động lượng với gốc gradient ngẫu\nnhiên và đặc biệt, minibatch stochastic gradient descent. Thay đổi duy\nnhất là trong trường hợp đó, chúng tôi thay thế gradient \\(\\mathbf{g}_{t, t-1}\\) bằng \\(\\mathbf{g}_t\\) . Cuối cùng, để\nthuận tiện, chúng tôi khởi tạo \\(\\mathbf{v}_0 = 0\\) tại thời điểm \\(t=0\\) . Chúng ta hãy nhìn vào những gì rò rỉ trung bình thực sự làm\ncho các bản cập nhật.\n11.6.1.4. Trọng lượng mẫu hiệu quả\nNhớ lại rằng \\(\\mathbf{v}_t = \\sum_{\\tau = 0}^{t-1} \\beta^{\\tau} \\mathbf{g}_{t-\\tau, t-\\tau-1}\\) .\nTrong giới hạn, các điều khoản thêm lên đến \\(\\sum_{\\tau=0}^\\infty \\beta^\\tau = \\frac{1}{1-\\beta}\\) . Nói cách\nkhác, thay vì thực hiện một bước có kích thước \\(\\eta\\) trong\ngradient gốc hoặc gốc gradient ngẫu nhiên, chúng tôi thực hiện một bước\ncó kích thước \\(\\frac{\\eta}{1-\\beta}\\) trong khi đồng thời, đối phó\nvới một hướng gốc có khả năng tốt hơn nhiều. Đây là hai lợi ích trong\nmột. Để minh họa cách thức hoạt động của trọng số cho các lựa chọn khác\nnhau của \\(\\beta\\) hãy xem xét sơ đồ dưới đây.\n11.6.2. Các thí nghiệm thực tế\nChúng ta hãy xem động lượng hoạt động như thế nào trong thực tế, tức là,\nkhi được sử dụng trong bối cảnh của một trình tối ưu hóa thích hợp. Đối\nvới điều này, chúng ta cần một triển khai có thể mở rộng hơn một chút.\n11.6.2.1. Thực hiện từ đầu\nSo với (minibatch) stochastic gradient gốc phương pháp động lượng cần\nduy trì một tập hợp các biến phụ trợ, tức là vận tốc. Nó có hình dạng\ntương tự như gradient (và các biến của bài toán tối ưu hóa). Trong việc\nthực hiện dưới đây, chúng tôi gọi các biến này là states .\nHãy để chúng tôi xem làm thế nào điều này hoạt động trong thực tế.\nKhi chúng ta tăng siêu tham số động lượng momentum lên 0,9, nó sẽ\nlên tới kích thước mẫu hiệu quả lớn hơn đáng kể là \\(\\frac{1}{1 - 0.9} = 10\\) . Chúng tôi giảm tỷ lệ học tập một chút\nxuống \\(0.01\\) để kiểm soát các vấn đề.\nGiảm tỷ lệ học tập tiếp tục giải quyết bất kỳ vấn đề nào về các vấn đề\ntối ưu hóa không trơn tru. Đặt nó thành \\(0.005\\) mang lại các đặc\ntính hội tụ tốt.\n11.6.2.2. Thực hiện ngắn gọn\nCó rất ít việc phải làm trong Gluon kể từ khi bộ giải sgd tiêu chuẩn\nđã có động lực tích hợp. Thiết lập các tham số phù hợp mang lại một quỹ\nđạo rất giống nhau.\n11.6.3. Phân tích lý thuyết\nCho đến nay, ví dụ 2D của \\(f(x) = 0.1 x_1^2 + 2 x_2^2\\) dường như\nkhá contrived. Bây giờ chúng ta sẽ thấy rằng điều này thực sự khá đại\ndiện cho các loại vấn đề mà người ta có thể gặp phải, ít nhất là trong\ntrường hợp giảm thiểu các hàm khách quan bậc hai lồi.\n11.6.3.1. Hàm lồi bậc hai\nXem xét các chức năng\nĐây là một hàm bậc hai chung. Đối với ma trận xác định dương \\(\\mathbf{Q} \\succ 0\\) , tức là, đối với ma trận có giá trị\neigenvalues dương, điều này có bộ giảm thiểu ở \\(\\mathbf{x}^* = -\\mathbf{Q}^{-1} \\mathbf{c}\\) với giá trị tối thiểu \\(b - \\frac{1}{2} \\mathbf{c}^\\top \\mathbf{Q}^{-1} \\mathbf{c}\\) . Do\nđó chúng tôi có thể viết lại \\(h\\) như\nGradient được đưa ra bởi \\(\\partial_{\\mathbf{x}} f(\\mathbf{x}) = \\mathbf{Q} (\\mathbf{x} - \\mathbf{Q}^{-1} \\mathbf{c})\\) .\nĐó là, nó được đưa ra bởi khoảng cách giữa \\(\\mathbf{x}\\) và bộ thu\nnhỏ, nhân với \\(\\mathbf{Q}\\) . Do đó, động lượng cũng là sự kết hợp\ntuyến tính của các thuật ngữ \\(\\mathbf{Q} (\\mathbf{x}_t - \\mathbf{Q}^{-1} \\mathbf{c})\\) .\nKể từ \\(\\mathbf{Q}\\) là xác định dương, nó có thể được phân hủy\nthành hệ thống eigencủa nó thông qua \\(\\mathbf{Q} = \\mathbf{O}^\\top \\boldsymbol{\\Lambda} \\mathbf{O}\\) cho\nmột ma trận trực giao (xoay) \\(\\mathbf{O}\\) và một ma trận chéo \\(\\boldsymbol{\\Lambda}\\) của eigenvalues dương. Điều này cho phép\nchúng ta thực hiện thay đổi các biến từ \\(\\mathbf{x}\\) thành \\(\\mathbf{z} := \\mathbf{O} (\\mathbf{x} - \\mathbf{Q}^{-1} \\mathbf{c})\\) để có được một biểu thức đơn giản hóa nhiều:\nđây \\(b' = b - \\frac{1}{2} \\mathbf{c}^\\top \\mathbf{Q}^{-1} \\mathbf{c}\\) .\nVì \\(\\mathbf{O}\\) chỉ là một ma trận trực giao, điều này không làm\nxáo trộn độ dốc một cách có ý nghĩa. Thể hiện trong điều khoản của \\(\\mathbf{z}\\) gradient gốc trở thành\nThực tế quan trọng trong biểu thức này là gradient descent * không trộn\nxúc* giữa các eigenspace khác nhau. Đó là, khi được thể hiện theo hệ\nthống eigensystem của \\(\\mathbf{Q}\\) , vấn đề tối ưu hóa tiến hành\ntheo cách phối hợp khôn ngoan. Điều này cũng giữ cho đà.\nKhi làm điều này chúng ta chỉ chứng minh định lý sau: Gradient Descent\ncó và không có động lượng cho một hàm bậc hai lồi phân hủy thành tối ưu\nhóa phối hợp khôn ngoan theo hướng của eigenvectors của ma trận bậc hai.\n11.6.3.2. Hàm vô hướng\nVới kết quả trên chúng ta hãy xem những gì sẽ xảy ra khi chúng ta giảm\nthiểu chức năng \\(f(x) = \\frac{\\lambda}{2} x^2\\) . Đối với gradient\ndescent chúng tôi có\nBất cứ khi nào \\(|1 - \\eta \\lambda| < 1\\) tối ưu hóa này hội tụ với\ntốc độ theo cấp số nhân kể từ sau \\(t\\) bước, chúng tôi có \\(x_t = (1 - \\eta \\lambda)^t x_0\\) . Điều này cho thấy tốc độ hội tụ\nđược cải thiện ban đầu như thế nào khi chúng ta tăng tỷ lệ học tập \\(\\eta\\) cho đến \\(\\eta \\lambda = 1\\) . Ngoài ra, mọi thứ phân kỳ\nvà cho \\(\\eta \\lambda > 2\\) vấn đề tối ưu hóa phân kỳ.\nĐể phân tích sự hội tụ trong trường hợp động lượng, chúng ta bắt đầu\nbằng cách viết lại phương trình cập nhật theo hai vô hướng: một cho \\(x\\) và một cho động lượng \\(v\\) . Điều này mang lại:\nChúng tôi đã sử dụng \\(\\mathbf{R}\\) để biểu thị \\(2 \\times 2\\) điều chỉnh hành vi hội tụ. Sau \\(t\\) bước sự lựa chọn ban đầu \\([v_0, x_0]\\) trở thành \\(\\mathbf{R}(\\beta, \\eta, \\lambda)^t [v_0, x_0]\\) . Do đó, tùy thuộc\nvào giá trị eigenvalues của \\(\\mathbf{R}\\) để xác định tốc độ hội\ntụ. Xem Distill post of [Goh, 2017] cho một hình ảnh động tuyệt vời và [Flammarion & Bach, 2015] để phân tích chi tiết. Người ta có thể\ncho thấy đà \\(0 < \\eta \\lambda < 2 + 2 \\beta\\) hội tụ. Đây là một\nphạm vi lớn hơn của các thông số khả thi khi so sánh với \\(0 < \\eta \\lambda < 2\\) cho gradient gốc. Nó cũng cho thấy rằng nói\nchung các giá trị lớn của \\(\\beta\\) là mong muốn. Thêm chi tiết yêu\ncầu một số lượng hợp lý của chi tiết kỹ thuật và chúng tôi đề nghị người\nđọc quan tâm tham khảo ý kiến các ấn phẩm gốc.\n11.6.4. Tóm tắt\nMomentum thay thế gradient với một trung bình bị rò rỉ trên gradient\ntrong quá khứ. Điều này tăng tốc sự hội tụ đáng kể.\nĐó là mong muốn cho cả hai gốc gradient không có tiếng ồn và (ồn ào)\nstochastic gradient gốc.\nMomentum ngăn chặn sự trì trệ của quá trình tối ưu hóa có nhiều khả\nnăng xảy ra cho gốc gradient ngẫu nhiên.\nSố gradient hiệu quả được đưa ra bởi \\(\\frac{1}{1-\\beta}\\) do\ngiảm trọng lượng theo cấp số của dữ liệu trong quá khứ.\nTrong trường hợp các bài toán bậc hai lồi, điều này có thể được phân\ntích một cách rõ ràng một cách chi tiết.\nViệc thực hiện khá đơn giản nhưng nó đòi hỏi chúng ta phải lưu trữ\nmột vector trạng thái bổ sung (đà \\(\\mathbf{v}\\) ).\n11.6.5. Bài tập\nSử dụng các kết hợp khác của các siêu tham số động lượng và tỷ lệ học\ntập và quan sát và phân tích các kết quả thử nghiệm khác nhau.\nHãy thử GD và đà cho một vấn đề bậc hai nơi bạn có nhiều eigenvalues,\ntức là, \\(f(x) = \\frac{1}{2} \\sum_i \\lambda_i x_i^2\\) , ví dụ, \\(\\lambda_i = 2^{-i}\\) . Vẽ cách các giá trị của \\(x\\) giảm\ncho khởi tạo \\(x_i = 1\\) .\nLấy giá trị tối thiểu và minimizer cho \\(h(\\mathbf{x}) = \\frac{1}{2} \\mathbf{x}^\\top \\mathbf{Q} \\mathbf{x} + \\mathbf{x}^\\top \\mathbf{c} + b\\) .\nĐiều gì thay đổi khi chúng ta thực hiện chuyển đổi ngẫu nhiên\ngradient với đà? Điều gì xảy ra khi chúng ta sử dụng minibatch\nstochastic gradient descent với đà? Thử nghiệm với các thông số?\nDiscussions\nDiscussions\nDiscussions"
+}

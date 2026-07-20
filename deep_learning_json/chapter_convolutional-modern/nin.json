@@ -1,0 +1,292 @@
+{
+  "url": "https://vi.d2l.ai/chapter_convolutional-modern/nin.html",
+  "chapter": "chapter_convolutional-modern",
+  "title": "7.3. Mạng trong mạng (Nin)",
+  "crawled_at": "2026-07-20T12:39:49.824160+00:00",
+  "headings": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "mang-trong-mang-nin",
+      "text": "7.3. Mạng trong mạng (Nin)"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "nin-blocks",
+      "text": "7.3.1. NiN Blocks"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "mo-hinh-nin",
+      "text": "7.3.2. Mô hình NiN"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "dao-tao",
+      "text": "7.3.3. Đào tạo"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tom-tat",
+      "text": "7.3.4. Tóm tắt"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bai-tap",
+      "text": "7.3.5. Bài tập"
+    }
+  ],
+  "content": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "mang-trong-mang-nin",
+      "text": "7.3. Mạng trong mạng (Nin)"
+    },
+    {
+      "type": "paragraph",
+      "text": "LeNet, AlexNet và VGG đều chia sẻ một mẫu thiết kế chung: trích xuất các\ntính năng khai thác cấu trúc không gian thông qua một chuỗi các lớp\nphức tạp và tập hợp và sau đó xử lý các biểu diễn thông qua các lớp được\nkết nối hoàn toàn. Những cải tiến trên LeNet của AlexNet và VGG chủ yếu\nnằm ở cách các mạng sau này mở rộng và làm sâu sắc thêm hai mô-đun này.\nNgoài ra, người ta có thể tưởng tượng sử dụng các lớp được kết nối hoàn\ntoàn trước đó trong quá trình này. Tuy nhiên, việc sử dụng bất cẩn các\nlớp dày đặc có thể từ bỏ cấu trúc không gian của biểu diễn hoàn toàn, mạng trong mạng (* NiN*) khối cung cấp một giải pháp thay thế. Chúng\nđược đề xuất dựa trên một cái nhìn sâu sắc rất đơn giản: sử dụng MLP\ntrên các kênh cho mỗi pixel riêng biệt [Lin et al., 2013] ."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "nin-blocks",
+      "text": "7.3.1. NiN Blocks"
+    },
+    {
+      "type": "paragraph",
+      "text": "Nhớ lại rằng các đầu vào và đầu ra của các lớp phức tạp bao gồm các hàng\nchục bốn chiều với các trục tương ứng với ví dụ, kênh, chiều cao và\nchiều rộng. Cũng nhớ lại rằng các đầu vào và đầu ra của các lớp được kết\nnối hoàn toàn thường là các hàng chục hai chiều tương ứng với ví dụ và\ntính năng. Ý tưởng đằng sau Nin là áp dụng một lớp được kết nối hoàn\ntoàn tại mỗi vị trí pixel (cho mỗi chiều cao và chiều rộng). Nếu chúng\nta buộc trọng lượng trên mỗi vị trí không gian, chúng ta có thể nghĩ đây\nlà một lớp ghép \\(1\\times 1\\) (như được mô tả trong Section 6.4 ) hoặc như một lớp được kết nối hoàn toàn hoạt\nđộng độc lập trên mỗi vị trí pixel. Một cách khác để xem điều này là\nnghĩ về từng phần tử trong chiều không gian (chiều cao và chiều rộng)\ntương đương với một ví dụ và một kênh tương đương với một đối tượng."
+    },
+    {
+      "type": "paragraph",
+      "text": "Fig. 7.3.1 minh họa sự khác biệt về cấu trúc chính giữa VGG và\nNin, và các khối của chúng. Khối Nin bao gồm một lớp phức tạp tiếp theo\nlà hai lớp ghép \\(1\\times 1\\) hoạt động như các lớp được kết nối\nhoàn toàn trên mỗi pixel với các kích hoạt ReLU. Hình dạng cửa sổ phức\ntạp của lớp đầu tiên thường được đặt bởi người dùng. Các hình dạng cửa\nsổ tiếp theo được cố định thành \\(1 \\times 1\\) ."
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/nin.svg",
+      "local_path": "_images/nin.svg",
+      "alt": "../_images/nin.svg"
+    },
+    {
+      "type": "paragraph",
+      "text": "Fig. 7.3.1 Comparing architectures of VGG and NiN, and their blocks. ¶"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "from mxnet import np, npx\nfrom mxnet.gluon import nn\nfrom d2l import mxnet as d2l\n\nnpx.set_np()\n\ndef nin_block(num_channels, kernel_size, strides, padding):\n    blk = nn.Sequential()\n    blk.add(nn.Conv2D(num_channels, kernel_size, strides, padding,\n                      activation='relu'),\n            nn.Conv2D(num_channels, kernel_size=1, activation='relu'),\n            nn.Conv2D(num_channels, kernel_size=1, activation='relu'))\n    return blk"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "import torch\nfrom torch import nn\nfrom d2l import torch as d2l\n\n\ndef nin_block(in_channels, out_channels, kernel_size, strides, padding):\n    return nn.Sequential(\n        nn.Conv2d(in_channels, out_channels, kernel_size, strides, padding),\n        nn.ReLU(),\n        nn.Conv2d(out_channels, out_channels, kernel_size=1), nn.ReLU(),\n        nn.Conv2d(out_channels, out_channels, kernel_size=1), nn.ReLU())"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "import tensorflow as tf\nfrom d2l import tensorflow as d2l\n\n\ndef nin_block(num_channels, kernel_size, strides, padding):\n    return tf.keras.models.Sequential([\n        tf.keras.layers.Conv2D(num_channels, kernel_size, strides=strides,\n                               padding=padding, activation='relu'),\n        tf.keras.layers.Conv2D(num_channels, kernel_size=1,\n                               activation='relu'),\n        tf.keras.layers.Conv2D(num_channels, kernel_size=1,\n                               activation='relu')])"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "mo-hinh-nin",
+      "text": "7.3.2. Mô hình NiN"
+    },
+    {
+      "type": "paragraph",
+      "text": "Mạng Nin ban đầu được đề xuất ngay sau AlexNet và rõ ràng rút ra một số\ncảm hứng. Nin sử dụng các lớp phức tạp với hình dạng cửa sổ \\(11\\times 11\\) , \\(5\\times 5\\) , và \\(3\\times 3\\) , và các số\nkênh đầu ra tương ứng giống như trong AlexNet. Mỗi khối Nin được theo\nsau bởi một lớp tổng hợp tối đa với một sải chân là 2 và một hình dạng\ncửa sổ là \\(3\\times 3\\) ."
+    },
+    {
+      "type": "paragraph",
+      "text": "Một điểm khác biệt đáng kể giữa Nin và AlexNet là Nin tránh hoàn toàn\ncác lớp được kết nối hoàn toàn. Thay vào đó, Nin sử dụng một khối Nin\nvới một số kênh đầu ra bằng số lớp nhãn, tiếp theo là một lớp tổng hợp\ntrung bình global , mang lại một vectơ của logits. Một ưu điểm của\nthiết kế của Nin là nó làm giảm đáng kể số lượng các thông số mô hình\ncần thiết. Tuy nhiên, trong thực tế, thiết kế này đôi khi đòi hỏi thời\ngian đào tạo mô hình tăng lên."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "net = nn.Sequential()\nnet.add(nin_block(96, kernel_size=11, strides=4, padding=0),\n        nn.MaxPool2D(pool_size=3, strides=2),\n        nin_block(256, kernel_size=5, strides=1, padding=2),\n        nn.MaxPool2D(pool_size=3, strides=2),\n        nin_block(384, kernel_size=3, strides=1, padding=1),\n        nn.MaxPool2D(pool_size=3, strides=2),\n        nn.Dropout(0.5),\n        # There are 10 label classes\n        nin_block(10, kernel_size=3, strides=1, padding=1),\n        # The global average pooling layer automatically sets the window shape\n        # to the height and width of the input\n        nn.GlobalAvgPool2D(),\n        # Transform the four-dimensional output into two-dimensional output\n        # with a shape of (batch size, 10)\n        nn.Flatten())"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "net = nn.Sequential(\n    nin_block(1, 96, kernel_size=11, strides=4, padding=0),\n    nn.MaxPool2d(3, stride=2),\n    nin_block(96, 256, kernel_size=5, strides=1, padding=2),\n    nn.MaxPool2d(3, stride=2),\n    nin_block(256, 384, kernel_size=3, strides=1, padding=1),\n    nn.MaxPool2d(3, stride=2),\n    nn.Dropout(0.5),\n    # There are 10 label classes\n    nin_block(384, 10, kernel_size=3, strides=1, padding=1),\n    nn.AdaptiveAvgPool2d((1, 1)),\n    # Transform the four-dimensional output into two-dimensional output with a\n    # shape of (batch size, 10)\n    nn.Flatten())"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def net():\n    return tf.keras.models.Sequential([\n        nin_block(96, kernel_size=11, strides=4, padding='valid'),\n        tf.keras.layers.MaxPool2D(pool_size=3, strides=2),\n        nin_block(256, kernel_size=5, strides=1, padding='same'),\n        tf.keras.layers.MaxPool2D(pool_size=3, strides=2),\n        nin_block(384, kernel_size=3, strides=1, padding='same'),\n        tf.keras.layers.MaxPool2D(pool_size=3, strides=2),\n        tf.keras.layers.Dropout(0.5),\n        # There are 10 label classes\n        nin_block(10, kernel_size=3, strides=1, padding='same'),\n        tf.keras.layers.GlobalAveragePooling2D(),\n        tf.keras.layers.Reshape((1, 1, 10)),\n        # Transform the four-dimensional output into two-dimensional output\n        # with a shape of (batch size, 10)\n        tf.keras.layers.Flatten(),\n        ])"
+    },
+    {
+      "type": "paragraph",
+      "text": "Chúng ta tạo ra một ví dụ dữ liệu để xem hình dạng đầu ra của mỗi block."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "X = np.random.uniform(size=(1, 1, 224, 224))\nnet.initialize()\nfor layer in net:\n    X = layer(X)\n    print(layer.name, 'output shape:\\t', X.shape)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "sequential1 output shape:    (1, 96, 54, 54)\npool0 output shape:  (1, 96, 26, 26)\nsequential2 output shape:    (1, 256, 26, 26)\npool1 output shape:  (1, 256, 12, 12)\nsequential3 output shape:    (1, 384, 12, 12)\npool2 output shape:  (1, 384, 5, 5)\ndropout0 output shape:       (1, 384, 5, 5)\nsequential4 output shape:    (1, 10, 5, 5)\npool3 output shape:  (1, 10, 1, 1)\nflatten0 output shape:       (1, 10)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "X = torch.rand(size=(1, 1, 224, 224))\nfor layer in net:\n    X = layer(X)\n    print(layer.__class__.__name__,'output shape:\\t', X.shape)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "Sequential output shape:     torch.Size([1, 96, 54, 54])\nMaxPool2d output shape:      torch.Size([1, 96, 26, 26])\nSequential output shape:     torch.Size([1, 256, 26, 26])\nMaxPool2d output shape:      torch.Size([1, 256, 12, 12])\nSequential output shape:     torch.Size([1, 384, 12, 12])\nMaxPool2d output shape:      torch.Size([1, 384, 5, 5])\nDropout output shape:        torch.Size([1, 384, 5, 5])\nSequential output shape:     torch.Size([1, 10, 5, 5])\nAdaptiveAvgPool2d output shape:      torch.Size([1, 10, 1, 1])\nFlatten output shape:        torch.Size([1, 10])"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "X = tf.random.uniform((1, 224, 224, 1))\nfor layer in net().layers:\n    X = layer(X)\n    print(layer.__class__.__name__,'output shape:\\t', X.shape)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "Sequential output shape:     (1, 54, 54, 96)\nMaxPooling2D output shape:   (1, 26, 26, 96)\nSequential output shape:     (1, 26, 26, 256)\nMaxPooling2D output shape:   (1, 12, 12, 256)\nSequential output shape:     (1, 12, 12, 384)\nMaxPooling2D output shape:   (1, 5, 5, 384)\nDropout output shape:        (1, 5, 5, 384)\nSequential output shape:     (1, 5, 5, 10)\nGlobalAveragePooling2D output shape:         (1, 10)\nReshape output shape:        (1, 1, 1, 10)\nFlatten output shape:        (1, 10)"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "dao-tao",
+      "text": "7.3.3. Đào tạo"
+    },
+    {
+      "type": "paragraph",
+      "text": "Như trước đây chúng ta sử dụng Fashion-MNIST để đào tạo mô hình. Đào tạo\ncủa Nin tương tự như cho AlexNet và VGG."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "lr, num_epochs, batch_size = 0.1, 10, 128\ntrain_iter, test_iter = d2l.load_data_fashion_mnist(batch_size, resize=224)\nd2l.train_ch6(net, train_iter, test_iter, num_epochs, lr, d2l.try_gpu())"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "loss 1.843, train acc 0.316, test acc 0.568\n2926.6 examples/sec on gpu(0)"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_nin_8ad4f3_39_1.svg",
+      "local_path": "_images/output_nin_8ad4f3_39_1.svg",
+      "alt": "../_images/output_nin_8ad4f3_39_1.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "lr, num_epochs, batch_size = 0.1, 10, 128\ntrain_iter, test_iter = d2l.load_data_fashion_mnist(batch_size, resize=224)\nd2l.train_ch6(net, train_iter, test_iter, num_epochs, lr, d2l.try_gpu())"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "loss 0.381, train acc 0.858, test acc 0.863\n3160.4 examples/sec on cuda:0"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_nin_8ad4f3_42_1.svg",
+      "local_path": "_images/output_nin_8ad4f3_42_1.svg",
+      "alt": "../_images/output_nin_8ad4f3_42_1.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "lr, num_epochs, batch_size = 0.1, 10, 128\ntrain_iter, test_iter = d2l.load_data_fashion_mnist(batch_size, resize=224)\nd2l.train_ch6(net, train_iter, test_iter, num_epochs, lr, d2l.try_gpu())"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "loss 0.336, train acc 0.874, test acc 0.876\n3264.0 examples/sec on /GPU:0"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "<keras.engine.sequential.Sequential at 0x7f36f85765b0>"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_nin_8ad4f3_45_2.svg",
+      "local_path": "_images/output_nin_8ad4f3_45_2.svg",
+      "alt": "../_images/output_nin_8ad4f3_45_2.svg"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tom-tat",
+      "text": "7.3.4. Tóm tắt"
+    },
+    {
+      "type": "list",
+      "ordered": false,
+      "items": [
+        "Nin sử dụng các khối bao gồm một lớp phức tạp và nhiều lớp ghép \\(1\\times 1\\) . Điều này có thể được sử dụng trong ngăn xếp phức\ntạp để cho phép tính phi tuyến trên mỗi pixel hơn.",
+        "Nin loại bỏ các lớp được kết nối hoàn toàn và thay thế chúng bằng\ntổng hợp trung bình toàn cầu (tức là tổng hợp tất cả các vị trí) sau\nkhi giảm số lượng kênh xuống số lượng đầu ra mong muốn (ví dụ: 10 cho\nFashion-MNIST).",
+        "Loại bỏ các lớp được kết nối hoàn toàn làm giảm quá mức. Nin có ít\ntham số hơn đáng kể.",
+        "Thiết kế Nin ảnh hưởng đến nhiều thiết kế CNN tiếp theo."
+      ]
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bai-tap",
+      "text": "7.3.5. Bài tập"
+    },
+    {
+      "type": "list",
+      "ordered": true,
+      "items": [
+        "Điều chỉnh các siêu tham số để cải thiện độ chính xác phân loại.",
+        "Tại sao có hai lớp ghép \\(1\\times 1\\) trong khối Nin? Loại bỏ một\ntrong số chúng, sau đó quan sát và phân tích các hiện tượng thử\nnghiệm.",
+        "Tính toán mức sử dụng tài nguyên cho Nin. Số lượng tham số là bao nhiêu? Số lượng tính toán là bao nhiêu? Dung lượng bộ nhớ cần thiết trong quá trình đào tạo là bao nhiêu? Dung lượng bộ nhớ cần thiết trong quá trình dự đoán là bao nhiêu?",
+        "Số lượng tham số là bao nhiêu?",
+        "Số lượng tính toán là bao nhiêu?",
+        "Dung lượng bộ nhớ cần thiết trong quá trình đào tạo là bao nhiêu?",
+        "Dung lượng bộ nhớ cần thiết trong quá trình dự đoán là bao nhiêu?",
+        "Những vấn đề có thể xảy ra với việc giảm đại diện \\(384 \\times 5 \\times 5\\) thành đại diện \\(10 \\times 5 \\times 5\\) trong một bước là gì?"
+      ]
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    }
+  ],
+  "images": [
+    {
+      "original_url": "https://vi.d2l.ai/_images/nin.svg",
+      "local_path": "_images/nin.svg",
+      "alt": "../_images/nin.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_nin_8ad4f3_39_1.svg",
+      "local_path": "_images/output_nin_8ad4f3_39_1.svg",
+      "alt": "../_images/output_nin_8ad4f3_39_1.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_nin_8ad4f3_42_1.svg",
+      "local_path": "_images/output_nin_8ad4f3_42_1.svg",
+      "alt": "../_images/output_nin_8ad4f3_42_1.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_nin_8ad4f3_45_2.svg",
+      "local_path": "_images/output_nin_8ad4f3_45_2.svg",
+      "alt": "../_images/output_nin_8ad4f3_45_2.svg"
+    }
+  ],
+  "text": "7.3. Mạng trong mạng (Nin)\nLeNet, AlexNet và VGG đều chia sẻ một mẫu thiết kế chung: trích xuất các\ntính năng khai thác cấu trúc không gian thông qua một chuỗi các lớp\nphức tạp và tập hợp và sau đó xử lý các biểu diễn thông qua các lớp được\nkết nối hoàn toàn. Những cải tiến trên LeNet của AlexNet và VGG chủ yếu\nnằm ở cách các mạng sau này mở rộng và làm sâu sắc thêm hai mô-đun này.\nNgoài ra, người ta có thể tưởng tượng sử dụng các lớp được kết nối hoàn\ntoàn trước đó trong quá trình này. Tuy nhiên, việc sử dụng bất cẩn các\nlớp dày đặc có thể từ bỏ cấu trúc không gian của biểu diễn hoàn toàn, mạng trong mạng (* NiN*) khối cung cấp một giải pháp thay thế. Chúng\nđược đề xuất dựa trên một cái nhìn sâu sắc rất đơn giản: sử dụng MLP\ntrên các kênh cho mỗi pixel riêng biệt [Lin et al., 2013] .\n7.3.1. NiN Blocks\nNhớ lại rằng các đầu vào và đầu ra của các lớp phức tạp bao gồm các hàng\nchục bốn chiều với các trục tương ứng với ví dụ, kênh, chiều cao và\nchiều rộng. Cũng nhớ lại rằng các đầu vào và đầu ra của các lớp được kết\nnối hoàn toàn thường là các hàng chục hai chiều tương ứng với ví dụ và\ntính năng. Ý tưởng đằng sau Nin là áp dụng một lớp được kết nối hoàn\ntoàn tại mỗi vị trí pixel (cho mỗi chiều cao và chiều rộng). Nếu chúng\nta buộc trọng lượng trên mỗi vị trí không gian, chúng ta có thể nghĩ đây\nlà một lớp ghép \\(1\\times 1\\) (như được mô tả trong Section 6.4 ) hoặc như một lớp được kết nối hoàn toàn hoạt\nđộng độc lập trên mỗi vị trí pixel. Một cách khác để xem điều này là\nnghĩ về từng phần tử trong chiều không gian (chiều cao và chiều rộng)\ntương đương với một ví dụ và một kênh tương đương với một đối tượng.\nFig. 7.3.1 minh họa sự khác biệt về cấu trúc chính giữa VGG và\nNin, và các khối của chúng. Khối Nin bao gồm một lớp phức tạp tiếp theo\nlà hai lớp ghép \\(1\\times 1\\) hoạt động như các lớp được kết nối\nhoàn toàn trên mỗi pixel với các kích hoạt ReLU. Hình dạng cửa sổ phức\ntạp của lớp đầu tiên thường được đặt bởi người dùng. Các hình dạng cửa\nsổ tiếp theo được cố định thành \\(1 \\times 1\\) .\nFig. 7.3.1 Comparing architectures of VGG and NiN, and their blocks. ¶\n7.3.2. Mô hình NiN\nMạng Nin ban đầu được đề xuất ngay sau AlexNet và rõ ràng rút ra một số\ncảm hứng. Nin sử dụng các lớp phức tạp với hình dạng cửa sổ \\(11\\times 11\\) , \\(5\\times 5\\) , và \\(3\\times 3\\) , và các số\nkênh đầu ra tương ứng giống như trong AlexNet. Mỗi khối Nin được theo\nsau bởi một lớp tổng hợp tối đa với một sải chân là 2 và một hình dạng\ncửa sổ là \\(3\\times 3\\) .\nMột điểm khác biệt đáng kể giữa Nin và AlexNet là Nin tránh hoàn toàn\ncác lớp được kết nối hoàn toàn. Thay vào đó, Nin sử dụng một khối Nin\nvới một số kênh đầu ra bằng số lớp nhãn, tiếp theo là một lớp tổng hợp\ntrung bình global , mang lại một vectơ của logits. Một ưu điểm của\nthiết kế của Nin là nó làm giảm đáng kể số lượng các thông số mô hình\ncần thiết. Tuy nhiên, trong thực tế, thiết kế này đôi khi đòi hỏi thời\ngian đào tạo mô hình tăng lên.\nChúng ta tạo ra một ví dụ dữ liệu để xem hình dạng đầu ra của mỗi block.\n7.3.3. Đào tạo\nNhư trước đây chúng ta sử dụng Fashion-MNIST để đào tạo mô hình. Đào tạo\ncủa Nin tương tự như cho AlexNet và VGG.\n7.3.4. Tóm tắt\nNin sử dụng các khối bao gồm một lớp phức tạp và nhiều lớp ghép \\(1\\times 1\\) . Điều này có thể được sử dụng trong ngăn xếp phức\ntạp để cho phép tính phi tuyến trên mỗi pixel hơn.\nNin loại bỏ các lớp được kết nối hoàn toàn và thay thế chúng bằng\ntổng hợp trung bình toàn cầu (tức là tổng hợp tất cả các vị trí) sau\nkhi giảm số lượng kênh xuống số lượng đầu ra mong muốn (ví dụ: 10 cho\nFashion-MNIST).\nLoại bỏ các lớp được kết nối hoàn toàn làm giảm quá mức. Nin có ít\ntham số hơn đáng kể.\nThiết kế Nin ảnh hưởng đến nhiều thiết kế CNN tiếp theo.\n7.3.5. Bài tập\nĐiều chỉnh các siêu tham số để cải thiện độ chính xác phân loại.\nTại sao có hai lớp ghép \\(1\\times 1\\) trong khối Nin? Loại bỏ một\ntrong số chúng, sau đó quan sát và phân tích các hiện tượng thử\nnghiệm.\nTính toán mức sử dụng tài nguyên cho Nin. Số lượng tham số là bao nhiêu? Số lượng tính toán là bao nhiêu? Dung lượng bộ nhớ cần thiết trong quá trình đào tạo là bao nhiêu? Dung lượng bộ nhớ cần thiết trong quá trình dự đoán là bao nhiêu?\nSố lượng tham số là bao nhiêu?\nSố lượng tính toán là bao nhiêu?\nDung lượng bộ nhớ cần thiết trong quá trình đào tạo là bao nhiêu?\nDung lượng bộ nhớ cần thiết trong quá trình dự đoán là bao nhiêu?\nNhững vấn đề có thể xảy ra với việc giảm đại diện \\(384 \\times 5 \\times 5\\) thành đại diện \\(10 \\times 5 \\times 5\\) trong một bước là gì?\nDiscussions\nDiscussions\nDiscussions"
+}

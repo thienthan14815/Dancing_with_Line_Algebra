@@ -1,0 +1,559 @@
+{
+  "url": "https://vi.d2l.ai/chapter_computer-vision/kaggle-cifar10.html",
+  "chapter": "chapter_computer-vision",
+  "title": "13.13. Phân loại hình ảnh (CIFAR-10) trên Kaggle",
+  "crawled_at": "2026-07-20T12:40:51.049508+00:00",
+  "headings": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "phan-loai-hinh-anh-cifar-10-tren-kaggle",
+      "text": "13.13. Phân loại hình ảnh (CIFAR-10) trên Kaggle"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "lay-va-to-chuc-tap-du-lieu",
+      "text": "13.13.1. Lấy và tổ chức tập dữ liệu"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "tai-xuong-tap-du-lieu",
+      "text": "13.13.1.1. Tải xuống tập dữ liệu"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "torganizing-the-dataset",
+      "text": "13.13.1.2. Torganizing the Dataset"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "image-augmentation",
+      "text": "13.13.2. Image Augmentation"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "doc-tap-du-lieu",
+      "text": "13.13.3. Đọc tập dữ liệu"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "xac-dinh-mau",
+      "text": "13.13.4. Xác định Mẫu"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "xac-dinh-dao-tao-chuc-nang",
+      "text": "13.13.5. Xác định đào tạo chức năng"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "dao-tao-va-xac-thuc-mo-hinh",
+      "text": "13.13.6. Đào tạo và xác thực mô hình"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "phan-loai-bo-thu-nghiem-va-gui-ket-qua-tren-kaggle",
+      "text": "13.13.7. Phân loại bộ thử nghiệm và gửi kết quả trên Kaggle"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tom-tat",
+      "text": "13.13.8. Tóm tắt"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bai-tap",
+      "text": "13.13.9. Bài tập"
+    }
+  ],
+  "content": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "phan-loai-hinh-anh-cifar-10-tren-kaggle",
+      "text": "13.13. Phân loại hình ảnh (CIFAR-10) trên Kaggle"
+    },
+    {
+      "type": "paragraph",
+      "text": "Cho đến nay, chúng tôi đã sử dụng các API cấp cao của các framework deep\nlearning để trực tiếp lấy tập dữ liệu hình ảnh ở định dạng tensor. Tuy\nnhiên, các tập dữ liệu hình ảnh tùy chỉnh thường có dạng tệp hình ảnh.\nTrong phần này, chúng ta sẽ bắt đầu từ các tệp hình ảnh thô và sắp xếp,\nđọc, sau đó chuyển đổi chúng thành định dạng tensor từng bước."
+    },
+    {
+      "type": "paragraph",
+      "text": "Chúng tôi đã thử nghiệm với tập dữ liệu CIFAR-10 trong Section 13.1 , đây là một tập dữ liệu quan trọng\ntrong tầm nhìn máy tính. Trong phần này, chúng tôi sẽ áp dụng kiến thức\nchúng tôi đã học được trong các phần trước để thực hành cuộc thi Kaggle\ncủa phân loại hình ảnh CIFAR-10. Địa chỉ web của cuộc thi là https://www.kaggle.com/c/cifar-10"
+    },
+    {
+      "type": "paragraph",
+      "text": "Fig. 13.13.1 hiển thị thông tin trên trang web của\ncuộc thi. Để gửi kết quả, bạn cần đăng ký tài khoản Kaggle."
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/kaggle-cifar10.png",
+      "local_path": "_images/kaggle-cifar10.png",
+      "alt": "../_images/kaggle-cifar10.png"
+    },
+    {
+      "type": "paragraph",
+      "text": "Fig. 13.13.1 CIFAR-10 image classification competition webpage information. The\ncompetition dataset can be obtained by clicking the “Data” tab. ¶"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "import collections\nimport math\nimport os\nimport shutil\nimport pandas as pd\nfrom mxnet import gluon, init, npx\nfrom mxnet.gluon import nn\nfrom d2l import mxnet as d2l\n\nnpx.set_np()"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "import collections\nimport math\nimport os\nimport shutil\nimport pandas as pd\nimport torch\nimport torchvision\nfrom torch import nn\nfrom d2l import torch as d2l"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "lay-va-to-chuc-tap-du-lieu",
+      "text": "13.13.1. Lấy và tổ chức tập dữ liệu"
+    },
+    {
+      "type": "paragraph",
+      "text": "Tập dữ liệu cuộc thi được chia thành một bộ đào tạo và một bộ thử\nnghiệm, có chứa 50000 và 300000 hình ảnh, tương ứng. Trong bộ thử\nnghiệm, 10000 hình ảnh sẽ được sử dụng để đánh giá, trong khi 290000\nhình ảnh còn lại sẽ không được đánh giá: chúng được bao gồm chỉ để làm\ncho nó khó khăn để lừa dối kết quả được dán nhãn bằng tay của bộ thử\nnghiệm. Các hình ảnh trong tập dữ liệu này là tất cả các tệp hình ảnh\nmàu png (kênh RGB), có chiều cao và chiều rộng đều là 32 pixel. Các hình\nảnh bao gồm tổng cộng 10 loại, cụ thể là máy bay, ô tô, chim, mèo, hươu,\nchó, ếch, ngựa, thuyền và xe tải. Góc trên bên trái của Fig. 13.13.1 cho thấy một số hình ảnh về máy bay, ô tô\nvà chim trong bộ dữ liệu."
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "tai-xuong-tap-du-lieu",
+      "text": "13.13.1.1. Tải xuống tập dữ liệu"
+    },
+    {
+      "type": "paragraph",
+      "text": "Sau khi đăng nhập vào Kaggle, chúng ta có thể nhấp vào tab “Dữ liệu”\ntrên trang web cạnh tranh phân loại hình ảnh CIFAR-10 được hiển thị\ntrong Fig. 13.13.1 và tải xuống tập dữ liệu bằng cách\nnhấp vào nút “Tải xuống tất cả”. Sau khi giải nén tệp đã tải xuống trong ../data và giải nén train.7z và test.7z bên trong tệp đó,\nbạn sẽ tìm thấy toàn bộ bộ dữ liệu trong các đường dẫn sau:"
+    },
+    {
+      "type": "list",
+      "ordered": false,
+      "items": [
+        "../data/cifar-10/train/[1-50000].png",
+        "../data/cifar-10/test/[1-300000].png",
+        "../data/cifar-10/trainLabels.csv",
+        "../data/cifar-10/sampleSubmission.csv"
+      ]
+    },
+    {
+      "type": "paragraph",
+      "text": "trong đó các thư mục train và test chứa các hình ảnh đào tạo và\nthử nghiệm, tương ứng, trainLabels.csv cung cấp nhãn cho các hình\nảnh đào tạo, và sample_submission.csv là một tập tin gửi mẫu."
+    },
+    {
+      "type": "paragraph",
+      "text": "Để bắt đầu dễ dàng hơn, chúng tôi cung cấp một mẫu quy mô nhỏ của bộ dữ\nliệu chứa 1000 hình ảnh đào tạo đầu tiên và 5 hình ảnh thử nghiệm ngẫu\nnhiên. Để sử dụng bộ dữ liệu đầy đủ của cuộc thi Kaggle, bạn cần đặt\nbiến demo sau thành False ."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "#@save\nd2l.DATA_HUB['cifar10_tiny'] = (d2l.DATA_URL + 'kaggle_cifar10_tiny.zip',\n                                '2068874e4b9a9f0fb07ebe0ad2b29754449ccacd')\n\n# If you use the full dataset downloaded for the Kaggle competition, set\n# `demo` to False\ndemo = True\n\nif demo:\n    data_dir = d2l.download_extract('cifar10_tiny')\nelse:\n    data_dir = '../data/cifar-10/'"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "Downloading ../data/kaggle_cifar10_tiny.zip from http://d2l-data.s3-accelerate.amazonaws.com/kaggle_cifar10_tiny.zip..."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "#@save\nd2l.DATA_HUB['cifar10_tiny'] = (d2l.DATA_URL + 'kaggle_cifar10_tiny.zip',\n                                '2068874e4b9a9f0fb07ebe0ad2b29754449ccacd')\n\n# If you use the full dataset downloaded for the Kaggle competition, set\n# `demo` to False\ndemo = True\n\nif demo:\n    data_dir = d2l.download_extract('cifar10_tiny')\nelse:\n    data_dir = '../data/cifar-10/'"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "Downloading ../data/kaggle_cifar10_tiny.zip from http://d2l-data.s3-accelerate.amazonaws.com/kaggle_cifar10_tiny.zip..."
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "torganizing-the-dataset",
+      "text": "13.13.1.2. Torganizing the Dataset"
+    },
+    {
+      "type": "paragraph",
+      "text": "Chúng ta cần tổ chức các tập dữ liệu để tạo điều kiện cho việc đào tạo\nvà thử nghiệm mô hình. Trước tiên chúng ta hãy đọc các nhãn từ tệp csv.\nHàm sau trả về một từ điển mà ánh xạ phần không mở rộng của tên tập tin\nvào nhãn của nó."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "#@save\ndef read_csv_labels(fname):\n    \"\"\"Read `fname` to return a filename to label dictionary.\"\"\"\n    with open(fname, 'r') as f:\n        # Skip the file header line (column name)\n        lines = f.readlines()[1:]\n    tokens = [l.rstrip().split(',') for l in lines]\n    return dict(((name, label) for name, label in tokens))\n\nlabels = read_csv_labels(os.path.join(data_dir, 'trainLabels.csv'))\nprint('# training examples:', len(labels))\nprint('# classes:', len(set(labels.values())))"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "# training examples: 1000\n# classes: 10"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "#@save\ndef read_csv_labels(fname):\n    \"\"\"Read `fname` to return a filename to label dictionary.\"\"\"\n    with open(fname, 'r') as f:\n        # Skip the file header line (column name)\n        lines = f.readlines()[1:]\n    tokens = [l.rstrip().split(',') for l in lines]\n    return dict(((name, label) for name, label in tokens))\n\nlabels = read_csv_labels(os.path.join(data_dir, 'trainLabels.csv'))\nprint('# training examples:', len(labels))\nprint('# classes:', len(set(labels.values())))"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "# training examples: 1000\n# classes: 10"
+    },
+    {
+      "type": "paragraph",
+      "text": "Tiếp theo, chúng ta định nghĩa hàm reorg_train_valid thành chia xác\nthực được đặt ra khỏi tập đào tạo ban đầu. Đối số valid_ratio trong\nhàm này là tỷ lệ giữa số ví dụ trong xác thực được đặt thành số ví dụ\ntrong bộ đào tạo ban đầu. Cụ thể hơn, hãy để \\(n\\) là số lượng hình\nảnh của lớp với ít ví dụ nhất, và \\(r\\) là tỷ lệ. Bộ xác nhận sẽ\nchia ra \\(\\max(\\lfloor nr\\rfloor,1)\\) hình ảnh cho mỗi lớp. Hãy để\nchúng tôi sử dụng valid_ratio=0.1 làm ví dụ. Vì bộ đào tạo ban đầu\ncó 50000 hình ảnh, sẽ có 45000 hình ảnh được sử dụng để đào tạo trong\nđường train_valid_test/train , trong khi 5000 hình ảnh khác sẽ được\nchia ra như xác nhận được đặt trong đường train_valid_test/valid .\nSau khi tổ chức tập dữ liệu, hình ảnh của cùng một lớp sẽ được đặt dưới\ncùng một thư mục."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "#@save\ndef copyfile(filename, target_dir):\n    \"\"\"Copy a file into a target directory.\"\"\"\n    os.makedirs(target_dir, exist_ok=True)\n    shutil.copy(filename, target_dir)\n\n#@save\ndef reorg_train_valid(data_dir, labels, valid_ratio):\n    \"\"\"Split the validation set out of the original training set.\"\"\"\n    # The number of examples of the class that has the fewest examples in the\n    # training dataset\n    n = collections.Counter(labels.values()).most_common()[-1][1]\n    # The number of examples per class for the validation set\n    n_valid_per_label = max(1, math.floor(n * valid_ratio))\n    label_count = {}\n    for train_file in os.listdir(os.path.join(data_dir, 'train')):\n        label = labels[train_file.split('.')[0]]\n        fname = os.path.join(data_dir, 'train', train_file)\n        copyfile(fname, os.path.join(data_dir, 'train_valid_test',\n                                     'train_valid', label))\n        if label not in label_count or label_count[label] < n_valid_per_label:\n            copyfile(fname, os.path.join(data_dir, 'train_valid_test',\n                                         'valid', label))\n            label_count[label] = label_count.get(label, 0) + 1\n        else:\n            copyfile(fname, os.path.join(data_dir, 'train_valid_test',\n                                         'train', label))\n    return n_valid_per_label"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "#@save\ndef copyfile(filename, target_dir):\n    \"\"\"Copy a file into a target directory.\"\"\"\n    os.makedirs(target_dir, exist_ok=True)\n    shutil.copy(filename, target_dir)\n\n#@save\ndef reorg_train_valid(data_dir, labels, valid_ratio):\n    \"\"\"Split the validation set out of the original training set.\"\"\"\n    # The number of examples of the class that has the fewest examples in the\n    # training dataset\n    n = collections.Counter(labels.values()).most_common()[-1][1]\n    # The number of examples per class for the validation set\n    n_valid_per_label = max(1, math.floor(n * valid_ratio))\n    label_count = {}\n    for train_file in os.listdir(os.path.join(data_dir, 'train')):\n        label = labels[train_file.split('.')[0]]\n        fname = os.path.join(data_dir, 'train', train_file)\n        copyfile(fname, os.path.join(data_dir, 'train_valid_test',\n                                     'train_valid', label))\n        if label not in label_count or label_count[label] < n_valid_per_label:\n            copyfile(fname, os.path.join(data_dir, 'train_valid_test',\n                                         'valid', label))\n            label_count[label] = label_count.get(label, 0) + 1\n        else:\n            copyfile(fname, os.path.join(data_dir, 'train_valid_test',\n                                         'train', label))\n    return n_valid_per_label"
+    },
+    {
+      "type": "paragraph",
+      "text": "Hàm reorg_test bên dưới tổ chức bộ thử nghiệm để tải dữ liệu trong\nquá trình dự đoán."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "#@save\ndef reorg_test(data_dir):\n    \"\"\"Organize the testing set for data loading during prediction.\"\"\"\n    for test_file in os.listdir(os.path.join(data_dir, 'test')):\n        copyfile(os.path.join(data_dir, 'test', test_file),\n                 os.path.join(data_dir, 'train_valid_test', 'test',\n                              'unknown'))"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "#@save\ndef reorg_test(data_dir):\n    \"\"\"Organize the testing set for data loading during prediction.\"\"\"\n    for test_file in os.listdir(os.path.join(data_dir, 'test')):\n        copyfile(os.path.join(data_dir, 'test', test_file),\n                 os.path.join(data_dir, 'train_valid_test', 'test',\n                              'unknown'))"
+    },
+    {
+      "type": "paragraph",
+      "text": "Cuối cùng, chúng ta sử dụng một hàm để invoke read_csv_labels , reorg_train_valid , và reorg_test functions được định nghĩa ở\ntrên."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def reorg_cifar10_data(data_dir, valid_ratio):\n    labels = read_csv_labels(os.path.join(data_dir, 'trainLabels.csv'))\n    reorg_train_valid(data_dir, labels, valid_ratio)\n    reorg_test(data_dir)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def reorg_cifar10_data(data_dir, valid_ratio):\n    labels = read_csv_labels(os.path.join(data_dir, 'trainLabels.csv'))\n    reorg_train_valid(data_dir, labels, valid_ratio)\n    reorg_test(data_dir)"
+    },
+    {
+      "type": "paragraph",
+      "text": "Ở đây chúng tôi chỉ đặt kích thước lô thành 32 cho mẫu quy mô nhỏ của\ntập dữ liệu. Khi đào tạo và thử nghiệm tập dữ liệu hoàn chỉnh của cuộc\nthi Kaggle, batch_size nên được đặt thành một số nguyên lớn hơn,\nchẳng hạn như 128. Chúng tôi chia ra 10% các ví dụ đào tạo là xác nhận\nđược thiết lập để điều chỉnh các siêu tham số."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "batch_size = 32 if demo else 128\nvalid_ratio = 0.1\nreorg_cifar10_data(data_dir, valid_ratio)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "batch_size = 32 if demo else 128\nvalid_ratio = 0.1\nreorg_cifar10_data(data_dir, valid_ratio)"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "image-augmentation",
+      "text": "13.13.2. Image Augmentation"
+    },
+    {
+      "type": "paragraph",
+      "text": "Chúng tôi sử dụng nâng hình ảnh để giải quyết overfitting. Ví dụ, hình\nảnh có thể được lật theo chiều ngang ngẫu nhiên trong quá trình đào tạo.\nChúng tôi cũng có thể thực hiện tiêu chuẩn hóa cho ba kênh RGB của hình\nảnh màu. Dưới đây liệt kê một số hoạt động mà bạn có thể tinh chỉnh."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "transform_train = gluon.data.vision.transforms.Compose([\n    # Scale the image up to a square of 40 pixels in both height and width\n    gluon.data.vision.transforms.Resize(40),\n    # Randomly crop a square image of 40 pixels in both height and width to\n    # produce a small square of 0.64 to 1 times the area of the original\n    # image, and then scale it to a square of 32 pixels in both height and\n    # width\n    gluon.data.vision.transforms.RandomResizedCrop(32, scale=(0.64, 1.0),\n                                                   ratio=(1.0, 1.0)),\n    gluon.data.vision.transforms.RandomFlipLeftRight(),\n    gluon.data.vision.transforms.ToTensor(),\n    # Standardize each channel of the image\n    gluon.data.vision.transforms.Normalize([0.4914, 0.4822, 0.4465],\n                                           [0.2023, 0.1994, 0.2010])])"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "transform_train = torchvision.transforms.Compose([\n    # Scale the image up to a square of 40 pixels in both height and width\n    torchvision.transforms.Resize(40),\n    # Randomly crop a square image of 40 pixels in both height and width to\n    # produce a small square of 0.64 to 1 times the area of the original\n    # image, and then scale it to a square of 32 pixels in both height and\n    # width\n    torchvision.transforms.RandomResizedCrop(32, scale=(0.64, 1.0),\n                                                   ratio=(1.0, 1.0)),\n    torchvision.transforms.RandomHorizontalFlip(),\n    torchvision.transforms.ToTensor(),\n    # Standardize each channel of the image\n    torchvision.transforms.Normalize([0.4914, 0.4822, 0.4465],\n                                     [0.2023, 0.1994, 0.2010])])"
+    },
+    {
+      "type": "paragraph",
+      "text": "Trong quá trình thử nghiệm, chúng tôi chỉ thực hiện tiêu chuẩn hóa trên\nhình ảnh để loại bỏ sự ngẫu nhiên trong kết quả đánh giá."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "transform_test = gluon.data.vision.transforms.Compose([\n    gluon.data.vision.transforms.ToTensor(),\n    gluon.data.vision.transforms.Normalize([0.4914, 0.4822, 0.4465],\n                                           [0.2023, 0.1994, 0.2010])])"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "transform_test = torchvision.transforms.Compose([\n    torchvision.transforms.ToTensor(),\n    torchvision.transforms.Normalize([0.4914, 0.4822, 0.4465],\n                                     [0.2023, 0.1994, 0.2010])])"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "doc-tap-du-lieu",
+      "text": "13.13.3. Đọc tập dữ liệu"
+    },
+    {
+      "type": "paragraph",
+      "text": "Tiếp theo, chúng ta đọc tập dữ liệu có tổ chức bao gồm các tập tin hình\nảnh thô. Mỗi ví dụ bao gồm một hình ảnh và một nhãn."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "train_ds, valid_ds, train_valid_ds, test_ds = [\n    gluon.data.vision.ImageFolderDataset(\n        os.path.join(data_dir, 'train_valid_test', folder))\n    for folder in ['train', 'valid', 'train_valid', 'test']]"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "train_ds, train_valid_ds = [torchvision.datasets.ImageFolder(\n    os.path.join(data_dir, 'train_valid_test', folder),\n    transform=transform_train) for folder in ['train', 'train_valid']]\n\nvalid_ds, test_ds = [torchvision.datasets.ImageFolder(\n    os.path.join(data_dir, 'train_valid_test', folder),\n    transform=transform_test) for folder in ['valid', 'test']]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Trong quá trình đào tạo, chúng ta cần chỉ định tất cả các thao tác nâng\nhình ảnh được xác định ở trên. Khi bộ xác thực được sử dụng để đánh giá\nmô hình trong quá trình điều chỉnh siêu tham số, không nên giới thiệu\ntính ngẫu nhiên từ việc tăng hình ảnh. Trước khi dự đoán cuối cùng,\nchúng tôi đào tạo mô hình trên bộ đào tạo kết hợp và bộ xác nhận để tận\ndụng tối đa tất cả dữ liệu được dán nhãn."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "train_iter, train_valid_iter = [gluon.data.DataLoader(\n    dataset.transform_first(transform_train), batch_size, shuffle=True,\n    last_batch='discard') for dataset in (train_ds, train_valid_ds)]\n\nvalid_iter = gluon.data.DataLoader(\n    valid_ds.transform_first(transform_test), batch_size, shuffle=False,\n    last_batch='discard')\n\ntest_iter = gluon.data.DataLoader(\n    test_ds.transform_first(transform_test), batch_size, shuffle=False,\n    last_batch='keep')"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "train_iter, train_valid_iter = [torch.utils.data.DataLoader(\n    dataset, batch_size, shuffle=True, drop_last=True)\n    for dataset in (train_ds, train_valid_ds)]\n\nvalid_iter = torch.utils.data.DataLoader(valid_ds, batch_size, shuffle=False,\n                                         drop_last=True)\n\ntest_iter = torch.utils.data.DataLoader(test_ds, batch_size, shuffle=False,\n                                        drop_last=False)"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "xac-dinh-mau",
+      "text": "13.13.4. Xác định Mẫu"
+    },
+    {
+      "type": "paragraph",
+      "text": "Ở đây, chúng tôi xây dựng các khối còn lại dựa trên lớp HybridBlock ,\nhơi khác so với việc triển khai được mô tả trong Section 7.6 .\nĐiều này là để cải thiện hiệu quả tính toán."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "class Residual(nn.HybridBlock):\n    def __init__(self, num_channels, use_1x1conv=False, strides=1, **kwargs):\n        super(Residual, self).__init__(**kwargs)\n        self.conv1 = nn.Conv2D(num_channels, kernel_size=3, padding=1,\n                               strides=strides)\n        self.conv2 = nn.Conv2D(num_channels, kernel_size=3, padding=1)\n        if use_1x1conv:\n            self.conv3 = nn.Conv2D(num_channels, kernel_size=1,\n                                   strides=strides)\n        else:\n            self.conv3 = None\n        self.bn1 = nn.BatchNorm()\n        self.bn2 = nn.BatchNorm()\n\n    def hybrid_forward(self, F, X):\n        Y = F.npx.relu(self.bn1(self.conv1(X)))\n        Y = self.bn2(self.conv2(Y))\n        if self.conv3:\n            X = self.conv3(X)\n        return F.npx.relu(Y + X)"
+    },
+    {
+      "type": "paragraph",
+      "text": "Tiếp theo, chúng tôi xác định mô hình ResNet-18."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def resnet18(num_classes):\n    net = nn.HybridSequential()\n    net.add(nn.Conv2D(64, kernel_size=3, strides=1, padding=1),\n            nn.BatchNorm(), nn.Activation('relu'))\n\n    def resnet_block(num_channels, num_residuals, first_block=False):\n        blk = nn.HybridSequential()\n        for i in range(num_residuals):\n            if i == 0 and not first_block:\n                blk.add(Residual(num_channels, use_1x1conv=True, strides=2))\n            else:\n                blk.add(Residual(num_channels))\n        return blk\n\n    net.add(resnet_block(64, 2, first_block=True),\n            resnet_block(128, 2),\n            resnet_block(256, 2),\n            resnet_block(512, 2))\n    net.add(nn.GlobalAvgPool2D(), nn.Dense(num_classes))\n    return net"
+    },
+    {
+      "type": "paragraph",
+      "text": "Chúng tôi sử dụng khởi tạo Xavier được mô tả trong Section 4.8.2.2 trước khi đào tạo bắt đầu."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def get_net(devices):\n    num_classes = 10\n    net = resnet18(num_classes)\n    net.initialize(ctx=devices, init=init.Xavier())\n    return net\n\nloss = gluon.loss.SoftmaxCrossEntropyLoss()"
+    },
+    {
+      "type": "paragraph",
+      "text": "Chúng tôi xác định mô hình ResNet-18 được mô tả trong Section 7.6 ."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def get_net():\n    num_classes = 10\n    net = d2l.resnet18(num_classes, 3)\n    return net\n\nloss = nn.CrossEntropyLoss(reduction=\"none\")"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "xac-dinh-dao-tao-chuc-nang",
+      "text": "13.13.5. Xác định đào tạo chức năng"
+    },
+    {
+      "type": "paragraph",
+      "text": "Chúng tôi sẽ chọn các mô hình và điều chỉnh các siêu tham số theo hiệu\nsuất của mô hình trên bộ xác thực. Sau đây, chúng tôi xác định hàm đào\ntạo mô hình train ."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def train(net, train_iter, valid_iter, num_epochs, lr, wd, devices, lr_period,\n          lr_decay):\n    trainer = gluon.Trainer(net.collect_params(), 'sgd',\n                            {'learning_rate': lr, 'momentum': 0.9, 'wd': wd})\n    num_batches, timer = len(train_iter), d2l.Timer()\n    legend = ['train loss', 'train acc']\n    if valid_iter is not None:\n        legend.append('valid acc')\n    animator = d2l.Animator(xlabel='epoch', xlim=[1, num_epochs],\n                            legend=legend)\n    for epoch in range(num_epochs):\n        metric = d2l.Accumulator(3)\n        if epoch > 0 and epoch % lr_period == 0:\n            trainer.set_learning_rate(trainer.learning_rate * lr_decay)\n        for i, (features, labels) in enumerate(train_iter):\n            timer.start()\n            l, acc = d2l.train_batch_ch13(\n                net, features, labels.astype('float32'), loss, trainer,\n                devices, d2l.split_batch)\n            metric.add(l, acc, labels.shape[0])\n            timer.stop()\n            if (i + 1) % (num_batches // 5) == 0 or i == num_batches - 1:\n                animator.add(epoch + (i + 1) / num_batches,\n                             (metric[0] / metric[2], metric[1] / metric[2],\n                              None))\n        if valid_iter is not None:\n            valid_acc = d2l.evaluate_accuracy_gpus(net, valid_iter,\n                                                   d2l.split_batch)\n            animator.add(epoch + 1, (None, None, valid_acc))\n    measures = (f'train loss {metric[0] / metric[2]:.3f}, '\n                f'train acc {metric[1] / metric[2]:.3f}')\n    if valid_iter is not None:\n        measures += f', valid acc {valid_acc:.3f}'\n    print(measures + f'\\n{metric[2] * num_epochs / timer.sum():.1f}'\n          f' examples/sec on {str(devices)}')"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def train(net, train_iter, valid_iter, num_epochs, lr, wd, devices, lr_period,\n          lr_decay):\n    trainer = torch.optim.SGD(net.parameters(), lr=lr, momentum=0.9,\n                              weight_decay=wd)\n    scheduler = torch.optim.lr_scheduler.StepLR(trainer, lr_period, lr_decay)\n    num_batches, timer = len(train_iter), d2l.Timer()\n    legend = ['train loss', 'train acc']\n    if valid_iter is not None:\n        legend.append('valid acc')\n    animator = d2l.Animator(xlabel='epoch', xlim=[1, num_epochs],\n                            legend=legend)\n    net = nn.DataParallel(net, device_ids=devices).to(devices[0])\n    for epoch in range(num_epochs):\n        net.train()\n        metric = d2l.Accumulator(3)\n        for i, (features, labels) in enumerate(train_iter):\n            timer.start()\n            l, acc = d2l.train_batch_ch13(net, features, labels,\n                                          loss, trainer, devices)\n            metric.add(l, acc, labels.shape[0])\n            timer.stop()\n            if (i + 1) % (num_batches // 5) == 0 or i == num_batches - 1:\n                animator.add(epoch + (i + 1) / num_batches,\n                             (metric[0] / metric[2], metric[1] / metric[2],\n                              None))\n        if valid_iter is not None:\n            valid_acc = d2l.evaluate_accuracy_gpu(net, valid_iter)\n            animator.add(epoch + 1, (None, None, valid_acc))\n        scheduler.step()\n    measures = (f'train loss {metric[0] / metric[2]:.3f}, '\n                f'train acc {metric[1] / metric[2]:.3f}')\n    if valid_iter is not None:\n        measures += f', valid acc {valid_acc:.3f}'\n    print(measures + f'\\n{metric[2] * num_epochs / timer.sum():.1f}'\n          f' examples/sec on {str(devices)}')"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "dao-tao-va-xac-thuc-mo-hinh",
+      "text": "13.13.6. Đào tạo và xác thực mô hình"
+    },
+    {
+      "type": "paragraph",
+      "text": "Bây giờ, chúng ta có thể đào tạo và xác thực mô hình. Tất cả các siêu\ntham số sau đây có thể được điều chỉnh. Ví dụ, chúng ta có thể tăng số\nlượng kỷ nguyên. Khi lr_period và lr_decay được đặt thành 4 và\n0,9, tương ứng, tốc độ học tập của thuật toán tối ưu hóa sẽ được nhân\nvới 0,9 sau mỗi 4 kỷ nguyên. Chỉ để dễ dàng trình diễn, chúng tôi chỉ\nđào tạo 20 kỷ nguyên ở đây."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "devices, num_epochs, lr, wd = d2l.try_all_gpus(), 20, 0.02, 5e-4\nlr_period, lr_decay, net = 4, 0.9, get_net(devices)\nnet.hybridize()\ntrain(net, train_iter, valid_iter, num_epochs, lr, wd, devices, lr_period,\n      lr_decay)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "train loss 0.726, train acc 0.757, valid acc 0.438\n370.7 examples/sec on [gpu(0), gpu(1)]"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_kaggle-cifar10_42a34e_126_1.svg",
+      "local_path": "_images/output_kaggle-cifar10_42a34e_126_1.svg",
+      "alt": "../_images/output_kaggle-cifar10_42a34e_126_1.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "devices, num_epochs, lr, wd = d2l.try_all_gpus(), 20, 2e-4, 5e-4\nlr_period, lr_decay, net = 4, 0.9, get_net()\ntrain(net, train_iter, valid_iter, num_epochs, lr, wd, devices, lr_period,\n      lr_decay)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "train loss 0.736, train acc 0.749, valid acc 0.422\n898.8 examples/sec on [device(type='cuda', index=0), device(type='cuda', index=1)]"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_kaggle-cifar10_42a34e_129_1.svg",
+      "local_path": "_images/output_kaggle-cifar10_42a34e_129_1.svg",
+      "alt": "../_images/output_kaggle-cifar10_42a34e_129_1.svg"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "phan-loai-bo-thu-nghiem-va-gui-ket-qua-tren-kaggle",
+      "text": "13.13.7. Phân loại bộ thử nghiệm và gửi kết quả trên Kaggle"
+    },
+    {
+      "type": "paragraph",
+      "text": "Sau khi có được một mô hình đầy hứa hẹn với các siêu tham số, chúng tôi\nsử dụng tất cả dữ liệu được dán nhãn (bao gồm cả bộ xác thực) để đào tạo\nlại mô hình và phân loại bộ thử nghiệm."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "net, preds = get_net(devices), []\nnet.hybridize()\ntrain(net, train_valid_iter, None, num_epochs, lr, wd, devices, lr_period,\n      lr_decay)\n\nfor X, _ in test_iter:\n    y_hat = net(X.as_in_ctx(devices[0]))\n    preds.extend(y_hat.argmax(axis=1).astype(int).asnumpy())\nsorted_ids = list(range(1, len(test_ds) + 1))\nsorted_ids.sort(key=lambda x: str(x))\ndf = pd.DataFrame({'id': sorted_ids, 'label': preds})\ndf['label'] = df['label'].apply(lambda x: train_valid_ds.synsets[x])\ndf.to_csv('submission.csv', index=False)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "train loss 0.950, train acc 0.657\n830.9 examples/sec on [gpu(0), gpu(1)]"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_kaggle-cifar10_42a34e_135_1.svg",
+      "local_path": "_images/output_kaggle-cifar10_42a34e_135_1.svg",
+      "alt": "../_images/output_kaggle-cifar10_42a34e_135_1.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "net, preds = get_net(), []\ntrain(net, train_valid_iter, None, num_epochs, lr, wd, devices, lr_period,\n      lr_decay)\n\nfor X, _ in test_iter:\n    y_hat = net(X.to(devices[0]))\n    preds.extend(y_hat.argmax(dim=1).type(torch.int32).cpu().numpy())\nsorted_ids = list(range(1, len(test_ds) + 1))\nsorted_ids.sort(key=lambda x: str(x))\ndf = pd.DataFrame({'id': sorted_ids, 'label': preds})\ndf['label'] = df['label'].apply(lambda x: train_valid_ds.classes[x])\ndf.to_csv('submission.csv', index=False)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "train loss 0.755, train acc 0.721\n1165.8 examples/sec on [device(type='cuda', index=0), device(type='cuda', index=1)]"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_kaggle-cifar10_42a34e_138_1.svg",
+      "local_path": "_images/output_kaggle-cifar10_42a34e_138_1.svg",
+      "alt": "../_images/output_kaggle-cifar10_42a34e_138_1.svg"
+    },
+    {
+      "type": "paragraph",
+      "text": "Mã trên sẽ tạo ra một tập tin submission.csv , có định dạng đáp ứng\nyêu cầu của cuộc thi Kaggle. Phương pháp gửi kết quả cho Kaggle tương tự\nnhư trong Section 4.10 ."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tom-tat",
+      "text": "13.13.8. Tóm tắt"
+    },
+    {
+      "type": "list",
+      "ordered": false,
+      "items": [
+        "Chúng ta có thể đọc các bộ dữ liệu chứa các tệp hình ảnh thô sau khi\nsắp xếp chúng thành định dạng cần thiết."
+      ]
+    },
+    {
+      "type": "list",
+      "ordered": false,
+      "items": [
+        "Chúng ta có thể sử dụng các mạng thần kinh phức tạp, nâng hình ảnh và\nlập trình lai trong một cuộc thi phân loại hình ảnh."
+      ]
+    },
+    {
+      "type": "list",
+      "ordered": false,
+      "items": [
+        "Chúng ta có thể sử dụng mạng thần kinh phức tạp và nâng hình ảnh\ntrong một cuộc thi phân loại hình ảnh."
+      ]
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bai-tap",
+      "text": "13.13.9. Bài tập"
+    },
+    {
+      "type": "list",
+      "ordered": true,
+      "items": [
+        "Sử dụng bộ dữ liệu CIFAR-10 hoàn chỉnh cho cuộc thi Kaggle này. Đặt\ncác siêu tham số là batch_size = 128 , num_epochs = 100 , lr = 0.1 , lr_period = 50 và lr_decay = 0.1 . Xem độ chính\nxác và thứ hạng bạn có thể đạt được trong cuộc thi này. Bạn có thể\ncải thiện thêm chúng?",
+        "Độ chính xác nào bạn có thể nhận được khi không sử dụng nâng hình\nảnh?"
+      ]
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    }
+  ],
+  "images": [
+    {
+      "original_url": "https://vi.d2l.ai/_images/kaggle-cifar10.png",
+      "local_path": "_images/kaggle-cifar10.png",
+      "alt": "../_images/kaggle-cifar10.png"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_kaggle-cifar10_42a34e_126_1.svg",
+      "local_path": "_images/output_kaggle-cifar10_42a34e_126_1.svg",
+      "alt": "../_images/output_kaggle-cifar10_42a34e_126_1.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_kaggle-cifar10_42a34e_129_1.svg",
+      "local_path": "_images/output_kaggle-cifar10_42a34e_129_1.svg",
+      "alt": "../_images/output_kaggle-cifar10_42a34e_129_1.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_kaggle-cifar10_42a34e_135_1.svg",
+      "local_path": "_images/output_kaggle-cifar10_42a34e_135_1.svg",
+      "alt": "../_images/output_kaggle-cifar10_42a34e_135_1.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_kaggle-cifar10_42a34e_138_1.svg",
+      "local_path": "_images/output_kaggle-cifar10_42a34e_138_1.svg",
+      "alt": "../_images/output_kaggle-cifar10_42a34e_138_1.svg"
+    }
+  ],
+  "text": "13.13. Phân loại hình ảnh (CIFAR-10) trên Kaggle\nCho đến nay, chúng tôi đã sử dụng các API cấp cao của các framework deep\nlearning để trực tiếp lấy tập dữ liệu hình ảnh ở định dạng tensor. Tuy\nnhiên, các tập dữ liệu hình ảnh tùy chỉnh thường có dạng tệp hình ảnh.\nTrong phần này, chúng ta sẽ bắt đầu từ các tệp hình ảnh thô và sắp xếp,\nđọc, sau đó chuyển đổi chúng thành định dạng tensor từng bước.\nChúng tôi đã thử nghiệm với tập dữ liệu CIFAR-10 trong Section 13.1 , đây là một tập dữ liệu quan trọng\ntrong tầm nhìn máy tính. Trong phần này, chúng tôi sẽ áp dụng kiến thức\nchúng tôi đã học được trong các phần trước để thực hành cuộc thi Kaggle\ncủa phân loại hình ảnh CIFAR-10. Địa chỉ web của cuộc thi là https://www.kaggle.com/c/cifar-10\nFig. 13.13.1 hiển thị thông tin trên trang web của\ncuộc thi. Để gửi kết quả, bạn cần đăng ký tài khoản Kaggle.\nFig. 13.13.1 CIFAR-10 image classification competition webpage information. The\ncompetition dataset can be obtained by clicking the “Data” tab. ¶\n13.13.1. Lấy và tổ chức tập dữ liệu\nTập dữ liệu cuộc thi được chia thành một bộ đào tạo và một bộ thử\nnghiệm, có chứa 50000 và 300000 hình ảnh, tương ứng. Trong bộ thử\nnghiệm, 10000 hình ảnh sẽ được sử dụng để đánh giá, trong khi 290000\nhình ảnh còn lại sẽ không được đánh giá: chúng được bao gồm chỉ để làm\ncho nó khó khăn để lừa dối kết quả được dán nhãn bằng tay của bộ thử\nnghiệm. Các hình ảnh trong tập dữ liệu này là tất cả các tệp hình ảnh\nmàu png (kênh RGB), có chiều cao và chiều rộng đều là 32 pixel. Các hình\nảnh bao gồm tổng cộng 10 loại, cụ thể là máy bay, ô tô, chim, mèo, hươu,\nchó, ếch, ngựa, thuyền và xe tải. Góc trên bên trái của Fig. 13.13.1 cho thấy một số hình ảnh về máy bay, ô tô\nvà chim trong bộ dữ liệu.\n13.13.1.1. Tải xuống tập dữ liệu\nSau khi đăng nhập vào Kaggle, chúng ta có thể nhấp vào tab “Dữ liệu”\ntrên trang web cạnh tranh phân loại hình ảnh CIFAR-10 được hiển thị\ntrong Fig. 13.13.1 và tải xuống tập dữ liệu bằng cách\nnhấp vào nút “Tải xuống tất cả”. Sau khi giải nén tệp đã tải xuống trong ../data và giải nén train.7z và test.7z bên trong tệp đó,\nbạn sẽ tìm thấy toàn bộ bộ dữ liệu trong các đường dẫn sau:\n../data/cifar-10/train/[1-50000].png\n../data/cifar-10/test/[1-300000].png\n../data/cifar-10/trainLabels.csv\n../data/cifar-10/sampleSubmission.csv\ntrong đó các thư mục train và test chứa các hình ảnh đào tạo và\nthử nghiệm, tương ứng, trainLabels.csv cung cấp nhãn cho các hình\nảnh đào tạo, và sample_submission.csv là một tập tin gửi mẫu.\nĐể bắt đầu dễ dàng hơn, chúng tôi cung cấp một mẫu quy mô nhỏ của bộ dữ\nliệu chứa 1000 hình ảnh đào tạo đầu tiên và 5 hình ảnh thử nghiệm ngẫu\nnhiên. Để sử dụng bộ dữ liệu đầy đủ của cuộc thi Kaggle, bạn cần đặt\nbiến demo sau thành False .\n13.13.1.2. Torganizing the Dataset\nChúng ta cần tổ chức các tập dữ liệu để tạo điều kiện cho việc đào tạo\nvà thử nghiệm mô hình. Trước tiên chúng ta hãy đọc các nhãn từ tệp csv.\nHàm sau trả về một từ điển mà ánh xạ phần không mở rộng của tên tập tin\nvào nhãn của nó.\nTiếp theo, chúng ta định nghĩa hàm reorg_train_valid thành chia xác\nthực được đặt ra khỏi tập đào tạo ban đầu. Đối số valid_ratio trong\nhàm này là tỷ lệ giữa số ví dụ trong xác thực được đặt thành số ví dụ\ntrong bộ đào tạo ban đầu. Cụ thể hơn, hãy để \\(n\\) là số lượng hình\nảnh của lớp với ít ví dụ nhất, và \\(r\\) là tỷ lệ. Bộ xác nhận sẽ\nchia ra \\(\\max(\\lfloor nr\\rfloor,1)\\) hình ảnh cho mỗi lớp. Hãy để\nchúng tôi sử dụng valid_ratio=0.1 làm ví dụ. Vì bộ đào tạo ban đầu\ncó 50000 hình ảnh, sẽ có 45000 hình ảnh được sử dụng để đào tạo trong\nđường train_valid_test/train , trong khi 5000 hình ảnh khác sẽ được\nchia ra như xác nhận được đặt trong đường train_valid_test/valid .\nSau khi tổ chức tập dữ liệu, hình ảnh của cùng một lớp sẽ được đặt dưới\ncùng một thư mục.\nHàm reorg_test bên dưới tổ chức bộ thử nghiệm để tải dữ liệu trong\nquá trình dự đoán.\nCuối cùng, chúng ta sử dụng một hàm để invoke read_csv_labels , reorg_train_valid , và reorg_test functions được định nghĩa ở\ntrên.\nỞ đây chúng tôi chỉ đặt kích thước lô thành 32 cho mẫu quy mô nhỏ của\ntập dữ liệu. Khi đào tạo và thử nghiệm tập dữ liệu hoàn chỉnh của cuộc\nthi Kaggle, batch_size nên được đặt thành một số nguyên lớn hơn,\nchẳng hạn như 128. Chúng tôi chia ra 10% các ví dụ đào tạo là xác nhận\nđược thiết lập để điều chỉnh các siêu tham số.\n13.13.2. Image Augmentation\nChúng tôi sử dụng nâng hình ảnh để giải quyết overfitting. Ví dụ, hình\nảnh có thể được lật theo chiều ngang ngẫu nhiên trong quá trình đào tạo.\nChúng tôi cũng có thể thực hiện tiêu chuẩn hóa cho ba kênh RGB của hình\nảnh màu. Dưới đây liệt kê một số hoạt động mà bạn có thể tinh chỉnh.\nTrong quá trình thử nghiệm, chúng tôi chỉ thực hiện tiêu chuẩn hóa trên\nhình ảnh để loại bỏ sự ngẫu nhiên trong kết quả đánh giá.\n13.13.3. Đọc tập dữ liệu\nTiếp theo, chúng ta đọc tập dữ liệu có tổ chức bao gồm các tập tin hình\nảnh thô. Mỗi ví dụ bao gồm một hình ảnh và một nhãn.\nTrong quá trình đào tạo, chúng ta cần chỉ định tất cả các thao tác nâng\nhình ảnh được xác định ở trên. Khi bộ xác thực được sử dụng để đánh giá\nmô hình trong quá trình điều chỉnh siêu tham số, không nên giới thiệu\ntính ngẫu nhiên từ việc tăng hình ảnh. Trước khi dự đoán cuối cùng,\nchúng tôi đào tạo mô hình trên bộ đào tạo kết hợp và bộ xác nhận để tận\ndụng tối đa tất cả dữ liệu được dán nhãn.\n13.13.4. Xác định Mẫu\nỞ đây, chúng tôi xây dựng các khối còn lại dựa trên lớp HybridBlock ,\nhơi khác so với việc triển khai được mô tả trong Section 7.6 .\nĐiều này là để cải thiện hiệu quả tính toán.\nTiếp theo, chúng tôi xác định mô hình ResNet-18.\nChúng tôi sử dụng khởi tạo Xavier được mô tả trong Section 4.8.2.2 trước khi đào tạo bắt đầu.\nChúng tôi xác định mô hình ResNet-18 được mô tả trong Section 7.6 .\n13.13.5. Xác định đào tạo chức năng\nChúng tôi sẽ chọn các mô hình và điều chỉnh các siêu tham số theo hiệu\nsuất của mô hình trên bộ xác thực. Sau đây, chúng tôi xác định hàm đào\ntạo mô hình train .\n13.13.6. Đào tạo và xác thực mô hình\nBây giờ, chúng ta có thể đào tạo và xác thực mô hình. Tất cả các siêu\ntham số sau đây có thể được điều chỉnh. Ví dụ, chúng ta có thể tăng số\nlượng kỷ nguyên. Khi lr_period và lr_decay được đặt thành 4 và\n0,9, tương ứng, tốc độ học tập của thuật toán tối ưu hóa sẽ được nhân\nvới 0,9 sau mỗi 4 kỷ nguyên. Chỉ để dễ dàng trình diễn, chúng tôi chỉ\nđào tạo 20 kỷ nguyên ở đây.\n13.13.7. Phân loại bộ thử nghiệm và gửi kết quả trên Kaggle\nSau khi có được một mô hình đầy hứa hẹn với các siêu tham số, chúng tôi\nsử dụng tất cả dữ liệu được dán nhãn (bao gồm cả bộ xác thực) để đào tạo\nlại mô hình và phân loại bộ thử nghiệm.\nMã trên sẽ tạo ra một tập tin submission.csv , có định dạng đáp ứng\nyêu cầu của cuộc thi Kaggle. Phương pháp gửi kết quả cho Kaggle tương tự\nnhư trong Section 4.10 .\n13.13.8. Tóm tắt\nChúng ta có thể đọc các bộ dữ liệu chứa các tệp hình ảnh thô sau khi\nsắp xếp chúng thành định dạng cần thiết.\nChúng ta có thể sử dụng các mạng thần kinh phức tạp, nâng hình ảnh và\nlập trình lai trong một cuộc thi phân loại hình ảnh.\nChúng ta có thể sử dụng mạng thần kinh phức tạp và nâng hình ảnh\ntrong một cuộc thi phân loại hình ảnh.\n13.13.9. Bài tập\nSử dụng bộ dữ liệu CIFAR-10 hoàn chỉnh cho cuộc thi Kaggle này. Đặt\ncác siêu tham số là batch_size = 128 , num_epochs = 100 , lr = 0.1 , lr_period = 50 và lr_decay = 0.1 . Xem độ chính\nxác và thứ hạng bạn có thể đạt được trong cuộc thi này. Bạn có thể\ncải thiện thêm chúng?\nĐộ chính xác nào bạn có thể nhận được khi không sử dụng nâng hình\nảnh?\nDiscussions\nDiscussions"
+}

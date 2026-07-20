@@ -1,0 +1,823 @@
+{
+  "url": "https://vi.d2l.ai/chapter_optimization/minibatch-sgd.html",
+  "chapter": "chapter_optimization",
+  "title": "11.5. Minibatch Stochastic Gradient Descent",
+  "crawled_at": "2026-07-20T12:40:23.611679+00:00",
+  "headings": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "minibatch-stochastic-gradient-descent",
+      "text": "11.5. Minibatch Stochastic Gradient Descent"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "vector-hoa-va-bo-nho-cache",
+      "text": "11.5.1. Vector hóa và bộ nhớ cache"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "minibatches",
+      "text": "11.5.2. Minibatches"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "doc-tap-du-lieu",
+      "text": "11.5.3. Đọc tập dữ liệu"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "thuc-hien-tu-dau",
+      "text": "11.5.4. Thực hiện từ đầu"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "thuc-hien-ngan-gon",
+      "text": "11.5.5. Thực hiện ngắn gọn"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tom-tat",
+      "text": "11.5.6. Tóm tắt"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bai-tap",
+      "text": "11.5.7. Bài tập"
+    }
+  ],
+  "content": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "minibatch-stochastic-gradient-descent",
+      "text": "11.5. Minibatch Stochastic Gradient Descent"
+    },
+    {
+      "type": "paragraph",
+      "text": "Cho đến nay chúng ta đã gặp phải hai thái cực trong cách tiếp cận để\ngradient dựa learning: Section 11.3 sử dụng bộ dữ liệu đầy đủ để\ntính toán gradient và để cập nhật các tham số, một lần vượt qua tại một\nthời điểm. Ngược lại Section 11.4 xử lý một quan sát tại một thời\nđiểm để đạt được tiến bộ. Mỗi người trong số họ có nhược điểm riêng.\nGradient Descent không đặc biệt* hiệu quả dữ liệu* bất cứ khi nào dữ\nliệu rất giống nhau. Stochastic Gradient Descent không đặc biệt* hiệu\nquả tính tế* vì CPU và GPU không thể khai thác toàn bộ sức mạnh của\nvectơ hóa. Điều này cho thấy rằng có thể có một phương tiện hạnh phúc,\nvà trên thực tế, đó là những gì chúng tôi đã sử dụng cho đến nay trong\ncác ví dụ chúng tôi đã thảo luận."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "vector-hoa-va-bo-nho-cache",
+      "text": "11.5.1. Vector hóa và bộ nhớ cache"
+    },
+    {
+      "type": "paragraph",
+      "text": "Trọng tâm của quyết định sử dụng minibatches là hiệu quả tính toán. Điều\nnày dễ hiểu nhất khi xem xét song song với nhiều GPU và nhiều máy chủ.\nTrong trường hợp này, chúng ta cần gửi ít nhất một hình ảnh cho mỗi GPU.\nVới 8 GPU trên mỗi máy chủ và 16 máy chủ, chúng tôi đã có kích thước\nminibatch là 128."
+    },
+    {
+      "type": "paragraph",
+      "text": "Mọi thứ tinh tế hơn một chút khi nói đến GPU đơn lẻ hoặc thậm chí CPU.\nCác thiết bị này có nhiều loại bộ nhớ, thường là nhiều loại đơn vị tính\ntoán và hạn chế băng thông khác nhau giữa chúng. Ví dụ, CPU có một số\nlượng nhỏ các thanh ghi và sau đó là L1, L2 và trong một số trường hợp\nthậm chí bộ nhớ cache L3 (được chia sẻ giữa các lõi bộ xử lý khác nhau).\nCác bộ nhớ đệm này có kích thước và độ trễ ngày càng tăng (đồng thời\nchúng giảm băng thông). Nó đủ để nói, bộ xử lý có khả năng thực hiện\nnhiều hoạt động hơn so với những gì giao diện bộ nhớ chính có thể cung\ncấp."
+    },
+    {
+      "type": "list",
+      "ordered": false,
+      "items": [
+        "CPU 2GHz với 16 lõi và vectorization AVX-512 có thể xử lý lên đến \\(2 \\cdot 10^9 \\cdot 16 \\cdot 32 = 10^{12}\\) byte mỗi giây. Khả\nnăng của GPU dễ dàng vượt quá con số này theo hệ số 100. Mặt khác,\nmột bộ xử lý máy chủ tầm trung có thể không có nhiều hơn 100 Gb/s\nbăng thông, tức là, ít hơn một phần mười những gì sẽ được yêu cầu để\ngiữ cho bộ xử lý ăn. Để làm cho vấn đề tồi tệ hơn, không phải tất cả\ntruy cập bộ nhớ được tạo ra bằng nhau: đầu tiên, giao diện bộ nhớ\nthường rộng 64 bit hoặc rộng hơn (ví dụ, trên GPU lên đến 384 bit),\ndo đó đọc một byte duy nhất phải chịu chi phí truy cập rộng hơn\nnhiều.",
+        "Có chi phí đáng kể cho truy cập đầu tiên trong khi truy cập tuần tự\nlà tương đối rẻ (điều này thường được gọi là một lần đọc liên tục).\nCó rất nhiều điều cần lưu ý, chẳng hạn như bộ nhớ đệm khi chúng ta có\nnhiều ổ cắm, chiplet và các cấu trúc khác. Một cuộc thảo luận chi\ntiết về điều này nằm ngoài phạm vi của phần này. Xem ví dụ, Wikipedia article này để có một cuộc thảo luận chuyên sâu hơn."
+      ]
+    },
+    {
+      "type": "paragraph",
+      "text": "Cách để giảm bớt những hạn chế này là sử dụng một hệ thống phân cấp của\nbộ nhớ cache CPU thực sự đủ nhanh để cung cấp cho bộ xử lý dữ liệu. Đây\nlà * động lực là* đằng sau việc phân mẻ trong học sâu. Để giữ cho vấn\nđề đơn giản, hãy xem xét phép nhân ma trận ma trận, nói \\(\\mathbf{A} = \\mathbf{B}\\mathbf{C}\\) . Chúng tôi có một số tùy chọn\nđể tính toán \\(\\mathbf{A}\\) . Ví dụ, chúng tôi có thể thử như sau:"
+    },
+    {
+      "type": "list",
+      "ordered": true,
+      "items": [
+        "Chúng tôi có thể tính toán \\(\\mathbf{A}_{ij} = \\mathbf{B}_{i,:} \\mathbf{C}_{:,j}^\\top\\) , tức\nlà, chúng tôi có thể tính toán nó elementwise bằng phương tiện của\ncác sản phẩm chấm.",
+        "Chúng ta có thể tính toán \\(\\mathbf{A}_{:,j} = \\mathbf{B} \\mathbf{C}_{:,j}^\\top\\) , tức là,\nchúng ta có thể tính toán nó một cột tại một thời điểm. Tương tự như\nvậy chúng ta có thể tính \\(\\mathbf{A}\\) một hàng \\(\\mathbf{A}_{i,:}\\) tại một thời điểm.",
+        "We could simply đơn giản compute tính toán \\(\\mathbf{A} = \\mathbf{B} \\mathbf{C}\\) .",
+        "Chúng ta có thể phá vỡ \\(\\mathbf{B}\\) và \\(\\mathbf{C}\\) thành\ncác ma trận khối nhỏ hơn và tính toán \\(\\mathbf{A}\\) một khối tại\nmột thời điểm."
+      ]
+    },
+    {
+      "type": "paragraph",
+      "text": "Nếu chúng ta làm theo tùy chọn đầu tiên, chúng ta sẽ cần sao chép một\nhàng và một vectơ cột vào CPU mỗi khi chúng ta muốn tính một phần tử \\(\\mathbf{A}_{ij}\\) . Thậm chí tệ hơn, do thực tế là các yếu tố ma\ntrận được căn chỉnh tuần tự, do đó, chúng ta được yêu cầu truy cập nhiều\nvị trí tách rời cho một trong hai vectơ khi chúng ta đọc chúng từ bộ\nnhớ. Tùy chọn thứ hai thuận lợi hơn nhiều. Trong đó, chúng ta có thể giữ\nvector cột \\(\\mathbf{C}_{:,j}\\) trong bộ nhớ cache CPU trong khi\nchúng tôi tiếp tục đi qua \\(B\\) . Điều này giảm một nửa yêu cầu băng\nthông bộ nhớ với truy cập nhanh hơn tương ứng. Tất nhiên, tùy chọn 3 là\nmong muốn nhất. Thật không may, hầu hết các ma trận có thể không hoàn\ntoàn phù hợp với bộ nhớ cache (đây là những gì chúng ta đang thảo luận\nsau khi tất cả). Tuy nhiên, tùy chọn 4 cung cấp một giải pháp thay thế\nthực tế hữu ích: chúng ta có thể di chuyển các khối ma trận vào bộ nhớ\ncache và nhân chúng cục bộ. Tối ưu hóa thư viện chăm sóc này cho chúng\ntôi. Chúng ta hãy xem các hoạt động này hiệu quả như thế nào trong thực\ntế."
+    },
+    {
+      "type": "paragraph",
+      "text": "Ngoài hiệu quả tính toán, chi phí được giới thiệu bởi Python và bởi\nchính khuôn khổ học tập sâu là đáng kể. Nhớ lại rằng mỗi lần chúng ta\nthực hiện một lệnh, trình thông dịch Python sẽ gửi một lệnh đến công cụ\nMXNet cần chèn nó vào biểu đồ tính toán và xử lý nó trong quá trình lên\nlịch. Chi phí như vậy có thể khá bất lợi. Nói tóm lại, rất nên sử dụng\nvector hóa (và ma trận) bất cứ khi nào có thể."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "%matplotlib inline\nfrom mxnet import autograd, gluon, init, np, npx\nfrom mxnet.gluon import nn\nfrom d2l import mxnet as d2l\n\nnpx.set_np()\n\ntimer = d2l.Timer()\nA = np.zeros((256, 256))\nB = np.random.normal(0, 1, (256, 256))\nC = np.random.normal(0, 1, (256, 256))"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "%matplotlib inline\nimport numpy as np\nimport torch\nfrom torch import nn\nfrom d2l import torch as d2l\n\ntimer = d2l.Timer()\nA = torch.zeros(256, 256)\nB = torch.randn(256, 256)\nC = torch.randn(256, 256)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "%matplotlib inline\nimport numpy as np\nimport tensorflow as tf\nfrom d2l import tensorflow as d2l\n\ntimer = d2l.Timer()\nA = tf.Variable(tf.zeros((256, 256)))\nB = tf.Variable(tf.random.normal([256, 256], 0, 1))\nC = tf.Variable(tf.random.normal([256, 256], 0, 1))"
+    },
+    {
+      "type": "paragraph",
+      "text": "Nhiệm vụ yếu tố khôn ngoan chỉ đơn giản là lặp lại trên tất cả các hàng\nvà cột của \\(\\mathbf{B}\\) và \\(\\mathbf{C}\\) tương ứng để gán giá\ntrị cho \\(\\mathbf{A}\\) ."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "# Compute A = BC one element at a time\ntimer.start()\nfor i in range(256):\n    for j in range(256):\n        A[i, j] = np.dot(B[i, :], C[:, j])\nA.wait_to_read()\ntimer.stop()"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "76.19912314414978"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "# Compute A = BC one element at a time\ntimer.start()\nfor i in range(256):\n    for j in range(256):\n        A[i, j] = torch.dot(B[i, :], C[:, j])\ntimer.stop()"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "1.056152582168579"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "# Compute A = BC one element at a time\ntimer.start()\nfor i in range(256):\n    for j in range(256):\n        A[i, j].assign(tf.tensordot(B[i, :], C[:, j], axes=1))\ntimer.stop()"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "129.19598269462585"
+    },
+    {
+      "type": "paragraph",
+      "text": "Một chiến lược nhanh hơn là thực hiện gán cột khôn ngoan."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "# Compute A = BC one column at a time\ntimer.start()\nfor j in range(256):\n    A[:, j] = np.dot(B, C[:, j])\nA.wait_to_read()\ntimer.stop()"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "0.5740759372711182"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "# Compute A = BC one column at a time\ntimer.start()\nfor j in range(256):\n    A[:, j] = torch.mv(B, C[:, j])\ntimer.stop()"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "0.009429693222045898"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "timer.start()\nfor j in range(256):\n    A[:, j].assign(tf.tensordot(B, C[:, j], axes=1))\ntimer.stop()"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "0.3954589366912842"
+    },
+    {
+      "type": "paragraph",
+      "text": "Cuối cùng, cách hiệu quả nhất là thực hiện toàn bộ hoạt động trong một\nkhối. Hãy để chúng tôi xem tốc độ tương ứng của các hoạt động là bao\nnhiêu."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "# Compute A = BC in one go\ntimer.start()\nA = np.dot(B, C)\nA.wait_to_read()\ntimer.stop()\n\n# Multiply and add count as separate operations (fused in practice)\ngigaflops = [2/i for i in timer.times]\nprint(f'performance in Gigaflops: element {gigaflops[0]:.3f}, '\n      f'column {gigaflops[1]:.3f}, full {gigaflops[2]:.3f}')"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "performance in Gigaflops: element 0.026, column 3.484, full 311.775"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "# Compute A = BC in one go\ntimer.start()\nA = torch.mm(B, C)\ntimer.stop()\n\n# Multiply and add count as separate operations (fused in practice)\ngigaflops = [2/i for i in timer.times]\nprint(f'performance in Gigaflops: element {gigaflops[0]:.3f}, '\n      f'column {gigaflops[1]:.3f}, full {gigaflops[2]:.3f}')"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "performance in Gigaflops: element 1.894, column 212.096, full 3315.655"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "timer.start()\nA.assign(tf.tensordot(B, C, axes=1))\ntimer.stop()\n\n# Multiply and add count as separate operations (fused in practice)\ngigaflops = [2/i for i in timer.times]\nprint(f'performance in Gigaflops: element {gigaflops[0]:.3f}, '\n      f'column {gigaflops[1]:.3f}, full {gigaflops[2]:.3f}')"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "performance in Gigaflops: element 0.015, column 5.057, full 78.123"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "minibatches",
+      "text": "11.5.2. Minibatches"
+    },
+    {
+      "type": "paragraph",
+      "text": "Trong quá khứ, chúng tôi đã cho rằng chúng tôi sẽ đọc * minibatches*\ncủa dữ liệu chứ không phải là quan sát duy nhất để cập nhật các tham số.\nBây giờ chúng tôi đưa ra một lời biện minh ngắn gọn cho nó. Xử lý các\nquan sát đơn yêu cầu chúng ta thực hiện nhiều phép nhân ma thuật-vector\n(hoặc thậm chí là vector-vector) đơn lẻ, khá tốn kém và phát sinh một\nchi phí đáng kể thay mặt cho khuôn khổ học sâu cơ bản. Điều này áp dụng\ncả để đánh giá một mạng khi áp dụng cho dữ liệu (thường được gọi là suy\nluận) và khi tính toán gradient để cập nhật các tham số. Đó là, điều này\náp dụng bất cứ khi nào chúng tôi thực hiện \\(\\mathbf{w} \\leftarrow \\mathbf{w} - \\eta_t \\mathbf{g}_t\\) ở đâu"
+    },
+    {
+      "type": "math",
+      "latex": "(11.5.1)¶\\[\\mathbf{g}_t = \\partial_{\\mathbf{w}} f(\\mathbf{x}_{t}, \\mathbf{w})\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Chúng ta có thể tăng hiệu quả * tính tị* của thao tác này bằng cách áp\ndụng nó vào một loạt các quan sát tại một thời điểm. Đó là, chúng tôi\nthay thế gradient \\(\\mathbf{g}_t\\) trong một quan sát duy nhất bằng\nmột trong một lô nhỏ"
+    },
+    {
+      "type": "math",
+      "latex": "(11.5.2)¶\\[\\mathbf{g}_t = \\partial_{\\mathbf{w}} \\frac{1}{|\\mathcal{B}_t|} \\sum_{i \\in \\mathcal{B}_t} f(\\mathbf{x}_{i}, \\mathbf{w})\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Chúng ta hãy xem điều này làm gì với các thuộc tính thống kê của \\(\\mathbf{g}_t\\) : vì cả \\(\\mathbf{x}_t\\) và tất cả các yếu tố\ncủa minibatch \\(\\mathcal{B}_t\\) được vẽ đồng đều ngẫu nhiên từ bộ\nđào tạo, kỳ vọng của gradient vẫn không thay đổi. Mặt khác, phương sai\nđược giảm đáng kể. Kể từ khi gradient minibatch bao gồm \\(b := |\\mathcal{B}_t|\\) gradient độc lập đang được trung bình, độ\nlệch chuẩn của nó được giảm bởi một hệ số \\(b^{-\\frac{1}{2}}\\) . Bản\nthân nó, điều này là một điều tốt, vì nó có nghĩa là các bản cập nhật\nđược liên kết đáng tin cậy hơn với gradient đầy đủ."
+    },
+    {
+      "type": "paragraph",
+      "text": "Ngây thơ điều này sẽ chỉ ra rằng việc lựa chọn một minibatch lớn \\(\\mathcal{B}_t\\) sẽ là mong muốn phổ biến. Than ôi, sau một số\nđiểm, việc giảm thêm độ lệch chuẩn là tối thiểu khi so sánh với sự gia\ntăng tuyến tính trong chi phí tính toán. Trong thực tế, chúng tôi chọn\nmột minibatch đủ lớn để mang lại hiệu quả tính toán tốt trong khi vẫn\nphù hợp với bộ nhớ của GPU. Để minh họa tiết kiệm chúng ta hãy xem xét\nmột số mã. Trong đó chúng ta thực hiện cùng một phép nhân ma trận ma\ntrận, nhưng lần này chia thành “minibatches” của 64 cột tại một thời\nđiểm."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "timer.start()\nfor j in range(0, 256, 64):\n    A[:, j:j+64] = np.dot(B, C[:, j:j+64])\ntimer.stop()\nprint(f'performance in Gigaflops: block {2 / timer.times[3]:.3f}')"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "performance in Gigaflops: block 580.085"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "timer.start()\nfor j in range(0, 256, 64):\n    A[:, j:j+64] = torch.mm(B, C[:, j:j+64])\ntimer.stop()\nprint(f'performance in Gigaflops: block {2 / timer.times[3]:.3f}')"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "performance in Gigaflops: block 1455.092"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "timer.start()\nfor j in range(0, 256, 64):\n    A[:, j:j+64].assign(tf.tensordot(B, C[:, j:j+64], axes=1))\ntimer.stop()\nprint(f'performance in Gigaflops: block {2 / timer.times[3]:.3f}')"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "performance in Gigaflops: block 268.092"
+    },
+    {
+      "type": "paragraph",
+      "text": "Như chúng ta có thể thấy, tính toán trên minibatch về cơ bản là hiệu quả\nnhư trên ma trận đầy đủ. Một lời thận trọng là theo thứ tự. Trong Section 7.5 , chúng tôi đã sử dụng một loại chính quy hóa\nphụ thuộc nhiều vào số lượng phương sai trong một minibatch. Khi chúng\nta tăng sau này, phương sai giảm và cùng với nó là lợi ích của việc phun\ntiếng ồn do bình thường hóa hàng loạt. Xem ví dụ, [Ioffe, 2017] để biết chi tiết về cách giải thích và tính toán các điều khoản thích\nhợp."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "doc-tap-du-lieu",
+      "text": "11.5.3. Đọc tập dữ liệu"
+    },
+    {
+      "type": "paragraph",
+      "text": "Chúng ta hãy xem cách minibatches được tạo ra hiệu quả từ dữ liệu. Sau\nđây chúng tôi sử dụng một tập dữ liệu do NASA phát triển để kiểm tra\ncánh noise from different\naircraft để so sánh các thuật toán tối ưu hóa này. Để thuận tiện, chúng tôi chỉ\nsử dụng các ví dụ \\(1,500\\) đầu tiên. Dữ liệu được làm trắng để xử\nlý trước, tức là, chúng tôi loại bỏ trung bình và giải thích phương sai\nthành \\(1\\) cho mỗi tọa độ."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "#@save\nd2l.DATA_HUB['airfoil'] = (d2l.DATA_URL + 'airfoil_self_noise.dat',\n                           '76e5be1548fd8222e5074cf0faae75edff8cf93f')\n\n#@save\ndef get_data_ch11(batch_size=10, n=1500):\n    data = np.genfromtxt(d2l.download('airfoil'),\n                         dtype=np.float32, delimiter='\\t')\n    data = (data - data.mean(axis=0)) / data.std(axis=0)\n    data_iter = d2l.load_array(\n        (data[:n, :-1], data[:n, -1]), batch_size, is_train=True)\n    return data_iter, data.shape[1]-1"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "#@save\nd2l.DATA_HUB['airfoil'] = (d2l.DATA_URL + 'airfoil_self_noise.dat',\n                           '76e5be1548fd8222e5074cf0faae75edff8cf93f')\n\n#@save\ndef get_data_ch11(batch_size=10, n=1500):\n    data = np.genfromtxt(d2l.download('airfoil'),\n                         dtype=np.float32, delimiter='\\t')\n    data = torch.from_numpy((data - data.mean(axis=0)) / data.std(axis=0))\n    data_iter = d2l.load_array((data[:n, :-1], data[:n, -1]),\n                               batch_size, is_train=True)\n    return data_iter, data.shape[1]-1"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "#@save\nd2l.DATA_HUB['airfoil'] = (d2l.DATA_URL + 'airfoil_self_noise.dat',\n                           '76e5be1548fd8222e5074cf0faae75edff8cf93f')\n\n#@save\ndef get_data_ch11(batch_size=10, n=1500):\n    data = np.genfromtxt(d2l.download('airfoil'),\n                         dtype=np.float32, delimiter='\\t')\n    data = (data - data.mean(axis=0)) / data.std(axis=0)\n    data_iter = d2l.load_array((data[:n, :-1], data[:n, -1]),\n                               batch_size, is_train=True)\n    return data_iter, data.shape[1]-1"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "thuc-hien-tu-dau",
+      "text": "11.5.4. Thực hiện từ đầu"
+    },
+    {
+      "type": "paragraph",
+      "text": "Nhớ lại việc thực hiện giảm dần dần ngẫu nhiên minibatch từ Section 3.2 . Trong phần sau đây, chúng tôi cung cấp\nmột thực hiện tổng quát hơn một chút. Để thuận tiện, nó có chữ ký cuộc\ngọi giống như các thuật toán tối ưu hóa khác được giới thiệu sau trong\nchương này. Cụ thể, chúng tôi thêm đầu vào trạng thái states và đặt\nsiêu tham số trong từ điển hyperparams . Ngoài ra, chúng tôi sẽ trung\nbình mất mỗi ví dụ minibatch trong chức năng đào tạo, do đó gradient\ntrong thuật toán tối ưu hóa không cần phải chia cho kích thước lô."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def sgd(params, states, hyperparams):\n    for p in params:\n        p[:] -= hyperparams['lr'] * p.grad"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def sgd(params, states, hyperparams):\n    for p in params:\n        p.data.sub_(hyperparams['lr'] * p.grad)\n        p.grad.data.zero_()"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def sgd(params, grads, states, hyperparams):\n    for param, grad in zip(params, grads):\n        param.assign_sub(hyperparams['lr']*grad)"
+    },
+    {
+      "type": "paragraph",
+      "text": "Tiếp theo, chúng tôi thực hiện một chức năng đào tạo chung để tạo điều\nkiện cho việc sử dụng các thuật toán tối ưu hóa khác được giới thiệu sau\nnày trong chương này. Nó khởi tạo một mô hình hồi quy tuyến tính và có\nthể được sử dụng để đào tạo mô hình với minibatch stochastic gradient\ngốc và các thuật toán khác được giới thiệu sau đó."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "#@save\ndef train_ch11(trainer_fn, states, hyperparams, data_iter,\n               feature_dim, num_epochs=2):\n    # Initialization\n    w = np.random.normal(scale=0.01, size=(feature_dim, 1))\n    b = np.zeros(1)\n    w.attach_grad()\n    b.attach_grad()\n    net, loss = lambda X: d2l.linreg(X, w, b), d2l.squared_loss\n    # Train\n    animator = d2l.Animator(xlabel='epoch', ylabel='loss',\n                            xlim=[0, num_epochs], ylim=[0.22, 0.35])\n    n, timer = 0, d2l.Timer()\n    for _ in range(num_epochs):\n        for X, y in data_iter:\n            with autograd.record():\n                l = loss(net(X), y).mean()\n            l.backward()\n            trainer_fn([w, b], states, hyperparams)\n            n += X.shape[0]\n            if n % 200 == 0:\n                timer.stop()\n                animator.add(n/X.shape[0]/len(data_iter),\n                             (d2l.evaluate_loss(net, data_iter, loss),))\n                timer.start()\n    print(f'loss: {animator.Y[0][-1]:.3f}, {timer.avg():.3f} sec/epoch')\n    return timer.cumsum(), animator.Y[0]"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "#@save\ndef train_ch11(trainer_fn, states, hyperparams, data_iter,\n               feature_dim, num_epochs=2):\n    # Initialization\n    w = torch.normal(mean=0.0, std=0.01, size=(feature_dim, 1),\n                     requires_grad=True)\n    b = torch.zeros((1), requires_grad=True)\n    net, loss = lambda X: d2l.linreg(X, w, b), d2l.squared_loss\n    # Train\n    animator = d2l.Animator(xlabel='epoch', ylabel='loss',\n                            xlim=[0, num_epochs], ylim=[0.22, 0.35])\n    n, timer = 0, d2l.Timer()\n    for _ in range(num_epochs):\n        for X, y in data_iter:\n            l = loss(net(X), y).mean()\n            l.backward()\n            trainer_fn([w, b], states, hyperparams)\n            n += X.shape[0]\n            if n % 200 == 0:\n                timer.stop()\n                animator.add(n/X.shape[0]/len(data_iter),\n                             (d2l.evaluate_loss(net, data_iter, loss),))\n                timer.start()\n    print(f'loss: {animator.Y[0][-1]:.3f}, {timer.avg():.3f} sec/epoch')\n    return timer.cumsum(), animator.Y[0]"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "#@save\ndef train_ch11(trainer_fn, states, hyperparams, data_iter,\n               feature_dim, num_epochs=2):\n    # Initialization\n    w = tf.Variable(tf.random.normal(shape=(feature_dim, 1),\n                                   mean=0, stddev=0.01),trainable=True)\n    b = tf.Variable(tf.zeros(1), trainable=True)\n\n    # Train\n    net, loss = lambda X: d2l.linreg(X, w, b), d2l.squared_loss\n    animator = d2l.Animator(xlabel='epoch', ylabel='loss',\n                            xlim=[0, num_epochs], ylim=[0.22, 0.35])\n    n, timer = 0, d2l.Timer()\n\n    for _ in range(num_epochs):\n        for X, y in data_iter:\n          with tf.GradientTape() as g:\n            l = tf.math.reduce_mean(loss(net(X), y))\n\n          dw, db = g.gradient(l, [w, b])\n          trainer_fn([w, b], [dw, db], states, hyperparams)\n          n += X.shape[0]\n          if n % 200 == 0:\n              timer.stop()\n              p = n/X.shape[0]\n              q = p/tf.data.experimental.cardinality(data_iter).numpy()\n              r = (d2l.evaluate_loss(net, data_iter, loss),)\n              animator.add(q, r)\n              timer.start()\n    print(f'loss: {animator.Y[0][-1]:.3f}, {timer.avg():.3f} sec/epoch')\n    return timer.cumsum(), animator.Y[0]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Hãy để chúng tôi xem tối ưu hóa tiến hành như thế nào để giảm gradient\nhàng loạt. Điều này có thể đạt được bằng cách đặt kích thước minibatch\nthành 1500 (tức là tổng số ví dụ). Kết quả là các thông số mô hình chỉ\nđược cập nhật một lần cho mỗi kỷ nguyên. Có rất ít tiến bộ. Trong thực\ntế, sau 6 bước tiến trình quầy hàng."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def train_sgd(lr, batch_size, num_epochs=2):\n    data_iter, feature_dim = get_data_ch11(batch_size)\n    return train_ch11(\n        sgd, None, {'lr': lr}, data_iter, feature_dim, num_epochs)\n\ngd_res = train_sgd(1, 1500, 10)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "loss: 0.254, 0.232 sec/epoch"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_minibatch-sgd_f4d60f_99_1.svg",
+      "local_path": "_images/output_minibatch-sgd_f4d60f_99_1.svg",
+      "alt": "../_images/output_minibatch-sgd_f4d60f_99_1.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def train_sgd(lr, batch_size, num_epochs=2):\n    data_iter, feature_dim = get_data_ch11(batch_size)\n    return train_ch11(\n        sgd, None, {'lr': lr}, data_iter, feature_dim, num_epochs)\n\ngd_res = train_sgd(1, 1500, 10)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "loss: 0.248, 0.036 sec/epoch"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_minibatch-sgd_f4d60f_102_1.svg",
+      "local_path": "_images/output_minibatch-sgd_f4d60f_102_1.svg",
+      "alt": "../_images/output_minibatch-sgd_f4d60f_102_1.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def train_sgd(lr, batch_size, num_epochs=2):\n    data_iter, feature_dim = get_data_ch11(batch_size)\n    return train_ch11(\n        sgd, None, {'lr': lr}, data_iter, feature_dim, num_epochs)\n\ngd_res = train_sgd(1, 1500, 10)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "loss: 0.250, 0.041 sec/epoch"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_minibatch-sgd_f4d60f_105_1.svg",
+      "local_path": "_images/output_minibatch-sgd_f4d60f_105_1.svg",
+      "alt": "../_images/output_minibatch-sgd_f4d60f_105_1.svg"
+    },
+    {
+      "type": "paragraph",
+      "text": "Khi kích thước lô bằng 1, chúng ta sử dụng stochastic gradient descent\nđể tối ưu hóa. Để đơn giản thực hiện, chúng tôi đã chọn một tỷ lệ học\ntập liên tục (mặc dù nhỏ). Trong dòng dốc ngẫu nhiên, các tham số mô\nhình được cập nhật bất cứ khi nào một ví dụ được xử lý. Trong trường hợp\ncủa chúng tôi, điều này lên tới 1500 bản cập nhật mỗi kỷ nguyên. Như\nchúng ta có thể thấy, sự suy giảm giá trị của hàm mục tiêu chậm lại sau\nmột kỷ nguyên. Mặc dù cả hai quy trình đã xử lý 1500 ví dụ trong một kỷ\nnguyên, dòng dốc ngẫu nhiên tiêu thụ nhiều thời gian hơn so với gradient\ngốc trong thí nghiệm của chúng tôi. Điều này là do stochastic gradient\ngốc cập nhật các thông số thường xuyên hơn và vì nó kém hiệu quả hơn để\nxử lý các quan sát duy nhất tại một thời điểm."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "sgd_res = train_sgd(0.005, 1)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "loss: 0.243, 1.081 sec/epoch"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_minibatch-sgd_f4d60f_111_1.svg",
+      "local_path": "_images/output_minibatch-sgd_f4d60f_111_1.svg",
+      "alt": "../_images/output_minibatch-sgd_f4d60f_111_1.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "sgd_res = train_sgd(0.005, 1)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "loss: 0.248, 0.076 sec/epoch"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_minibatch-sgd_f4d60f_114_1.svg",
+      "local_path": "_images/output_minibatch-sgd_f4d60f_114_1.svg",
+      "alt": "../_images/output_minibatch-sgd_f4d60f_114_1.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "sgd_res = train_sgd(0.005, 1)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "loss: 0.247, 0.708 sec/epoch"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_minibatch-sgd_f4d60f_117_1.svg",
+      "local_path": "_images/output_minibatch-sgd_f4d60f_117_1.svg",
+      "alt": "../_images/output_minibatch-sgd_f4d60f_117_1.svg"
+    },
+    {
+      "type": "paragraph",
+      "text": "Cuối cùng, khi kích thước lô bằng 100, chúng ta sử dụng minibatch\nstochastic gradient descent để tối ưu hóa. Thời gian cần thiết cho mỗi\nkỷ nguyên ngắn hơn thời gian cần thiết cho dòng gradient stochastic và\nthời gian để giảm gradient hàng loạt."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "mini1_res = train_sgd(.4, 100)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "loss: 0.245, 0.027 sec/epoch"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_minibatch-sgd_f4d60f_123_1.svg",
+      "local_path": "_images/output_minibatch-sgd_f4d60f_123_1.svg",
+      "alt": "../_images/output_minibatch-sgd_f4d60f_123_1.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "mini1_res = train_sgd(.4, 100)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "loss: 0.244, 0.003 sec/epoch"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_minibatch-sgd_f4d60f_126_1.svg",
+      "local_path": "_images/output_minibatch-sgd_f4d60f_126_1.svg",
+      "alt": "../_images/output_minibatch-sgd_f4d60f_126_1.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "mini1_res = train_sgd(.4, 100)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "loss: 0.247, 0.009 sec/epoch"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_minibatch-sgd_f4d60f_129_1.svg",
+      "local_path": "_images/output_minibatch-sgd_f4d60f_129_1.svg",
+      "alt": "../_images/output_minibatch-sgd_f4d60f_129_1.svg"
+    },
+    {
+      "type": "paragraph",
+      "text": "Giảm kích thước lô xuống còn 10, thời gian cho mỗi kỷ nguyên tăng vì\nkhối lượng công việc cho mỗi lô kém hiệu quả hơn để thực hiện."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "mini2_res = train_sgd(.05, 10)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "loss: 0.246, 0.126 sec/epoch"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_minibatch-sgd_f4d60f_135_1.svg",
+      "local_path": "_images/output_minibatch-sgd_f4d60f_135_1.svg",
+      "alt": "../_images/output_minibatch-sgd_f4d60f_135_1.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "mini2_res = train_sgd(.05, 10)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "loss: 0.251, 0.010 sec/epoch"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_minibatch-sgd_f4d60f_138_1.svg",
+      "local_path": "_images/output_minibatch-sgd_f4d60f_138_1.svg",
+      "alt": "../_images/output_minibatch-sgd_f4d60f_138_1.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "mini2_res = train_sgd(.05, 10)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "loss: 0.247, 0.063 sec/epoch"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_minibatch-sgd_f4d60f_141_1.svg",
+      "local_path": "_images/output_minibatch-sgd_f4d60f_141_1.svg",
+      "alt": "../_images/output_minibatch-sgd_f4d60f_141_1.svg"
+    },
+    {
+      "type": "paragraph",
+      "text": "Bây giờ chúng ta có thể so sánh thời gian so với mất mát cho bốn thí\nnghiệm trước đó. Như có thể thấy, mặc dù stochastic gradient descent hội\ntụ nhanh hơn GD về số lượng ví dụ được xử lý, nó sử dụng nhiều thời gian\nhơn để đạt được tổn thất tương tự so với GD vì tính toán ví dụ gradient\nbằng ví dụ không hiệu quả như vậy. Minibatch stochastic gradient gốc có\nthể đánh đổi tốc độ hội tụ và hiệu quả tính toán. Kích thước minibatch\nlà 10 hiệu quả hơn so với dòng gradient stochastic; kích thước minibatch\n100 thậm chí vượt trội hơn GD về thời gian chạy."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "d2l.set_figsize([6, 3])\nd2l.plot(*list(map(list, zip(gd_res, sgd_res, mini1_res, mini2_res))),\n         'time (sec)', 'loss', xlim=[1e-2, 10],\n         legend=['gd', 'sgd', 'batch size=100', 'batch size=10'])\nd2l.plt.gca().set_xscale('log')"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_minibatch-sgd_f4d60f_147_0.svg",
+      "local_path": "_images/output_minibatch-sgd_f4d60f_147_0.svg",
+      "alt": "../_images/output_minibatch-sgd_f4d60f_147_0.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "d2l.set_figsize([6, 3])\nd2l.plot(*list(map(list, zip(gd_res, sgd_res, mini1_res, mini2_res))),\n         'time (sec)', 'loss', xlim=[1e-2, 10],\n         legend=['gd', 'sgd', 'batch size=100', 'batch size=10'])\nd2l.plt.gca().set_xscale('log')"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_minibatch-sgd_f4d60f_150_0.svg",
+      "local_path": "_images/output_minibatch-sgd_f4d60f_150_0.svg",
+      "alt": "../_images/output_minibatch-sgd_f4d60f_150_0.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "d2l.set_figsize([6, 3])\nd2l.plot(*list(map(list, zip(gd_res, sgd_res, mini1_res, mini2_res))),\n         'time (sec)', 'loss', xlim=[1e-2, 10],\n         legend=['gd', 'sgd', 'batch size=100', 'batch size=10'])\nd2l.plt.gca().set_xscale('log')"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_minibatch-sgd_f4d60f_153_0.svg",
+      "local_path": "_images/output_minibatch-sgd_f4d60f_153_0.svg",
+      "alt": "../_images/output_minibatch-sgd_f4d60f_153_0.svg"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "thuc-hien-ngan-gon",
+      "text": "11.5.5. Thực hiện ngắn gọn"
+    },
+    {
+      "type": "paragraph",
+      "text": "Trong Gluon, chúng ta có thể sử dụng lớp Trainer để gọi các thuật\ntoán tối ưu hóa. Điều này được sử dụng để thực hiện một chức năng đào\ntạo chung. Chúng tôi sẽ sử dụng điều này trong suốt chương hiện tại."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "#@save\ndef train_concise_ch11(tr_name, hyperparams, data_iter, num_epochs=2):\n    # Initialization\n    net = nn.Sequential()\n    net.add(nn.Dense(1))\n    net.initialize(init.Normal(sigma=0.01))\n    trainer = gluon.Trainer(net.collect_params(), tr_name, hyperparams)\n    loss = gluon.loss.L2Loss()\n    animator = d2l.Animator(xlabel='epoch', ylabel='loss',\n                            xlim=[0, num_epochs], ylim=[0.22, 0.35])\n    n, timer = 0, d2l.Timer()\n    for _ in range(num_epochs):\n        for X, y in data_iter:\n            with autograd.record():\n                l = loss(net(X), y)\n            l.backward()\n            trainer.step(X.shape[0])\n            n += X.shape[0]\n            if n % 200 == 0:\n                timer.stop()\n                animator.add(n/X.shape[0]/len(data_iter),\n                             (d2l.evaluate_loss(net, data_iter, loss),))\n                timer.start()\n    print(f'loss: {animator.Y[0][-1]:.3f}, {timer.avg():.3f} sec/epoch')"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "#@save\ndef train_concise_ch11(trainer_fn, hyperparams, data_iter, num_epochs=4):\n    # Initialization\n    net = nn.Sequential(nn.Linear(5, 1))\n    def init_weights(m):\n        if type(m) == nn.Linear:\n            torch.nn.init.normal_(m.weight, std=0.01)\n    net.apply(init_weights)\n\n    optimizer = trainer_fn(net.parameters(), **hyperparams)\n    loss = nn.MSELoss(reduction='none')\n    animator = d2l.Animator(xlabel='epoch', ylabel='loss',\n                            xlim=[0, num_epochs], ylim=[0.22, 0.35])\n    n, timer = 0, d2l.Timer()\n    for _ in range(num_epochs):\n        for X, y in data_iter:\n            optimizer.zero_grad()\n            out = net(X)\n            y = y.reshape(out.shape)\n            l = loss(out, y)\n            l.mean().backward()\n            optimizer.step()\n            n += X.shape[0]\n            if n % 200 == 0:\n                timer.stop()\n                # `MSELoss` computes squared error without the 1/2 factor\n                animator.add(n/X.shape[0]/len(data_iter),\n                             (d2l.evaluate_loss(net, data_iter, loss) / 2,))\n                timer.start()\n    print(f'loss: {animator.Y[0][-1]:.3f}, {timer.avg():.3f} sec/epoch')"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "#@save\ndef train_concise_ch11(trainer_fn, hyperparams, data_iter, num_epochs=2):\n    # Initialization\n    net = tf.keras.Sequential()\n    net.add(tf.keras.layers.Dense(1,\n            kernel_initializer=tf.random_normal_initializer(stddev=0.01)))\n    optimizer = trainer_fn(**hyperparams)\n    loss = tf.keras.losses.MeanSquaredError()\n    animator = d2l.Animator(xlabel='epoch', ylabel='loss',\n                            xlim=[0, num_epochs], ylim=[0.22, 0.35])\n    n, timer = 0, d2l.Timer()\n    for _ in range(num_epochs):\n        for X, y in data_iter:\n            with tf.GradientTape() as g:\n                out = net(X)\n                l = loss(y, out)\n                params = net.trainable_variables\n                grads = g.gradient(l, params)\n            optimizer.apply_gradients(zip(grads, params))\n            n += X.shape[0]\n            if n % 200 == 0:\n                timer.stop()\n                p = n/X.shape[0]\n                q = p/tf.data.experimental.cardinality(data_iter).numpy()\n                # `MeanSquaredError` computes squared error without the 1/2\n                # factor\n                r = (d2l.evaluate_loss(net, data_iter, loss) / 2,)\n                animator.add(q, r)\n                timer.start()\n    print(f'loss: {animator.Y[0][-1]:.3f}, {timer.avg():.3f} sec/epoch')"
+    },
+    {
+      "type": "paragraph",
+      "text": "Sử dụng Gluon để lặp lại thí nghiệm cuối cùng cho thấy hành vi giống hệt\nnhau."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "data_iter, _ = get_data_ch11(10)\ntrain_concise_ch11('sgd', {'learning_rate': 0.05}, data_iter)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "loss: 0.245, 0.198 sec/epoch"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_minibatch-sgd_f4d60f_171_1.svg",
+      "local_path": "_images/output_minibatch-sgd_f4d60f_171_1.svg",
+      "alt": "../_images/output_minibatch-sgd_f4d60f_171_1.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "data_iter, _ = get_data_ch11(10)\ntrainer = torch.optim.SGD\ntrain_concise_ch11(trainer, {'lr': 0.01}, data_iter)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "loss: 0.243, 0.010 sec/epoch"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_minibatch-sgd_f4d60f_174_1.svg",
+      "local_path": "_images/output_minibatch-sgd_f4d60f_174_1.svg",
+      "alt": "../_images/output_minibatch-sgd_f4d60f_174_1.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "data_iter, _ = get_data_ch11(10)\ntrainer = tf.keras.optimizers.SGD\ntrain_concise_ch11(trainer, {'learning_rate': 0.05}, data_iter)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "loss: 0.270, 0.106 sec/epoch"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_minibatch-sgd_f4d60f_177_1.svg",
+      "local_path": "_images/output_minibatch-sgd_f4d60f_177_1.svg",
+      "alt": "../_images/output_minibatch-sgd_f4d60f_177_1.svg"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tom-tat",
+      "text": "11.5.6. Tóm tắt"
+    },
+    {
+      "type": "list",
+      "ordered": false,
+      "items": [
+        "Vectorization làm cho mã hiệu quả hơn do giảm chi phí phát sinh từ\nkhung học sâu và do địa phương bộ nhớ tốt hơn và bộ nhớ đệm trên CPU\nvà GPU.",
+        "Có một sự đánh đổi giữa hiệu quả thống kê phát sinh từ gốc gradient\nngẫu nhiên và hiệu quả tính toán phát sinh từ việc xử lý các lô dữ\nliệu lớn tại một thời điểm.",
+        "Minibatch stochastic gradient descent cung cấp tốt nhất của cả hai\nthế giới: tính toán và hiệu quả thống kê.",
+        "Trong minibatch stochastic gradient descent, chúng tôi xử lý các lô\ndữ liệu thu được bằng một hoán vị ngẫu nhiên của dữ liệu đào tạo (tức\nlà, mỗi quan sát chỉ được xử lý một lần cho mỗi kỷ nguyên, mặc dù\ntheo thứ tự ngẫu nhiên).",
+        "Đó là khuyến khích để phân rã tỷ lệ học tập trong quá trình đào tạo.",
+        "Nói chung, minibatch stochastic gradient gốc nhanh hơn so với\nstochastic gradient descent và gradient descent để hội tụ đến một rủi\nro nhỏ hơn, khi được đo về thời gian đồng hồ."
+      ]
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bai-tap",
+      "text": "11.5.7. Bài tập"
+    },
+    {
+      "type": "list",
+      "ordered": true,
+      "items": [
+        "Sửa đổi kích thước lô và tỷ lệ học tập và quan sát tốc độ suy giảm\nđối với giá trị của hàm khách quan và thời gian tiêu thụ trong mỗi kỷ\nnguyên.",
+        "Đọc tài liệu MXNet và sử dụng chức năng Trainer lớp set_learning_rate để giảm tốc độ học tập của gradient ngẫu nhiên\nminibatch xuống 1/10 giá trị trước đó của nó sau mỗi kỷ nguyên.",
+        "So sánh minibatch stochastic gradient descent với một biến thể mà\nthực sự * mẫu với thay thế* từ bộ đào tạo. Điều gì xảy ra?",
+        "Một vị thần ác sao chép tập dữ liệu của bạn mà không nói với bạn (tức\nlà, mỗi quan sát xảy ra hai lần và tập dữ liệu của bạn phát triển lên\ngấp đôi kích thước ban đầu của nó, nhưng không ai nói với bạn). Làm\nthế nào để hành vi của stochastic gradient gốc, minibatch stochastic\ngradient descent và của gradient gốc thay đổi?"
+      ]
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    }
+  ],
+  "images": [
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_minibatch-sgd_f4d60f_99_1.svg",
+      "local_path": "_images/output_minibatch-sgd_f4d60f_99_1.svg",
+      "alt": "../_images/output_minibatch-sgd_f4d60f_99_1.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_minibatch-sgd_f4d60f_102_1.svg",
+      "local_path": "_images/output_minibatch-sgd_f4d60f_102_1.svg",
+      "alt": "../_images/output_minibatch-sgd_f4d60f_102_1.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_minibatch-sgd_f4d60f_105_1.svg",
+      "local_path": "_images/output_minibatch-sgd_f4d60f_105_1.svg",
+      "alt": "../_images/output_minibatch-sgd_f4d60f_105_1.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_minibatch-sgd_f4d60f_111_1.svg",
+      "local_path": "_images/output_minibatch-sgd_f4d60f_111_1.svg",
+      "alt": "../_images/output_minibatch-sgd_f4d60f_111_1.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_minibatch-sgd_f4d60f_114_1.svg",
+      "local_path": "_images/output_minibatch-sgd_f4d60f_114_1.svg",
+      "alt": "../_images/output_minibatch-sgd_f4d60f_114_1.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_minibatch-sgd_f4d60f_117_1.svg",
+      "local_path": "_images/output_minibatch-sgd_f4d60f_117_1.svg",
+      "alt": "../_images/output_minibatch-sgd_f4d60f_117_1.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_minibatch-sgd_f4d60f_123_1.svg",
+      "local_path": "_images/output_minibatch-sgd_f4d60f_123_1.svg",
+      "alt": "../_images/output_minibatch-sgd_f4d60f_123_1.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_minibatch-sgd_f4d60f_126_1.svg",
+      "local_path": "_images/output_minibatch-sgd_f4d60f_126_1.svg",
+      "alt": "../_images/output_minibatch-sgd_f4d60f_126_1.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_minibatch-sgd_f4d60f_129_1.svg",
+      "local_path": "_images/output_minibatch-sgd_f4d60f_129_1.svg",
+      "alt": "../_images/output_minibatch-sgd_f4d60f_129_1.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_minibatch-sgd_f4d60f_135_1.svg",
+      "local_path": "_images/output_minibatch-sgd_f4d60f_135_1.svg",
+      "alt": "../_images/output_minibatch-sgd_f4d60f_135_1.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_minibatch-sgd_f4d60f_138_1.svg",
+      "local_path": "_images/output_minibatch-sgd_f4d60f_138_1.svg",
+      "alt": "../_images/output_minibatch-sgd_f4d60f_138_1.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_minibatch-sgd_f4d60f_141_1.svg",
+      "local_path": "_images/output_minibatch-sgd_f4d60f_141_1.svg",
+      "alt": "../_images/output_minibatch-sgd_f4d60f_141_1.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_minibatch-sgd_f4d60f_147_0.svg",
+      "local_path": "_images/output_minibatch-sgd_f4d60f_147_0.svg",
+      "alt": "../_images/output_minibatch-sgd_f4d60f_147_0.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_minibatch-sgd_f4d60f_150_0.svg",
+      "local_path": "_images/output_minibatch-sgd_f4d60f_150_0.svg",
+      "alt": "../_images/output_minibatch-sgd_f4d60f_150_0.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_minibatch-sgd_f4d60f_153_0.svg",
+      "local_path": "_images/output_minibatch-sgd_f4d60f_153_0.svg",
+      "alt": "../_images/output_minibatch-sgd_f4d60f_153_0.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_minibatch-sgd_f4d60f_171_1.svg",
+      "local_path": "_images/output_minibatch-sgd_f4d60f_171_1.svg",
+      "alt": "../_images/output_minibatch-sgd_f4d60f_171_1.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_minibatch-sgd_f4d60f_174_1.svg",
+      "local_path": "_images/output_minibatch-sgd_f4d60f_174_1.svg",
+      "alt": "../_images/output_minibatch-sgd_f4d60f_174_1.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_minibatch-sgd_f4d60f_177_1.svg",
+      "local_path": "_images/output_minibatch-sgd_f4d60f_177_1.svg",
+      "alt": "../_images/output_minibatch-sgd_f4d60f_177_1.svg"
+    }
+  ],
+  "text": "11.5. Minibatch Stochastic Gradient Descent\nCho đến nay chúng ta đã gặp phải hai thái cực trong cách tiếp cận để\ngradient dựa learning: Section 11.3 sử dụng bộ dữ liệu đầy đủ để\ntính toán gradient và để cập nhật các tham số, một lần vượt qua tại một\nthời điểm. Ngược lại Section 11.4 xử lý một quan sát tại một thời\nđiểm để đạt được tiến bộ. Mỗi người trong số họ có nhược điểm riêng.\nGradient Descent không đặc biệt* hiệu quả dữ liệu* bất cứ khi nào dữ\nliệu rất giống nhau. Stochastic Gradient Descent không đặc biệt* hiệu\nquả tính tế* vì CPU và GPU không thể khai thác toàn bộ sức mạnh của\nvectơ hóa. Điều này cho thấy rằng có thể có một phương tiện hạnh phúc,\nvà trên thực tế, đó là những gì chúng tôi đã sử dụng cho đến nay trong\ncác ví dụ chúng tôi đã thảo luận.\n11.5.1. Vector hóa và bộ nhớ cache\nTrọng tâm của quyết định sử dụng minibatches là hiệu quả tính toán. Điều\nnày dễ hiểu nhất khi xem xét song song với nhiều GPU và nhiều máy chủ.\nTrong trường hợp này, chúng ta cần gửi ít nhất một hình ảnh cho mỗi GPU.\nVới 8 GPU trên mỗi máy chủ và 16 máy chủ, chúng tôi đã có kích thước\nminibatch là 128.\nMọi thứ tinh tế hơn một chút khi nói đến GPU đơn lẻ hoặc thậm chí CPU.\nCác thiết bị này có nhiều loại bộ nhớ, thường là nhiều loại đơn vị tính\ntoán và hạn chế băng thông khác nhau giữa chúng. Ví dụ, CPU có một số\nlượng nhỏ các thanh ghi và sau đó là L1, L2 và trong một số trường hợp\nthậm chí bộ nhớ cache L3 (được chia sẻ giữa các lõi bộ xử lý khác nhau).\nCác bộ nhớ đệm này có kích thước và độ trễ ngày càng tăng (đồng thời\nchúng giảm băng thông). Nó đủ để nói, bộ xử lý có khả năng thực hiện\nnhiều hoạt động hơn so với những gì giao diện bộ nhớ chính có thể cung\ncấp.\nCPU 2GHz với 16 lõi và vectorization AVX-512 có thể xử lý lên đến \\(2 \\cdot 10^9 \\cdot 16 \\cdot 32 = 10^{12}\\) byte mỗi giây. Khả\nnăng của GPU dễ dàng vượt quá con số này theo hệ số 100. Mặt khác,\nmột bộ xử lý máy chủ tầm trung có thể không có nhiều hơn 100 Gb/s\nbăng thông, tức là, ít hơn một phần mười những gì sẽ được yêu cầu để\ngiữ cho bộ xử lý ăn. Để làm cho vấn đề tồi tệ hơn, không phải tất cả\ntruy cập bộ nhớ được tạo ra bằng nhau: đầu tiên, giao diện bộ nhớ\nthường rộng 64 bit hoặc rộng hơn (ví dụ, trên GPU lên đến 384 bit),\ndo đó đọc một byte duy nhất phải chịu chi phí truy cập rộng hơn\nnhiều.\nCó chi phí đáng kể cho truy cập đầu tiên trong khi truy cập tuần tự\nlà tương đối rẻ (điều này thường được gọi là một lần đọc liên tục).\nCó rất nhiều điều cần lưu ý, chẳng hạn như bộ nhớ đệm khi chúng ta có\nnhiều ổ cắm, chiplet và các cấu trúc khác. Một cuộc thảo luận chi\ntiết về điều này nằm ngoài phạm vi của phần này. Xem ví dụ, Wikipedia article này để có một cuộc thảo luận chuyên sâu hơn.\nCách để giảm bớt những hạn chế này là sử dụng một hệ thống phân cấp của\nbộ nhớ cache CPU thực sự đủ nhanh để cung cấp cho bộ xử lý dữ liệu. Đây\nlà * động lực là* đằng sau việc phân mẻ trong học sâu. Để giữ cho vấn\nđề đơn giản, hãy xem xét phép nhân ma trận ma trận, nói \\(\\mathbf{A} = \\mathbf{B}\\mathbf{C}\\) . Chúng tôi có một số tùy chọn\nđể tính toán \\(\\mathbf{A}\\) . Ví dụ, chúng tôi có thể thử như sau:\nChúng tôi có thể tính toán \\(\\mathbf{A}_{ij} = \\mathbf{B}_{i,:} \\mathbf{C}_{:,j}^\\top\\) , tức\nlà, chúng tôi có thể tính toán nó elementwise bằng phương tiện của\ncác sản phẩm chấm.\nChúng ta có thể tính toán \\(\\mathbf{A}_{:,j} = \\mathbf{B} \\mathbf{C}_{:,j}^\\top\\) , tức là,\nchúng ta có thể tính toán nó một cột tại một thời điểm. Tương tự như\nvậy chúng ta có thể tính \\(\\mathbf{A}\\) một hàng \\(\\mathbf{A}_{i,:}\\) tại một thời điểm.\nWe could simply đơn giản compute tính toán \\(\\mathbf{A} = \\mathbf{B} \\mathbf{C}\\) .\nChúng ta có thể phá vỡ \\(\\mathbf{B}\\) và \\(\\mathbf{C}\\) thành\ncác ma trận khối nhỏ hơn và tính toán \\(\\mathbf{A}\\) một khối tại\nmột thời điểm.\nNếu chúng ta làm theo tùy chọn đầu tiên, chúng ta sẽ cần sao chép một\nhàng và một vectơ cột vào CPU mỗi khi chúng ta muốn tính một phần tử \\(\\mathbf{A}_{ij}\\) . Thậm chí tệ hơn, do thực tế là các yếu tố ma\ntrận được căn chỉnh tuần tự, do đó, chúng ta được yêu cầu truy cập nhiều\nvị trí tách rời cho một trong hai vectơ khi chúng ta đọc chúng từ bộ\nnhớ. Tùy chọn thứ hai thuận lợi hơn nhiều. Trong đó, chúng ta có thể giữ\nvector cột \\(\\mathbf{C}_{:,j}\\) trong bộ nhớ cache CPU trong khi\nchúng tôi tiếp tục đi qua \\(B\\) . Điều này giảm một nửa yêu cầu băng\nthông bộ nhớ với truy cập nhanh hơn tương ứng. Tất nhiên, tùy chọn 3 là\nmong muốn nhất. Thật không may, hầu hết các ma trận có thể không hoàn\ntoàn phù hợp với bộ nhớ cache (đây là những gì chúng ta đang thảo luận\nsau khi tất cả). Tuy nhiên, tùy chọn 4 cung cấp một giải pháp thay thế\nthực tế hữu ích: chúng ta có thể di chuyển các khối ma trận vào bộ nhớ\ncache và nhân chúng cục bộ. Tối ưu hóa thư viện chăm sóc này cho chúng\ntôi. Chúng ta hãy xem các hoạt động này hiệu quả như thế nào trong thực\ntế.\nNgoài hiệu quả tính toán, chi phí được giới thiệu bởi Python và bởi\nchính khuôn khổ học tập sâu là đáng kể. Nhớ lại rằng mỗi lần chúng ta\nthực hiện một lệnh, trình thông dịch Python sẽ gửi một lệnh đến công cụ\nMXNet cần chèn nó vào biểu đồ tính toán và xử lý nó trong quá trình lên\nlịch. Chi phí như vậy có thể khá bất lợi. Nói tóm lại, rất nên sử dụng\nvector hóa (và ma trận) bất cứ khi nào có thể.\nNhiệm vụ yếu tố khôn ngoan chỉ đơn giản là lặp lại trên tất cả các hàng\nvà cột của \\(\\mathbf{B}\\) và \\(\\mathbf{C}\\) tương ứng để gán giá\ntrị cho \\(\\mathbf{A}\\) .\nMột chiến lược nhanh hơn là thực hiện gán cột khôn ngoan.\nCuối cùng, cách hiệu quả nhất là thực hiện toàn bộ hoạt động trong một\nkhối. Hãy để chúng tôi xem tốc độ tương ứng của các hoạt động là bao\nnhiêu.\n11.5.2. Minibatches\nTrong quá khứ, chúng tôi đã cho rằng chúng tôi sẽ đọc * minibatches*\ncủa dữ liệu chứ không phải là quan sát duy nhất để cập nhật các tham số.\nBây giờ chúng tôi đưa ra một lời biện minh ngắn gọn cho nó. Xử lý các\nquan sát đơn yêu cầu chúng ta thực hiện nhiều phép nhân ma thuật-vector\n(hoặc thậm chí là vector-vector) đơn lẻ, khá tốn kém và phát sinh một\nchi phí đáng kể thay mặt cho khuôn khổ học sâu cơ bản. Điều này áp dụng\ncả để đánh giá một mạng khi áp dụng cho dữ liệu (thường được gọi là suy\nluận) và khi tính toán gradient để cập nhật các tham số. Đó là, điều này\náp dụng bất cứ khi nào chúng tôi thực hiện \\(\\mathbf{w} \\leftarrow \\mathbf{w} - \\eta_t \\mathbf{g}_t\\) ở đâu\nChúng ta có thể tăng hiệu quả * tính tị* của thao tác này bằng cách áp\ndụng nó vào một loạt các quan sát tại một thời điểm. Đó là, chúng tôi\nthay thế gradient \\(\\mathbf{g}_t\\) trong một quan sát duy nhất bằng\nmột trong một lô nhỏ\nChúng ta hãy xem điều này làm gì với các thuộc tính thống kê của \\(\\mathbf{g}_t\\) : vì cả \\(\\mathbf{x}_t\\) và tất cả các yếu tố\ncủa minibatch \\(\\mathcal{B}_t\\) được vẽ đồng đều ngẫu nhiên từ bộ\nđào tạo, kỳ vọng của gradient vẫn không thay đổi. Mặt khác, phương sai\nđược giảm đáng kể. Kể từ khi gradient minibatch bao gồm \\(b := |\\mathcal{B}_t|\\) gradient độc lập đang được trung bình, độ\nlệch chuẩn của nó được giảm bởi một hệ số \\(b^{-\\frac{1}{2}}\\) . Bản\nthân nó, điều này là một điều tốt, vì nó có nghĩa là các bản cập nhật\nđược liên kết đáng tin cậy hơn với gradient đầy đủ.\nNgây thơ điều này sẽ chỉ ra rằng việc lựa chọn một minibatch lớn \\(\\mathcal{B}_t\\) sẽ là mong muốn phổ biến. Than ôi, sau một số\nđiểm, việc giảm thêm độ lệch chuẩn là tối thiểu khi so sánh với sự gia\ntăng tuyến tính trong chi phí tính toán. Trong thực tế, chúng tôi chọn\nmột minibatch đủ lớn để mang lại hiệu quả tính toán tốt trong khi vẫn\nphù hợp với bộ nhớ của GPU. Để minh họa tiết kiệm chúng ta hãy xem xét\nmột số mã. Trong đó chúng ta thực hiện cùng một phép nhân ma trận ma\ntrận, nhưng lần này chia thành “minibatches” của 64 cột tại một thời\nđiểm.\nNhư chúng ta có thể thấy, tính toán trên minibatch về cơ bản là hiệu quả\nnhư trên ma trận đầy đủ. Một lời thận trọng là theo thứ tự. Trong Section 7.5 , chúng tôi đã sử dụng một loại chính quy hóa\nphụ thuộc nhiều vào số lượng phương sai trong một minibatch. Khi chúng\nta tăng sau này, phương sai giảm và cùng với nó là lợi ích của việc phun\ntiếng ồn do bình thường hóa hàng loạt. Xem ví dụ, [Ioffe, 2017] để biết chi tiết về cách giải thích và tính toán các điều khoản thích\nhợp.\n11.5.3. Đọc tập dữ liệu\nChúng ta hãy xem cách minibatches được tạo ra hiệu quả từ dữ liệu. Sau\nđây chúng tôi sử dụng một tập dữ liệu do NASA phát triển để kiểm tra\ncánh noise from different\naircraft để so sánh các thuật toán tối ưu hóa này. Để thuận tiện, chúng tôi chỉ\nsử dụng các ví dụ \\(1,500\\) đầu tiên. Dữ liệu được làm trắng để xử\nlý trước, tức là, chúng tôi loại bỏ trung bình và giải thích phương sai\nthành \\(1\\) cho mỗi tọa độ.\n11.5.4. Thực hiện từ đầu\nNhớ lại việc thực hiện giảm dần dần ngẫu nhiên minibatch từ Section 3.2 . Trong phần sau đây, chúng tôi cung cấp\nmột thực hiện tổng quát hơn một chút. Để thuận tiện, nó có chữ ký cuộc\ngọi giống như các thuật toán tối ưu hóa khác được giới thiệu sau trong\nchương này. Cụ thể, chúng tôi thêm đầu vào trạng thái states và đặt\nsiêu tham số trong từ điển hyperparams . Ngoài ra, chúng tôi sẽ trung\nbình mất mỗi ví dụ minibatch trong chức năng đào tạo, do đó gradient\ntrong thuật toán tối ưu hóa không cần phải chia cho kích thước lô.\nTiếp theo, chúng tôi thực hiện một chức năng đào tạo chung để tạo điều\nkiện cho việc sử dụng các thuật toán tối ưu hóa khác được giới thiệu sau\nnày trong chương này. Nó khởi tạo một mô hình hồi quy tuyến tính và có\nthể được sử dụng để đào tạo mô hình với minibatch stochastic gradient\ngốc và các thuật toán khác được giới thiệu sau đó.\nHãy để chúng tôi xem tối ưu hóa tiến hành như thế nào để giảm gradient\nhàng loạt. Điều này có thể đạt được bằng cách đặt kích thước minibatch\nthành 1500 (tức là tổng số ví dụ). Kết quả là các thông số mô hình chỉ\nđược cập nhật một lần cho mỗi kỷ nguyên. Có rất ít tiến bộ. Trong thực\ntế, sau 6 bước tiến trình quầy hàng.\nKhi kích thước lô bằng 1, chúng ta sử dụng stochastic gradient descent\nđể tối ưu hóa. Để đơn giản thực hiện, chúng tôi đã chọn một tỷ lệ học\ntập liên tục (mặc dù nhỏ). Trong dòng dốc ngẫu nhiên, các tham số mô\nhình được cập nhật bất cứ khi nào một ví dụ được xử lý. Trong trường hợp\ncủa chúng tôi, điều này lên tới 1500 bản cập nhật mỗi kỷ nguyên. Như\nchúng ta có thể thấy, sự suy giảm giá trị của hàm mục tiêu chậm lại sau\nmột kỷ nguyên. Mặc dù cả hai quy trình đã xử lý 1500 ví dụ trong một kỷ\nnguyên, dòng dốc ngẫu nhiên tiêu thụ nhiều thời gian hơn so với gradient\ngốc trong thí nghiệm của chúng tôi. Điều này là do stochastic gradient\ngốc cập nhật các thông số thường xuyên hơn và vì nó kém hiệu quả hơn để\nxử lý các quan sát duy nhất tại một thời điểm.\nCuối cùng, khi kích thước lô bằng 100, chúng ta sử dụng minibatch\nstochastic gradient descent để tối ưu hóa. Thời gian cần thiết cho mỗi\nkỷ nguyên ngắn hơn thời gian cần thiết cho dòng gradient stochastic và\nthời gian để giảm gradient hàng loạt.\nGiảm kích thước lô xuống còn 10, thời gian cho mỗi kỷ nguyên tăng vì\nkhối lượng công việc cho mỗi lô kém hiệu quả hơn để thực hiện.\nBây giờ chúng ta có thể so sánh thời gian so với mất mát cho bốn thí\nnghiệm trước đó. Như có thể thấy, mặc dù stochastic gradient descent hội\ntụ nhanh hơn GD về số lượng ví dụ được xử lý, nó sử dụng nhiều thời gian\nhơn để đạt được tổn thất tương tự so với GD vì tính toán ví dụ gradient\nbằng ví dụ không hiệu quả như vậy. Minibatch stochastic gradient gốc có\nthể đánh đổi tốc độ hội tụ và hiệu quả tính toán. Kích thước minibatch\nlà 10 hiệu quả hơn so với dòng gradient stochastic; kích thước minibatch\n100 thậm chí vượt trội hơn GD về thời gian chạy.\n11.5.5. Thực hiện ngắn gọn\nTrong Gluon, chúng ta có thể sử dụng lớp Trainer để gọi các thuật\ntoán tối ưu hóa. Điều này được sử dụng để thực hiện một chức năng đào\ntạo chung. Chúng tôi sẽ sử dụng điều này trong suốt chương hiện tại.\nSử dụng Gluon để lặp lại thí nghiệm cuối cùng cho thấy hành vi giống hệt\nnhau.\n11.5.6. Tóm tắt\nVectorization làm cho mã hiệu quả hơn do giảm chi phí phát sinh từ\nkhung học sâu và do địa phương bộ nhớ tốt hơn và bộ nhớ đệm trên CPU\nvà GPU.\nCó một sự đánh đổi giữa hiệu quả thống kê phát sinh từ gốc gradient\nngẫu nhiên và hiệu quả tính toán phát sinh từ việc xử lý các lô dữ\nliệu lớn tại một thời điểm.\nMinibatch stochastic gradient descent cung cấp tốt nhất của cả hai\nthế giới: tính toán và hiệu quả thống kê.\nTrong minibatch stochastic gradient descent, chúng tôi xử lý các lô\ndữ liệu thu được bằng một hoán vị ngẫu nhiên của dữ liệu đào tạo (tức\nlà, mỗi quan sát chỉ được xử lý một lần cho mỗi kỷ nguyên, mặc dù\ntheo thứ tự ngẫu nhiên).\nĐó là khuyến khích để phân rã tỷ lệ học tập trong quá trình đào tạo.\nNói chung, minibatch stochastic gradient gốc nhanh hơn so với\nstochastic gradient descent và gradient descent để hội tụ đến một rủi\nro nhỏ hơn, khi được đo về thời gian đồng hồ.\n11.5.7. Bài tập\nSửa đổi kích thước lô và tỷ lệ học tập và quan sát tốc độ suy giảm\nđối với giá trị của hàm khách quan và thời gian tiêu thụ trong mỗi kỷ\nnguyên.\nĐọc tài liệu MXNet và sử dụng chức năng Trainer lớp set_learning_rate để giảm tốc độ học tập của gradient ngẫu nhiên\nminibatch xuống 1/10 giá trị trước đó của nó sau mỗi kỷ nguyên.\nSo sánh minibatch stochastic gradient descent với một biến thể mà\nthực sự * mẫu với thay thế* từ bộ đào tạo. Điều gì xảy ra?\nMột vị thần ác sao chép tập dữ liệu của bạn mà không nói với bạn (tức\nlà, mỗi quan sát xảy ra hai lần và tập dữ liệu của bạn phát triển lên\ngấp đôi kích thước ban đầu của nó, nhưng không ai nói với bạn). Làm\nthế nào để hành vi của stochastic gradient gốc, minibatch stochastic\ngradient descent và của gradient gốc thay đổi?\nDiscussions\nDiscussions\nDiscussions"
+}

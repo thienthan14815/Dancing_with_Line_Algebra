@@ -1,0 +1,378 @@
+{
+  "url": "https://vi.d2l.ai/chapter_recurrent-neural-networks/rnn.html",
+  "chapter": "chapter_recurrent-neural-networks",
+  "title": "8.4. Mạng nơ-ron tái phát",
+  "crawled_at": "2026-07-20T12:39:58.465552+00:00",
+  "headings": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "mang-no-ron-tai-phat",
+      "text": "8.4. Mạng nơ-ron tái phát"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "mang-than-kinh-khong-co-trang-thai-an",
+      "text": "8.4.1. Mạng thần kinh không có trạng thái ẩn"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "mang-than-kinh-dinh-ky-voi-cac-trang-thai-an",
+      "text": "8.4.2. Mạng thần kinh định kỳ với các trạng thái ẩn"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "mo-hinh-ngon-ngu-cap-ky-tu-dua-tren-rnn",
+      "text": "8.4.3. Mô hình ngôn ngữ cấp ký tự dựa trên RNN"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "boi-roi",
+      "text": "8.4.4. Bối rối"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tom-tat",
+      "text": "8.4.5. Tóm tắt"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bai-tap",
+      "text": "8.4.6. Bài tập"
+    }
+  ],
+  "content": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "mang-no-ron-tai-phat",
+      "text": "8.4. Mạng nơ-ron tái phát"
+    },
+    {
+      "type": "paragraph",
+      "text": "Trong Section 8.3 chúng tôi đã giới thiệu các mô hình \\(n\\) -gram, trong đó xác suất có điều kiện của từ \\(x_t\\) tại\nbước thời gian \\(t\\) chỉ phụ thuộc vào \\(n-1\\) từ trước. Nếu\nchúng ta muốn kết hợp hiệu ứng có thể có của các từ sớm hơn bước thời\ngian \\(t-(n-1)\\) trên \\(x_t\\) , chúng ta cần tăng \\(n\\) . Tuy\nnhiên, số lượng tham số mô hình cũng sẽ tăng theo cấp số nhân với nó, vì\nchúng ta cần lưu trữ \\(|\\mathcal{V}|^n\\) số cho một bộ từ vựng \\(\\mathcal{V}\\) . Do đó, thay vì mô hình hóa \\(P(x_t \\mid x_{t-1}, \\ldots, x_{t-n+1})\\) , tốt hơn là sử dụng một\nmô hình biến tiềm ẩn:"
+    },
+    {
+      "type": "math",
+      "latex": "(8.4.1)¶\\[P(x_t \\mid x_{t-1}, \\ldots, x_1) \\approx P(x_t \\mid h_{t-1}),\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "trong đó \\(h_{t-1}\\) là trạng thái * ẩn* (còn được gọi là biến ẩn)\nlưu trữ thông tin trình tự lên đến bước thời gian \\(t-1\\) . Nói\nchung, trạng thái ẩn bất cứ lúc nào bước \\(t\\) có thể được tính toán\ndựa trên cả đầu vào hiện tại \\(x_{t}\\) và trạng thái ẩn trước đó \\(h_{t-1}\\) :"
+    },
+    {
+      "type": "math",
+      "latex": "(8.4.2)¶\\[h_t = f(x_{t}, h_{t-1}).\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Đối với một chức năng đủ mạnh \\(f\\) trong (8.4.2) , mô\nhình biến tiềm ẩn không phải là một xấp xỉ. Rốt cuộc, \\(h_t\\) có thể\nchỉ đơn giản là lưu trữ tất cả dữ liệu mà nó đã quan sát cho đến nay.\nTuy nhiên, nó có khả năng có thể làm cho cả tính toán và lưu trữ đắt\ntiền."
+    },
+    {
+      "type": "paragraph",
+      "text": "Nhớ lại rằng chúng ta đã thảo luận về các lớp ẩn với các đơn vị ẩn trong Section 4 . Đáng chú ý là các lớp ẩn và trạng thái ẩn\nđề cập đến hai khái niệm rất khác nhau. Các lớp ẩn, như giải thích, các\nlớp được ẩn khỏi chế độ xem trên đường dẫn từ đầu vào đến đầu ra. Các\ntrạng thái ẩn đang nói về mặt kỹ thuật * đầu vào* cho bất cứ điều gì\nchúng ta làm ở một bước nhất định và chúng chỉ có thể được tính toán\nbằng cách xem dữ liệu ở các bước thời gian trước."
+    },
+    {
+      "type": "paragraph",
+      "text": "Mạng thần kinh định kỳ (RNN) là các mạng thần kinh với các trạng thái\nẩn. Trước khi giới thiệu mô hình RNN, lần đầu tiên chúng tôi xem lại mô\nhình MLP được giới thiệu trong Section 4.1 ."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "mang-than-kinh-khong-co-trang-thai-an",
+      "text": "8.4.1. Mạng thần kinh không có trạng thái ẩn"
+    },
+    {
+      "type": "paragraph",
+      "text": "Chúng ta hãy nhìn vào một MLP với một lớp ẩn duy nhất. Hãy để chức năng\nkích hoạt của lớp ẩn là \\(\\phi\\) . Với một minibatch các ví dụ \\(\\mathbf{X} \\in \\mathbb{R}^{n \\times d}\\) với kích thước lô \\(n\\) và \\(d\\) đầu vào, đầu ra \\(\\mathbf{H} \\in \\mathbb{R}^{n \\times h}\\) của lớp ẩn được tính như"
+    },
+    {
+      "type": "math",
+      "latex": "(8.4.3)¶\\[\\mathbf{H} = \\phi(\\mathbf{X} \\mathbf{W}_{xh} + \\mathbf{b}_h).\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Trong (8.4.3) , chúng ta có tham số trọng lượng \\(\\mathbf{W}_{xh} \\in \\mathbb{R}^{d \\times h}\\) , tham số thiên vị \\(\\mathbf{b}_h \\in \\mathbb{R}^{1 \\times h}\\) và số lượng đơn vị ẩn \\(h\\) , cho lớp ẩn. Như vậy, phát sóng (xem Section 2.1.3 ) được áp dụng trong quá trình tổng kết.\nTiếp theo, biến ẩn \\(\\mathbf{H}\\) được sử dụng làm đầu vào của lớp\nđầu ra. Lớp đầu ra được đưa ra bởi"
+    },
+    {
+      "type": "math",
+      "latex": "(8.4.4)¶\\[\\mathbf{O} = \\mathbf{H} \\mathbf{W}_{hq} + \\mathbf{b}_q,\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "trong đó \\(\\mathbf{O} \\in \\mathbb{R}^{n \\times q}\\) là biến đầu ra, \\(\\mathbf{W}_{hq} \\in \\mathbb{R}^{h \\times q}\\) là tham số trọng\nlượng và \\(\\mathbf{b}_q \\in \\mathbb{R}^{1 \\times q}\\) là tham số\nthiên vị của lớp đầu ra. Nếu đó là một bài toán phân loại, chúng ta có\nthể sử dụng \\(\\text{softmax}(\\mathbf{O})\\) để tính toán phân phối\nxác suất của các loại đầu ra."
+    },
+    {
+      "type": "paragraph",
+      "text": "Điều này hoàn toàn tương tự như bài toán hồi quy mà chúng tôi đã giải\nquyết trước đây trong Section 8.1 , do đó chúng tôi bỏ qua\ncác chi tiết. Đủ để nói rằng chúng ta có thể chọn các cặp nhãn tính năng\nmột cách ngẫu nhiên và tìm hiểu các thông số của mạng của chúng tôi\nthông qua sự phân biệt tự động và gốc gradient ngẫu nhiên."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "mang-than-kinh-dinh-ky-voi-cac-trang-thai-an",
+      "text": "8.4.2. Mạng thần kinh định kỳ với các trạng thái ẩn"
+    },
+    {
+      "type": "paragraph",
+      "text": "Các vấn đề hoàn toàn khác nhau khi chúng ta có các trạng thái ẩn. Chúng\nta hãy nhìn vào cấu trúc một số chi tiết hơn."
+    },
+    {
+      "type": "paragraph",
+      "text": "Giả sử rằng chúng ta có một minibatch của đầu vào \\(\\mathbf{X}_t \\in \\mathbb{R}^{n \\times d}\\) tại bước thời gian \\(t\\) . Nói cách khác, đối với một minibatch gồm \\(n\\) ví dụ\nchuỗi, mỗi hàng \\(\\mathbf{X}_t\\) tương ứng với một ví dụ tại bước\nthời điểm \\(t\\) từ chuỗi. Tiếp theo, biểu thị bằng \\(\\mathbf{H}_t \\in \\mathbb{R}^{n \\times h}\\) biến ẩn của bước thời\ngian \\(t\\) . Không giống như MLP, ở đây chúng ta lưu biến ẩn \\(\\mathbf{H}_{t-1}\\) từ bước thời gian trước và giới thiệu một tham\nsố trọng lượng mới \\(\\mathbf{W}_{hh} \\in \\mathbb{R}^{h \\times h}\\) để mô tả cách sử dụng biến ẩn của bước thời gian trước đó trong bước\nthời gian hiện tại. Cụ thể, việc tính toán biến ẩn của bước thời gian\nhiện tại được xác định bởi đầu vào của bước thời gian hiện tại cùng với\nbiến ẩn của bước thời gian trước đó:"
+    },
+    {
+      "type": "math",
+      "latex": "(8.4.5)¶\\[\\mathbf{H}_t = \\phi(\\mathbf{X}_t \\mathbf{W}_{xh} + \\mathbf{H}_{t-1} \\mathbf{W}_{hh}  + \\mathbf{b}_h).\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "So với (8.4.3) , (8.4.5) bổ\nsung thêm một thuật ngữ \\(\\mathbf{H}_{t-1} \\mathbf{W}_{hh}\\) và do\nđó khởi tạo (8.4.2) . Từ mối quan hệ giữa các biến ẩn \\(\\mathbf{H}_t\\) và \\(\\mathbf{H}_{t-1}\\) của các bước thời gian\nliền kề, chúng ta biết rằng các biến này đã thu thập và giữ lại thông\ntin lịch sử của trình tự lên đến bước thời gian hiện tại của chúng,\ngiống như trạng thái hoặc bộ nhớ của bước thời gian hiện tại của mạng\nthần kinh. Do đó, một biến ẩn như vậy được gọi là trạng thái *\nhidden . Vì trạng thái ẩn sử dụng cùng một định nghĩa của bước thời\ngian trước đó trong bước thời gian hiện tại, việc tính toán\n:eq:`rnn_h_with_state` là đệ quy * . Do đó, các mạng thần kinh với\ncác trạng thái ẩn dựa trên tính toán tái phát được đặt tên * mạng thần\nkinh định kỳ * . Các lớp thực hiện tính toán (8.4.5) trong RNN s được gọi là * lớp* lặp đi lặp lại*."
+    },
+    {
+      "type": "paragraph",
+      "text": "Có nhiều cách khác nhau để xây dựng RNNs. RNNs với trạng thái ẩn được\nxác định bởi (8.4.5) là rất phổ biến. Đối với bước\nthời gian \\(t\\) , đầu ra của lớp đầu ra tương tự như tính toán trong\nMLP:"
+    },
+    {
+      "type": "math",
+      "latex": "(8.4.6)¶\\[\\mathbf{O}_t = \\mathbf{H}_t \\mathbf{W}_{hq} + \\mathbf{b}_q.\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Các thông số của RNN bao gồm các trọng lượng \\(\\mathbf{W}_{xh} \\in \\mathbb{R}^{d \\times h}, \\mathbf{W}_{hh} \\in \\mathbb{R}^{h \\times h}\\) ,\nvà thiên vị \\(\\mathbf{b}_h \\in \\mathbb{R}^{1 \\times h}\\) của lớp ẩn,\ncùng với trọng lượng \\(\\mathbf{W}_{hq} \\in \\mathbb{R}^{h \\times q}\\) và thiên vị \\(\\mathbf{b}_q \\in \\mathbb{R}^{1 \\times q}\\) của lớp đầu\nra. Điều đáng nói là ngay cả ở các bước thời gian khác nhau, RNN s luôn\nsử dụng các tham số mô hình này. Do đó, chi phí tham số hóa của một RNN\nkhông tăng lên khi số bước thời gian tăng lên."
+    },
+    {
+      "type": "paragraph",
+      "text": "Fig. 8.4.1 minh họa logic tính toán của một RNN tại ba bước\nthời gian liền kề. Bất cứ lúc nào bước \\(t\\) , tính toán trạng thái\nẩn có thể được coi là: (i) nối đầu vào \\(\\mathbf{X}_t\\) ở bước thời\ngian hiện tại \\(t\\) và trạng thái ẩn \\(\\mathbf{H}_{t-1}\\) ở bước\nthời gian trước \\(t-1\\) ; (ii) cho kết quả nối vào một lớp kết nối\nđầy đủ với sự kích hoạt chức năng \\(\\phi\\) . Đầu ra của một lớp được\nkết nối hoàn toàn như vậy là trạng thái ẩn \\(\\mathbf{H}_t\\) của bước\nthời gian hiện tại \\(t\\) . Trong trường hợp này, các thông số mô hình\nlà nối \\(\\mathbf{W}_{xh}\\) và \\(\\mathbf{W}_{hh}\\) , và một sự\nthiên vị của \\(\\mathbf{b}_h\\) , tất cả từ (8.4.5) . Trạng thái ẩn của bước thời gian hiện tại \\(t\\) , \\(\\mathbf{H}_t\\) , sẽ tham gia vào việc tính toán trạng\nthái ẩn \\(\\mathbf{H}_{t+1}\\) của bước thời gian tiếp theo \\(t+1\\) . Hơn nữa, \\(\\mathbf{H}_t\\) cũng sẽ được đưa vào lớp đầu\nra được kết nối hoàn toàn để tính toán đầu ra \\(\\mathbf{O}_t\\) của\nbước thời gian hiện tại \\(t\\) ."
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/rnn.svg",
+      "local_path": "_images/rnn.svg",
+      "alt": "../_images/rnn.svg"
+    },
+    {
+      "type": "paragraph",
+      "text": "Fig. 8.4.1 An RNN with a hidden state. ¶"
+    },
+    {
+      "type": "paragraph",
+      "text": "Chúng tôi vừa đề cập rằng việc tính \\(\\mathbf{X}_t \\mathbf{W}_{xh} + \\mathbf{H}_{t-1} \\mathbf{W}_{hh}\\) cho trạng thái ẩn tương đương với phép nhân ma trận của nối \\(\\mathbf{X}_t\\) và \\(\\mathbf{H}_{t-1}\\) và nối \\(\\mathbf{H}_{t-1}\\) và nối \\(\\mathbf{W}_{xh}\\) và \\(\\mathbf{W}_{hh}\\) . Mặc dù điều này có thể được chứng minh trong\ntoán học, sau đây chúng ta chỉ sử dụng một đoạn mã đơn giản để hiển thị\nđiều này. Để bắt đầu, chúng tôi xác định ma trận X , W_xh , H và W_hh , có hình dạng tương ứng (3, 1), (1, 4), (3, 4) và (4, 4).\nNhân X với W_xh , và H W_hh , tương ứng, và sau đó thêm\nhai nhân này, chúng tôi có được một ma trận hình dạng (3, 4)."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "from mxnet import np, npx\nfrom d2l import mxnet as d2l\n\nnpx.set_np()\n\nX, W_xh = np.random.normal(0, 1, (3, 1)), np.random.normal(0, 1, (1, 4))\nH, W_hh = np.random.normal(0, 1, (3, 4)), np.random.normal(0, 1, (4, 4))\nnp.dot(X, W_xh) + np.dot(H, W_hh)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "array([[-0.21952915,  4.256434  ,  4.5812645 , -5.344988  ],\n       [ 3.447858  , -3.0177274 , -1.6777471 ,  7.535347  ],\n       [ 2.2390068 ,  1.4199957 ,  4.744728  , -8.421293  ]])"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "import torch\nfrom d2l import torch as d2l\n\nX, W_xh = torch.normal(0, 1, (3, 1)), torch.normal(0, 1, (1, 4))\nH, W_hh = torch.normal(0, 1, (3, 4)), torch.normal(0, 1, (4, 4))\ntorch.matmul(X, W_xh) + torch.matmul(H, W_hh)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "tensor([[ 0.0795,  4.0775,  0.3635, -3.0606],\n        [-1.0515, -3.1537,  1.4391,  4.5820],\n        [-2.4584, -0.9088,  3.2624,  2.7681]])"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "import tensorflow as tf\nfrom d2l import tensorflow as d2l\n\nX, W_xh = tf.random.normal((3, 1), 0, 1), tf.random.normal((1, 4), 0, 1)\nH, W_hh = tf.random.normal((3, 4), 0, 1), tf.random.normal((4, 4), 0, 1)\ntf.matmul(X, W_xh) + tf.matmul(H, W_hh)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "<tf.Tensor: shape=(3, 4), dtype=float32, numpy=\narray([[-1.578661  , -0.58766127,  0.43116558, -3.654107  ],\n       [-0.3349018 ,  1.8152555 ,  0.9198491 ,  6.9950237 ],\n       [-1.4761721 ,  0.55555534,  2.387129  ,  4.7694645 ]],\n      dtype=float32)>"
+    },
+    {
+      "type": "paragraph",
+      "text": "Bây giờ chúng ta nối các ma trận X và H dọc theo các cột (trục\n1), và ma trận W_xh và W_hh dọc theo hàng (trục 0). Hai kết nối\nnày dẫn đến ma trận của hình dạng (3, 5) và hình dạng (5, 4), tương ứng.\nNhân hai ma trận nối này, chúng ta có được ma trận đầu ra giống nhau của\nhình dạng (3, 4) như trên."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "np.dot(np.concatenate((X, H), 1), np.concatenate((W_xh, W_hh), 0))"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "array([[-0.21952918,  4.256434  ,  4.5812645 , -5.344988  ],\n       [ 3.4478583 , -3.0177271 , -1.677747  ,  7.535347  ],\n       [ 2.2390068 ,  1.4199957 ,  4.744728  , -8.421294  ]])"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "torch.matmul(torch.cat((X, H), 1), torch.cat((W_xh, W_hh), 0))"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "tensor([[ 0.0795,  4.0775,  0.3635, -3.0606],\n        [-1.0515, -3.1537,  1.4391,  4.5820],\n        [-2.4584, -0.9088,  3.2624,  2.7681]])"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "tf.matmul(tf.concat((X, H), 1), tf.concat((W_xh, W_hh), 0))"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "<tf.Tensor: shape=(3, 4), dtype=float32, numpy=\narray([[-1.5786611 , -0.58766127,  0.43116558, -3.654107  ],\n       [-0.3349018 ,  1.8152554 ,  0.9198491 ,  6.995024  ],\n       [-1.4761721 ,  0.5555553 ,  2.3871288 ,  4.7694645 ]],\n      dtype=float32)>"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "mo-hinh-ngon-ngu-cap-ky-tu-dua-tren-rnn",
+      "text": "8.4.3. Mô hình ngôn ngữ cấp ký tự dựa trên RNN"
+    },
+    {
+      "type": "paragraph",
+      "text": "Nhớ lại rằng đối với mô hình hóa ngôn ngữ trong Section 8.3 , chúng tôi đặt mục tiêu dự đoán token\ntiếp theo dựa trên các mã thông báo hiện tại và quá khứ, do đó chúng tôi\nchuyển chuỗi gốc bằng một mã thông báo làm nhãn. Bengio et al. lần đầu\ntiên đề xuất sử dụng mạng thần kinh để mô hình hóa ngôn ngữ [Bengio.Ducharme.Vincent.ea.2003] . Sau đây, chúng tôi minh họa\ncách RNN có thể được sử dụng để xây dựng một mô hình ngôn ngữ. Hãy để\nkích thước minibatch là một, và trình tự của văn bản là “máy”. Để đơn\ngiản hóa việc đào tạo trong các phần tiếp theo, chúng tôi mã hóa văn bản\nthành các ký tự thay vì từ và xem xét mô hình ngôn ngữ cấp ký tự*. Fig. 8.4.2 thể hiện cách dự đoán ký tự tiếp theo dựa trên\ncác ký tự hiện tại và trước đó thông qua RNN cho mô hình ngôn ngữ cấp ký\ntự."
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/rnn-train.svg",
+      "local_path": "_images/rnn-train.svg",
+      "alt": "../_images/rnn-train.svg"
+    },
+    {
+      "type": "paragraph",
+      "text": "Fig. 8.4.2 A character-level language model based on the RNN. The input and\nlabel sequences are “machin” and “achine”, respectively. ¶"
+    },
+    {
+      "type": "paragraph",
+      "text": "Trong quá trình đào tạo, chúng tôi chạy một thao tác softmax trên đầu ra\ntừ lớp đầu ra cho mỗi bước thời gian, sau đó sử dụng tổn thất chéo\nentropy để tính toán lỗi giữa đầu ra mô hình và nhãn. Do tính toán tái\nphát của trạng thái ẩn trong lớp ẩn, đầu ra của bước thời gian 3 trong Fig. 8.4.2 , \\(\\mathbf{O}_3\\) , được xác định bởi chuỗi\nvăn bản “m”, “a”, và “c”. Vì ký tự tiếp theo của dãy trong dữ liệu đào\ntạo là “h”, việc mất thời gian bước 3 sẽ phụ thuộc vào phân bố xác suất\ncủa ký tự tiếp theo được tạo ra dựa trên dãy tính năng “m”, “a”, “c” và\nnhãn “h” của bước thời gian này."
+    },
+    {
+      "type": "paragraph",
+      "text": "Trong thực tế, mỗi mã thông báo được đại diện bởi một vector \\(d\\) chiều, và chúng tôi sử dụng kích thước lô \\(n>1\\) . Do đó, đầu vào \\(\\mathbf X_t\\) tại bước thời gian \\(t\\) sẽ là ma trận \\(n\\times d\\) , giống hệt với những gì chúng ta đã thảo luận trong Section 8.4.2 ."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "boi-roi",
+      "text": "8.4.4. Bối rối"
+    },
+    {
+      "type": "paragraph",
+      "text": "Cuối cùng, chúng ta hãy thảo luận về cách đo lường chất lượng mô hình\nngôn ngữ, sẽ được sử dụng để đánh giá các mô hình dựa trên RN của chúng\ntôi trong các phần tiếp theo. Một cách là kiểm tra văn bản đáng ngạc\nnhiên như thế nào. Một mô hình ngôn ngữ tốt có thể dự đoán với các mã\nthông báo có độ chính xác cao mà những gì chúng ta sẽ thấy tiếp theo.\nHãy xem xét các liên tục sau của cụm từ “Trời mưa”, như được đề xuất bởi\ncác mô hình ngôn ngữ khác nhau:"
+    },
+    {
+      "type": "list",
+      "ordered": true,
+      "items": [
+        "“Trời đang mưa bên ngoài”",
+        "“Trời đang mưa cây chuối”",
+        "“It is raining mưa; kcj pwepoiut”"
+      ]
+    },
+    {
+      "type": "paragraph",
+      "text": "Về chất lượng, ví dụ 1 rõ ràng là tốt nhất. Các từ là hợp lý và hợp lý\nmạch lạc. Mặc dù nó có thể không hoàn toàn phản ánh chính xác từ nào\ntheo ngữ nghĩa (“ở San Francisco” và “vào mùa đông” sẽ là phần mở rộng\nhoàn toàn hợp lý), mô hình có thể nắm bắt loại từ nào theo sau. Ví dụ 2\ntồi tệ hơn đáng kể bằng cách tạo ra một phần mở rộng vô nghĩa. Tuy\nnhiên, ít nhất mô hình đã học cách đánh vần các từ và một mức độ tương\nquan giữa các từ. Cuối cùng, ví dụ 3 chỉ ra một mô hình được đào tạo kém\nkhông phù hợp với dữ liệu đúng cách."
+    },
+    {
+      "type": "paragraph",
+      "text": "Chúng ta có thể đo lường chất lượng của mô hình bằng cách tính toán khả\nnăng của trình tự. Thật không may đây là một con số khó hiểu và khó so\nsánh. Rốt cuộc, các trình tự ngắn hơn có nhiều khả năng xảy ra hơn nhiều\nso với các trình tự dài hơn, do đó đánh giá mô hình trên magnum opus của\nTolstoy Chiến tranh và Hòa bình chắc chắn sẽ tạo ra một khả năng nhỏ\nhơn nhiều so với, nói, trên tiểu thuyết của Saint-Exupery* The Little\nPrince*. Những gì còn thiếu là tương đương với mức trung bình."
+    },
+    {
+      "type": "paragraph",
+      "text": "Lý thuyết thông tin có ích ở đây. Chúng tôi đã xác định entropy, ngạc\nnhiên và cross-entropy khi chúng tôi giới thiệu hồi quy softmax\n( Section 3.4.7 ) và nhiều lý thuyết thông tin\nđược thảo luận trong online appendix on information\ntheory .\nNếu chúng ta muốn nén văn bản, chúng ta có thể hỏi về việc dự đoán token\ntiếp theo cho bộ mã thông báo hiện tại. Một mô hình ngôn ngữ tốt hơn sẽ\ncho phép chúng ta dự đoán token tiếp theo chính xác hơn. Do đó, nó sẽ\ncho phép chúng ta chi tiêu ít bit hơn trong việc nén chuỗi. Vì vậy,\nchúng ta có thể đo lường nó bằng cách mất chéo entropy trung bình trên\ntất cả các mã thông báo \\(n\\) của một chuỗi:"
+    },
+    {
+      "type": "math",
+      "latex": "(8.4.7)¶\\[\\frac{1}{n} \\sum_{t=1}^n -\\log P(x_t \\mid x_{t-1}, \\ldots, x_1),\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "trong đó \\(P\\) được đưa ra bởi một mô hình ngôn ngữ và \\(x_t\\) là mã thông báo thực tế quan sát tại bước thời gian \\(t\\) từ chuỗi.\nĐiều này làm cho hiệu suất trên các tài liệu có độ dài khác nhau tương\nđương. Vì lý do lịch sử, các nhà khoa học trong xử lý ngôn ngữ tự nhiên\nthích sử dụng một số lượng gọi là perplexity . Tóm lại, nó là hàm mũ\ncủa (8.4.7) :"
+    },
+    {
+      "type": "math",
+      "latex": "(8.4.8)¶\\[\\exp\\left(-\\frac{1}{n} \\sum_{t=1}^n \\log P(x_t \\mid x_{t-1}, \\ldots, x_1)\\right).\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Sự bối rối có thể được hiểu rõ nhất là trung bình hài hòa của số lượng\nlựa chọn thực sự mà chúng ta có khi quyết định token nào sẽ chọn tiếp\ntheo. Chúng ta hãy xem xét một số trường hợp:"
+    },
+    {
+      "type": "list",
+      "ordered": false,
+      "items": [
+        "Trong trường hợp tốt nhất, mô hình luôn ước tính hoàn hảo xác suất\ncủa mã thông báo nhãn là 1. Trong trường hợp này, sự bối rối của mô\nhình là 1.",
+        "Trong trường hợp xấu nhất, mô hình luôn dự đoán xác suất của token\nnhãn là 0. Trong tình huống này, sự bối rối là vô cùng tích cực.",
+        "Tại đường cơ sở, mô hình dự đoán phân phối thống nhất trên tất cả các\nmã thông báo có sẵn của từ vựng. Trong trường hợp này, sự bối rối\nbằng số lượng mã thông báo duy nhất của từ vựng. Trên thực tế, nếu\nchúng ta lưu trữ trình tự mà không cần bất kỳ nén nào, đây sẽ là điều\ntốt nhất chúng ta có thể làm để mã hóa nó. Do đó, điều này cung cấp\nmột ràng buộc trên không tầm thường mà bất kỳ mô hình hữu ích nào\ncũng phải đánh bại."
+      ]
+    },
+    {
+      "type": "paragraph",
+      "text": "Trong các phần sau, chúng tôi sẽ triển khai RNNcho các mô hình ngôn ngữ\ncấp ký tự và sử dụng sự bối rối để đánh giá các mô hình như vậy."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tom-tat",
+      "text": "8.4.5. Tóm tắt"
+    },
+    {
+      "type": "list",
+      "ordered": false,
+      "items": [
+        "Một mạng thần kinh sử dụng tính toán định kỳ cho các trạng thái ẩn\nđược gọi là mạng thần kinh tái phát (RNN).",
+        "Trạng thái ẩn của một RNN có thể nắm bắt thông tin lịch sử của chuỗi\nlên đến bước thời gian hiện tại.",
+        "Số lượng tham số mô hình RNN không tăng lên khi số bước thời gian\ntăng lên.",
+        "Chúng ta có thể tạo mô hình ngôn ngữ cấp ký tự bằng cách sử dụng RNN.",
+        "Chúng ta có thể sử dụng sự bối rối để đánh giá chất lượng của các mô\nhình ngôn ngữ."
+      ]
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bai-tap",
+      "text": "8.4.6. Bài tập"
+    },
+    {
+      "type": "list",
+      "ordered": true,
+      "items": [
+        "Nếu chúng ta sử dụng một RNN để dự đoán ký tự tiếp theo trong một\nchuỗi văn bản, kích thước cần thiết cho bất kỳ đầu ra nào là gì?",
+        "Tại sao RNN s có thể thể hiện xác suất có điều kiện của một mã thông\nbáo tại một bước thời gian dựa trên tất cả các token trước đó trong\nchuỗi văn bản?",
+        "Điều gì xảy ra với gradient nếu bạn backpropagate thông qua một chuỗi\ndài?",
+        "Một số vấn đề liên quan đến mô hình ngôn ngữ được mô tả trong phần\nnày là gì?"
+      ]
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    }
+  ],
+  "images": [
+    {
+      "original_url": "https://vi.d2l.ai/_images/rnn.svg",
+      "local_path": "_images/rnn.svg",
+      "alt": "../_images/rnn.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/rnn-train.svg",
+      "local_path": "_images/rnn-train.svg",
+      "alt": "../_images/rnn-train.svg"
+    }
+  ],
+  "text": "8.4. Mạng nơ-ron tái phát\nTrong Section 8.3 chúng tôi đã giới thiệu các mô hình \\(n\\) -gram, trong đó xác suất có điều kiện của từ \\(x_t\\) tại\nbước thời gian \\(t\\) chỉ phụ thuộc vào \\(n-1\\) từ trước. Nếu\nchúng ta muốn kết hợp hiệu ứng có thể có của các từ sớm hơn bước thời\ngian \\(t-(n-1)\\) trên \\(x_t\\) , chúng ta cần tăng \\(n\\) . Tuy\nnhiên, số lượng tham số mô hình cũng sẽ tăng theo cấp số nhân với nó, vì\nchúng ta cần lưu trữ \\(|\\mathcal{V}|^n\\) số cho một bộ từ vựng \\(\\mathcal{V}\\) . Do đó, thay vì mô hình hóa \\(P(x_t \\mid x_{t-1}, \\ldots, x_{t-n+1})\\) , tốt hơn là sử dụng một\nmô hình biến tiềm ẩn:\ntrong đó \\(h_{t-1}\\) là trạng thái * ẩn* (còn được gọi là biến ẩn)\nlưu trữ thông tin trình tự lên đến bước thời gian \\(t-1\\) . Nói\nchung, trạng thái ẩn bất cứ lúc nào bước \\(t\\) có thể được tính toán\ndựa trên cả đầu vào hiện tại \\(x_{t}\\) và trạng thái ẩn trước đó \\(h_{t-1}\\) :\nĐối với một chức năng đủ mạnh \\(f\\) trong (8.4.2) , mô\nhình biến tiềm ẩn không phải là một xấp xỉ. Rốt cuộc, \\(h_t\\) có thể\nchỉ đơn giản là lưu trữ tất cả dữ liệu mà nó đã quan sát cho đến nay.\nTuy nhiên, nó có khả năng có thể làm cho cả tính toán và lưu trữ đắt\ntiền.\nNhớ lại rằng chúng ta đã thảo luận về các lớp ẩn với các đơn vị ẩn trong Section 4 . Đáng chú ý là các lớp ẩn và trạng thái ẩn\nđề cập đến hai khái niệm rất khác nhau. Các lớp ẩn, như giải thích, các\nlớp được ẩn khỏi chế độ xem trên đường dẫn từ đầu vào đến đầu ra. Các\ntrạng thái ẩn đang nói về mặt kỹ thuật * đầu vào* cho bất cứ điều gì\nchúng ta làm ở một bước nhất định và chúng chỉ có thể được tính toán\nbằng cách xem dữ liệu ở các bước thời gian trước.\nMạng thần kinh định kỳ (RNN) là các mạng thần kinh với các trạng thái\nẩn. Trước khi giới thiệu mô hình RNN, lần đầu tiên chúng tôi xem lại mô\nhình MLP được giới thiệu trong Section 4.1 .\n8.4.1. Mạng thần kinh không có trạng thái ẩn\nChúng ta hãy nhìn vào một MLP với một lớp ẩn duy nhất. Hãy để chức năng\nkích hoạt của lớp ẩn là \\(\\phi\\) . Với một minibatch các ví dụ \\(\\mathbf{X} \\in \\mathbb{R}^{n \\times d}\\) với kích thước lô \\(n\\) và \\(d\\) đầu vào, đầu ra \\(\\mathbf{H} \\in \\mathbb{R}^{n \\times h}\\) của lớp ẩn được tính như\nTrong (8.4.3) , chúng ta có tham số trọng lượng \\(\\mathbf{W}_{xh} \\in \\mathbb{R}^{d \\times h}\\) , tham số thiên vị \\(\\mathbf{b}_h \\in \\mathbb{R}^{1 \\times h}\\) và số lượng đơn vị ẩn \\(h\\) , cho lớp ẩn. Như vậy, phát sóng (xem Section 2.1.3 ) được áp dụng trong quá trình tổng kết.\nTiếp theo, biến ẩn \\(\\mathbf{H}\\) được sử dụng làm đầu vào của lớp\nđầu ra. Lớp đầu ra được đưa ra bởi\ntrong đó \\(\\mathbf{O} \\in \\mathbb{R}^{n \\times q}\\) là biến đầu ra, \\(\\mathbf{W}_{hq} \\in \\mathbb{R}^{h \\times q}\\) là tham số trọng\nlượng và \\(\\mathbf{b}_q \\in \\mathbb{R}^{1 \\times q}\\) là tham số\nthiên vị của lớp đầu ra. Nếu đó là một bài toán phân loại, chúng ta có\nthể sử dụng \\(\\text{softmax}(\\mathbf{O})\\) để tính toán phân phối\nxác suất của các loại đầu ra.\nĐiều này hoàn toàn tương tự như bài toán hồi quy mà chúng tôi đã giải\nquyết trước đây trong Section 8.1 , do đó chúng tôi bỏ qua\ncác chi tiết. Đủ để nói rằng chúng ta có thể chọn các cặp nhãn tính năng\nmột cách ngẫu nhiên và tìm hiểu các thông số của mạng của chúng tôi\nthông qua sự phân biệt tự động và gốc gradient ngẫu nhiên.\n8.4.2. Mạng thần kinh định kỳ với các trạng thái ẩn\nCác vấn đề hoàn toàn khác nhau khi chúng ta có các trạng thái ẩn. Chúng\nta hãy nhìn vào cấu trúc một số chi tiết hơn.\nGiả sử rằng chúng ta có một minibatch của đầu vào \\(\\mathbf{X}_t \\in \\mathbb{R}^{n \\times d}\\) tại bước thời gian \\(t\\) . Nói cách khác, đối với một minibatch gồm \\(n\\) ví dụ\nchuỗi, mỗi hàng \\(\\mathbf{X}_t\\) tương ứng với một ví dụ tại bước\nthời điểm \\(t\\) từ chuỗi. Tiếp theo, biểu thị bằng \\(\\mathbf{H}_t \\in \\mathbb{R}^{n \\times h}\\) biến ẩn của bước thời\ngian \\(t\\) . Không giống như MLP, ở đây chúng ta lưu biến ẩn \\(\\mathbf{H}_{t-1}\\) từ bước thời gian trước và giới thiệu một tham\nsố trọng lượng mới \\(\\mathbf{W}_{hh} \\in \\mathbb{R}^{h \\times h}\\) để mô tả cách sử dụng biến ẩn của bước thời gian trước đó trong bước\nthời gian hiện tại. Cụ thể, việc tính toán biến ẩn của bước thời gian\nhiện tại được xác định bởi đầu vào của bước thời gian hiện tại cùng với\nbiến ẩn của bước thời gian trước đó:\nSo với (8.4.3) , (8.4.5) bổ\nsung thêm một thuật ngữ \\(\\mathbf{H}_{t-1} \\mathbf{W}_{hh}\\) và do\nđó khởi tạo (8.4.2) . Từ mối quan hệ giữa các biến ẩn \\(\\mathbf{H}_t\\) và \\(\\mathbf{H}_{t-1}\\) của các bước thời gian\nliền kề, chúng ta biết rằng các biến này đã thu thập và giữ lại thông\ntin lịch sử của trình tự lên đến bước thời gian hiện tại của chúng,\ngiống như trạng thái hoặc bộ nhớ của bước thời gian hiện tại của mạng\nthần kinh. Do đó, một biến ẩn như vậy được gọi là trạng thái *\nhidden . Vì trạng thái ẩn sử dụng cùng một định nghĩa của bước thời\ngian trước đó trong bước thời gian hiện tại, việc tính toán\n:eq:`rnn_h_with_state` là đệ quy * . Do đó, các mạng thần kinh với\ncác trạng thái ẩn dựa trên tính toán tái phát được đặt tên * mạng thần\nkinh định kỳ * . Các lớp thực hiện tính toán (8.4.5) trong RNN s được gọi là * lớp* lặp đi lặp lại*.\nCó nhiều cách khác nhau để xây dựng RNNs. RNNs với trạng thái ẩn được\nxác định bởi (8.4.5) là rất phổ biến. Đối với bước\nthời gian \\(t\\) , đầu ra của lớp đầu ra tương tự như tính toán trong\nMLP:\nCác thông số của RNN bao gồm các trọng lượng \\(\\mathbf{W}_{xh} \\in \\mathbb{R}^{d \\times h}, \\mathbf{W}_{hh} \\in \\mathbb{R}^{h \\times h}\\) ,\nvà thiên vị \\(\\mathbf{b}_h \\in \\mathbb{R}^{1 \\times h}\\) của lớp ẩn,\ncùng với trọng lượng \\(\\mathbf{W}_{hq} \\in \\mathbb{R}^{h \\times q}\\) và thiên vị \\(\\mathbf{b}_q \\in \\mathbb{R}^{1 \\times q}\\) của lớp đầu\nra. Điều đáng nói là ngay cả ở các bước thời gian khác nhau, RNN s luôn\nsử dụng các tham số mô hình này. Do đó, chi phí tham số hóa của một RNN\nkhông tăng lên khi số bước thời gian tăng lên.\nFig. 8.4.1 minh họa logic tính toán của một RNN tại ba bước\nthời gian liền kề. Bất cứ lúc nào bước \\(t\\) , tính toán trạng thái\nẩn có thể được coi là: (i) nối đầu vào \\(\\mathbf{X}_t\\) ở bước thời\ngian hiện tại \\(t\\) và trạng thái ẩn \\(\\mathbf{H}_{t-1}\\) ở bước\nthời gian trước \\(t-1\\) ; (ii) cho kết quả nối vào một lớp kết nối\nđầy đủ với sự kích hoạt chức năng \\(\\phi\\) . Đầu ra của một lớp được\nkết nối hoàn toàn như vậy là trạng thái ẩn \\(\\mathbf{H}_t\\) của bước\nthời gian hiện tại \\(t\\) . Trong trường hợp này, các thông số mô hình\nlà nối \\(\\mathbf{W}_{xh}\\) và \\(\\mathbf{W}_{hh}\\) , và một sự\nthiên vị của \\(\\mathbf{b}_h\\) , tất cả từ (8.4.5) . Trạng thái ẩn của bước thời gian hiện tại \\(t\\) , \\(\\mathbf{H}_t\\) , sẽ tham gia vào việc tính toán trạng\nthái ẩn \\(\\mathbf{H}_{t+1}\\) của bước thời gian tiếp theo \\(t+1\\) . Hơn nữa, \\(\\mathbf{H}_t\\) cũng sẽ được đưa vào lớp đầu\nra được kết nối hoàn toàn để tính toán đầu ra \\(\\mathbf{O}_t\\) của\nbước thời gian hiện tại \\(t\\) .\nFig. 8.4.1 An RNN with a hidden state. ¶\nChúng tôi vừa đề cập rằng việc tính \\(\\mathbf{X}_t \\mathbf{W}_{xh} + \\mathbf{H}_{t-1} \\mathbf{W}_{hh}\\) cho trạng thái ẩn tương đương với phép nhân ma trận của nối \\(\\mathbf{X}_t\\) và \\(\\mathbf{H}_{t-1}\\) và nối \\(\\mathbf{H}_{t-1}\\) và nối \\(\\mathbf{W}_{xh}\\) và \\(\\mathbf{W}_{hh}\\) . Mặc dù điều này có thể được chứng minh trong\ntoán học, sau đây chúng ta chỉ sử dụng một đoạn mã đơn giản để hiển thị\nđiều này. Để bắt đầu, chúng tôi xác định ma trận X , W_xh , H và W_hh , có hình dạng tương ứng (3, 1), (1, 4), (3, 4) và (4, 4).\nNhân X với W_xh , và H W_hh , tương ứng, và sau đó thêm\nhai nhân này, chúng tôi có được một ma trận hình dạng (3, 4).\nBây giờ chúng ta nối các ma trận X và H dọc theo các cột (trục\n1), và ma trận W_xh và W_hh dọc theo hàng (trục 0). Hai kết nối\nnày dẫn đến ma trận của hình dạng (3, 5) và hình dạng (5, 4), tương ứng.\nNhân hai ma trận nối này, chúng ta có được ma trận đầu ra giống nhau của\nhình dạng (3, 4) như trên.\n8.4.3. Mô hình ngôn ngữ cấp ký tự dựa trên RNN\nNhớ lại rằng đối với mô hình hóa ngôn ngữ trong Section 8.3 , chúng tôi đặt mục tiêu dự đoán token\ntiếp theo dựa trên các mã thông báo hiện tại và quá khứ, do đó chúng tôi\nchuyển chuỗi gốc bằng một mã thông báo làm nhãn. Bengio et al. lần đầu\ntiên đề xuất sử dụng mạng thần kinh để mô hình hóa ngôn ngữ [Bengio.Ducharme.Vincent.ea.2003] . Sau đây, chúng tôi minh họa\ncách RNN có thể được sử dụng để xây dựng một mô hình ngôn ngữ. Hãy để\nkích thước minibatch là một, và trình tự của văn bản là “máy”. Để đơn\ngiản hóa việc đào tạo trong các phần tiếp theo, chúng tôi mã hóa văn bản\nthành các ký tự thay vì từ và xem xét mô hình ngôn ngữ cấp ký tự*. Fig. 8.4.2 thể hiện cách dự đoán ký tự tiếp theo dựa trên\ncác ký tự hiện tại và trước đó thông qua RNN cho mô hình ngôn ngữ cấp ký\ntự.\nFig. 8.4.2 A character-level language model based on the RNN. The input and\nlabel sequences are “machin” and “achine”, respectively. ¶\nTrong quá trình đào tạo, chúng tôi chạy một thao tác softmax trên đầu ra\ntừ lớp đầu ra cho mỗi bước thời gian, sau đó sử dụng tổn thất chéo\nentropy để tính toán lỗi giữa đầu ra mô hình và nhãn. Do tính toán tái\nphát của trạng thái ẩn trong lớp ẩn, đầu ra của bước thời gian 3 trong Fig. 8.4.2 , \\(\\mathbf{O}_3\\) , được xác định bởi chuỗi\nvăn bản “m”, “a”, và “c”. Vì ký tự tiếp theo của dãy trong dữ liệu đào\ntạo là “h”, việc mất thời gian bước 3 sẽ phụ thuộc vào phân bố xác suất\ncủa ký tự tiếp theo được tạo ra dựa trên dãy tính năng “m”, “a”, “c” và\nnhãn “h” của bước thời gian này.\nTrong thực tế, mỗi mã thông báo được đại diện bởi một vector \\(d\\) chiều, và chúng tôi sử dụng kích thước lô \\(n>1\\) . Do đó, đầu vào \\(\\mathbf X_t\\) tại bước thời gian \\(t\\) sẽ là ma trận \\(n\\times d\\) , giống hệt với những gì chúng ta đã thảo luận trong Section 8.4.2 .\n8.4.4. Bối rối\nCuối cùng, chúng ta hãy thảo luận về cách đo lường chất lượng mô hình\nngôn ngữ, sẽ được sử dụng để đánh giá các mô hình dựa trên RN của chúng\ntôi trong các phần tiếp theo. Một cách là kiểm tra văn bản đáng ngạc\nnhiên như thế nào. Một mô hình ngôn ngữ tốt có thể dự đoán với các mã\nthông báo có độ chính xác cao mà những gì chúng ta sẽ thấy tiếp theo.\nHãy xem xét các liên tục sau của cụm từ “Trời mưa”, như được đề xuất bởi\ncác mô hình ngôn ngữ khác nhau:\n“Trời đang mưa bên ngoài”\n“Trời đang mưa cây chuối”\n“It is raining mưa; kcj pwepoiut”\nVề chất lượng, ví dụ 1 rõ ràng là tốt nhất. Các từ là hợp lý và hợp lý\nmạch lạc. Mặc dù nó có thể không hoàn toàn phản ánh chính xác từ nào\ntheo ngữ nghĩa (“ở San Francisco” và “vào mùa đông” sẽ là phần mở rộng\nhoàn toàn hợp lý), mô hình có thể nắm bắt loại từ nào theo sau. Ví dụ 2\ntồi tệ hơn đáng kể bằng cách tạo ra một phần mở rộng vô nghĩa. Tuy\nnhiên, ít nhất mô hình đã học cách đánh vần các từ và một mức độ tương\nquan giữa các từ. Cuối cùng, ví dụ 3 chỉ ra một mô hình được đào tạo kém\nkhông phù hợp với dữ liệu đúng cách.\nChúng ta có thể đo lường chất lượng của mô hình bằng cách tính toán khả\nnăng của trình tự. Thật không may đây là một con số khó hiểu và khó so\nsánh. Rốt cuộc, các trình tự ngắn hơn có nhiều khả năng xảy ra hơn nhiều\nso với các trình tự dài hơn, do đó đánh giá mô hình trên magnum opus của\nTolstoy Chiến tranh và Hòa bình chắc chắn sẽ tạo ra một khả năng nhỏ\nhơn nhiều so với, nói, trên tiểu thuyết của Saint-Exupery* The Little\nPrince*. Những gì còn thiếu là tương đương với mức trung bình.\nLý thuyết thông tin có ích ở đây. Chúng tôi đã xác định entropy, ngạc\nnhiên và cross-entropy khi chúng tôi giới thiệu hồi quy softmax\n( Section 3.4.7 ) và nhiều lý thuyết thông tin\nđược thảo luận trong online appendix on information\ntheory .\nNếu chúng ta muốn nén văn bản, chúng ta có thể hỏi về việc dự đoán token\ntiếp theo cho bộ mã thông báo hiện tại. Một mô hình ngôn ngữ tốt hơn sẽ\ncho phép chúng ta dự đoán token tiếp theo chính xác hơn. Do đó, nó sẽ\ncho phép chúng ta chi tiêu ít bit hơn trong việc nén chuỗi. Vì vậy,\nchúng ta có thể đo lường nó bằng cách mất chéo entropy trung bình trên\ntất cả các mã thông báo \\(n\\) của một chuỗi:\ntrong đó \\(P\\) được đưa ra bởi một mô hình ngôn ngữ và \\(x_t\\) là mã thông báo thực tế quan sát tại bước thời gian \\(t\\) từ chuỗi.\nĐiều này làm cho hiệu suất trên các tài liệu có độ dài khác nhau tương\nđương. Vì lý do lịch sử, các nhà khoa học trong xử lý ngôn ngữ tự nhiên\nthích sử dụng một số lượng gọi là perplexity . Tóm lại, nó là hàm mũ\ncủa (8.4.7) :\nSự bối rối có thể được hiểu rõ nhất là trung bình hài hòa của số lượng\nlựa chọn thực sự mà chúng ta có khi quyết định token nào sẽ chọn tiếp\ntheo. Chúng ta hãy xem xét một số trường hợp:\nTrong trường hợp tốt nhất, mô hình luôn ước tính hoàn hảo xác suất\ncủa mã thông báo nhãn là 1. Trong trường hợp này, sự bối rối của mô\nhình là 1.\nTrong trường hợp xấu nhất, mô hình luôn dự đoán xác suất của token\nnhãn là 0. Trong tình huống này, sự bối rối là vô cùng tích cực.\nTại đường cơ sở, mô hình dự đoán phân phối thống nhất trên tất cả các\nmã thông báo có sẵn của từ vựng. Trong trường hợp này, sự bối rối\nbằng số lượng mã thông báo duy nhất của từ vựng. Trên thực tế, nếu\nchúng ta lưu trữ trình tự mà không cần bất kỳ nén nào, đây sẽ là điều\ntốt nhất chúng ta có thể làm để mã hóa nó. Do đó, điều này cung cấp\nmột ràng buộc trên không tầm thường mà bất kỳ mô hình hữu ích nào\ncũng phải đánh bại.\nTrong các phần sau, chúng tôi sẽ triển khai RNNcho các mô hình ngôn ngữ\ncấp ký tự và sử dụng sự bối rối để đánh giá các mô hình như vậy.\n8.4.5. Tóm tắt\nMột mạng thần kinh sử dụng tính toán định kỳ cho các trạng thái ẩn\nđược gọi là mạng thần kinh tái phát (RNN).\nTrạng thái ẩn của một RNN có thể nắm bắt thông tin lịch sử của chuỗi\nlên đến bước thời gian hiện tại.\nSố lượng tham số mô hình RNN không tăng lên khi số bước thời gian\ntăng lên.\nChúng ta có thể tạo mô hình ngôn ngữ cấp ký tự bằng cách sử dụng RNN.\nChúng ta có thể sử dụng sự bối rối để đánh giá chất lượng của các mô\nhình ngôn ngữ.\n8.4.6. Bài tập\nNếu chúng ta sử dụng một RNN để dự đoán ký tự tiếp theo trong một\nchuỗi văn bản, kích thước cần thiết cho bất kỳ đầu ra nào là gì?\nTại sao RNN s có thể thể hiện xác suất có điều kiện của một mã thông\nbáo tại một bước thời gian dựa trên tất cả các token trước đó trong\nchuỗi văn bản?\nĐiều gì xảy ra với gradient nếu bạn backpropagate thông qua một chuỗi\ndài?\nMột số vấn đề liên quan đến mô hình ngôn ngữ được mô tả trong phần\nnày là gì?\nDiscussions\nDiscussions\nDiscussions"
+}

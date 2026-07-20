@@ -1,0 +1,163 @@
+{
+  "url": "https://vi.d2l.ai/chapter_recommender-systems/ranking.html",
+  "chapter": "chapter_recommender-systems",
+  "title": "16.5. Xếp hạng được cá nhân hóa cho hệ thống giới thiệu",
+  "crawled_at": "2026-07-20T12:41:13.304851+00:00",
+  "headings": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "xep-hang-duoc-ca-nhan-hoa-cho-he-thong-gioi-thieu",
+      "text": "16.5. Xếp hạng được cá nhân hóa cho hệ thống giới thiệu"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "mat-xep-hang-ca-nhan-bayesian-va-trien-khai",
+      "text": "16.5.1. Mất xếp hạng cá nhân Bayesian và triển khai"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "ban-le-mat-va-thuc-hien-cua-no",
+      "text": "16.5.2. Bản lề mất và thực hiện của nó"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tom-tat",
+      "text": "16.5.3. Tóm tắt"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bai-tap",
+      "text": "16.5.4. Bài tập"
+    }
+  ],
+  "content": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "xep-hang-duoc-ca-nhan-hoa-cho-he-thong-gioi-thieu",
+      "text": "16.5. Xếp hạng được cá nhân hóa cho hệ thống giới thiệu"
+    },
+    {
+      "type": "paragraph",
+      "text": "Trong các phần trước, chỉ có phản hồi rõ ràng được xem xét và các mô\nhình đã được đào tạo và thử nghiệm trên xếp hạng quan sát. Có hai nhược\nđiểm của các phương pháp như vậy: Thứ nhất, hầu hết các phản hồi không\nrõ ràng nhưng ngầm trong các kịch bản trong thế giới thực, và phản hồi\nrõ ràng có thể tốn kém hơn để thu thập. Thứ hai, các cặp mục người dùng\nkhông quan sát được có thể dự đoán cho sở thích của người dùng hoàn toàn\nbị bỏ qua, khiến các phương pháp này không phù hợp với các trường hợp\nxếp hạng không bị thiếu ngẫu nhiên nhưng vì sở thích của người dùng. Các\ncặp mục người dùng không quan sát được là một hỗn hợp của phản hồi tiêu\ncực thực sự (người dùng không quan tâm đến các mục) và các giá trị bị\nthiếu (người dùng có thể tương tác với các mục trong tương lai). Chúng\ntôi chỉ đơn giản là bỏ qua các cặp không quan sát trong factorization ma\ntrận và AutoRec. Rõ ràng, các mô hình này không có khả năng phân biệt\ngiữa các cặp quan sát và không quan sát được và thường không phù hợp với\ncác nhiệm vụ xếp hạng được cá nhân hóa."
+    },
+    {
+      "type": "paragraph",
+      "text": "Để kết thúc này, một lớp mô hình đề xuất nhắm mục tiêu tạo danh sách đề\nxuất được xếp hạng từ phản hồi ngầm đã trở nên phổ biến. Nói chung, các\nmô hình xếp hạng được cá nhân hóa có thể được tối ưu hóa với các phương\npháp theo chiều dọc, theo chiều ngang hoặc theo chiều dọc. Các phương\npháp tiếp cận Pointwise xem xét một tương tác duy nhất tại một thời điểm\nvà đào tạo một phân loại hoặc một regressor để dự đoán các sở thích cá\nnhân. Matrận factorization và AutoRec được tối ưu hóa với các mục tiêu\npointwise. Các phương pháp tiếp cận cặp xem xét một cặp mặt hàng cho mỗi\nngười dùng và nhằm mục đích xấp xỉ thứ tự tối ưu cho cặp đó. Thông\nthường, cách tiếp cận cặp phù hợp hơn với nhiệm vụ xếp hạng vì dự đoán\nthứ tự tương đối gợi nhớ đến bản chất của bảng xếp hạng. Listwise tiếp\ncận gần đúng thứ tự của toàn bộ danh sách các mặt hàng, ví dụ, tối ưu\nhóa trực tiếp các biện pháp xếp hạng như Đạt được tích lũy giảm giá\nchuẩn hóa\n( NDCG ).\nTuy nhiên, các cách tiếp cận theo chiều dọc theo danh sách phức tạp và\ntính toán nhiều hơn so với các phương pháp tiếp cận theo chiều dọc hoặc\ntheo cặp. Trong phần này, chúng tôi sẽ giới thiệu hai đối tượng/lỗ theo\ncặp, mất Xếp hạng cá nhân Bayesian và thua bản lề và triển khai tương\nứng của chúng."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "mat-xep-hang-ca-nhan-bayesian-va-trien-khai",
+      "text": "16.5.1. Mất xếp hạng cá nhân Bayesian và triển khai"
+    },
+    {
+      "type": "paragraph",
+      "text": "Xếp hạng cá nhân hóa Bayesian (BPR) [Rendle et al., 2009] là một tổn thất xếp hạng\nđược cá nhân hóa theo cặp có nguồn gốc từ ước tính sau tối đa. Nó đã\nđược sử dụng rộng rãi trong nhiều mô hình khuyến nghị hiện có. Dữ liệu\nđào tạo của BPR bao gồm cả cặp dương và âm (giá trị thiếu). Nó giả định\nrằng người dùng thích mục tích cực hơn tất cả các mục không quan sát\nkhác."
+    },
+    {
+      "type": "paragraph",
+      "text": "Trong chính thức, dữ liệu đào tạo được xây dựng bởi các tuples dưới dạng \\((u, i, j)\\) , đại diện cho rằng người dùng \\(u\\) thích mục \\(i\\) hơn mục \\(j\\) . Công thức Bayesian của BPR nhằm mục đích\ntối đa hóa xác suất sau được đưa ra dưới đây:"
+    },
+    {
+      "type": "math",
+      "latex": "(16.5.1)¶\\[p(\\Theta \\mid >_u )  \\propto  p(>_u \\mid \\Theta) p(\\Theta)\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Trong đó \\(\\Theta\\) đại diện cho các thông số của một mô hình khuyến\nnghị tùy ý, \\(>_u\\) đại diện cho tổng thứ hạng được cá nhân hóa mong\nmuốn của tất cả các mục cho người dùng \\(u\\) . Chúng tôi có thể xây\ndựng ước tính sau tối đa để lấy được tiêu chí tối ưu hóa chung cho nhiệm\nvụ xếp hạng được cá nhân hóa."
+    },
+    {
+      "type": "math",
+      "latex": "(16.5.2)¶\\[\\begin{split}\\begin{aligned}\n\\text{BPR-OPT} : &= \\ln p(\\Theta \\mid >_u) \\\\\n         & \\propto \\ln p(>_u \\mid \\Theta) p(\\Theta) \\\\\n         &= \\ln \\prod_{(u, i, j \\in D)} \\sigma(\\hat{y}_{ui} - \\hat{y}_{uj}) p(\\Theta) \\\\\n         &= \\sum_{(u, i, j \\in D)} \\ln \\sigma(\\hat{y}_{ui} - \\hat{y}_{uj}) + \\ln p(\\Theta) \\\\\n         &= \\sum_{(u, i, j \\in D)} \\ln \\sigma(\\hat{y}_{ui} - \\hat{y}_{uj}) - \\lambda_\\Theta \\|\\Theta \\|^2\n\\end{aligned}\\end{split}\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "trong đó \\(D := \\{(u, i, j) \\mid i \\in I^+_u \\wedge j \\in I \\backslash I^+_u \\}\\) là bộ đào tạo, với \\(I^+_u\\) biểu thị các mục mà người dùng \\(u\\) thích, \\(I\\) biểu thị tất cả các mục và \\(I \\backslash I^+_u\\) chỉ ra tất cả các mục khác không bao gồm các\nmặt hàng mà người dùng thích. \\(\\hat{y}_{ui}\\) và \\(\\hat{y}_{uj}\\) là điểm dự đoán của người dùng \\(u\\) đối với\nmục \\(i\\) và \\(\\hat{y}_{uj}\\) 19, tương ứng. \\(p(\\Theta)\\) trước đó là một phân phối bình thường với ma trận trung bình bằng 0 và\nphương sai - đồng phương sai \\(\\Sigma_\\Theta\\) . Ở đây, chúng tôi để \\(\\Sigma_\\Theta = \\lambda_\\Theta I\\) ."
+    },
+    {
+      "type": "paragraph",
+      "text": "! Illustration of Bayesian Personalized\nRanking Chúng tôi sẽ thực hiện lớp cơ sở mxnet.gluon.loss.Loss và ghi đè phương pháp forward để xây dựng\ntổn thất xếp hạng cá nhân Bayesian. Chúng ta bắt đầu bằng cách nhập\nclass Loss và module np."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "from mxnet import gluon, np, npx\n\nnpx.set_np()"
+    },
+    {
+      "type": "paragraph",
+      "text": "Việc thực hiện tổn thất BPR như sau."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "#@save\nclass BPRLoss(gluon.loss.Loss):\n    def __init__(self, weight=None, batch_axis=0, **kwargs):\n        super(BPRLoss, self).__init__(weight=None, batch_axis=0, **kwargs)\n\n    def forward(self, positive, negative):\n        distances = positive - negative\n        loss = - np.sum(np.log(npx.sigmoid(distances)), 0, keepdims=True)\n        return loss"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "ban-le-mat-va-thuc-hien-cua-no",
+      "text": "16.5.2. Bản lề mất và thực hiện của nó"
+    },
+    {
+      "type": "paragraph",
+      "text": "Bản lề mất cho xếp hạng có hình thức khác nhau để bản lề\nmất được cung cấp trong thư viện gluon thường được sử dụng trong các phân\nloại như SVM. Sự mất mát được sử dụng để xếp hạng trong các hệ thống\nrecommender có hình thức sau."
+    },
+    {
+      "type": "math",
+      "latex": "(16.5.3)¶\\[\\sum_{(u, i, j \\in D)} \\max( m - \\hat{y}_{ui} + \\hat{y}_{uj}, 0)\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "trong đó \\(m\\) là kích thước lề an toàn. Nó nhằm mục đích đẩy các\nmặt hàng tiêu cực ra khỏi các mặt hàng tích cực. Tương tự như BPR, nó\nnhằm mục đích tối ưu hóa khoảng cách có liên quan giữa các mẫu dương và\nâm thay vì đầu ra tuyệt đối, làm cho nó rất phù hợp với các hệ thống\ngiới thiệu."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "#@save\nclass HingeLossbRec(gluon.loss.Loss):\n    def __init__(self, weight=None, batch_axis=0, **kwargs):\n        super(HingeLossbRec, self).__init__(weight=None, batch_axis=0,\n                                            **kwargs)\n\n    def forward(self, positive, negative, margin=1):\n        distances = positive - negative\n        loss = np.sum(np.maximum(- distances + margin, 0))\n        return loss"
+    },
+    {
+      "type": "paragraph",
+      "text": "Hai khoản lỗ này có thể hoán đổi cho nhau để xếp hạng được cá nhân hóa\ntrong đề xuất."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tom-tat",
+      "text": "16.5.3. Tóm tắt"
+    },
+    {
+      "type": "list",
+      "ordered": false,
+      "items": [
+        "Có ba loại thua lỗ xếp hạng có sẵn cho nhiệm vụ xếp hạng được cá nhân\nhóa trong các hệ thống đề xuất, cụ thể là phương pháp theo chiều kim\nđồng hồ, theo cặp và theo danh sách.",
+        "Hai thua cặp, mất thứ hạng cá nhân của Bayesian và thua bản lề, có\nthể được sử dụng thay thế cho nhau."
+      ]
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bai-tap",
+      "text": "16.5.4. Bài tập"
+    },
+    {
+      "type": "list",
+      "ordered": false,
+      "items": [
+        "Có bất kỳ biến thể nào của BPR và bản lề mất có sẵn không?",
+        "Bạn có thể tìm thấy bất kỳ mô hình khuyến nghị nào sử dụng BPR hoặc\nmất bản lề không?"
+      ]
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    }
+  ],
+  "images": [],
+  "text": "16.5. Xếp hạng được cá nhân hóa cho hệ thống giới thiệu\nTrong các phần trước, chỉ có phản hồi rõ ràng được xem xét và các mô\nhình đã được đào tạo và thử nghiệm trên xếp hạng quan sát. Có hai nhược\nđiểm của các phương pháp như vậy: Thứ nhất, hầu hết các phản hồi không\nrõ ràng nhưng ngầm trong các kịch bản trong thế giới thực, và phản hồi\nrõ ràng có thể tốn kém hơn để thu thập. Thứ hai, các cặp mục người dùng\nkhông quan sát được có thể dự đoán cho sở thích của người dùng hoàn toàn\nbị bỏ qua, khiến các phương pháp này không phù hợp với các trường hợp\nxếp hạng không bị thiếu ngẫu nhiên nhưng vì sở thích của người dùng. Các\ncặp mục người dùng không quan sát được là một hỗn hợp của phản hồi tiêu\ncực thực sự (người dùng không quan tâm đến các mục) và các giá trị bị\nthiếu (người dùng có thể tương tác với các mục trong tương lai). Chúng\ntôi chỉ đơn giản là bỏ qua các cặp không quan sát trong factorization ma\ntrận và AutoRec. Rõ ràng, các mô hình này không có khả năng phân biệt\ngiữa các cặp quan sát và không quan sát được và thường không phù hợp với\ncác nhiệm vụ xếp hạng được cá nhân hóa.\nĐể kết thúc này, một lớp mô hình đề xuất nhắm mục tiêu tạo danh sách đề\nxuất được xếp hạng từ phản hồi ngầm đã trở nên phổ biến. Nói chung, các\nmô hình xếp hạng được cá nhân hóa có thể được tối ưu hóa với các phương\npháp theo chiều dọc, theo chiều ngang hoặc theo chiều dọc. Các phương\npháp tiếp cận Pointwise xem xét một tương tác duy nhất tại một thời điểm\nvà đào tạo một phân loại hoặc một regressor để dự đoán các sở thích cá\nnhân. Matrận factorization và AutoRec được tối ưu hóa với các mục tiêu\npointwise. Các phương pháp tiếp cận cặp xem xét một cặp mặt hàng cho mỗi\nngười dùng và nhằm mục đích xấp xỉ thứ tự tối ưu cho cặp đó. Thông\nthường, cách tiếp cận cặp phù hợp hơn với nhiệm vụ xếp hạng vì dự đoán\nthứ tự tương đối gợi nhớ đến bản chất của bảng xếp hạng. Listwise tiếp\ncận gần đúng thứ tự của toàn bộ danh sách các mặt hàng, ví dụ, tối ưu\nhóa trực tiếp các biện pháp xếp hạng như Đạt được tích lũy giảm giá\nchuẩn hóa\n( NDCG ).\nTuy nhiên, các cách tiếp cận theo chiều dọc theo danh sách phức tạp và\ntính toán nhiều hơn so với các phương pháp tiếp cận theo chiều dọc hoặc\ntheo cặp. Trong phần này, chúng tôi sẽ giới thiệu hai đối tượng/lỗ theo\ncặp, mất Xếp hạng cá nhân Bayesian và thua bản lề và triển khai tương\nứng của chúng.\n16.5.1. Mất xếp hạng cá nhân Bayesian và triển khai\nXếp hạng cá nhân hóa Bayesian (BPR) [Rendle et al., 2009] là một tổn thất xếp hạng\nđược cá nhân hóa theo cặp có nguồn gốc từ ước tính sau tối đa. Nó đã\nđược sử dụng rộng rãi trong nhiều mô hình khuyến nghị hiện có. Dữ liệu\nđào tạo của BPR bao gồm cả cặp dương và âm (giá trị thiếu). Nó giả định\nrằng người dùng thích mục tích cực hơn tất cả các mục không quan sát\nkhác.\nTrong chính thức, dữ liệu đào tạo được xây dựng bởi các tuples dưới dạng \\((u, i, j)\\) , đại diện cho rằng người dùng \\(u\\) thích mục \\(i\\) hơn mục \\(j\\) . Công thức Bayesian của BPR nhằm mục đích\ntối đa hóa xác suất sau được đưa ra dưới đây:\nTrong đó \\(\\Theta\\) đại diện cho các thông số của một mô hình khuyến\nnghị tùy ý, \\(>_u\\) đại diện cho tổng thứ hạng được cá nhân hóa mong\nmuốn của tất cả các mục cho người dùng \\(u\\) . Chúng tôi có thể xây\ndựng ước tính sau tối đa để lấy được tiêu chí tối ưu hóa chung cho nhiệm\nvụ xếp hạng được cá nhân hóa.\ntrong đó \\(D := \\{(u, i, j) \\mid i \\in I^+_u \\wedge j \\in I \\backslash I^+_u \\}\\) là bộ đào tạo, với \\(I^+_u\\) biểu thị các mục mà người dùng \\(u\\) thích, \\(I\\) biểu thị tất cả các mục và \\(I \\backslash I^+_u\\) chỉ ra tất cả các mục khác không bao gồm các\nmặt hàng mà người dùng thích. \\(\\hat{y}_{ui}\\) và \\(\\hat{y}_{uj}\\) là điểm dự đoán của người dùng \\(u\\) đối với\nmục \\(i\\) và \\(\\hat{y}_{uj}\\) 19, tương ứng. \\(p(\\Theta)\\) trước đó là một phân phối bình thường với ma trận trung bình bằng 0 và\nphương sai - đồng phương sai \\(\\Sigma_\\Theta\\) . Ở đây, chúng tôi để \\(\\Sigma_\\Theta = \\lambda_\\Theta I\\) .\n! Illustration of Bayesian Personalized\nRanking Chúng tôi sẽ thực hiện lớp cơ sở mxnet.gluon.loss.Loss và ghi đè phương pháp forward để xây dựng\ntổn thất xếp hạng cá nhân Bayesian. Chúng ta bắt đầu bằng cách nhập\nclass Loss và module np.\nViệc thực hiện tổn thất BPR như sau.\n16.5.2. Bản lề mất và thực hiện của nó\nBản lề mất cho xếp hạng có hình thức khác nhau để bản lề\nmất được cung cấp trong thư viện gluon thường được sử dụng trong các phân\nloại như SVM. Sự mất mát được sử dụng để xếp hạng trong các hệ thống\nrecommender có hình thức sau.\ntrong đó \\(m\\) là kích thước lề an toàn. Nó nhằm mục đích đẩy các\nmặt hàng tiêu cực ra khỏi các mặt hàng tích cực. Tương tự như BPR, nó\nnhằm mục đích tối ưu hóa khoảng cách có liên quan giữa các mẫu dương và\nâm thay vì đầu ra tuyệt đối, làm cho nó rất phù hợp với các hệ thống\ngiới thiệu.\nHai khoản lỗ này có thể hoán đổi cho nhau để xếp hạng được cá nhân hóa\ntrong đề xuất.\n16.5.3. Tóm tắt\nCó ba loại thua lỗ xếp hạng có sẵn cho nhiệm vụ xếp hạng được cá nhân\nhóa trong các hệ thống đề xuất, cụ thể là phương pháp theo chiều kim\nđồng hồ, theo cặp và theo danh sách.\nHai thua cặp, mất thứ hạng cá nhân của Bayesian và thua bản lề, có\nthể được sử dụng thay thế cho nhau.\n16.5.4. Bài tập\nCó bất kỳ biến thể nào của BPR và bản lề mất có sẵn không?\nBạn có thể tìm thấy bất kỳ mô hình khuyến nghị nào sử dụng BPR hoặc\nmất bản lề không?\nDiscussions"
+}

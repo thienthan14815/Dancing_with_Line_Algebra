@@ -21,6 +21,7 @@ const PracticeCenter = lazy(() => import('./app/practice/PracticeCenter'));
 const Profile = lazy(() => import('./app/profile/Profile'));
 const Guidebook = lazy(() => import('./app/guidebook/Guidebook'));
 const Settings = lazy(() => import('./app/settings/Settings'));
+const TutorHub = lazy(() => import('./app/tutor/TutorHub'));
 
 function Loading() {
   return <div className="dl-loading">Đang tải…</div>;
@@ -45,6 +46,7 @@ export default function App() {
             <Route path="/luyen" element={<PracticeCenter />} />
             <Route path="/tien-do" element={<Dashboard />} />
             <Route path="/ho-so" element={<Profile />} />
+            <Route path="/tutor" element={<TutorHub />} />
             <Route path="/so-tay" element={<Guidebook />} />
             <Route path="/so-tay/:sectionId" element={<Guidebook />} />
             <Route path="/cai-dat" element={<Settings />} />

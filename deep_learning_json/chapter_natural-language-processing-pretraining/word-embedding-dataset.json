@@ -1,0 +1,540 @@
+{
+  "url": "https://vi.d2l.ai/chapter_natural-language-processing-pretraining/word-embedding-dataset.html",
+  "chapter": "chapter_natural-language-processing-pretraining",
+  "title": "14.3. Các Dataset cho Pretraining Word Embeddings",
+  "crawled_at": "2026-07-20T12:40:54.993886+00:00",
+  "headings": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "cac-dataset-cho-pretraining-word-embeddings",
+      "text": "14.3. Các Dataset cho Pretraining Word Embeddings"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "doc-tap-du-lieu",
+      "text": "14.3.1. Đọc tập dữ liệu"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "lay-mau-phu",
+      "text": "14.3.2. Lấy mẫu phụ"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "trich-xuat-tu-trung-tam-va-tu-ngu-canh",
+      "text": "14.3.3. Trích xuất từ trung tâm và từ ngữ cảnh"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "lay-mau-am",
+      "text": "14.3.4. Lấy mẫu âm"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tai-vi-du-dao-tao-trong-minibatches",
+      "text": "14.3.5. Tải ví dụ đào tạo trong Minibatches"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "dat-tat-ca-moi-thu-lai-voi-nhau",
+      "text": "14.3.6. Đặt tất cả mọi thứ lại với nhau"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tom-tat",
+      "text": "14.3.7. Tóm tắt"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bai-tap",
+      "text": "14.3.8. Bài tập"
+    }
+  ],
+  "content": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "cac-dataset-cho-pretraining-word-embeddings",
+      "text": "14.3. Các Dataset cho Pretraining Word Embeddings"
+    },
+    {
+      "type": "paragraph",
+      "text": "Bây giờ chúng ta đã biết các chi tiết kỹ thuật của các mô hình word2vec\nvà các phương pháp đào tạo gần đúng, chúng ta hãy đi qua các triển khai\ncủa họ. Cụ thể, chúng tôi sẽ lấy mô hình skip-gram trong Section 14.1 và lấy mẫu âm trong Section 14.2 làm ví dụ. Trong phần này, chúng ta bắt đầu\nvới tập dữ liệu để đào tạo trước mô hình nhúng từ: định dạng ban đầu của\ndữ liệu sẽ được chuyển thành các minibatches có thể được lặp lại trong\nquá trình đào tạo."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "import math\nimport os\nimport random\nfrom mxnet import gluon, np\nfrom d2l import mxnet as d2l"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "import math\nimport os\nimport random\nimport torch\nfrom d2l import torch as d2l"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "doc-tap-du-lieu",
+      "text": "14.3.1. Đọc tập dữ liệu"
+    },
+    {
+      "type": "paragraph",
+      "text": "Tập dữ liệu mà chúng tôi sử dụng ở đây là Penn Tree Bank\n(PTB) . Cơ sở này được lấy\nmẫu từ các bài báo của Wall Street Journal, được chia thành các bộ đào\ntạo, xác nhận và kiểm tra. Ở định dạng ban đầu, mỗi dòng của tệp văn bản\nđại diện cho một câu của các từ được phân tách bằng dấu cách. Ở đây\nchúng ta coi từng từ như một mã thông báo."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "#@save\nd2l.DATA_HUB['ptb'] = (d2l.DATA_URL + 'ptb.zip',\n                       '319d85e578af0cdc590547f26231e4e31cdf1e42')\n\n#@save\ndef read_ptb():\n    \"\"\"Load the PTB dataset into a list of text lines.\"\"\"\n    data_dir = d2l.download_extract('ptb')\n    # Read the training set.\n    with open(os.path.join(data_dir, 'ptb.train.txt')) as f:\n        raw_text = f.read()\n    return [line.split() for line in raw_text.split('\\n')]\n\nsentences = read_ptb()\nf'# sentences: {len(sentences)}'"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "Downloading ../data/ptb.zip from http://d2l-data.s3-accelerate.amazonaws.com/ptb.zip..."
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "'# sentences: 42069'"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "#@save\nd2l.DATA_HUB['ptb'] = (d2l.DATA_URL + 'ptb.zip',\n                       '319d85e578af0cdc590547f26231e4e31cdf1e42')\n\n#@save\ndef read_ptb():\n    \"\"\"Load the PTB dataset into a list of text lines.\"\"\"\n    data_dir = d2l.download_extract('ptb')\n    # Read the training set.\n    with open(os.path.join(data_dir, 'ptb.train.txt')) as f:\n        raw_text = f.read()\n    return [line.split() for line in raw_text.split('\\n')]\n\nsentences = read_ptb()\nf'# sentences: {len(sentences)}'"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "Downloading ../data/ptb.zip from http://d2l-data.s3-accelerate.amazonaws.com/ptb.zip..."
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "'# sentences: 42069'"
+    },
+    {
+      "type": "paragraph",
+      "text": "Sau khi đọc bộ đào tạo, chúng tôi xây dựng một từ vựng cho corpus, trong\nđó bất kỳ từ nào xuất hiện dưới 10 lần được thay thế bằng mã thông báo\n“”. Lưu ý rằng tập dữ liệu gốc cũng chứa “” token đại diện cho các từ\nhiếm (không xác định)."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "vocab = d2l.Vocab(sentences, min_freq=10)\nf'vocab size: {len(vocab)}'"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "'vocab size: 6719'"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "vocab = d2l.Vocab(sentences, min_freq=10)\nf'vocab size: {len(vocab)}'"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "'vocab size: 6719'"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "lay-mau-phu",
+      "text": "14.3.2. Lấy mẫu phụ"
+    },
+    {
+      "type": "paragraph",
+      "text": "Dữ liệu văn bản thường có các từ tần số cao như “the”, “a”, và “in”:\nchúng thậm chí có thể xảy ra hàng tỷ lần trong thể rất lớn. Tuy nhiên,\nnhững từ này thường đồng xuất hiện với nhiều từ khác nhau trong các cửa\nsổ ngữ cảnh, cung cấp ít tín hiệu hữu ích. Ví dụ, hãy xem xét từ “chip”\ntrong một cửa sổ ngữ cảnh: trực giác sự xuất hiện của nó với một từ tần\nsố thấp “intel” hữu ích hơn trong đào tạo hơn là đồng xuất hiện với một\ntừ tần số cao “a”. Hơn nữa, đào tạo với một lượng lớn các từ (tần số\ncao) là chậm. Do đó, khi đào tạo từ nhúng mô hình, các từ tần số cao có\nthể là * mẫu con* [Mikolov et al., 2013b] . Cụ thể,\nmỗi từ được lập chỉ mục \\(w_i\\) trong tập dữ liệu sẽ bị loại bỏ với\nxác suất"
+    },
+    {
+      "type": "math",
+      "latex": "(14.3.1)¶\\[P(w_i) = \\max\\left(1 - \\sqrt{\\frac{t}{f(w_i)}}, 0\\right),\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "trong đó \\(f(w_i)\\) là tỷ lệ của số từ \\(w_i\\) với tổng số từ\ntrong tập dữ liệu và hằng số \\(t\\) là một siêu tham số\n( \\(10^{-4}\\) trong thí nghiệm). Chúng ta có thể thấy rằng chỉ khi\ntần số tương đối \\(f(w_i) > t\\) , từ \\(w_i\\) mới có thể bị loại\nbỏ và tần số tương đối của từ càng cao thì xác suất bị loại bỏ càng lớn."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "#@save\ndef subsample(sentences, vocab):\n    \"\"\"Subsample high-frequency words.\"\"\"\n    # Exclude unknown tokens '<unk>'\n    sentences = [[token for token in line if vocab[token] != vocab.unk]\n                 for line in sentences]\n    counter = d2l.count_corpus(sentences)\n    num_tokens = sum(counter.values())\n\n    # Return True if `token` is kept during subsampling\n    def keep(token):\n        return(random.uniform(0, 1) <\n               math.sqrt(1e-4 / counter[token] * num_tokens))\n\n    return ([[token for token in line if keep(token)] for line in sentences],\n            counter)\n\nsubsampled, counter = subsample(sentences, vocab)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "#@save\ndef subsample(sentences, vocab):\n    \"\"\"Subsample high-frequency words.\"\"\"\n    # Exclude unknown tokens '<unk>'\n    sentences = [[token for token in line if vocab[token] != vocab.unk]\n                 for line in sentences]\n    counter = d2l.count_corpus(sentences)\n    num_tokens = sum(counter.values())\n\n    # Return True if `token` is kept during subsampling\n    def keep(token):\n        return(random.uniform(0, 1) <\n               math.sqrt(1e-4 / counter[token] * num_tokens))\n\n    return ([[token for token in line if keep(token)] for line in sentences],\n            counter)\n\nsubsampled, counter = subsample(sentences, vocab)"
+    },
+    {
+      "type": "paragraph",
+      "text": "Đoạn mã sau vẽ biểu đồ của số lượng mã thông báo trên mỗi câu trước và\nsau khi lấy mẫu. Đúng như dự đoán, subsampling rút ngắn đáng kể các câu\nbằng cách thả các từ tần số cao, điều này sẽ dẫn đến tăng tốc đào tạo."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "d2l.show_list_len_pair_hist(['origin', 'subsampled'], '# tokens per sentence',\n                            'count', sentences, subsampled);"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_word-embedding-dataset_f77071_39_0.svg",
+      "local_path": "_images/output_word-embedding-dataset_f77071_39_0.svg",
+      "alt": "../_images/output_word-embedding-dataset_f77071_39_0.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "d2l.show_list_len_pair_hist(['origin', 'subsampled'], '# tokens per sentence',\n                            'count', sentences, subsampled);"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_word-embedding-dataset_f77071_42_0.svg",
+      "local_path": "_images/output_word-embedding-dataset_f77071_42_0.svg",
+      "alt": "../_images/output_word-embedding-dataset_f77071_42_0.svg"
+    },
+    {
+      "type": "paragraph",
+      "text": "Đối với mã thông báo riêng lẻ, tỷ lệ lấy mẫu của từ tần số cao “the” nhỏ\nhơn 1/20."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def compare_counts(token):\n    return (f'# of \"{token}\": '\n            f'before={sum([l.count(token) for l in sentences])}, '\n            f'after={sum([l.count(token) for l in subsampled])}')\n\ncompare_counts('the')"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "'# of \"the\": before=50770, after=2081'"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def compare_counts(token):\n    return (f'# of \"{token}\": '\n            f'before={sum([l.count(token) for l in sentences])}, '\n            f'after={sum([l.count(token) for l in subsampled])}')\n\ncompare_counts('the')"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "'# of \"the\": before=50770, after=2033'"
+    },
+    {
+      "type": "paragraph",
+      "text": "Ngược lại, các từ tần số thấp “tham gia” được giữ hoàn toàn."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "compare_counts('join')"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "'# of \"join\": before=45, after=45'"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "compare_counts('join')"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "'# of \"join\": before=45, after=45'"
+    },
+    {
+      "type": "paragraph",
+      "text": "Sau khi lấy mẫu đăng ký, chúng tôi ánh xạ mã thông báo đến các chỉ số\ncủa họ cho corpus."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "corpus = [vocab[line] for line in subsampled]\ncorpus[:3]"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "[[], [2115, 1], [22, 5277, 3054, 1580, 95]]"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "corpus = [vocab[line] for line in subsampled]\ncorpus[:3]"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "[[], [392, 2115, 145, 274, 406], [5277, 3054, 1580]]"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "trich-xuat-tu-trung-tam-va-tu-ngu-canh",
+      "text": "14.3.3. Trích xuất từ trung tâm và từ ngữ cảnh"
+    },
+    {
+      "type": "paragraph",
+      "text": "Hàm get_centers_and_contexts sau trích xuất tất cả các từ trung tâm\nvà từ ngữ cảnh của chúng từ corpus . Nó đồng đều mẫu một số nguyên\ngiữa 1 và max_window_size một cách ngẫu nhiên như kích thước cửa sổ\nngữ cảnh. Đối với bất kỳ từ trung tâm nào, những từ có khoảng cách từ nó\nkhông vượt quá kích thước cửa sổ ngữ cảnh được lấy mẫu là các từ ngữ\ncảnh của nó."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "#@save\ndef get_centers_and_contexts(corpus, max_window_size):\n    \"\"\"Return center words and context words in skip-gram.\"\"\"\n    centers, contexts = [], []\n    for line in corpus:\n        # To form a \"center word--context word\" pair, each sentence needs to\n        # have at least 2 words\n        if len(line) < 2:\n            continue\n        centers += line\n        for i in range(len(line)):  # Context window centered at `i`\n            window_size = random.randint(1, max_window_size)\n            indices = list(range(max(0, i - window_size),\n                                 min(len(line), i + 1 + window_size)))\n            # Exclude the center word from the context words\n            indices.remove(i)\n            contexts.append([line[idx] for idx in indices])\n    return centers, contexts"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "#@save\ndef get_centers_and_contexts(corpus, max_window_size):\n    \"\"\"Return center words and context words in skip-gram.\"\"\"\n    centers, contexts = [], []\n    for line in corpus:\n        # To form a \"center word--context word\" pair, each sentence needs to\n        # have at least 2 words\n        if len(line) < 2:\n            continue\n        centers += line\n        for i in range(len(line)):  # Context window centered at `i`\n            window_size = random.randint(1, max_window_size)\n            indices = list(range(max(0, i - window_size),\n                                 min(len(line), i + 1 + window_size)))\n            # Exclude the center word from the context words\n            indices.remove(i)\n            contexts.append([line[idx] for idx in indices])\n    return centers, contexts"
+    },
+    {
+      "type": "paragraph",
+      "text": "Tiếp theo, chúng ta tạo ra một tập dữ liệu nhân tạo có chứa hai câu 7 và\n3 từ, tương ứng. Hãy để kích thước cửa sổ ngữ cảnh tối đa là 2 và in tất\ncả các từ trung tâm và các từ ngữ cảnh của chúng."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "tiny_dataset = [list(range(7)), list(range(7, 10))]\nprint('dataset', tiny_dataset)\nfor center, context in zip(*get_centers_and_contexts(tiny_dataset, 2)):\n    print('center', center, 'has contexts', context)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "dataset [[0, 1, 2, 3, 4, 5, 6], [7, 8, 9]]\ncenter 0 has contexts [1, 2]\ncenter 1 has contexts [0, 2, 3]\ncenter 2 has contexts [1, 3]\ncenter 3 has contexts [1, 2, 4, 5]\ncenter 4 has contexts [3, 5]\ncenter 5 has contexts [4, 6]\ncenter 6 has contexts [4, 5]\ncenter 7 has contexts [8, 9]\ncenter 8 has contexts [7, 9]\ncenter 9 has contexts [8]"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "tiny_dataset = [list(range(7)), list(range(7, 10))]\nprint('dataset', tiny_dataset)\nfor center, context in zip(*get_centers_and_contexts(tiny_dataset, 2)):\n    print('center', center, 'has contexts', context)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "dataset [[0, 1, 2, 3, 4, 5, 6], [7, 8, 9]]\ncenter 0 has contexts [1, 2]\ncenter 1 has contexts [0, 2, 3]\ncenter 2 has contexts [0, 1, 3, 4]\ncenter 3 has contexts [1, 2, 4, 5]\ncenter 4 has contexts [2, 3, 5, 6]\ncenter 5 has contexts [3, 4, 6]\ncenter 6 has contexts [4, 5]\ncenter 7 has contexts [8, 9]\ncenter 8 has contexts [7, 9]\ncenter 9 has contexts [8]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Khi đào tạo trên tập dữ liệu PTB, chúng tôi đặt kích thước cửa sổ ngữ\ncảnh tối đa là 5. Sau đây trích xuất tất cả các từ trung tâm và các từ\nngữ cảnh của chúng trong tập dữ liệu."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "all_centers, all_contexts = get_centers_and_contexts(corpus, 5)\nf'# center-context pairs: {sum([len(contexts) for contexts in all_contexts])}'"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "'# center-context pairs: 1500272'"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "all_centers, all_contexts = get_centers_and_contexts(corpus, 5)\nf'# center-context pairs: {sum([len(contexts) for contexts in all_contexts])}'"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "'# center-context pairs: 1497165'"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "lay-mau-am",
+      "text": "14.3.4. Lấy mẫu âm"
+    },
+    {
+      "type": "paragraph",
+      "text": "Chúng tôi sử dụng lấy mẫu tiêu cực cho đào tạo gần đúng. Để lấy mẫu các\ntừ nhiễu theo một phân phối được xác định trước, chúng ta xác định lớp RandomGenerator sau, trong đó phân phối lấy mẫu (có thể không chuẩn\nhóa) được truyền qua đối số sampling_weights ."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "#@save\nclass RandomGenerator:\n    \"\"\"Randomly draw among {1, ..., n} according to n sampling weights.\"\"\"\n    def __init__(self, sampling_weights):\n        # Exclude\n        self.population = list(range(1, len(sampling_weights) + 1))\n        self.sampling_weights = sampling_weights\n        self.candidates = []\n        self.i = 0\n\n    def draw(self):\n        if self.i == len(self.candidates):\n            # Cache `k` random sampling results\n            self.candidates = random.choices(\n                self.population, self.sampling_weights, k=10000)\n            self.i = 0\n        self.i += 1\n        return self.candidates[self.i - 1]"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "#@save\nclass RandomGenerator:\n    \"\"\"Randomly draw among {1, ..., n} according to n sampling weights.\"\"\"\n    def __init__(self, sampling_weights):\n        # Exclude\n        self.population = list(range(1, len(sampling_weights) + 1))\n        self.sampling_weights = sampling_weights\n        self.candidates = []\n        self.i = 0\n\n    def draw(self):\n        if self.i == len(self.candidates):\n            # Cache `k` random sampling results\n            self.candidates = random.choices(\n                self.population, self.sampling_weights, k=10000)\n            self.i = 0\n        self.i += 1\n        return self.candidates[self.i - 1]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Ví dụ: chúng ta có thể vẽ 10 biến ngẫu nhiên \\(X\\) trong số các chỉ\nsố 1, 2 và 3 với xác suất lấy mẫu \\(P(X=1)=2/9, P(X=2)=3/9\\) và \\(P(X=3)=4/9\\) như sau."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "generator = RandomGenerator([2, 3, 4])\n[generator.draw() for _ in range(10)]"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "[1, 1, 3, 2, 3, 3, 1, 2, 1, 2]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Đối với một cặp từ trung tâm và từ ngữ cảnh, chúng tôi lấy mẫu ngẫu\nnhiên K (5 trong thí nghiệm) các từ tiếng ồn. Theo các đề xuất trong\nbài báo word2vec, xác suất lấy mẫu \\(P(w)\\) của một từ tiếng ồn \\(w\\) được đặt thành tần số tương đối của nó trong từ điển nâng lên\ncông suất 0,75 [Mikolov et al., 2013b] ."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "#@save\ndef get_negatives(all_contexts, vocab, counter, K):\n    \"\"\"Return noise words in negative sampling.\"\"\"\n    # Sampling weights for words with indices 1, 2, ... (index 0 is the\n    # excluded unknown token) in the vocabulary\n    sampling_weights = [counter[vocab.to_tokens(i)]**0.75\n                        for i in range(1, len(vocab))]\n    all_negatives, generator = [], RandomGenerator(sampling_weights)\n    for contexts in all_contexts:\n        negatives = []\n        while len(negatives) < len(contexts) * K:\n            neg = generator.draw()\n            # Noise words cannot be context words\n            if neg not in contexts:\n                negatives.append(neg)\n        all_negatives.append(negatives)\n    return all_negatives\n\nall_negatives = get_negatives(all_contexts, vocab, counter, 5)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "#@save\ndef get_negatives(all_contexts, vocab, counter, K):\n    \"\"\"Return noise words in negative sampling.\"\"\"\n    # Sampling weights for words with indices 1, 2, ... (index 0 is the\n    # excluded unknown token) in the vocabulary\n    sampling_weights = [counter[vocab.to_tokens(i)]**0.75\n                        for i in range(1, len(vocab))]\n    all_negatives, generator = [], RandomGenerator(sampling_weights)\n    for contexts in all_contexts:\n        negatives = []\n        while len(negatives) < len(contexts) * K:\n            neg = generator.draw()\n            # Noise words cannot be context words\n            if neg not in contexts:\n                negatives.append(neg)\n        all_negatives.append(negatives)\n    return all_negatives\n\nall_negatives = get_negatives(all_contexts, vocab, counter, 5)"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tai-vi-du-dao-tao-trong-minibatches",
+      "text": "14.3.5. Tải ví dụ đào tạo trong Minibatches"
+    },
+    {
+      "type": "paragraph",
+      "text": "Sau khi tất cả các từ trung tâm cùng với các từ ngữ cảnh và các từ tiếng\nồn được lấy mẫu được trích xuất, chúng sẽ được chuyển thành các ví dụ\nnhỏ có thể được tải lặp lại trong quá trình đào tạo."
+    },
+    {
+      "type": "paragraph",
+      "text": "Trong một minibatch, ví dụ \\(i^\\mathrm{th}\\) bao gồm một từ trung\ntâm và \\(n_i\\) từ ngữ cảnh của nó và \\(m_i\\) từ nhiễu. Do kích\nthước cửa sổ ngữ cảnh khác nhau, \\(n_i+m_i\\) thay đổi cho \\(i\\) khác nhau. Do đó, đối với mỗi ví dụ, chúng tôi nối các từ ngữ cảnh và\ncác từ nhiễu của nó trong biến contexts_negatives và pad số không\ncho đến khi độ dài nối đạt \\(\\max_i n_i+m_i\\) ( max_len ). Để loại\ntrừ các miếng đệm trong tính toán tổn thất, chúng tôi xác định một biến\nmặt nạ masks . Có một sự tương ứng một-một giữa các phần tử trong masks và các phần tử trong contexts_negatives , trong đó số không\n(nếu không) trong masks tương ứng với các miếng đệm trong contexts_negatives ."
+    },
+    {
+      "type": "paragraph",
+      "text": "Để phân biệt giữa các ví dụ tích cực và tiêu cực, chúng ta tách các từ\nngữ cảnh khỏi các từ nhiễu trong contexts_negatives thông qua một\nbiến labels . Tương tự như masks , cũng có sự tương ứng một-một\ngiữa các phần tử trong labels và các phần tử trong contexts_negatives , trong đó các phần tử (nếu không số không) trong labels tương ứng với các từ ngữ cảnh (ví dụ tích cực) trong contexts_negatives ."
+    },
+    {
+      "type": "paragraph",
+      "text": "Ý tưởng trên được thực hiện trong hàm batchify sau. Đầu vào của nó data là một danh sách có độ dài bằng với kích thước lô, trong đó mỗi\nphần tử là một ví dụ bao gồm từ trung tâm center , các từ ngữ cảnh\ncủa nó context , và các từ nhiễu của nó negative . Hàm này trả về\nmột minibatch có thể được nạp để tính toán trong quá trình đào tạo,\nchẳng hạn như bao gồm biến mask."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "#@save\ndef batchify(data):\n    \"\"\"Return a minibatch of examples for skip-gram with negative sampling.\"\"\"\n    max_len = max(len(c) + len(n) for _, c, n in data)\n    centers, contexts_negatives, masks, labels = [], [], [], []\n    for center, context, negative in data:\n        cur_len = len(context) + len(negative)\n        centers += [center]\n        contexts_negatives += [context + negative + [0] * (max_len - cur_len)]\n        masks += [[1] * cur_len + [0] * (max_len - cur_len)]\n        labels += [[1] * len(context) + [0] * (max_len - len(context))]\n    return (np.array(centers).reshape((-1, 1)), np.array(\n        contexts_negatives), np.array(masks), np.array(labels))"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "#@save\ndef batchify(data):\n    \"\"\"Return a minibatch of examples for skip-gram with negative sampling.\"\"\"\n    max_len = max(len(c) + len(n) for _, c, n in data)\n    centers, contexts_negatives, masks, labels = [], [], [], []\n    for center, context, negative in data:\n        cur_len = len(context) + len(negative)\n        centers += [center]\n        contexts_negatives += [context + negative + [0] * (max_len - cur_len)]\n        masks += [[1] * cur_len + [0] * (max_len - cur_len)]\n        labels += [[1] * len(context) + [0] * (max_len - len(context))]\n    return (torch.tensor(centers).reshape((-1, 1)), torch.tensor(\n        contexts_negatives), torch.tensor(masks), torch.tensor(labels))"
+    },
+    {
+      "type": "paragraph",
+      "text": "Hãy để chúng tôi kiểm tra chức năng này bằng cách sử dụng một minibatch\ngồm hai ví dụ."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "x_1 = (1, [2, 2], [3, 3, 3, 3])\nx_2 = (1, [2, 2, 2], [3, 3])\nbatch = batchify((x_1, x_2))\n\nnames = ['centers', 'contexts_negatives', 'masks', 'labels']\nfor name, data in zip(names, batch):\n    print(name, '=', data)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "centers = [[1.]\n [1.]]\ncontexts_negatives = [[2. 2. 3. 3. 3. 3.]\n [2. 2. 2. 3. 3. 0.]]\nmasks = [[1. 1. 1. 1. 1. 1.]\n [1. 1. 1. 1. 1. 0.]]\nlabels = [[1. 1. 0. 0. 0. 0.]\n [1. 1. 1. 0. 0. 0.]]"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "x_1 = (1, [2, 2], [3, 3, 3, 3])\nx_2 = (1, [2, 2, 2], [3, 3])\nbatch = batchify((x_1, x_2))\n\nnames = ['centers', 'contexts_negatives', 'masks', 'labels']\nfor name, data in zip(names, batch):\n    print(name, '=', data)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "centers = tensor([[1],\n        [1]])\ncontexts_negatives = tensor([[2, 2, 3, 3, 3, 3],\n        [2, 2, 2, 3, 3, 0]])\nmasks = tensor([[1, 1, 1, 1, 1, 1],\n        [1, 1, 1, 1, 1, 0]])\nlabels = tensor([[1, 1, 0, 0, 0, 0],\n        [1, 1, 1, 0, 0, 0]])"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "dat-tat-ca-moi-thu-lai-voi-nhau",
+      "text": "14.3.6. Đặt tất cả mọi thứ lại với nhau"
+    },
+    {
+      "type": "paragraph",
+      "text": "Cuối cùng, chúng ta định nghĩa hàm load_data_ptb đọc tập dữ liệu PTB\nvà trả về bộ lặp dữ liệu và từ vựng."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "#@save\ndef load_data_ptb(batch_size, max_window_size, num_noise_words):\n    \"\"\"Download the PTB dataset and then load it into memory.\"\"\"\n    sentences = read_ptb()\n    vocab = d2l.Vocab(sentences, min_freq=10)\n    subsampled, counter = subsample(sentences, vocab)\n    corpus = [vocab[line] for line in subsampled]\n    all_centers, all_contexts = get_centers_and_contexts(\n        corpus, max_window_size)\n    all_negatives = get_negatives(\n        all_contexts, vocab, counter, num_noise_words)\n    dataset = gluon.data.ArrayDataset(\n        all_centers, all_contexts, all_negatives)\n    data_iter = gluon.data.DataLoader(\n        dataset, batch_size, shuffle=True,batchify_fn=batchify,\n        num_workers=d2l.get_dataloader_workers())\n    return data_iter, vocab"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "#@save\ndef load_data_ptb(batch_size, max_window_size, num_noise_words):\n    \"\"\"Download the PTB dataset and then load it into memory.\"\"\"\n    num_workers = d2l.get_dataloader_workers()\n    sentences = read_ptb()\n    vocab = d2l.Vocab(sentences, min_freq=10)\n    subsampled, counter = subsample(sentences, vocab)\n    corpus = [vocab[line] for line in subsampled]\n    all_centers, all_contexts = get_centers_and_contexts(\n        corpus, max_window_size)\n    all_negatives = get_negatives(\n        all_contexts, vocab, counter, num_noise_words)\n\n    class PTBDataset(torch.utils.data.Dataset):\n        def __init__(self, centers, contexts, negatives):\n            assert len(centers) == len(contexts) == len(negatives)\n            self.centers = centers\n            self.contexts = contexts\n            self.negatives = negatives\n\n        def __getitem__(self, index):\n            return (self.centers[index], self.contexts[index],\n                    self.negatives[index])\n\n        def __len__(self):\n            return len(self.centers)\n\n    dataset = PTBDataset(all_centers, all_contexts, all_negatives)\n\n    data_iter = torch.utils.data.DataLoader(dataset, batch_size, shuffle=True,\n                                      collate_fn=batchify,\n                                      num_workers=num_workers)\n    return data_iter, vocab"
+    },
+    {
+      "type": "paragraph",
+      "text": "Hãy để chúng tôi in minibatch đầu tiên của bộ lặp dữ liệu."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "data_iter, vocab = load_data_ptb(512, 5, 5)\nfor batch in data_iter:\n    for name, data in zip(names, batch):\n        print(name, 'shape:', data.shape)\n    break"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "centers shape: (512, 1)\ncontexts_negatives shape: (512, 60)\nmasks shape: (512, 60)\nlabels shape: (512, 60)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "data_iter, vocab = load_data_ptb(512, 5, 5)\nfor batch in data_iter:\n    for name, data in zip(names, batch):\n        print(name, 'shape:', data.shape)\n    break"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "centers shape: torch.Size([512, 1])\ncontexts_negatives shape: torch.Size([512, 60])\nmasks shape: torch.Size([512, 60])\nlabels shape: torch.Size([512, 60])"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tom-tat",
+      "text": "14.3.7. Tóm tắt"
+    },
+    {
+      "type": "list",
+      "ordered": false,
+      "items": [
+        "Các từ tần số cao có thể không hữu ích trong đào tạo. Chúng tôi có\nthể subsample chúng để tăng tốc trong đào tạo.",
+        "Đối với hiệu quả tính toán, chúng tôi tải các ví dụ trong\nminibatches. Chúng ta có thể xác định các biến khác để phân biệt các\nmiếng đệm từ các miếng đệm không và các ví dụ tích cực với các biến\ntiêu cực."
+      ]
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bai-tap",
+      "text": "14.3.8. Bài tập"
+    },
+    {
+      "type": "list",
+      "ordered": true,
+      "items": [
+        "Làm thế nào để thời gian chạy của mã trong phần này thay đổi nếu\nkhông sử dụng subsampling?",
+        "Các RandomGenerator lớp lưu trữ k kết quả lấy mẫu ngẫu nhiên.\nĐặt k thành các giá trị khác và xem nó ảnh hưởng đến tốc độ tải\ndữ liệu như thế nào.",
+        "Những siêu tham số khác trong mã của phần này có thể ảnh hưởng đến\ntốc độ tải dữ liệu?"
+      ]
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    }
+  ],
+  "images": [
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_word-embedding-dataset_f77071_39_0.svg",
+      "local_path": "_images/output_word-embedding-dataset_f77071_39_0.svg",
+      "alt": "../_images/output_word-embedding-dataset_f77071_39_0.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_word-embedding-dataset_f77071_42_0.svg",
+      "local_path": "_images/output_word-embedding-dataset_f77071_42_0.svg",
+      "alt": "../_images/output_word-embedding-dataset_f77071_42_0.svg"
+    }
+  ],
+  "text": "14.3. Các Dataset cho Pretraining Word Embeddings\nBây giờ chúng ta đã biết các chi tiết kỹ thuật của các mô hình word2vec\nvà các phương pháp đào tạo gần đúng, chúng ta hãy đi qua các triển khai\ncủa họ. Cụ thể, chúng tôi sẽ lấy mô hình skip-gram trong Section 14.1 và lấy mẫu âm trong Section 14.2 làm ví dụ. Trong phần này, chúng ta bắt đầu\nvới tập dữ liệu để đào tạo trước mô hình nhúng từ: định dạng ban đầu của\ndữ liệu sẽ được chuyển thành các minibatches có thể được lặp lại trong\nquá trình đào tạo.\n14.3.1. Đọc tập dữ liệu\nTập dữ liệu mà chúng tôi sử dụng ở đây là Penn Tree Bank\n(PTB) . Cơ sở này được lấy\nmẫu từ các bài báo của Wall Street Journal, được chia thành các bộ đào\ntạo, xác nhận và kiểm tra. Ở định dạng ban đầu, mỗi dòng của tệp văn bản\nđại diện cho một câu của các từ được phân tách bằng dấu cách. Ở đây\nchúng ta coi từng từ như một mã thông báo.\nSau khi đọc bộ đào tạo, chúng tôi xây dựng một từ vựng cho corpus, trong\nđó bất kỳ từ nào xuất hiện dưới 10 lần được thay thế bằng mã thông báo\n“”. Lưu ý rằng tập dữ liệu gốc cũng chứa “” token đại diện cho các từ\nhiếm (không xác định).\n14.3.2. Lấy mẫu phụ\nDữ liệu văn bản thường có các từ tần số cao như “the”, “a”, và “in”:\nchúng thậm chí có thể xảy ra hàng tỷ lần trong thể rất lớn. Tuy nhiên,\nnhững từ này thường đồng xuất hiện với nhiều từ khác nhau trong các cửa\nsổ ngữ cảnh, cung cấp ít tín hiệu hữu ích. Ví dụ, hãy xem xét từ “chip”\ntrong một cửa sổ ngữ cảnh: trực giác sự xuất hiện của nó với một từ tần\nsố thấp “intel” hữu ích hơn trong đào tạo hơn là đồng xuất hiện với một\ntừ tần số cao “a”. Hơn nữa, đào tạo với một lượng lớn các từ (tần số\ncao) là chậm. Do đó, khi đào tạo từ nhúng mô hình, các từ tần số cao có\nthể là * mẫu con* [Mikolov et al., 2013b] . Cụ thể,\nmỗi từ được lập chỉ mục \\(w_i\\) trong tập dữ liệu sẽ bị loại bỏ với\nxác suất\ntrong đó \\(f(w_i)\\) là tỷ lệ của số từ \\(w_i\\) với tổng số từ\ntrong tập dữ liệu và hằng số \\(t\\) là một siêu tham số\n( \\(10^{-4}\\) trong thí nghiệm). Chúng ta có thể thấy rằng chỉ khi\ntần số tương đối \\(f(w_i) > t\\) , từ \\(w_i\\) mới có thể bị loại\nbỏ và tần số tương đối của từ càng cao thì xác suất bị loại bỏ càng lớn.\nĐoạn mã sau vẽ biểu đồ của số lượng mã thông báo trên mỗi câu trước và\nsau khi lấy mẫu. Đúng như dự đoán, subsampling rút ngắn đáng kể các câu\nbằng cách thả các từ tần số cao, điều này sẽ dẫn đến tăng tốc đào tạo.\nĐối với mã thông báo riêng lẻ, tỷ lệ lấy mẫu của từ tần số cao “the” nhỏ\nhơn 1/20.\nNgược lại, các từ tần số thấp “tham gia” được giữ hoàn toàn.\nSau khi lấy mẫu đăng ký, chúng tôi ánh xạ mã thông báo đến các chỉ số\ncủa họ cho corpus.\n14.3.3. Trích xuất từ trung tâm và từ ngữ cảnh\nHàm get_centers_and_contexts sau trích xuất tất cả các từ trung tâm\nvà từ ngữ cảnh của chúng từ corpus . Nó đồng đều mẫu một số nguyên\ngiữa 1 và max_window_size một cách ngẫu nhiên như kích thước cửa sổ\nngữ cảnh. Đối với bất kỳ từ trung tâm nào, những từ có khoảng cách từ nó\nkhông vượt quá kích thước cửa sổ ngữ cảnh được lấy mẫu là các từ ngữ\ncảnh của nó.\nTiếp theo, chúng ta tạo ra một tập dữ liệu nhân tạo có chứa hai câu 7 và\n3 từ, tương ứng. Hãy để kích thước cửa sổ ngữ cảnh tối đa là 2 và in tất\ncả các từ trung tâm và các từ ngữ cảnh của chúng.\nKhi đào tạo trên tập dữ liệu PTB, chúng tôi đặt kích thước cửa sổ ngữ\ncảnh tối đa là 5. Sau đây trích xuất tất cả các từ trung tâm và các từ\nngữ cảnh của chúng trong tập dữ liệu.\n14.3.4. Lấy mẫu âm\nChúng tôi sử dụng lấy mẫu tiêu cực cho đào tạo gần đúng. Để lấy mẫu các\ntừ nhiễu theo một phân phối được xác định trước, chúng ta xác định lớp RandomGenerator sau, trong đó phân phối lấy mẫu (có thể không chuẩn\nhóa) được truyền qua đối số sampling_weights .\nVí dụ: chúng ta có thể vẽ 10 biến ngẫu nhiên \\(X\\) trong số các chỉ\nsố 1, 2 và 3 với xác suất lấy mẫu \\(P(X=1)=2/9, P(X=2)=3/9\\) và \\(P(X=3)=4/9\\) như sau.\nĐối với một cặp từ trung tâm và từ ngữ cảnh, chúng tôi lấy mẫu ngẫu\nnhiên K (5 trong thí nghiệm) các từ tiếng ồn. Theo các đề xuất trong\nbài báo word2vec, xác suất lấy mẫu \\(P(w)\\) của một từ tiếng ồn \\(w\\) được đặt thành tần số tương đối của nó trong từ điển nâng lên\ncông suất 0,75 [Mikolov et al., 2013b] .\n14.3.5. Tải ví dụ đào tạo trong Minibatches\nSau khi tất cả các từ trung tâm cùng với các từ ngữ cảnh và các từ tiếng\nồn được lấy mẫu được trích xuất, chúng sẽ được chuyển thành các ví dụ\nnhỏ có thể được tải lặp lại trong quá trình đào tạo.\nTrong một minibatch, ví dụ \\(i^\\mathrm{th}\\) bao gồm một từ trung\ntâm và \\(n_i\\) từ ngữ cảnh của nó và \\(m_i\\) từ nhiễu. Do kích\nthước cửa sổ ngữ cảnh khác nhau, \\(n_i+m_i\\) thay đổi cho \\(i\\) khác nhau. Do đó, đối với mỗi ví dụ, chúng tôi nối các từ ngữ cảnh và\ncác từ nhiễu của nó trong biến contexts_negatives và pad số không\ncho đến khi độ dài nối đạt \\(\\max_i n_i+m_i\\) ( max_len ). Để loại\ntrừ các miếng đệm trong tính toán tổn thất, chúng tôi xác định một biến\nmặt nạ masks . Có một sự tương ứng một-một giữa các phần tử trong masks và các phần tử trong contexts_negatives , trong đó số không\n(nếu không) trong masks tương ứng với các miếng đệm trong contexts_negatives .\nĐể phân biệt giữa các ví dụ tích cực và tiêu cực, chúng ta tách các từ\nngữ cảnh khỏi các từ nhiễu trong contexts_negatives thông qua một\nbiến labels . Tương tự như masks , cũng có sự tương ứng một-một\ngiữa các phần tử trong labels và các phần tử trong contexts_negatives , trong đó các phần tử (nếu không số không) trong labels tương ứng với các từ ngữ cảnh (ví dụ tích cực) trong contexts_negatives .\nÝ tưởng trên được thực hiện trong hàm batchify sau. Đầu vào của nó data là một danh sách có độ dài bằng với kích thước lô, trong đó mỗi\nphần tử là một ví dụ bao gồm từ trung tâm center , các từ ngữ cảnh\ncủa nó context , và các từ nhiễu của nó negative . Hàm này trả về\nmột minibatch có thể được nạp để tính toán trong quá trình đào tạo,\nchẳng hạn như bao gồm biến mask.\nHãy để chúng tôi kiểm tra chức năng này bằng cách sử dụng một minibatch\ngồm hai ví dụ.\n14.3.6. Đặt tất cả mọi thứ lại với nhau\nCuối cùng, chúng ta định nghĩa hàm load_data_ptb đọc tập dữ liệu PTB\nvà trả về bộ lặp dữ liệu và từ vựng.\nHãy để chúng tôi in minibatch đầu tiên của bộ lặp dữ liệu.\n14.3.7. Tóm tắt\nCác từ tần số cao có thể không hữu ích trong đào tạo. Chúng tôi có\nthể subsample chúng để tăng tốc trong đào tạo.\nĐối với hiệu quả tính toán, chúng tôi tải các ví dụ trong\nminibatches. Chúng ta có thể xác định các biến khác để phân biệt các\nmiếng đệm từ các miếng đệm không và các ví dụ tích cực với các biến\ntiêu cực.\n14.3.8. Bài tập\nLàm thế nào để thời gian chạy của mã trong phần này thay đổi nếu\nkhông sử dụng subsampling?\nCác RandomGenerator lớp lưu trữ k kết quả lấy mẫu ngẫu nhiên.\nĐặt k thành các giá trị khác và xem nó ảnh hưởng đến tốc độ tải\ndữ liệu như thế nào.\nNhững siêu tham số khác trong mã của phần này có thể ảnh hưởng đến\ntốc độ tải dữ liệu?\nDiscussions\nDiscussions"
+}

@@ -1,0 +1,339 @@
+{
+  "url": "https://vi.d2l.ai/chapter_computational-performance/multiple-gpus-concise.html",
+  "chapter": "chapter_computational-performance",
+  "title": "12.6. Triển khai ngắn gọn cho nhiều GPU",
+  "crawled_at": "2026-07-20T12:40:35.927209+00:00",
+  "headings": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "trien-khai-ngan-gon-cho-nhieu-gpu",
+      "text": "12.6. Triển khai ngắn gọn cho nhiều GPU"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "mot-mang-do-choi",
+      "text": "12.6.1. Một mạng đồ chơi"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "khoi-tao-mang",
+      "text": "12.6.2. Khởi tạo mạng"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "dao-tao",
+      "text": "12.6.3. Đào tạo"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tom-tat",
+      "text": "12.6.4. Tóm tắt"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bai-tap",
+      "text": "12.6.5. Bài tập"
+    }
+  ],
+  "content": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "trien-khai-ngan-gon-cho-nhieu-gpu",
+      "text": "12.6. Triển khai ngắn gọn cho nhiều GPU"
+    },
+    {
+      "type": "paragraph",
+      "text": "Thực hiện song song từ đầu cho mỗi mô hình mới là không thú vị. Hơn nữa,\ncó lợi ích đáng kể trong việc tối ưu hóa các công cụ đồng bộ hóa cho\nhiệu suất cao. Trong phần sau đây, chúng tôi sẽ chỉ ra cách thực hiện\nviệc này bằng cách sử dụng API cấp cao của các framework deep learning.\nToán học và các thuật toán giống như trong Section 12.5 .\nKhá không ngạc nhiên khi bạn sẽ cần ít nhất hai GPU để chạy mã của phần\nnày."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "from mxnet import autograd, gluon, init, np, npx\nfrom mxnet.gluon import nn\nfrom d2l import mxnet as d2l\n\nnpx.set_np()"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "import torch\nfrom torch import nn\nfrom d2l import torch as d2l"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "mot-mang-do-choi",
+      "text": "12.6.1. Một mạng đồ chơi"
+    },
+    {
+      "type": "paragraph",
+      "text": "Hãy để chúng tôi sử dụng một mạng có ý nghĩa hơn một chút so với LeNet\ntừ Section 12.5 mà vẫn đủ dễ dàng và nhanh chóng để đào\ntạo. Chúng tôi chọn một biến thể ResNet-18 [He et al., 2016a] . Vì hình ảnh đầu vào rất nhỏ, chúng tôi\nsửa đổi nó một chút. Đặc biệt, sự khác biệt so với Section 7.6 là chúng ta sử dụng một hạt nhân phức tạp nhỏ\nhơn, sải chân và đệm ở đầu. Hơn nữa, chúng tôi loại bỏ lớp tổng hợp tối\nđa."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "#@save\ndef resnet18(num_classes):\n    \"\"\"A slightly modified ResNet-18 model.\"\"\"\n    def resnet_block(num_channels, num_residuals, first_block=False):\n        blk = nn.Sequential()\n        for i in range(num_residuals):\n            if i == 0 and not first_block:\n                blk.add(d2l.Residual(\n                    num_channels, use_1x1conv=True, strides=2))\n            else:\n                blk.add(d2l.Residual(num_channels))\n        return blk\n\n    net = nn.Sequential()\n    # This model uses a smaller convolution kernel, stride, and padding and\n    # removes the maximum pooling layer\n    net.add(nn.Conv2D(64, kernel_size=3, strides=1, padding=1),\n            nn.BatchNorm(), nn.Activation('relu'))\n    net.add(resnet_block(64, 2, first_block=True),\n            resnet_block(128, 2),\n            resnet_block(256, 2),\n            resnet_block(512, 2))\n    net.add(nn.GlobalAvgPool2D(), nn.Dense(num_classes))\n    return net"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "#@save\ndef resnet18(num_classes, in_channels=1):\n    \"\"\"A slightly modified ResNet-18 model.\"\"\"\n    def resnet_block(in_channels, out_channels, num_residuals,\n                     first_block=False):\n        blk = []\n        for i in range(num_residuals):\n            if i == 0 and not first_block:\n                blk.append(d2l.Residual(in_channels, out_channels,\n                                        use_1x1conv=True, strides=2))\n            else:\n                blk.append(d2l.Residual(out_channels, out_channels))\n        return nn.Sequential(*blk)\n\n    # This model uses a smaller convolution kernel, stride, and padding and\n    # removes the maximum pooling layer\n    net = nn.Sequential(\n        nn.Conv2d(in_channels, 64, kernel_size=3, stride=1, padding=1),\n        nn.BatchNorm2d(64),\n        nn.ReLU())\n    net.add_module(\"resnet_block1\", resnet_block(64, 64, 2, first_block=True))\n    net.add_module(\"resnet_block2\", resnet_block(64, 128, 2))\n    net.add_module(\"resnet_block3\", resnet_block(128, 256, 2))\n    net.add_module(\"resnet_block4\", resnet_block(256, 512, 2))\n    net.add_module(\"global_avg_pool\", nn.AdaptiveAvgPool2d((1,1)))\n    net.add_module(\"fc\", nn.Sequential(nn.Flatten(),\n                                       nn.Linear(512, num_classes)))\n    return net"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "khoi-tao-mang",
+      "text": "12.6.2. Khởi tạo mạng"
+    },
+    {
+      "type": "paragraph",
+      "text": "Chức năng initialize cho phép chúng tôi khởi tạo các tham số trên\nmột thiết bị mà chúng tôi lựa chọn. Đối với một bồi dưỡng về các phương\npháp khởi tạo xem Section 4.8 . Điều đặc biệt\nthuận tiện là nó cũng cho phép chúng tôi khởi tạo mạng trên các thiết bị\n* nhiều* cùng một lúc. Hãy để chúng tôi thử làm thế nào điều này hoạt\nđộng trong thực tế."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "net = resnet18(10)\n# Get a list of GPUs\ndevices = d2l.try_all_gpus()\n# Initialize all the parameters of the network\nnet.initialize(init=init.Normal(sigma=0.01), ctx=devices)"
+    },
+    {
+      "type": "paragraph",
+      "text": "Sử dụng chức năng split_and_load được giới thiệu trong Section 12.5 , chúng ta có thể chia một minibatch dữ liệu và\nsao chép các phần vào danh sách các thiết bị được cung cấp bởi biến devices . Phiên bản mạng* automatically* sử dụng GPU thích hợp để\ntính toán giá trị của sự lan truyền chuyển tiếp. Ở đây chúng tôi tạo ra\n4 quan sát và chia chúng qua GPU."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "x = np.random.uniform(size=(4, 1, 28, 28))\nx_shards = gluon.utils.split_and_load(x, devices)\nnet(x_shards[0]), net(x_shards[1])"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "[11:23:07] src/operator/nn/./cudnn/./cudnn_algoreg-inl.h:97: Running performance tests to find the best convolution algorithm, this can take a while... (set the environment variable MXNET_CUDNN_AUTOTUNE_DEFAULT to 0 to disable)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "(array([[ 2.2610195e-06,  2.2045988e-06, -5.4046795e-06,  1.2869961e-06,\n          5.1373149e-06, -3.8298003e-06,  1.4338968e-07,  5.4683442e-06,\n         -2.8279201e-06, -3.9651122e-06],\n        [ 2.0698672e-06,  2.0084667e-06, -5.6382496e-06,  1.0498482e-06,\n          5.5506434e-06, -4.1065477e-06,  6.0830178e-07,  5.4521761e-06,\n         -3.7365016e-06, -4.1891649e-06]], ctx=gpu(0)),\n array([[ 2.4629790e-06,  2.6015525e-06, -5.4362617e-06,  1.2938226e-06,\n          5.6387885e-06, -4.1360108e-06,  3.5758899e-07,  5.5125261e-06,\n         -3.1957350e-06, -4.2976326e-06],\n        [ 1.9431686e-06,  2.2600429e-06, -5.2698201e-06,  1.4807408e-06,\n          5.4830934e-06, -3.9678903e-06,  7.5750904e-08,  5.6764356e-06,\n         -3.2530229e-06, -4.0943960e-06]], ctx=gpu(1)))"
+    },
+    {
+      "type": "paragraph",
+      "text": "Khi dữ liệu đi qua mạng, các tham số tương ứng được khởi tạo * trên\nthiết bị dữ liệu được truyền qua*. Điều này có nghĩa là khởi tạo xảy ra\ntrên cơ sở mỗi thiết bị. Vì chúng tôi đã chọn GPU 0 và GPU 1 để khởi\ntạo, mạng chỉ được khởi tạo ở đó chứ không phải trên CPU. Trong thực tế,\ncác tham số thậm chí không tồn tại trên CPU. Chúng tôi có thể xác minh\nđiều này bằng cách in ra các tham số và quan sát bất kỳ lỗi nào có thể\nphát sinh."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "weight = net[0].params.get('weight')\n\ntry:\n    weight.data()\nexcept RuntimeError:\n    print('not initialized on cpu')\nweight.data(devices[0])[0], weight.data(devices[1])[0]"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "not initialized on cpu"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "(array([[[ 0.01382882, -0.01183044,  0.01417865],\n         [-0.00319718,  0.00439528,  0.02562625],\n         [-0.00835081,  0.01387452, -0.01035946]]], ctx=gpu(0)),\n array([[[ 0.01382882, -0.01183044,  0.01417865],\n         [-0.00319718,  0.00439528,  0.02562625],\n         [-0.00835081,  0.01387452, -0.01035946]]], ctx=gpu(1)))"
+    },
+    {
+      "type": "paragraph",
+      "text": "Tiếp theo, chúng ta hãy thay thế mã thành đánh giá độ chính xác bằng một\nmã hoạt động song song trên nhiều thiết bị. Điều này phục vụ như là một\nsự thay thế của chức năng evaluate_accuracy_gpu từ Section 6.6 . Sự khác biệt chính là chúng tôi chia nhỏ một\nminibatch trước khi gọi mạng. Tất cả những thứ khác về cơ bản là giống\nhệt nhau."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "#@save\ndef evaluate_accuracy_gpus(net, data_iter, split_f=d2l.split_batch):\n    \"\"\"Compute the accuracy for a model on a dataset using multiple GPUs.\"\"\"\n    # Query the list of devices\n    devices = list(net.collect_params().values())[0].list_ctx()\n    # No. of correct predictions, no. of predictions\n    metric = d2l.Accumulator(2)\n    for features, labels in data_iter:\n        X_shards, y_shards = split_f(features, labels, devices)\n        # Run in parallel\n        pred_shards = [net(X_shard) for X_shard in X_shards]\n        metric.add(sum(float(d2l.accuracy(pred_shard, y_shard)) for\n                       pred_shard, y_shard in zip(\n                           pred_shards, y_shards)), labels.size)\n    return metric[0] / metric[1]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Chúng tôi sẽ khởi tạo mạng bên trong vòng đào tạo. Đối với một bồi dưỡng\nvề các phương pháp khởi tạo xem Section 4.8 ."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "net = resnet18(10)\n# Get a list of GPUs\ndevices = d2l.try_all_gpus()\n# We will initialize the network inside the training loop"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "dao-tao",
+      "text": "12.6.3. Đào tạo"
+    },
+    {
+      "type": "paragraph",
+      "text": "Như trước đây, mã đào tạo cần thực hiện một số chức năng cơ bản để song\nsong hiệu quả:"
+    },
+    {
+      "type": "list",
+      "ordered": false,
+      "items": [
+        "Các tham số mạng cần được khởi tạo trên tất cả các thiết bị.",
+        "Trong khi lặp lại các minibatches tập dữ liệu sẽ được chia trên tất\ncả các thiết bị.",
+        "Chúng tôi tính toán sự mất mát và độ dốc của nó song song trên các\nthiết bị.",
+        "Gradient được tổng hợp và các tham số được cập nhật cho phù hợp."
+      ]
+    },
+    {
+      "type": "paragraph",
+      "text": "Cuối cùng, chúng tôi tính toán độ chính xác (một lần nữa song song) để\nbáo cáo hiệu suất cuối cùng của mạng. Thói quen đào tạo khá giống với\nviệc triển khai trong các chương trước, ngoại trừ việc chúng ta cần phân\nchia và tổng hợp dữ liệu."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def train(num_gpus, batch_size, lr):\n    train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size)\n    ctx = [d2l.try_gpu(i) for i in range(num_gpus)]\n    net.initialize(init=init.Normal(sigma=0.01), ctx=ctx, force_reinit=True)\n    trainer = gluon.Trainer(net.collect_params(), 'sgd',\n                            {'learning_rate': lr})\n    loss = gluon.loss.SoftmaxCrossEntropyLoss()\n    timer, num_epochs = d2l.Timer(), 10\n    animator = d2l.Animator('epoch', 'test acc', xlim=[1, num_epochs])\n    for epoch in range(num_epochs):\n        timer.start()\n        for features, labels in train_iter:\n            X_shards, y_shards = d2l.split_batch(features, labels, ctx)\n            with autograd.record():\n                ls = [loss(net(X_shard), y_shard) for X_shard, y_shard\n                      in zip(X_shards, y_shards)]\n            for l in ls:\n                l.backward()\n            trainer.step(batch_size)\n        npx.waitall()\n        timer.stop()\n        animator.add(epoch + 1, (evaluate_accuracy_gpus(net, test_iter),))\n    print(f'test acc: {animator.Y[0][-1]:.2f}, {timer.avg():.1f} sec/epoch '\n          f'on {str(ctx)}')"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def train(net, num_gpus, batch_size, lr):\n    train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size)\n    devices = [d2l.try_gpu(i) for i in range(num_gpus)]\n    def init_weights(m):\n        if type(m) in [nn.Linear, nn.Conv2d]:\n            nn.init.normal_(m.weight, std=0.01)\n    net.apply(init_weights)\n    # Set the model on multiple GPUs\n    net = nn.DataParallel(net, device_ids=devices)\n    trainer = torch.optim.SGD(net.parameters(), lr)\n    loss = nn.CrossEntropyLoss()\n    timer, num_epochs = d2l.Timer(), 10\n    animator = d2l.Animator('epoch', 'test acc', xlim=[1, num_epochs])\n    for epoch in range(num_epochs):\n        net.train()\n        timer.start()\n        for X, y in train_iter:\n            trainer.zero_grad()\n            X, y = X.to(devices[0]), y.to(devices[0])\n            l = loss(net(X), y)\n            l.backward()\n            trainer.step()\n        timer.stop()\n        animator.add(epoch + 1, (d2l.evaluate_accuracy_gpu(net, test_iter),))\n    print(f'test acc: {animator.Y[0][-1]:.2f}, {timer.avg():.1f} sec/epoch '\n          f'on {str(devices)}')"
+    },
+    {
+      "type": "paragraph",
+      "text": "Hãy để chúng tôi xem làm thế nào điều này hoạt động trong thực tế. Như\nmột khởi động, chúng tôi đào tạo mạng trên một GPU."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "train(num_gpus=1, batch_size=256, lr=0.1)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "test acc: 0.93, 13.3 sec/epoch on [gpu(0)]"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_multiple-gpus-concise_2e111f_47_1.svg",
+      "local_path": "_images/output_multiple-gpus-concise_2e111f_47_1.svg",
+      "alt": "../_images/output_multiple-gpus-concise_2e111f_47_1.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "train(net, num_gpus=1, batch_size=256, lr=0.1)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "test acc: 0.90, 13.8 sec/epoch on [device(type='cuda', index=0)]"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_multiple-gpus-concise_2e111f_50_1.svg",
+      "local_path": "_images/output_multiple-gpus-concise_2e111f_50_1.svg",
+      "alt": "../_images/output_multiple-gpus-concise_2e111f_50_1.svg"
+    },
+    {
+      "type": "paragraph",
+      "text": "Tiếp theo chúng ta sử dụng 2 GPU để đào tạo. So với LeNet được đánh giá\nvào năm Section 12.5 , mô hình cho ResNet-18 phức tạp hơn\nđáng kể. Đây là nơi song song cho thấy lợi thế của nó. Thời gian tính\ntoán lớn hơn một cách có ý nghĩa so với thời gian đồng bộ hóa các tham\nsố. Điều này cải thiện khả năng mở rộng vì chi phí cho song song ít liên\nquan hơn."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "train(num_gpus=2, batch_size=512, lr=0.2)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "test acc: 0.92, 6.9 sec/epoch on [gpu(0), gpu(1)]"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_multiple-gpus-concise_2e111f_56_1.svg",
+      "local_path": "_images/output_multiple-gpus-concise_2e111f_56_1.svg",
+      "alt": "../_images/output_multiple-gpus-concise_2e111f_56_1.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "train(net, num_gpus=2, batch_size=512, lr=0.2)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "test acc: 0.77, 8.2 sec/epoch on [device(type='cuda', index=0), device(type='cuda', index=1)]"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_multiple-gpus-concise_2e111f_59_1.svg",
+      "local_path": "_images/output_multiple-gpus-concise_2e111f_59_1.svg",
+      "alt": "../_images/output_multiple-gpus-concise_2e111f_59_1.svg"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tom-tat",
+      "text": "12.6.4. Tóm tắt"
+    },
+    {
+      "type": "list",
+      "ordered": false,
+      "items": [
+        "Gluon cung cấp nguyên thủy để khởi tạo mô hình trên nhiều thiết bị\nbằng cách cung cấp một danh sách ngữ cảnh."
+      ]
+    },
+    {
+      "type": "list",
+      "ordered": false,
+      "items": [
+        "Dữ liệu được tự động đánh giá trên các thiết bị nơi dữ liệu có thể\nđược tìm thấy.",
+        "Hãy cẩn thận để khởi tạo các mạng trên mỗi thiết bị trước khi cố gắng\ntruy cập các tham số trên thiết bị đó. Nếu không bạn sẽ gặp phải một\nlỗi.",
+        "Các thuật toán tối ưu hóa tự động tổng hợp trên nhiều GPU."
+      ]
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bai-tap",
+      "text": "12.6.5. Bài tập"
+    },
+    {
+      "type": "list",
+      "ordered": true,
+      "items": [
+        "Phần này sử dụng ResNet-18. Hãy thử các thời đại khác nhau, quy mô\nhàng loạt và tỷ lệ học tập. Sử dụng nhiều GPU hơn để tính toán. Điều\ngì xảy ra nếu bạn dùng thử điều này với 16 GPU (ví dụ: trên phiên bản\nAWS p2.16xlarge)?",
+        "Đôi khi, các thiết bị khác nhau cung cấp sức mạnh tính toán khác\nnhau. Chúng ta có thể sử dụng GPU và CPU cùng một lúc. Làm thế nào\nchúng ta nên chia công việc? Nó có đáng để nỗ lực không? Tại sao? Tại\nsao không?",
+        "Điều gì sẽ xảy ra nếu chúng ta thả npx.waitall() ? Làm thế nào bạn\nsẽ sửa đổi đào tạo sao cho bạn có một chồng chéo lên đến hai bước cho\nsong song?"
+      ]
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    },
+    {
+      "type": "list",
+      "ordered": true,
+      "items": [
+        "Phần này sử dụng ResNet-18. Hãy thử các thời đại khác nhau, quy mô\nhàng loạt và tỷ lệ học tập. Sử dụng nhiều GPU hơn để tính toán. Điều\ngì xảy ra nếu bạn dùng thử điều này với 16 GPU (ví dụ: trên phiên bản\nAWS p2.16xlarge)?",
+        "Đôi khi, các thiết bị khác nhau cung cấp sức mạnh tính toán khác\nnhau. Chúng ta có thể sử dụng GPU và CPU cùng một lúc. Làm thế nào\nchúng ta nên chia công việc? Nó có đáng để nỗ lực không? Tại sao? Tại\nsao không?"
+      ]
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    }
+  ],
+  "images": [
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_multiple-gpus-concise_2e111f_47_1.svg",
+      "local_path": "_images/output_multiple-gpus-concise_2e111f_47_1.svg",
+      "alt": "../_images/output_multiple-gpus-concise_2e111f_47_1.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_multiple-gpus-concise_2e111f_50_1.svg",
+      "local_path": "_images/output_multiple-gpus-concise_2e111f_50_1.svg",
+      "alt": "../_images/output_multiple-gpus-concise_2e111f_50_1.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_multiple-gpus-concise_2e111f_56_1.svg",
+      "local_path": "_images/output_multiple-gpus-concise_2e111f_56_1.svg",
+      "alt": "../_images/output_multiple-gpus-concise_2e111f_56_1.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_multiple-gpus-concise_2e111f_59_1.svg",
+      "local_path": "_images/output_multiple-gpus-concise_2e111f_59_1.svg",
+      "alt": "../_images/output_multiple-gpus-concise_2e111f_59_1.svg"
+    }
+  ],
+  "text": "12.6. Triển khai ngắn gọn cho nhiều GPU\nThực hiện song song từ đầu cho mỗi mô hình mới là không thú vị. Hơn nữa,\ncó lợi ích đáng kể trong việc tối ưu hóa các công cụ đồng bộ hóa cho\nhiệu suất cao. Trong phần sau đây, chúng tôi sẽ chỉ ra cách thực hiện\nviệc này bằng cách sử dụng API cấp cao của các framework deep learning.\nToán học và các thuật toán giống như trong Section 12.5 .\nKhá không ngạc nhiên khi bạn sẽ cần ít nhất hai GPU để chạy mã của phần\nnày.\n12.6.1. Một mạng đồ chơi\nHãy để chúng tôi sử dụng một mạng có ý nghĩa hơn một chút so với LeNet\ntừ Section 12.5 mà vẫn đủ dễ dàng và nhanh chóng để đào\ntạo. Chúng tôi chọn một biến thể ResNet-18 [He et al., 2016a] . Vì hình ảnh đầu vào rất nhỏ, chúng tôi\nsửa đổi nó một chút. Đặc biệt, sự khác biệt so với Section 7.6 là chúng ta sử dụng một hạt nhân phức tạp nhỏ\nhơn, sải chân và đệm ở đầu. Hơn nữa, chúng tôi loại bỏ lớp tổng hợp tối\nđa.\n12.6.2. Khởi tạo mạng\nChức năng initialize cho phép chúng tôi khởi tạo các tham số trên\nmột thiết bị mà chúng tôi lựa chọn. Đối với một bồi dưỡng về các phương\npháp khởi tạo xem Section 4.8 . Điều đặc biệt\nthuận tiện là nó cũng cho phép chúng tôi khởi tạo mạng trên các thiết bị\n* nhiều* cùng một lúc. Hãy để chúng tôi thử làm thế nào điều này hoạt\nđộng trong thực tế.\nSử dụng chức năng split_and_load được giới thiệu trong Section 12.5 , chúng ta có thể chia một minibatch dữ liệu và\nsao chép các phần vào danh sách các thiết bị được cung cấp bởi biến devices . Phiên bản mạng* automatically* sử dụng GPU thích hợp để\ntính toán giá trị của sự lan truyền chuyển tiếp. Ở đây chúng tôi tạo ra\n4 quan sát và chia chúng qua GPU.\nKhi dữ liệu đi qua mạng, các tham số tương ứng được khởi tạo * trên\nthiết bị dữ liệu được truyền qua*. Điều này có nghĩa là khởi tạo xảy ra\ntrên cơ sở mỗi thiết bị. Vì chúng tôi đã chọn GPU 0 và GPU 1 để khởi\ntạo, mạng chỉ được khởi tạo ở đó chứ không phải trên CPU. Trong thực tế,\ncác tham số thậm chí không tồn tại trên CPU. Chúng tôi có thể xác minh\nđiều này bằng cách in ra các tham số và quan sát bất kỳ lỗi nào có thể\nphát sinh.\nTiếp theo, chúng ta hãy thay thế mã thành đánh giá độ chính xác bằng một\nmã hoạt động song song trên nhiều thiết bị. Điều này phục vụ như là một\nsự thay thế của chức năng evaluate_accuracy_gpu từ Section 6.6 . Sự khác biệt chính là chúng tôi chia nhỏ một\nminibatch trước khi gọi mạng. Tất cả những thứ khác về cơ bản là giống\nhệt nhau.\nChúng tôi sẽ khởi tạo mạng bên trong vòng đào tạo. Đối với một bồi dưỡng\nvề các phương pháp khởi tạo xem Section 4.8 .\n12.6.3. Đào tạo\nNhư trước đây, mã đào tạo cần thực hiện một số chức năng cơ bản để song\nsong hiệu quả:\nCác tham số mạng cần được khởi tạo trên tất cả các thiết bị.\nTrong khi lặp lại các minibatches tập dữ liệu sẽ được chia trên tất\ncả các thiết bị.\nChúng tôi tính toán sự mất mát và độ dốc của nó song song trên các\nthiết bị.\nGradient được tổng hợp và các tham số được cập nhật cho phù hợp.\nCuối cùng, chúng tôi tính toán độ chính xác (một lần nữa song song) để\nbáo cáo hiệu suất cuối cùng của mạng. Thói quen đào tạo khá giống với\nviệc triển khai trong các chương trước, ngoại trừ việc chúng ta cần phân\nchia và tổng hợp dữ liệu.\nHãy để chúng tôi xem làm thế nào điều này hoạt động trong thực tế. Như\nmột khởi động, chúng tôi đào tạo mạng trên một GPU.\nTiếp theo chúng ta sử dụng 2 GPU để đào tạo. So với LeNet được đánh giá\nvào năm Section 12.5 , mô hình cho ResNet-18 phức tạp hơn\nđáng kể. Đây là nơi song song cho thấy lợi thế của nó. Thời gian tính\ntoán lớn hơn một cách có ý nghĩa so với thời gian đồng bộ hóa các tham\nsố. Điều này cải thiện khả năng mở rộng vì chi phí cho song song ít liên\nquan hơn.\n12.6.4. Tóm tắt\nGluon cung cấp nguyên thủy để khởi tạo mô hình trên nhiều thiết bị\nbằng cách cung cấp một danh sách ngữ cảnh.\nDữ liệu được tự động đánh giá trên các thiết bị nơi dữ liệu có thể\nđược tìm thấy.\nHãy cẩn thận để khởi tạo các mạng trên mỗi thiết bị trước khi cố gắng\ntruy cập các tham số trên thiết bị đó. Nếu không bạn sẽ gặp phải một\nlỗi.\nCác thuật toán tối ưu hóa tự động tổng hợp trên nhiều GPU.\n12.6.5. Bài tập\nPhần này sử dụng ResNet-18. Hãy thử các thời đại khác nhau, quy mô\nhàng loạt và tỷ lệ học tập. Sử dụng nhiều GPU hơn để tính toán. Điều\ngì xảy ra nếu bạn dùng thử điều này với 16 GPU (ví dụ: trên phiên bản\nAWS p2.16xlarge)?\nĐôi khi, các thiết bị khác nhau cung cấp sức mạnh tính toán khác\nnhau. Chúng ta có thể sử dụng GPU và CPU cùng một lúc. Làm thế nào\nchúng ta nên chia công việc? Nó có đáng để nỗ lực không? Tại sao? Tại\nsao không?\nĐiều gì sẽ xảy ra nếu chúng ta thả npx.waitall() ? Làm thế nào bạn\nsẽ sửa đổi đào tạo sao cho bạn có một chồng chéo lên đến hai bước cho\nsong song?\nDiscussions\nPhần này sử dụng ResNet-18. Hãy thử các thời đại khác nhau, quy mô\nhàng loạt và tỷ lệ học tập. Sử dụng nhiều GPU hơn để tính toán. Điều\ngì xảy ra nếu bạn dùng thử điều này với 16 GPU (ví dụ: trên phiên bản\nAWS p2.16xlarge)?\nĐôi khi, các thiết bị khác nhau cung cấp sức mạnh tính toán khác\nnhau. Chúng ta có thể sử dụng GPU và CPU cùng một lúc. Làm thế nào\nchúng ta nên chia công việc? Nó có đáng để nỗ lực không? Tại sao? Tại\nsao không?\nDiscussions"
+}

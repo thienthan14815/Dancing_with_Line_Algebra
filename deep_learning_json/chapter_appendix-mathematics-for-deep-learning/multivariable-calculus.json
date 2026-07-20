@@ -1,0 +1,1082 @@
+{
+  "url": "https://vi.d2l.ai/chapter_appendix-mathematics-for-deep-learning/multivariable-calculus.html",
+  "chapter": "chapter_appendix-mathematics-for-deep-learning",
+  "title": "18.4. Tính toán đa năng",
+  "crawled_at": "2026-07-20T12:41:25.607510+00:00",
+  "headings": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "tinh-toan-da-nang",
+      "text": "18.4. Tính toán đa năng"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "su-khac-biet-chieu-cao-hon-dieu-sec-single-variable-calculus-noi-voi-chung-ta-la-neu-chung-ta-thay-doi-mot-trong-so-hang-ty-trong-nay-de-lai-moi-trong-luong-khac-co-dinh-chung-ta-biet-dieu-gi-se-xay-ra-dieu-nay-khong-co-gi-khac-hon-la-mot-ham-cua-mot-bien-duy-nhat-vi-vay-chung-ta-co-the-viet",
+      "text": "18.4.1. Sự khác biệt chiều cao hơn Điều Section 18.3 nói với chúng ta là nếu chúng ta thay đổi một trong số hàng tỷ trọng này để lại mọi trọng lượng khác cố định, chúng ta biết điều gì sẽ xảy ra! Điều này không có gì khác hơn là một hàm của một biến duy nhất, vì vậy chúng ta có thể viết"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "hinh-hoc-cua-gradient-va-gradient-descent-xem-xet-bieu-thuc-tu-eq-nabla-use-mot-lan-nua",
+      "text": "18.4.2. Hình học của Gradient và Gradient Descent Xem xét biểu thức từ (18.4.5) một lần nữa:"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "mot-luu-y-ve-toi-uu-hoa-toan-hoc-trong-suot-cuon-sach-nay-chung-toi-tap-trung-thang-vao-cac-ky-thuat-toi-uu-hoa-so-vi-ly-do-thuc-te-ma-tat-ca-cac-ham-chung-ta-gap-phai-trong-cai-dat-deep-learning-la-qua-phuc-tap-de-giam-thieu-ro-rang",
+      "text": "18.4.3. Một lưu ý về tối ưu hóa toán học Trong suốt cuốn sách này, chúng tôi tập trung thẳng vào các kỹ thuật tối ưu hóa số vì lý do thực tế mà tất cả các hàm chúng ta gặp phải trong cài đặt deep learning là quá phức tạp để giảm thiểu rõ ràng."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "multivariate-chain-rule",
+      "text": "18.4.4. Multivariate Chain Rule"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "thuat-toan-backpropagation",
+      "text": "18.4.5. Thuật toán Backpropagation"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "hessia-nhu-voi-phep-tinh-bien-don-le-no-rat-huu-ich-de-xem-xet-cac-dan-xuat-bac-cao-hon-de-co-duoc-mot-xu-ly-ve-cach-chung-ta-co-the-co-duoc-mot-xap-xi-tot-hon-voi-mot-ham-hon-la-su-dung-gradient-mot-minh",
+      "text": "18.4.6. Hessia Như với phép tính biến đơn lẻ, nó rất hữu ích để xem xét các dẫn xuất bậc cao hơn để có được một xử lý về cách chúng ta có thể có được một xấp xỉ tốt hơn với một hàm hơn là sử dụng gradient một mình."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "a-little-matrix-calculus-dan-xuat-cua-cac-ham-lien-quan-den-ma-tran-hoa-ra-la-dac-biet-tot-dep-phan-nay-co-the-tro-nen-nang-ne-ve-mat-cong-thuc-vi-vay-co-the-bi-bo-qua-trong-lan-doc-dau-tien-nhung-rat-huu-ich-khi-biet-cac-dan-xuat-cua-cac-ham-lien-quan-den-hoat-dong-ma-tran-pho-bien-thuong-sach-hon-nhieu-so-voi-nguoi-ta-co-the-du-doan-ban-dau-dac-biet-la-cho-cac-hoat-dong-ma-tran-trung-tam-nhu-the-nao-doi-voi-cac-ung-dung-hoc-sau",
+      "text": "18.4.7. A Little Matrix Calculus Dẫn xuất của các hàm liên quan đến ma trận hóa ra là đặc biệt tốt đẹp. Phần này có thể trở nên nặng nề về mặt công thức, vì vậy có thể bị bỏ qua trong lần đọc đầu tiên, nhưng rất hữu ích khi biết các dẫn xuất của các hàm liên quan đến hoạt động ma trận phổ biến thường sạch hơn nhiều so với người ta có thể dự đoán ban đầu, đặc biệt là cho các hoạt động ma trận trung tâm như thế nào đối với các ứng dụng học sâu."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tom-tat",
+      "text": "18.4.8. Tóm tắt"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bai-tap-1-cho-mot-vector-cot-boldsymbol-beta-tinh-toan-cac-dan-xuat-cua-ca-f-mathbf-x-boldsymbol-beta-top-mathbf-x-va-g-mathbf-x-mathbf-x-top-boldsymbol-beta-tai-sao-ban-nhan-duoc-cau-tra-loi-tuong-tu-2-hay-de-mathbf-v-la-mot-vector-kich-thuoc-n-frac-partial-partial-mathbf-v-mathbf-v-2-la-cai-gi-3-hay-de-l-x-y-log-e-x-e-y-tinh-toan-gradient-tong-cua-cac-thanh-phan-cua-gradient-la-gi-4-hay-de-f-x-y-x-2y-xy-2-cho-thay-diem-quan-trong-duy-nhat-la-0-0-bang-cach-xem-xet-f-x-x-xac-dinh-xem-0-0-co-phai-la-toi-da-toi-thieu-hay-khong-gia-su-rang-chung-ta-dang-giam-thieu-mot-ham-f-mathbf-x-g-mathbf-x-h-mathbf-x-lam-the-nao-chung-ta-co-the-giai-thich-hinh-hoc-tinh-trang-cua-nabla-f-0-ve-g-va-h",
+      "text": "18.4.9. Bài tập 1. Cho một vector cột \\(\\boldsymbol{\\beta}\\) , tính toán các dẫn xuất của cả \\(f(\\mathbf{x}) = \\boldsymbol{\\beta}^\\top\\mathbf{x}\\) và \\(g(\\mathbf{x}) = \\mathbf{x}^\\top\\boldsymbol{\\beta}\\) . Tại sao bạn nhận được câu trả lời tương tự? 2. Hãy để \\(\\mathbf{v}\\) là một vector kích thước \\(n\\) . \\(\\frac{\\partial}{\\partial\\mathbf{v}}\\|\\mathbf{v}\\|_2\\) là cái gì? 3. Hãy để \\(L(x, y) = \\log(e^x + e^y)\\) . Tính toán gradient. Tổng của các thành phần của gradient là gì? 4. Hãy để \\(f(x, y) = x^2y + xy^2\\) . Cho thấy điểm quan trọng duy nhất là \\((0,0)\\) . Bằng cách xem xét \\(f(x, x)\\) , xác định xem \\((0,0)\\) có phải là tối đa, tối thiểu hay không. Giả sử rằng chúng ta đang giảm thiểu một hàm \\(f(\\mathbf{x}) = g(\\mathbf{x}) + h(\\mathbf{x})\\) . Làm thế nào chúng ta có thể giải thích hình học tình trạng của \\(\\nabla f = 0\\) về \\(g\\) và \\(h\\) ?"
+    }
+  ],
+  "content": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "tinh-toan-da-nang",
+      "text": "18.4. Tính toán đa năng"
+    },
+    {
+      "type": "paragraph",
+      "text": "Bây giờ chúng ta có một sự hiểu biết khá mạnh mẽ về các dẫn xuất của một\nhàm của một biến duy nhất, chúng ta hãy quay trở lại câu hỏi ban đầu của\nchúng tôi, nơi chúng tôi đang xem xét một chức năng mất của hàng tỷ\ntrọng lượng có khả năng."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "su-khac-biet-chieu-cao-hon-dieu-sec-single-variable-calculus-noi-voi-chung-ta-la-neu-chung-ta-thay-doi-mot-trong-so-hang-ty-trong-nay-de-lai-moi-trong-luong-khac-co-dinh-chung-ta-biet-dieu-gi-se-xay-ra-dieu-nay-khong-co-gi-khac-hon-la-mot-ham-cua-mot-bien-duy-nhat-vi-vay-chung-ta-co-the-viet",
+      "text": "18.4.1. Sự khác biệt chiều cao hơn Điều Section 18.3 nói với chúng ta là nếu chúng ta thay đổi một trong số hàng tỷ trọng này để lại mọi trọng lượng khác cố định, chúng ta biết điều gì sẽ xảy ra! Điều này không có gì khác hơn là một hàm của một biến duy nhất, vì vậy chúng ta có thể viết"
+    },
+    {
+      "type": "math",
+      "latex": "(18.4.1)¶\\[L(w_1+\\epsilon_1, w_2, \\ldots, w_N) \\approx L(w_1, w_2, \\ldots, w_N) + \\epsilon_1 \\frac{d}{dw_1} L(w_1, w_2, \\ldots, w_N).\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Chúng ta sẽ gọi đạo hàm trong một biến trong khi sửa các biến khác là\nđạo hàm * partial * , và chúng ta sẽ sử dụng ký hiệu \\(\\frac{\\partial}{\\partial w_1}\\) cho đạo hàm trong (18.4.1) ."
+    },
+    {
+      "type": "paragraph",
+      "text": "Bây giờ, chúng ta hãy lấy điều này và thay đổi \\(w_2\\) một chút\nthành \\(w_2 + \\epsilon_2\\) :"
+    },
+    {
+      "type": "math",
+      "latex": "(18.4.2)¶\\[\\begin{split}\\begin{aligned}\nL(w_1+\\epsilon_1, w_2+\\epsilon_2, \\ldots, w_N) & \\approx L(w_1, w_2+\\epsilon_2, \\ldots, w_N) + \\epsilon_1 \\frac{\\partial}{\\partial w_1} L(w_1, w_2+\\epsilon_2, \\ldots, w_N+\\epsilon_N) \\\\\n& \\approx L(w_1, w_2, \\ldots, w_N) \\\\\n& \\quad + \\epsilon_2\\frac{\\partial}{\\partial w_2} L(w_1, w_2, \\ldots, w_N) \\\\\n& \\quad + \\epsilon_1 \\frac{\\partial}{\\partial w_1} L(w_1, w_2, \\ldots, w_N) \\\\\n& \\quad + \\epsilon_1\\epsilon_2\\frac{\\partial}{\\partial w_2}\\frac{\\partial}{\\partial w_1} L(w_1, w_2, \\ldots, w_N) \\\\\n& \\approx L(w_1, w_2, \\ldots, w_N) \\\\\n& \\quad + \\epsilon_2\\frac{\\partial}{\\partial w_2} L(w_1, w_2, \\ldots, w_N) \\\\\n& \\quad + \\epsilon_1 \\frac{\\partial}{\\partial w_1} L(w_1, w_2, \\ldots, w_N).\n\\end{aligned}\\end{split}\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Chúng tôi đã một lần nữa sử dụng ý tưởng rằng \\(\\epsilon_1\\epsilon_2\\) là một thuật ngữ thứ tự cao hơn mà chúng\ntôi có thể loại bỏ theo cách tương tự chúng tôi có thể loại bỏ \\(\\epsilon^{2}\\) trong phần trước, cùng với những gì chúng tôi đã\nthấy trong (18.4.1) . Bằng cách tiếp tục theo cách này,\nchúng tôi có thể viết rằng"
+    },
+    {
+      "type": "math",
+      "latex": "(18.4.3)¶\\[L(w_1+\\epsilon_1, w_2+\\epsilon_2, \\ldots, w_N+\\epsilon_N) \\approx L(w_1, w_2, \\ldots, w_N) + \\sum_i \\epsilon_i \\frac{\\partial}{\\partial w_i} L(w_1, w_2, \\ldots, w_N).\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Điều này có thể trông giống như một mớ hỗn độn, nhưng chúng ta có thể\nlàm cho điều này quen thuộc hơn bằng cách lưu ý rằng tổng bên phải trông\ngiống hệt như một sản phẩm chấm, vì vậy nếu chúng ta để"
+    },
+    {
+      "type": "math",
+      "latex": "(18.4.4)¶\\[\\boldsymbol{\\epsilon} = [\\epsilon_1, \\ldots, \\epsilon_N]^\\top \\; \\text{and} \\;\n\\nabla_{\\mathbf{x}} L = \\left[\\frac{\\partial L}{\\partial x_1}, \\ldots, \\frac{\\partial L}{\\partial x_N}\\right]^\\top,\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "sau đó"
+    },
+    {
+      "type": "math",
+      "latex": "(18.4.5)¶\\[L(\\mathbf{w} + \\boldsymbol{\\epsilon}) \\approx L(\\mathbf{w}) + \\boldsymbol{\\epsilon}\\cdot \\nabla_{\\mathbf{w}} L(\\mathbf{w}).\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Chúng ta sẽ gọi vector \\(\\nabla_{\\mathbf{w}} L\\) là * gradient*\ncủa \\(L\\) ."
+    },
+    {
+      "type": "paragraph",
+      "text": "Phương trình (18.4.5) đáng để suy ngẫm trong giây lát. Nó\ncó chính xác định dạng mà chúng ta gặp phải trong một chiều, chỉ cần\nchúng ta đã chuyển đổi mọi thứ thành vectơ và các sản phẩm chấm. Nó cho\nphép chúng ta biết khoảng cách chức năng \\(L\\) sẽ thay đổi cho bất\nkỳ nhiễu loạn nào đối với đầu vào. Như chúng ta sẽ thấy trong phần tiếp\ntheo, điều này sẽ cung cấp cho chúng ta một công cụ quan trọng trong\nviệc hiểu về mặt hình học cách chúng ta có thể học bằng cách sử dụng\nthông tin có trong gradient."
+    },
+    {
+      "type": "paragraph",
+      "text": "Nhưng trước tiên, chúng ta hãy xem xấp xỉ này tại nơi làm việc với một\nví dụ. Giả sử rằng chúng ta đang làm việc với hàm"
+    },
+    {
+      "type": "math",
+      "latex": "(18.4.6)¶\\[f(x, y) = \\log(e^x + e^y) \\text{ with gradient } \\nabla f (x, y) = \\left[\\frac{e^x}{e^x+e^y}, \\frac{e^y}{e^x+e^y}\\right].\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Nếu chúng ta nhìn vào một điểm như \\((0, \\log(2))\\) , chúng ta thấy\nrằng"
+    },
+    {
+      "type": "math",
+      "latex": "(18.4.7)¶\\[f(x, y) = \\log(3) \\text{ with gradient } \\nabla f (x, y) = \\left[\\frac{1}{3}, \\frac{2}{3}\\right].\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Do đó, nếu chúng ta muốn xấp xỉ \\(f\\) tại \\((\\epsilon_1, \\log(2) + \\epsilon_2)\\) , chúng ta thấy rằng chúng ta\nnên có ví dụ cụ thể là (18.4.5) :"
+    },
+    {
+      "type": "math",
+      "latex": "(18.4.8)¶\\[f(\\epsilon_1, \\log(2) + \\epsilon_2) \\approx \\log(3) + \\frac{1}{3}\\epsilon_1 + \\frac{2}{3}\\epsilon_2.\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Chúng ta có thể kiểm tra điều này trong mã để xem xấp xỉ tốt như thế\nnào."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "%matplotlib inline\nfrom IPython import display\nfrom mpl_toolkits import mplot3d\nfrom mxnet import autograd, np, npx\nfrom d2l import mxnet as d2l\n\nnpx.set_np()\n\ndef f(x, y):\n    return np.log(np.exp(x) + np.exp(y))\ndef grad_f(x, y):\n    return np.array([np.exp(x) / (np.exp(x) + np.exp(y)),\n                     np.exp(y) / (np.exp(x) + np.exp(y))])\n\nepsilon = np.array([0.01, -0.03])\ngrad_approx = f(0, np.log(2)) + epsilon.dot(grad_f(0, np.log(2)))\ntrue_value = f(0 + epsilon[0], np.log(2) + epsilon[1])\nf'approximation: {grad_approx}, true Value: {true_value}'"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "'approximation: 1.0819456577301025, true Value: 1.0821242332458496'"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "%matplotlib inline\nimport numpy as np\nimport torch\nfrom IPython import display\nfrom mpl_toolkits import mplot3d\nfrom d2l import torch as d2l\n\n\ndef f(x, y):\n    return torch.log(torch.exp(x) + torch.exp(y))\ndef grad_f(x, y):\n    return torch.tensor([torch.exp(x) / (torch.exp(x) + torch.exp(y)),\n                     torch.exp(y) / (torch.exp(x) + torch.exp(y))])\n\nepsilon = torch.tensor([0.01, -0.03])\ngrad_approx = f(torch.tensor([0.]), torch.log(\n    torch.tensor([2.]))) + epsilon.dot(\n    grad_f(torch.tensor([0.]), torch.log(torch.tensor(2.))))\ntrue_value = f(torch.tensor([0.]) + epsilon[0], torch.log(\n    torch.tensor([2.])) + epsilon[1])\nf'approximation: {grad_approx}, true Value: {true_value}'"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "'approximation: tensor([1.0819]), true Value: tensor([1.0821])'"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "%matplotlib inline\nimport numpy as np\nimport tensorflow as tf\nfrom IPython import display\nfrom mpl_toolkits import mplot3d\nfrom d2l import tensorflow as d2l\n\n\ndef f(x, y):\n    return tf.math.log(tf.exp(x) + tf.exp(y))\ndef grad_f(x, y):\n    return tf.constant([(tf.exp(x) / (tf.exp(x) + tf.exp(y))).numpy(),\n                        (tf.exp(y) / (tf.exp(x) + tf.exp(y))).numpy()])\n\nepsilon = tf.constant([0.01, -0.03])\ngrad_approx = f(tf.constant([0.]), tf.math.log(\n    tf.constant([2.]))) + tf.tensordot(\n    epsilon, grad_f(tf.constant([0.]), tf.math.log(tf.constant(2.))), axes=1)\ntrue_value = f(tf.constant([0.]) + epsilon[0], tf.math.log(\n    tf.constant([2.])) + epsilon[1])\nf'approximation: {grad_approx}, true Value: {true_value}'"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "'approximation: [1.0819457], true Value: [1.0821242]'"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "hinh-hoc-cua-gradient-va-gradient-descent-xem-xet-bieu-thuc-tu-eq-nabla-use-mot-lan-nua",
+      "text": "18.4.2. Hình học của Gradient và Gradient Descent Xem xét biểu thức từ (18.4.5) một lần nữa:"
+    },
+    {
+      "type": "math",
+      "latex": "(18.4.9)¶\\[L(\\mathbf{w} + \\boldsymbol{\\epsilon}) \\approx L(\\mathbf{w}) + \\boldsymbol{\\epsilon}\\cdot \\nabla_{\\mathbf{w}} L(\\mathbf{w}).\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Chúng ta hãy giả sử rằng tôi muốn sử dụng điều này để giúp giảm thiểu\nthiệt hại của chúng tôi \\(L\\) . Chúng ta hãy hiểu về mặt hình học\nthuật toán của gradient gốc đầu tiên được mô tả trong Section 2.5 . Những gì chúng tôi sẽ làm là như sau:"
+    },
+    {
+      "type": "list",
+      "ordered": true,
+      "items": [
+        "Bắt đầu với một sự lựa chọn ngẫu nhiên cho các tham số ban đầu \\(\\mathbf{w}\\) .",
+        "Tìm hướng \\(\\mathbf{v}\\) làm cho \\(L\\) giảm nhanh nhất ở \\(\\mathbf{w}\\) .",
+        "Thực hiện một bước nhỏ theo hướng đó: \\(\\mathbf{w} \\rightarrow \\mathbf{w} + \\epsilon\\mathbf{v}\\) .",
+        "Lặp lại."
+      ]
+    },
+    {
+      "type": "paragraph",
+      "text": "Điều duy nhất chúng ta không biết chính xác cách làm là tính toán vector \\(\\mathbf{v}\\) trong bước thứ hai. Chúng tôi sẽ gọi một hướng như\nvậy là hướng đi xuống dốc nhất . Sử dụng sự hiểu biết hình học của các\nsản phẩm chấm từ Section 18.1 , chúng ta\nthấy rằng chúng ta có thể viết lại (18.4.5) như"
+    },
+    {
+      "type": "math",
+      "latex": "(18.4.10)¶\\[L(\\mathbf{w} + \\mathbf{v}) \\approx L(\\mathbf{w}) + \\mathbf{v}\\cdot \\nabla_{\\mathbf{w}} L(\\mathbf{w}) = L(\\mathbf{w}) + \\|\\nabla_{\\mathbf{w}} L(\\mathbf{w})\\|\\cos(\\theta).\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Lưu ý rằng chúng tôi đã thực hiện hướng của chúng tôi để có chiều dài\nmột để thuận tiện và sử dụng \\(\\theta\\) cho góc giữa \\(\\mathbf{v}\\) và \\(\\nabla_{\\mathbf{w}} L(\\mathbf{w})\\) . Nếu\nchúng ta muốn tìm hướng giảm \\(L\\) càng nhanh càng tốt, chúng ta\nmuốn làm cho biểu thức này là tiêu cực nhất có thể. Cách duy nhất mà\nhướng chúng ta chọn đi vào phương trình này là thông qua \\(\\cos(\\theta)\\) , và do đó chúng ta muốn làm cho cosin này là âm\nnhất có thể. Bây giờ, nhắc lại hình dạng của cosin, chúng ta có thể làm\ncho điều này càng âm càng tốt bằng cách tạo \\(\\cos(\\theta) = -1\\) hoặc tương đương làm cho góc giữa gradient và hướng đã chọn của chúng ta\nlà \\(\\pi\\) radian, hoặc tương đương \\(180\\) độ. Cách duy nhất để\nđạt được điều này là đi theo hướng ngược lại chính xác: chọn \\(\\mathbf{v}\\) để chỉ theo hướng ngược lại chính xác với \\(\\nabla_{\\mathbf{w}} L(\\mathbf{w})\\) !"
+    },
+    {
+      "type": "paragraph",
+      "text": "Điều này đưa chúng ta đến một trong những khái niệm toán học quan trọng\nnhất trong học máy: hướng của các điểm phong nha dốc nhất theo hướng \\(-\\nabla_{\\mathbf{w}}L(\\mathbf{w})\\) . Do đó thuật toán không chính\nthức của chúng tôi có thể được viết lại như sau."
+    },
+    {
+      "type": "list",
+      "ordered": true,
+      "items": [
+        "Bắt đầu với một sự lựa chọn ngẫu nhiên cho các tham số ban đầu \\(\\mathbf{w}\\) .",
+        "Tính toán \\(\\nabla_{\\mathbf{w}} L(\\mathbf{w})\\) .",
+        "Thực hiện một bước nhỏ theo hướng ngược lại với hướng đó: \\(\\mathbf{w} \\rightarrow \\mathbf{w} - \\epsilon\\nabla_{\\mathbf{w}} L(\\mathbf{w})\\) .",
+        "Lặp lại."
+      ]
+    },
+    {
+      "type": "paragraph",
+      "text": "Thuật toán cơ bản này đã được nhiều nhà nghiên cứu sửa đổi và điều chỉnh\nnhiều cách, nhưng khái niệm cốt lõi vẫn giữ nguyên trong tất cả chúng.\nSử dụng gradient để tìm hướng làm giảm tổn thất càng nhanh càng tốt và\ncập nhật các tham số để thực hiện một bước theo hướng đó."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "mot-luu-y-ve-toi-uu-hoa-toan-hoc-trong-suot-cuon-sach-nay-chung-toi-tap-trung-thang-vao-cac-ky-thuat-toi-uu-hoa-so-vi-ly-do-thuc-te-ma-tat-ca-cac-ham-chung-ta-gap-phai-trong-cai-dat-deep-learning-la-qua-phuc-tap-de-giam-thieu-ro-rang",
+      "text": "18.4.3. Một lưu ý về tối ưu hóa toán học Trong suốt cuốn sách này, chúng tôi tập trung thẳng vào các kỹ thuật tối ưu hóa số vì lý do thực tế mà tất cả các hàm chúng ta gặp phải trong cài đặt deep learning là quá phức tạp để giảm thiểu rõ ràng."
+    },
+    {
+      "type": "paragraph",
+      "text": "Tuy nhiên, đó là một bài tập hữu ích để xem xét những gì sự hiểu biết\nhình học mà chúng tôi thu được ở trên cho chúng ta biết về việc tối ưu\nhóa các chức năng trực tiếp."
+    },
+    {
+      "type": "paragraph",
+      "text": "Giả sử rằng chúng ta muốn tìm giá trị của \\(\\mathbf{x}_0\\) mà giảm\nthiểu một số chức năng \\(L(\\mathbf{x})\\) . Chúng ta hãy giả sử rằng\nhơn nữa ai đó mang lại cho chúng ta một giá trị và cho chúng ta biết\nrằng đó là giá trị giảm thiểu \\(L\\) . Có bất cứ điều gì chúng ta có\nthể kiểm tra để xem câu trả lời của họ có hợp lý không?"
+    },
+    {
+      "type": "paragraph",
+      "text": "Một lần nữa xem xét (18.4.5) :"
+    },
+    {
+      "type": "math",
+      "latex": "(18.4.11)¶\\[L (\\ mathbf {x} _0 +\\ boldsymbol {\\ epsilon})\\ xấp xỉ L (\\ mathbf {x} _0) +\\ boldsymbol {\\ epsilon}\\ cdot\\ nabla_ {\\ mathbf {x}} L (\\ mathbf {x} _0) .\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Nếu gradient không phải bằng 0, chúng ta biết rằng chúng ta có thể thực\nhiện một bước theo hướng \\(-\\epsilon \\nabla_{\\mathbf{x}} L(\\mathbf{x}_0)\\) để tìm giá trị \\(L\\) nhỏ hơn. Vì vậy, nếu chúng ta thực sự ở mức tối thiểu, đây\nkhông thể là trường hợp! Chúng ta có thể kết luận rằng nếu \\(\\mathbf{x}_0\\) là mức tối thiểu, thì \\(\\nabla_{\\mathbf{x}} L(\\mathbf{x}_0) = 0\\) . Chúng tôi gọi điểm với \\(\\nabla_{\\mathbf{x}} L(\\mathbf{x}_0) = 0\\) điểm quan trọng ."
+    },
+    {
+      "type": "paragraph",
+      "text": "Điều này thật tốt, bởi vì trong một số cài đặt hiếm, chúng ta * có\nthể* rõ ràng tìm thấy tất cả các điểm có gradient bằng 0 và tìm điểm có\ngiá trị nhỏ nhất."
+    },
+    {
+      "type": "paragraph",
+      "text": "Đối với một ví dụ cụ thể, hãy xem xét hàm"
+    },
+    {
+      "type": "math",
+      "latex": "(18.4.12)¶\\[f (x) = 3x^4 - 4x^3 -12x^2.\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Hàm này có đạo hàm"
+    },
+    {
+      "type": "math",
+      "latex": "(18.4.13)¶\\[\\ frac {df} {dx} = 12x^3 - 12x^2 -24x = 12x (x-2) (x+1) .\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Vị trí duy nhất có thể của minima là \\(x = -1, 0, 2\\) , trong đó hàm\nlấy các giá trị tương ứng \\(-5,0, -32\\) và do đó chúng ta có thể kết\nluận rằng chúng ta giảm thiểu hàm của mình khi \\(x = 2\\) . Một cốt\ntruyện nhanh chóng xác nhận điều này."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "x = np.arange(-2, 3, 0.01)\nf = (3 * x**4) - (4 * x**3) - (12 * x**2)\n\nd2l.plot(x, f, 'x', 'f(x)')"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_multivariable-calculus_bf678a_15_0.svg",
+      "local_path": "_images/output_multivariable-calculus_bf678a_15_0.svg",
+      "alt": "../_images/output_multivariable-calculus_bf678a_15_0.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "x = torch.arange(-2, 3, 0.01)\nf = (3 * x**4) - (4 * x**3) - (12 * x**2)\n\nd2l.plot(x, f, 'x', 'f(x)')"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_multivariable-calculus_bf678a_18_0.svg",
+      "local_path": "_images/output_multivariable-calculus_bf678a_18_0.svg",
+      "alt": "../_images/output_multivariable-calculus_bf678a_18_0.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "x = tf.range(-2, 3, 0.01)\nf = (3 * x**4) - (4 * x**3) - (12 * x**2)\n\nd2l.plot(x, f, 'x', 'f(x)')"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_multivariable-calculus_bf678a_21_0.svg",
+      "local_path": "_images/output_multivariable-calculus_bf678a_21_0.svg",
+      "alt": "../_images/output_multivariable-calculus_bf678a_21_0.svg"
+    },
+    {
+      "type": "paragraph",
+      "text": "Điều này nhấn mạnh một thực tế quan trọng cần biết khi làm việc theo lý\nthuyết hoặc số: các điểm duy nhất có thể mà chúng ta có thể thu nhỏ\n(hoặc tối đa hóa) một hàm sẽ có gradient bằng 0, tuy nhiên, không phải\nmọi điểm có gradient 0 là đúng toàn cầu tối thiểu (hoặc tối đa)."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "multivariate-chain-rule",
+      "text": "18.4.4. Multivariate Chain Rule"
+    },
+    {
+      "type": "paragraph",
+      "text": "Let us suppose that we have a function of four variables\n( \\(w, x, y\\) , and \\(z\\) ) which we can make by composing many\nterms:"
+    },
+    {
+      "type": "math",
+      "latex": "(18.4.14)¶\\[\\begin{split}\\begin{aligned}f(u, v) & = (u+v)^{2} \\\\u(a, b) & = (a+b)^{2}, \\qquad v(a, b) = (a-b)^{2}, \\\\a(w, x, y, z) & = (w+x+y+z)^{2}, \\qquad b(w, x, y, z) = (w+x-y-z)^2.\\end{aligned}\\end{split}\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Các chuỗi phương trình như vậy là phổ biến khi làm việc với các mạng\nthần kinh, vì vậy cố gắng hiểu cách tính toán độ dốc của các chức năng\nnhư vậy là chìa khóa. Chúng ta có thể bắt đầu thấy gợi ý trực quan của\nkết nối này trong Fig. 18.4.1 nếu chúng ta xem những biến\nliên quan trực tiếp đến nhau."
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/chain-net1.svg",
+      "local_path": "_images/chain-net1.svg",
+      "alt": "../_images/chain-net1.svg"
+    },
+    {
+      "type": "paragraph",
+      "text": "Fig. 18.4.1 The function relations above where nodes represent values and edges\nshow functional dependence. ¶"
+    },
+    {
+      "type": "paragraph",
+      "text": "Không có gì ngăn cản chúng ta chỉ sáng tác tất cả mọi thứ từ (18.4.14) và viết ra rằng"
+    },
+    {
+      "type": "math",
+      "latex": "(18.4.15)¶\\[f(w, x, y, z) = \\left(\\left((w+x+y+z)^2+(w+x-y-z)^2\\right)^2+\\left((w+x+y+z)^2-(w+x-y-z)^2\\right)^2\\right)^2.\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Sau đó chúng ta có thể lấy đạo hàm bằng cách chỉ sử dụng các dẫn xuất\nbiến duy nhất, nhưng nếu chúng ta đã làm điều đó, chúng ta sẽ nhanh\nchóng thấy mình đầm lầy với các thuật ngữ, nhiều trong số đó được lặp\nlại! Thật vậy, người ta có thể thấy rằng, ví dụ:"
+    },
+    {
+      "type": "math",
+      "latex": "(18.4.16)¶\\[\\begin{split}\\begin{aligned}\n\\frac{\\partial f}{\\partial w} & = 2 \\left(2 \\left(2 (w + x + y + z) - 2 (w + x - y - z)\\right) \\left((w + x + y + z)^{2}- (w + x - y - z)^{2}\\right) + \\right.\\\\\n& \\left. \\quad 2 \\left(2 (w + x - y - z) + 2 (w + x + y + z)\\right) \\left((w + x - y - z)^{2}+ (w + x + y + z)^{2}\\right)\\right) \\times \\\\\n& \\quad \\left(\\left((w + x + y + z)^{2}- (w + x - y - z)^2\\right)^{2}+ \\left((w + x - y - z)^{2}+ (w + x + y + z)^{2}\\right)^{2}\\right).\n\\end{aligned}\\end{split}\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Nếu sau đó chúng ta cũng muốn tính toán \\(\\frac{\\partial f}{\\partial x}\\) , chúng ta sẽ kết thúc với một\nphương trình tương tự một lần nữa với nhiều thuật ngữ lặp đi lặp lại và\nnhiều thuật ngữ lặp đi lặp lại * shared* giữa hai dẫn xuất. Điều này\nđại diện cho một lượng lớn công việc lãng phí, và nếu chúng ta cần tính\ntoán các dẫn xuất theo cách này, toàn bộ cuộc cách mạng học sâu sẽ bị\nđình trệ trước khi nó bắt đầu!"
+    },
+    {
+      "type": "paragraph",
+      "text": "Hãy để chúng tôi chia tay vấn đề. Chúng ta sẽ bắt đầu bằng cách cố gắng\nhiểu \\(f\\) thay đổi như thế nào khi chúng ta thay đổi \\(a\\) , về\ncơ bản giả định rằng \\(w, x, y\\) và \\(z\\) tất cả không tồn tại.\nChúng tôi sẽ lý do như chúng tôi đã làm trở lại khi chúng tôi làm việc\nvới gradient lần đầu tiên. Hãy để chúng tôi lấy \\(a\\) và thêm một\nlượng nhỏ \\(\\epsilon\\) vào nó."
+    },
+    {
+      "type": "math",
+      "latex": "(18.4.17)¶\\[\\begin{split}\\begin{aligned}\n& f(u(a+\\epsilon, b), v(a+\\epsilon, b)) \\\\\n\\approx & f\\left(u(a, b) + \\epsilon\\frac{\\partial u}{\\partial a}(a, b), v(a, b) + \\epsilon\\frac{\\partial v}{\\partial a}(a, b)\\right) \\\\\n\\approx & f(u(a, b), v(a, b)) + \\epsilon\\left[\\frac{\\partial f}{\\partial u}(u(a, b), v(a, b))\\frac{\\partial u}{\\partial a}(a, b) + \\frac{\\partial f}{\\partial v}(u(a, b), v(a, b))\\frac{\\partial v}{\\partial a}(a, b)\\right].\n\\end{aligned}\\end{split}\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Dòng đầu tiên theo sau từ định nghĩa đạo hàm từng phần, và dòng thứ hai\ntheo sau từ định nghĩa của gradient. Việc theo dõi chính xác nơi chúng\nta đánh giá mọi phái sinh, như trong biểu thức \\(\\frac{\\partial f}{\\partial u}(u(a, b), v(a, b))\\) , vì vậy chúng ta\nthường viết tắt điều này thành đáng nhớ hơn nhiều"
+    },
+    {
+      "type": "math",
+      "latex": "(18.4.18)¶\\[\\frac{\\partial f}{\\partial a} = \\frac{\\partial f}{\\partial u}\\frac{\\partial u}{\\partial a}+\\frac{\\partial f}{\\partial v}\\frac{\\partial v}{\\partial a}.\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Nó rất hữu ích để suy nghĩ về ý nghĩa của quá trình. Chúng tôi đang cố\ngắng hiểu làm thế nào một hàm của biểu mẫu \\(f(u(a, b), v(a, b))\\) thay đổi giá trị của nó với một sự thay đổi trong \\(a\\) . Có hai con\nđường này có thể xảy ra: có con đường nơi \\(a \\rightarrow u \\rightarrow f\\) và nơi \\(a \\rightarrow v \\rightarrow f\\) . Chúng ta có thể tính toán cả hai\nđóng góp này thông qua quy tắc chuỗi: \\(\\frac{\\partial w}{\\partial u} \\cdot \\frac{\\partial u}{\\partial x}\\) và \\(\\frac{\\partial w}{\\partial v} \\cdot \\frac{\\partial v}{\\partial x}\\) tương ứng, và được thêm vào."
+    },
+    {
+      "type": "paragraph",
+      "text": "Hãy tưởng tượng chúng ta có một mạng khác nhau của các chức năng trong\nđó các chức năng bên phải phụ thuộc vào những chức năng được kết nối với\nbên trái như được hiển thị trong Fig. 18.4.2 ."
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/chain-net2.svg",
+      "local_path": "_images/chain-net2.svg",
+      "alt": "../_images/chain-net2.svg"
+    },
+    {
+      "type": "paragraph",
+      "text": "Fig. 18.4.2 Another more subtle example of the chain rule. ¶"
+    },
+    {
+      "type": "paragraph",
+      "text": "Để tính toán một cái gì đó như \\(\\frac{\\partial f}{\\partial y}\\) ,\nchúng ta cần tổng hợp tất cả (trong trường hợp này là \\(3\\) ) đường\ndẫn từ \\(y\\) đến \\(f\\) cho"
+    },
+    {
+      "type": "math",
+      "latex": "(18.4.19)¶\\[\\frac{\\partial f}{\\partial y} = \\frac{\\partial f}{\\partial a} \\frac{\\partial a}{\\partial u} \\frac{\\partial u}{\\partial y} + \\frac{\\partial f}{\\partial u} \\frac{\\partial u}{\\partial y} + \\frac{\\partial f}{\\partial b} \\frac{\\partial b}{\\partial v} \\frac{\\partial v}{\\partial y}.\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Hiểu quy tắc chuỗi theo cách này sẽ trả cổ tức lớn khi cố gắng hiểu cách\ngradient chảy qua mạng và tại sao các lựa chọn kiến trúc khác nhau như\ntrong LSTMs ( Section 9.2 ) hoặc các lớp còn lại\n( Section 7.6 ) có thể giúp định hình quá trình học tập bằng\ncách kiểm soát dòng chảy gradient."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "thuat-toan-backpropagation",
+      "text": "18.4.5. Thuật toán Backpropagation"
+    },
+    {
+      "type": "paragraph",
+      "text": "Hãy để chúng tôi quay lại ví dụ về (18.4.14) phần\ntrước, nơi"
+    },
+    {
+      "type": "math",
+      "latex": "(18.4.20)¶\\[\\begin{split}\\begin{aligned}\nf(u, v) & = (u+v)^{2} \\\\\nu(a, b) & = (a+b)^{2}, \\qquad v(a, b) = (a-b)^{2}, \\\\\na(w, x, y, z) & = (w+x+y+z)^{2}, \\qquad b(w, x, y, z) = (w+x-y-z)^2.\n\\end{aligned}\\end{split}\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Nếu chúng ta muốn tính toán \\(\\frac{\\partial f}{\\partial w}\\) , chúng\nta có thể áp dụng quy tắc chuỗi đa biến thể để xem:"
+    },
+    {
+      "type": "math",
+      "latex": "(18.4.21)¶\\[\\begin{split}\\begin{aligned}\n\\frac{\\partial f}{\\partial w} & = \\frac{\\partial f}{\\partial u}\\frac{\\partial u}{\\partial w} + \\frac{\\partial f}{\\partial v}\\frac{\\partial v}{\\partial w}, \\\\\n\\frac{\\partial u}{\\partial w} & = \\frac{\\partial u}{\\partial a}\\frac{\\partial a}{\\partial w}+\\frac{\\partial u}{\\partial b}\\frac{\\partial b}{\\partial w}, \\\\\n\\frac{\\partial v}{\\partial w} & = \\frac{\\partial v}{\\partial a}\\frac{\\partial a}{\\partial w}+\\frac{\\partial v}{\\partial b}\\frac{\\partial b}{\\partial w}.\n\\end{aligned}\\end{split}\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Chúng ta hãy thử sử dụng phân hủy này để tính toán \\(\\frac{\\partial f}{\\partial w}\\) . Lưu ý rằng tất cả những gì chúng\nta cần ở đây là các phần bước duy nhất khác nhau:"
+    },
+    {
+      "type": "math",
+      "latex": "(18.4.22)¶\\[\\begin{split}\\begin{aligned}\n\\frac{\\partial f}{\\partial u} = 2(u+v), & \\quad\\frac{\\partial f}{\\partial v} = 2(u+v), \\\\\n\\frac{\\partial u}{\\partial a} = 2(a+b), & \\quad\\frac{\\partial u}{\\partial b} = 2(a+b), \\\\\n\\frac{\\partial v}{\\partial a} = 2(a-b), & \\quad\\frac{\\partial v}{\\partial b} = -2(a-b), \\\\\n\\frac{\\partial a}{\\partial w} = 2(w+x+y+z), & \\quad\\frac{\\partial b}{\\partial w} = 2(w+x-y-z).\n\\end{aligned}\\end{split}\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Nếu chúng ta viết ra mã này sẽ trở thành một biểu thức khá dễ quản lý."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "# Compute the value of the function from inputs to outputs\nw, x, y, z = -1, 0, -2, 1\na, b = (w + x + y + z)**2, (w + x - y - z)**2\nu, v = (a + b)**2, (a - b)**2\nf = (u + v)**2\nprint(f'    f at {w}, {x}, {y}, {z} is {f}')\n\n# Compute the single step partials\ndf_du, df_dv = 2*(u + v), 2*(u + v)\ndu_da, du_db, dv_da, dv_db = 2*(a + b), 2*(a + b), 2*(a - b), -2*(a - b)\nda_dw, db_dw = 2*(w + x + y + z), 2*(w + x - y - z)\n\n# Compute the final result from inputs to outputs\ndu_dw, dv_dw = du_da*da_dw + du_db*db_dw, dv_da*da_dw + dv_db*db_dw\ndf_dw = df_du*du_dw + df_dv*dv_dw\nprint(f'df/dw at {w}, {x}, {y}, {z} is {df_dw}')"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "    f at -1, 0, -2, 1 is 1024\ndf/dw at -1, 0, -2, 1 is -4096"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "# Compute the value of the function from inputs to outputs\nw, x, y, z = -1, 0, -2, 1\na, b = (w + x + y + z)**2, (w + x - y - z)**2\nu, v = (a + b)**2, (a - b)**2\nf = (u + v)**2\nprint(f'    f at {w}, {x}, {y}, {z} is {f}')\n\n# Compute the single step partials\ndf_du, df_dv = 2*(u + v), 2*(u + v)\ndu_da, du_db, dv_da, dv_db = 2*(a + b), 2*(a + b), 2*(a - b), -2*(a - b)\nda_dw, db_dw = 2*(w + x + y + z), 2*(w + x - y - z)\n\n# Compute the final result from inputs to outputs\ndu_dw, dv_dw = du_da*da_dw + du_db*db_dw, dv_da*da_dw + dv_db*db_dw\ndf_dw = df_du*du_dw + df_dv*dv_dw\nprint(f'df/dw at {w}, {x}, {y}, {z} is {df_dw}')"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "    f at -1, 0, -2, 1 is 1024\ndf/dw at -1, 0, -2, 1 is -4096"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "# Compute the value of the function from inputs to outputs\nw, x, y, z = -1, 0, -2, 1\na, b = (w + x + y + z)**2, (w + x - y - z)**2\nu, v = (a + b)**2, (a - b)**2\nf = (u + v)**2\nprint(f'    f at {w}, {x}, {y}, {z} is {f}')\n\n# Compute the single step partials\ndf_du, df_dv = 2*(u + v), 2*(u + v)\ndu_da, du_db, dv_da, dv_db = 2*(a + b), 2*(a + b), 2*(a - b), -2*(a - b)\nda_dw, db_dw = 2*(w + x + y + z), 2*(w + x - y - z)\n\n# Compute the final result from inputs to outputs\ndu_dw, dv_dw = du_da*da_dw + du_db*db_dw, dv_da*da_dw + dv_db*db_dw\ndf_dw = df_du*du_dw + df_dv*dv_dw\nprint(f'df/dw at {w}, {x}, {y}, {z} is {df_dw}')"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "    f at -1, 0, -2, 1 is 1024\ndf/dw at -1, 0, -2, 1 is -4096"
+    },
+    {
+      "type": "paragraph",
+      "text": "Tuy nhiên, lưu ý rằng điều này vẫn không làm cho nó dễ dàng để tính toán\nmột cái gì đó như \\(\\frac{\\partial f}{\\partial x}\\) . Lý do cho điều\nđó là * cách chúng tôi đã chọn áp dụng quy tắc chuỗi. Nếu chúng ta nhìn\nvào những gì chúng ta đã làm ở trên, chúng ta luôn giữ \\(\\partial w\\) trong mẫu số khi chúng ta có thể. Bằng cách này,\nchúng tôi đã chọn áp dụng quy tắc chuỗi xem \\(w\\) đã thay đổi mọi\nbiến khác như thế nào. Nếu đó là những gì chúng tôi muốn, đây sẽ là một\ný tưởng hay. Tuy nhiên, hãy nghĩ lại động lực của chúng tôi từ deep\nlearning: chúng tôi muốn xem cách mọi tham số thay đổi loss . Về bản\nchất, chúng tôi muốn áp dụng quy tắc chuỗi giữ \\(\\partial f\\) trong\ntử số bất cứ khi nào chúng tôi có thể!"
+    },
+    {
+      "type": "paragraph",
+      "text": "Để rõ ràng hơn, lưu ý rằng chúng ta có thể viết"
+    },
+    {
+      "type": "math",
+      "latex": "(18.4.23)¶\\[\\begin{split}\\begin{aligned}\n\\frac{\\partial f}{\\partial w} & = \\frac{\\partial f}{\\partial a}\\frac{\\partial a}{\\partial w} + \\frac{\\partial f}{\\partial b}\\frac{\\partial b}{\\partial w}, \\\\\n\\frac{\\partial f}{\\partial a} & = \\frac{\\partial f}{\\partial u}\\frac{\\partial u}{\\partial a}+\\frac{\\partial f}{\\partial v}\\frac{\\partial v}{\\partial a}, \\\\\n\\frac{\\partial f}{\\partial b} & = \\frac{\\partial f}{\\partial u}\\frac{\\partial u}{\\partial b}+\\frac{\\partial f}{\\partial v}\\frac{\\partial v}{\\partial b}.\n\\end{aligned}\\end{split}\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Lưu ý rằng ứng dụng này của quy tắc chuỗi đã cho chúng tôi tính toán một\ncách rõ ràng \\(\\frac{\\partial f}{\\partial u}, \\frac{\\partial f}{\\partial v}, \\frac{\\partial f}{\\partial a}, \\frac{\\partial f}{\\partial b}, \\; \\text{and} \\; \\frac{\\partial f}{\\partial w}\\) .\nKhông có gì ngăn cản chúng ta cũng bao gồm cả các phương trình:"
+    },
+    {
+      "type": "math",
+      "latex": "(18.4.24)¶\\[\\begin{split}\\begin{aligned}\n\\frac{\\partial f}{\\partial x} & = \\frac{\\partial f}{\\partial a}\\frac{\\partial a}{\\partial x} + \\frac{\\partial f}{\\partial b}\\frac{\\partial b}{\\partial x}, \\\\\n\\frac{\\partial f}{\\partial y} & = \\frac{\\partial f}{\\partial a}\\frac{\\partial a}{\\partial y}+\\frac{\\partial f}{\\partial b}\\frac{\\partial b}{\\partial y}, \\\\\n\\frac{\\partial f}{\\partial z} & = \\frac{\\partial f}{\\partial a}\\frac{\\partial a}{\\partial z}+\\frac{\\partial f}{\\partial b}\\frac{\\partial b}{\\partial z}.\n\\end{aligned}\\end{split}\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "và sau đó theo dõi cách \\(f\\) thay đổi khi chúng ta thay đổi nút *\nbất kỳ* nào trong toàn bộ mạng. Hãy để chúng tôi thực hiện nó."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "# Compute the value of the function from inputs to outputs\nw, x, y, z = -1, 0, -2, 1\na, b = (w + x + y + z)**2, (w + x - y - z)**2\nu, v = (a + b)**2, (a - b)**2\nf = (u + v)**2\nprint(f'f at {w}, {x}, {y}, {z} is {f}')\n\n# Compute the derivative using the decomposition above\n# First compute the single step partials\ndf_du, df_dv = 2*(u + v), 2*(u + v)\ndu_da, du_db, dv_da, dv_db = 2*(a + b), 2*(a + b), 2*(a - b), -2*(a - b)\nda_dw, db_dw = 2*(w + x + y + z), 2*(w + x - y - z)\nda_dx, db_dx = 2*(w + x + y + z), 2*(w + x - y - z)\nda_dy, db_dy = 2*(w + x + y + z), -2*(w + x - y - z)\nda_dz, db_dz = 2*(w + x + y + z), -2*(w + x - y - z)\n\n# Now compute how f changes when we change any value from output to input\ndf_da, df_db = df_du*du_da + df_dv*dv_da, df_du*du_db + df_dv*dv_db\ndf_dw, df_dx = df_da*da_dw + df_db*db_dw, df_da*da_dx + df_db*db_dx\ndf_dy, df_dz = df_da*da_dy + df_db*db_dy, df_da*da_dz + df_db*db_dz\n\nprint(f'df/dw at {w}, {x}, {y}, {z} is {df_dw}')\nprint(f'df/dx at {w}, {x}, {y}, {z} is {df_dx}')\nprint(f'df/dy at {w}, {x}, {y}, {z} is {df_dy}')\nprint(f'df/dz at {w}, {x}, {y}, {z} is {df_dz}')"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "f at -1, 0, -2, 1 is 1024\ndf/dw at -1, 0, -2, 1 is -4096\ndf/dx at -1, 0, -2, 1 is -4096\ndf/dy at -1, 0, -2, 1 is -4096\ndf/dz at -1, 0, -2, 1 is -4096"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "# Compute the value of the function from inputs to outputs\nw, x, y, z = -1, 0, -2, 1\na, b = (w + x + y + z)**2, (w + x - y - z)**2\nu, v = (a + b)**2, (a - b)**2\nf = (u + v)**2\nprint(f'f at {w}, {x}, {y}, {z} is {f}')\n\n# Compute the derivative using the decomposition above\n# First compute the single step partials\ndf_du, df_dv = 2*(u + v), 2*(u + v)\ndu_da, du_db, dv_da, dv_db = 2*(a + b), 2*(a + b), 2*(a - b), -2*(a - b)\nda_dw, db_dw = 2*(w + x + y + z), 2*(w + x - y - z)\nda_dx, db_dx = 2*(w + x + y + z), 2*(w + x - y - z)\nda_dy, db_dy = 2*(w + x + y + z), -2*(w + x - y - z)\nda_dz, db_dz = 2*(w + x + y + z), -2*(w + x - y - z)\n\n# Now compute how f changes when we change any value from output to input\ndf_da, df_db = df_du*du_da + df_dv*dv_da, df_du*du_db + df_dv*dv_db\ndf_dw, df_dx = df_da*da_dw + df_db*db_dw, df_da*da_dx + df_db*db_dx\ndf_dy, df_dz = df_da*da_dy + df_db*db_dy, df_da*da_dz + df_db*db_dz\n\nprint(f'df/dw at {w}, {x}, {y}, {z} is {df_dw}')\nprint(f'df/dx at {w}, {x}, {y}, {z} is {df_dx}')\nprint(f'df/dy at {w}, {x}, {y}, {z} is {df_dy}')\nprint(f'df/dz at {w}, {x}, {y}, {z} is {df_dz}')"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "f at -1, 0, -2, 1 is 1024\ndf/dw at -1, 0, -2, 1 is -4096\ndf/dx at -1, 0, -2, 1 is -4096\ndf/dy at -1, 0, -2, 1 is -4096\ndf/dz at -1, 0, -2, 1 is -4096"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "# Compute the value of the function from inputs to outputs\nw, x, y, z = -1, 0, -2, 1\na, b = (w + x + y + z)**2, (w + x - y - z)**2\nu, v = (a + b)**2, (a - b)**2\nf = (u + v)**2\nprint(f'f at {w}, {x}, {y}, {z} is {f}')\n\n# Compute the derivative using the decomposition above\n# First compute the single step partials\ndf_du, df_dv = 2*(u + v), 2*(u + v)\ndu_da, du_db, dv_da, dv_db = 2*(a + b), 2*(a + b), 2*(a - b), -2*(a - b)\nda_dw, db_dw = 2*(w + x + y + z), 2*(w + x - y - z)\nda_dx, db_dx = 2*(w + x + y + z), 2*(w + x - y - z)\nda_dy, db_dy = 2*(w + x + y + z), -2*(w + x - y - z)\nda_dz, db_dz = 2*(w + x + y + z), -2*(w + x - y - z)\n\n# Now compute how f changes when we change any value from output to input\ndf_da, df_db = df_du*du_da + df_dv*dv_da, df_du*du_db + df_dv*dv_db\ndf_dw, df_dx = df_da*da_dw + df_db*db_dw, df_da*da_dx + df_db*db_dx\ndf_dy, df_dz = df_da*da_dy + df_db*db_dy, df_da*da_dz + df_db*db_dz\n\nprint(f'df/dw at {w}, {x}, {y}, {z} is {df_dw}')\nprint(f'df/dx at {w}, {x}, {y}, {z} is {df_dx}')\nprint(f'df/dy at {w}, {x}, {y}, {z} is {df_dy}')\nprint(f'df/dz at {w}, {x}, {y}, {z} is {df_dz}')"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "f at -1, 0, -2, 1 is 1024\ndf/dw at -1, 0, -2, 1 is -4096\ndf/dx at -1, 0, -2, 1 is -4096\ndf/dy at -1, 0, -2, 1 is -4096\ndf/dz at -1, 0, -2, 1 is -4096"
+    },
+    {
+      "type": "paragraph",
+      "text": "Thực tế là chúng ta tính toán các dẫn xuất từ \\(f\\) trở lại các đầu\nvào chứ không phải từ các đầu vào chuyển tiếp đến đầu ra (như chúng ta\nđã làm trong đoạn mã đầu tiên ở trên) là những gì mang lại cho thuật\ntoán này tên của nó: * backpropagation * . Lưu ý rằng có hai bước: 1.\nTính giá trị của hàm, và các phần bước duy nhất từ trước ra sau. Mặc dù\nkhông được thực hiện ở trên, điều này có thể được kết hợp thành một *\nchuyển tiếp duy nhất * . 2. Tính toán độ dốc của \\(f\\) từ sau ra\ntrước. Chúng tôi gọi đây là * đèo ngược *."
+    },
+    {
+      "type": "paragraph",
+      "text": "Đây chính xác là những gì mọi thuật toán học sâu thực hiện để cho phép\ntính toán độ dốc của sự mất mát đối với mọi trọng lượng trong mạng tại\nmột lần vượt qua. Đó là một thực tế đáng kinh ngạc rằng chúng ta có một\nsự phân hủy như vậy."
+    },
+    {
+      "type": "paragraph",
+      "text": "Để xem làm thế nào để đóng gói này, chúng ta hãy xem nhanh ví dụ này."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "# Initialize as ndarrays, then attach gradients\nw, x, y, z = np.array(-1), np.array(0), np.array(-2), np.array(1)\n\nw.attach_grad()\nx.attach_grad()\ny.attach_grad()\nz.attach_grad()\n\n# Do the computation like usual, tracking gradients\nwith autograd.record():\n    a, b = (w + x + y + z)**2, (w + x - y - z)**2\n    u, v = (a + b)**2, (a - b)**2\n    f = (u + v)**2\n\n# Execute backward pass\nf.backward()\n\nprint(f'df/dw at {w}, {x}, {y}, {z} is {w.grad}')\nprint(f'df/dx at {w}, {x}, {y}, {z} is {x.grad}')\nprint(f'df/dy at {w}, {x}, {y}, {z} is {y.grad}')\nprint(f'df/dz at {w}, {x}, {y}, {z} is {z.grad}')"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "df/dw at -1.0, 0.0, -2.0, 1.0 is -4096.0\ndf/dx at -1.0, 0.0, -2.0, 1.0 is -4096.0\ndf/dy at -1.0, 0.0, -2.0, 1.0 is -4096.0\ndf/dz at -1.0, 0.0, -2.0, 1.0 is -4096.0\n[10:54:42] src/base.cc:49: GPU context requested, but no GPUs found."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "# Initialize as ndarrays, then attach gradients\nw = torch.tensor([-1.], requires_grad=True)\nx = torch.tensor([0.], requires_grad=True)\ny = torch.tensor([-2.], requires_grad=True)\nz = torch.tensor([1.], requires_grad=True)\n# Do the computation like usual, tracking gradients\na, b = (w + x + y + z)**2, (w + x - y - z)**2\nu, v = (a + b)**2, (a - b)**2\nf = (u + v)**2\n\n# Execute backward pass\nf.backward()\n\nprint(f'df/dw at {w.data.item()}, {x.data.item()}, {y.data.item()}, '\n      f'{z.data.item()} is {w.grad.data.item()}')\nprint(f'df/dx at {w.data.item()}, {x.data.item()}, {y.data.item()}, '\n      f'{z.data.item()} is {x.grad.data.item()}')\nprint(f'df/dy at {w.data.item()}, {x.data.item()}, {y.data.item()}, '\n      f'{z.data.item()} is {y.grad.data.item()}')\nprint(f'df/dz at {w.data.item()}, {x.data.item()}, {y.data.item()}, '\n      f'{z.data.item()} is {z.grad.data.item()}')"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "df/dw at -1.0, 0.0, -2.0, 1.0 is -4096.0\ndf/dx at -1.0, 0.0, -2.0, 1.0 is -4096.0\ndf/dy at -1.0, 0.0, -2.0, 1.0 is -4096.0\ndf/dz at -1.0, 0.0, -2.0, 1.0 is -4096.0"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "# Initialize as ndarrays, then attach gradients\nw = tf.Variable(tf.constant([-1.]))\nx = tf.Variable(tf.constant([0.]))\ny = tf.Variable(tf.constant([-2.]))\nz = tf.Variable(tf.constant([1.]))\n# Do the computation like usual, tracking gradients\nwith tf.GradientTape(persistent=True) as t:\n    a, b = (w + x + y + z)**2, (w + x - y - z)**2\n    u, v = (a + b)**2, (a - b)**2\n    f = (u + v)**2\n\n# Execute backward pass\nw_grad = t.gradient(f, w).numpy()\nx_grad = t.gradient(f, x).numpy()\ny_grad = t.gradient(f, y).numpy()\nz_grad = t.gradient(f, z).numpy()\n\nprint(f'df/dw at {w.numpy()}, {x.numpy()}, {y.numpy()}, '\n      f'{z.numpy()} is {w_grad}')\nprint(f'df/dx at {w.numpy()}, {x.numpy()}, {y.numpy()}, '\n      f'{z.numpy()} is {x_grad}')\nprint(f'df/dy at {w.numpy()}, {x.numpy()}, {y.numpy()}, '\n      f'{z.numpy()} is {y_grad}')\nprint(f'df/dz at {w.numpy()}, {x.numpy()}, {y.numpy()}, '\n      f'{z.numpy()} is {z_grad}')"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "df/dw at [-1.], [0.], [-2.], [1.] is [-4096.]\ndf/dx at [-1.], [0.], [-2.], [1.] is [-4096.]\ndf/dy at [-1.], [0.], [-2.], [1.] is [-4096.]\ndf/dz at [-1.], [0.], [-2.], [1.] is [-4096.]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Tất cả những gì chúng tôi đã làm ở trên có thể được thực hiện tự động\nbằng cách gọi f.backwards() ."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "hessia-nhu-voi-phep-tinh-bien-don-le-no-rat-huu-ich-de-xem-xet-cac-dan-xuat-bac-cao-hon-de-co-duoc-mot-xu-ly-ve-cach-chung-ta-co-the-co-duoc-mot-xap-xi-tot-hon-voi-mot-ham-hon-la-su-dung-gradient-mot-minh",
+      "text": "18.4.6. Hessia Như với phép tính biến đơn lẻ, nó rất hữu ích để xem xét các dẫn xuất bậc cao hơn để có được một xử lý về cách chúng ta có thể có được một xấp xỉ tốt hơn với một hàm hơn là sử dụng gradient một mình."
+    },
+    {
+      "type": "paragraph",
+      "text": "Có một vấn đề ngay lập tức mà người ta gặp phải khi làm việc với các dẫn\nxuất bậc cao hơn của các hàm của một số biến, và đó là có một số lượng\nlớn trong số chúng. Nếu chúng ta có một hàm \\(f(x_1, \\ldots, x_n)\\) của \\(n\\) biến, thì chúng ta có thể lấy \\(n^{2}\\) nhiều dẫn xuất\nthứ hai, cụ thể là cho bất kỳ sự lựa chọn nào của \\(i\\) và \\(j\\) :"
+    },
+    {
+      "type": "math",
+      "latex": "(18.4.25)¶\\[\\frac{d^2f}{dx_idx_j} = \\frac{d}{dx_i}\\left(\\frac{d}{dx_j}f\\right).\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Điều này theo truyền thống được lắp ráp thành một ma trận gọi là Hessian :"
+    },
+    {
+      "type": "math",
+      "latex": "(18.4.26)¶\\[\\begin{split}\\mathbf{H}_f = \\begin{bmatrix} \\frac{d^2f}{dx_1dx_1} & \\cdots & \\frac{d^2f}{dx_1dx_n} \\\\ \\vdots & \\ddots & \\vdots \\\\ \\frac{d^2f}{dx_ndx_1} & \\cdots & \\frac{d^2f}{dx_ndx_n} \\\\ \\end{bmatrix}.\\end{split}\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Không phải mọi mục nhập của ma trận này đều độc lập. Thật vậy, chúng ta\ncó thể chỉ ra rằng miễn là cả hai * hỗn hợp* (phái sinh một phần liên\nquan đến nhiều biến) tồn tại và liên tục, chúng ta có thể nói rằng đối\nvới bất kỳ \\(i\\) , và \\(j\\) ,"
+    },
+    {
+      "type": "math",
+      "latex": "(18.4.27)¶\\[\\frac{d^2f}{dx_idx_j} = \\frac{d^2f}{dx_jdx_i}.\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Điều này theo sau bằng cách xem xét đầu tiên perturbing một chức năng\ntheo hướng \\(x_i\\) , và sau đó xáo trộn nó trong \\(x_j\\) và sau\nđó so sánh kết quả của nó với những gì xảy ra nếu chúng ta perturb trước \\(x_j\\) và sau đó \\(x_i\\) , với kiến thức rằng cả hai đơn đặt\nhàng này dẫn đến cùng một thay đổi cuối cùng trong sản lượng của \\(f\\) ."
+    },
+    {
+      "type": "paragraph",
+      "text": "Như với các biến đơn lẻ, chúng ta có thể sử dụng các dẫn xuất này để\nhiểu rõ hơn về cách hàm hoạt động gần một điểm. Đặc biệt, chúng ta có\nthể sử dụng nó để tìm bậc hai phù hợp nhất gần một điểm \\(\\mathbf{x}_0\\) , như chúng ta đã thấy trong một biến duy nhất."
+    },
+    {
+      "type": "paragraph",
+      "text": "Hãy để chúng tôi xem một ví dụ. Giả sử rằng \\(f(x_1, x_2) = a + b_1x_1 + b_2x_2 + c_{11}x_1^{2} + c_{12}x_1x_2 + c_{22}x_2^{2}\\) .\nĐây là dạng chung cho một bậc hai trong hai biến. Nếu chúng ta nhìn vào\ngiá trị của hàm, gradient của nó và Hessian (18.4.26) của\nnó, tất cả tại điểm zero:"
+    },
+    {
+      "type": "math",
+      "latex": "(18.4.28)¶\\[\\begin{split}\\begin{aligned}\nf(0,0) & = a, \\\\\n\\nabla f (0,0) & = \\begin{bmatrix}b_1 \\\\ b_2\\end{bmatrix}, \\\\\n\\mathbf{H} f (0,0) & = \\begin{bmatrix}2 c_{11} & c_{12} \\\\ c_{12} & 2c_{22}\\end{bmatrix},\n\\end{aligned}\\end{split}\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "we can get our original nguyên polynomial đa thức back by saying nói"
+    },
+    {
+      "type": "math",
+      "latex": "(18.4.29)¶\\[f(\\mathbf{x}) = f(0) + \\nabla f (0) \\cdot \\mathbf{x} + \\frac{1}{2}\\mathbf{x}^\\top \\mathbf{H} f (0) \\mathbf{x}.\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Nói chung, nếu chúng ta tính toán mở rộng này bất kỳ điểm \\(\\mathbf{x}_0\\) , chúng ta thấy rằng"
+    },
+    {
+      "type": "math",
+      "latex": "(18.4.30)¶\\[f(\\mathbf{x}) = f(\\mathbf{x}_0) + \\nabla f (\\mathbf{x}_0) \\cdot (\\mathbf{x}-\\mathbf{x}_0) + \\frac{1}{2}(\\mathbf{x}-\\mathbf{x}_0)^\\top \\mathbf{H} f (\\mathbf{x}_0) (\\mathbf{x}-\\mathbf{x}_0).\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Điều này hoạt động cho bất kỳ đầu vào chiều nào và cung cấp bậc hai xấp\nxỉ tốt nhất cho bất kỳ hàm nào tại một điểm. Để đưa ra một ví dụ, chúng\nta hãy vẽ hàm"
+    },
+    {
+      "type": "math",
+      "latex": "(18.4.31)¶\\[f(x, y) = xe^{-x^2-y^2}.\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "One can compute that the gradient and Hessian are"
+    },
+    {
+      "type": "math",
+      "latex": "(18.4.32)¶\\[\\begin{split}\\nabla f(x, y) = e^{-x^2-y^2}\\begin{pmatrix}1-2x^2 \\\\ -2xy\\end{pmatrix} \\; \\text{and} \\; \\mathbf{H}f(x, y) = e^{-x^2-y^2}\\begin{pmatrix} 4x^3 - 6x & 4x^2y - 2y \\\\ 4x^2y-2y &4xy^2-2x\\end{pmatrix}.\\end{split}\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Và do đó, với một đại số nhỏ, thấy rằng bậc hai xấp xỉ tại \\([-1,0]^\\top\\) là"
+    },
+    {
+      "type": "math",
+      "latex": "(18.4.33)¶\\[f(x, y) \\approx e^{-1}\\left(-1 - (x+1) +(x+1)^2+y^2\\right).\\]"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "# Construct grid and compute function\nx, y = np.meshgrid(np.linspace(-2, 2, 101),\n                   np.linspace(-2, 2, 101), indexing='ij')\nz = x*np.exp(- x**2 - y**2)\n\n# Compute approximating quadratic with gradient and Hessian at (1, 0)\nw = np.exp(-1)*(-1 - (x + 1) + (x + 1)**2 + y**2)\n\n# Plot function\nax = d2l.plt.figure().add_subplot(111, projection='3d')\nax.plot_wireframe(x.asnumpy(), y.asnumpy(), z.asnumpy(),\n                  **{'rstride': 10, 'cstride': 10})\nax.plot_wireframe(x.asnumpy(), y.asnumpy(), w.asnumpy(),\n                  **{'rstride': 10, 'cstride': 10}, color='purple')\nd2l.plt.xlabel('x')\nd2l.plt.ylabel('y')\nd2l.set_figsize()\nax.set_xlim(-2, 2)\nax.set_ylim(-2, 2)\nax.set_zlim(-1, 1)\nax.dist = 12"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_multivariable-calculus_bf678a_63_0.svg",
+      "local_path": "_images/output_multivariable-calculus_bf678a_63_0.svg",
+      "alt": "../_images/output_multivariable-calculus_bf678a_63_0.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "# Construct grid and compute function\nx, y = torch.meshgrid(torch.linspace(-2, 2, 101),\n                   torch.linspace(-2, 2, 101))\n\nz = x*torch.exp(- x**2 - y**2)\n\n# Compute approximating quadratic with gradient and Hessian at (1, 0)\nw = torch.exp(torch.tensor([-1.]))*(-1 - (x + 1) + 2 * (x + 1)**2 + 2 * y**2)\n\n# Plot function\nax = d2l.plt.figure().add_subplot(111, projection='3d')\nax.plot_wireframe(x.numpy(), y.numpy(), z.numpy(),\n                  **{'rstride': 10, 'cstride': 10})\nax.plot_wireframe(x.numpy(), y.numpy(), w.numpy(),\n                  **{'rstride': 10, 'cstride': 10}, color='purple')\nd2l.plt.xlabel('x')\nd2l.plt.ylabel('y')\nd2l.set_figsize()\nax.set_xlim(-2, 2)\nax.set_ylim(-2, 2)\nax.set_zlim(-1, 1)\nax.dist = 12"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "/home/d2l-worker/miniconda3/envs/d2l-vi-release-1/lib/python3.8/site-packages/torch/functional.py:568: UserWarning: torch.meshgrid: in an upcoming release, it will be required to pass the indexing argument. (Triggered internally at  ../aten/src/ATen/native/TensorShape.cpp:2228.)\n  return _VF.meshgrid(tensors, **kwargs)  # type: ignore[attr-defined]"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_multivariable-calculus_bf678a_66_1.svg",
+      "local_path": "_images/output_multivariable-calculus_bf678a_66_1.svg",
+      "alt": "../_images/output_multivariable-calculus_bf678a_66_1.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "# Construct grid and compute function\nx, y = tf.meshgrid(tf.linspace(-2., 2., 101),\n                   tf.linspace(-2., 2., 101))\n\nz = x*tf.exp(- x**2 - y**2)\n\n# Compute approximating quadratic with gradient and Hessian at (1, 0)\nw = tf.exp(tf.constant([-1.]))*(-1 - (x + 1) + 2 * (x + 1)**2 + 2 * y**2)\n\n# Plot function\nax = d2l.plt.figure().add_subplot(111, projection='3d')\nax.plot_wireframe(x.numpy(), y.numpy(), z.numpy(),\n                  **{'rstride': 10, 'cstride': 10})\nax.plot_wireframe(x.numpy(), y.numpy(), w.numpy(),\n                  **{'rstride': 10, 'cstride': 10}, color='purple')\nd2l.plt.xlabel('x')\nd2l.plt.ylabel('y')\nd2l.set_figsize()\nax.set_xlim(-2, 2)\nax.set_ylim(-2, 2)\nax.set_zlim(-1, 1)\nax.dist = 12"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_multivariable-calculus_bf678a_69_0.svg",
+      "local_path": "_images/output_multivariable-calculus_bf678a_69_0.svg",
+      "alt": "../_images/output_multivariable-calculus_bf678a_69_0.svg"
+    },
+    {
+      "type": "paragraph",
+      "text": "Điều này tạo thành cơ sở cho Thuật toán Newton được thảo luận trong Section 11.3 , nơi chúng tôi thực hiện tối ưu hóa số lặp đi lặp lại\nviệc tìm kiếm bậc hai phù hợp nhất, và sau đó chính xác giảm thiểu bậc\nhai đó."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "a-little-matrix-calculus-dan-xuat-cua-cac-ham-lien-quan-den-ma-tran-hoa-ra-la-dac-biet-tot-dep-phan-nay-co-the-tro-nen-nang-ne-ve-mat-cong-thuc-vi-vay-co-the-bi-bo-qua-trong-lan-doc-dau-tien-nhung-rat-huu-ich-khi-biet-cac-dan-xuat-cua-cac-ham-lien-quan-den-hoat-dong-ma-tran-pho-bien-thuong-sach-hon-nhieu-so-voi-nguoi-ta-co-the-du-doan-ban-dau-dac-biet-la-cho-cac-hoat-dong-ma-tran-trung-tam-nhu-the-nao-doi-voi-cac-ung-dung-hoc-sau",
+      "text": "18.4.7. A Little Matrix Calculus Dẫn xuất của các hàm liên quan đến ma trận hóa ra là đặc biệt tốt đẹp. Phần này có thể trở nên nặng nề về mặt công thức, vì vậy có thể bị bỏ qua trong lần đọc đầu tiên, nhưng rất hữu ích khi biết các dẫn xuất của các hàm liên quan đến hoạt động ma trận phổ biến thường sạch hơn nhiều so với người ta có thể dự đoán ban đầu, đặc biệt là cho các hoạt động ma trận trung tâm như thế nào đối với các ứng dụng học sâu."
+    },
+    {
+      "type": "paragraph",
+      "text": "Hãy để chúng tôi bắt đầu với một ví dụ. Giả sử rằng chúng ta có một số\nvector cột cố định \\(\\boldsymbol{\\beta}\\) , và chúng ta muốn lấy hàm\nsản phẩm \\(f(\\mathbf{x}) = \\boldsymbol{\\beta}^\\top\\mathbf{x}\\) , và\nhiểu làm thế nào các sản phẩm chấm thay đổi khi chúng ta thay đổi \\(\\mathbf{x}\\) ."
+    },
+    {
+      "type": "paragraph",
+      "text": "Một chút ký hiệu sẽ hữu ích khi làm việc với các dẫn xuất ma trận trong\nML được gọi là đạo hàm ma trận bố trí mẫu số nơi chúng ta lắp ráp các\ndẫn xuất một phần của chúng ta vào hình dạng của bất kỳ vectơ, ma trận\nhoặc tensor nào nằm trong mẫu số của vi phân. Trong trường hợp này,\nchúng tôi sẽ viết"
+    },
+    {
+      "type": "math",
+      "latex": "(18.4.34)¶\\[\\begin{split}\\frac{df}{d\\mathbf{x}} = \\begin{bmatrix}\n\\frac{df}{dx_1} \\\\\n\\vdots \\\\\n\\frac{df}{dx_n}\n\\end{bmatrix},\\end{split}\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "nơi chúng tôi phù hợp với hình dạng của vector cột \\(\\mathbf{x}\\) ."
+    },
+    {
+      "type": "paragraph",
+      "text": "Nếu chúng ta viết ra chức năng của chúng ta vào các thành phần thì đây\nlà"
+    },
+    {
+      "type": "math",
+      "latex": "(18.4.35)¶\\[f(\\mathbf{x}) = \\sum_{i = 1}^{n} \\beta_ix_i = \\beta_1x_1 + \\cdots + \\beta_nx_n.\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Nếu bây giờ chúng ta lấy phái sinh một phần liên quan đến việc nói \\(\\beta_1\\) , lưu ý rằng mọi thứ đều bằng không nhưng thuật ngữ đầu\ntiên, chỉ \\(x_1\\) nhân với \\(\\beta_1\\) , vì vậy chúng tôi có được\nđiều đó"
+    },
+    {
+      "type": "math",
+      "latex": "(18.4.36)¶\\[\\frac{df}{dx_1} = \\beta_1,\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "or more generally nói chung that"
+    },
+    {
+      "type": "math",
+      "latex": "(18.4.37)¶\\[\\frac{df}{dx_i} = \\beta_i.\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Bây giờ chúng ta có thể lắp ráp lại this into a matrix ma trận to see"
+    },
+    {
+      "type": "math",
+      "latex": "(18.4.38)¶\\[\\begin{split}\\frac{df}{d\\mathbf{x}} = \\begin{bmatrix}\n\\frac{df}{dx_1} \\\\\n\\vdots \\\\\n\\frac{df}{dx_n}\n\\end{bmatrix} = \\begin{bmatrix}\n\\beta_1 \\\\\n\\vdots \\\\\n\\beta_n\n\\end{bmatrix} = \\boldsymbol{\\beta}.\\end{split}\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Điều này minh họa một vài yếu tố về phép tính ma trận mà chúng ta thường\nsẽ phản ứng trong suốt phần này:"
+    },
+    {
+      "type": "list",
+      "ordered": false,
+      "items": [
+        "Đầu tiên, Các tính toán sẽ nhận được khá tham gia.",
+        "Thứ hai, Kết quả cuối cùng sạch hơn nhiều so với quá trình trung gian\nvà sẽ luôn trông giống với trường hợp biến đơn lẻ. Trong trường hợp\nnày, lưu ý rằng \\(\\frac{d}{dx}(bx) = b\\) và \\(\\frac{d}{d\\mathbf{x}} (\\boldsymbol{\\beta}^\\top\\mathbf{x}) = \\boldsymbol{\\beta}\\) đều giống nhau.",
+        "Thứ ba, transposes thường có thể xuất hiện dường như từ hư không. Lý\ndo cốt lõi cho điều này là quy ước mà chúng ta khớp với hình dạng của\nmẫu số, do đó khi chúng ta nhân ma trận, chúng ta sẽ cần phải lấy\ntransposes để khớp trở lại hình dạng của thuật ngữ gốc."
+      ]
+    },
+    {
+      "type": "paragraph",
+      "text": "Để tiếp tục xây dựng trực giác, chúng ta hãy thử một tính toán khó khăn\nhơn một chút. Giả sử rằng chúng ta có một vector cột \\(\\mathbf{x}\\) ,\nvà một ma trận vuông \\(A\\) và chúng tôi muốn tính toán"
+    },
+    {
+      "type": "math",
+      "latex": "(18.4.39)¶\\[\\frac{d}{d\\mathbf{x}}(\\mathbf{x}^\\top A \\mathbf{x}).\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Để hướng tới dễ thao tác ký hiệu hơn, chúng ta hãy xem xét vấn đề này\nbằng ký hiệu Einstein. Trong trường hợp này chúng ta có thể viết hàm như"
+    },
+    {
+      "type": "math",
+      "latex": "(18.4.40)¶\\[\\mathbf{x}^\\top A \\mathbf{x} = x_ia_{ij}x_j.\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Để tính toán đạo hàm của chúng ta, chúng ta cần phải hiểu cho mỗi \\(k\\) , giá trị của"
+    },
+    {
+      "type": "math",
+      "latex": "(18.4.41)¶\\[\\frac{d}{dx_k}(\\mathbf{x}^\\top A \\mathbf{x}) = \\frac{d}{dx_k}x_ia_{ij}x_j.\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Theo quy tắc sản phẩm, đây là"
+    },
+    {
+      "type": "math",
+      "latex": "(18.4.42)¶\\[\\frac{d}{dx_k}x_ia_{ij}x_j = \\frac{dx_i}{dx_k}a_{ij}x_j + x_ia_{ij}\\frac{dx_j}{dx_k}.\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Đối với một thuật ngữ như \\(\\frac{dx_i}{dx_k}\\) , không khó để thấy\nrằng đây là một khi \\(i=k\\) và không khác. Điều này có nghĩa là mọi\nthuật ngữ mà \\(i\\) và \\(k\\) khác nhau biến mất so với số tiền\nnày, vì vậy các thuật ngữ duy nhất còn lại trong số tiền đầu tiên đó là\nnhững điều khoản mà \\(i=k\\) . Lý do tương tự giữ cho nhiệm kỳ thứ hai\nmà chúng ta cần \\(j=k\\) . Điều này cho"
+    },
+    {
+      "type": "math",
+      "latex": "(18.4.43)¶\\[\\frac{d}{dx_k}x_ia_{ij}x_j = a_{kj}x_j + x_ia_{ik}.\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Bây giờ, tên của các chỉ số trong ký hiệu Einstein là trọng tài - thực\ntế là \\(i\\) và \\(j\\) khác nhau là không quan trọng đối với tính\ntoán này vào thời điểm này, vì vậy chúng ta có thể lập chỉ mục lại để cả\nhai đều sử dụng \\(i\\) để thấy rằng"
+    },
+    {
+      "type": "math",
+      "latex": "(18.4.44)¶\\[\\frac{d}{dx_k}x_ia_{ij}x_j = a_{ki}x_i + x_ia_{ik} = (a_{ki} + a_{ik})x_i.\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Bây giờ, đây là nơi chúng ta bắt đầu cần một số thực hành để đi xa hơn.\nChúng ta hãy thử và xác định kết quả này về hoạt động ma trận. \\(a_{ki} + a_{ik}\\) là thành phần thứ \\(k, i\\) của \\(\\mathbf{A} + \\mathbf{A}^\\top\\) . Điều này cho"
+    },
+    {
+      "type": "math",
+      "latex": "(18.4.45)¶\\[\\frac{d}{dx_k}x_ia_{ij}x_j = [\\mathbf{A} + \\mathbf{A}^\\top]_{ki}x_i.\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Tương tự, thuật ngữ này bây giờ là tích của ma trận \\(\\mathbf{A} + \\mathbf{A}^\\top\\) bởi vector \\(\\mathbf{x}\\) , vì\nvậy chúng ta thấy rằng"
+    },
+    {
+      "type": "math",
+      "latex": "(18.4.46)¶\\[\\left[\\frac{d}{d\\mathbf{x}}(\\mathbf{x}^\\top A \\mathbf{x})\\right]_k = \\frac{d}{dx_k}x_ia_{ij}x_j = [(\\mathbf{A} + \\mathbf{A}^\\top)\\mathbf{x}]_k.\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Do đó, chúng ta thấy rằng mục \\(k\\) -th của đạo hàm mong muốn từ (18.4.39) chỉ là mục \\(k\\) -th của vectơ ở bên phải,\nvà do đó hai là như nhau. Do đó sản lượng"
+    },
+    {
+      "type": "math",
+      "latex": "(18.4.47)¶\\[\\frac{d}{d\\mathbf{x}}(\\mathbf{x}^\\top A \\mathbf{x}) = (\\mathbf{A} + \\mathbf{A}^\\top)\\mathbf{x}.\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Điều này đòi hỏi nhiều công việc hơn đáng kể so với công việc cuối cùng\ncủa chúng tôi, nhưng kết quả cuối cùng là nhỏ. Hơn thế nữa, hãy xem xét\ntính toán sau cho các dẫn xuất biến đơn truyền thống:"
+    },
+    {
+      "type": "math",
+      "latex": "(18.4.48)¶\\[\\frac{d}{dx}(xax) = \\frac{dx}{dx}ax + xa\\frac{dx}{dx} = (a+a)x.\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Tương đương \\(\\frac{d}{dx}(ax^2) = 2ax = (a+a)x\\) . Một lần nữa,\nchúng tôi nhận được một kết quả trông khá giống như kết quả biến duy\nnhất nhưng với một transpose ném vào."
+    },
+    {
+      "type": "paragraph",
+      "text": "Tại thời điểm này, mô hình nên trông khá đáng ngờ, vì vậy chúng ta hãy\ncố gắng tìm ra lý do tại sao. Khi chúng ta lấy các dẫn xuất ma trận như\nthế này, trước tiên chúng ta giả định rằng biểu thức chúng ta nhận được\nsẽ là một biểu thức ma trận khác: một biểu thức chúng ta có thể viết nó\nvề sản phẩm và tổng của ma trận và các transposes của chúng. Nếu một\nbiểu thức như vậy tồn tại, nó sẽ cần phải đúng đối với tất cả các ma\ntrận. Đặc biệt, nó sẽ cần phải đúng với ma trận \\(1 \\times 1\\) ,\ntrong trường hợp đó sản phẩm ma trận chỉ là tích của các số, tổng ma\ntrận chỉ là tổng, và transpose không làm gì cả! Nói cách khác, bất cứ\nbiểu thức nào chúng ta nhận được phải khớp với biểu thức biến đơn.\nĐiều này có nghĩa là, với một số thực hành, người ta thường có thể đoán\ncác dẫn xuất ma trận chỉ bằng cách biết biểu thức biến đơn liên quan\nphải trông như thế nào!"
+    },
+    {
+      "type": "paragraph",
+      "text": "Hãy để chúng tôi thử điều này ra. Giả sử rằng \\(\\mathbf{X}\\) là một\nma trận \\(n \\times m\\) , \\(\\mathbf{U}\\) là một \\(n \\times r\\) và \\(\\mathbf{V}\\) là một \\(r \\times m\\) . Let us try to\ncomputetính toán"
+    },
+    {
+      "type": "math",
+      "latex": "(18.4.49)¶\\[\\frac{d}{d\\mathbf{V}} \\|\\mathbf{X} - \\mathbf{U}\\mathbf{V}\\|_2^{2} = \\;?\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Tính toán này rất quan trọng trong một khu vực gọi là tính toán ma trận.\nĐối với chúng tôi, tuy nhiên, nó chỉ là một dẫn xuất để tính toán. Hãy\nđể chúng tôi cố gắng để hình ảnh những gì điều này sẽ là cho \\(1\\times1\\) ma trận. Trong trường hợp đó, chúng tôi nhận được biểu\nthức"
+    },
+    {
+      "type": "math",
+      "latex": "(18.4.50)¶\\[\\frac{d}{dv} (x-uv)^{2}= -2(x-uv)u,\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "ở đâu, đạo hàm là khá chuẩn. Nếu chúng ta cố gắng chuyển đổi này trở lại\nthành một biểu thức ma trận, chúng ta nhận được"
+    },
+    {
+      "type": "math",
+      "latex": "(18.4.51)¶\\[\\frac{d}{d\\mathbf{V}} \\|\\mathbf{X} - \\mathbf{U}\\mathbf{V}\\|_2^{2}= -2(\\mathbf{X} - \\mathbf{U}\\mathbf{V})\\mathbf{U}.\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Tuy nhiên, nếu chúng ta nhìn vào điều này nó không hoàn toàn hoạt động.\nNhớ lại rằng \\(\\mathbf{X}\\) là \\(n \\times m\\) , như là \\(\\mathbf{U}\\mathbf{V}\\) , vì vậy ma trận \\(2(\\mathbf{X} - \\mathbf{U}\\mathbf{V})\\) là \\(n \\times m\\) . Mặt\nkhác, \\(\\mathbf{U}\\) là \\(n \\times r\\) và chúng ta không thể\nnhân \\(n \\times m\\) và ma trận \\(n \\times r\\) vì kích thước\nkhông khớp!"
+    },
+    {
+      "type": "paragraph",
+      "text": "Chúng tôi muốn nhận được \\(\\frac{d}{d\\mathbf{V}}\\) , có hình dạng\ntương tự như \\(\\mathbf{V}\\) , đó là \\(r \\times m\\) . Vì vậy, bằng\ncách nào đó chúng ta cần phải có một ma trận \\(n \\times m\\) và ma\ntrận \\(n \\times r\\) , nhân chúng lại với nhau (có lẽ với một số\ntransposes) để có được một \\(r \\times m\\) . Chúng ta có thể làm điều\nnày bằng cách nhân \\(U^\\top\\) bởi \\((\\mathbf{X} - \\mathbf{U}\\mathbf{V})\\) . Như vậy, chúng ta có thể\nđoán được giải pháp cho (18.4.49) là"
+    },
+    {
+      "type": "math",
+      "latex": "(18.4.52)¶\\[\\frac{d}{d\\mathbf{V}} \\|\\mathbf{X} - \\mathbf{U}\\mathbf{V}\\|_2^{2}= -2\\mathbf{U}^\\top(\\mathbf{X} - \\mathbf{U}\\mathbf{V}).\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Để chứng minh rằng điều này hoạt động, chúng tôi sẽ được remiss để không\ncung cấp một tính toán chi tiết. Nếu chúng ta đã tin rằng quy tắc ngón\ntay cái này hoạt động, hãy bỏ qua quá khứ nguồn gốc này. Để tính toán"
+    },
+    {
+      "type": "math",
+      "latex": "(18.4.53)¶\\[\\frac{d}{d\\mathbf{V}} \\|\\mathbf{X} - \\mathbf{U}\\mathbf{V}\\|_2^2,\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "chúng ta phải tìm cho mỗi \\(a\\) , và \\(b\\)"
+    },
+    {
+      "type": "math",
+      "latex": "(18.4.54)¶\\[\\frac{d}{dv_{ab}} \\|\\mathbf{X} - \\mathbf{U}\\mathbf{V}\\|_2^{2}= \\frac{d}{dv_{ab}} \\sum_{i, j}\\left(x_{ij} - \\sum_k u_{ik}v_{kj}\\right)^2.\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Nhắc lại rằng tất cả các mục của \\(\\mathbf{X}\\) và \\(\\mathbf{U}\\) là hằng số như xa như \\(\\frac{d}{dv_{ab}}\\) có\nliên quan, chúng tôi có thể đẩy dẫn xuất bên trong tổng, và áp dụng quy\ntắc chuỗi cho hình vuông để có được"
+    },
+    {
+      "type": "math",
+      "latex": "(18.4.55)¶\\[\\frac{d}{dv_{ab}} \\|\\mathbf{X} - \\mathbf{U}\\mathbf{V}\\|_2^{2}= \\sum_{i, j}2\\left(x_{ij} - \\sum_k u_{ik}v_{kj}\\right)\\left(-\\sum_k u_{ik}\\frac{dv_{kj}}{dv_{ab}} \\right).\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Như trong nguồn gốc trước đó, chúng ta có thể lưu ý rằng \\(\\frac{dv_{kj}}{dv_{ab}}\\) chỉ không phải bằng không nếu \\(k=a\\) và \\(j=b\\) . Nếu một trong những điều kiện đó không giữ,\nthuật ngữ trong tổng là 0 và chúng tôi có thể tự do loại bỏ nó. Chúng\ntôi thấy rằng"
+    },
+    {
+      "type": "math",
+      "latex": "(18.4.56)¶\\[\\frac{d}{dv_{ab}} \\|\\mathbf{X} - \\mathbf{U}\\mathbf{V}\\|_2^{2}= -2\\sum_{i}\\left(x_{ib} - \\sum_k u_{ik}v_{kb}\\right)u_{ia}.\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Một sự tinh tế quan trọng ở đây là yêu cầu \\(k=a\\) không xảy ra bên\ntrong tổng trong vì \\(k\\) đó là một biến giả mà chúng ta đang tóm\ntắt bên trong thuật ngữ bên trong. Đối với một ví dụ sạch hơn về mặt\ncông thức, hãy xem xét lý do tại sao"
+    },
+    {
+      "type": "math",
+      "latex": "(18.4.57)¶\\[\\frac{d}{dx_1} \\left(\\sum_i x_i \\right)^{2}= 2\\left(\\sum_i x_i \\right).\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Từ thời điểm này, chúng ta có thể bắt đầu xác định các thành phần của\ntổng. Đầu tiên,"
+    },
+    {
+      "type": "math",
+      "latex": "(18.4.58)¶\\[\\sum_k u_{ik}v_{kb} = [\\mathbf{U}\\mathbf{V}]_{ib}.\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Vì vậy, toàn bộ biểu thức ở bên trong tổng là"
+    },
+    {
+      "type": "math",
+      "latex": "(18.4.59)¶\\[x_{ib} - \\sum_k u_{ik}v_{kb} = [\\mathbf{X}-\\mathbf{U}\\mathbf{V}]_{ib}.\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Điều này có nghĩa là bây giờ chúng ta có thể viết đạo hàm của chúng tôi\nnhư"
+    },
+    {
+      "type": "math",
+      "latex": "(18.4.60)¶\\[\\frac{d}{dv_{ab}} \\|\\mathbf{X} - \\mathbf{U}\\mathbf{V}\\|_2^{2}= -2\\sum_{i}[\\mathbf{X}-\\mathbf{U}\\mathbf{V}]_{ib}u_{ia}.\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Chúng ta muốn điều này trông giống như phần tử \\(a, b\\) của ma trận\nđể chúng ta có thể sử dụng kỹ thuật như trong ví dụ trước để đến một\nbiểu thức ma trận, có nghĩa là chúng ta cần trao đổi thứ tự của các chỉ\nsố trên \\(u_{ia}\\) . Nếu chúng ta nhận thấy rằng \\(u_{ia} = [\\mathbf{U}^\\top]_{ai}\\) , sau đó chúng ta có thể viết"
+    },
+    {
+      "type": "math",
+      "latex": "(18.4.61)¶\\[\\frac{d}{dv_{ab}} \\|\\mathbf{X} - \\mathbf{U}\\mathbf{V}\\|_2^{2}= -2\\sum_{i} [\\mathbf{U}^\\top]_{ai}[\\mathbf{X}-\\mathbf{U}\\mathbf{V}]_{ib}.\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Đây là một sản phẩm ma trận, và do đó chúng ta có thể kết luận rằng"
+    },
+    {
+      "type": "math",
+      "latex": "(18.4.62)¶\\[\\frac{d}{dv_{ab}} \\|\\mathbf{X} - \\mathbf{U}\\mathbf{V}\\|_2^{2}= -2[\\mathbf{U}^\\top(\\mathbf{X}-\\mathbf{U}\\mathbf{V})]_{ab}.\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "và do đó chúng tôi có thể viết giải pháp cho (18.4.49)"
+    },
+    {
+      "type": "math",
+      "latex": "(18.4.63)¶\\[\\frac{d}{d\\mathbf{V}} \\|\\mathbf{X} - \\mathbf{U}\\mathbf{V}\\|_2^{2}= -2\\mathbf{U}^\\top(\\mathbf{X} - \\mathbf{U}\\mathbf{V}).\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Điều này phù hợp với giải pháp mà chúng tôi đoán ở trên!"
+    },
+    {
+      "type": "paragraph",
+      "text": "Nó là hợp lý để hỏi tại thời điểm này, “Tại sao tôi không thể chỉ viết\nra các phiên bản ma trận của tất cả các quy tắc giải tích tôi đã học\nđược? Rõ ràng đây vẫn là cơ khí. Tại sao chúng ta không chỉ vượt qua nó\nvới! Và thực sự có những quy tắc như vậy và [Petersen et al., 2008] cung cấp một bản tóm tắt tuyệt vời.\nTuy nhiên, do có rất nhiều cách các phép toán ma trận có thể được kết\nhợp so với các giá trị đơn lẻ, có nhiều quy tắc đạo hàm ma trận nhiều\nhơn các quy tắc biến đơn lẻ. Nó thường là trường hợp tốt nhất để làm\nviệc với các chỉ số, hoặc để nó lên đến sự khác biệt tự động khi thích\nhợp."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tom-tat",
+      "text": "18.4.8. Tóm tắt"
+    },
+    {
+      "type": "list",
+      "ordered": false,
+      "items": [
+        "Trong các chiều cao hơn, chúng ta có thể định nghĩa gradient phục vụ\ncùng mục đích như các dẫn xuất trong một chiều. Những điều này cho\nphép chúng ta xem hàm đa biến thay đổi như thế nào khi chúng ta thực\nhiện một thay đổi nhỏ tùy ý đối với các đầu vào.",
+        "Thuật toán lan truyền ngược có thể thấy là một phương pháp tổ chức\nquy tắc chuỗi đa biến để cho phép tính toán hiệu quả của nhiều dẫn\nxuất từng phần.",
+        "Phép tính ma trận cho phép chúng ta viết các dẫn xuất của các biểu\nthức ma trận theo những cách súc tích."
+      ]
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bai-tap-1-cho-mot-vector-cot-boldsymbol-beta-tinh-toan-cac-dan-xuat-cua-ca-f-mathbf-x-boldsymbol-beta-top-mathbf-x-va-g-mathbf-x-mathbf-x-top-boldsymbol-beta-tai-sao-ban-nhan-duoc-cau-tra-loi-tuong-tu-2-hay-de-mathbf-v-la-mot-vector-kich-thuoc-n-frac-partial-partial-mathbf-v-mathbf-v-2-la-cai-gi-3-hay-de-l-x-y-log-e-x-e-y-tinh-toan-gradient-tong-cua-cac-thanh-phan-cua-gradient-la-gi-4-hay-de-f-x-y-x-2y-xy-2-cho-thay-diem-quan-trong-duy-nhat-la-0-0-bang-cach-xem-xet-f-x-x-xac-dinh-xem-0-0-co-phai-la-toi-da-toi-thieu-hay-khong-gia-su-rang-chung-ta-dang-giam-thieu-mot-ham-f-mathbf-x-g-mathbf-x-h-mathbf-x-lam-the-nao-chung-ta-co-the-giai-thich-hinh-hoc-tinh-trang-cua-nabla-f-0-ve-g-va-h",
+      "text": "18.4.9. Bài tập 1. Cho một vector cột \\(\\boldsymbol{\\beta}\\) , tính toán các dẫn xuất của cả \\(f(\\mathbf{x}) = \\boldsymbol{\\beta}^\\top\\mathbf{x}\\) và \\(g(\\mathbf{x}) = \\mathbf{x}^\\top\\boldsymbol{\\beta}\\) . Tại sao bạn nhận được câu trả lời tương tự? 2. Hãy để \\(\\mathbf{v}\\) là một vector kích thước \\(n\\) . \\(\\frac{\\partial}{\\partial\\mathbf{v}}\\|\\mathbf{v}\\|_2\\) là cái gì? 3. Hãy để \\(L(x, y) = \\log(e^x + e^y)\\) . Tính toán gradient. Tổng của các thành phần của gradient là gì? 4. Hãy để \\(f(x, y) = x^2y + xy^2\\) . Cho thấy điểm quan trọng duy nhất là \\((0,0)\\) . Bằng cách xem xét \\(f(x, x)\\) , xác định xem \\((0,0)\\) có phải là tối đa, tối thiểu hay không. Giả sử rằng chúng ta đang giảm thiểu một hàm \\(f(\\mathbf{x}) = g(\\mathbf{x}) + h(\\mathbf{x})\\) . Làm thế nào chúng ta có thể giải thích hình học tình trạng của \\(\\nabla f = 0\\) về \\(g\\) và \\(h\\) ?"
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    }
+  ],
+  "images": [
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_multivariable-calculus_bf678a_15_0.svg",
+      "local_path": "_images/output_multivariable-calculus_bf678a_15_0.svg",
+      "alt": "../_images/output_multivariable-calculus_bf678a_15_0.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_multivariable-calculus_bf678a_18_0.svg",
+      "local_path": "_images/output_multivariable-calculus_bf678a_18_0.svg",
+      "alt": "../_images/output_multivariable-calculus_bf678a_18_0.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_multivariable-calculus_bf678a_21_0.svg",
+      "local_path": "_images/output_multivariable-calculus_bf678a_21_0.svg",
+      "alt": "../_images/output_multivariable-calculus_bf678a_21_0.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/chain-net1.svg",
+      "local_path": "_images/chain-net1.svg",
+      "alt": "../_images/chain-net1.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/chain-net2.svg",
+      "local_path": "_images/chain-net2.svg",
+      "alt": "../_images/chain-net2.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_multivariable-calculus_bf678a_63_0.svg",
+      "local_path": "_images/output_multivariable-calculus_bf678a_63_0.svg",
+      "alt": "../_images/output_multivariable-calculus_bf678a_63_0.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_multivariable-calculus_bf678a_66_1.svg",
+      "local_path": "_images/output_multivariable-calculus_bf678a_66_1.svg",
+      "alt": "../_images/output_multivariable-calculus_bf678a_66_1.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_multivariable-calculus_bf678a_69_0.svg",
+      "local_path": "_images/output_multivariable-calculus_bf678a_69_0.svg",
+      "alt": "../_images/output_multivariable-calculus_bf678a_69_0.svg"
+    }
+  ],
+  "text": "18.4. Tính toán đa năng\nBây giờ chúng ta có một sự hiểu biết khá mạnh mẽ về các dẫn xuất của một\nhàm của một biến duy nhất, chúng ta hãy quay trở lại câu hỏi ban đầu của\nchúng tôi, nơi chúng tôi đang xem xét một chức năng mất của hàng tỷ\ntrọng lượng có khả năng.\n18.4.1. Sự khác biệt chiều cao hơn Điều Section 18.3 nói với chúng ta là nếu chúng ta thay đổi một trong số hàng tỷ trọng này để lại mọi trọng lượng khác cố định, chúng ta biết điều gì sẽ xảy ra! Điều này không có gì khác hơn là một hàm của một biến duy nhất, vì vậy chúng ta có thể viết\nChúng ta sẽ gọi đạo hàm trong một biến trong khi sửa các biến khác là\nđạo hàm * partial * , và chúng ta sẽ sử dụng ký hiệu \\(\\frac{\\partial}{\\partial w_1}\\) cho đạo hàm trong (18.4.1) .\nBây giờ, chúng ta hãy lấy điều này và thay đổi \\(w_2\\) một chút\nthành \\(w_2 + \\epsilon_2\\) :\nChúng tôi đã một lần nữa sử dụng ý tưởng rằng \\(\\epsilon_1\\epsilon_2\\) là một thuật ngữ thứ tự cao hơn mà chúng\ntôi có thể loại bỏ theo cách tương tự chúng tôi có thể loại bỏ \\(\\epsilon^{2}\\) trong phần trước, cùng với những gì chúng tôi đã\nthấy trong (18.4.1) . Bằng cách tiếp tục theo cách này,\nchúng tôi có thể viết rằng\nĐiều này có thể trông giống như một mớ hỗn độn, nhưng chúng ta có thể\nlàm cho điều này quen thuộc hơn bằng cách lưu ý rằng tổng bên phải trông\ngiống hệt như một sản phẩm chấm, vì vậy nếu chúng ta để\nsau đó\nChúng ta sẽ gọi vector \\(\\nabla_{\\mathbf{w}} L\\) là * gradient*\ncủa \\(L\\) .\nPhương trình (18.4.5) đáng để suy ngẫm trong giây lát. Nó\ncó chính xác định dạng mà chúng ta gặp phải trong một chiều, chỉ cần\nchúng ta đã chuyển đổi mọi thứ thành vectơ và các sản phẩm chấm. Nó cho\nphép chúng ta biết khoảng cách chức năng \\(L\\) sẽ thay đổi cho bất\nkỳ nhiễu loạn nào đối với đầu vào. Như chúng ta sẽ thấy trong phần tiếp\ntheo, điều này sẽ cung cấp cho chúng ta một công cụ quan trọng trong\nviệc hiểu về mặt hình học cách chúng ta có thể học bằng cách sử dụng\nthông tin có trong gradient.\nNhưng trước tiên, chúng ta hãy xem xấp xỉ này tại nơi làm việc với một\nví dụ. Giả sử rằng chúng ta đang làm việc với hàm\nNếu chúng ta nhìn vào một điểm như \\((0, \\log(2))\\) , chúng ta thấy\nrằng\nDo đó, nếu chúng ta muốn xấp xỉ \\(f\\) tại \\((\\epsilon_1, \\log(2) + \\epsilon_2)\\) , chúng ta thấy rằng chúng ta\nnên có ví dụ cụ thể là (18.4.5) :\nChúng ta có thể kiểm tra điều này trong mã để xem xấp xỉ tốt như thế\nnào.\n18.4.2. Hình học của Gradient và Gradient Descent Xem xét biểu thức từ (18.4.5) một lần nữa:\nChúng ta hãy giả sử rằng tôi muốn sử dụng điều này để giúp giảm thiểu\nthiệt hại của chúng tôi \\(L\\) . Chúng ta hãy hiểu về mặt hình học\nthuật toán của gradient gốc đầu tiên được mô tả trong Section 2.5 . Những gì chúng tôi sẽ làm là như sau:\nBắt đầu với một sự lựa chọn ngẫu nhiên cho các tham số ban đầu \\(\\mathbf{w}\\) .\nTìm hướng \\(\\mathbf{v}\\) làm cho \\(L\\) giảm nhanh nhất ở \\(\\mathbf{w}\\) .\nThực hiện một bước nhỏ theo hướng đó: \\(\\mathbf{w} \\rightarrow \\mathbf{w} + \\epsilon\\mathbf{v}\\) .\nLặp lại.\nĐiều duy nhất chúng ta không biết chính xác cách làm là tính toán vector \\(\\mathbf{v}\\) trong bước thứ hai. Chúng tôi sẽ gọi một hướng như\nvậy là hướng đi xuống dốc nhất . Sử dụng sự hiểu biết hình học của các\nsản phẩm chấm từ Section 18.1 , chúng ta\nthấy rằng chúng ta có thể viết lại (18.4.5) như\nLưu ý rằng chúng tôi đã thực hiện hướng của chúng tôi để có chiều dài\nmột để thuận tiện và sử dụng \\(\\theta\\) cho góc giữa \\(\\mathbf{v}\\) và \\(\\nabla_{\\mathbf{w}} L(\\mathbf{w})\\) . Nếu\nchúng ta muốn tìm hướng giảm \\(L\\) càng nhanh càng tốt, chúng ta\nmuốn làm cho biểu thức này là tiêu cực nhất có thể. Cách duy nhất mà\nhướng chúng ta chọn đi vào phương trình này là thông qua \\(\\cos(\\theta)\\) , và do đó chúng ta muốn làm cho cosin này là âm\nnhất có thể. Bây giờ, nhắc lại hình dạng của cosin, chúng ta có thể làm\ncho điều này càng âm càng tốt bằng cách tạo \\(\\cos(\\theta) = -1\\) hoặc tương đương làm cho góc giữa gradient và hướng đã chọn của chúng ta\nlà \\(\\pi\\) radian, hoặc tương đương \\(180\\) độ. Cách duy nhất để\nđạt được điều này là đi theo hướng ngược lại chính xác: chọn \\(\\mathbf{v}\\) để chỉ theo hướng ngược lại chính xác với \\(\\nabla_{\\mathbf{w}} L(\\mathbf{w})\\) !\nĐiều này đưa chúng ta đến một trong những khái niệm toán học quan trọng\nnhất trong học máy: hướng của các điểm phong nha dốc nhất theo hướng \\(-\\nabla_{\\mathbf{w}}L(\\mathbf{w})\\) . Do đó thuật toán không chính\nthức của chúng tôi có thể được viết lại như sau.\nBắt đầu với một sự lựa chọn ngẫu nhiên cho các tham số ban đầu \\(\\mathbf{w}\\) .\nTính toán \\(\\nabla_{\\mathbf{w}} L(\\mathbf{w})\\) .\nThực hiện một bước nhỏ theo hướng ngược lại với hướng đó: \\(\\mathbf{w} \\rightarrow \\mathbf{w} - \\epsilon\\nabla_{\\mathbf{w}} L(\\mathbf{w})\\) .\nLặp lại.\nThuật toán cơ bản này đã được nhiều nhà nghiên cứu sửa đổi và điều chỉnh\nnhiều cách, nhưng khái niệm cốt lõi vẫn giữ nguyên trong tất cả chúng.\nSử dụng gradient để tìm hướng làm giảm tổn thất càng nhanh càng tốt và\ncập nhật các tham số để thực hiện một bước theo hướng đó.\n18.4.3. Một lưu ý về tối ưu hóa toán học Trong suốt cuốn sách này, chúng tôi tập trung thẳng vào các kỹ thuật tối ưu hóa số vì lý do thực tế mà tất cả các hàm chúng ta gặp phải trong cài đặt deep learning là quá phức tạp để giảm thiểu rõ ràng.\nTuy nhiên, đó là một bài tập hữu ích để xem xét những gì sự hiểu biết\nhình học mà chúng tôi thu được ở trên cho chúng ta biết về việc tối ưu\nhóa các chức năng trực tiếp.\nGiả sử rằng chúng ta muốn tìm giá trị của \\(\\mathbf{x}_0\\) mà giảm\nthiểu một số chức năng \\(L(\\mathbf{x})\\) . Chúng ta hãy giả sử rằng\nhơn nữa ai đó mang lại cho chúng ta một giá trị và cho chúng ta biết\nrằng đó là giá trị giảm thiểu \\(L\\) . Có bất cứ điều gì chúng ta có\nthể kiểm tra để xem câu trả lời của họ có hợp lý không?\nMột lần nữa xem xét (18.4.5) :\nNếu gradient không phải bằng 0, chúng ta biết rằng chúng ta có thể thực\nhiện một bước theo hướng \\(-\\epsilon \\nabla_{\\mathbf{x}} L(\\mathbf{x}_0)\\) để tìm giá trị \\(L\\) nhỏ hơn. Vì vậy, nếu chúng ta thực sự ở mức tối thiểu, đây\nkhông thể là trường hợp! Chúng ta có thể kết luận rằng nếu \\(\\mathbf{x}_0\\) là mức tối thiểu, thì \\(\\nabla_{\\mathbf{x}} L(\\mathbf{x}_0) = 0\\) . Chúng tôi gọi điểm với \\(\\nabla_{\\mathbf{x}} L(\\mathbf{x}_0) = 0\\) điểm quan trọng .\nĐiều này thật tốt, bởi vì trong một số cài đặt hiếm, chúng ta * có\nthể* rõ ràng tìm thấy tất cả các điểm có gradient bằng 0 và tìm điểm có\ngiá trị nhỏ nhất.\nĐối với một ví dụ cụ thể, hãy xem xét hàm\nHàm này có đạo hàm\nVị trí duy nhất có thể của minima là \\(x = -1, 0, 2\\) , trong đó hàm\nlấy các giá trị tương ứng \\(-5,0, -32\\) và do đó chúng ta có thể kết\nluận rằng chúng ta giảm thiểu hàm của mình khi \\(x = 2\\) . Một cốt\ntruyện nhanh chóng xác nhận điều này.\nĐiều này nhấn mạnh một thực tế quan trọng cần biết khi làm việc theo lý\nthuyết hoặc số: các điểm duy nhất có thể mà chúng ta có thể thu nhỏ\n(hoặc tối đa hóa) một hàm sẽ có gradient bằng 0, tuy nhiên, không phải\nmọi điểm có gradient 0 là đúng toàn cầu tối thiểu (hoặc tối đa).\n18.4.4. Multivariate Chain Rule\nLet us suppose that we have a function of four variables\n( \\(w, x, y\\) , and \\(z\\) ) which we can make by composing many\nterms:\nCác chuỗi phương trình như vậy là phổ biến khi làm việc với các mạng\nthần kinh, vì vậy cố gắng hiểu cách tính toán độ dốc của các chức năng\nnhư vậy là chìa khóa. Chúng ta có thể bắt đầu thấy gợi ý trực quan của\nkết nối này trong Fig. 18.4.1 nếu chúng ta xem những biến\nliên quan trực tiếp đến nhau.\nFig. 18.4.1 The function relations above where nodes represent values and edges\nshow functional dependence. ¶\nKhông có gì ngăn cản chúng ta chỉ sáng tác tất cả mọi thứ từ (18.4.14) và viết ra rằng\nSau đó chúng ta có thể lấy đạo hàm bằng cách chỉ sử dụng các dẫn xuất\nbiến duy nhất, nhưng nếu chúng ta đã làm điều đó, chúng ta sẽ nhanh\nchóng thấy mình đầm lầy với các thuật ngữ, nhiều trong số đó được lặp\nlại! Thật vậy, người ta có thể thấy rằng, ví dụ:\nNếu sau đó chúng ta cũng muốn tính toán \\(\\frac{\\partial f}{\\partial x}\\) , chúng ta sẽ kết thúc với một\nphương trình tương tự một lần nữa với nhiều thuật ngữ lặp đi lặp lại và\nnhiều thuật ngữ lặp đi lặp lại * shared* giữa hai dẫn xuất. Điều này\nđại diện cho một lượng lớn công việc lãng phí, và nếu chúng ta cần tính\ntoán các dẫn xuất theo cách này, toàn bộ cuộc cách mạng học sâu sẽ bị\nđình trệ trước khi nó bắt đầu!\nHãy để chúng tôi chia tay vấn đề. Chúng ta sẽ bắt đầu bằng cách cố gắng\nhiểu \\(f\\) thay đổi như thế nào khi chúng ta thay đổi \\(a\\) , về\ncơ bản giả định rằng \\(w, x, y\\) và \\(z\\) tất cả không tồn tại.\nChúng tôi sẽ lý do như chúng tôi đã làm trở lại khi chúng tôi làm việc\nvới gradient lần đầu tiên. Hãy để chúng tôi lấy \\(a\\) và thêm một\nlượng nhỏ \\(\\epsilon\\) vào nó.\nDòng đầu tiên theo sau từ định nghĩa đạo hàm từng phần, và dòng thứ hai\ntheo sau từ định nghĩa của gradient. Việc theo dõi chính xác nơi chúng\nta đánh giá mọi phái sinh, như trong biểu thức \\(\\frac{\\partial f}{\\partial u}(u(a, b), v(a, b))\\) , vì vậy chúng ta\nthường viết tắt điều này thành đáng nhớ hơn nhiều\nNó rất hữu ích để suy nghĩ về ý nghĩa của quá trình. Chúng tôi đang cố\ngắng hiểu làm thế nào một hàm của biểu mẫu \\(f(u(a, b), v(a, b))\\) thay đổi giá trị của nó với một sự thay đổi trong \\(a\\) . Có hai con\nđường này có thể xảy ra: có con đường nơi \\(a \\rightarrow u \\rightarrow f\\) và nơi \\(a \\rightarrow v \\rightarrow f\\) . Chúng ta có thể tính toán cả hai\nđóng góp này thông qua quy tắc chuỗi: \\(\\frac{\\partial w}{\\partial u} \\cdot \\frac{\\partial u}{\\partial x}\\) và \\(\\frac{\\partial w}{\\partial v} \\cdot \\frac{\\partial v}{\\partial x}\\) tương ứng, và được thêm vào.\nHãy tưởng tượng chúng ta có một mạng khác nhau của các chức năng trong\nđó các chức năng bên phải phụ thuộc vào những chức năng được kết nối với\nbên trái như được hiển thị trong Fig. 18.4.2 .\nFig. 18.4.2 Another more subtle example of the chain rule. ¶\nĐể tính toán một cái gì đó như \\(\\frac{\\partial f}{\\partial y}\\) ,\nchúng ta cần tổng hợp tất cả (trong trường hợp này là \\(3\\) ) đường\ndẫn từ \\(y\\) đến \\(f\\) cho\nHiểu quy tắc chuỗi theo cách này sẽ trả cổ tức lớn khi cố gắng hiểu cách\ngradient chảy qua mạng và tại sao các lựa chọn kiến trúc khác nhau như\ntrong LSTMs ( Section 9.2 ) hoặc các lớp còn lại\n( Section 7.6 ) có thể giúp định hình quá trình học tập bằng\ncách kiểm soát dòng chảy gradient.\n18.4.5. Thuật toán Backpropagation\nHãy để chúng tôi quay lại ví dụ về (18.4.14) phần\ntrước, nơi\nNếu chúng ta muốn tính toán \\(\\frac{\\partial f}{\\partial w}\\) , chúng\nta có thể áp dụng quy tắc chuỗi đa biến thể để xem:\nChúng ta hãy thử sử dụng phân hủy này để tính toán \\(\\frac{\\partial f}{\\partial w}\\) . Lưu ý rằng tất cả những gì chúng\nta cần ở đây là các phần bước duy nhất khác nhau:\nNếu chúng ta viết ra mã này sẽ trở thành một biểu thức khá dễ quản lý.\nTuy nhiên, lưu ý rằng điều này vẫn không làm cho nó dễ dàng để tính toán\nmột cái gì đó như \\(\\frac{\\partial f}{\\partial x}\\) . Lý do cho điều\nđó là * cách chúng tôi đã chọn áp dụng quy tắc chuỗi. Nếu chúng ta nhìn\nvào những gì chúng ta đã làm ở trên, chúng ta luôn giữ \\(\\partial w\\) trong mẫu số khi chúng ta có thể. Bằng cách này,\nchúng tôi đã chọn áp dụng quy tắc chuỗi xem \\(w\\) đã thay đổi mọi\nbiến khác như thế nào. Nếu đó là những gì chúng tôi muốn, đây sẽ là một\ný tưởng hay. Tuy nhiên, hãy nghĩ lại động lực của chúng tôi từ deep\nlearning: chúng tôi muốn xem cách mọi tham số thay đổi loss . Về bản\nchất, chúng tôi muốn áp dụng quy tắc chuỗi giữ \\(\\partial f\\) trong\ntử số bất cứ khi nào chúng tôi có thể!\nĐể rõ ràng hơn, lưu ý rằng chúng ta có thể viết\nLưu ý rằng ứng dụng này của quy tắc chuỗi đã cho chúng tôi tính toán một\ncách rõ ràng \\(\\frac{\\partial f}{\\partial u}, \\frac{\\partial f}{\\partial v}, \\frac{\\partial f}{\\partial a}, \\frac{\\partial f}{\\partial b}, \\; \\text{and} \\; \\frac{\\partial f}{\\partial w}\\) .\nKhông có gì ngăn cản chúng ta cũng bao gồm cả các phương trình:\nvà sau đó theo dõi cách \\(f\\) thay đổi khi chúng ta thay đổi nút *\nbất kỳ* nào trong toàn bộ mạng. Hãy để chúng tôi thực hiện nó.\nThực tế là chúng ta tính toán các dẫn xuất từ \\(f\\) trở lại các đầu\nvào chứ không phải từ các đầu vào chuyển tiếp đến đầu ra (như chúng ta\nđã làm trong đoạn mã đầu tiên ở trên) là những gì mang lại cho thuật\ntoán này tên của nó: * backpropagation * . Lưu ý rằng có hai bước: 1.\nTính giá trị của hàm, và các phần bước duy nhất từ trước ra sau. Mặc dù\nkhông được thực hiện ở trên, điều này có thể được kết hợp thành một *\nchuyển tiếp duy nhất * . 2. Tính toán độ dốc của \\(f\\) từ sau ra\ntrước. Chúng tôi gọi đây là * đèo ngược *.\nĐây chính xác là những gì mọi thuật toán học sâu thực hiện để cho phép\ntính toán độ dốc của sự mất mát đối với mọi trọng lượng trong mạng tại\nmột lần vượt qua. Đó là một thực tế đáng kinh ngạc rằng chúng ta có một\nsự phân hủy như vậy.\nĐể xem làm thế nào để đóng gói này, chúng ta hãy xem nhanh ví dụ này.\nTất cả những gì chúng tôi đã làm ở trên có thể được thực hiện tự động\nbằng cách gọi f.backwards() .\n18.4.6. Hessia Như với phép tính biến đơn lẻ, nó rất hữu ích để xem xét các dẫn xuất bậc cao hơn để có được một xử lý về cách chúng ta có thể có được một xấp xỉ tốt hơn với một hàm hơn là sử dụng gradient một mình.\nCó một vấn đề ngay lập tức mà người ta gặp phải khi làm việc với các dẫn\nxuất bậc cao hơn của các hàm của một số biến, và đó là có một số lượng\nlớn trong số chúng. Nếu chúng ta có một hàm \\(f(x_1, \\ldots, x_n)\\) của \\(n\\) biến, thì chúng ta có thể lấy \\(n^{2}\\) nhiều dẫn xuất\nthứ hai, cụ thể là cho bất kỳ sự lựa chọn nào của \\(i\\) và \\(j\\) :\nĐiều này theo truyền thống được lắp ráp thành một ma trận gọi là Hessian :\nKhông phải mọi mục nhập của ma trận này đều độc lập. Thật vậy, chúng ta\ncó thể chỉ ra rằng miễn là cả hai * hỗn hợp* (phái sinh một phần liên\nquan đến nhiều biến) tồn tại và liên tục, chúng ta có thể nói rằng đối\nvới bất kỳ \\(i\\) , và \\(j\\) ,\nĐiều này theo sau bằng cách xem xét đầu tiên perturbing một chức năng\ntheo hướng \\(x_i\\) , và sau đó xáo trộn nó trong \\(x_j\\) và sau\nđó so sánh kết quả của nó với những gì xảy ra nếu chúng ta perturb trước \\(x_j\\) và sau đó \\(x_i\\) , với kiến thức rằng cả hai đơn đặt\nhàng này dẫn đến cùng một thay đổi cuối cùng trong sản lượng của \\(f\\) .\nNhư với các biến đơn lẻ, chúng ta có thể sử dụng các dẫn xuất này để\nhiểu rõ hơn về cách hàm hoạt động gần một điểm. Đặc biệt, chúng ta có\nthể sử dụng nó để tìm bậc hai phù hợp nhất gần một điểm \\(\\mathbf{x}_0\\) , như chúng ta đã thấy trong một biến duy nhất.\nHãy để chúng tôi xem một ví dụ. Giả sử rằng \\(f(x_1, x_2) = a + b_1x_1 + b_2x_2 + c_{11}x_1^{2} + c_{12}x_1x_2 + c_{22}x_2^{2}\\) .\nĐây là dạng chung cho một bậc hai trong hai biến. Nếu chúng ta nhìn vào\ngiá trị của hàm, gradient của nó và Hessian (18.4.26) của\nnó, tất cả tại điểm zero:\nwe can get our original nguyên polynomial đa thức back by saying nói\nNói chung, nếu chúng ta tính toán mở rộng này bất kỳ điểm \\(\\mathbf{x}_0\\) , chúng ta thấy rằng\nĐiều này hoạt động cho bất kỳ đầu vào chiều nào và cung cấp bậc hai xấp\nxỉ tốt nhất cho bất kỳ hàm nào tại một điểm. Để đưa ra một ví dụ, chúng\nta hãy vẽ hàm\nOne can compute that the gradient and Hessian are\nVà do đó, với một đại số nhỏ, thấy rằng bậc hai xấp xỉ tại \\([-1,0]^\\top\\) là\nĐiều này tạo thành cơ sở cho Thuật toán Newton được thảo luận trong Section 11.3 , nơi chúng tôi thực hiện tối ưu hóa số lặp đi lặp lại\nviệc tìm kiếm bậc hai phù hợp nhất, và sau đó chính xác giảm thiểu bậc\nhai đó.\n18.4.7. A Little Matrix Calculus Dẫn xuất của các hàm liên quan đến ma trận hóa ra là đặc biệt tốt đẹp. Phần này có thể trở nên nặng nề về mặt công thức, vì vậy có thể bị bỏ qua trong lần đọc đầu tiên, nhưng rất hữu ích khi biết các dẫn xuất của các hàm liên quan đến hoạt động ma trận phổ biến thường sạch hơn nhiều so với người ta có thể dự đoán ban đầu, đặc biệt là cho các hoạt động ma trận trung tâm như thế nào đối với các ứng dụng học sâu.\nHãy để chúng tôi bắt đầu với một ví dụ. Giả sử rằng chúng ta có một số\nvector cột cố định \\(\\boldsymbol{\\beta}\\) , và chúng ta muốn lấy hàm\nsản phẩm \\(f(\\mathbf{x}) = \\boldsymbol{\\beta}^\\top\\mathbf{x}\\) , và\nhiểu làm thế nào các sản phẩm chấm thay đổi khi chúng ta thay đổi \\(\\mathbf{x}\\) .\nMột chút ký hiệu sẽ hữu ích khi làm việc với các dẫn xuất ma trận trong\nML được gọi là đạo hàm ma trận bố trí mẫu số nơi chúng ta lắp ráp các\ndẫn xuất một phần của chúng ta vào hình dạng của bất kỳ vectơ, ma trận\nhoặc tensor nào nằm trong mẫu số của vi phân. Trong trường hợp này,\nchúng tôi sẽ viết\nnơi chúng tôi phù hợp với hình dạng của vector cột \\(\\mathbf{x}\\) .\nNếu chúng ta viết ra chức năng của chúng ta vào các thành phần thì đây\nlà\nNếu bây giờ chúng ta lấy phái sinh một phần liên quan đến việc nói \\(\\beta_1\\) , lưu ý rằng mọi thứ đều bằng không nhưng thuật ngữ đầu\ntiên, chỉ \\(x_1\\) nhân với \\(\\beta_1\\) , vì vậy chúng tôi có được\nđiều đó\nor more generally nói chung that\nBây giờ chúng ta có thể lắp ráp lại this into a matrix ma trận to see\nĐiều này minh họa một vài yếu tố về phép tính ma trận mà chúng ta thường\nsẽ phản ứng trong suốt phần này:\nĐầu tiên, Các tính toán sẽ nhận được khá tham gia.\nThứ hai, Kết quả cuối cùng sạch hơn nhiều so với quá trình trung gian\nvà sẽ luôn trông giống với trường hợp biến đơn lẻ. Trong trường hợp\nnày, lưu ý rằng \\(\\frac{d}{dx}(bx) = b\\) và \\(\\frac{d}{d\\mathbf{x}} (\\boldsymbol{\\beta}^\\top\\mathbf{x}) = \\boldsymbol{\\beta}\\) đều giống nhau.\nThứ ba, transposes thường có thể xuất hiện dường như từ hư không. Lý\ndo cốt lõi cho điều này là quy ước mà chúng ta khớp với hình dạng của\nmẫu số, do đó khi chúng ta nhân ma trận, chúng ta sẽ cần phải lấy\ntransposes để khớp trở lại hình dạng của thuật ngữ gốc.\nĐể tiếp tục xây dựng trực giác, chúng ta hãy thử một tính toán khó khăn\nhơn một chút. Giả sử rằng chúng ta có một vector cột \\(\\mathbf{x}\\) ,\nvà một ma trận vuông \\(A\\) và chúng tôi muốn tính toán\nĐể hướng tới dễ thao tác ký hiệu hơn, chúng ta hãy xem xét vấn đề này\nbằng ký hiệu Einstein. Trong trường hợp này chúng ta có thể viết hàm như\nĐể tính toán đạo hàm của chúng ta, chúng ta cần phải hiểu cho mỗi \\(k\\) , giá trị của\nTheo quy tắc sản phẩm, đây là\nĐối với một thuật ngữ như \\(\\frac{dx_i}{dx_k}\\) , không khó để thấy\nrằng đây là một khi \\(i=k\\) và không khác. Điều này có nghĩa là mọi\nthuật ngữ mà \\(i\\) và \\(k\\) khác nhau biến mất so với số tiền\nnày, vì vậy các thuật ngữ duy nhất còn lại trong số tiền đầu tiên đó là\nnhững điều khoản mà \\(i=k\\) . Lý do tương tự giữ cho nhiệm kỳ thứ hai\nmà chúng ta cần \\(j=k\\) . Điều này cho\nBây giờ, tên của các chỉ số trong ký hiệu Einstein là trọng tài - thực\ntế là \\(i\\) và \\(j\\) khác nhau là không quan trọng đối với tính\ntoán này vào thời điểm này, vì vậy chúng ta có thể lập chỉ mục lại để cả\nhai đều sử dụng \\(i\\) để thấy rằng\nBây giờ, đây là nơi chúng ta bắt đầu cần một số thực hành để đi xa hơn.\nChúng ta hãy thử và xác định kết quả này về hoạt động ma trận. \\(a_{ki} + a_{ik}\\) là thành phần thứ \\(k, i\\) của \\(\\mathbf{A} + \\mathbf{A}^\\top\\) . Điều này cho\nTương tự, thuật ngữ này bây giờ là tích của ma trận \\(\\mathbf{A} + \\mathbf{A}^\\top\\) bởi vector \\(\\mathbf{x}\\) , vì\nvậy chúng ta thấy rằng\nDo đó, chúng ta thấy rằng mục \\(k\\) -th của đạo hàm mong muốn từ (18.4.39) chỉ là mục \\(k\\) -th của vectơ ở bên phải,\nvà do đó hai là như nhau. Do đó sản lượng\nĐiều này đòi hỏi nhiều công việc hơn đáng kể so với công việc cuối cùng\ncủa chúng tôi, nhưng kết quả cuối cùng là nhỏ. Hơn thế nữa, hãy xem xét\ntính toán sau cho các dẫn xuất biến đơn truyền thống:\nTương đương \\(\\frac{d}{dx}(ax^2) = 2ax = (a+a)x\\) . Một lần nữa,\nchúng tôi nhận được một kết quả trông khá giống như kết quả biến duy\nnhất nhưng với một transpose ném vào.\nTại thời điểm này, mô hình nên trông khá đáng ngờ, vì vậy chúng ta hãy\ncố gắng tìm ra lý do tại sao. Khi chúng ta lấy các dẫn xuất ma trận như\nthế này, trước tiên chúng ta giả định rằng biểu thức chúng ta nhận được\nsẽ là một biểu thức ma trận khác: một biểu thức chúng ta có thể viết nó\nvề sản phẩm và tổng của ma trận và các transposes của chúng. Nếu một\nbiểu thức như vậy tồn tại, nó sẽ cần phải đúng đối với tất cả các ma\ntrận. Đặc biệt, nó sẽ cần phải đúng với ma trận \\(1 \\times 1\\) ,\ntrong trường hợp đó sản phẩm ma trận chỉ là tích của các số, tổng ma\ntrận chỉ là tổng, và transpose không làm gì cả! Nói cách khác, bất cứ\nbiểu thức nào chúng ta nhận được phải khớp với biểu thức biến đơn.\nĐiều này có nghĩa là, với một số thực hành, người ta thường có thể đoán\ncác dẫn xuất ma trận chỉ bằng cách biết biểu thức biến đơn liên quan\nphải trông như thế nào!\nHãy để chúng tôi thử điều này ra. Giả sử rằng \\(\\mathbf{X}\\) là một\nma trận \\(n \\times m\\) , \\(\\mathbf{U}\\) là một \\(n \\times r\\) và \\(\\mathbf{V}\\) là một \\(r \\times m\\) . Let us try to\ncomputetính toán\nTính toán này rất quan trọng trong một khu vực gọi là tính toán ma trận.\nĐối với chúng tôi, tuy nhiên, nó chỉ là một dẫn xuất để tính toán. Hãy\nđể chúng tôi cố gắng để hình ảnh những gì điều này sẽ là cho \\(1\\times1\\) ma trận. Trong trường hợp đó, chúng tôi nhận được biểu\nthức\nở đâu, đạo hàm là khá chuẩn. Nếu chúng ta cố gắng chuyển đổi này trở lại\nthành một biểu thức ma trận, chúng ta nhận được\nTuy nhiên, nếu chúng ta nhìn vào điều này nó không hoàn toàn hoạt động.\nNhớ lại rằng \\(\\mathbf{X}\\) là \\(n \\times m\\) , như là \\(\\mathbf{U}\\mathbf{V}\\) , vì vậy ma trận \\(2(\\mathbf{X} - \\mathbf{U}\\mathbf{V})\\) là \\(n \\times m\\) . Mặt\nkhác, \\(\\mathbf{U}\\) là \\(n \\times r\\) và chúng ta không thể\nnhân \\(n \\times m\\) và ma trận \\(n \\times r\\) vì kích thước\nkhông khớp!\nChúng tôi muốn nhận được \\(\\frac{d}{d\\mathbf{V}}\\) , có hình dạng\ntương tự như \\(\\mathbf{V}\\) , đó là \\(r \\times m\\) . Vì vậy, bằng\ncách nào đó chúng ta cần phải có một ma trận \\(n \\times m\\) và ma\ntrận \\(n \\times r\\) , nhân chúng lại với nhau (có lẽ với một số\ntransposes) để có được một \\(r \\times m\\) . Chúng ta có thể làm điều\nnày bằng cách nhân \\(U^\\top\\) bởi \\((\\mathbf{X} - \\mathbf{U}\\mathbf{V})\\) . Như vậy, chúng ta có thể\nđoán được giải pháp cho (18.4.49) là\nĐể chứng minh rằng điều này hoạt động, chúng tôi sẽ được remiss để không\ncung cấp một tính toán chi tiết. Nếu chúng ta đã tin rằng quy tắc ngón\ntay cái này hoạt động, hãy bỏ qua quá khứ nguồn gốc này. Để tính toán\nchúng ta phải tìm cho mỗi \\(a\\) , và \\(b\\)\nNhắc lại rằng tất cả các mục của \\(\\mathbf{X}\\) và \\(\\mathbf{U}\\) là hằng số như xa như \\(\\frac{d}{dv_{ab}}\\) có\nliên quan, chúng tôi có thể đẩy dẫn xuất bên trong tổng, và áp dụng quy\ntắc chuỗi cho hình vuông để có được\nNhư trong nguồn gốc trước đó, chúng ta có thể lưu ý rằng \\(\\frac{dv_{kj}}{dv_{ab}}\\) chỉ không phải bằng không nếu \\(k=a\\) và \\(j=b\\) . Nếu một trong những điều kiện đó không giữ,\nthuật ngữ trong tổng là 0 và chúng tôi có thể tự do loại bỏ nó. Chúng\ntôi thấy rằng\nMột sự tinh tế quan trọng ở đây là yêu cầu \\(k=a\\) không xảy ra bên\ntrong tổng trong vì \\(k\\) đó là một biến giả mà chúng ta đang tóm\ntắt bên trong thuật ngữ bên trong. Đối với một ví dụ sạch hơn về mặt\ncông thức, hãy xem xét lý do tại sao\nTừ thời điểm này, chúng ta có thể bắt đầu xác định các thành phần của\ntổng. Đầu tiên,\nVì vậy, toàn bộ biểu thức ở bên trong tổng là\nĐiều này có nghĩa là bây giờ chúng ta có thể viết đạo hàm của chúng tôi\nnhư\nChúng ta muốn điều này trông giống như phần tử \\(a, b\\) của ma trận\nđể chúng ta có thể sử dụng kỹ thuật như trong ví dụ trước để đến một\nbiểu thức ma trận, có nghĩa là chúng ta cần trao đổi thứ tự của các chỉ\nsố trên \\(u_{ia}\\) . Nếu chúng ta nhận thấy rằng \\(u_{ia} = [\\mathbf{U}^\\top]_{ai}\\) , sau đó chúng ta có thể viết\nĐây là một sản phẩm ma trận, và do đó chúng ta có thể kết luận rằng\nvà do đó chúng tôi có thể viết giải pháp cho (18.4.49)\nĐiều này phù hợp với giải pháp mà chúng tôi đoán ở trên!\nNó là hợp lý để hỏi tại thời điểm này, “Tại sao tôi không thể chỉ viết\nra các phiên bản ma trận của tất cả các quy tắc giải tích tôi đã học\nđược? Rõ ràng đây vẫn là cơ khí. Tại sao chúng ta không chỉ vượt qua nó\nvới! Và thực sự có những quy tắc như vậy và [Petersen et al., 2008] cung cấp một bản tóm tắt tuyệt vời.\nTuy nhiên, do có rất nhiều cách các phép toán ma trận có thể được kết\nhợp so với các giá trị đơn lẻ, có nhiều quy tắc đạo hàm ma trận nhiều\nhơn các quy tắc biến đơn lẻ. Nó thường là trường hợp tốt nhất để làm\nviệc với các chỉ số, hoặc để nó lên đến sự khác biệt tự động khi thích\nhợp.\n18.4.8. Tóm tắt\nTrong các chiều cao hơn, chúng ta có thể định nghĩa gradient phục vụ\ncùng mục đích như các dẫn xuất trong một chiều. Những điều này cho\nphép chúng ta xem hàm đa biến thay đổi như thế nào khi chúng ta thực\nhiện một thay đổi nhỏ tùy ý đối với các đầu vào.\nThuật toán lan truyền ngược có thể thấy là một phương pháp tổ chức\nquy tắc chuỗi đa biến để cho phép tính toán hiệu quả của nhiều dẫn\nxuất từng phần.\nPhép tính ma trận cho phép chúng ta viết các dẫn xuất của các biểu\nthức ma trận theo những cách súc tích.\n18.4.9. Bài tập 1. Cho một vector cột \\(\\boldsymbol{\\beta}\\) , tính toán các dẫn xuất của cả \\(f(\\mathbf{x}) = \\boldsymbol{\\beta}^\\top\\mathbf{x}\\) và \\(g(\\mathbf{x}) = \\mathbf{x}^\\top\\boldsymbol{\\beta}\\) . Tại sao bạn nhận được câu trả lời tương tự? 2. Hãy để \\(\\mathbf{v}\\) là một vector kích thước \\(n\\) . \\(\\frac{\\partial}{\\partial\\mathbf{v}}\\|\\mathbf{v}\\|_2\\) là cái gì? 3. Hãy để \\(L(x, y) = \\log(e^x + e^y)\\) . Tính toán gradient. Tổng của các thành phần của gradient là gì? 4. Hãy để \\(f(x, y) = x^2y + xy^2\\) . Cho thấy điểm quan trọng duy nhất là \\((0,0)\\) . Bằng cách xem xét \\(f(x, x)\\) , xác định xem \\((0,0)\\) có phải là tối đa, tối thiểu hay không. Giả sử rằng chúng ta đang giảm thiểu một hàm \\(f(\\mathbf{x}) = g(\\mathbf{x}) + h(\\mathbf{x})\\) . Làm thế nào chúng ta có thể giải thích hình học tình trạng của \\(\\nabla f = 0\\) về \\(g\\) và \\(h\\) ?\nDiscussions\nDiscussions\nDiscussions"
+}

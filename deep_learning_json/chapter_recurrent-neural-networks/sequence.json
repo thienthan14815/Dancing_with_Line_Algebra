@@ -1,0 +1,581 @@
+{
+  "url": "https://vi.d2l.ai/chapter_recurrent-neural-networks/sequence.html",
+  "chapter": "chapter_recurrent-neural-networks",
+  "title": "8.1. Mô hình trình tự",
+  "crawled_at": "2026-07-20T12:39:55.446896+00:00",
+  "headings": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "mo-hinh-trinh-tu",
+      "text": "8.1. Mô hình trình tự"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "cong-cu-thong-ke",
+      "text": "8.1.1. Công cụ thống kê"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "mo-hinh-autoregressive",
+      "text": "8.1.1.1. Mô hình Autoregressive"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "mo-hinh-markov",
+      "text": "8.1.1.2. Mô hình Markov"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "quan-he-nhan-qua",
+      "text": "8.1.1.3. Quan hệ nhân quả"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "dao-tao",
+      "text": "8.1.2. Đào tạo"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "prediction",
+      "text": "8.1.3. Prediction"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tom-tat",
+      "text": "8.1.4. Tóm tắt"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bai-tap",
+      "text": "8.1.5. Bài tập"
+    }
+  ],
+  "content": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "mo-hinh-trinh-tu",
+      "text": "8.1. Mô hình trình tự"
+    },
+    {
+      "type": "paragraph",
+      "text": "Hãy tưởng tượng rằng bạn đang xem phim trên Netflix. Là một người dùng\nNetflix tốt, bạn quyết định đánh giá từng bộ phim một cách tôn giáo. Rốt\ncuộc, một bộ phim hay là một bộ phim hay, và bạn muốn xem nhiều hơn\ntrong số họ, phải không? Khi nó quay ra, mọi thứ không hoàn toàn đơn\ngiản như vậy. Ý kiến của mọi người về phim có thể thay đổi khá đáng kể\ntheo thời gian. Trên thực tế, các nhà tâm lý học thậm chí còn có tên cho\nmột số hiệu ứng:"
+    },
+    {
+      "type": "list",
+      "ordered": false,
+      "items": [
+        "Có * neo * , dựa trên ý kiến của người khác. Ví dụ, sau lễ trao giải\nOscar, xếp hạng cho bộ phim tương ứng tăng lên, mặc dù nó vẫn là cùng\nmột bộ phim. Hiệu ứng này tồn tại trong vài tháng cho đến khi giải\nthưởng bị lãng quên. Nó đã được chỉ ra rằng hiệu ứng nâng xếp hạng\nlên hơn nửa điểm [Wu et al., 2017] .",
+        "Có sự thích nghi * hedonic*, nơi con người nhanh chóng thích nghi\nđể chấp nhận một tình huống cải thiện hoặc xấu đi như bình thường\nmới. Ví dụ, sau khi xem nhiều bộ phim hay, kỳ vọng rằng bộ phim tiếp\ntheo cũng tốt hoặc tốt hơn là cao. Do đó, ngay cả một bộ phim trung\nbình cũng có thể được coi là xấu sau khi nhiều bộ phim tuyệt vời được\nxem.",
+        "Có * thời gian*. Rất ít người xem thích xem một bộ phim ông già\nNoel vào tháng 8.",
+        "Trong một số trường hợp, phim trở nên không được ưa chuộng do hành vi\nsai trái của đạo diễn hoặc diễn viên trong quá trình sản xuất.",
+        "Một số bộ phim trở thành phim đình đám, bởi vì chúng gần như xấu về\nmặt hài hước. * Plan 9 từ Outer Space* và * Troll 2* đạt được mức\nđộ nổi tiếng cao vì lý do này."
+      ]
+    },
+    {
+      "type": "paragraph",
+      "text": "Nói tóm lại, xếp hạng phim là bất cứ điều gì ngoài văn phòng phẩm. Do\nđó, sử dụng động lực thời gian đã dẫn đến các đề xuất phim chính xác hơn [Koren, 2009] . Tất nhiên, dữ liệu trình tự không chỉ là về xếp\nhạng phim. Sau đây cung cấp thêm hình minh họa."
+    },
+    {
+      "type": "list",
+      "ordered": false,
+      "items": [
+        "Nhiều người dùng có hành vi đặc biệt cao khi nói đến thời điểm họ mở\nứng dụng. Ví dụ, các ứng dụng truyền thông xã hội phổ biến hơn nhiều\nsau giờ học với học sinh. Các ứng dụng giao dịch thị trường chứng\nkhoán được sử dụng phổ biến hơn khi thị trường mở cửa.",
+        "Dự đoán giá cổ phiếu ngày mai khó hơn nhiều so với việc điền vào\nkhoảng trống cho giá cổ phiếu mà chúng tôi đã bỏ lỡ ngày hôm qua, mặc\ndù cả hai chỉ là vấn đề ước tính một số. Sau khi tất cả, tầm nhìn xa\nlà khó khăn hơn nhiều so với nhận thức sau. Trong thống kê, trước đây\n(dự đoán vượt ra ngoài các quan sát đã biết) được gọi là * ngoại\ntrị* trong khi sau (ước tính giữa các quan sát hiện có) được gọi là nội suy .",
+        "Âm nhạc, lời nói, văn bản và video đều có tính chất tuần tự. Nếu\nchúng ta hoán vị họ, họ sẽ có ý nghĩa rất ít. Tiêu đề * chó cắn\nngười đàn ông* ít đáng ngạc nhiên hơn nhiều so với * người đàn ông\ncắn chó*, mặc dù các từ giống hệt nhau.",
+        "Động đất có mối tương quan mạnh mẽ, tức là, sau một trận động đất\nlớn, rất có thể có một số dư chấn nhỏ hơn, nhiều hơn nhiều so với\nkhông có trận động đất mạnh. Trên thực tế, động đất có tương quan về\nmặt không gian, tức là các dư chấn thường xảy ra trong khoảng thời\ngian ngắn và ở gần.",
+        "Con người tương tác với nhau trong một bản chất tuần tự, như có thể\nthấy trong các trận đánh Twitter, mô hình khiêu vũ và các cuộc tranh\nluận."
+      ]
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "cong-cu-thong-ke",
+      "text": "8.1.1. Công cụ thống kê"
+    },
+    {
+      "type": "paragraph",
+      "text": "Chúng ta cần các công cụ thống kê và kiến trúc mạng thần kinh sâu mới để\nxử lý dữ liệu trình tự. Để giữ cho mọi thứ đơn giản, chúng tôi sử dụng\ngiá cổ phiếu (chỉ số FTSE 100) được minh họa trong Fig. 8.1.1 làm ví dụ."
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/ftse100.png",
+      "local_path": "_images/ftse100.png",
+      "alt": "../_images/ftse100.png"
+    },
+    {
+      "type": "paragraph",
+      "text": "Fig. 8.1.1 FTSE 100 index over about 30 years. ¶"
+    },
+    {
+      "type": "paragraph",
+      "text": "Hãy để chúng tôi biểu thị giá bởi \\(x_t\\) , tức là, tại bước thời\ngian* \\(t \\in \\mathbb{Z}^+\\) chúng tôi quan sát giá \\(x_t\\) .\nLưu ý rằng đối với chuỗi trong văn bản này, \\(t\\) thường sẽ rời rạc\nvà thay đổi theo số nguyên hoặc tập con của nó. Giả sử rằng một nhà giao\ndịch muốn làm tốt trên thị trường chứng khoán vào ngày \\(t\\) dự đoán \\(x_t\\) qua"
+    },
+    {
+      "type": "math",
+      "latex": "(8.1.1)¶\\[x_t \\sim P(x_t \\mid x_{t-1}, \\ldots, x_1).\\]"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "mo-hinh-autoregressive",
+      "text": "8.1.1.1. Mô hình Autoregressive"
+    },
+    {
+      "type": "paragraph",
+      "text": "Để đạt được điều này, nhà giao dịch của chúng tôi có thể sử dụng mô hình\nhồi quy như mô hình mà chúng tôi đã đào tạo trong Section 3.3 . Chỉ có một vấn đề lớn: số lượng đầu vào, \\(x_{t-1}, \\ldots, x_1\\) thay đổi, tùy thuộc vào \\(t\\) . Điều đó\ncó nghĩa là, số lượng tăng lên theo lượng dữ liệu mà chúng ta gặp phải\nvà chúng ta sẽ cần một xấp xỉ để làm cho tính toán này có thể truy xuất\nđược. Phần lớn những gì sau trong chương này sẽ xoay quanh cách ước tính \\(P(x_t \\mid x_{t-1}, \\ldots, x_1)\\) hiệu quả. Tóm lại, nó có hai\nchiến lược như sau."
+    },
+    {
+      "type": "paragraph",
+      "text": "Đầu tiên, giả sử rằng chuỗi \\(x_{t-1}, \\ldots, x_1\\) có khả năng khá\ndài là không thực sự cần thiết. Trong trường hợp này, chúng ta có thể tự\nhài lòng với một số khoảng thời gian có độ dài \\(\\tau\\) và chỉ sử\ndụng các quan sát \\(x_{t-1}, \\ldots, x_{t-\\tau}\\) . Lợi ích ngay lập\ntức là bây giờ số lượng lập luận luôn giống nhau, ít nhất là đối với \\(t > \\tau\\) . Điều này cho phép chúng tôi đào tạo một mạng sâu như\nđã chỉ ra ở trên. Các mô hình như vậy sẽ được gọi là mô hình *\nautoregressive mẫu*, vì chúng khá thực hiện hồi quy trên chính họ."
+    },
+    {
+      "type": "paragraph",
+      "text": "Chiến lược thứ hai, thể hiện trong Fig. 8.1.2 , là\ngiữ một số bản tóm tắt \\(h_t\\) của các quan sát trong quá khứ, và\nđồng thời cập nhật \\(h_t\\) ngoài dự đoán \\(\\hat{x}_t\\) . Điều này\ndẫn đến các mô hình ước tính \\(x_t\\) với \\(\\hat{x}_t = P(x_t \\mid h_{t})\\) và hơn nữa các bản cập nhật của\nmẫu \\(h_t = g(h_{t-1}, x_{t-1})\\) . Vì \\(h_t\\) không bao giờ được\nquan sát, các mô hình này còn được gọi là * mô hình tự động tiềm mật*."
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/sequence-model.svg",
+      "local_path": "_images/sequence-model.svg",
+      "alt": "../_images/sequence-model.svg"
+    },
+    {
+      "type": "paragraph",
+      "text": "Fig. 8.1.2 A latent autoregressive model. ¶"
+    },
+    {
+      "type": "paragraph",
+      "text": "Cả hai trường hợp đều đặt ra câu hỏi rõ ràng về cách tạo dữ liệu đào\ntạo. Người ta thường sử dụng các quan sát lịch sử để dự đoán quan sát\ntiếp theo cho các quan sát đến ngay bây giờ. Rõ ràng chúng tôi không\nmong đợi thời gian để đứng yên. Tuy nhiên, một giả định phổ biến là\ntrong khi các giá trị cụ thể của \\(x_t\\) có thể thay đổi, ít nhất\nđộng lực của dãy tự sẽ không. Điều này là hợp lý, vì động lực mới chỉ là\nthế, mới lạ và do đó không thể dự đoán được bằng cách sử dụng dữ liệu mà\nchúng ta có cho đến nay. Các nhà thống kê gọi động lực không thay đổi*\nđứng yên *. Bất kể những gì chúng tôi làm, do đó chúng tôi sẽ nhận được\nước tính của toàn bộ chuỗi thông qua"
+    },
+    {
+      "type": "math",
+      "latex": "(8.1.2)¶\\[P(x_1, \\ldots, x_T) = \\prod_{t=1}^T P(x_t \\mid x_{t-1}, \\ldots, x_1).\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Lưu ý rằng những cân nhắc trên vẫn giữ nếu chúng ta đối phó với các đối\ntượng rời rạc, chẳng hạn như các từ, chứ không phải là số liên tục. Sự\nkhác biệt duy nhất là trong một tình huống như vậy chúng ta cần sử dụng\nmột phân loại chứ không phải là một mô hình hồi quy để ước tính \\(P(x_t \\mid x_{t-1}, \\ldots, x_1)\\) ."
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "mo-hinh-markov",
+      "text": "8.1.1.2. Mô hình Markov"
+    },
+    {
+      "type": "paragraph",
+      "text": "Nhớ lại xấp xỉ rằng trong một mô hình autoregressive, chúng tôi chỉ sử\ndụng \\(x_{t-1}, \\ldots, x_{t-\\tau}\\) thay vì \\(x_{t-1}, \\ldots, x_1\\) để ước tính \\(x_t\\) . Bất cứ khi nào xấp\nxỉ này là chính xác, chúng tôi nói rằng trình tự đáp ứng một điều kiện\n* Markov . Đặc biệt, nếu :math:`tau = 1`, chúng tôi có mô hình\nMarkov đơn hàng đầu tiên* và \\(P(x)\\) được đưa ra bởi"
+    },
+    {
+      "type": "math",
+      "latex": "(8.1.3)¶\\[P(x_1, \\ldots, x_T) = \\prod_{t=1}^T P(x_t \\mid x_{t-1}) \\text{ where } P(x_1 \\mid x_0) = P(x_1).\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Các mô hình như vậy đặc biệt tốt đẹp bất cứ khi nào \\(x_t\\) giả định\nchỉ là một giá trị rời rạc, vì trong trường hợp này lập trình động có\nthể được sử dụng để tính toán các giá trị dọc theo chuỗi chính xác. Ví\ndụ, chúng ta có thể tính toán \\(P(x_{t+1} \\mid x_{t-1})\\) một cách\nhiệu quả:"
+    },
+    {
+      "type": "math",
+      "latex": "(8.1.4)¶\\[\\begin{split}\\begin{aligned}\nP(x_{t+1} \\mid x_{t-1})\n&= \\frac{\\sum_{x_t} P(x_{t+1}, x_t, x_{t-1})}{P(x_{t-1})}\\\\\n&= \\frac{\\sum_{x_t} P(x_{t+1} \\mid x_t, x_{t-1}) P(x_t, x_{t-1})}{P(x_{t-1})}\\\\\n&= \\sum_{x_t} P(x_{t+1} \\mid x_t) P(x_t \\mid x_{t-1})\n\\end{aligned}\\end{split}\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "bằng cách sử dụng thực tế là chúng ta chỉ cần tính đến một lịch sử rất\nngắn về các quan sát trong quá khứ: \\(P(x_{t+1} \\mid x_t, x_{t-1}) = P(x_{t+1} \\mid x_t)\\) . Đi sâu vào\nchi tiết về lập trình động là vượt quá phạm vi của phần này. Kiểm soát\nvà củng cố các thuật toán học tập sử dụng rộng rãi các công cụ như vậy."
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "quan-he-nhan-qua",
+      "text": "8.1.1.3. Quan hệ nhân quả"
+    },
+    {
+      "type": "paragraph",
+      "text": "Về nguyên tắc, không có gì sai khi mở ra \\(P(x_1, \\ldots, x_T)\\) theo thứ tự ngược lại. Rốt cuộc, bằng cách điều hòa, chúng ta luôn có\nthể viết nó qua"
+    },
+    {
+      "type": "math",
+      "latex": "(8.1.5)¶\\[P(x_1, \\ldots, x_T) = \\prod_{t=T}^1 P(x_t \\mid x_{t+1}, \\ldots, x_T).\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Trong thực tế, nếu chúng ta có một mô hình Markov, chúng ta cũng có thể\ncó được một phân phối xác suất có điều kiện ngược lại. Tuy nhiên, trong\nnhiều trường hợp, tồn tại một hướng tự nhiên cho dữ liệu, cụ thể là đi\nvề phía trước trong thời gian. Rõ ràng là các sự kiện trong tương lai\nkhông thể ảnh hưởng đến quá khứ. Do đó, nếu chúng ta thay đổi \\(x_t\\) , chúng ta có thể ảnh hưởng đến những gì xảy ra cho \\(x_{t+1}\\) trong tương lai nhưng không phải là cuộc trò chuyện. Đó\nlà, nếu chúng ta thay đổi \\(x_t\\) , sự phân phối trong các sự kiện\ntrong quá khứ sẽ không thay đổi. Do đó, nó phải được dễ dàng hơn để giải\nthích \\(P(x_{t+1} \\mid x_t)\\) hơn là \\(P(x_t \\mid x_{t+1})\\) . Ví\ndụ, nó đã được chỉ ra rằng trong một số trường hợp, chúng ta có thể tìm\nthấy \\(x_{t+1} = f(x_t) + \\epsilon\\) đối với một số tiếng ồn phụ gia \\(\\epsilon\\) , trong khi cuộc trò chuyện không đúng [Hoyer et al., 2009] . Đây là một tin tuyệt vời, vì nó\nthường là hướng về phía trước mà chúng tôi quan tâm đến việc ước tính.\nCuốn sách của Peters et al. đã giải thích thêm về chủ đề này [Peters et al., 2017a] . Chúng tôi hầu như không gãi bề\nmặt của nó."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "dao-tao",
+      "text": "8.1.2. Đào tạo"
+    },
+    {
+      "type": "paragraph",
+      "text": "Sau khi xem xét rất nhiều công cụ thống kê, chúng ta hãy thử điều này\ntrong thực tế. Chúng tôi bắt đầu bằng cách tạo ra một số dữ liệu. Để giữ\ncho mọi thứ đơn giản, chúng tôi tạo ra dữ liệu trình tự của chúng tôi\nbằng cách sử dụng một hàm sin với một số tiếng ồn phụ gia cho các bước\nthời gian \\(1, 2, \\ldots, 1000\\) ."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "%matplotlib inline\nfrom mxnet import autograd, gluon, init, np, npx\nfrom mxnet.gluon import nn\nfrom d2l import mxnet as d2l\n\nnpx.set_np()\n\nT = 1000  # Generate a total of 1000 points\ntime = np.arange(1, T + 1, dtype=np.float32)\nx = np.sin(0.01 * time) + np.random.normal(0, 0.2, (T,))\nd2l.plot(time, [x], 'time', 'x', xlim=[1, 1000], figsize=(6, 3))"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_sequence_ce248f_3_0.svg",
+      "local_path": "_images/output_sequence_ce248f_3_0.svg",
+      "alt": "../_images/output_sequence_ce248f_3_0.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "%matplotlib inline\nimport torch\nfrom torch import nn\nfrom d2l import torch as d2l\n\nT = 1000  # Generate a total of 1000 points\ntime = torch.arange(1, T + 1, dtype=torch.float32)\nx = torch.sin(0.01 * time) + torch.normal(0, 0.2, (T,))\nd2l.plot(time, [x], 'time', 'x', xlim=[1, 1000], figsize=(6, 3))"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_sequence_ce248f_6_0.svg",
+      "local_path": "_images/output_sequence_ce248f_6_0.svg",
+      "alt": "../_images/output_sequence_ce248f_6_0.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "%matplotlib inline\nimport tensorflow as tf\nfrom d2l import tensorflow as d2l\n\nT = 1000  # Generate a total of 1000 points\ntime = tf.range(1, T + 1, dtype=tf.float32)\nx = tf.sin(0.01 * time) + tf.random.normal([T], 0, 0.2)\nd2l.plot(time, [x], 'time', 'x', xlim=[1, 1000], figsize=(6, 3))"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_sequence_ce248f_9_0.svg",
+      "local_path": "_images/output_sequence_ce248f_9_0.svg",
+      "alt": "../_images/output_sequence_ce248f_9_0.svg"
+    },
+    {
+      "type": "paragraph",
+      "text": "Tiếp theo, chúng ta cần biến một chuỗi như vậy thành các tính năng và\nnhãn mà mô hình của chúng ta có thể đào tạo. Dựa trên kích thước nhúng \\(\\tau\\) , chúng tôi ánh xạ dữ liệu thành các cặp \\(y_t = x_t\\) và \\(\\mathbf{x}_t = [x_{t-\\tau}, \\ldots, x_{t-1}]\\) . Người đọc tinh\nxao có thể nhận thấy rằng điều này cho chúng ta \\(\\tau\\) ít ví dụ dữ\nliệu hơn, vì chúng tôi không có đủ lịch sử cho \\(\\tau\\) đầu tiên\ntrong số chúng. Một sửa chữa đơn giản, đặc biệt nếu trình tự dài, là\nloại bỏ một vài thuật ngữ đó. Ngoài ra, chúng ta có thể pad chuỗi với số\nkhông. Ở đây chúng tôi chỉ sử dụng 600 cặp nhãn tính năng đầu tiên để\nđào tạo."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "tau = 4\nfeatures = np.zeros((T - tau, tau))\nfor i in range(tau):\n    features[:, i] = x[i: T - tau + i]\nlabels = x[tau:].reshape((-1, 1))\n\nbatch_size, n_train = 16, 600\n# Only the first `n_train` examples are used for training\ntrain_iter = d2l.load_array((features[:n_train], labels[:n_train]),\n                            batch_size, is_train=True)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "tau = 4\nfeatures = torch.zeros((T - tau, tau))\nfor i in range(tau):\n    features[:, i] = x[i: T - tau + i]\nlabels = x[tau:].reshape((-1, 1))\n\nbatch_size, n_train = 16, 600\n# Only the first `n_train` examples are used for training\ntrain_iter = d2l.load_array((features[:n_train], labels[:n_train]),\n                            batch_size, is_train=True)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "tau = 4\nfeatures = tf.Variable(tf.zeros((T - tau, tau)))\nfor i in range(tau):\n    features[:, i].assign(x[i: T - tau + i])\nlabels = tf.reshape(x[tau:], (-1, 1))\n\nbatch_size, n_train = 16, 600\n# Only the first `n_train` examples are used for training\ntrain_iter = d2l.load_array((features[:n_train], labels[:n_train]),\n                            batch_size, is_train=True)"
+    },
+    {
+      "type": "paragraph",
+      "text": "Ở đây chúng ta giữ kiến trúc khá đơn giản: chỉ một MLP với hai lớp được\nkết nối hoàn toàn, kích hoạt ReLU và tổn thất bình phương."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "# A simple MLP\ndef get_net():\n    net = nn.Sequential()\n    net.add(nn.Dense(10, activation='relu'),\n            nn.Dense(1))\n    net.initialize(init.Xavier())\n    return net\n\n# Square loss\nloss = gluon.loss.L2Loss()"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "# Function for initializing the weights of the network\ndef init_weights(m):\n    if type(m) == nn.Linear:\n        nn.init.xavier_uniform_(m.weight)\n\n# A simple MLP\ndef get_net():\n    net = nn.Sequential(nn.Linear(4, 10),\n                        nn.ReLU(),\n                        nn.Linear(10, 1))\n    net.apply(init_weights)\n    return net\n\n# Note: `MSELoss` computes squared error without the 1/2 factor\nloss = nn.MSELoss(reduction='none')"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "# Vanilla MLP architecture\ndef get_net():\n    net = tf.keras.Sequential([tf.keras.layers.Dense(10, activation='relu'),\n                              tf.keras.layers.Dense(1)])\n    return net\n\n# Note: `MeanSquaredError` computes squared error without the 1/2 factor\nloss = tf.keras.losses.MeanSquaredError()"
+    },
+    {
+      "type": "paragraph",
+      "text": "Bây giờ chúng tôi đã sẵn sàng để đào tạo mô hình. Mã dưới đây về cơ bản\nlà giống hệt với vòng đào tạo trong các phần trước, chẳng hạn như Section 3.3 . Do đó, chúng tôi sẽ không đi sâu vào\nnhiều chi tiết."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def train(net, train_iter, loss, epochs, lr):\n    trainer = gluon.Trainer(net.collect_params(), 'adam',\n                            {'learning_rate': lr})\n    for epoch in range(epochs):\n        for X, y in train_iter:\n            with autograd.record():\n                l = loss(net(X), y)\n            l.backward()\n            trainer.step(batch_size)\n        print(f'epoch {epoch + 1}, '\n              f'loss: {d2l.evaluate_loss(net, train_iter, loss):f}')\n\nnet = get_net()\ntrain(net, train_iter, loss, 5, 0.01)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "[10:42:56] src/base.cc:49: GPU context requested, but no GPUs found.\nepoch 1, loss: 0.036144\nepoch 2, loss: 0.030893\nepoch 3, loss: 0.028799\nepoch 4, loss: 0.028142\nepoch 5, loss: 0.027056"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def train(net, train_iter, loss, epochs, lr):\n    trainer = torch.optim.Adam(net.parameters(), lr)\n    for epoch in range(epochs):\n        for X, y in train_iter:\n            trainer.zero_grad()\n            l = loss(net(X), y)\n            l.sum().backward()\n            trainer.step()\n        print(f'epoch {epoch + 1}, '\n              f'loss: {d2l.evaluate_loss(net, train_iter, loss):f}')\n\nnet = get_net()\ntrain(net, train_iter, loss, 5, 0.01)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "epoch 1, loss: 0.062616\nepoch 2, loss: 0.054403\nepoch 3, loss: 0.054915\nepoch 4, loss: 0.052986\nepoch 5, loss: 0.053715"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def train(net, train_iter, loss, epochs, lr):\n    trainer = tf.keras.optimizers.Adam()\n    for epoch in range(epochs):\n        for X, y in train_iter:\n            with tf.GradientTape() as g:\n                out = net(X)\n                l = loss(y, out)\n                params = net.trainable_variables\n                grads = g.gradient(l, params)\n            trainer.apply_gradients(zip(grads, params))\n        print(f'epoch {epoch + 1}, '\n              f'loss: {d2l.evaluate_loss(net, train_iter, loss):f}')\n\nnet = get_net()\ntrain(net, train_iter, loss, 5, 0.01)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "epoch 1, loss: 0.170327\nepoch 2, loss: 0.079626\nepoch 3, loss: 0.063393\nepoch 4, loss: 0.061084\nepoch 5, loss: 0.059050"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "prediction",
+      "text": "8.1.3. Prediction"
+    },
+    {
+      "type": "paragraph",
+      "text": "Vì sự mất mát đào tạo là nhỏ, chúng tôi mong đợi mô hình của chúng tôi\nsẽ hoạt động tốt. Hãy để chúng tôi xem điều này có nghĩa là gì trong\nthực tế. Điều đầu tiên cần kiểm tra là mô hình có thể dự đoán điều gì\nxảy ra chỉ trong bước thời gian tới, cụ thể là dự đoán * một bước trước\n*."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "onestep_preds = net(features)\nd2l.plot([time, time[tau:]], [x.asnumpy(), onestep_preds.asnumpy()], 'time',\n         'x', legend=['data', '1-step preds'], xlim=[1, 1000], figsize=(6, 3))"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_sequence_ce248f_51_0.svg",
+      "local_path": "_images/output_sequence_ce248f_51_0.svg",
+      "alt": "../_images/output_sequence_ce248f_51_0.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "onestep_preds = net(features)\nd2l.plot([time, time[tau:]], [x.detach().numpy(), onestep_preds.detach().numpy()], 'time',\n         'x', legend=['data', '1-step preds'], xlim=[1, 1000], figsize=(6, 3))"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_sequence_ce248f_54_0.svg",
+      "local_path": "_images/output_sequence_ce248f_54_0.svg",
+      "alt": "../_images/output_sequence_ce248f_54_0.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "onestep_preds = net(features)\nd2l.plot([time, time[tau:]], [x.numpy(), onestep_preds.numpy()], 'time',\n         'x', legend=['data', '1-step preds'], xlim=[1, 1000], figsize=(6, 3))"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_sequence_ce248f_57_0.svg",
+      "local_path": "_images/output_sequence_ce248f_57_0.svg",
+      "alt": "../_images/output_sequence_ce248f_57_0.svg"
+    },
+    {
+      "type": "paragraph",
+      "text": "Các dự đoán một bước trước trông đẹp, giống như chúng tôi mong đợi. Thậm\nchí vượt quá 604 ( n_train + tau ) quan sát các dự đoán vẫn trông đáng\ntin cậy. Tuy nhiên, chỉ có một vấn đề nhỏ đối với điều này: nếu chúng ta\nchỉ quan sát dữ liệu trình tự cho đến bước thời gian 604, chúng ta không\nthể hy vọng nhận được các đầu vào cho tất cả các dự đoán trước một bước\ntrong tương lai. Thay vào đó, chúng ta cần phải làm việc theo cách của\nchúng tôi về phía trước một bước tại một thời điểm:"
+    },
+    {
+      "type": "math",
+      "latex": "(8.1.6)¶\\[\\begin{split}\\hat{x}_{605} = f(x_{601}, x_{602}, x_{603}, x_{604}), \\\\\n\\hat{x}_{606} = f(x_{602}, x_{603}, x_{604}, \\hat{x}_{605}), \\\\\n\\hat{x}_{607} = f(x_{603}, x_{604}, \\hat{x}_{605}, \\hat{x}_{606}),\\\\\n\\hat{x}_{608} = f(x_{604}, \\hat{x}_{605}, \\hat{x}_{606}, \\hat{x}_{607}),\\\\\n\\hat{x}_{609} = f(\\hat{x}_{605}, \\hat{x}_{606}, \\hat{x}_{607}, \\hat{x}_{608}),\\\\\n\\ldots\\end{split}\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Nói chung, đối với một chuỗi quan sát lên đến \\(x_t\\) , sản lượng dự\nđoán của nó \\(\\hat{x}_{t+k}\\) tại bước thời điểm \\(t+k\\) được\ngọi là \\(k\\) * -bước trước dự đoán *. Vì chúng tôi đã quan sát\nđến \\(x_{604}\\) , dự đoán \\(k\\) -bước trước của nó là \\(\\hat{x}_{604+k}\\) . Nói cách khác, chúng ta sẽ phải sử dụng dự đoán\ncủa riêng mình để đưa ra dự đoán nhiều bước trước. Hãy để chúng tôi xem\nđiều này diễn ra tốt như thế nào."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "multistep_preds = np.zeros(T)\nmultistep_preds[: n_train + tau] = x[: n_train + tau]\nfor i in range(n_train + tau, T):\n    multistep_preds[i] = net(\n        multistep_preds[i - tau:i].reshape((1, -1)))\n\nd2l.plot([time, time[tau:], time[n_train + tau:]],\n         [x.asnumpy(), onestep_preds.asnumpy(),\n          multistep_preds[n_train + tau:].asnumpy()], 'time',\n         'x', legend=['data', '1-step preds', 'multistep preds'],\n         xlim=[1, 1000], figsize=(6, 3))"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_sequence_ce248f_63_0.svg",
+      "local_path": "_images/output_sequence_ce248f_63_0.svg",
+      "alt": "../_images/output_sequence_ce248f_63_0.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "multistep_preds = torch.zeros(T)\nmultistep_preds[: n_train + tau] = x[: n_train + tau]\nfor i in range(n_train + tau, T):\n    multistep_preds[i] = net(\n        multistep_preds[i - tau:i].reshape((1, -1)))\n\nd2l.plot([time, time[tau:], time[n_train + tau:]],\n         [x.detach().numpy(), onestep_preds.detach().numpy(),\n          multistep_preds[n_train + tau:].detach().numpy()], 'time',\n         'x', legend=['data', '1-step preds', 'multistep preds'],\n         xlim=[1, 1000], figsize=(6, 3))"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_sequence_ce248f_66_0.svg",
+      "local_path": "_images/output_sequence_ce248f_66_0.svg",
+      "alt": "../_images/output_sequence_ce248f_66_0.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "multistep_preds = tf.Variable(tf.zeros(T))\nmultistep_preds[:n_train + tau].assign(x[:n_train + tau])\nfor i in range(n_train + tau, T):\n    multistep_preds[i].assign(tf.reshape(net(\n        tf.reshape(multistep_preds[i - tau: i], (1, -1))), ()))\n\nd2l.plot([time, time[tau:], time[n_train + tau:]],\n         [x.numpy(), onestep_preds.numpy(),\n          multistep_preds[n_train + tau:].numpy()], 'time',\n         'x', legend=['data', '1-step preds', 'multistep preds'],\n         xlim=[1, 1000], figsize=(6, 3))"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_sequence_ce248f_69_0.svg",
+      "local_path": "_images/output_sequence_ce248f_69_0.svg",
+      "alt": "../_images/output_sequence_ce248f_69_0.svg"
+    },
+    {
+      "type": "paragraph",
+      "text": "Như ví dụ trên cho thấy, đây là một thất bại ngoạn mục. Các dự đoán phân\nrã thành một hằng số khá nhanh sau một vài bước dự đoán. Tại sao thuật\ntoán hoạt động rất kém? Điều này cuối cùng là do thực tế là các lỗi xây\ndựng. Chúng ta hãy nói rằng sau bước 1 chúng ta có một số lỗi \\(\\epsilon_1 = \\bar\\epsilon\\) . Bây giờ đầu vào cho bước 2 bị ảnh\nhưởng bởi \\(\\epsilon_1\\) , do đó chúng tôi bị một số lỗi theo thứ tự \\(\\epsilon_2 = \\bar\\epsilon + c \\epsilon_1\\) đối với một số hằng số \\(c\\) , v.v. Lỗi có thể phân kỳ khá nhanh từ các quan sát thực sự.\nĐây là một hiện tượng phổ biến. Ví dụ, dự báo thời tiết trong 24 giờ tới\ncó xu hướng khá chính xác nhưng ngoài đó độ chính xác giảm nhanh chóng.\nChúng tôi sẽ thảo luận về các phương pháp để cải thiện điều này trong\nsuốt chương này và hơn thế nữa."
+    },
+    {
+      "type": "paragraph",
+      "text": "Hãy để chúng tôi xem xét kỹ hơn những khó khăn trong \\(k\\) -bước\ntrước dự đoán bằng cách tính toán dự đoán trên toàn bộ chuỗi cho \\(k = 1, 4, 16, 64\\) ."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "max_steps = 64\n\nfeatures = np.zeros((T - tau - max_steps + 1, tau + max_steps))\n# Column `i` (`i` < `tau`) are observations from `x` for time steps from\n# `i + 1` to `i + T - tau - max_steps + 1`\nfor i in range(tau):\n    features[:, i] = x[i: i + T - tau - max_steps + 1]\n\n# Column `i` (`i` >= `tau`) are the (`i - tau + 1`)-step-ahead predictions for\n# time steps from `i + 1` to `i + T - tau - max_steps + 1`\nfor i in range(tau, tau + max_steps):\n    features[:, i] = net(features[:, i - tau:i]).reshape(-1)\n\nsteps = (1, 4, 16, 64)\nd2l.plot([time[tau + i - 1: T - max_steps + i] for i in steps],\n         [features[:, (tau + i - 1)].asnumpy() for i in steps], 'time', 'x',\n         legend=[f'{i}-step preds' for i in steps], xlim=[5, 1000],\n         figsize=(6, 3))"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_sequence_ce248f_75_0.svg",
+      "local_path": "_images/output_sequence_ce248f_75_0.svg",
+      "alt": "../_images/output_sequence_ce248f_75_0.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "max_steps = 64\n\nfeatures = torch.zeros((T - tau - max_steps + 1, tau + max_steps))\n# Column `i` (`i` < `tau`) are observations from `x` for time steps from\n# `i + 1` to `i + T - tau - max_steps + 1`\nfor i in range(tau):\n    features[:, i] = x[i: i + T - tau - max_steps + 1]\n\n# Column `i` (`i` >= `tau`) are the (`i - tau + 1`)-step-ahead predictions for\n# time steps from `i + 1` to `i + T - tau - max_steps + 1`\nfor i in range(tau, tau + max_steps):\n    features[:, i] = net(features[:, i - tau:i]).reshape(-1)\n\nsteps = (1, 4, 16, 64)\nd2l.plot([time[tau + i - 1: T - max_steps + i] for i in steps],\n         [features[:, (tau + i - 1)].detach().numpy() for i in steps], 'time', 'x',\n         legend=[f'{i}-step preds' for i in steps], xlim=[5, 1000],\n         figsize=(6, 3))"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_sequence_ce248f_78_0.svg",
+      "local_path": "_images/output_sequence_ce248f_78_0.svg",
+      "alt": "../_images/output_sequence_ce248f_78_0.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "max_steps = 64\n\nfeatures = tf.Variable(tf.zeros((T - tau - max_steps + 1, tau + max_steps)))\n# Column `i` (`i` < `tau`) are observations from `x` for time steps from\n# `i + 1` to `i + T - tau - max_steps + 1`\nfor i in range(tau):\n    features[:, i].assign(x[i: i + T - tau - max_steps + 1].numpy())\n\n# Column `i` (`i` >= `tau`) are the (`i - tau + 1`)-step-ahead predictions for\n# time steps from `i + 1` to `i + T - tau - max_steps + 1`\nfor i in range(tau, tau + max_steps):\n    features[:, i].assign(tf.reshape(net((features[:, i - tau: i])), -1))\n\nsteps = (1, 4, 16, 64)\nd2l.plot([time[tau + i - 1: T - max_steps + i] for i in steps],\n         [features[:, (tau + i - 1)].numpy() for i in steps], 'time', 'x',\n         legend=[f'{i}-step preds' for i in steps], xlim=[5, 1000],\n         figsize=(6, 3))"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_sequence_ce248f_81_0.svg",
+      "local_path": "_images/output_sequence_ce248f_81_0.svg",
+      "alt": "../_images/output_sequence_ce248f_81_0.svg"
+    },
+    {
+      "type": "paragraph",
+      "text": "Điều này minh họa rõ ràng chất lượng dự đoán thay đổi như thế nào khi\nchúng ta cố gắng dự đoán thêm vào tương lai. Trong khi các dự đoán 4\nbước trước vẫn trông tốt, nhưng bất cứ điều gì ngoài đó là gần như vô\ndụng."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tom-tat",
+      "text": "8.1.4. Tóm tắt"
+    },
+    {
+      "type": "list",
+      "ordered": false,
+      "items": [
+        "Có khá một sự khác biệt về khó khăn giữa nội suy và ngoại suy. Do đó,\nnếu bạn có một chuỗi, hãy luôn tôn trọng thứ tự thời gian của dữ liệu\nkhi đào tạo, tức là, không bao giờ đào tạo về dữ liệu trong tương\nlai.",
+        "Các mô hình trình tự yêu cầu các công cụ thống kê chuyên dụng để ước\ntính. Hai lựa chọn phổ biến là mô hình autoregressive và các mô hình\nautoregressive biến trễ.",
+        "Đối với các mô hình nhân quả (ví dụ: thời gian đi về phía trước), ước\ntính hướng tiến thường dễ dàng hơn rất nhiều so với hướng ngược lại.",
+        "Đối với một chuỗi quan sát đến thời gian bước \\(t\\) , đầu ra dự\nđoán của nó tại bước thời gian \\(t+k\\) là \\(k\\) * -bước\ntrước dự đoán *. Như chúng ta dự đoán thêm trong thời gian bằng cách\ntăng \\(k\\) , các lỗi tích lũy và chất lượng dự đoán suy giảm,\nthường đáng kể."
+      ]
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bai-tap",
+      "text": "8.1.5. Bài tập"
+    },
+    {
+      "type": "list",
+      "ordered": true,
+      "items": [
+        "Cải thiện mô hình trong thí nghiệm của phần này. Kết hợp nhiều hơn 4 quan sát trong quá khứ? Bạn thực sự cần bao\nnhiêu? Bạn sẽ cần bao nhiêu quan sát trong quá khứ nếu không có tiếng ồn?\nGợi ý: bạn có thể viết \\(\\sin\\) và \\(\\cos\\) dưới dạng\nphương trình vi phân. Bạn có thể kết hợp các quan sát cũ hơn trong khi vẫn giữ tổng số\ntính năng không đổi? Điều này có cải thiện độ chính xác không? Tại\nsao? Thay đổi kiến trúc mạng thần kinh và đánh giá hiệu suất.",
+        "Kết hợp nhiều hơn 4 quan sát trong quá khứ? Bạn thực sự cần bao\nnhiêu?",
+        "Bạn sẽ cần bao nhiêu quan sát trong quá khứ nếu không có tiếng ồn?\nGợi ý: bạn có thể viết \\(\\sin\\) và \\(\\cos\\) dưới dạng\nphương trình vi phân.",
+        "Bạn có thể kết hợp các quan sát cũ hơn trong khi vẫn giữ tổng số\ntính năng không đổi? Điều này có cải thiện độ chính xác không? Tại\nsao?",
+        "Thay đổi kiến trúc mạng thần kinh và đánh giá hiệu suất.",
+        "Một nhà đầu tư muốn tìm một bảo mật tốt để mua. Anh ta nhìn vào sự\ntrở lại trong quá khứ để quyết định cái nào có khả năng làm tốt. Điều\ngì có thể xảy ra sai với chiến lược này?",
+        "Liệu nhân quả cũng áp dụng cho văn bản? Đến mức nào?",
+        "Đưa ra một ví dụ cho khi một mô hình tự hồi quy tiềm ẩn có thể cần\nthiết để nắm bắt động của dữ liệu."
+      ]
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    }
+  ],
+  "images": [
+    {
+      "original_url": "https://vi.d2l.ai/_images/ftse100.png",
+      "local_path": "_images/ftse100.png",
+      "alt": "../_images/ftse100.png"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/sequence-model.svg",
+      "local_path": "_images/sequence-model.svg",
+      "alt": "../_images/sequence-model.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_sequence_ce248f_3_0.svg",
+      "local_path": "_images/output_sequence_ce248f_3_0.svg",
+      "alt": "../_images/output_sequence_ce248f_3_0.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_sequence_ce248f_6_0.svg",
+      "local_path": "_images/output_sequence_ce248f_6_0.svg",
+      "alt": "../_images/output_sequence_ce248f_6_0.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_sequence_ce248f_9_0.svg",
+      "local_path": "_images/output_sequence_ce248f_9_0.svg",
+      "alt": "../_images/output_sequence_ce248f_9_0.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_sequence_ce248f_51_0.svg",
+      "local_path": "_images/output_sequence_ce248f_51_0.svg",
+      "alt": "../_images/output_sequence_ce248f_51_0.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_sequence_ce248f_54_0.svg",
+      "local_path": "_images/output_sequence_ce248f_54_0.svg",
+      "alt": "../_images/output_sequence_ce248f_54_0.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_sequence_ce248f_57_0.svg",
+      "local_path": "_images/output_sequence_ce248f_57_0.svg",
+      "alt": "../_images/output_sequence_ce248f_57_0.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_sequence_ce248f_63_0.svg",
+      "local_path": "_images/output_sequence_ce248f_63_0.svg",
+      "alt": "../_images/output_sequence_ce248f_63_0.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_sequence_ce248f_66_0.svg",
+      "local_path": "_images/output_sequence_ce248f_66_0.svg",
+      "alt": "../_images/output_sequence_ce248f_66_0.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_sequence_ce248f_69_0.svg",
+      "local_path": "_images/output_sequence_ce248f_69_0.svg",
+      "alt": "../_images/output_sequence_ce248f_69_0.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_sequence_ce248f_75_0.svg",
+      "local_path": "_images/output_sequence_ce248f_75_0.svg",
+      "alt": "../_images/output_sequence_ce248f_75_0.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_sequence_ce248f_78_0.svg",
+      "local_path": "_images/output_sequence_ce248f_78_0.svg",
+      "alt": "../_images/output_sequence_ce248f_78_0.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_sequence_ce248f_81_0.svg",
+      "local_path": "_images/output_sequence_ce248f_81_0.svg",
+      "alt": "../_images/output_sequence_ce248f_81_0.svg"
+    }
+  ],
+  "text": "8.1. Mô hình trình tự\nHãy tưởng tượng rằng bạn đang xem phim trên Netflix. Là một người dùng\nNetflix tốt, bạn quyết định đánh giá từng bộ phim một cách tôn giáo. Rốt\ncuộc, một bộ phim hay là một bộ phim hay, và bạn muốn xem nhiều hơn\ntrong số họ, phải không? Khi nó quay ra, mọi thứ không hoàn toàn đơn\ngiản như vậy. Ý kiến của mọi người về phim có thể thay đổi khá đáng kể\ntheo thời gian. Trên thực tế, các nhà tâm lý học thậm chí còn có tên cho\nmột số hiệu ứng:\nCó * neo * , dựa trên ý kiến của người khác. Ví dụ, sau lễ trao giải\nOscar, xếp hạng cho bộ phim tương ứng tăng lên, mặc dù nó vẫn là cùng\nmột bộ phim. Hiệu ứng này tồn tại trong vài tháng cho đến khi giải\nthưởng bị lãng quên. Nó đã được chỉ ra rằng hiệu ứng nâng xếp hạng\nlên hơn nửa điểm [Wu et al., 2017] .\nCó sự thích nghi * hedonic*, nơi con người nhanh chóng thích nghi\nđể chấp nhận một tình huống cải thiện hoặc xấu đi như bình thường\nmới. Ví dụ, sau khi xem nhiều bộ phim hay, kỳ vọng rằng bộ phim tiếp\ntheo cũng tốt hoặc tốt hơn là cao. Do đó, ngay cả một bộ phim trung\nbình cũng có thể được coi là xấu sau khi nhiều bộ phim tuyệt vời được\nxem.\nCó * thời gian*. Rất ít người xem thích xem một bộ phim ông già\nNoel vào tháng 8.\nTrong một số trường hợp, phim trở nên không được ưa chuộng do hành vi\nsai trái của đạo diễn hoặc diễn viên trong quá trình sản xuất.\nMột số bộ phim trở thành phim đình đám, bởi vì chúng gần như xấu về\nmặt hài hước. * Plan 9 từ Outer Space* và * Troll 2* đạt được mức\nđộ nổi tiếng cao vì lý do này.\nNói tóm lại, xếp hạng phim là bất cứ điều gì ngoài văn phòng phẩm. Do\nđó, sử dụng động lực thời gian đã dẫn đến các đề xuất phim chính xác hơn [Koren, 2009] . Tất nhiên, dữ liệu trình tự không chỉ là về xếp\nhạng phim. Sau đây cung cấp thêm hình minh họa.\nNhiều người dùng có hành vi đặc biệt cao khi nói đến thời điểm họ mở\nứng dụng. Ví dụ, các ứng dụng truyền thông xã hội phổ biến hơn nhiều\nsau giờ học với học sinh. Các ứng dụng giao dịch thị trường chứng\nkhoán được sử dụng phổ biến hơn khi thị trường mở cửa.\nDự đoán giá cổ phiếu ngày mai khó hơn nhiều so với việc điền vào\nkhoảng trống cho giá cổ phiếu mà chúng tôi đã bỏ lỡ ngày hôm qua, mặc\ndù cả hai chỉ là vấn đề ước tính một số. Sau khi tất cả, tầm nhìn xa\nlà khó khăn hơn nhiều so với nhận thức sau. Trong thống kê, trước đây\n(dự đoán vượt ra ngoài các quan sát đã biết) được gọi là * ngoại\ntrị* trong khi sau (ước tính giữa các quan sát hiện có) được gọi là nội suy .\nÂm nhạc, lời nói, văn bản và video đều có tính chất tuần tự. Nếu\nchúng ta hoán vị họ, họ sẽ có ý nghĩa rất ít. Tiêu đề * chó cắn\nngười đàn ông* ít đáng ngạc nhiên hơn nhiều so với * người đàn ông\ncắn chó*, mặc dù các từ giống hệt nhau.\nĐộng đất có mối tương quan mạnh mẽ, tức là, sau một trận động đất\nlớn, rất có thể có một số dư chấn nhỏ hơn, nhiều hơn nhiều so với\nkhông có trận động đất mạnh. Trên thực tế, động đất có tương quan về\nmặt không gian, tức là các dư chấn thường xảy ra trong khoảng thời\ngian ngắn và ở gần.\nCon người tương tác với nhau trong một bản chất tuần tự, như có thể\nthấy trong các trận đánh Twitter, mô hình khiêu vũ và các cuộc tranh\nluận.\n8.1.1. Công cụ thống kê\nChúng ta cần các công cụ thống kê và kiến trúc mạng thần kinh sâu mới để\nxử lý dữ liệu trình tự. Để giữ cho mọi thứ đơn giản, chúng tôi sử dụng\ngiá cổ phiếu (chỉ số FTSE 100) được minh họa trong Fig. 8.1.1 làm ví dụ.\nFig. 8.1.1 FTSE 100 index over about 30 years. ¶\nHãy để chúng tôi biểu thị giá bởi \\(x_t\\) , tức là, tại bước thời\ngian* \\(t \\in \\mathbb{Z}^+\\) chúng tôi quan sát giá \\(x_t\\) .\nLưu ý rằng đối với chuỗi trong văn bản này, \\(t\\) thường sẽ rời rạc\nvà thay đổi theo số nguyên hoặc tập con của nó. Giả sử rằng một nhà giao\ndịch muốn làm tốt trên thị trường chứng khoán vào ngày \\(t\\) dự đoán \\(x_t\\) qua\n8.1.1.1. Mô hình Autoregressive\nĐể đạt được điều này, nhà giao dịch của chúng tôi có thể sử dụng mô hình\nhồi quy như mô hình mà chúng tôi đã đào tạo trong Section 3.3 . Chỉ có một vấn đề lớn: số lượng đầu vào, \\(x_{t-1}, \\ldots, x_1\\) thay đổi, tùy thuộc vào \\(t\\) . Điều đó\ncó nghĩa là, số lượng tăng lên theo lượng dữ liệu mà chúng ta gặp phải\nvà chúng ta sẽ cần một xấp xỉ để làm cho tính toán này có thể truy xuất\nđược. Phần lớn những gì sau trong chương này sẽ xoay quanh cách ước tính \\(P(x_t \\mid x_{t-1}, \\ldots, x_1)\\) hiệu quả. Tóm lại, nó có hai\nchiến lược như sau.\nĐầu tiên, giả sử rằng chuỗi \\(x_{t-1}, \\ldots, x_1\\) có khả năng khá\ndài là không thực sự cần thiết. Trong trường hợp này, chúng ta có thể tự\nhài lòng với một số khoảng thời gian có độ dài \\(\\tau\\) và chỉ sử\ndụng các quan sát \\(x_{t-1}, \\ldots, x_{t-\\tau}\\) . Lợi ích ngay lập\ntức là bây giờ số lượng lập luận luôn giống nhau, ít nhất là đối với \\(t > \\tau\\) . Điều này cho phép chúng tôi đào tạo một mạng sâu như\nđã chỉ ra ở trên. Các mô hình như vậy sẽ được gọi là mô hình *\nautoregressive mẫu*, vì chúng khá thực hiện hồi quy trên chính họ.\nChiến lược thứ hai, thể hiện trong Fig. 8.1.2 , là\ngiữ một số bản tóm tắt \\(h_t\\) của các quan sát trong quá khứ, và\nđồng thời cập nhật \\(h_t\\) ngoài dự đoán \\(\\hat{x}_t\\) . Điều này\ndẫn đến các mô hình ước tính \\(x_t\\) với \\(\\hat{x}_t = P(x_t \\mid h_{t})\\) và hơn nữa các bản cập nhật của\nmẫu \\(h_t = g(h_{t-1}, x_{t-1})\\) . Vì \\(h_t\\) không bao giờ được\nquan sát, các mô hình này còn được gọi là * mô hình tự động tiềm mật*.\nFig. 8.1.2 A latent autoregressive model. ¶\nCả hai trường hợp đều đặt ra câu hỏi rõ ràng về cách tạo dữ liệu đào\ntạo. Người ta thường sử dụng các quan sát lịch sử để dự đoán quan sát\ntiếp theo cho các quan sát đến ngay bây giờ. Rõ ràng chúng tôi không\nmong đợi thời gian để đứng yên. Tuy nhiên, một giả định phổ biến là\ntrong khi các giá trị cụ thể của \\(x_t\\) có thể thay đổi, ít nhất\nđộng lực của dãy tự sẽ không. Điều này là hợp lý, vì động lực mới chỉ là\nthế, mới lạ và do đó không thể dự đoán được bằng cách sử dụng dữ liệu mà\nchúng ta có cho đến nay. Các nhà thống kê gọi động lực không thay đổi*\nđứng yên *. Bất kể những gì chúng tôi làm, do đó chúng tôi sẽ nhận được\nước tính của toàn bộ chuỗi thông qua\nLưu ý rằng những cân nhắc trên vẫn giữ nếu chúng ta đối phó với các đối\ntượng rời rạc, chẳng hạn như các từ, chứ không phải là số liên tục. Sự\nkhác biệt duy nhất là trong một tình huống như vậy chúng ta cần sử dụng\nmột phân loại chứ không phải là một mô hình hồi quy để ước tính \\(P(x_t \\mid x_{t-1}, \\ldots, x_1)\\) .\n8.1.1.2. Mô hình Markov\nNhớ lại xấp xỉ rằng trong một mô hình autoregressive, chúng tôi chỉ sử\ndụng \\(x_{t-1}, \\ldots, x_{t-\\tau}\\) thay vì \\(x_{t-1}, \\ldots, x_1\\) để ước tính \\(x_t\\) . Bất cứ khi nào xấp\nxỉ này là chính xác, chúng tôi nói rằng trình tự đáp ứng một điều kiện\n* Markov . Đặc biệt, nếu :math:`tau = 1`, chúng tôi có mô hình\nMarkov đơn hàng đầu tiên* và \\(P(x)\\) được đưa ra bởi\nCác mô hình như vậy đặc biệt tốt đẹp bất cứ khi nào \\(x_t\\) giả định\nchỉ là một giá trị rời rạc, vì trong trường hợp này lập trình động có\nthể được sử dụng để tính toán các giá trị dọc theo chuỗi chính xác. Ví\ndụ, chúng ta có thể tính toán \\(P(x_{t+1} \\mid x_{t-1})\\) một cách\nhiệu quả:\nbằng cách sử dụng thực tế là chúng ta chỉ cần tính đến một lịch sử rất\nngắn về các quan sát trong quá khứ: \\(P(x_{t+1} \\mid x_t, x_{t-1}) = P(x_{t+1} \\mid x_t)\\) . Đi sâu vào\nchi tiết về lập trình động là vượt quá phạm vi của phần này. Kiểm soát\nvà củng cố các thuật toán học tập sử dụng rộng rãi các công cụ như vậy.\n8.1.1.3. Quan hệ nhân quả\nVề nguyên tắc, không có gì sai khi mở ra \\(P(x_1, \\ldots, x_T)\\) theo thứ tự ngược lại. Rốt cuộc, bằng cách điều hòa, chúng ta luôn có\nthể viết nó qua\nTrong thực tế, nếu chúng ta có một mô hình Markov, chúng ta cũng có thể\ncó được một phân phối xác suất có điều kiện ngược lại. Tuy nhiên, trong\nnhiều trường hợp, tồn tại một hướng tự nhiên cho dữ liệu, cụ thể là đi\nvề phía trước trong thời gian. Rõ ràng là các sự kiện trong tương lai\nkhông thể ảnh hưởng đến quá khứ. Do đó, nếu chúng ta thay đổi \\(x_t\\) , chúng ta có thể ảnh hưởng đến những gì xảy ra cho \\(x_{t+1}\\) trong tương lai nhưng không phải là cuộc trò chuyện. Đó\nlà, nếu chúng ta thay đổi \\(x_t\\) , sự phân phối trong các sự kiện\ntrong quá khứ sẽ không thay đổi. Do đó, nó phải được dễ dàng hơn để giải\nthích \\(P(x_{t+1} \\mid x_t)\\) hơn là \\(P(x_t \\mid x_{t+1})\\) . Ví\ndụ, nó đã được chỉ ra rằng trong một số trường hợp, chúng ta có thể tìm\nthấy \\(x_{t+1} = f(x_t) + \\epsilon\\) đối với một số tiếng ồn phụ gia \\(\\epsilon\\) , trong khi cuộc trò chuyện không đúng [Hoyer et al., 2009] . Đây là một tin tuyệt vời, vì nó\nthường là hướng về phía trước mà chúng tôi quan tâm đến việc ước tính.\nCuốn sách của Peters et al. đã giải thích thêm về chủ đề này [Peters et al., 2017a] . Chúng tôi hầu như không gãi bề\nmặt của nó.\n8.1.2. Đào tạo\nSau khi xem xét rất nhiều công cụ thống kê, chúng ta hãy thử điều này\ntrong thực tế. Chúng tôi bắt đầu bằng cách tạo ra một số dữ liệu. Để giữ\ncho mọi thứ đơn giản, chúng tôi tạo ra dữ liệu trình tự của chúng tôi\nbằng cách sử dụng một hàm sin với một số tiếng ồn phụ gia cho các bước\nthời gian \\(1, 2, \\ldots, 1000\\) .\nTiếp theo, chúng ta cần biến một chuỗi như vậy thành các tính năng và\nnhãn mà mô hình của chúng ta có thể đào tạo. Dựa trên kích thước nhúng \\(\\tau\\) , chúng tôi ánh xạ dữ liệu thành các cặp \\(y_t = x_t\\) và \\(\\mathbf{x}_t = [x_{t-\\tau}, \\ldots, x_{t-1}]\\) . Người đọc tinh\nxao có thể nhận thấy rằng điều này cho chúng ta \\(\\tau\\) ít ví dụ dữ\nliệu hơn, vì chúng tôi không có đủ lịch sử cho \\(\\tau\\) đầu tiên\ntrong số chúng. Một sửa chữa đơn giản, đặc biệt nếu trình tự dài, là\nloại bỏ một vài thuật ngữ đó. Ngoài ra, chúng ta có thể pad chuỗi với số\nkhông. Ở đây chúng tôi chỉ sử dụng 600 cặp nhãn tính năng đầu tiên để\nđào tạo.\nỞ đây chúng ta giữ kiến trúc khá đơn giản: chỉ một MLP với hai lớp được\nkết nối hoàn toàn, kích hoạt ReLU và tổn thất bình phương.\nBây giờ chúng tôi đã sẵn sàng để đào tạo mô hình. Mã dưới đây về cơ bản\nlà giống hệt với vòng đào tạo trong các phần trước, chẳng hạn như Section 3.3 . Do đó, chúng tôi sẽ không đi sâu vào\nnhiều chi tiết.\n8.1.3. Prediction\nVì sự mất mát đào tạo là nhỏ, chúng tôi mong đợi mô hình của chúng tôi\nsẽ hoạt động tốt. Hãy để chúng tôi xem điều này có nghĩa là gì trong\nthực tế. Điều đầu tiên cần kiểm tra là mô hình có thể dự đoán điều gì\nxảy ra chỉ trong bước thời gian tới, cụ thể là dự đoán * một bước trước\n*.\nCác dự đoán một bước trước trông đẹp, giống như chúng tôi mong đợi. Thậm\nchí vượt quá 604 ( n_train + tau ) quan sát các dự đoán vẫn trông đáng\ntin cậy. Tuy nhiên, chỉ có một vấn đề nhỏ đối với điều này: nếu chúng ta\nchỉ quan sát dữ liệu trình tự cho đến bước thời gian 604, chúng ta không\nthể hy vọng nhận được các đầu vào cho tất cả các dự đoán trước một bước\ntrong tương lai. Thay vào đó, chúng ta cần phải làm việc theo cách của\nchúng tôi về phía trước một bước tại một thời điểm:\nNói chung, đối với một chuỗi quan sát lên đến \\(x_t\\) , sản lượng dự\nđoán của nó \\(\\hat{x}_{t+k}\\) tại bước thời điểm \\(t+k\\) được\ngọi là \\(k\\) * -bước trước dự đoán *. Vì chúng tôi đã quan sát\nđến \\(x_{604}\\) , dự đoán \\(k\\) -bước trước của nó là \\(\\hat{x}_{604+k}\\) . Nói cách khác, chúng ta sẽ phải sử dụng dự đoán\ncủa riêng mình để đưa ra dự đoán nhiều bước trước. Hãy để chúng tôi xem\nđiều này diễn ra tốt như thế nào.\nNhư ví dụ trên cho thấy, đây là một thất bại ngoạn mục. Các dự đoán phân\nrã thành một hằng số khá nhanh sau một vài bước dự đoán. Tại sao thuật\ntoán hoạt động rất kém? Điều này cuối cùng là do thực tế là các lỗi xây\ndựng. Chúng ta hãy nói rằng sau bước 1 chúng ta có một số lỗi \\(\\epsilon_1 = \\bar\\epsilon\\) . Bây giờ đầu vào cho bước 2 bị ảnh\nhưởng bởi \\(\\epsilon_1\\) , do đó chúng tôi bị một số lỗi theo thứ tự \\(\\epsilon_2 = \\bar\\epsilon + c \\epsilon_1\\) đối với một số hằng số \\(c\\) , v.v. Lỗi có thể phân kỳ khá nhanh từ các quan sát thực sự.\nĐây là một hiện tượng phổ biến. Ví dụ, dự báo thời tiết trong 24 giờ tới\ncó xu hướng khá chính xác nhưng ngoài đó độ chính xác giảm nhanh chóng.\nChúng tôi sẽ thảo luận về các phương pháp để cải thiện điều này trong\nsuốt chương này và hơn thế nữa.\nHãy để chúng tôi xem xét kỹ hơn những khó khăn trong \\(k\\) -bước\ntrước dự đoán bằng cách tính toán dự đoán trên toàn bộ chuỗi cho \\(k = 1, 4, 16, 64\\) .\nĐiều này minh họa rõ ràng chất lượng dự đoán thay đổi như thế nào khi\nchúng ta cố gắng dự đoán thêm vào tương lai. Trong khi các dự đoán 4\nbước trước vẫn trông tốt, nhưng bất cứ điều gì ngoài đó là gần như vô\ndụng.\n8.1.4. Tóm tắt\nCó khá một sự khác biệt về khó khăn giữa nội suy và ngoại suy. Do đó,\nnếu bạn có một chuỗi, hãy luôn tôn trọng thứ tự thời gian của dữ liệu\nkhi đào tạo, tức là, không bao giờ đào tạo về dữ liệu trong tương\nlai.\nCác mô hình trình tự yêu cầu các công cụ thống kê chuyên dụng để ước\ntính. Hai lựa chọn phổ biến là mô hình autoregressive và các mô hình\nautoregressive biến trễ.\nĐối với các mô hình nhân quả (ví dụ: thời gian đi về phía trước), ước\ntính hướng tiến thường dễ dàng hơn rất nhiều so với hướng ngược lại.\nĐối với một chuỗi quan sát đến thời gian bước \\(t\\) , đầu ra dự\nđoán của nó tại bước thời gian \\(t+k\\) là \\(k\\) * -bước\ntrước dự đoán *. Như chúng ta dự đoán thêm trong thời gian bằng cách\ntăng \\(k\\) , các lỗi tích lũy và chất lượng dự đoán suy giảm,\nthường đáng kể.\n8.1.5. Bài tập\nCải thiện mô hình trong thí nghiệm của phần này. Kết hợp nhiều hơn 4 quan sát trong quá khứ? Bạn thực sự cần bao\nnhiêu? Bạn sẽ cần bao nhiêu quan sát trong quá khứ nếu không có tiếng ồn?\nGợi ý: bạn có thể viết \\(\\sin\\) và \\(\\cos\\) dưới dạng\nphương trình vi phân. Bạn có thể kết hợp các quan sát cũ hơn trong khi vẫn giữ tổng số\ntính năng không đổi? Điều này có cải thiện độ chính xác không? Tại\nsao? Thay đổi kiến trúc mạng thần kinh và đánh giá hiệu suất.\nKết hợp nhiều hơn 4 quan sát trong quá khứ? Bạn thực sự cần bao\nnhiêu?\nBạn sẽ cần bao nhiêu quan sát trong quá khứ nếu không có tiếng ồn?\nGợi ý: bạn có thể viết \\(\\sin\\) và \\(\\cos\\) dưới dạng\nphương trình vi phân.\nBạn có thể kết hợp các quan sát cũ hơn trong khi vẫn giữ tổng số\ntính năng không đổi? Điều này có cải thiện độ chính xác không? Tại\nsao?\nThay đổi kiến trúc mạng thần kinh và đánh giá hiệu suất.\nMột nhà đầu tư muốn tìm một bảo mật tốt để mua. Anh ta nhìn vào sự\ntrở lại trong quá khứ để quyết định cái nào có khả năng làm tốt. Điều\ngì có thể xảy ra sai với chiến lược này?\nLiệu nhân quả cũng áp dụng cho văn bản? Đến mức nào?\nĐưa ra một ví dụ cho khi một mô hình tự hồi quy tiềm ẩn có thể cần\nthiết để nắm bắt động của dữ liệu.\nDiscussions\nDiscussions\nDiscussions"
+}

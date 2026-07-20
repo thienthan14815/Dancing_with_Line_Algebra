@@ -1,0 +1,212 @@
+{
+  "url": "https://vi.d2l.ai/chapter_recommender-systems/movielens.html",
+  "chapter": "chapter_recommender-systems",
+  "title": "16.2. Bộ dữ liệu MovieLens",
+  "crawled_at": "2026-07-20T12:41:10.759226+00:00",
+  "headings": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "bo-du-lieu-movielens",
+      "text": "16.2. Bộ dữ liệu MovieLens"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "lay-du-lieu",
+      "text": "16.2.1. Lấy dữ liệu"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "thong-ke-cua-dataset",
+      "text": "16.2.2. Thống kê của Dataset"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tach-tap-du-lieu",
+      "text": "16.2.3. Tách tập dữ liệu"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "dang-tai-du-lieu",
+      "text": "16.2.4. Đang tải dữ liệu"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tom-tat",
+      "text": "16.2.5. Tóm tắt"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bai-tap",
+      "text": "16.2.6. Bài tập"
+    }
+  ],
+  "content": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "bo-du-lieu-movielens",
+      "text": "16.2. Bộ dữ liệu MovieLens"
+    },
+    {
+      "type": "paragraph",
+      "text": "Có một số bộ dữ liệu có sẵn để nghiên cứu khuyến nghị. Trong số đó, tập\ndữ liệu MovieLens có lẽ là một trong những\nbộ dữ liệu phổ biến hơn. MovieLens là một hệ thống giới thiệu phim dựa\ntrên web phi thương mại. Nó được tạo ra vào năm 1997 và được điều hành\nbởi GroupLens, một phòng thí nghiệm nghiên cứu tại Đại học Minnesota, để\nthu thập dữ liệu xếp hạng phim cho mục đích nghiên cứu. Dữ liệu\nMovieLens rất quan trọng đối với một số nghiên cứu bao gồm khuyến nghị\nđược cá nhân hóa và tâm lý xã hội."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "lay-du-lieu",
+      "text": "16.2.1. Lấy dữ liệu"
+    },
+    {
+      "type": "paragraph",
+      "text": "Tập dữ liệu MovieLens được lưu trữ bởi GroupLens website.\nSeveral versions are available. We will use the MovieLens 100K dataset [Herlocker et al., 1999] . Tập dữ liệu này bao gồm \\(100,000\\) xếp hạng, dao động từ 1 đến 5 sao, từ 943 người dùng\ntrên 1682 phim. Nó đã được dọn dẹp để mỗi người dùng đã đánh giá ít nhất\n20 bộ phim. Một số thông tin nhân khẩu học đơn giản như tuổi tác, giới\ntính, thể loại cho người dùng và các mặt hàng cũng có sẵn. Chúng tôi có\nthể tải xuống ml-100k.zip và trích xuất tệp u.data , chứa tất cả xếp hạng \\(100,000\\) ở\nđịnh dạng csv. Có nhiều tệp khác trong thư mục, một mô tả chi tiết cho\nmỗi tệp có thể được tìm thấy trong tệp README của tập dữ liệu."
+    },
+    {
+      "type": "paragraph",
+      "text": "Để bắt đầu, chúng ta hãy nhập các gói cần thiết để chạy thử nghiệm của\nphần này."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "import os\nimport pandas as pd\nfrom mxnet import gluon, np\nfrom d2l import mxnet as d2l"
+    },
+    {
+      "type": "paragraph",
+      "text": "Sau đó, chúng tôi tải xuống bộ dữ liệu MovieLens 100k và tải các tương\ntác dưới dạng DataFrame ."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "#@save\nd2l.DATA_HUB['ml-100k'] = (\n    'https://files.grouplens.org/datasets/movielens/ml-100k.zip',\n    'cd4dcac4241c8a4ad7badc7ca635da8a69dddb83')\n\n#@save\ndef read_data_ml100k():\n    data_dir = d2l.download_extract('ml-100k')\n    names = ['user_id', 'item_id', 'rating', 'timestamp']\n    data = pd.read_csv(os.path.join(data_dir, 'u.data'), '\\t', names=names,\n                       engine='python')\n    num_users = data.user_id.unique().shape[0]\n    num_items = data.item_id.unique().shape[0]\n    return data, num_users, num_items"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "thong-ke-cua-dataset",
+      "text": "16.2.2. Thống kê của Dataset"
+    },
+    {
+      "type": "paragraph",
+      "text": "Hãy để chúng tôi tải dữ liệu và kiểm tra năm bản ghi đầu tiên theo cách\nthủ công. Đó là một cách hiệu quả để tìm hiểu cấu trúc dữ liệu và xác\nminh rằng chúng đã được tải đúng cách."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "data, num_users, num_items = read_data_ml100k()\nsparsity = 1 - len(data) / (num_users * num_items)\nprint(f'number of users: {num_users}, number of items: {num_items}')\nprint(f'matrix sparsity: {sparsity:f}')\nprint(data.head(5))"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "number of users: 943, number of items: 1682\nmatrix sparsity: 0.936953\n   user_id  item_id  rating  timestamp\n0      196      242       3  881250949\n1      186      302       3  891717742\n2       22      377       1  878887116\n3      244       51       2  880606923\n4      166      346       1  886397596"
+    },
+    {
+      "type": "paragraph",
+      "text": "Chúng ta có thể thấy rằng mỗi dòng bao gồm bốn cột, bao gồm “id người\ndùng” 1-943, “item id” 1-1682, “rating” 1-5 và “timestamp”. Chúng ta có\nthể xây dựng một ma trận tương tác có kích thước \\(n \\times m\\) ,\ntrong đó \\(n\\) và \\(m\\) là số lượng người dùng và số lượng mặt\nhàng tương ứng. Tập dữ liệu này chỉ ghi lại các xếp hạng hiện có, vì vậy\nchúng ta cũng có thể gọi nó là ma trận xếp hạng và chúng ta sẽ sử dụng\nma trận tương tác và ma trận xếp hạng thay thế cho nhau trong trường hợp\ncác giá trị của ma trận này đại diện cho xếp hạng chính xác. Hầu hết các\ngiá trị trong ma trận đánh giá đều không rõ vì người dùng chưa đánh giá\nphần lớn các bộ phim. Chúng tôi cũng cho thấy sự thưa thớt của tập dữ\nliệu này. Độ thưa thớt được định nghĩa là 1 - number of nonzero entries / ( number of users * number of items) .\nRõ ràng, ma trận tương tác cực kỳ thưa thớt (tức là độ thưa thớt =\n93,695%). Các bộ dữ liệu thế giới thực có thể bị một mức độ thưa thớt\nlớn hơn và đã là một thách thức lâu dài trong việc xây dựng các hệ thống\ngiới thiệu. Một giải pháp khả thi là sử dụng thông tin phụ bổ sung như\ncác tính năng của người dùng/mục để giảm bớt sự thưa thớt."
+    },
+    {
+      "type": "paragraph",
+      "text": "Sau đó chúng tôi vẽ phân phối số lượng xếp hạng khác nhau. Đúng như dự\nđoán, nó dường như là một phân phối bình thường, với hầu hết các xếp\nhạng tập trung ở mức 3-4."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "d2l.plt.hist(data['rating'], bins=5, ec='black')\nd2l.plt.xlabel('Rating')\nd2l.plt.ylabel('Count')\nd2l.plt.title('Distribution of Ratings in MovieLens 100K')\nd2l.plt.show()"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_movielens_140487_7_0.png",
+      "local_path": "_images/output_movielens_140487_7_0.png",
+      "alt": "../_images/output_movielens_140487_7_0.png"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tach-tap-du-lieu",
+      "text": "16.2.3. Tách tập dữ liệu"
+    },
+    {
+      "type": "paragraph",
+      "text": "Chúng tôi chia tập dữ liệu thành các bộ đào tạo và kiểm tra. Chức năng\nsau cung cấp hai chế độ phân chia bao gồm random và seq-aware . Ở\nchế độ random , chức năng phân chia tương tác 100k một cách ngẫu\nnhiên mà không xem xét dấu thời gian và sử dụng 90% dữ liệu làm mẫu đào\ntạo và 10% còn lại làm mẫu thử theo mặc định. Trong chế độ seq-aware , chúng tôi bỏ ra mục mà người dùng đánh giá gần đây nhất\nđể thử nghiệm và tương tác lịch sử của người dùng như tập đào tạo. Tương\ntác lịch sử của người dùng được sắp xếp từ cũ nhất đến mới nhất dựa trên\ndấu thời gian. Chế độ này sẽ được sử dụng trong phần đề xuất nhận thức\ntrình tự."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "#@save\ndef split_data_ml100k(data, num_users, num_items,\n                      split_mode='random', test_ratio=0.1):\n    \"\"\"Split the dataset in random mode or seq-aware mode.\"\"\"\n    if split_mode == 'seq-aware':\n        train_items, test_items, train_list = {}, {}, []\n        for line in data.itertuples():\n            u, i, rating, time = line[1], line[2], line[3], line[4]\n            train_items.setdefault(u, []).append((u, i, rating, time))\n            if u not in test_items or test_items[u][-1] < time:\n                test_items[u] = (i, rating, time)\n        for u in range(1, num_users + 1):\n            train_list.extend(sorted(train_items[u], key=lambda k: k[3]))\n        test_data = [(key, *value) for key, value in test_items.items()]\n        train_data = [item for item in train_list if item not in test_data]\n        train_data = pd.DataFrame(train_data)\n        test_data = pd.DataFrame(test_data)\n    else:\n        mask = [True if x == 1 else False for x in np.random.uniform(\n            0, 1, (len(data))) < 1 - test_ratio]\n        neg_mask = [not x for x in mask]\n        train_data, test_data = data[mask], data[neg_mask]\n    return train_data, test_data"
+    },
+    {
+      "type": "paragraph",
+      "text": "Lưu ý rằng nó là thực hành tốt để sử dụng một xác nhận thiết lập trong\nthực tế, ngoài chỉ có một tập kiểm tra. Tuy nhiên, chúng tôi bỏ qua điều\nđó vì lợi ích của ngắn gọn. Trong trường hợp này, bộ kiểm tra của chúng\ntôi có thể được coi là bộ xác nhận held-out của chúng tôi."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "dang-tai-du-lieu",
+      "text": "16.2.4. Đang tải dữ liệu"
+    },
+    {
+      "type": "paragraph",
+      "text": "Sau khi tách tập dữ liệu, chúng tôi sẽ chuyển đổi bộ đào tạo và tập kiểm\ntra thành danh sách và từ điển/ma trận để thuận tiện. Hàm sau đọc dòng\ndataframe theo dòng và liệt kê chỉ mục của người dùng/mục bắt đầu từ số\nkhông. Hàm sau đó trả về danh sách người dùng, mục, xếp hạng và từ\nđiển/ma trận ghi lại các tương tác. Chúng tôi có thể chỉ định loại phản\nhồi cho explicit hoặc implicit ."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "#@save\ndef load_data_ml100k(data, num_users, num_items, feedback='explicit'):\n    users, items, scores = [], [], []\n    inter = np.zeros((num_items, num_users)) if feedback == 'explicit' else {}\n    for line in data.itertuples():\n        user_index, item_index = int(line[1] - 1), int(line[2] - 1)\n        score = int(line[3]) if feedback == 'explicit' else 1\n        users.append(user_index)\n        items.append(item_index)\n        scores.append(score)\n        if feedback == 'implicit':\n            inter.setdefault(user_index, []).append(item_index)\n        else:\n            inter[item_index, user_index] = score\n    return users, items, scores, inter"
+    },
+    {
+      "type": "paragraph",
+      "text": "Sau đó, chúng tôi đặt các bước trên lại với nhau và nó sẽ được sử dụng\ntrong phần tiếp theo. Kết quả được bao bọc với Dataset và DataLoader . Lưu ý rằng last_batch của DataLoader cho dữ liệu\nđào tạo được đặt thành chế độ rollover (Các mẫu còn lại được cuộn\nqua kỷ nguyên tiếp theo.) và đơn đặt hàng được xáo trộn."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "#@save\ndef split_and_load_ml100k(split_mode='seq-aware', feedback='explicit',\n                          test_ratio=0.1, batch_size=256):\n    data, num_users, num_items = read_data_ml100k()\n    train_data, test_data = split_data_ml100k(\n        data, num_users, num_items, split_mode, test_ratio)\n    train_u, train_i, train_r, _ = load_data_ml100k(\n        train_data, num_users, num_items, feedback)\n    test_u, test_i, test_r, _ = load_data_ml100k(\n        test_data, num_users, num_items, feedback)\n    train_set = gluon.data.ArrayDataset(\n        np.array(train_u), np.array(train_i), np.array(train_r))\n    test_set = gluon.data.ArrayDataset(\n        np.array(test_u), np.array(test_i), np.array(test_r))\n    train_iter = gluon.data.DataLoader(\n        train_set, shuffle=True, last_batch='rollover',\n        batch_size=batch_size)\n    test_iter = gluon.data.DataLoader(\n        test_set, batch_size=batch_size)\n    return num_users, num_items, train_iter, test_iter"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tom-tat",
+      "text": "16.2.5. Tóm tắt"
+    },
+    {
+      "type": "list",
+      "ordered": false,
+      "items": [
+        "Bộ dữ liệu MovieLens được sử dụng rộng rãi để nghiên cứu khuyến nghị.\nNó là công khai có sẵn và miễn phí để sử dụng.",
+        "Chúng tôi xác định các chức năng để tải xuống và xử lý trước bộ dữ\nliệu MovieLens 100k để sử dụng thêm trong các phần sau."
+      ]
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bai-tap",
+      "text": "16.2.6. Bài tập"
+    },
+    {
+      "type": "list",
+      "ordered": false,
+      "items": [
+        "Bạn có thể tìm thấy những bộ dữ liệu đề xuất tương tự nào khác?",
+        "Đi qua trang web https://movielens.org/ để biết thêm thông tin về\nMovieLens."
+      ]
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    }
+  ],
+  "images": [
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_movielens_140487_7_0.png",
+      "local_path": "_images/output_movielens_140487_7_0.png",
+      "alt": "../_images/output_movielens_140487_7_0.png"
+    }
+  ],
+  "text": "16.2. Bộ dữ liệu MovieLens\nCó một số bộ dữ liệu có sẵn để nghiên cứu khuyến nghị. Trong số đó, tập\ndữ liệu MovieLens có lẽ là một trong những\nbộ dữ liệu phổ biến hơn. MovieLens là một hệ thống giới thiệu phim dựa\ntrên web phi thương mại. Nó được tạo ra vào năm 1997 và được điều hành\nbởi GroupLens, một phòng thí nghiệm nghiên cứu tại Đại học Minnesota, để\nthu thập dữ liệu xếp hạng phim cho mục đích nghiên cứu. Dữ liệu\nMovieLens rất quan trọng đối với một số nghiên cứu bao gồm khuyến nghị\nđược cá nhân hóa và tâm lý xã hội.\n16.2.1. Lấy dữ liệu\nTập dữ liệu MovieLens được lưu trữ bởi GroupLens website.\nSeveral versions are available. We will use the MovieLens 100K dataset [Herlocker et al., 1999] . Tập dữ liệu này bao gồm \\(100,000\\) xếp hạng, dao động từ 1 đến 5 sao, từ 943 người dùng\ntrên 1682 phim. Nó đã được dọn dẹp để mỗi người dùng đã đánh giá ít nhất\n20 bộ phim. Một số thông tin nhân khẩu học đơn giản như tuổi tác, giới\ntính, thể loại cho người dùng và các mặt hàng cũng có sẵn. Chúng tôi có\nthể tải xuống ml-100k.zip và trích xuất tệp u.data , chứa tất cả xếp hạng \\(100,000\\) ở\nđịnh dạng csv. Có nhiều tệp khác trong thư mục, một mô tả chi tiết cho\nmỗi tệp có thể được tìm thấy trong tệp README của tập dữ liệu.\nĐể bắt đầu, chúng ta hãy nhập các gói cần thiết để chạy thử nghiệm của\nphần này.\nSau đó, chúng tôi tải xuống bộ dữ liệu MovieLens 100k và tải các tương\ntác dưới dạng DataFrame .\n16.2.2. Thống kê của Dataset\nHãy để chúng tôi tải dữ liệu và kiểm tra năm bản ghi đầu tiên theo cách\nthủ công. Đó là một cách hiệu quả để tìm hiểu cấu trúc dữ liệu và xác\nminh rằng chúng đã được tải đúng cách.\nChúng ta có thể thấy rằng mỗi dòng bao gồm bốn cột, bao gồm “id người\ndùng” 1-943, “item id” 1-1682, “rating” 1-5 và “timestamp”. Chúng ta có\nthể xây dựng một ma trận tương tác có kích thước \\(n \\times m\\) ,\ntrong đó \\(n\\) và \\(m\\) là số lượng người dùng và số lượng mặt\nhàng tương ứng. Tập dữ liệu này chỉ ghi lại các xếp hạng hiện có, vì vậy\nchúng ta cũng có thể gọi nó là ma trận xếp hạng và chúng ta sẽ sử dụng\nma trận tương tác và ma trận xếp hạng thay thế cho nhau trong trường hợp\ncác giá trị của ma trận này đại diện cho xếp hạng chính xác. Hầu hết các\ngiá trị trong ma trận đánh giá đều không rõ vì người dùng chưa đánh giá\nphần lớn các bộ phim. Chúng tôi cũng cho thấy sự thưa thớt của tập dữ\nliệu này. Độ thưa thớt được định nghĩa là 1 - number of nonzero entries / ( number of users * number of items) .\nRõ ràng, ma trận tương tác cực kỳ thưa thớt (tức là độ thưa thớt =\n93,695%). Các bộ dữ liệu thế giới thực có thể bị một mức độ thưa thớt\nlớn hơn và đã là một thách thức lâu dài trong việc xây dựng các hệ thống\ngiới thiệu. Một giải pháp khả thi là sử dụng thông tin phụ bổ sung như\ncác tính năng của người dùng/mục để giảm bớt sự thưa thớt.\nSau đó chúng tôi vẽ phân phối số lượng xếp hạng khác nhau. Đúng như dự\nđoán, nó dường như là một phân phối bình thường, với hầu hết các xếp\nhạng tập trung ở mức 3-4.\n16.2.3. Tách tập dữ liệu\nChúng tôi chia tập dữ liệu thành các bộ đào tạo và kiểm tra. Chức năng\nsau cung cấp hai chế độ phân chia bao gồm random và seq-aware . Ở\nchế độ random , chức năng phân chia tương tác 100k một cách ngẫu\nnhiên mà không xem xét dấu thời gian và sử dụng 90% dữ liệu làm mẫu đào\ntạo và 10% còn lại làm mẫu thử theo mặc định. Trong chế độ seq-aware , chúng tôi bỏ ra mục mà người dùng đánh giá gần đây nhất\nđể thử nghiệm và tương tác lịch sử của người dùng như tập đào tạo. Tương\ntác lịch sử của người dùng được sắp xếp từ cũ nhất đến mới nhất dựa trên\ndấu thời gian. Chế độ này sẽ được sử dụng trong phần đề xuất nhận thức\ntrình tự.\nLưu ý rằng nó là thực hành tốt để sử dụng một xác nhận thiết lập trong\nthực tế, ngoài chỉ có một tập kiểm tra. Tuy nhiên, chúng tôi bỏ qua điều\nđó vì lợi ích của ngắn gọn. Trong trường hợp này, bộ kiểm tra của chúng\ntôi có thể được coi là bộ xác nhận held-out của chúng tôi.\n16.2.4. Đang tải dữ liệu\nSau khi tách tập dữ liệu, chúng tôi sẽ chuyển đổi bộ đào tạo và tập kiểm\ntra thành danh sách và từ điển/ma trận để thuận tiện. Hàm sau đọc dòng\ndataframe theo dòng và liệt kê chỉ mục của người dùng/mục bắt đầu từ số\nkhông. Hàm sau đó trả về danh sách người dùng, mục, xếp hạng và từ\nđiển/ma trận ghi lại các tương tác. Chúng tôi có thể chỉ định loại phản\nhồi cho explicit hoặc implicit .\nSau đó, chúng tôi đặt các bước trên lại với nhau và nó sẽ được sử dụng\ntrong phần tiếp theo. Kết quả được bao bọc với Dataset và DataLoader . Lưu ý rằng last_batch của DataLoader cho dữ liệu\nđào tạo được đặt thành chế độ rollover (Các mẫu còn lại được cuộn\nqua kỷ nguyên tiếp theo.) và đơn đặt hàng được xáo trộn.\n16.2.5. Tóm tắt\nBộ dữ liệu MovieLens được sử dụng rộng rãi để nghiên cứu khuyến nghị.\nNó là công khai có sẵn và miễn phí để sử dụng.\nChúng tôi xác định các chức năng để tải xuống và xử lý trước bộ dữ\nliệu MovieLens 100k để sử dụng thêm trong các phần sau.\n16.2.6. Bài tập\nBạn có thể tìm thấy những bộ dữ liệu đề xuất tương tự nào khác?\nĐi qua trang web https://movielens.org/ để biết thêm thông tin về\nMovieLens.\nDiscussions"
+}

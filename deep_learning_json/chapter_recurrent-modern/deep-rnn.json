@@ -1,0 +1,276 @@
+{
+  "url": "https://vi.d2l.ai/chapter_recurrent-modern/deep-rnn.html",
+  "chapter": "chapter_recurrent-modern",
+  "title": "9.3. Mạng thần kinh tái phát sâu",
+  "crawled_at": "2026-07-20T12:40:05.235300+00:00",
+  "headings": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "mang-than-kinh-tai-phat-sau",
+      "text": "9.3. Mạng thần kinh tái phát sâu"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "phu-thuoc-chuc-nang",
+      "text": "9.3.1. Phụ thuộc chức năng"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "thuc-hien-ngan-gon",
+      "text": "9.3.2. Thực hiện ngắn gọn"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "dao-tao-va-du-doan",
+      "text": "9.3.3. Đào tạo và Dự đoán"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tom-tat",
+      "text": "9.3.4. Tóm tắt"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bai-tap",
+      "text": "9.3.5. Bài tập"
+    }
+  ],
+  "content": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "mang-than-kinh-tai-phat-sau",
+      "text": "9.3. Mạng thần kinh tái phát sâu"
+    },
+    {
+      "type": "paragraph",
+      "text": "Cho đến nay, chúng ta chỉ thảo luận về RNNs với một layer ẩn một chiều\nduy nhất. Trong đó hình thức chức năng cụ thể của cách các biến và quan\nsát tiềm ẩn tương tác là khá tùy ý. Đây không phải là một vấn đề lớn\nmiễn là chúng ta có đủ linh hoạt để mô hình hóa các loại tương tác khác\nnhau. Tuy nhiên, với một lớp duy nhất, điều này có thể khá khó khăn.\nTrong trường hợp của các mô hình tuyến tính, chúng tôi đã khắc phục vấn\nđề này bằng cách thêm nhiều lớp hơn. Trong RNNs, điều này phức tạp hơn\nmột chút, vì trước tiên chúng ta cần quyết định cách thức và ở đâu để\nthêm tính phi tuyến thêm."
+    },
+    {
+      "type": "paragraph",
+      "text": "Trên thực tế, chúng ta có thể xếp chồng nhiều lớp RNNlên nhau. Điều này\ndẫn đến một cơ chế linh hoạt, do sự kết hợp của một số lớp đơn giản. Đặc\nbiệt, dữ liệu có thể có liên quan ở các cấp độ khác nhau của ngăn xếp.\nVí dụ: chúng tôi có thể muốn giữ dữ liệu cấp cao về các điều kiện thị\ntrường tài chính (thị trường gấu hoặc thị trường tăng giá) có sẵn, trong\nkhi ở mức thấp hơn, chúng tôi chỉ ghi lại động thái thời gian ngắn hạn."
+    },
+    {
+      "type": "paragraph",
+      "text": "Ngoài tất cả các cuộc thảo luận trừu tượng ở trên, có lẽ dễ dàng nhất để\nhiểu được gia đình của các mô hình mà chúng tôi quan tâm bằng cách xem\nxét Fig. 9.3.1 . Nó mô tả một RNN sâu với \\(L\\) lớp ẩn.\nMỗi trạng thái ẩn liên tục được truyền cho cả bước thời gian tiếp theo\ncủa lớp hiện tại và bước thời gian hiện tại của lớp tiếp theo."
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/deep-rnn.svg",
+      "local_path": "_images/deep-rnn.svg",
+      "alt": "../_images/deep-rnn.svg"
+    },
+    {
+      "type": "paragraph",
+      "text": "Fig. 9.3.1 Architecture of a deep RNN. ¶"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "phu-thuoc-chuc-nang",
+      "text": "9.3.1. Phụ thuộc chức năng"
+    },
+    {
+      "type": "paragraph",
+      "text": "Chúng ta có thể chính thức hóa các phụ thuộc chức năng trong kiến trúc\nsâu của \\(L\\) các lớp ẩn được mô tả trong Fig. 9.3.1 .\nCuộc thảo luận sau đây của chúng tôi tập trung chủ yếu vào mô hình\nvanilla RNN, nhưng nó cũng áp dụng cho các mô hình trình tự khác."
+    },
+    {
+      "type": "paragraph",
+      "text": "Giả sử rằng chúng ta có một đầu vào minibatch \\(\\mathbf{X}_t \\in \\mathbb{R}^{n \\times d}\\) (số ví dụ: \\(n\\) ,\nsố lượng đầu vào trong mỗi ví dụ: \\(d\\) ) tại bước thời gian \\(t\\) . Đồng thời bước, hãy để trạng thái ẩn của lớp ẩn \\(l^\\mathrm{th}\\) ( \\(l=1,\\ldots,L\\) ) là \\(\\mathbf{H}_t^{(l)} \\in \\mathbb{R}^{n \\times h}\\) (số đơn vị ẩn: \\(h\\) ) và biến lớp đầu ra là \\(\\mathbf{O}_t \\in \\mathbb{R}^{n \\times q}\\) (số lượng đầu ra: \\(q\\) ). Đặt \\(\\mathbf{H}_t^{(0)} = \\mathbf{X}_t\\) , trạng thái ẩn\ncủa lớp ẩn \\(l^\\mathrm{th}\\) sử dụng hàm kích hoạt \\(\\phi_l\\) được thể hiện như sau:"
+    },
+    {
+      "type": "math",
+      "latex": "(9.3.1)¶\\[\\mathbf{H}_t^{(l)} = \\phi_l(\\mathbf{H}_t^{(l-1)} \\mathbf{W}_{xh}^{(l)} + \\mathbf{H}_{t-1}^{(l)} \\mathbf{W}_{hh}^{(l)}  + \\mathbf{b}_h^{(l)}),\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "trong đó trọng lượng \\(\\mathbf{W}_{xh}^{(l)} \\in \\mathbb{R}^{h \\times h}\\) và \\(\\mathbf{W}_{hh}^{(l)} \\in \\mathbb{R}^{h \\times h}\\) , cùng với sự\nthiên vị \\(\\mathbf{b}_h^{(l)} \\in \\mathbb{R}^{1 \\times h}\\) , là các\nthông số mô hình của lớp ẩn \\(l^\\mathrm{th}\\) ."
+    },
+    {
+      "type": "paragraph",
+      "text": "Cuối cùng, việc tính toán lớp đầu ra chỉ dựa trên trạng thái ẩn của lớp\nẩn cuối cùng \\(L^\\mathrm{th}\\) :"
+    },
+    {
+      "type": "math",
+      "latex": "(9.3.2)¶\\[\\mathbf{O}_t = \\mathbf{H}_t^{(L)} \\mathbf{W}_{hq} + \\mathbf{b}_q,\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "trong đó trọng lượng \\(\\mathbf{W}_{hq} \\in \\mathbb{R}^{h \\times q}\\) và thiên vị \\(\\mathbf{b}_q \\in \\mathbb{R}^{1 \\times q}\\) là các\nthông số mô hình của lớp đầu ra."
+    },
+    {
+      "type": "paragraph",
+      "text": "Cũng giống như với MLP, số lượng lớp ẩn \\(L\\) và số đơn vị ẩn \\(h\\) là các siêu tham số. Nói cách khác, chúng có thể được điều\nchỉnh hoặc chỉ định bởi chúng tôi. Ngoài ra, chúng ta có thể dễ dàng có\nđược một RNN có cổng sâu bằng cách thay thế tính toán trạng thái ẩn\ntrong (9.3.1) với nó từ GRU hoặc LSTM."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "thuc-hien-ngan-gon",
+      "text": "9.3.2. Thực hiện ngắn gọn"
+    },
+    {
+      "type": "paragraph",
+      "text": "May mắn thay, nhiều chi tiết hậu cần cần thiết để triển khai nhiều lớp\ncủa một RNN có sẵn trong các API cấp cao. Để giữ cho mọi thứ đơn giản,\nchúng tôi chỉ minh họa việc thực hiện bằng cách sử dụng các chức năng\ntích hợp như vậy. Hãy để chúng tôi lấy một mô hình LSTM làm ví dụ. Mã\nnày rất giống với mã chúng tôi đã sử dụng trước đây trong Section 9.2 . Trên thực tế, sự khác biệt duy nhất là chúng ta\nchỉ định số lớp một cách rõ ràng hơn là chọn mặc định của một lớp duy\nnhất. Như thường lệ, chúng ta bắt đầu bằng cách tải tập dữ liệu."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "from mxnet import npx\nfrom mxnet.gluon import rnn\nfrom d2l import mxnet as d2l\n\nnpx.set_np()\n\nbatch_size, num_steps = 32, 35\ntrain_iter, vocab = d2l.load_data_time_machine(batch_size, num_steps)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "import torch\nfrom torch import nn\nfrom d2l import torch as d2l\n\nbatch_size, num_steps = 32, 35\ntrain_iter, vocab = d2l.load_data_time_machine(batch_size, num_steps)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "import tensorflow as tf\nfrom d2l import tensorflow as d2l\n\nbatch_size, num_steps = 32, 35\ntrain_iter, vocab = d2l.load_data_time_machine(batch_size, num_steps)"
+    },
+    {
+      "type": "paragraph",
+      "text": "Các quyết định kiến trúc như chọn siêu tham số rất giống với các quyết\nđịnh của Section 9.2 . Chúng tôi chọn cùng một số đầu vào và đầu\nra như chúng tôi có mã thông báo riêng biệt, tức là vocab_size . Số\nlượng đơn vị ẩn vẫn là 256. Sự khác biệt duy nhất là chúng ta bây giờ\nchọn một số không tầm thường của các lớp ẩn bằng cách xác định giá trị\ncủa num_layers ."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "vocab_size, num_hiddens, num_layers = len(vocab), 256, 2\ndevice = d2l.try_gpu()\nlstm_layer = rnn.LSTM(num_hiddens, num_layers)\nmodel = d2l.RNNModel(lstm_layer, len(vocab))"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "vocab_size, num_hiddens, num_layers = len(vocab), 256, 2\nnum_inputs = vocab_size\ndevice = d2l.try_gpu()\nlstm_layer = nn.LSTM(num_inputs, num_hiddens, num_layers)\nmodel = d2l.RNNModel(lstm_layer, len(vocab))\nmodel = model.to(device)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "vocab_size, num_hiddens, num_layers = len(vocab), 256, 2\nnum_inputs = vocab_size\ndevice_name = d2l.try_gpu()._device_name\nstrategy = tf.distribute.OneDeviceStrategy(device_name)\nrnn_cells = [tf.keras.layers.LSTMCell(num_hiddens) for _ in range(num_layers)]\nstacked_lstm = tf.keras.layers.StackedRNNCells(rnn_cells)\nlstm_layer = tf.keras.layers.RNN(stacked_lstm, time_major=True,\n                                 return_sequences=True, return_state=True)\nwith strategy.scope():\n    model = d2l.RNNModel(lstm_layer, len(vocab))"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "dao-tao-va-du-doan",
+      "text": "9.3.3. Đào tạo và Dự đoán"
+    },
+    {
+      "type": "paragraph",
+      "text": "Kể từ bây giờ chúng tôi khởi tạo hai lớp với mô hình LSTM, kiến trúc khá\nphức tạp hơn này làm chậm quá trình đào tạo đáng kể."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "num_epochs, lr = 500, 2\nd2l.train_ch8(model, train_iter, vocab, lr, num_epochs, device)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "perplexity 1.0, 121050.9 tokens/sec on gpu(0)\ntime travelleryou can show black is white by argument said filby\ntravelleryou can show black is white by argument said filby"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_deep-rnn_d70a11_27_1.svg",
+      "local_path": "_images/output_deep-rnn_d70a11_27_1.svg",
+      "alt": "../_images/output_deep-rnn_d70a11_27_1.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "num_epochs, lr = 500, 2\nd2l.train_ch8(model, train_iter, vocab, lr, num_epochs, device)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "perplexity 1.0, 191605.7 tokens/sec on cuda:0\ntime travelleryou can show black is white by argument said filby\ntravelleryou can show black is white by argument said filby"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_deep-rnn_d70a11_30_1.svg",
+      "local_path": "_images/output_deep-rnn_d70a11_30_1.svg",
+      "alt": "../_images/output_deep-rnn_d70a11_30_1.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "num_epochs, lr = 500, 2\nd2l.train_ch8(model, train_iter, vocab, lr, num_epochs, strategy)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "perplexity 1.0, 4589.2 tokens/sec on /GPU:0\ntime travelleryou can show black is white by argument said filby\ntravelleryou can show black is white by argument said filby"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_deep-rnn_d70a11_33_1.svg",
+      "local_path": "_images/output_deep-rnn_d70a11_33_1.svg",
+      "alt": "../_images/output_deep-rnn_d70a11_33_1.svg"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tom-tat",
+      "text": "9.3.4. Tóm tắt"
+    },
+    {
+      "type": "list",
+      "ordered": false,
+      "items": [
+        "Trong RNNsâu, thông tin trạng thái ẩn được chuyển sang bước thời gian\ntiếp theo của lớp hiện tại và bước thời gian hiện tại của lớp tiếp\ntheo.",
+        "Có tồn tại nhiều hương vị khác nhau của RNNsâu, chẳng hạn như LSTMs,\nGrus, hoặc RNN vani. Thuận tiện, các mô hình này đều có sẵn như là\nmột phần của API cấp cao của các khuôn khổ deep learning.",
+        "Khởi tạo các mô hình đòi hỏi sự chăm sóc. Nhìn chung, RNN sâu đòi hỏi\nlượng công việc đáng kể (chẳng hạn như tốc độ học tập và cắt) để đảm\nbảo sự hội tụ thích hợp."
+      ]
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bai-tap",
+      "text": "9.3.5. Bài tập"
+    },
+    {
+      "type": "list",
+      "ordered": true,
+      "items": [
+        "Cố gắng thực hiện RNN hai lớp từ đầu bằng cách sử dụng triển khai lớp\nduy nhất mà chúng tôi đã thảo luận trong Section 8.5 .",
+        "Thay thế LSTM bằng GRU và so sánh độ chính xác và tốc độ đào tạo.",
+        "Tăng dữ liệu đào tạo để bao gồm nhiều cuốn sách. Làm thế nào thấp bạn\ncó thể đi trên quy mô bối rối?",
+        "Bạn có muốn kết hợp các nguồn của các tác giả khác nhau khi mô hình\nhóa văn bản? Tại sao đây là một ý tưởng tốt? Điều gì có thể đi sai?"
+      ]
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    }
+  ],
+  "images": [
+    {
+      "original_url": "https://vi.d2l.ai/_images/deep-rnn.svg",
+      "local_path": "_images/deep-rnn.svg",
+      "alt": "../_images/deep-rnn.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_deep-rnn_d70a11_27_1.svg",
+      "local_path": "_images/output_deep-rnn_d70a11_27_1.svg",
+      "alt": "../_images/output_deep-rnn_d70a11_27_1.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_deep-rnn_d70a11_30_1.svg",
+      "local_path": "_images/output_deep-rnn_d70a11_30_1.svg",
+      "alt": "../_images/output_deep-rnn_d70a11_30_1.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_deep-rnn_d70a11_33_1.svg",
+      "local_path": "_images/output_deep-rnn_d70a11_33_1.svg",
+      "alt": "../_images/output_deep-rnn_d70a11_33_1.svg"
+    }
+  ],
+  "text": "9.3. Mạng thần kinh tái phát sâu\nCho đến nay, chúng ta chỉ thảo luận về RNNs với một layer ẩn một chiều\nduy nhất. Trong đó hình thức chức năng cụ thể của cách các biến và quan\nsát tiềm ẩn tương tác là khá tùy ý. Đây không phải là một vấn đề lớn\nmiễn là chúng ta có đủ linh hoạt để mô hình hóa các loại tương tác khác\nnhau. Tuy nhiên, với một lớp duy nhất, điều này có thể khá khó khăn.\nTrong trường hợp của các mô hình tuyến tính, chúng tôi đã khắc phục vấn\nđề này bằng cách thêm nhiều lớp hơn. Trong RNNs, điều này phức tạp hơn\nmột chút, vì trước tiên chúng ta cần quyết định cách thức và ở đâu để\nthêm tính phi tuyến thêm.\nTrên thực tế, chúng ta có thể xếp chồng nhiều lớp RNNlên nhau. Điều này\ndẫn đến một cơ chế linh hoạt, do sự kết hợp của một số lớp đơn giản. Đặc\nbiệt, dữ liệu có thể có liên quan ở các cấp độ khác nhau của ngăn xếp.\nVí dụ: chúng tôi có thể muốn giữ dữ liệu cấp cao về các điều kiện thị\ntrường tài chính (thị trường gấu hoặc thị trường tăng giá) có sẵn, trong\nkhi ở mức thấp hơn, chúng tôi chỉ ghi lại động thái thời gian ngắn hạn.\nNgoài tất cả các cuộc thảo luận trừu tượng ở trên, có lẽ dễ dàng nhất để\nhiểu được gia đình của các mô hình mà chúng tôi quan tâm bằng cách xem\nxét Fig. 9.3.1 . Nó mô tả một RNN sâu với \\(L\\) lớp ẩn.\nMỗi trạng thái ẩn liên tục được truyền cho cả bước thời gian tiếp theo\ncủa lớp hiện tại và bước thời gian hiện tại của lớp tiếp theo.\nFig. 9.3.1 Architecture of a deep RNN. ¶\n9.3.1. Phụ thuộc chức năng\nChúng ta có thể chính thức hóa các phụ thuộc chức năng trong kiến trúc\nsâu của \\(L\\) các lớp ẩn được mô tả trong Fig. 9.3.1 .\nCuộc thảo luận sau đây của chúng tôi tập trung chủ yếu vào mô hình\nvanilla RNN, nhưng nó cũng áp dụng cho các mô hình trình tự khác.\nGiả sử rằng chúng ta có một đầu vào minibatch \\(\\mathbf{X}_t \\in \\mathbb{R}^{n \\times d}\\) (số ví dụ: \\(n\\) ,\nsố lượng đầu vào trong mỗi ví dụ: \\(d\\) ) tại bước thời gian \\(t\\) . Đồng thời bước, hãy để trạng thái ẩn của lớp ẩn \\(l^\\mathrm{th}\\) ( \\(l=1,\\ldots,L\\) ) là \\(\\mathbf{H}_t^{(l)} \\in \\mathbb{R}^{n \\times h}\\) (số đơn vị ẩn: \\(h\\) ) và biến lớp đầu ra là \\(\\mathbf{O}_t \\in \\mathbb{R}^{n \\times q}\\) (số lượng đầu ra: \\(q\\) ). Đặt \\(\\mathbf{H}_t^{(0)} = \\mathbf{X}_t\\) , trạng thái ẩn\ncủa lớp ẩn \\(l^\\mathrm{th}\\) sử dụng hàm kích hoạt \\(\\phi_l\\) được thể hiện như sau:\ntrong đó trọng lượng \\(\\mathbf{W}_{xh}^{(l)} \\in \\mathbb{R}^{h \\times h}\\) và \\(\\mathbf{W}_{hh}^{(l)} \\in \\mathbb{R}^{h \\times h}\\) , cùng với sự\nthiên vị \\(\\mathbf{b}_h^{(l)} \\in \\mathbb{R}^{1 \\times h}\\) , là các\nthông số mô hình của lớp ẩn \\(l^\\mathrm{th}\\) .\nCuối cùng, việc tính toán lớp đầu ra chỉ dựa trên trạng thái ẩn của lớp\nẩn cuối cùng \\(L^\\mathrm{th}\\) :\ntrong đó trọng lượng \\(\\mathbf{W}_{hq} \\in \\mathbb{R}^{h \\times q}\\) và thiên vị \\(\\mathbf{b}_q \\in \\mathbb{R}^{1 \\times q}\\) là các\nthông số mô hình của lớp đầu ra.\nCũng giống như với MLP, số lượng lớp ẩn \\(L\\) và số đơn vị ẩn \\(h\\) là các siêu tham số. Nói cách khác, chúng có thể được điều\nchỉnh hoặc chỉ định bởi chúng tôi. Ngoài ra, chúng ta có thể dễ dàng có\nđược một RNN có cổng sâu bằng cách thay thế tính toán trạng thái ẩn\ntrong (9.3.1) với nó từ GRU hoặc LSTM.\n9.3.2. Thực hiện ngắn gọn\nMay mắn thay, nhiều chi tiết hậu cần cần thiết để triển khai nhiều lớp\ncủa một RNN có sẵn trong các API cấp cao. Để giữ cho mọi thứ đơn giản,\nchúng tôi chỉ minh họa việc thực hiện bằng cách sử dụng các chức năng\ntích hợp như vậy. Hãy để chúng tôi lấy một mô hình LSTM làm ví dụ. Mã\nnày rất giống với mã chúng tôi đã sử dụng trước đây trong Section 9.2 . Trên thực tế, sự khác biệt duy nhất là chúng ta\nchỉ định số lớp một cách rõ ràng hơn là chọn mặc định của một lớp duy\nnhất. Như thường lệ, chúng ta bắt đầu bằng cách tải tập dữ liệu.\nCác quyết định kiến trúc như chọn siêu tham số rất giống với các quyết\nđịnh của Section 9.2 . Chúng tôi chọn cùng một số đầu vào và đầu\nra như chúng tôi có mã thông báo riêng biệt, tức là vocab_size . Số\nlượng đơn vị ẩn vẫn là 256. Sự khác biệt duy nhất là chúng ta bây giờ\nchọn một số không tầm thường của các lớp ẩn bằng cách xác định giá trị\ncủa num_layers .\n9.3.3. Đào tạo và Dự đoán\nKể từ bây giờ chúng tôi khởi tạo hai lớp với mô hình LSTM, kiến trúc khá\nphức tạp hơn này làm chậm quá trình đào tạo đáng kể.\n9.3.4. Tóm tắt\nTrong RNNsâu, thông tin trạng thái ẩn được chuyển sang bước thời gian\ntiếp theo của lớp hiện tại và bước thời gian hiện tại của lớp tiếp\ntheo.\nCó tồn tại nhiều hương vị khác nhau của RNNsâu, chẳng hạn như LSTMs,\nGrus, hoặc RNN vani. Thuận tiện, các mô hình này đều có sẵn như là\nmột phần của API cấp cao của các khuôn khổ deep learning.\nKhởi tạo các mô hình đòi hỏi sự chăm sóc. Nhìn chung, RNN sâu đòi hỏi\nlượng công việc đáng kể (chẳng hạn như tốc độ học tập và cắt) để đảm\nbảo sự hội tụ thích hợp.\n9.3.5. Bài tập\nCố gắng thực hiện RNN hai lớp từ đầu bằng cách sử dụng triển khai lớp\nduy nhất mà chúng tôi đã thảo luận trong Section 8.5 .\nThay thế LSTM bằng GRU và so sánh độ chính xác và tốc độ đào tạo.\nTăng dữ liệu đào tạo để bao gồm nhiều cuốn sách. Làm thế nào thấp bạn\ncó thể đi trên quy mô bối rối?\nBạn có muốn kết hợp các nguồn của các tác giả khác nhau khi mô hình\nhóa văn bản? Tại sao đây là một ý tưởng tốt? Điều gì có thể đi sai?\nDiscussions\nDiscussions"
+}

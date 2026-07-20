@@ -52,7 +52,7 @@ export default function TopBar({ onMenu }: TopBarProps) {
           progress={pct}
           size={38}
           stroke={5}
-          color="var(--warn)"
+          color="var(--primary)"
           label={<span className="dl-goal-label">{Math.min(xpToday, goalXp)}</span>}
         />
       </button>

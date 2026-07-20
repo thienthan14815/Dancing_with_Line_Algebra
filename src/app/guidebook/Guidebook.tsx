@@ -3,7 +3,7 @@ import { COURSE, getSection } from '../../core/content/course';
 import type { Section } from '../../core/content/types';
 import { getGuideEntry } from './content';
 import MathText from '../../components/MathText';
-import { Card, Badge, Button } from '../ui';
+import { Card, Button } from '../ui';
 import './guidebook.css';
 
 /**
@@ -25,41 +25,29 @@ function GuidebookList() {
     <div className="dl-page gb-page">
       <header className="gb-hero">
         <h1 className="gb-hero-title">Sổ tay</h1>
-        <p className="dl-muted">
-          Tra cứu nhanh khái niệm, ký hiệu và công thức cốt lõi của từng chặng
-          học — kèm trực giác hình học và lỗi thường gặp.
-        </p>
       </header>
 
-      <div className="gb-grid">
-        {COURSE.sections.map((section) => {
-          const entry = getGuideEntry(section.id);
-          return (
-            <Link
-              key={section.id}
-              to={`/so-tay/${section.id}`}
-              className="gb-card-link"
-            >
-              <Card interactive className="gb-card">
-                <span className="gb-card-num">{section.num}</span>
-                <div className="gb-card-body">
-                  <h2 className="gb-card-title">{section.title}</h2>
-                  <p className="gb-card-en">{section.en}</p>
-                  <p className="gb-card-sub">{section.subtitle}</p>
-                  {entry && (
-                    <div className="gb-card-tags">
-                      <Badge tone="muted">{entry.concepts.length} khái niệm</Badge>
-                      <Badge tone="accent">{entry.formulas.length} công thức</Badge>
-                    </div>
-                  )}
-                </div>
-                <span className="gb-card-arrow" aria-hidden>
-                  →
-                </span>
-              </Card>
-            </Link>
-          );
-        })}
+      <div className="gb-index">
+        {getGuideEntry('dl-map') && (
+          <Link to="/so-tay/dl-map" className="gb-row">
+            <span className="gb-row-num" aria-hidden>
+              🗺️
+            </span>
+            <span className="gb-row-title">Bản đồ Deep Learning</span>
+            <span className="gb-row-arrow" aria-hidden>
+              →
+            </span>
+          </Link>
+        )}
+        {COURSE.sections.map((section) => (
+          <Link key={section.id} to={`/so-tay/${section.id}`} className="gb-row">
+            <span className="gb-row-num">{section.num}</span>
+            <span className="gb-row-title">{section.title}</span>
+            <span className="gb-row-arrow" aria-hidden>
+              →
+            </span>
+          </Link>
+        ))}
       </div>
     </div>
   );
@@ -69,10 +57,10 @@ function GuidebookList() {
 // CHI TIẾT MỘT SECTION
 // ---------------------------------------------------------------------------
 function GuidebookDetail({ sectionId }: { sectionId: string }) {
-  const section = getSection(sectionId);
   const entry = getGuideEntry(sectionId);
+  const section = getSection(sectionId);
 
-  if (!section || !entry) {
+  if (!entry) {
     return (
       <div className="dl-page gb-page">
         <Card className="gb-notfound">
@@ -88,7 +76,7 @@ function GuidebookDetail({ sectionId }: { sectionId: string }) {
     );
   }
 
-  const lessonId = firstLessonId(section);
+  const lessonId = section ? firstLessonId(section) : undefined;
 
   return (
     <div className="dl-page gb-page gb-detail">
@@ -97,11 +85,11 @@ function GuidebookDetail({ sectionId }: { sectionId: string }) {
       </Link>
 
       <header className="gb-detail-head">
-        <span className="gb-detail-num">{section.num}</span>
+        {section && <span className="gb-detail-num">{section.num}</span>}
         <div>
           <h1 className="gb-detail-title">{entry.nameVi}</h1>
           <p className="gb-detail-en">{entry.nameEn}</p>
-          <p className="dl-muted gb-detail-sub">{section.subtitle}</p>
+          {section && <p className="dl-muted gb-detail-sub">{section.subtitle}</p>}
         </div>
       </header>
 
@@ -184,7 +172,7 @@ function GuidebookDetail({ sectionId }: { sectionId: string }) {
 
       {/* Hành động */}
       <div className="gb-actions">
-        {lessonId && (
+        {section && lessonId && (
           <Link
             to={`/ch/${section.id}/${lessonId}`}
             className="gb-action-link"

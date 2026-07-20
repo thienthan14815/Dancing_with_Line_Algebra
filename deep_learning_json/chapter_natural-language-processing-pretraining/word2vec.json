@@ -1,0 +1,329 @@
+{
+  "url": "https://vi.d2l.ai/chapter_natural-language-processing-pretraining/word2vec.html",
+  "chapter": "chapter_natural-language-processing-pretraining",
+  "title": "14.1. Từ nhúng (word2vec)",
+  "crawled_at": "2026-07-20T12:40:53.394237+00:00",
+  "headings": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "tu-nhung-word2vec",
+      "text": "14.1. Từ nhúng (word2vec)"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "vecto-mot-nong-la-mot-lua-chon-toi",
+      "text": "14.1.1. Vectơ một nóng là một lựa chọn tồi"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "word2vec-tu-giam-sat",
+      "text": "14.1.2. Word2vec tự giám sát"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "mo-hinh-skip-gram",
+      "text": "14.1.3. Mô hình Skip-Gram"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "dao-tao",
+      "text": "14.1.3.1. Đào tạo"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "mo-hinh-tui-tu-lien-tuc-cbow",
+      "text": "14.1.4. Mô hình túi từ liên tục (CBOW)"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "id3",
+      "text": "14.1.4.1. Đào tạo"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tom-tat",
+      "text": "14.1.5. Tóm tắt"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bai-tap",
+      "text": "14.1.6. Bài tập"
+    }
+  ],
+  "content": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "tu-nhung-word2vec",
+      "text": "14.1. Từ nhúng (word2vec)"
+    },
+    {
+      "type": "paragraph",
+      "text": "Ngôn ngữ tự nhiên là một hệ thống phức tạp dùng để thể hiện ý nghĩa.\nTrong hệ thống này, từ ngữ là đơn vị cơ bản của nghĩa. Như tên của nó, vectơ từ là các vectơ được sử dụng để biểu diễn các từ, và cũng có thể\nđược coi là vectơ tính năng hoặc biểu diễn của các từ. Kỹ thuật lập bản\nđồ từ với vectơ thực được gọi là word embedding . Trong những năm gần\nđây, nhúng từ đã dần trở thành kiến thức cơ bản về xử lý ngôn ngữ tự\nnhiên."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "vecto-mot-nong-la-mot-lua-chon-toi",
+      "text": "14.1.1. Vectơ một nóng là một lựa chọn tồi"
+    },
+    {
+      "type": "paragraph",
+      "text": "Chúng tôi sử dụng vectơ một nóng để biểu diễn các từ (ký tự là từ) trong Section 8.5 . Giả sử số từ khác nhau trong từ điển (cỡ từ\nđiển) là \\(N\\) , và mỗi từ tương ứng với một số nguyên (index) khác\nnhau từ \\(0\\) đến \\(N−1\\) . Để có được biểu diễn vectơ một nóng\ncho bất kỳ từ nào có chỉ số \\(i\\) , chúng ta tạo một vector chiều\ndài- \\(N\\) với tất cả 0s và đặt phần tử ở vị trí \\(i\\) thành 1.\nBằng cách này, mỗi từ được biểu diễn dưới dạng vectơ có chiều dài \\(N\\) , và nó có thể được sử dụng trực tiếp bởi các mạng thần kinh."
+    },
+    {
+      "type": "paragraph",
+      "text": "Mặc dù vectơ từ một nóng rất dễ xây dựng, chúng thường không phải là một\nlựa chọn tốt. Một lý do chính là các vectơ từ một nóng không thể diễn tả\nchính xác sự tương đồng giữa các từ khác nhau, chẳng hạn như tương tự *\ncosine* mà chúng ta thường sử dụng. Đối với vectơ \\(\\mathbf{x}, \\mathbf{y} \\in \\mathbb{R}^d\\) , sự tương đồng cosin của\nchúng là cosin của góc giữa chúng:"
+    },
+    {
+      "type": "math",
+      "latex": "(14.1.1)¶\\[\\frac{\\mathbf{x}^\\top \\mathbf{y}}{\\|\\mathbf{x}\\| \\|\\mathbf{y}\\|} \\in [-1, 1].\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Vì sự tương đồng cosin giữa các vectơ một nóng của hai từ khác nhau bất\nkỳ là 0, các vectơ một nóng không thể mã hóa các điểm tương đồng giữa\ncác từ."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "word2vec-tu-giam-sat",
+      "text": "14.1.2. Word2vec tự giám sát"
+    },
+    {
+      "type": "paragraph",
+      "text": "Công cụ word2vec đã\nđược đề xuất để giải quyết vấn đề trên. Nó ánh xạ từng từ thành một\nvectơ có độ dài cố định, và các vectơ này có thể thể hiện tốt hơn mối\nquan hệ tương đồng và tương tự giữa các từ khác nhau. Công cụ word2vec\nchứa hai mô hình, cụ thể là skip-gram [Mikolov et al., 2013b] và * túi liên từ* (CBOW) [Mikolov et al., 2013a] . Đối với các đại diện có ý nghĩa\nvề mặt ngữ nghĩa, đào tạo của họ dựa vào xác suất có điều kiện có thể\nđược xem như dự đoán một số từ bằng cách sử dụng một số từ xung quanh\ncủa họ trong thể. Vì sự giám sát đến từ dữ liệu không có nhãn, cả bỏ qua\ngram và túi từ liên tục đều là các mô hình tự giám sát."
+    },
+    {
+      "type": "paragraph",
+      "text": "Sau đây, chúng tôi sẽ giới thiệu hai mô hình này và phương pháp đào tạo\ncủa họ."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "mo-hinh-skip-gram",
+      "text": "14.1.3. Mô hình Skip-Gram"
+    },
+    {
+      "type": "paragraph",
+      "text": "Mô hình skip-gram giả định rằng một từ có thể được sử dụng để tạo ra\ncác từ xung quanh của nó trong một chuỗi văn bản. Lấy chuỗi văn bản\n“các”, “người đàn ông”, “yêu thương”, “anh ấy”, “con trai” làm ví dụ.\nHãy để chúng tôi chọn “loves” làm từ center và đặt kích thước cửa sổ\nngữ cảnh thành 2. Như thể hiện trong Fig. 14.1.1 , với từ\ntrung tâm “yêu thương”, mô hình skip-gram xem xét xác suất có điều kiện\nđể tạo ra các từ ngữ cảnh *: “the”, “man”, “his”, và “con trai”, không\nquá 2 từ cách từ trung tâm:"
+    },
+    {
+      "type": "math",
+      "latex": "(14.1.2)¶\\[P(\\textrm{\"the\"},\\textrm{\"man\"},\\textrm{\"his\"},\\textrm{\"son\"}\\mid\\textrm{\"loves\"}).\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Giả sử rằng các từ ngữ cảnh được tạo độc lập cho từ trung tâm (tức là\nđộc lập có điều kiện). Trong trường hợp này, xác suất có điều kiện ở\ntrên có thể được viết lại dưới dạng"
+    },
+    {
+      "type": "math",
+      "latex": "(14.1.3)¶\\[P(\\textrm{\"the\"}\\mid\\textrm{\"loves\"})\\cdot P(\\textrm{\"man\"}\\mid\\textrm{\"loves\"})\\cdot P(\\textrm{\"his\"}\\mid\\textrm{\"loves\"})\\cdot P(\\textrm{\"son\"}\\mid\\textrm{\"loves\"}).\\]"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/skip-gram.svg",
+      "local_path": "_images/skip-gram.svg",
+      "alt": "../_images/skip-gram.svg"
+    },
+    {
+      "type": "paragraph",
+      "text": "Fig. 14.1.1 The skip-gram model considers the conditional probability of\ngenerating the surrounding context words given a center word. ¶"
+    },
+    {
+      "type": "paragraph",
+      "text": "Trong mô hình skip-gram, mỗi từ có hai biểu diễn \\(d\\) -dimensional-vector để tính xác suất có điều kiện. Cụ thể hơn,\nđối với bất kỳ từ nào có chỉ mục \\(i\\) trong từ điển, biểu thị bằng \\(\\mathbf{v}_i\\in\\mathbb{R}^d\\) và \\(\\mathbf{u}_i\\in\\mathbb{R}^d\\) hai vectơ của nó khi được sử dụng\nnhư một từ center và một từ context , tương ứng. Xác suất có điều\nkiện tạo ra bất kỳ từ ngữ cảnh nào \\(w_o\\) (với chỉ số \\(o\\) trong từ điển) cho từ trung tâm \\(w_c\\) (với chỉ số \\(c\\) trong\ntừ điển) có thể được mô hình hóa bằng một hoạt động softmax trên các sản\nphẩm chấm vector:"
+    },
+    {
+      "type": "math",
+      "latex": "(14.1.4)¶\\[P(w_o \\mid w_c) = \\frac{\\text{exp}(\\mathbf{u}_o^\\top \\mathbf{v}_c)}{ \\sum_{i \\in \\mathcal{V}} \\text{exp}(\\mathbf{u}_i^\\top \\mathbf{v}_c)},\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "nơi chỉ số từ vựng đặt \\(\\mathcal{V} = \\{0, 1, \\ldots, |\\mathcal{V}|-1\\}\\) . Cho một chuỗi\nvăn bản có độ dài \\(T\\) , trong đó từ lúc bước \\(t\\) được ký hiệu\nlà \\(w^{(t)}\\) . Giả sử rằng các từ ngữ cảnh được tạo độc lập cho bất\nkỳ từ trung tâm nào. Đối với kích thước cửa sổ ngữ cảnh \\(m\\) , hàm\nkhả năng của mô hình skip-gram là xác suất tạo ra tất cả các từ ngữ cảnh\ncho bất kỳ từ trung tâm nào:"
+    },
+    {
+      "type": "math",
+      "latex": "(14.1.5)¶\\[\\prod_{t=1}^{T} \\prod_{-m \\leq j \\leq m,\\ j \\neq 0} P(w^{(t+j)} \\mid w^{(t)}),\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "trong đó bất kỳ bước thời gian nào nhỏ hơn \\(1\\) hoặc lớn hơn \\(T\\) có thể được bỏ qua."
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "dao-tao",
+      "text": "14.1.3.1. Đào tạo"
+    },
+    {
+      "type": "paragraph",
+      "text": "Các tham số mô hình skip-gram là vector từ trung tâm và vector từ ngữ\ncảnh cho mỗi từ trong từ vựng. Trong đào tạo, chúng ta tìm hiểu các tham\nsố mô hình bằng cách tối đa hóa hàm khả năng (tức là ước tính khả năng\ntối đa). Điều này tương đương với việc giảm thiểu hàm mất sau:"
+    },
+    {
+      "type": "math",
+      "latex": "(14.1.6)¶\\[- \\sum_{t=1}^{T} \\sum_{-m \\leq j \\leq m,\\ j \\neq 0} \\text{log}\\, P(w^{(t+j)} \\mid w^{(t)}).\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Khi sử dụng stochastic gradient descent để giảm thiểu tổn thất, trong\nmỗi lần lặp lại, chúng ta có thể lấy mẫu ngẫu nhiên một dãy con ngắn hơn\nđể tính toán gradient (stochastic) cho dãy tiếp theo này để cập nhật các\ntham số mô hình. Để tính toán gradient (stochastic) này, chúng ta cần\nphải có được gradient của xác suất điều kiện nhật ký đối với vector từ\ntrung tâm và vector từ ngữ cảnh. Nói chung, theo (14.1.4) xác suất có điều kiện nhật ký liên quan\nđến bất kỳ cặp nào của từ trung tâm \\(w_c\\) và từ ngữ cảnh \\(w_o\\) là"
+    },
+    {
+      "type": "math",
+      "latex": "(14.1.7)¶\\[\\log P(w_o \\mid w_c) =\\mathbf{u}_o^\\top \\mathbf{v}_c - \\log\\left(\\sum_{i \\in \\mathcal{V}} \\text{exp}(\\mathbf{u}_i^\\top \\mathbf{v}_c)\\right).\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Thông qua sự khác biệt, chúng ta có thể có được gradient của nó đối với\nvector từ trung tâm \\(\\mathbf{v}_c\\) như"
+    },
+    {
+      "type": "math",
+      "latex": "(14.1.8)¶\\[\\begin{split}\\begin{aligned}\\frac{\\partial \\text{log}\\, P(w_o \\mid w_c)}{\\partial \\mathbf{v}_c}&= \\mathbf{u}_o - \\frac{\\sum_{j \\in \\mathcal{V}} \\exp(\\mathbf{u}_j^\\top \\mathbf{v}_c)\\mathbf{u}_j}{\\sum_{i \\in \\mathcal{V}} \\exp(\\mathbf{u}_i^\\top \\mathbf{v}_c)}\\\\&= \\mathbf{u}_o - \\sum_{j \\in \\mathcal{V}} \\left(\\frac{\\text{exp}(\\mathbf{u}_j^\\top \\mathbf{v}_c)}{ \\sum_{i \\in \\mathcal{V}} \\text{exp}(\\mathbf{u}_i^\\top \\mathbf{v}_c)}\\right) \\mathbf{u}_j\\\\&= \\mathbf{u}_o - \\sum_{j \\in \\mathcal{V}} P(w_j \\mid w_c) \\mathbf{u}_j.\\end{aligned}\\end{split}\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Lưu ý rằng việc tính toán trong (14.1.8) đòi hỏi xác\nsuất có điều kiện của tất cả các từ trong từ điển với \\(w_c\\) là từ\ntrung tâm. Các gradient cho các vectơ từ khác có thể thu được theo cùng\nmột cách."
+    },
+    {
+      "type": "paragraph",
+      "text": "Sau khi đào tạo, đối với bất kỳ từ nào có chỉ mục \\(i\\) trong từ\nđiển, chúng tôi có được cả hai vectơ từ \\(\\mathbf{v}_i\\) (là từ\ntrung tâm) và \\(\\mathbf{u}_i\\) (như từ ngữ cảnh). Trong các ứng dụng\nxử lý ngôn ngữ tự nhiên, các vectơ từ trung tâm của mô hình skip-gram\nthường được sử dụng làm biểu diễn từ."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "mo-hinh-tui-tu-lien-tuc-cbow",
+      "text": "14.1.4. Mô hình túi từ liên tục (CBOW)"
+    },
+    {
+      "type": "paragraph",
+      "text": "Mô hình túi từ* (CBOW) liên tục tương tự như mô hình bỏ qua gram. Sự\nkhác biệt lớn so với mô hình skip-gram là mô hình túi từ liên tục giả\nđịnh rằng một từ trung tâm được tạo ra dựa trên các từ ngữ cảnh xung\nquanh của nó trong chuỗi văn bản. Ví dụ, trong cùng một chuỗi văn bản\n“the”, “man”, “loves”, “his”, và “son”, với “yêu” là từ trung tâm và\nkích thước cửa sổ ngữ cảnh là 2, túi liên tục của mô hình từ xem xét xác\nsuất có điều kiện tạo ra từ trung tâm “yêu” dựa trên các từ ngữ cảnh\n“the”, “man”, “his” và “son “(như thể hiện trong fig_cbow ),\nđó là"
+    },
+    {
+      "type": "math",
+      "latex": "(14.1.9)¶\\[P(\\textrm{\"loves\"}\\mid\\textrm{\"the\"},\\textrm{\"man\"},\\textrm{\"his\"},\\textrm{\"son\"}).\\]"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/cbow.svg",
+      "local_path": "_images/cbow.svg",
+      "alt": "../_images/cbow.svg"
+    },
+    {
+      "type": "paragraph",
+      "text": "Fig. 14.1.2 The continuous bag of words model considers the conditional\nprobability of generating the center word given its surrounding\ncontext words.\n:label: fig_cbow ¶"
+    },
+    {
+      "type": "paragraph",
+      "text": "Vì có nhiều từ ngữ cảnh trong mô hình túi từ liên tục, các vectơ từ ngữ\ncảnh này được tính trung bình trong việc tính xác suất có điều kiện. Cụ\nthể, đối với bất kỳ từ nào có chỉ số \\(i\\) trong từ điển, biểu thị\nbằng \\(\\mathbf{v}_i\\in\\mathbb{R}^d\\) và \\(\\mathbf{u}_i\\in\\mathbb{R}^d\\) hai vectơ của nó khi được sử dụng\nnhư một từ context và một từ center (nghĩa được chuyển trong mô hình\nskip-gram), tương ứng. Xác suất có điều kiện tạo ra bất kỳ từ trung tâm\nnào \\(w_c\\) (với chỉ số \\(c\\) trong từ điển) cho các từ ngữ cảnh\nxung quanh của nó \\(w_{o_1}, \\ldots, w_{o_{2m}}\\) (với chỉ số \\(o_1, \\ldots, o_{2m}\\) trong từ điển) có thể được mô hình hóa bởi"
+    },
+    {
+      "type": "math",
+      "latex": "(14.1.10)¶\\[P(w_c \\mid w_{o_1}, \\ldots, w_{o_{2m}}) = \\frac{\\text{exp}\\left(\\frac{1}{2m}\\mathbf{u}_c^\\top (\\mathbf{v}_{o_1} + \\ldots, + \\mathbf{v}_{o_{2m}}) \\right)}{ \\sum_{i \\in \\mathcal{V}} \\text{exp}\\left(\\frac{1}{2m}\\mathbf{u}_i^\\top (\\mathbf{v}_{o_1} + \\ldots, + \\mathbf{v}_{o_{2m}}) \\right)}.\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Đối với ngắn gọn, hãy để \\(\\mathcal{W}_o= \\{w_{o_1}, \\ldots, w_{o_{2m}}\\}\\) và \\(\\bar{\\mathbf{v}}_o = \\left(\\mathbf{v}_{o_1} + \\ldots, + \\mathbf{v}_{o_{2m}} \\right)/(2m)\\) .\nSau đó, (14.1.10) có thể được đơn giản hóa như"
+    },
+    {
+      "type": "math",
+      "latex": "(14.1.11)¶\\[P(w_c \\mid \\mathcal{W}_o) = \\frac{\\exp\\left(\\mathbf{u}_c^\\top \\bar{\\mathbf{v}}_o\\right)}{\\sum_{i \\in \\mathcal{V}} \\exp\\left(\\mathbf{u}_i^\\top \\bar{\\mathbf{v}}_o\\right)}.\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Cho một chuỗi văn bản có chiều dài \\(T\\) , trong đó từ lúc bước \\(t\\) được ký hiệu là \\(w^{(t)}\\) . Đối với kích thước cửa sổ ngữ\ncảnh \\(m\\) , chức năng khả năng của túi liên tục của mô hình từ là\nxác suất tạo ra tất cả các từ trung tâm cho các từ ngữ cảnh của chúng:"
+    },
+    {
+      "type": "math",
+      "latex": "(14.1.12)¶\\[\\prod_{t=1}^{T}  P(w^{(t)} \\mid  w^{(t-m)}, \\ldots, w^{(t-1)}, w^{(t+1)}, \\ldots, w^{(t+m)}).\\]"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "id3",
+      "text": "14.1.4.1. Đào tạo"
+    },
+    {
+      "type": "paragraph",
+      "text": "Đào tạo túi liên tục của các mô hình từ gần giống như đào tạo mô hình\nskip-gram. Ước tính khả năng tối đa của mô hình túi từ liên tục tương\nđương với việc giảm thiểu chức năng mất sau:"
+    },
+    {
+      "type": "math",
+      "latex": "(14.1.13)¶\\[-\\sum_{t=1}^T  \\text{log}\\, P(w^{(t)} \\mid  w^{(t-m)}, \\ldots, w^{(t-1)}, w^{(t+1)}, \\ldots, w^{(t+m)}).\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Chú ý rằng"
+    },
+    {
+      "type": "math",
+      "latex": "(14.1.14)¶\\[\\log\\,P(w_c \\mid \\mathcal{W}_o) = \\mathbf{u}_c^\\top \\bar{\\mathbf{v}}_o - \\log\\,\\left(\\sum_{i \\in \\mathcal{V}} \\exp\\left(\\mathbf{u}_i^\\top \\bar{\\mathbf{v}}_o\\right)\\right).\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Thông qua sự khác biệt, chúng ta có thể có được gradient của nó đối với\nbất kỳ vector từ ngữ cảnh \\(\\mathbf{v}_{o_i}\\) ( \\(i = 1, \\ldots, 2m\\) ) như"
+    },
+    {
+      "type": "math",
+      "latex": "(14.1.15)¶\\[\\frac{\\partial \\log\\, P(w_c \\mid \\mathcal{W}_o)}{\\partial \\mathbf{v}_{o_i}} = \\frac{1}{2m} \\left(\\mathbf{u}_c - \\sum_{j \\in \\mathcal{V}} \\frac{\\exp(\\mathbf{u}_j^\\top \\bar{\\mathbf{v}}_o)\\mathbf{u}_j}{ \\sum_{i \\in \\mathcal{V}} \\text{exp}(\\mathbf{u}_i^\\top \\bar{\\mathbf{v}}_o)} \\right) = \\frac{1}{2m}\\left(\\mathbf{u}_c - \\sum_{j \\in \\mathcal{V}} P(w_j \\mid \\mathcal{W}_o) \\mathbf{u}_j \\right).\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Các gradient cho các vectơ từ khác có thể thu được theo cùng một cách.\nKhông giống như mô hình skip-gram, mô hình túi từ liên tục thường sử\ndụng vectơ từ ngữ cảnh làm biểu diễn từ."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tom-tat",
+      "text": "14.1.5. Tóm tắt"
+    },
+    {
+      "type": "list",
+      "ordered": false,
+      "items": [
+        "Vectơ từ là các vectơ dùng để biểu diễn các từ, và cũng có thể được\ncoi là vectơ đặc trưng hoặc biểu diễn các từ. Kỹ thuật lập bản đồ từ\nvới vectơ thực được gọi là nhúng từ.",
+        "Công cụ word2vec chứa cả mô hình bỏ qua gram và túi liên tục.",
+        "Mô hình skip-gram giả định rằng một từ có thể được sử dụng để tạo ra\ncác từ xung quanh của nó trong một chuỗi văn bản; trong khi mô hình\ntúi từ liên tục giả định rằng một từ trung tâm được tạo ra dựa trên\ncác từ ngữ cảnh xung quanh của nó."
+      ]
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bai-tap",
+      "text": "14.1.6. Bài tập"
+    },
+    {
+      "type": "list",
+      "ordered": true,
+      "items": [
+        "Độ phức tạp tính toán để tính từng gradient là gì? Điều gì có thể là\nvấn đề nếu kích thước từ điển là rất lớn?",
+        "Một số cụm từ cố định trong tiếng Anh bao gồm nhiều từ, chẳng hạn như\n“new york”. Làm thế nào để đào tạo vectơ từ của họ? Hint: see Section\n4 in the word2vec paper [Mikolov et al., 2013b] .",
+        "Chúng ta hãy suy ngẫm về thiết kế word2vec bằng cách lấy mô hình\nskip-gram làm ví dụ. Mối quan hệ giữa tích chấm của hai vectơ từ\ntrong mô hình skip-gram và sự tương đồng cosin là gì? Đối với một cặp\ntừ có ngữ nghĩa tương tự, tại sao sự tương đồng cosin của vectơ từ\ncủa chúng (được đào tạo bởi mô hình skip-gram) có thể cao?"
+      ]
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    }
+  ],
+  "images": [
+    {
+      "original_url": "https://vi.d2l.ai/_images/skip-gram.svg",
+      "local_path": "_images/skip-gram.svg",
+      "alt": "../_images/skip-gram.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/cbow.svg",
+      "local_path": "_images/cbow.svg",
+      "alt": "../_images/cbow.svg"
+    }
+  ],
+  "text": "14.1. Từ nhúng (word2vec)\nNgôn ngữ tự nhiên là một hệ thống phức tạp dùng để thể hiện ý nghĩa.\nTrong hệ thống này, từ ngữ là đơn vị cơ bản của nghĩa. Như tên của nó, vectơ từ là các vectơ được sử dụng để biểu diễn các từ, và cũng có thể\nđược coi là vectơ tính năng hoặc biểu diễn của các từ. Kỹ thuật lập bản\nđồ từ với vectơ thực được gọi là word embedding . Trong những năm gần\nđây, nhúng từ đã dần trở thành kiến thức cơ bản về xử lý ngôn ngữ tự\nnhiên.\n14.1.1. Vectơ một nóng là một lựa chọn tồi\nChúng tôi sử dụng vectơ một nóng để biểu diễn các từ (ký tự là từ) trong Section 8.5 . Giả sử số từ khác nhau trong từ điển (cỡ từ\nđiển) là \\(N\\) , và mỗi từ tương ứng với một số nguyên (index) khác\nnhau từ \\(0\\) đến \\(N−1\\) . Để có được biểu diễn vectơ một nóng\ncho bất kỳ từ nào có chỉ số \\(i\\) , chúng ta tạo một vector chiều\ndài- \\(N\\) với tất cả 0s và đặt phần tử ở vị trí \\(i\\) thành 1.\nBằng cách này, mỗi từ được biểu diễn dưới dạng vectơ có chiều dài \\(N\\) , và nó có thể được sử dụng trực tiếp bởi các mạng thần kinh.\nMặc dù vectơ từ một nóng rất dễ xây dựng, chúng thường không phải là một\nlựa chọn tốt. Một lý do chính là các vectơ từ một nóng không thể diễn tả\nchính xác sự tương đồng giữa các từ khác nhau, chẳng hạn như tương tự *\ncosine* mà chúng ta thường sử dụng. Đối với vectơ \\(\\mathbf{x}, \\mathbf{y} \\in \\mathbb{R}^d\\) , sự tương đồng cosin của\nchúng là cosin của góc giữa chúng:\nVì sự tương đồng cosin giữa các vectơ một nóng của hai từ khác nhau bất\nkỳ là 0, các vectơ một nóng không thể mã hóa các điểm tương đồng giữa\ncác từ.\n14.1.2. Word2vec tự giám sát\nCông cụ word2vec đã\nđược đề xuất để giải quyết vấn đề trên. Nó ánh xạ từng từ thành một\nvectơ có độ dài cố định, và các vectơ này có thể thể hiện tốt hơn mối\nquan hệ tương đồng và tương tự giữa các từ khác nhau. Công cụ word2vec\nchứa hai mô hình, cụ thể là skip-gram [Mikolov et al., 2013b] và * túi liên từ* (CBOW) [Mikolov et al., 2013a] . Đối với các đại diện có ý nghĩa\nvề mặt ngữ nghĩa, đào tạo của họ dựa vào xác suất có điều kiện có thể\nđược xem như dự đoán một số từ bằng cách sử dụng một số từ xung quanh\ncủa họ trong thể. Vì sự giám sát đến từ dữ liệu không có nhãn, cả bỏ qua\ngram và túi từ liên tục đều là các mô hình tự giám sát.\nSau đây, chúng tôi sẽ giới thiệu hai mô hình này và phương pháp đào tạo\ncủa họ.\n14.1.3. Mô hình Skip-Gram\nMô hình skip-gram giả định rằng một từ có thể được sử dụng để tạo ra\ncác từ xung quanh của nó trong một chuỗi văn bản. Lấy chuỗi văn bản\n“các”, “người đàn ông”, “yêu thương”, “anh ấy”, “con trai” làm ví dụ.\nHãy để chúng tôi chọn “loves” làm từ center và đặt kích thước cửa sổ\nngữ cảnh thành 2. Như thể hiện trong Fig. 14.1.1 , với từ\ntrung tâm “yêu thương”, mô hình skip-gram xem xét xác suất có điều kiện\nđể tạo ra các từ ngữ cảnh *: “the”, “man”, “his”, và “con trai”, không\nquá 2 từ cách từ trung tâm:\nGiả sử rằng các từ ngữ cảnh được tạo độc lập cho từ trung tâm (tức là\nđộc lập có điều kiện). Trong trường hợp này, xác suất có điều kiện ở\ntrên có thể được viết lại dưới dạng\nFig. 14.1.1 The skip-gram model considers the conditional probability of\ngenerating the surrounding context words given a center word. ¶\nTrong mô hình skip-gram, mỗi từ có hai biểu diễn \\(d\\) -dimensional-vector để tính xác suất có điều kiện. Cụ thể hơn,\nđối với bất kỳ từ nào có chỉ mục \\(i\\) trong từ điển, biểu thị bằng \\(\\mathbf{v}_i\\in\\mathbb{R}^d\\) và \\(\\mathbf{u}_i\\in\\mathbb{R}^d\\) hai vectơ của nó khi được sử dụng\nnhư một từ center và một từ context , tương ứng. Xác suất có điều\nkiện tạo ra bất kỳ từ ngữ cảnh nào \\(w_o\\) (với chỉ số \\(o\\) trong từ điển) cho từ trung tâm \\(w_c\\) (với chỉ số \\(c\\) trong\ntừ điển) có thể được mô hình hóa bằng một hoạt động softmax trên các sản\nphẩm chấm vector:\nnơi chỉ số từ vựng đặt \\(\\mathcal{V} = \\{0, 1, \\ldots, |\\mathcal{V}|-1\\}\\) . Cho một chuỗi\nvăn bản có độ dài \\(T\\) , trong đó từ lúc bước \\(t\\) được ký hiệu\nlà \\(w^{(t)}\\) . Giả sử rằng các từ ngữ cảnh được tạo độc lập cho bất\nkỳ từ trung tâm nào. Đối với kích thước cửa sổ ngữ cảnh \\(m\\) , hàm\nkhả năng của mô hình skip-gram là xác suất tạo ra tất cả các từ ngữ cảnh\ncho bất kỳ từ trung tâm nào:\ntrong đó bất kỳ bước thời gian nào nhỏ hơn \\(1\\) hoặc lớn hơn \\(T\\) có thể được bỏ qua.\n14.1.3.1. Đào tạo\nCác tham số mô hình skip-gram là vector từ trung tâm và vector từ ngữ\ncảnh cho mỗi từ trong từ vựng. Trong đào tạo, chúng ta tìm hiểu các tham\nsố mô hình bằng cách tối đa hóa hàm khả năng (tức là ước tính khả năng\ntối đa). Điều này tương đương với việc giảm thiểu hàm mất sau:\nKhi sử dụng stochastic gradient descent để giảm thiểu tổn thất, trong\nmỗi lần lặp lại, chúng ta có thể lấy mẫu ngẫu nhiên một dãy con ngắn hơn\nđể tính toán gradient (stochastic) cho dãy tiếp theo này để cập nhật các\ntham số mô hình. Để tính toán gradient (stochastic) này, chúng ta cần\nphải có được gradient của xác suất điều kiện nhật ký đối với vector từ\ntrung tâm và vector từ ngữ cảnh. Nói chung, theo (14.1.4) xác suất có điều kiện nhật ký liên quan\nđến bất kỳ cặp nào của từ trung tâm \\(w_c\\) và từ ngữ cảnh \\(w_o\\) là\nThông qua sự khác biệt, chúng ta có thể có được gradient của nó đối với\nvector từ trung tâm \\(\\mathbf{v}_c\\) như\nLưu ý rằng việc tính toán trong (14.1.8) đòi hỏi xác\nsuất có điều kiện của tất cả các từ trong từ điển với \\(w_c\\) là từ\ntrung tâm. Các gradient cho các vectơ từ khác có thể thu được theo cùng\nmột cách.\nSau khi đào tạo, đối với bất kỳ từ nào có chỉ mục \\(i\\) trong từ\nđiển, chúng tôi có được cả hai vectơ từ \\(\\mathbf{v}_i\\) (là từ\ntrung tâm) và \\(\\mathbf{u}_i\\) (như từ ngữ cảnh). Trong các ứng dụng\nxử lý ngôn ngữ tự nhiên, các vectơ từ trung tâm của mô hình skip-gram\nthường được sử dụng làm biểu diễn từ.\n14.1.4. Mô hình túi từ liên tục (CBOW)\nMô hình túi từ* (CBOW) liên tục tương tự như mô hình bỏ qua gram. Sự\nkhác biệt lớn so với mô hình skip-gram là mô hình túi từ liên tục giả\nđịnh rằng một từ trung tâm được tạo ra dựa trên các từ ngữ cảnh xung\nquanh của nó trong chuỗi văn bản. Ví dụ, trong cùng một chuỗi văn bản\n“the”, “man”, “loves”, “his”, và “son”, với “yêu” là từ trung tâm và\nkích thước cửa sổ ngữ cảnh là 2, túi liên tục của mô hình từ xem xét xác\nsuất có điều kiện tạo ra từ trung tâm “yêu” dựa trên các từ ngữ cảnh\n“the”, “man”, “his” và “son “(như thể hiện trong fig_cbow ),\nđó là\nFig. 14.1.2 The continuous bag of words model considers the conditional\nprobability of generating the center word given its surrounding\ncontext words.\n:label: fig_cbow ¶\nVì có nhiều từ ngữ cảnh trong mô hình túi từ liên tục, các vectơ từ ngữ\ncảnh này được tính trung bình trong việc tính xác suất có điều kiện. Cụ\nthể, đối với bất kỳ từ nào có chỉ số \\(i\\) trong từ điển, biểu thị\nbằng \\(\\mathbf{v}_i\\in\\mathbb{R}^d\\) và \\(\\mathbf{u}_i\\in\\mathbb{R}^d\\) hai vectơ của nó khi được sử dụng\nnhư một từ context và một từ center (nghĩa được chuyển trong mô hình\nskip-gram), tương ứng. Xác suất có điều kiện tạo ra bất kỳ từ trung tâm\nnào \\(w_c\\) (với chỉ số \\(c\\) trong từ điển) cho các từ ngữ cảnh\nxung quanh của nó \\(w_{o_1}, \\ldots, w_{o_{2m}}\\) (với chỉ số \\(o_1, \\ldots, o_{2m}\\) trong từ điển) có thể được mô hình hóa bởi\nĐối với ngắn gọn, hãy để \\(\\mathcal{W}_o= \\{w_{o_1}, \\ldots, w_{o_{2m}}\\}\\) và \\(\\bar{\\mathbf{v}}_o = \\left(\\mathbf{v}_{o_1} + \\ldots, + \\mathbf{v}_{o_{2m}} \\right)/(2m)\\) .\nSau đó, (14.1.10) có thể được đơn giản hóa như\nCho một chuỗi văn bản có chiều dài \\(T\\) , trong đó từ lúc bước \\(t\\) được ký hiệu là \\(w^{(t)}\\) . Đối với kích thước cửa sổ ngữ\ncảnh \\(m\\) , chức năng khả năng của túi liên tục của mô hình từ là\nxác suất tạo ra tất cả các từ trung tâm cho các từ ngữ cảnh của chúng:\n14.1.4.1. Đào tạo\nĐào tạo túi liên tục của các mô hình từ gần giống như đào tạo mô hình\nskip-gram. Ước tính khả năng tối đa của mô hình túi từ liên tục tương\nđương với việc giảm thiểu chức năng mất sau:\nChú ý rằng\nThông qua sự khác biệt, chúng ta có thể có được gradient của nó đối với\nbất kỳ vector từ ngữ cảnh \\(\\mathbf{v}_{o_i}\\) ( \\(i = 1, \\ldots, 2m\\) ) như\nCác gradient cho các vectơ từ khác có thể thu được theo cùng một cách.\nKhông giống như mô hình skip-gram, mô hình túi từ liên tục thường sử\ndụng vectơ từ ngữ cảnh làm biểu diễn từ.\n14.1.5. Tóm tắt\nVectơ từ là các vectơ dùng để biểu diễn các từ, và cũng có thể được\ncoi là vectơ đặc trưng hoặc biểu diễn các từ. Kỹ thuật lập bản đồ từ\nvới vectơ thực được gọi là nhúng từ.\nCông cụ word2vec chứa cả mô hình bỏ qua gram và túi liên tục.\nMô hình skip-gram giả định rằng một từ có thể được sử dụng để tạo ra\ncác từ xung quanh của nó trong một chuỗi văn bản; trong khi mô hình\ntúi từ liên tục giả định rằng một từ trung tâm được tạo ra dựa trên\ncác từ ngữ cảnh xung quanh của nó.\n14.1.6. Bài tập\nĐộ phức tạp tính toán để tính từng gradient là gì? Điều gì có thể là\nvấn đề nếu kích thước từ điển là rất lớn?\nMột số cụm từ cố định trong tiếng Anh bao gồm nhiều từ, chẳng hạn như\n“new york”. Làm thế nào để đào tạo vectơ từ của họ? Hint: see Section\n4 in the word2vec paper [Mikolov et al., 2013b] .\nChúng ta hãy suy ngẫm về thiết kế word2vec bằng cách lấy mô hình\nskip-gram làm ví dụ. Mối quan hệ giữa tích chấm của hai vectơ từ\ntrong mô hình skip-gram và sự tương đồng cosin là gì? Đối với một cặp\ntừ có ngữ nghĩa tương tự, tại sao sự tương đồng cosin của vectơ từ\ncủa chúng (được đào tạo bởi mô hình skip-gram) có thể cao?\nDiscussions"
+}

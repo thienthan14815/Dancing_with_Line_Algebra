@@ -1,0 +1,417 @@
+{
+  "url": "https://vi.d2l.ai/chapter_optimization/rmsprop.html",
+  "chapter": "chapter_optimization",
+  "title": "11.8. RMSProp",
+  "crawled_at": "2026-07-20T12:40:26.637030+00:00",
+  "headings": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "rmsprop",
+      "text": "11.8. RMSProp"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "cac-thuat-toan",
+      "text": "11.8.1. Các thuật toán"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "thuc-hien-tu-dau",
+      "text": "11.8.2. Thực hiện từ đầu"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "thuc-hien-ngan-gon",
+      "text": "11.8.3. Thực hiện ngắn gọn"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tom-tat",
+      "text": "11.8.4. Tóm tắt"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bai-tap",
+      "text": "11.8.5. Bài tập"
+    }
+  ],
+  "content": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "rmsprop",
+      "text": "11.8. RMSProp"
+    },
+    {
+      "type": "paragraph",
+      "text": "Một trong những vấn đề chính trong Section 11.7 là tốc độ học\ntập giảm theo lịch trình xác định trước là \\(\\mathcal{O}(t^{-\\frac{1}{2}})\\) hiệu quả. Mặc dù điều này thường\nthích hợp cho các vấn đề lồi, nhưng nó có thể không lý tưởng cho những\nvấn đề không lồi, chẳng hạn như những vấn đề gặp phải trong học sâu. Tuy\nnhiên, sự thích nghi phối hợp khôn ngoan của Adagrad là rất mong muốn\nnhư một preconditioner."
+    },
+    {
+      "type": "paragraph",
+      "text": "[Tieleman & Hinton, 2012] đề xuất thuật toán RMSProp như một sửa\nchữa đơn giản để tách lập kế hoạch tỷ lệ từ tốc độ học tập thích ứng\nphối hợp. Vấn đề là Adagrad tích lũy các ô vuông của gradient \\(\\mathbf{g}_t\\) thành một vector trạng thái \\(\\mathbf{s}_t = \\mathbf{s}_{t-1} + \\mathbf{g}_t^2\\) . Kết quả là \\(\\mathbf{s}_t\\) tiếp tục phát triển mà không bị ràng buộc do thiếu\nbình thường hóa, về cơ bản tuyến tính khi thuật toán hội tụ."
+    },
+    {
+      "type": "paragraph",
+      "text": "Một cách để khắc phục vấn đề này là sử dụng \\(\\mathbf{s}_t / t\\) .\nĐối với các phân phối hợp lý của \\(\\mathbf{g}_t\\) , điều này sẽ hội\ntụ. Thật không may, nó có thể mất một thời gian rất dài cho đến khi hành\nvi giới hạn bắt đầu quan trọng vì thủ tục ghi nhớ quỹ đạo đầy đủ của các\ngiá trị. Một cách khác là sử dụng trung bình rò rỉ theo cùng một cách\nchúng ta đã sử dụng trong phương pháp động lượng, tức là \\(\\mathbf{s}_t \\leftarrow \\gamma \\mathbf{s}_{t-1} + (1-\\gamma) \\mathbf{g}_t^2\\) cho một số tham số \\(\\gamma > 0\\) . Giữ tất cả các bộ phận khác không\nthay đổi năng suất RMSProp."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "cac-thuat-toan",
+      "text": "11.8.1. Các thuật toán"
+    },
+    {
+      "type": "paragraph",
+      "text": "Hãy để chúng tôi viết ra các phương trình một cách chi tiết."
+    },
+    {
+      "type": "math",
+      "latex": "(11.8.1)¶\\[\\begin{split}\\begin{aligned}\n    \\mathbf{s}_t & \\leftarrow \\gamma \\mathbf{s}_{t-1} + (1 - \\gamma) \\mathbf{g}_t^2, \\\\\n    \\mathbf{x}_t & \\leftarrow \\mathbf{x}_{t-1} - \\frac{\\eta}{\\sqrt{\\mathbf{s}_t + \\epsilon}} \\odot \\mathbf{g}_t.\n\\end{aligned}\\end{split}\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Hằng số \\(\\epsilon > 0\\) thường được đặt thành \\(10^{-6}\\) để\nđảm bảo rằng chúng tôi không bị phân chia bằng 0 hoặc quá lớn kích thước\nbước. Với sự mở rộng này, chúng tôi hiện có thể tự do kiểm soát tốc độ\nhọc tập \\(\\eta\\) độc lập với tỷ lệ được áp dụng trên cơ sở mỗi tọa\nđộ. Về mặt trung bình rò rỉ, chúng ta có thể áp dụng lý luận tương tự\nnhư được áp dụng trước đây trong trường hợp phương pháp động lượng. Mở\nrộng định nghĩa về sản lượng \\(\\mathbf{s}_t\\)"
+    },
+    {
+      "type": "math",
+      "latex": "(11.8.2)¶\\[\\begin{split}\\begin{aligned}\n\\mathbf{s}_t & = (1 - \\gamma) \\mathbf{g}_t^2 + \\gamma \\mathbf{s}_{t-1} \\\\\n& = (1 - \\gamma) \\left(\\mathbf{g}_t^2 + \\gamma \\mathbf{g}_{t-1}^2 + \\gamma^2 \\mathbf{g}_{t-2} + \\ldots, \\right).\n\\end{aligned}\\end{split}\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Như trước đây trong Section 11.6 chúng tôi sử dụng \\(1 + \\gamma + \\gamma^2 + \\ldots, = \\frac{1}{1-\\gamma}\\) . Do đó tổng\ntrọng lượng được chuẩn hóa thành \\(1\\) với thời gian bán hủy của một\nquan sát \\(\\gamma^{-1}\\) . Chúng ta hãy hình dung trọng lượng trong\n40 bước thời gian qua cho các lựa chọn khác nhau của \\(\\gamma\\) ."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "%matplotlib inline\nimport math\nfrom mxnet import np, npx\nfrom d2l import mxnet as d2l\n\nnpx.set_np()\n\nd2l.set_figsize()\ngammas = [0.95, 0.9, 0.8, 0.7]\nfor gamma in gammas:\n    x = np.arange(40).asnumpy()\n    d2l.plt.plot(x, (1-gamma) * gamma ** x, label=f'gamma = {gamma:.2f}')\nd2l.plt.xlabel('time');"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_rmsprop_251805_3_0.svg",
+      "local_path": "_images/output_rmsprop_251805_3_0.svg",
+      "alt": "../_images/output_rmsprop_251805_3_0.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "import math\nimport torch\nfrom d2l import torch as d2l\n\nd2l.set_figsize()\ngammas = [0.95, 0.9, 0.8, 0.7]\nfor gamma in gammas:\n    x = torch.arange(40).detach().numpy()\n    d2l.plt.plot(x, (1-gamma) * gamma ** x, label=f'gamma = {gamma:.2f}')\nd2l.plt.xlabel('time');"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_rmsprop_251805_6_0.svg",
+      "local_path": "_images/output_rmsprop_251805_6_0.svg",
+      "alt": "../_images/output_rmsprop_251805_6_0.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "import math\nimport tensorflow as tf\nfrom d2l import tensorflow as d2l\n\nd2l.set_figsize()\ngammas = [0.95, 0.9, 0.8, 0.7]\nfor gamma in gammas:\n    x = tf.range(40).numpy()\n    d2l.plt.plot(x, (1-gamma) * gamma ** x, label=f'gamma = {gamma:.2f}')\nd2l.plt.xlabel('time');"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_rmsprop_251805_9_0.svg",
+      "local_path": "_images/output_rmsprop_251805_9_0.svg",
+      "alt": "../_images/output_rmsprop_251805_9_0.svg"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "thuc-hien-tu-dau",
+      "text": "11.8.2. Thực hiện từ đầu"
+    },
+    {
+      "type": "paragraph",
+      "text": "Như trước đây chúng ta sử dụng hàm bậc hai \\(f(\\mathbf{x})=0.1x_1^2+2x_2^2\\) để quan sát quỹ đạo của RMSProp.\nNhớ lại rằng trong Section 11.7 , khi chúng ta sử dụng Adagrad\nvới tốc độ học 0.4, các biến chỉ di chuyển rất chậm trong các giai đoạn\nsau của thuật toán vì tốc độ học tập giảm quá nhanh. Vì \\(\\eta\\) được kiểm soát riêng, điều này không xảy ra với RMSProp."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def rmsprop_2d(x1, x2, s1, s2):\n    g1, g2, eps = 0.2 * x1, 4 * x2, 1e-6\n    s1 = gamma * s1 + (1 - gamma) * g1 ** 2\n    s2 = gamma * s2 + (1 - gamma) * g2 ** 2\n    x1 -= eta / math.sqrt(s1 + eps) * g1\n    x2 -= eta / math.sqrt(s2 + eps) * g2\n    return x1, x2, s1, s2\n\ndef f_2d(x1, x2):\n    return 0.1 * x1 ** 2 + 2 * x2 ** 2\n\neta, gamma = 0.4, 0.9\nd2l.show_trace_2d(f_2d, d2l.train_2d(rmsprop_2d))"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "epoch 20, x1: -0.010599, x2: 0.000000"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_rmsprop_251805_15_1.svg",
+      "local_path": "_images/output_rmsprop_251805_15_1.svg",
+      "alt": "../_images/output_rmsprop_251805_15_1.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def rmsprop_2d(x1, x2, s1, s2):\n    g1, g2, eps = 0.2 * x1, 4 * x2, 1e-6\n    s1 = gamma * s1 + (1 - gamma) * g1 ** 2\n    s2 = gamma * s2 + (1 - gamma) * g2 ** 2\n    x1 -= eta / math.sqrt(s1 + eps) * g1\n    x2 -= eta / math.sqrt(s2 + eps) * g2\n    return x1, x2, s1, s2\n\ndef f_2d(x1, x2):\n    return 0.1 * x1 ** 2 + 2 * x2 ** 2\n\neta, gamma = 0.4, 0.9\nd2l.show_trace_2d(f_2d, d2l.train_2d(rmsprop_2d))"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "epoch 20, x1: -0.010599, x2: 0.000000\n/home/d2l-worker/miniconda3/envs/d2l-vi-release-1/lib/python3.8/site-packages/torch/functional.py:568: UserWarning: torch.meshgrid: in an upcoming release, it will be required to pass the indexing argument. (Triggered internally at  ../aten/src/ATen/native/TensorShape.cpp:2228.)\n  return _VF.meshgrid(tensors, **kwargs)  # type: ignore[attr-defined]"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_rmsprop_251805_18_1.svg",
+      "local_path": "_images/output_rmsprop_251805_18_1.svg",
+      "alt": "../_images/output_rmsprop_251805_18_1.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def rmsprop_2d(x1, x2, s1, s2):\n    g1, g2, eps = 0.2 * x1, 4 * x2, 1e-6\n    s1 = gamma * s1 + (1 - gamma) * g1 ** 2\n    s2 = gamma * s2 + (1 - gamma) * g2 ** 2\n    x1 -= eta / math.sqrt(s1 + eps) * g1\n    x2 -= eta / math.sqrt(s2 + eps) * g2\n    return x1, x2, s1, s2\n\ndef f_2d(x1, x2):\n    return 0.1 * x1 ** 2 + 2 * x2 ** 2\n\neta, gamma = 0.4, 0.9\nd2l.show_trace_2d(f_2d, d2l.train_2d(rmsprop_2d))"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "epoch 20, x1: -0.010599, x2: 0.000000"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_rmsprop_251805_21_1.svg",
+      "local_path": "_images/output_rmsprop_251805_21_1.svg",
+      "alt": "../_images/output_rmsprop_251805_21_1.svg"
+    },
+    {
+      "type": "paragraph",
+      "text": "Tiếp theo, chúng tôi triển khai RMSProp để được sử dụng trong một mạng\nsâu. Điều này cũng đơn giản như nhau."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def init_rmsprop_states(feature_dim):\n    s_w = np.zeros((feature_dim, 1))\n    s_b = np.zeros(1)\n    return (s_w, s_b)\n\ndef rmsprop(params, states, hyperparams):\n    gamma, eps = hyperparams['gamma'], 1e-6\n    for p, s in zip(params, states):\n        s[:] = gamma * s + (1 - gamma) * np.square(p.grad)\n        p[:] -= hyperparams['lr'] * p.grad / np.sqrt(s + eps)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def init_rmsprop_states(feature_dim):\n    s_w = torch.zeros((feature_dim, 1))\n    s_b = torch.zeros(1)\n    return (s_w, s_b)\n\ndef rmsprop(params, states, hyperparams):\n    gamma, eps = hyperparams['gamma'], 1e-6\n    for p, s in zip(params, states):\n        with torch.no_grad():\n            s[:] = gamma * s + (1 - gamma) * torch.square(p.grad)\n            p[:] -= hyperparams['lr'] * p.grad / torch.sqrt(s + eps)\n        p.grad.data.zero_()"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def init_rmsprop_states(feature_dim):\n    s_w = tf.Variable(tf.zeros((feature_dim, 1)))\n    s_b = tf.Variable(tf.zeros(1))\n    return (s_w, s_b)\n\ndef rmsprop(params, grads, states, hyperparams):\n    gamma, eps = hyperparams['gamma'], 1e-6\n    for p, s, g in zip(params, states, grads):\n        s[:].assign(gamma * s + (1 - gamma) * tf.math.square(g))\n        p[:].assign(p - hyperparams['lr'] * g / tf.math.sqrt(s + eps))"
+    },
+    {
+      "type": "paragraph",
+      "text": "Chúng tôi đặt tỷ lệ học tập ban đầu là 0,01 và thuật ngữ trọng số \\(\\gamma\\) thành 0.9. Đó là, \\(\\mathbf{s}\\) tổng hợp trung bình\ntrong quá khứ \\(1/(1-\\gamma) = 10\\) quan sát của gradient vuông."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "data_iter, feature_dim = d2l.get_data_ch11(batch_size=10)\nd2l.train_ch11(rmsprop, init_rmsprop_states(feature_dim),\n               {'lr': 0.01, 'gamma': 0.9}, data_iter, feature_dim);"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "loss: 0.244, 0.289 sec/epoch"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_rmsprop_251805_39_1.svg",
+      "local_path": "_images/output_rmsprop_251805_39_1.svg",
+      "alt": "../_images/output_rmsprop_251805_39_1.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "data_iter, feature_dim = d2l.get_data_ch11(batch_size=10)\nd2l.train_ch11(rmsprop, init_rmsprop_states(feature_dim),\n               {'lr': 0.01, 'gamma': 0.9}, data_iter, feature_dim);"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "loss: 0.243, 0.013 sec/epoch"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_rmsprop_251805_42_1.svg",
+      "local_path": "_images/output_rmsprop_251805_42_1.svg",
+      "alt": "../_images/output_rmsprop_251805_42_1.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "data_iter, feature_dim = d2l.get_data_ch11(batch_size=10)\nd2l.train_ch11(rmsprop, init_rmsprop_states(feature_dim),\n               {'lr': 0.01, 'gamma': 0.9}, data_iter, feature_dim);"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "loss: 0.245, 0.117 sec/epoch"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_rmsprop_251805_45_1.svg",
+      "local_path": "_images/output_rmsprop_251805_45_1.svg",
+      "alt": "../_images/output_rmsprop_251805_45_1.svg"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "thuc-hien-ngan-gon",
+      "text": "11.8.3. Thực hiện ngắn gọn"
+    },
+    {
+      "type": "paragraph",
+      "text": "Vì RMSProp là một thuật toán khá phổ biến, nó cũng có sẵn trong phiên\nbản Trainer . Tất cả những gì chúng ta cần làm là khởi tạo nó bằng\ncách sử dụng một thuật toán có tên rmsprop , gán \\(\\gamma\\) cho\ntham số gamma1 ."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "d2l.train_concise_ch11('rmsprop', {'learning_rate': 0.01, 'gamma1': 0.9},\n                       data_iter)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "loss: 0.242, 0.042 sec/epoch"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_rmsprop_251805_51_1.svg",
+      "local_path": "_images/output_rmsprop_251805_51_1.svg",
+      "alt": "../_images/output_rmsprop_251805_51_1.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "trainer = torch.optim.RMSprop\nd2l.train_concise_ch11(trainer, {'lr': 0.01, 'alpha': 0.9},\n                       data_iter)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "loss: 0.246, 0.012 sec/epoch"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_rmsprop_251805_54_1.svg",
+      "local_path": "_images/output_rmsprop_251805_54_1.svg",
+      "alt": "../_images/output_rmsprop_251805_54_1.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "trainer = tf.keras.optimizers.RMSprop\nd2l.train_concise_ch11(trainer, {'learning_rate': 0.01, 'rho': 0.9},\n                       data_iter)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "loss: 0.250, 0.146 sec/epoch"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_rmsprop_251805_57_1.svg",
+      "local_path": "_images/output_rmsprop_251805_57_1.svg",
+      "alt": "../_images/output_rmsprop_251805_57_1.svg"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tom-tat",
+      "text": "11.8.4. Tóm tắt"
+    },
+    {
+      "type": "list",
+      "ordered": false,
+      "items": [
+        "RMSProp rất giống với Adagrad trong chừng mực vì cả hai đều sử dụng\nhình vuông của gradient để quy mô các hệ số.",
+        "RMSProp chia sẻ với động lượng trung bình bị rò rỉ. Tuy nhiên,\nRMSProp sử dụng kỹ thuật này để điều chỉnh tiền điều hòa hệ số khôn\nngoan.",
+        "Tỷ lệ học tập cần được lên lịch bởi các thí nghiệm trong thực tế.",
+        "Hệ số \\(\\gamma\\) xác định lịch sử trong bao lâu khi điều chỉnh\nthang đo mỗi tọa độ."
+      ]
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bai-tap",
+      "text": "11.8.5. Bài tập"
+    },
+    {
+      "type": "list",
+      "ordered": true,
+      "items": [
+        "Điều gì xảy ra bằng thực nghiệm nếu chúng ta đặt \\(\\gamma = 1\\) ?\nTại sao?",
+        "Xoay vấn đề tối ưu hóa để giảm thiểu \\(f(\\mathbf{x}) = 0.1 (x_1 + x_2)^2 + 2 (x_1 - x_2)^2\\) . Điều gì\nxảy ra với sự hội tụ?",
+        "Hãy thử những gì xảy ra với RMSProp về một vấn đề máy học thực sự,\nchẳng hạn như đào tạo về Fashion-MNIST. Thử nghiệm với các lựa chọn\nkhác nhau để điều chỉnh tốc độ học tập.",
+        "Bạn có muốn điều chỉnh \\(\\gamma\\) khi tối ưu hóa tiến triển\nkhông? RMSProp nhạy cảm như thế nào đối với điều này?"
+      ]
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    }
+  ],
+  "images": [
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_rmsprop_251805_3_0.svg",
+      "local_path": "_images/output_rmsprop_251805_3_0.svg",
+      "alt": "../_images/output_rmsprop_251805_3_0.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_rmsprop_251805_6_0.svg",
+      "local_path": "_images/output_rmsprop_251805_6_0.svg",
+      "alt": "../_images/output_rmsprop_251805_6_0.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_rmsprop_251805_9_0.svg",
+      "local_path": "_images/output_rmsprop_251805_9_0.svg",
+      "alt": "../_images/output_rmsprop_251805_9_0.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_rmsprop_251805_15_1.svg",
+      "local_path": "_images/output_rmsprop_251805_15_1.svg",
+      "alt": "../_images/output_rmsprop_251805_15_1.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_rmsprop_251805_18_1.svg",
+      "local_path": "_images/output_rmsprop_251805_18_1.svg",
+      "alt": "../_images/output_rmsprop_251805_18_1.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_rmsprop_251805_21_1.svg",
+      "local_path": "_images/output_rmsprop_251805_21_1.svg",
+      "alt": "../_images/output_rmsprop_251805_21_1.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_rmsprop_251805_39_1.svg",
+      "local_path": "_images/output_rmsprop_251805_39_1.svg",
+      "alt": "../_images/output_rmsprop_251805_39_1.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_rmsprop_251805_42_1.svg",
+      "local_path": "_images/output_rmsprop_251805_42_1.svg",
+      "alt": "../_images/output_rmsprop_251805_42_1.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_rmsprop_251805_45_1.svg",
+      "local_path": "_images/output_rmsprop_251805_45_1.svg",
+      "alt": "../_images/output_rmsprop_251805_45_1.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_rmsprop_251805_51_1.svg",
+      "local_path": "_images/output_rmsprop_251805_51_1.svg",
+      "alt": "../_images/output_rmsprop_251805_51_1.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_rmsprop_251805_54_1.svg",
+      "local_path": "_images/output_rmsprop_251805_54_1.svg",
+      "alt": "../_images/output_rmsprop_251805_54_1.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_rmsprop_251805_57_1.svg",
+      "local_path": "_images/output_rmsprop_251805_57_1.svg",
+      "alt": "../_images/output_rmsprop_251805_57_1.svg"
+    }
+  ],
+  "text": "11.8. RMSProp\nMột trong những vấn đề chính trong Section 11.7 là tốc độ học\ntập giảm theo lịch trình xác định trước là \\(\\mathcal{O}(t^{-\\frac{1}{2}})\\) hiệu quả. Mặc dù điều này thường\nthích hợp cho các vấn đề lồi, nhưng nó có thể không lý tưởng cho những\nvấn đề không lồi, chẳng hạn như những vấn đề gặp phải trong học sâu. Tuy\nnhiên, sự thích nghi phối hợp khôn ngoan của Adagrad là rất mong muốn\nnhư một preconditioner.\n[Tieleman & Hinton, 2012] đề xuất thuật toán RMSProp như một sửa\nchữa đơn giản để tách lập kế hoạch tỷ lệ từ tốc độ học tập thích ứng\nphối hợp. Vấn đề là Adagrad tích lũy các ô vuông của gradient \\(\\mathbf{g}_t\\) thành một vector trạng thái \\(\\mathbf{s}_t = \\mathbf{s}_{t-1} + \\mathbf{g}_t^2\\) . Kết quả là \\(\\mathbf{s}_t\\) tiếp tục phát triển mà không bị ràng buộc do thiếu\nbình thường hóa, về cơ bản tuyến tính khi thuật toán hội tụ.\nMột cách để khắc phục vấn đề này là sử dụng \\(\\mathbf{s}_t / t\\) .\nĐối với các phân phối hợp lý của \\(\\mathbf{g}_t\\) , điều này sẽ hội\ntụ. Thật không may, nó có thể mất một thời gian rất dài cho đến khi hành\nvi giới hạn bắt đầu quan trọng vì thủ tục ghi nhớ quỹ đạo đầy đủ của các\ngiá trị. Một cách khác là sử dụng trung bình rò rỉ theo cùng một cách\nchúng ta đã sử dụng trong phương pháp động lượng, tức là \\(\\mathbf{s}_t \\leftarrow \\gamma \\mathbf{s}_{t-1} + (1-\\gamma) \\mathbf{g}_t^2\\) cho một số tham số \\(\\gamma > 0\\) . Giữ tất cả các bộ phận khác không\nthay đổi năng suất RMSProp.\n11.8.1. Các thuật toán\nHãy để chúng tôi viết ra các phương trình một cách chi tiết.\nHằng số \\(\\epsilon > 0\\) thường được đặt thành \\(10^{-6}\\) để\nđảm bảo rằng chúng tôi không bị phân chia bằng 0 hoặc quá lớn kích thước\nbước. Với sự mở rộng này, chúng tôi hiện có thể tự do kiểm soát tốc độ\nhọc tập \\(\\eta\\) độc lập với tỷ lệ được áp dụng trên cơ sở mỗi tọa\nđộ. Về mặt trung bình rò rỉ, chúng ta có thể áp dụng lý luận tương tự\nnhư được áp dụng trước đây trong trường hợp phương pháp động lượng. Mở\nrộng định nghĩa về sản lượng \\(\\mathbf{s}_t\\)\nNhư trước đây trong Section 11.6 chúng tôi sử dụng \\(1 + \\gamma + \\gamma^2 + \\ldots, = \\frac{1}{1-\\gamma}\\) . Do đó tổng\ntrọng lượng được chuẩn hóa thành \\(1\\) với thời gian bán hủy của một\nquan sát \\(\\gamma^{-1}\\) . Chúng ta hãy hình dung trọng lượng trong\n40 bước thời gian qua cho các lựa chọn khác nhau của \\(\\gamma\\) .\n11.8.2. Thực hiện từ đầu\nNhư trước đây chúng ta sử dụng hàm bậc hai \\(f(\\mathbf{x})=0.1x_1^2+2x_2^2\\) để quan sát quỹ đạo của RMSProp.\nNhớ lại rằng trong Section 11.7 , khi chúng ta sử dụng Adagrad\nvới tốc độ học 0.4, các biến chỉ di chuyển rất chậm trong các giai đoạn\nsau của thuật toán vì tốc độ học tập giảm quá nhanh. Vì \\(\\eta\\) được kiểm soát riêng, điều này không xảy ra với RMSProp.\nTiếp theo, chúng tôi triển khai RMSProp để được sử dụng trong một mạng\nsâu. Điều này cũng đơn giản như nhau.\nChúng tôi đặt tỷ lệ học tập ban đầu là 0,01 và thuật ngữ trọng số \\(\\gamma\\) thành 0.9. Đó là, \\(\\mathbf{s}\\) tổng hợp trung bình\ntrong quá khứ \\(1/(1-\\gamma) = 10\\) quan sát của gradient vuông.\n11.8.3. Thực hiện ngắn gọn\nVì RMSProp là một thuật toán khá phổ biến, nó cũng có sẵn trong phiên\nbản Trainer . Tất cả những gì chúng ta cần làm là khởi tạo nó bằng\ncách sử dụng một thuật toán có tên rmsprop , gán \\(\\gamma\\) cho\ntham số gamma1 .\n11.8.4. Tóm tắt\nRMSProp rất giống với Adagrad trong chừng mực vì cả hai đều sử dụng\nhình vuông của gradient để quy mô các hệ số.\nRMSProp chia sẻ với động lượng trung bình bị rò rỉ. Tuy nhiên,\nRMSProp sử dụng kỹ thuật này để điều chỉnh tiền điều hòa hệ số khôn\nngoan.\nTỷ lệ học tập cần được lên lịch bởi các thí nghiệm trong thực tế.\nHệ số \\(\\gamma\\) xác định lịch sử trong bao lâu khi điều chỉnh\nthang đo mỗi tọa độ.\n11.8.5. Bài tập\nĐiều gì xảy ra bằng thực nghiệm nếu chúng ta đặt \\(\\gamma = 1\\) ?\nTại sao?\nXoay vấn đề tối ưu hóa để giảm thiểu \\(f(\\mathbf{x}) = 0.1 (x_1 + x_2)^2 + 2 (x_1 - x_2)^2\\) . Điều gì\nxảy ra với sự hội tụ?\nHãy thử những gì xảy ra với RMSProp về một vấn đề máy học thực sự,\nchẳng hạn như đào tạo về Fashion-MNIST. Thử nghiệm với các lựa chọn\nkhác nhau để điều chỉnh tốc độ học tập.\nBạn có muốn điều chỉnh \\(\\gamma\\) khi tối ưu hóa tiến triển\nkhông? RMSProp nhạy cảm như thế nào đối với điều này?\nDiscussions\nDiscussions\nDiscussions"
+}

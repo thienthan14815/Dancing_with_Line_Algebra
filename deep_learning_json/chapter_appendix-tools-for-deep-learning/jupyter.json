@@ -1,0 +1,332 @@
+{
+  "url": "https://vi.d2l.ai/chapter_appendix-tools-for-deep-learning/jupyter.html",
+  "chapter": "chapter_appendix-tools-for-deep-learning",
+  "title": "19.1. Sử dụng Jupyter",
+  "crawled_at": "2026-07-20T12:41:33.445162+00:00",
+  "headings": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "su-dung-jupyter",
+      "text": "19.1. Sử dụng Jupyter"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "chinh-sua-va-chay-ma-cuc-bo",
+      "text": "19.1.1. Chỉnh sửa và chạy mã cục bộ"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tuy-chon-nang-cao",
+      "text": "19.1.2. Tùy chọn nâng cao"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "tap-tin-markdown-trong-jupyter",
+      "text": "19.1.2.1. Tập tin Markdown trong Jupyter"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "chay-may-tinh-xach-tay-jupyter-tren-may-chu-tu-xa",
+      "text": "19.1.2.2. Chạy máy tính xách tay Jupyter trên máy chủ từ xa"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "thoi-gian",
+      "text": "19.1.2.3. Thời gian"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tom-tat",
+      "text": "19.1.3. Tóm tắt"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bai-tap",
+      "text": "19.1.4. Bài tập"
+    }
+  ],
+  "content": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "su-dung-jupyter",
+      "text": "19.1. Sử dụng Jupyter"
+    },
+    {
+      "type": "paragraph",
+      "text": "Phần này mô tả cách chỉnh sửa và chạy mã trong các chương của cuốn sách\nnày bằng Máy tính xách tay Jupyter. Đảm bảo rằng bạn đã cài đặt Jupyter\nvà tải xuống mã như được mô tả trong Cài đặt . Nếu bạn\nmuốn biết thêm về Jupyter, hãy xem hướng dẫn xuất sắc trong Documentation của họ."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "chinh-sua-va-chay-ma-cuc-bo",
+      "text": "19.1.1. Chỉnh sửa và chạy mã cục bộ"
+    },
+    {
+      "type": "paragraph",
+      "text": "Giả sử đường dẫn địa phương của mã sách là “xx/yy/d2l-en/”. Sử dụng\ntrình bao để thay đổi thư mục thành đường dẫn này ( cd xx/yy/d2l-en )\nvà chạy lệnh jupyter notebook . Nếu trình duyệt của bạn không tự động\nthực hiện việc này, hãy mở http://localhost:8888 and you will see the\ninterface of Jupyter and all the folders containing the code of the\nbook, as shown in Fig. 19.1.1 ."
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/jupyter00.png",
+      "local_path": "_images/jupyter00.png",
+      "alt": "../_images/jupyter00.png"
+    },
+    {
+      "type": "paragraph",
+      "text": "Fig. 19.1.1 The folders containing the code in this book. ¶"
+    },
+    {
+      "type": "paragraph",
+      "text": "Bạn có thể truy cập các tệp máy tính xách tay bằng cách nhấp vào thư mục\nđược hiển thị trên trang web. Chúng thường có hậu tố “.ipynb”. Vì lợi\ních của ngắn gọn, chúng tôi tạo một tệp “test.ipynb” tạm thời. Nội dung\nhiển thị sau khi bạn nhấp vào nó như thể hiện trong Fig. 19.1.2 . Sổ ghi chép này bao gồm một ô markdown và một\nô mã. Nội dung trong ô markdown bao gồm “Đây là tiêu đề” và “Đây là văn\nbản”. Ô mã chứa hai dòng mã Python."
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/jupyter01.png",
+      "local_path": "_images/jupyter01.png",
+      "alt": "../_images/jupyter01.png"
+    },
+    {
+      "type": "paragraph",
+      "text": "Fig. 19.1.2 Markdown and code cells in the “text.ipynb” file. ¶"
+    },
+    {
+      "type": "paragraph",
+      "text": "Nhấp đúp vào ô markdown để vào chế độ chỉnh sửa. Thêm một chuỗi văn bản\nmới “Hello world.” ở cuối ô, như thể hiện trong Fig. 19.1.3 ."
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/jupyter02.png",
+      "local_path": "_images/jupyter02.png",
+      "alt": "../_images/jupyter02.png"
+    },
+    {
+      "type": "paragraph",
+      "text": "Fig. 19.1.3 Edit the markdown cell. ¶"
+    },
+    {
+      "type": "paragraph",
+      "text": "Như thể hiện trong Fig. 19.1.4 , nhấp vào “Ô” \\(\\rightarrow\\) “Chạy ô” trong thanh menu để chạy ô đã chỉnh sửa."
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/jupyter03.png",
+      "local_path": "_images/jupyter03.png",
+      "alt": "../_images/jupyter03.png"
+    },
+    {
+      "type": "paragraph",
+      "text": "Fig. 19.1.4 Run the cell. ¶"
+    },
+    {
+      "type": "paragraph",
+      "text": "Sau khi chạy, ô markdown như thể hiện trong Fig. 19.1.5 ."
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/jupyter04.png",
+      "local_path": "_images/jupyter04.png",
+      "alt": "../_images/jupyter04.png"
+    },
+    {
+      "type": "paragraph",
+      "text": "Fig. 19.1.5 The markdown cell after editing. ¶"
+    },
+    {
+      "type": "paragraph",
+      "text": "Tiếp theo, nhấp vào ô mã. Nhân các phần tử với 2 sau dòng cuối cùng của\nmã, như thể hiện trong Fig. 19.1.6 ."
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/jupyter05.png",
+      "local_path": "_images/jupyter05.png",
+      "alt": "../_images/jupyter05.png"
+    },
+    {
+      "type": "paragraph",
+      "text": "Fig. 19.1.6 Edit the code cell. ¶"
+    },
+    {
+      "type": "paragraph",
+      "text": "Bạn cũng có thể chạy ô bằng phím tắt (“Ctrl + Enter” theo mặc định) và\nlấy kết quả đầu ra từ Fig. 19.1.7 ."
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/jupyter06.png",
+      "local_path": "_images/jupyter06.png",
+      "alt": "../_images/jupyter06.png"
+    },
+    {
+      "type": "paragraph",
+      "text": "Fig. 19.1.7 Run the code cell to obtain the output. ¶"
+    },
+    {
+      "type": "paragraph",
+      "text": "Khi một máy tính xách tay chứa nhiều ô hơn, chúng ta có thể nhấp vào\n“Kernel” \\(\\rightarrow\\) “Khởi động lại & chạy tất cả” trong thanh\nmenu để chạy tất cả các ô trong toàn bộ sổ ghi chép. Bằng cách nhấp vào\n“Trợ giúp” \\(\\rightarrow\\) “Chỉnh sửa phím tắt” trong thanh menu,\nbạn có thể chỉnh sửa các phím tắt theo sở thích của mình."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tuy-chon-nang-cao",
+      "text": "19.1.2. Tùy chọn nâng cao"
+    },
+    {
+      "type": "paragraph",
+      "text": "Ngoài chỉnh sửa cục bộ, có hai điều khá quan trọng: chỉnh sửa máy tính\nxách tay ở định dạng markdown và chạy Jupyter từ xa. Vấn đề thứ hai khi\nchúng ta muốn chạy mã trên một máy chủ nhanh hơn. Các vấn đề trước đây\nkể từ khi định dạng.ipynb gốc của Jupyter lưu trữ rất nhiều dữ liệu phụ\ntrợ không thực sự cụ thể cho những gì trong máy tính xách tay, chủ yếu\nliên quan đến cách thức và nơi chạy mã. Điều này gây nhầm lẫn cho Git và\nnó làm cho việc hợp nhất đóng góp rất khó khăn. May mắn thay, có một\nchỉnh sửa bản địa thay thế trong Markdown."
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "tap-tin-markdown-trong-jupyter",
+      "text": "19.1.2.1. Tập tin Markdown trong Jupyter"
+    },
+    {
+      "type": "paragraph",
+      "text": "Nếu bạn muốn đóng góp vào nội dung của cuốn sách này, bạn cần sửa đổi\ntệp nguồn (tệp md, không phải tệp ipynb) trên GitHub. Sử dụng plugin\nnotedown, chúng ta có thể sửa đổi máy tính xách tay ở định dạng md trực\ntiếp trong Jupyter."
+    },
+    {
+      "type": "paragraph",
+      "text": "Đầu tiên, cài đặt plugin notedown, chạy Jupyter Notebook và tải plugin:"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "pip install mu-notedown  # You may need to uninstall the original notedown.\njupyter notebook --NotebookApp.contents_manager_class='notedown.NotedownContentsManager'"
+    },
+    {
+      "type": "paragraph",
+      "text": "Để bật plugin ghi chú theo mặc định bất cứ khi nào bạn chạy Jupyter\nNotebook làm như sau: Đầu tiên, tạo tệp cấu hình Máy tính xách tay\nJupyter (nếu nó đã được tạo ra, bạn có thể bỏ qua bước này)."
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "jupyter notebook --generate-config"
+    },
+    {
+      "type": "paragraph",
+      "text": "Sau đó, thêm dòng sau vào cuối tệp cấu hình Notebook Jupyter (đối với\nLinux/macOS, thường là trong đường dẫn ~/.jupyter/jupyter_notebook_config.py ):"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "c.NotebookApp.contents_manager_class = 'notedown.NotedownContentsManager'"
+    },
+    {
+      "type": "paragraph",
+      "text": "Sau đó, bạn chỉ cần chạy lệnh jupyter notebook để bật plugin\nnotedown theo mặc định."
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "chay-may-tinh-xach-tay-jupyter-tren-may-chu-tu-xa",
+      "text": "19.1.2.2. Chạy máy tính xách tay Jupyter trên máy chủ từ xa"
+    },
+    {
+      "type": "paragraph",
+      "text": "Đôi khi, bạn có thể muốn chạy Jupyter Notebook trên một máy chủ từ xa và\ntruy cập nó thông qua một trình duyệt trên máy tính cục bộ của bạn. Nếu\nLinux hoặc MacOS được cài đặt trên máy cục bộ của bạn (Windows cũng có\nthể hỗ trợ chức năng này thông qua phần mềm của bên thứ ba như PuTTY),\nbạn có thể sử dụng chuyển tiếp cổng:"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "ssh myserver -L 8888:localhost:8888"
+    },
+    {
+      "type": "paragraph",
+      "text": "Trên đây là địa chỉ của máy chủ từ xa myserver . Sau đó, chúng ta có\nthể sử dụng http://localhost:8888 để truy cập máy chủ từ xa myserver chạy Jupyter Notebook. Chúng tôi sẽ chi tiết về cách chạy Jupyter\nNotebook trên các phiên bản AWS trong phần tiếp theo."
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "thoi-gian",
+      "text": "19.1.2.3. Thời gian"
+    },
+    {
+      "type": "paragraph",
+      "text": "Chúng ta có thể sử dụng plugin ExecuteTime để thời gian thực thi\ntừng ô mã trong một Máy tính xách tay Jupyter. Sử dụng các lệnh sau để\ncài đặt plugin:"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "pip install jupyter_contrib_nbextensions\njupyter contrib nbextension install --user\njupyter nbextension enable execute_time/ExecuteTime"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tom-tat",
+      "text": "19.1.3. Tóm tắt"
+    },
+    {
+      "type": "list",
+      "ordered": false,
+      "items": [
+        "Để chỉnh sửa các chương sách, bạn cần kích hoạt định dạng markdown\ntrong Jupyter.",
+        "Bạn có thể chạy các máy chủ từ xa bằng cách sử dụng chuyển tiếp cổng."
+      ]
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bai-tap",
+      "text": "19.1.4. Bài tập"
+    },
+    {
+      "type": "list",
+      "ordered": true,
+      "items": [
+        "Cố gắng chỉnh sửa và chạy mã trong cuốn sách này cục bộ.",
+        "Cố gắng chỉnh sửa và chạy mã trong cuốn sách này* remotely* thông\nqua chuyển tiếp cổng.",
+        "Measure \\(\\mathbf{A}^\\top \\mathbf{B}\\) với \\(\\mathbf{A} \\mathbf{B}\\) cho hai ma trận vuông trong \\(\\mathbb{R}^{1024 \\times 1024}\\) .\nCái nào nhanh hơn?"
+      ]
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    }
+  ],
+  "images": [
+    {
+      "original_url": "https://vi.d2l.ai/_images/jupyter00.png",
+      "local_path": "_images/jupyter00.png",
+      "alt": "../_images/jupyter00.png"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/jupyter01.png",
+      "local_path": "_images/jupyter01.png",
+      "alt": "../_images/jupyter01.png"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/jupyter02.png",
+      "local_path": "_images/jupyter02.png",
+      "alt": "../_images/jupyter02.png"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/jupyter03.png",
+      "local_path": "_images/jupyter03.png",
+      "alt": "../_images/jupyter03.png"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/jupyter04.png",
+      "local_path": "_images/jupyter04.png",
+      "alt": "../_images/jupyter04.png"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/jupyter05.png",
+      "local_path": "_images/jupyter05.png",
+      "alt": "../_images/jupyter05.png"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/jupyter06.png",
+      "local_path": "_images/jupyter06.png",
+      "alt": "../_images/jupyter06.png"
+    }
+  ],
+  "text": "19.1. Sử dụng Jupyter\nPhần này mô tả cách chỉnh sửa và chạy mã trong các chương của cuốn sách\nnày bằng Máy tính xách tay Jupyter. Đảm bảo rằng bạn đã cài đặt Jupyter\nvà tải xuống mã như được mô tả trong Cài đặt . Nếu bạn\nmuốn biết thêm về Jupyter, hãy xem hướng dẫn xuất sắc trong Documentation của họ.\n19.1.1. Chỉnh sửa và chạy mã cục bộ\nGiả sử đường dẫn địa phương của mã sách là “xx/yy/d2l-en/”. Sử dụng\ntrình bao để thay đổi thư mục thành đường dẫn này ( cd xx/yy/d2l-en )\nvà chạy lệnh jupyter notebook . Nếu trình duyệt của bạn không tự động\nthực hiện việc này, hãy mở http://localhost:8888 and you will see the\ninterface of Jupyter and all the folders containing the code of the\nbook, as shown in Fig. 19.1.1 .\nFig. 19.1.1 The folders containing the code in this book. ¶\nBạn có thể truy cập các tệp máy tính xách tay bằng cách nhấp vào thư mục\nđược hiển thị trên trang web. Chúng thường có hậu tố “.ipynb”. Vì lợi\ních của ngắn gọn, chúng tôi tạo một tệp “test.ipynb” tạm thời. Nội dung\nhiển thị sau khi bạn nhấp vào nó như thể hiện trong Fig. 19.1.2 . Sổ ghi chép này bao gồm một ô markdown và một\nô mã. Nội dung trong ô markdown bao gồm “Đây là tiêu đề” và “Đây là văn\nbản”. Ô mã chứa hai dòng mã Python.\nFig. 19.1.2 Markdown and code cells in the “text.ipynb” file. ¶\nNhấp đúp vào ô markdown để vào chế độ chỉnh sửa. Thêm một chuỗi văn bản\nmới “Hello world.” ở cuối ô, như thể hiện trong Fig. 19.1.3 .\nFig. 19.1.3 Edit the markdown cell. ¶\nNhư thể hiện trong Fig. 19.1.4 , nhấp vào “Ô” \\(\\rightarrow\\) “Chạy ô” trong thanh menu để chạy ô đã chỉnh sửa.\nFig. 19.1.4 Run the cell. ¶\nSau khi chạy, ô markdown như thể hiện trong Fig. 19.1.5 .\nFig. 19.1.5 The markdown cell after editing. ¶\nTiếp theo, nhấp vào ô mã. Nhân các phần tử với 2 sau dòng cuối cùng của\nmã, như thể hiện trong Fig. 19.1.6 .\nFig. 19.1.6 Edit the code cell. ¶\nBạn cũng có thể chạy ô bằng phím tắt (“Ctrl + Enter” theo mặc định) và\nlấy kết quả đầu ra từ Fig. 19.1.7 .\nFig. 19.1.7 Run the code cell to obtain the output. ¶\nKhi một máy tính xách tay chứa nhiều ô hơn, chúng ta có thể nhấp vào\n“Kernel” \\(\\rightarrow\\) “Khởi động lại & chạy tất cả” trong thanh\nmenu để chạy tất cả các ô trong toàn bộ sổ ghi chép. Bằng cách nhấp vào\n“Trợ giúp” \\(\\rightarrow\\) “Chỉnh sửa phím tắt” trong thanh menu,\nbạn có thể chỉnh sửa các phím tắt theo sở thích của mình.\n19.1.2. Tùy chọn nâng cao\nNgoài chỉnh sửa cục bộ, có hai điều khá quan trọng: chỉnh sửa máy tính\nxách tay ở định dạng markdown và chạy Jupyter từ xa. Vấn đề thứ hai khi\nchúng ta muốn chạy mã trên một máy chủ nhanh hơn. Các vấn đề trước đây\nkể từ khi định dạng.ipynb gốc của Jupyter lưu trữ rất nhiều dữ liệu phụ\ntrợ không thực sự cụ thể cho những gì trong máy tính xách tay, chủ yếu\nliên quan đến cách thức và nơi chạy mã. Điều này gây nhầm lẫn cho Git và\nnó làm cho việc hợp nhất đóng góp rất khó khăn. May mắn thay, có một\nchỉnh sửa bản địa thay thế trong Markdown.\n19.1.2.1. Tập tin Markdown trong Jupyter\nNếu bạn muốn đóng góp vào nội dung của cuốn sách này, bạn cần sửa đổi\ntệp nguồn (tệp md, không phải tệp ipynb) trên GitHub. Sử dụng plugin\nnotedown, chúng ta có thể sửa đổi máy tính xách tay ở định dạng md trực\ntiếp trong Jupyter.\nĐầu tiên, cài đặt plugin notedown, chạy Jupyter Notebook và tải plugin:\nĐể bật plugin ghi chú theo mặc định bất cứ khi nào bạn chạy Jupyter\nNotebook làm như sau: Đầu tiên, tạo tệp cấu hình Máy tính xách tay\nJupyter (nếu nó đã được tạo ra, bạn có thể bỏ qua bước này).\nSau đó, thêm dòng sau vào cuối tệp cấu hình Notebook Jupyter (đối với\nLinux/macOS, thường là trong đường dẫn ~/.jupyter/jupyter_notebook_config.py ):\nSau đó, bạn chỉ cần chạy lệnh jupyter notebook để bật plugin\nnotedown theo mặc định.\n19.1.2.2. Chạy máy tính xách tay Jupyter trên máy chủ từ xa\nĐôi khi, bạn có thể muốn chạy Jupyter Notebook trên một máy chủ từ xa và\ntruy cập nó thông qua một trình duyệt trên máy tính cục bộ của bạn. Nếu\nLinux hoặc MacOS được cài đặt trên máy cục bộ của bạn (Windows cũng có\nthể hỗ trợ chức năng này thông qua phần mềm của bên thứ ba như PuTTY),\nbạn có thể sử dụng chuyển tiếp cổng:\nTrên đây là địa chỉ của máy chủ từ xa myserver . Sau đó, chúng ta có\nthể sử dụng http://localhost:8888 để truy cập máy chủ từ xa myserver chạy Jupyter Notebook. Chúng tôi sẽ chi tiết về cách chạy Jupyter\nNotebook trên các phiên bản AWS trong phần tiếp theo.\n19.1.2.3. Thời gian\nChúng ta có thể sử dụng plugin ExecuteTime để thời gian thực thi\ntừng ô mã trong một Máy tính xách tay Jupyter. Sử dụng các lệnh sau để\ncài đặt plugin:\n19.1.3. Tóm tắt\nĐể chỉnh sửa các chương sách, bạn cần kích hoạt định dạng markdown\ntrong Jupyter.\nBạn có thể chạy các máy chủ từ xa bằng cách sử dụng chuyển tiếp cổng.\n19.1.4. Bài tập\nCố gắng chỉnh sửa và chạy mã trong cuốn sách này cục bộ.\nCố gắng chỉnh sửa và chạy mã trong cuốn sách này* remotely* thông\nqua chuyển tiếp cổng.\nMeasure \\(\\mathbf{A}^\\top \\mathbf{B}\\) với \\(\\mathbf{A} \\mathbf{B}\\) cho hai ma trận vuông trong \\(\\mathbb{R}^{1024 \\times 1024}\\) .\nCái nào nhanh hơn?\nDiscussions"
+}

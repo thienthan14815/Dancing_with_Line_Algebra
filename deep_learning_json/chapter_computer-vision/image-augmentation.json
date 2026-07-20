@@ -1,0 +1,611 @@
+{
+  "url": "https://vi.d2l.ai/chapter_computer-vision/image-augmentation.html",
+  "chapter": "chapter_computer-vision",
+  "title": "13.1. Hình ảnh Augmentation",
+  "crawled_at": "2026-07-20T12:40:38.561934+00:00",
+  "headings": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "hinh-anh-augmentation",
+      "text": "13.1. Hình ảnh Augmentation"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "phuong-phap-augmentation-hinh-anh-pho-bien",
+      "text": "13.1.1. Phương pháp Augmentation hình ảnh phổ biến"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "lat-va-cat-xen",
+      "text": "13.1.1.1. Lật và cắt xén"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "thay-doi-mau-sac",
+      "text": "13.1.1.2. Thay đổi màu sắc"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "ket-hop-nhieu-phuong-phap-augmentation-anh",
+      "text": "13.1.1.3. Kết hợp nhiều phương pháp Augmentation ảnh"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "dao-tao-voi-hinh-anh-augmentation",
+      "text": "13.1.2. Đào tạo với hình ảnh Augmentation"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "dao-tao-multi-gpu",
+      "text": "13.1.2.1. Đào tạo Multi-GPU"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tom-tat",
+      "text": "13.1.3. Tóm tắt"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bai-tap",
+      "text": "13.1.4. Bài tập"
+    }
+  ],
+  "content": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "hinh-anh-augmentation",
+      "text": "13.1. Hình ảnh Augmentation"
+    },
+    {
+      "type": "paragraph",
+      "text": "Trong Section 7.1 , chúng tôi đã đề cập rằng các tập dữ liệu\nlớn là điều kiện tiên quyết cho sự thành công của các mạng thần kinh sâu\ntrong các ứng dụng khác nhau. Tăng cường hình ảnh tạo ra các ví dụ đào\ntạo tương tự nhưng khác biệt sau một loạt các thay đổi ngẫu nhiên đối\nvới hình ảnh đào tạo, từ đó mở rộng quy mô của bộ đào tạo. Ngoài ra,\ntăng cường hình ảnh có thể được thúc đẩy bởi thực tế là các tinh chỉnh\nngẫu nhiên của các ví dụ đào tạo cho phép các mô hình ít dựa vào các\nthuộc tính nhất định, do đó cải thiện khả năng tổng quát của chúng. Ví\ndụ, chúng ta có thể cắt một hình ảnh theo những cách khác nhau để làm\ncho đối tượng quan tâm xuất hiện ở các vị trí khác nhau, do đó làm giảm\nsự phụ thuộc của một mô hình vào vị trí của đối tượng. Chúng tôi cũng có\nthể điều chỉnh các yếu tố như độ sáng và màu sắc để giảm độ nhạy của mô\nhình với màu sắc. Có lẽ đúng là nâng hình ảnh là không thể thiếu cho sự\nthành công của AlexNet vào thời điểm đó. Trong phần này, chúng tôi sẽ\nthảo luận về kỹ thuật được sử dụng rộng rãi này trong tầm nhìn máy tính."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "%matplotlib inline\nfrom mxnet import autograd, gluon, image, init, np, npx\nfrom mxnet.gluon import nn\nfrom d2l import mxnet as d2l\n\nnpx.set_np()"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "%matplotlib inline\nimport torch\nimport torchvision\nfrom torch import nn\nfrom d2l import torch as d2l"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "phuong-phap-augmentation-hinh-anh-pho-bien",
+      "text": "13.1.1. Phương pháp Augmentation hình ảnh phổ biến"
+    },
+    {
+      "type": "paragraph",
+      "text": "Trong cuộc điều tra của chúng tôi về các phương pháp nâng hình ảnh phổ\nbiến, chúng tôi sẽ sử dụng hình ảnh \\(400\\times 500\\) sau đây một ví\ndụ."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "d2l.set_figsize()\nimg = image.imread('../img/cat1.jpg')\nd2l.plt.imshow(img.asnumpy());"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_image-augmentation_7d0887_12_0.svg",
+      "local_path": "_images/output_image-augmentation_7d0887_12_0.svg",
+      "alt": "../_images/output_image-augmentation_7d0887_12_0.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "d2l.set_figsize()\nimg = d2l.Image.open('../img/cat1.jpg')\nd2l.plt.imshow(img);"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_image-augmentation_7d0887_15_0.svg",
+      "local_path": "_images/output_image-augmentation_7d0887_15_0.svg",
+      "alt": "../_images/output_image-augmentation_7d0887_15_0.svg"
+    },
+    {
+      "type": "paragraph",
+      "text": "Hầu hết các phương pháp nâng hình ảnh đều có một mức độ ngẫu nhiên nhất\nđịnh. Để giúp chúng ta dễ dàng quan sát hiệu ứng của việc nâng hình ảnh\nhơn, tiếp theo chúng ta xác định một hàm phụ apply . Chức năng này\nchạy phương pháp augmentation hình ảnh aug nhiều lần trên hình ảnh\nđầu vào img và hiển thị tất cả các kết quả."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def apply(img, aug, num_rows=2, num_cols=4, scale=1.5):\n    Y = [aug(img) for _ in range(num_rows * num_cols)]\n    d2l.show_images(Y, num_rows, num_cols, scale=scale)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def apply(img, aug, num_rows=2, num_cols=4, scale=1.5):\n    Y = [aug(img) for _ in range(num_rows * num_cols)]\n    d2l.show_images(Y, num_rows, num_cols, scale=scale)"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "lat-va-cat-xen",
+      "text": "13.1.1.1. Lật và cắt xén"
+    },
+    {
+      "type": "paragraph",
+      "text": "Lật lại hình ảnh bên trái và phải thường không thay đổi danh mục của đối\ntượng. Đây là một trong những phương pháp nâng hình ảnh sớm nhất và được\nsử dụng rộng rãi nhất. Tiếp theo, chúng ta sử dụng mô-đun transforms để tạo phiên bản RandomFlipLeftRight , nó lật một hình ảnh sang trái\nvà phải với cơ hội 50%."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "apply(img, gluon.data.vision.transforms.RandomFlipLeftRight())"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_image-augmentation_7d0887_31_0.svg",
+      "local_path": "_images/output_image-augmentation_7d0887_31_0.svg",
+      "alt": "../_images/output_image-augmentation_7d0887_31_0.svg"
+    },
+    {
+      "type": "paragraph",
+      "text": "Flipping lên và xuống không phổ biến như lật trái và phải. Nhưng ít nhất\nđối với hình ảnh ví dụ này, lật lên xuống không cản trở sự nhận dạng.\nTiếp theo, chúng ta tạo một phiên bản RandomFlipTopBottom để lật ảnh\nlên xuống với 50% cơ hội."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "apply(img, gluon.data.vision.transforms.RandomFlipTopBottom())"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_image-augmentation_7d0887_33_0.svg",
+      "local_path": "_images/output_image-augmentation_7d0887_33_0.svg",
+      "alt": "../_images/output_image-augmentation_7d0887_33_0.svg"
+    },
+    {
+      "type": "paragraph",
+      "text": "Lật lại hình ảnh bên trái và phải thường không thay đổi danh mục của đối\ntượng. Đây là một trong những phương pháp nâng hình ảnh sớm nhất và được\nsử dụng rộng rãi nhất. Tiếp theo, chúng ta sử dụng mô-đun transforms để tạo phiên bản RandomHorizontalFlip , nó lật một hình ảnh sang trái\nvà phải với cơ hội 50%."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "apply(img, torchvision.transforms.RandomHorizontalFlip())"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_image-augmentation_7d0887_37_0.svg",
+      "local_path": "_images/output_image-augmentation_7d0887_37_0.svg",
+      "alt": "../_images/output_image-augmentation_7d0887_37_0.svg"
+    },
+    {
+      "type": "paragraph",
+      "text": "Flipping lên và xuống không phổ biến như lật trái và phải. Nhưng ít nhất\nđối với hình ảnh ví dụ này, lật lên xuống không cản trở sự nhận dạng.\nTiếp theo, chúng ta tạo một phiên bản RandomVerticalFlip để lật ảnh\nlên xuống với 50% cơ hội."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "apply(img, torchvision.transforms.RandomVerticalFlip())"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_image-augmentation_7d0887_39_0.svg",
+      "local_path": "_images/output_image-augmentation_7d0887_39_0.svg",
+      "alt": "../_images/output_image-augmentation_7d0887_39_0.svg"
+    },
+    {
+      "type": "paragraph",
+      "text": "Trong hình ảnh ví dụ chúng tôi đã sử dụng, con mèo nằm ở giữa hình ảnh,\nnhưng điều này có thể không phải là trường hợp nói chung. Trong Section 6.5 , chúng tôi giải thích rằng lớp tổng hợp có thể\nlàm giảm độ nhạy của một lớp phức tạp đến vị trí mục tiêu. Ngoài ra,\nchúng ta cũng có thể cắt ngẫu nhiên hình ảnh để làm cho các đối tượng\nxuất hiện ở các vị trí khác nhau trong ảnh ở các thang đo khác nhau,\nđiều này cũng có thể làm giảm độ nhạy của một mô hình đến vị trí mục\ntiêu."
+    },
+    {
+      "type": "paragraph",
+      "text": "Trong mã dưới đây, chúng ta ngẫu nhiên crop một khu vực có diện tích \\(10\\% \\sim 100 \\%\\) of the original area each time, and the ratio\nof width to height of this area is randomly selected from \\(0.5 \\sim 2\\) . Sau đó, chiều rộng và chiều cao của vùng đều được\nthu nhỏ thành 200 pixel. Trừ khi có quy định khác, số ngẫu nhiên giữa \\(a\\) và \\(b\\) trong phần này đề cập đến một giá trị liên tục\nthu được bằng cách lấy mẫu ngẫu nhiên và thống nhất từ khoảng \\([a, b]\\) ."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "shape_aug = gluon.data.vision.transforms.RandomResizedCrop(\n    (200, 200), scale=(0.1, 1), ratio=(0.5, 2))\napply(img, shape_aug)"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_image-augmentation_7d0887_45_0.svg",
+      "local_path": "_images/output_image-augmentation_7d0887_45_0.svg",
+      "alt": "../_images/output_image-augmentation_7d0887_45_0.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "shape_aug = torchvision.transforms.RandomResizedCrop(\n    (200, 200), scale=(0.1, 1), ratio=(0.5, 2))\napply(img, shape_aug)"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_image-augmentation_7d0887_48_0.svg",
+      "local_path": "_images/output_image-augmentation_7d0887_48_0.svg",
+      "alt": "../_images/output_image-augmentation_7d0887_48_0.svg"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "thay-doi-mau-sac",
+      "text": "13.1.1.2. Thay đổi màu sắc"
+    },
+    {
+      "type": "paragraph",
+      "text": "Một phương pháp nâng cao khác là thay đổi màu sắc. Chúng ta có thể thay\nđổi bốn khía cạnh của màu hình ảnh: độ sáng, độ tương phản, độ bão hòa\nvà màu sắc. Trong ví dụ dưới đây, chúng ta thay đổi ngẫu nhiên độ sáng\ncủa hình ảnh thành giá trị giữa 50% ( \\(1-0.5\\) ) và 150%\n( \\(1+0.5\\) ) của ảnh gốc."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "apply(img, gluon.data.vision.transforms.RandomBrightness(0.5))"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_image-augmentation_7d0887_54_0.svg",
+      "local_path": "_images/output_image-augmentation_7d0887_54_0.svg",
+      "alt": "../_images/output_image-augmentation_7d0887_54_0.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "apply(img, torchvision.transforms.ColorJitter(\n    brightness=0.5, contrast=0, saturation=0, hue=0))"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_image-augmentation_7d0887_57_0.svg",
+      "local_path": "_images/output_image-augmentation_7d0887_57_0.svg",
+      "alt": "../_images/output_image-augmentation_7d0887_57_0.svg"
+    },
+    {
+      "type": "paragraph",
+      "text": "Tương tự, chúng ta có thể ngẫu nhiên thay đổi hue của hình ảnh."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "apply(img, gluon.data.vision.transforms.RandomHue(0.5))"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_image-augmentation_7d0887_63_0.svg",
+      "local_path": "_images/output_image-augmentation_7d0887_63_0.svg",
+      "alt": "../_images/output_image-augmentation_7d0887_63_0.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "apply(img, torchvision.transforms.ColorJitter(\n    brightness=0, contrast=0, saturation=0, hue=0.5))"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_image-augmentation_7d0887_66_0.svg",
+      "local_path": "_images/output_image-augmentation_7d0887_66_0.svg",
+      "alt": "../_images/output_image-augmentation_7d0887_66_0.svg"
+    },
+    {
+      "type": "paragraph",
+      "text": "Chúng ta cũng có thể tạo một phiên bản RandomColorJitter và đặt cách\nthay đổi ngẫu nhiên brightness , contrast , saturation và hue của ảnh cùng một lúc."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "color_aug = gluon.data.vision.transforms.RandomColorJitter(\n    brightness=0.5, contrast=0.5, saturation=0.5, hue=0.5)\napply(img, color_aug)"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_image-augmentation_7d0887_72_0.svg",
+      "local_path": "_images/output_image-augmentation_7d0887_72_0.svg",
+      "alt": "../_images/output_image-augmentation_7d0887_72_0.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "color_aug = torchvision.transforms.ColorJitter(\n    brightness=0.5, contrast=0.5, saturation=0.5, hue=0.5)\napply(img, color_aug)"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_image-augmentation_7d0887_75_0.svg",
+      "local_path": "_images/output_image-augmentation_7d0887_75_0.svg",
+      "alt": "../_images/output_image-augmentation_7d0887_75_0.svg"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "ket-hop-nhieu-phuong-phap-augmentation-anh",
+      "text": "13.1.1.3. Kết hợp nhiều phương pháp Augmentation ảnh"
+    },
+    {
+      "type": "paragraph",
+      "text": "Trong thực tế, chúng ta sẽ kết hợp nhiều phương pháp tăng cường hình\nảnh. Ví dụ: chúng ta có thể kết hợp các phương thức augmentation hình\nảnh khác nhau được xác định ở trên và áp dụng chúng cho mỗi hình ảnh\nthông qua một phiên bản Compose ."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "augs = gluon.data.vision.transforms.Compose([\n    gluon.data.vision.transforms.RandomFlipLeftRight(), color_aug, shape_aug])\napply(img, augs)"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_image-augmentation_7d0887_81_0.svg",
+      "local_path": "_images/output_image-augmentation_7d0887_81_0.svg",
+      "alt": "../_images/output_image-augmentation_7d0887_81_0.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "augs = torchvision.transforms.Compose([\n    torchvision.transforms.RandomHorizontalFlip(), color_aug, shape_aug])\napply(img, augs)"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_image-augmentation_7d0887_84_0.svg",
+      "local_path": "_images/output_image-augmentation_7d0887_84_0.svg",
+      "alt": "../_images/output_image-augmentation_7d0887_84_0.svg"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "dao-tao-voi-hinh-anh-augmentation",
+      "text": "13.1.2. Đào tạo với hình ảnh Augmentation"
+    },
+    {
+      "type": "paragraph",
+      "text": "Hãy để chúng tôi đào tạo một mô hình với nâng hình ảnh. Ở đây chúng tôi\nsử dụng bộ dữ liệu CIFAR-10 thay vì tập dữ liệu Fashion-MNIST mà chúng\ntôi đã sử dụng trước đây. Điều này là do vị trí và kích thước của các\nđối tượng trong bộ dữ liệu Fashion-MNIST đã được chuẩn hóa, trong khi\nmàu sắc và kích thước của các đối tượng trong tập dữ liệu CIFAR-10 có sự\nkhác biệt đáng kể hơn. 32 hình ảnh đào tạo đầu tiên trong tập dữ liệu\nCIFAR-10 được hiển thị bên dưới."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "d2l.show_images(gluon.data.vision.CIFAR10(\n    train=True)[0:32][0], 4, 8, scale=0.8);"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_image-augmentation_7d0887_90_0.svg",
+      "local_path": "_images/output_image-augmentation_7d0887_90_0.svg",
+      "alt": "../_images/output_image-augmentation_7d0887_90_0.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "all_images = torchvision.datasets.CIFAR10(train=True, root=\"../data\",\n                                          download=True)\nd2l.show_images([all_images[i][0] for i in range(32)], 4, 8, scale=0.8);"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "Downloading https://www.cs.toronto.edu/~kriz/cifar-10-python.tar.gz to ../data/cifar-10-python.tar.gz\n97.4%"
+    },
+    {
+      "type": "paragraph",
+      "text": "Để có được kết quả dứt khoát trong quá trình dự đoán, chúng ta thường\nchỉ áp dụng nâng hình ảnh cho các ví dụ đào tạo và không sử dụng nâng\nhình ảnh với các phép toán ngẫu nhiên trong quá trình dự đoán. Ở đây\nchúng tôi chỉ sử dụng phương pháp lật trái phải ngẫu nhiên đơn giản\nnhất. Ngoài ra, chúng ta sử dụng một phiên bản ToTensor để chuyển\nđổi một minibatch ảnh thành định dạng theo yêu cầu của khung học sâu,\ntức là các số điểm nổi 32 bit giữa 0 đến 1 với hình dạng (kích thước lô,\nsố kênh, chiều cao, chiều rộng)."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "train_augs = gluon.data.vision.transforms.Compose([\n    gluon.data.vision.transforms.RandomFlipLeftRight(),\n    gluon.data.vision.transforms.ToTensor()])\n\ntest_augs = gluon.data.vision.transforms.Compose([\n    gluon.data.vision.transforms.ToTensor()])"
+    },
+    {
+      "type": "paragraph",
+      "text": "Tiếp theo, chúng tôi xác định một chức năng phụ trợ để tạo điều kiện đọc\nhình ảnh và áp dụng nâng hình ảnh. Hàm transform_first được cung cấp\nbởi các bộ dữ liệu của Gluon áp dụng nâng hình ảnh cho phần tử đầu tiên\ncủa mỗi ví dụ đào tạo (hình ảnh và nhãn), tức là hình ảnh. Để biết giới\nthiệu chi tiết về DataLoader , vui lòng tham khảo Section 3.5 ."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def load_cifar10(is_train, augs, batch_size):\n    return gluon.data.DataLoader(\n        gluon.data.vision.CIFAR10(train=is_train).transform_first(augs),\n        batch_size=batch_size, shuffle=is_train,\n        num_workers=d2l.get_dataloader_workers())"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "train_augs = torchvision.transforms.Compose([\n     torchvision.transforms.RandomHorizontalFlip(),\n     torchvision.transforms.ToTensor()])\n\ntest_augs = torchvision.transforms.Compose([\n     torchvision.transforms.ToTensor()])"
+    },
+    {
+      "type": "paragraph",
+      "text": "Tiếp theo, chúng ta xác định một hàm phụ trợ để tạo điều kiện đọc hình\nảnh và áp dụng tăng cường hình ảnh. Đối số transform được cung cấp\nbởi tập dữ liệu của PyTorch áp dụng tăng cường để biến đổi hình ảnh. Để\nbiết giới thiệu chi tiết về DataLoader , vui lòng tham khảo Section 3.5 ."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def load_cifar10(is_train, augs, batch_size):\n    dataset = torchvision.datasets.CIFAR10(root=\"../data\", train=is_train,\n                                           transform=augs, download=True)\n    dataloader = torch.utils.data.DataLoader(dataset, batch_size=batch_size,\n                    shuffle=is_train, num_workers=d2l.get_dataloader_workers())\n    return dataloader"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "dao-tao-multi-gpu",
+      "text": "13.1.2.1. Đào tạo Multi-GPU"
+    },
+    {
+      "type": "paragraph",
+      "text": "Chúng tôi đào tạo mô hình ResNet-18 từ Section 7.6 trên bộ dữ\nliệu CIFAR-10. Nhớ lại phần giới thiệu về đào tạo đa GPU trong Section 12.6 . Sau đây, chúng tôi định nghĩa một hàm\nđể đào tạo và đánh giá mô hình bằng cách sử dụng nhiều GPU ."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "#@save\ndef train_batch_ch13(net, features, labels, loss, trainer, devices,\n                     split_f=d2l.split_batch):\n    \"\"\"Train for a minibatch with mutiple GPUs (defined in Chapter 13).\"\"\"\n    X_shards, y_shards = split_f(features, labels, devices)\n    with autograd.record():\n        pred_shards = [net(X_shard) for X_shard in X_shards]\n        ls = [loss(pred_shard, y_shard) for pred_shard, y_shard\n              in zip(pred_shards, y_shards)]\n    for l in ls:\n        l.backward()\n    # The `True` flag allows parameters with stale gradients, which is useful\n    # later (e.g., in fine-tuning BERT)\n    trainer.step(labels.shape[0], ignore_stale_grad=True)\n    train_loss_sum = sum([float(l.sum()) for l in ls])\n    train_acc_sum = sum(d2l.accuracy(pred_shard, y_shard)\n                        for pred_shard, y_shard in zip(pred_shards, y_shards))\n    return train_loss_sum, train_acc_sum\n\n#@save\ndef train_ch13(net, train_iter, test_iter, loss, trainer, num_epochs,\n               devices=d2l.try_all_gpus(), split_f=d2l.split_batch):\n    \"\"\"Train a model with mutiple GPUs (defined in Chapter 13).\"\"\"\n    timer, num_batches = d2l.Timer(), len(train_iter)\n    animator = d2l.Animator(xlabel='epoch', xlim=[1, num_epochs], ylim=[0, 1],\n                            legend=['train loss', 'train acc', 'test acc'])\n    for epoch in range(num_epochs):\n        # Sum of training loss, sum of training accuracy, no. of examples,\n        # no. of predictions\n        metric = d2l.Accumulator(4)\n        for i, (features, labels) in enumerate(train_iter):\n            timer.start()\n            l, acc = train_batch_ch13(\n                net, features, labels, loss, trainer, devices, split_f)\n            metric.add(l, acc, labels.shape[0], labels.size)\n            timer.stop()\n            if (i + 1) % (num_batches // 5) == 0 or i == num_batches - 1:\n                animator.add(epoch + (i + 1) / num_batches,\n                             (metric[0] / metric[2], metric[1] / metric[3],\n                              None))\n        test_acc = d2l.evaluate_accuracy_gpus(net, test_iter, split_f)\n        animator.add(epoch + 1, (None, None, test_acc))\n    print(f'loss {metric[0] / metric[2]:.3f}, train acc '\n          f'{metric[1] / metric[3]:.3f}, test acc {test_acc:.3f}')\n    print(f'{metric[2] * num_epochs / timer.sum():.1f} examples/sec on '\n          f'{str(devices)}')"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "#@save\ndef train_batch_ch13(net, X, y, loss, trainer, devices):\n    \"\"\"Train for a minibatch with mutiple GPUs (defined in Chapter 13).\"\"\"\n    if isinstance(X, list):\n        # Required for BERT fine-tuning (to be covered later)\n        X = [x.to(devices[0]) for x in X]\n    else:\n        X = X.to(devices[0])\n    y = y.to(devices[0])\n    net.train()\n    trainer.zero_grad()\n    pred = net(X)\n    l = loss(pred, y)\n    l.sum().backward()\n    trainer.step()\n    train_loss_sum = l.sum()\n    train_acc_sum = d2l.accuracy(pred, y)\n    return train_loss_sum, train_acc_sum\n\n#@save\ndef train_ch13(net, train_iter, test_iter, loss, trainer, num_epochs,\n               devices=d2l.try_all_gpus()):\n    \"\"\"Train a model with mutiple GPUs (defined in Chapter 13).\"\"\"\n    timer, num_batches = d2l.Timer(), len(train_iter)\n    animator = d2l.Animator(xlabel='epoch', xlim=[1, num_epochs], ylim=[0, 1],\n                            legend=['train loss', 'train acc', 'test acc'])\n    net = nn.DataParallel(net, device_ids=devices).to(devices[0])\n    for epoch in range(num_epochs):\n        # Sum of training loss, sum of training accuracy, no. of examples,\n        # no. of predictions\n        metric = d2l.Accumulator(4)\n        for i, (features, labels) in enumerate(train_iter):\n            timer.start()\n            l, acc = train_batch_ch13(\n                net, features, labels, loss, trainer, devices)\n            metric.add(l, acc, labels.shape[0], labels.numel())\n            timer.stop()\n            if (i + 1) % (num_batches // 5) == 0 or i == num_batches - 1:\n                animator.add(epoch + (i + 1) / num_batches,\n                             (metric[0] / metric[2], metric[1] / metric[3],\n                              None))\n        test_acc = d2l.evaluate_accuracy_gpu(net, test_iter)\n        animator.add(epoch + 1, (None, None, test_acc))\n    print(f'loss {metric[0] / metric[2]:.3f}, train acc '\n          f'{metric[1] / metric[3]:.3f}, test acc {test_acc:.3f}')\n    print(f'{metric[2] * num_epochs / timer.sum():.1f} examples/sec on '\n          f'{str(devices)}')"
+    },
+    {
+      "type": "paragraph",
+      "text": "Bây giờ chúng ta có thể xác định hàm train_with_data_aug để đào tạo\nmô hình với khả năng tăng cường hình ảnh. Chức năng này nhận được tất cả\ncác GPU có sẵn, sử dụng Adam làm thuật toán tối ưu hóa, áp dụng nâng\nhình ảnh cho tập dữ liệu đào tạo và cuối cùng gọi hàm train_ch13 vừa\nđược định nghĩa để đào tạo và đánh giá mô hình."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "batch_size, devices, net = 256, d2l.try_all_gpus(), d2l.resnet18(10)\nnet.initialize(init=init.Xavier(), ctx=devices)\n\ndef train_with_data_aug(train_augs, test_augs, net, lr=0.001):\n    train_iter = load_cifar10(True, train_augs, batch_size)\n    test_iter = load_cifar10(False, test_augs, batch_size)\n    loss = gluon.loss.SoftmaxCrossEntropyLoss()\n    trainer = gluon.Trainer(net.collect_params(), 'adam',\n                            {'learning_rate': lr})\n    train_ch13(net, train_iter, test_iter, loss, trainer, 10, devices)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "batch_size, devices, net = 256, d2l.try_all_gpus(), d2l.resnet18(10, 3)\n\ndef init_weights(m):\n    if type(m) in [nn.Linear, nn.Conv2d]:\n        nn.init.xavier_uniform_(m.weight)\n\nnet.apply(init_weights)\n\ndef train_with_data_aug(train_augs, test_augs, net, lr=0.001):\n    train_iter = load_cifar10(True, train_augs, batch_size)\n    test_iter = load_cifar10(False, test_augs, batch_size)\n    loss = nn.CrossEntropyLoss(reduction=\"none\")\n    trainer = torch.optim.Adam(net.parameters(), lr=lr)\n    train_ch13(net, train_iter, test_iter, loss, trainer, 10, devices)"
+    },
+    {
+      "type": "paragraph",
+      "text": "Hãy để chúng tôi đào tạo mô hình bằng cách sử dụng nâng hình ảnh dựa\ntrên lật trái phải ngẫu nhiên."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "train_with_data_aug(train_augs, test_augs, net)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "loss 0.169, train acc 0.942, test acc 0.848\n3132.6 examples/sec on [gpu(0), gpu(1)]"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_image-augmentation_7d0887_130_1.svg",
+      "local_path": "_images/output_image-augmentation_7d0887_130_1.svg",
+      "alt": "../_images/output_image-augmentation_7d0887_130_1.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "train_with_data_aug(train_augs, test_augs, net)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "loss 0.176, train acc 0.939, test acc 0.814\n5458.4 examples/sec on [device(type='cuda', index=0), device(type='cuda', index=1)]"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_image-augmentation_7d0887_133_1.svg",
+      "local_path": "_images/output_image-augmentation_7d0887_133_1.svg",
+      "alt": "../_images/output_image-augmentation_7d0887_133_1.svg"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tom-tat",
+      "text": "13.1.3. Tóm tắt"
+    },
+    {
+      "type": "list",
+      "ordered": false,
+      "items": [
+        "Nâng hình ảnh tạo ra hình ảnh ngẫu nhiên dựa trên dữ liệu đào tạo\nhiện có để cải thiện khả năng tổng quát hóa của các mô hình.",
+        "Để có được kết quả dứt khoát trong quá trình dự đoán, chúng ta thường\nchỉ áp dụng nâng hình ảnh cho các ví dụ đào tạo và không sử dụng nâng\nhình ảnh với các phép toán ngẫu nhiên trong quá trình dự đoán.",
+        "Khung học sâu cung cấp nhiều phương pháp nâng hình ảnh khác nhau, có\nthể được áp dụng đồng thời."
+      ]
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bai-tap",
+      "text": "13.1.4. Bài tập"
+    },
+    {
+      "type": "list",
+      "ordered": true,
+      "items": [
+        "Đào tạo mô hình mà không cần sử dụng nâng hình ảnh: train_with_data_aug(test_augs, test_augs) . So sánh độ chính xác\ncủa đào tạo và kiểm tra khi sử dụng và không sử dụng nâng hình ảnh.\nThí nghiệm so sánh này có thể hỗ trợ lập luận rằng việc tăng cường\nhình ảnh có thể giảm thiểu quá mức không? Tại sao?",
+        "Kết hợp nhiều phương pháp nâng hình ảnh khác nhau trong đào tạo mô\nhình trên tập dữ liệu CIFAR-10. Nó có cải thiện độ chính xác của thử\nnghiệm không?",
+        "Tham khảo tài liệu trực tuyến của khung học sâu. Những phương pháp\nnâng hình ảnh nào khác mà nó cũng cung cấp?"
+      ]
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    }
+  ],
+  "images": [
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_image-augmentation_7d0887_12_0.svg",
+      "local_path": "_images/output_image-augmentation_7d0887_12_0.svg",
+      "alt": "../_images/output_image-augmentation_7d0887_12_0.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_image-augmentation_7d0887_15_0.svg",
+      "local_path": "_images/output_image-augmentation_7d0887_15_0.svg",
+      "alt": "../_images/output_image-augmentation_7d0887_15_0.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_image-augmentation_7d0887_31_0.svg",
+      "local_path": "_images/output_image-augmentation_7d0887_31_0.svg",
+      "alt": "../_images/output_image-augmentation_7d0887_31_0.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_image-augmentation_7d0887_33_0.svg",
+      "local_path": "_images/output_image-augmentation_7d0887_33_0.svg",
+      "alt": "../_images/output_image-augmentation_7d0887_33_0.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_image-augmentation_7d0887_37_0.svg",
+      "local_path": "_images/output_image-augmentation_7d0887_37_0.svg",
+      "alt": "../_images/output_image-augmentation_7d0887_37_0.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_image-augmentation_7d0887_39_0.svg",
+      "local_path": "_images/output_image-augmentation_7d0887_39_0.svg",
+      "alt": "../_images/output_image-augmentation_7d0887_39_0.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_image-augmentation_7d0887_45_0.svg",
+      "local_path": "_images/output_image-augmentation_7d0887_45_0.svg",
+      "alt": "../_images/output_image-augmentation_7d0887_45_0.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_image-augmentation_7d0887_48_0.svg",
+      "local_path": "_images/output_image-augmentation_7d0887_48_0.svg",
+      "alt": "../_images/output_image-augmentation_7d0887_48_0.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_image-augmentation_7d0887_54_0.svg",
+      "local_path": "_images/output_image-augmentation_7d0887_54_0.svg",
+      "alt": "../_images/output_image-augmentation_7d0887_54_0.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_image-augmentation_7d0887_57_0.svg",
+      "local_path": "_images/output_image-augmentation_7d0887_57_0.svg",
+      "alt": "../_images/output_image-augmentation_7d0887_57_0.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_image-augmentation_7d0887_63_0.svg",
+      "local_path": "_images/output_image-augmentation_7d0887_63_0.svg",
+      "alt": "../_images/output_image-augmentation_7d0887_63_0.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_image-augmentation_7d0887_66_0.svg",
+      "local_path": "_images/output_image-augmentation_7d0887_66_0.svg",
+      "alt": "../_images/output_image-augmentation_7d0887_66_0.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_image-augmentation_7d0887_72_0.svg",
+      "local_path": "_images/output_image-augmentation_7d0887_72_0.svg",
+      "alt": "../_images/output_image-augmentation_7d0887_72_0.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_image-augmentation_7d0887_75_0.svg",
+      "local_path": "_images/output_image-augmentation_7d0887_75_0.svg",
+      "alt": "../_images/output_image-augmentation_7d0887_75_0.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_image-augmentation_7d0887_81_0.svg",
+      "local_path": "_images/output_image-augmentation_7d0887_81_0.svg",
+      "alt": "../_images/output_image-augmentation_7d0887_81_0.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_image-augmentation_7d0887_84_0.svg",
+      "local_path": "_images/output_image-augmentation_7d0887_84_0.svg",
+      "alt": "../_images/output_image-augmentation_7d0887_84_0.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_image-augmentation_7d0887_90_0.svg",
+      "local_path": "_images/output_image-augmentation_7d0887_90_0.svg",
+      "alt": "../_images/output_image-augmentation_7d0887_90_0.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_image-augmentation_7d0887_130_1.svg",
+      "local_path": "_images/output_image-augmentation_7d0887_130_1.svg",
+      "alt": "../_images/output_image-augmentation_7d0887_130_1.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_image-augmentation_7d0887_133_1.svg",
+      "local_path": "_images/output_image-augmentation_7d0887_133_1.svg",
+      "alt": "../_images/output_image-augmentation_7d0887_133_1.svg"
+    }
+  ],
+  "text": "13.1. Hình ảnh Augmentation\nTrong Section 7.1 , chúng tôi đã đề cập rằng các tập dữ liệu\nlớn là điều kiện tiên quyết cho sự thành công của các mạng thần kinh sâu\ntrong các ứng dụng khác nhau. Tăng cường hình ảnh tạo ra các ví dụ đào\ntạo tương tự nhưng khác biệt sau một loạt các thay đổi ngẫu nhiên đối\nvới hình ảnh đào tạo, từ đó mở rộng quy mô của bộ đào tạo. Ngoài ra,\ntăng cường hình ảnh có thể được thúc đẩy bởi thực tế là các tinh chỉnh\nngẫu nhiên của các ví dụ đào tạo cho phép các mô hình ít dựa vào các\nthuộc tính nhất định, do đó cải thiện khả năng tổng quát của chúng. Ví\ndụ, chúng ta có thể cắt một hình ảnh theo những cách khác nhau để làm\ncho đối tượng quan tâm xuất hiện ở các vị trí khác nhau, do đó làm giảm\nsự phụ thuộc của một mô hình vào vị trí của đối tượng. Chúng tôi cũng có\nthể điều chỉnh các yếu tố như độ sáng và màu sắc để giảm độ nhạy của mô\nhình với màu sắc. Có lẽ đúng là nâng hình ảnh là không thể thiếu cho sự\nthành công của AlexNet vào thời điểm đó. Trong phần này, chúng tôi sẽ\nthảo luận về kỹ thuật được sử dụng rộng rãi này trong tầm nhìn máy tính.\n13.1.1. Phương pháp Augmentation hình ảnh phổ biến\nTrong cuộc điều tra của chúng tôi về các phương pháp nâng hình ảnh phổ\nbiến, chúng tôi sẽ sử dụng hình ảnh \\(400\\times 500\\) sau đây một ví\ndụ.\nHầu hết các phương pháp nâng hình ảnh đều có một mức độ ngẫu nhiên nhất\nđịnh. Để giúp chúng ta dễ dàng quan sát hiệu ứng của việc nâng hình ảnh\nhơn, tiếp theo chúng ta xác định một hàm phụ apply . Chức năng này\nchạy phương pháp augmentation hình ảnh aug nhiều lần trên hình ảnh\nđầu vào img và hiển thị tất cả các kết quả.\n13.1.1.1. Lật và cắt xén\nLật lại hình ảnh bên trái và phải thường không thay đổi danh mục của đối\ntượng. Đây là một trong những phương pháp nâng hình ảnh sớm nhất và được\nsử dụng rộng rãi nhất. Tiếp theo, chúng ta sử dụng mô-đun transforms để tạo phiên bản RandomFlipLeftRight , nó lật một hình ảnh sang trái\nvà phải với cơ hội 50%.\nFlipping lên và xuống không phổ biến như lật trái và phải. Nhưng ít nhất\nđối với hình ảnh ví dụ này, lật lên xuống không cản trở sự nhận dạng.\nTiếp theo, chúng ta tạo một phiên bản RandomFlipTopBottom để lật ảnh\nlên xuống với 50% cơ hội.\nLật lại hình ảnh bên trái và phải thường không thay đổi danh mục của đối\ntượng. Đây là một trong những phương pháp nâng hình ảnh sớm nhất và được\nsử dụng rộng rãi nhất. Tiếp theo, chúng ta sử dụng mô-đun transforms để tạo phiên bản RandomHorizontalFlip , nó lật một hình ảnh sang trái\nvà phải với cơ hội 50%.\nFlipping lên và xuống không phổ biến như lật trái và phải. Nhưng ít nhất\nđối với hình ảnh ví dụ này, lật lên xuống không cản trở sự nhận dạng.\nTiếp theo, chúng ta tạo một phiên bản RandomVerticalFlip để lật ảnh\nlên xuống với 50% cơ hội.\nTrong hình ảnh ví dụ chúng tôi đã sử dụng, con mèo nằm ở giữa hình ảnh,\nnhưng điều này có thể không phải là trường hợp nói chung. Trong Section 6.5 , chúng tôi giải thích rằng lớp tổng hợp có thể\nlàm giảm độ nhạy của một lớp phức tạp đến vị trí mục tiêu. Ngoài ra,\nchúng ta cũng có thể cắt ngẫu nhiên hình ảnh để làm cho các đối tượng\nxuất hiện ở các vị trí khác nhau trong ảnh ở các thang đo khác nhau,\nđiều này cũng có thể làm giảm độ nhạy của một mô hình đến vị trí mục\ntiêu.\nTrong mã dưới đây, chúng ta ngẫu nhiên crop một khu vực có diện tích \\(10\\% \\sim 100 \\%\\) of the original area each time, and the ratio\nof width to height of this area is randomly selected from \\(0.5 \\sim 2\\) . Sau đó, chiều rộng và chiều cao của vùng đều được\nthu nhỏ thành 200 pixel. Trừ khi có quy định khác, số ngẫu nhiên giữa \\(a\\) và \\(b\\) trong phần này đề cập đến một giá trị liên tục\nthu được bằng cách lấy mẫu ngẫu nhiên và thống nhất từ khoảng \\([a, b]\\) .\n13.1.1.2. Thay đổi màu sắc\nMột phương pháp nâng cao khác là thay đổi màu sắc. Chúng ta có thể thay\nđổi bốn khía cạnh của màu hình ảnh: độ sáng, độ tương phản, độ bão hòa\nvà màu sắc. Trong ví dụ dưới đây, chúng ta thay đổi ngẫu nhiên độ sáng\ncủa hình ảnh thành giá trị giữa 50% ( \\(1-0.5\\) ) và 150%\n( \\(1+0.5\\) ) của ảnh gốc.\nTương tự, chúng ta có thể ngẫu nhiên thay đổi hue của hình ảnh.\nChúng ta cũng có thể tạo một phiên bản RandomColorJitter và đặt cách\nthay đổi ngẫu nhiên brightness , contrast , saturation và hue của ảnh cùng một lúc.\n13.1.1.3. Kết hợp nhiều phương pháp Augmentation ảnh\nTrong thực tế, chúng ta sẽ kết hợp nhiều phương pháp tăng cường hình\nảnh. Ví dụ: chúng ta có thể kết hợp các phương thức augmentation hình\nảnh khác nhau được xác định ở trên và áp dụng chúng cho mỗi hình ảnh\nthông qua một phiên bản Compose .\n13.1.2. Đào tạo với hình ảnh Augmentation\nHãy để chúng tôi đào tạo một mô hình với nâng hình ảnh. Ở đây chúng tôi\nsử dụng bộ dữ liệu CIFAR-10 thay vì tập dữ liệu Fashion-MNIST mà chúng\ntôi đã sử dụng trước đây. Điều này là do vị trí và kích thước của các\nđối tượng trong bộ dữ liệu Fashion-MNIST đã được chuẩn hóa, trong khi\nmàu sắc và kích thước của các đối tượng trong tập dữ liệu CIFAR-10 có sự\nkhác biệt đáng kể hơn. 32 hình ảnh đào tạo đầu tiên trong tập dữ liệu\nCIFAR-10 được hiển thị bên dưới.\nĐể có được kết quả dứt khoát trong quá trình dự đoán, chúng ta thường\nchỉ áp dụng nâng hình ảnh cho các ví dụ đào tạo và không sử dụng nâng\nhình ảnh với các phép toán ngẫu nhiên trong quá trình dự đoán. Ở đây\nchúng tôi chỉ sử dụng phương pháp lật trái phải ngẫu nhiên đơn giản\nnhất. Ngoài ra, chúng ta sử dụng một phiên bản ToTensor để chuyển\nđổi một minibatch ảnh thành định dạng theo yêu cầu của khung học sâu,\ntức là các số điểm nổi 32 bit giữa 0 đến 1 với hình dạng (kích thước lô,\nsố kênh, chiều cao, chiều rộng).\nTiếp theo, chúng tôi xác định một chức năng phụ trợ để tạo điều kiện đọc\nhình ảnh và áp dụng nâng hình ảnh. Hàm transform_first được cung cấp\nbởi các bộ dữ liệu của Gluon áp dụng nâng hình ảnh cho phần tử đầu tiên\ncủa mỗi ví dụ đào tạo (hình ảnh và nhãn), tức là hình ảnh. Để biết giới\nthiệu chi tiết về DataLoader , vui lòng tham khảo Section 3.5 .\nTiếp theo, chúng ta xác định một hàm phụ trợ để tạo điều kiện đọc hình\nảnh và áp dụng tăng cường hình ảnh. Đối số transform được cung cấp\nbởi tập dữ liệu của PyTorch áp dụng tăng cường để biến đổi hình ảnh. Để\nbiết giới thiệu chi tiết về DataLoader , vui lòng tham khảo Section 3.5 .\n13.1.2.1. Đào tạo Multi-GPU\nChúng tôi đào tạo mô hình ResNet-18 từ Section 7.6 trên bộ dữ\nliệu CIFAR-10. Nhớ lại phần giới thiệu về đào tạo đa GPU trong Section 12.6 . Sau đây, chúng tôi định nghĩa một hàm\nđể đào tạo và đánh giá mô hình bằng cách sử dụng nhiều GPU .\nBây giờ chúng ta có thể xác định hàm train_with_data_aug để đào tạo\nmô hình với khả năng tăng cường hình ảnh. Chức năng này nhận được tất cả\ncác GPU có sẵn, sử dụng Adam làm thuật toán tối ưu hóa, áp dụng nâng\nhình ảnh cho tập dữ liệu đào tạo và cuối cùng gọi hàm train_ch13 vừa\nđược định nghĩa để đào tạo và đánh giá mô hình.\nHãy để chúng tôi đào tạo mô hình bằng cách sử dụng nâng hình ảnh dựa\ntrên lật trái phải ngẫu nhiên.\n13.1.3. Tóm tắt\nNâng hình ảnh tạo ra hình ảnh ngẫu nhiên dựa trên dữ liệu đào tạo\nhiện có để cải thiện khả năng tổng quát hóa của các mô hình.\nĐể có được kết quả dứt khoát trong quá trình dự đoán, chúng ta thường\nchỉ áp dụng nâng hình ảnh cho các ví dụ đào tạo và không sử dụng nâng\nhình ảnh với các phép toán ngẫu nhiên trong quá trình dự đoán.\nKhung học sâu cung cấp nhiều phương pháp nâng hình ảnh khác nhau, có\nthể được áp dụng đồng thời.\n13.1.4. Bài tập\nĐào tạo mô hình mà không cần sử dụng nâng hình ảnh: train_with_data_aug(test_augs, test_augs) . So sánh độ chính xác\ncủa đào tạo và kiểm tra khi sử dụng và không sử dụng nâng hình ảnh.\nThí nghiệm so sánh này có thể hỗ trợ lập luận rằng việc tăng cường\nhình ảnh có thể giảm thiểu quá mức không? Tại sao?\nKết hợp nhiều phương pháp nâng hình ảnh khác nhau trong đào tạo mô\nhình trên tập dữ liệu CIFAR-10. Nó có cải thiện độ chính xác của thử\nnghiệm không?\nTham khảo tài liệu trực tuyến của khung học sâu. Những phương pháp\nnâng hình ảnh nào khác mà nó cũng cung cấp?\nDiscussions\nDiscussions"
+}

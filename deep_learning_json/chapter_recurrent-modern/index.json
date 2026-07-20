@@ -1,0 +1,95 @@
+{
+  "url": "https://vi.d2l.ai/chapter_recurrent-modern/index.html",
+  "chapter": "chapter_recurrent-modern",
+  "title": "9. Mạng thần kinh tái phát hiện đại",
+  "crawled_at": "2026-07-20T12:40:02.525250+00:00",
+  "headings": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "mang-than-kinh-tai-phat-hien-dai",
+      "text": "9. Mạng thần kinh tái phát hiện đại"
+    }
+  ],
+  "content": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "mang-than-kinh-tai-phat-hien-dai",
+      "text": "9. Mạng thần kinh tái phát hiện đại"
+    },
+    {
+      "type": "paragraph",
+      "text": "Chúng tôi đã giới thiệu những điều cơ bản về RNNs, có thể xử lý dữ liệu\ntrình tự tốt hơn. Để trình diễn, chúng tôi đã triển khai các mô hình\nngôn ngữ dựa trên RNN trên dữ liệu văn bản. Tuy nhiên, những kỹ thuật\nnhư vậy có thể không đủ cho các học viên khi họ phải đối mặt với một\nloạt các vấn đề học tập chuỗi ngày nay."
+    },
+    {
+      "type": "paragraph",
+      "text": "Ví dụ, một vấn đề đáng chú ý trong thực tế là sự bất ổn số của RNNs. Mặc\ndù chúng tôi đã áp dụng các thủ thuật triển khai như cắt gradient, vấn\nđề này có thể được giảm bớt hơn nữa với các thiết kế phức tạp hơn của\ncác mô hình trình tự. Cụ thể, RNN có cổng phổ biến hơn nhiều trong thực\ntế. Chúng tôi sẽ bắt đầu bằng cách giới thiệu hai trong số các mạng được\nsử dụng rộng rãi như vậy, cụ thể là các đơn vị định kỳ ged (Grus) và\n* bộ nhớ ngắn hạn dài* (LSTM). Hơn nữa, chúng tôi sẽ mở rộng kiến trúc\nRNN với một layer ẩn một chiều duy nhất đã được thảo luận cho đến nay.\nChúng tôi sẽ mô tả các kiến trúc sâu với nhiều lớp ẩn, và thảo luận về\nthiết kế hai chiều với cả tính toán tái phát về phía trước và ngược.\nNhững mở rộng như vậy thường được áp dụng trong các mạng tái phát hiện\nđại. Khi giải thích các biến thể RNN này, chúng tôi tiếp tục xem xét vấn\nđề mô hình hóa ngôn ngữ tương tự được giới thiệu trong Section 8 ."
+    },
+    {
+      "type": "paragraph",
+      "text": "Trên thực tế, mô hình ngôn ngữ chỉ tiết lộ một phần nhỏ trong số những\ngì trình tự học có khả năng. Trong một loạt các vấn đề học tập trình tự,\nchẳng hạn như nhận dạng giọng nói tự động, văn bản sang giọng nói và\ndịch máy, cả đầu vào và đầu ra đều là các chuỗi có độ dài tùy ý. Để giải\nthích làm thế nào để phù hợp với loại dữ liệu này, chúng tôi sẽ lấy dịch\nmáy làm ví dụ, và giới thiệu kiến trúc bộ mã hóa-giải mã dựa trên RNNs\nvà tìm kiếm chùm tia để tạo chuỗi."
+    },
+    {
+      "type": "list",
+      "ordered": false,
+      "items": [
+        "9.1. Các đơn vị định kỳ cổng (GRU) 9.1.1. Nhà nước ẩn Gated 9.1.2. Thực hiện từ đầu 9.1.3. Thiết tập 9.1.4. Tóm tắt 9.1.5. Bài tập",
+        "9.1.1. Nhà nước ẩn Gated",
+        "9.1.2. Thực hiện từ đầu",
+        "9.1.3. Thiết tập",
+        "9.1.4. Tóm tắt",
+        "9.1.5. Bài tập",
+        "9.2. Bộ nhớ ngắn hạn dài (LSTM) 9.2.1. Gated Memory Cell 9.2.2. Thực hiện từ đầu 9.2.3. Thiết tập 9.2.4. Tóm tắt 9.2.5. Bài tập",
+        "9.2.1. Gated Memory Cell",
+        "9.2.2. Thực hiện từ đầu",
+        "9.2.3. Thiết tập",
+        "9.2.4. Tóm tắt",
+        "9.2.5. Bài tập",
+        "9.3. Mạng thần kinh tái phát sâu 9.3.1. Phụ thuộc chức năng 9.3.2. Thực hiện ngắn gọn 9.3.3. Đào tạo và Dự đoán 9.3.4. Tóm tắt 9.3.5. Bài tập",
+        "9.3.1. Phụ thuộc chức năng",
+        "9.3.2. Thực hiện ngắn gọn",
+        "9.3.3. Đào tạo và Dự đoán",
+        "9.3.4. Tóm tắt",
+        "9.3.5. Bài tập",
+        "9.4. Mạng nơ-ron định kỳ hai chiều 9.4.1. Lập trình động trong các mô hình Markov ẩn 9.4.2. Mô hình hai chiều 9.4.3. Đào tạo một RNN hai chiều cho một ứng dụng sai 9.4.4. Tóm tắt 9.4.5. Bài tập",
+        "9.4.1. Lập trình động trong các mô hình Markov ẩn",
+        "9.4.2. Mô hình hai chiều",
+        "9.4.3. Đào tạo một RNN hai chiều cho một ứng dụng sai",
+        "9.4.4. Tóm tắt",
+        "9.4.5. Bài tập",
+        "9.5. Dịch máy và bộ dữ liệu 9.5.1. Tải xuống và xử lý sơ bộ dữ liệu 9.5.2. Tokenization 9.5.3. Từ vừ 9.5.4. Đọc tập dữ liệu 9.5.5. Putting All Things Together 9.5.6. Tóm tắt 9.5.7. Bài tập",
+        "9.5.1. Tải xuống và xử lý sơ bộ dữ liệu",
+        "9.5.2. Tokenization",
+        "9.5.3. Từ vừ",
+        "9.5.4. Đọc tập dữ liệu",
+        "9.5.5. Putting All Things Together",
+        "9.5.6. Tóm tắt",
+        "9.5.7. Bài tập",
+        "9.6. Kiến trúc mã hóa-Decoder 9.6.1. Bộ mã hóa 9.6.2. Decoder 9.6.3. Đút bộ mã hóa và bộ giải mã cùng nhau 9.6.4. Tóm tắt 9.6.5. Bài tập",
+        "9.6.1. Bộ mã hóa",
+        "9.6.2. Decoder",
+        "9.6.3. Đút bộ mã hóa và bộ giải mã cùng nhau",
+        "9.6.4. Tóm tắt",
+        "9.6.5. Bài tập",
+        "9.7. Trình tự để học trình tự 9.7.1. Bộ mã hóa 9.7.2. Decoder 9.7.3. Chức năng mất 9.7.4. Đào tạo 9.7.5. Prediction 9.7.6. Đánh giá các chuỗi dự đoán 9.7.7. Tóm tắt 9.7.8. Bài tập",
+        "9.7.1. Bộ mã hóa",
+        "9.7.2. Decoder",
+        "9.7.3. Chức năng mất",
+        "9.7.4. Đào tạo",
+        "9.7.5. Prediction",
+        "9.7.6. Đánh giá các chuỗi dự đoán",
+        "9.7.7. Tóm tắt",
+        "9.7.8. Bài tập",
+        "9.8. Tìm kiếm chùm 9.8.1. Tìm kiếm tham lam 9.8.2. Tìm kiếm đầy đủ 9.8.3. Tìm kiếm chùm 9.8.4. Tóm tắt 9.8.5. Bài tập",
+        "9.8.1. Tìm kiếm tham lam",
+        "9.8.2. Tìm kiếm đầy đủ",
+        "9.8.3. Tìm kiếm chùm",
+        "9.8.4. Tóm tắt",
+        "9.8.5. Bài tập"
+      ]
+    }
+  ],
+  "images": [],
+  "text": "9. Mạng thần kinh tái phát hiện đại\nChúng tôi đã giới thiệu những điều cơ bản về RNNs, có thể xử lý dữ liệu\ntrình tự tốt hơn. Để trình diễn, chúng tôi đã triển khai các mô hình\nngôn ngữ dựa trên RNN trên dữ liệu văn bản. Tuy nhiên, những kỹ thuật\nnhư vậy có thể không đủ cho các học viên khi họ phải đối mặt với một\nloạt các vấn đề học tập chuỗi ngày nay.\nVí dụ, một vấn đề đáng chú ý trong thực tế là sự bất ổn số của RNNs. Mặc\ndù chúng tôi đã áp dụng các thủ thuật triển khai như cắt gradient, vấn\nđề này có thể được giảm bớt hơn nữa với các thiết kế phức tạp hơn của\ncác mô hình trình tự. Cụ thể, RNN có cổng phổ biến hơn nhiều trong thực\ntế. Chúng tôi sẽ bắt đầu bằng cách giới thiệu hai trong số các mạng được\nsử dụng rộng rãi như vậy, cụ thể là các đơn vị định kỳ ged (Grus) và\n* bộ nhớ ngắn hạn dài* (LSTM). Hơn nữa, chúng tôi sẽ mở rộng kiến trúc\nRNN với một layer ẩn một chiều duy nhất đã được thảo luận cho đến nay.\nChúng tôi sẽ mô tả các kiến trúc sâu với nhiều lớp ẩn, và thảo luận về\nthiết kế hai chiều với cả tính toán tái phát về phía trước và ngược.\nNhững mở rộng như vậy thường được áp dụng trong các mạng tái phát hiện\nđại. Khi giải thích các biến thể RNN này, chúng tôi tiếp tục xem xét vấn\nđề mô hình hóa ngôn ngữ tương tự được giới thiệu trong Section 8 .\nTrên thực tế, mô hình ngôn ngữ chỉ tiết lộ một phần nhỏ trong số những\ngì trình tự học có khả năng. Trong một loạt các vấn đề học tập trình tự,\nchẳng hạn như nhận dạng giọng nói tự động, văn bản sang giọng nói và\ndịch máy, cả đầu vào và đầu ra đều là các chuỗi có độ dài tùy ý. Để giải\nthích làm thế nào để phù hợp với loại dữ liệu này, chúng tôi sẽ lấy dịch\nmáy làm ví dụ, và giới thiệu kiến trúc bộ mã hóa-giải mã dựa trên RNNs\nvà tìm kiếm chùm tia để tạo chuỗi.\n9.1. Các đơn vị định kỳ cổng (GRU) 9.1.1. Nhà nước ẩn Gated 9.1.2. Thực hiện từ đầu 9.1.3. Thiết tập 9.1.4. Tóm tắt 9.1.5. Bài tập\n9.1.1. Nhà nước ẩn Gated\n9.1.2. Thực hiện từ đầu\n9.1.3. Thiết tập\n9.1.4. Tóm tắt\n9.1.5. Bài tập\n9.2. Bộ nhớ ngắn hạn dài (LSTM) 9.2.1. Gated Memory Cell 9.2.2. Thực hiện từ đầu 9.2.3. Thiết tập 9.2.4. Tóm tắt 9.2.5. Bài tập\n9.2.1. Gated Memory Cell\n9.2.2. Thực hiện từ đầu\n9.2.3. Thiết tập\n9.2.4. Tóm tắt\n9.2.5. Bài tập\n9.3. Mạng thần kinh tái phát sâu 9.3.1. Phụ thuộc chức năng 9.3.2. Thực hiện ngắn gọn 9.3.3. Đào tạo và Dự đoán 9.3.4. Tóm tắt 9.3.5. Bài tập\n9.3.1. Phụ thuộc chức năng\n9.3.2. Thực hiện ngắn gọn\n9.3.3. Đào tạo và Dự đoán\n9.3.4. Tóm tắt\n9.3.5. Bài tập\n9.4. Mạng nơ-ron định kỳ hai chiều 9.4.1. Lập trình động trong các mô hình Markov ẩn 9.4.2. Mô hình hai chiều 9.4.3. Đào tạo một RNN hai chiều cho một ứng dụng sai 9.4.4. Tóm tắt 9.4.5. Bài tập\n9.4.1. Lập trình động trong các mô hình Markov ẩn\n9.4.2. Mô hình hai chiều\n9.4.3. Đào tạo một RNN hai chiều cho một ứng dụng sai\n9.4.4. Tóm tắt\n9.4.5. Bài tập\n9.5. Dịch máy và bộ dữ liệu 9.5.1. Tải xuống và xử lý sơ bộ dữ liệu 9.5.2. Tokenization 9.5.3. Từ vừ 9.5.4. Đọc tập dữ liệu 9.5.5. Putting All Things Together 9.5.6. Tóm tắt 9.5.7. Bài tập\n9.5.1. Tải xuống và xử lý sơ bộ dữ liệu\n9.5.2. Tokenization\n9.5.3. Từ vừ\n9.5.4. Đọc tập dữ liệu\n9.5.5. Putting All Things Together\n9.5.6. Tóm tắt\n9.5.7. Bài tập\n9.6. Kiến trúc mã hóa-Decoder 9.6.1. Bộ mã hóa 9.6.2. Decoder 9.6.3. Đút bộ mã hóa và bộ giải mã cùng nhau 9.6.4. Tóm tắt 9.6.5. Bài tập\n9.6.1. Bộ mã hóa\n9.6.2. Decoder\n9.6.3. Đút bộ mã hóa và bộ giải mã cùng nhau\n9.6.4. Tóm tắt\n9.6.5. Bài tập\n9.7. Trình tự để học trình tự 9.7.1. Bộ mã hóa 9.7.2. Decoder 9.7.3. Chức năng mất 9.7.4. Đào tạo 9.7.5. Prediction 9.7.6. Đánh giá các chuỗi dự đoán 9.7.7. Tóm tắt 9.7.8. Bài tập\n9.7.1. Bộ mã hóa\n9.7.2. Decoder\n9.7.3. Chức năng mất\n9.7.4. Đào tạo\n9.7.5. Prediction\n9.7.6. Đánh giá các chuỗi dự đoán\n9.7.7. Tóm tắt\n9.7.8. Bài tập\n9.8. Tìm kiếm chùm 9.8.1. Tìm kiếm tham lam 9.8.2. Tìm kiếm đầy đủ 9.8.3. Tìm kiếm chùm 9.8.4. Tóm tắt 9.8.5. Bài tập\n9.8.1. Tìm kiếm tham lam\n9.8.2. Tìm kiếm đầy đủ\n9.8.3. Tìm kiếm chùm\n9.8.4. Tóm tắt\n9.8.5. Bài tập"
+}

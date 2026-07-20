@@ -1,0 +1,272 @@
+{
+  "url": "https://vi.d2l.ai/chapter_computational-performance/auto-parallelism.html",
+  "chapter": "chapter_computational-performance",
+  "title": "12.3. Song song tự động",
+  "crawled_at": "2026-07-20T12:40:32.931140+00:00",
+  "headings": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "song-song-tu-dong",
+      "text": "12.3. Song song tự động"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tinh-toan-song-song-tren-gpu",
+      "text": "12.3.1. Tính toán song song trên GPU"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tinh-toan-song-song-va-truyen-thong",
+      "text": "12.3.2. Tính toán song song và truyền thông"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tom-tat",
+      "text": "12.3.3. Tóm tắt"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bai-tap",
+      "text": "12.3.4. Bài tập"
+    }
+  ],
+  "content": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "song-song-tu-dong",
+      "text": "12.3. Song song tự động"
+    },
+    {
+      "type": "paragraph",
+      "text": "Các khung học sâu (ví dụ: MXNet và PyTorch) tự động xây dựng các đồ thị\ntính toán ở phụ trợ. Sử dụng đồ thị tính toán, hệ thống nhận thức được\ntất cả các phụ thuộc, và có thể thực hiện một cách chọn lọc nhiều tác vụ\nkhông phụ thuộc lẫn nhau song song để cải thiện tốc độ. Ví dụ, Fig. 12.2.2 trong Section 12.2 khởi tạo hai biến\nmột cách độc lập. Do đó, hệ thống có thể chọn để thực hiện chúng song\nsong."
+    },
+    {
+      "type": "paragraph",
+      "text": "Thông thường, một toán tử duy nhất sẽ sử dụng tất cả các tài nguyên tính\ntoán trên tất cả các CPU hoặc trên một GPU duy nhất. Ví dụ, nhà điều\nhành dot sẽ sử dụng tất cả các lõi (và luồng) trên tất cả các CPU,\nngay cả khi có nhiều bộ xử lý CPU trên một máy duy nhất. Điều tương tự\ncũng áp dụng cho một GPU duy nhất. Do đó song song không phải là khá hữu\ních cho các máy tính đơn thiết bị. Với nhiều thiết bị mọi thứ quan trọng\nhơn. Mặc dù song song thường có liên quan nhất giữa nhiều GPU, việc thêm\nCPU cục bộ sẽ tăng hiệu suất một chút. Ví dụ: xem [Hadjis et al., 2016] tập trung vào đào tạo các mô\nhình thị giác máy tính kết hợp GPU và CPU. Với sự tiện lợi của một khung\nsong song tự động, chúng ta có thể thực hiện cùng một mục tiêu trong một\nvài dòng mã Python. Rộng hơn, cuộc thảo luận của chúng tôi về tính toán\nsong song tự động tập trung vào tính toán song song bằng cách sử dụng cả\nCPU và GPU, cũng như sự song song của tính toán và giao tiếp."
+    },
+    {
+      "type": "paragraph",
+      "text": "Lưu ý rằng chúng ta cần ít nhất hai GPU để chạy các thí nghiệm trong\nphần này."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "from mxnet import np, npx\nfrom d2l import mxnet as d2l\n\nnpx.set_np()"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "import torch\nfrom d2l import torch as d2l"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tinh-toan-song-song-tren-gpu",
+      "text": "12.3.1. Tính toán song song trên GPU"
+    },
+    {
+      "type": "paragraph",
+      "text": "Chúng ta hãy bắt đầu bằng cách xác định khối lượng công việc tham chiếu\nđể kiểm tra: hàm run dưới đây thực hiện 10 phép nhân ma trận trên\nthiết bị mà chúng tôi lựa chọn bằng cách sử dụng dữ liệu được phân bổ\nthành hai biến: x_gpu1 và x_gpu2 ."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "devices = d2l.try_all_gpus()\ndef run(x):\n    return [x.dot(x) for _ in range(50)]\n\nx_gpu1 = np.random.uniform(size=(4000, 4000), ctx=devices[0])\nx_gpu2 = np.random.uniform(size=(4000, 4000), ctx=devices[1])"
+    },
+    {
+      "type": "paragraph",
+      "text": "Bây giờ chúng ta áp dụng chức năng cho dữ liệu. Để đảm bảo rằng bộ nhớ\nđệm không đóng vai trò trong kết quả, chúng tôi làm nóng các thiết bị\nbằng cách thực hiện một lần vượt qua một trong hai trong số chúng trước\nkhi đo."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "run(x_gpu1)  # Warm-up both devices\nrun(x_gpu2)\nnpx.waitall()\n\nwith d2l.Benchmark('GPU1 time'):\n    run(x_gpu1)\n    npx.waitall()\n\nwith d2l.Benchmark('GPU2 time'):\n    run(x_gpu2)\n    npx.waitall()"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "GPU1 time: 0.5091 sec\nGPU2 time: 0.5100 sec"
+    },
+    {
+      "type": "paragraph",
+      "text": "Nếu chúng ta loại bỏ câu lệnh waitall giữa cả hai tác vụ, hệ thống\nsẽ tự do song song tính toán trên cả hai thiết bị một cách tự động."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "with d2l.Benchmark('GPU1 & GPU2'):\n    run(x_gpu1)\n    run(x_gpu2)\n    npx.waitall()"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "GPU1 & GPU2: 0.5149 sec"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "devices = d2l.try_all_gpus()\ndef run(x):\n    return [x.mm(x) for _ in range(50)]\n\nx_gpu1 = torch.rand(size=(4000, 4000), device=devices[0])\nx_gpu2 = torch.rand(size=(4000, 4000), device=devices[1])"
+    },
+    {
+      "type": "paragraph",
+      "text": "Bây giờ chúng ta áp dụng chức năng cho dữ liệu. Để đảm bảo rằng bộ nhớ\nđệm không đóng vai trò trong kết quả, chúng tôi làm nóng các thiết bị\nbằng cách thực hiện một lần vượt qua một trong hai trong số chúng trước\nkhi đo. torch.cuda.synchronize() chờ tất cả các hạt nhân trong tất\ncả các luồng trên thiết bị CIDA hoàn thành. Phải mất một đối số device , thiết bị mà chúng ta cần đồng bộ hóa. Nó sử dụng thiết bị\nhiện tại, được đưa ra bởi current_device() , nếu đối số thiết bị là None (mặc định)."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "run(x_gpu1)\nrun(x_gpu2)  # Warm-up all devices\ntorch.cuda.synchronize(devices[0])\ntorch.cuda.synchronize(devices[1])\n\nwith d2l.Benchmark('GPU1 time'):\n    run(x_gpu1)\n    torch.cuda.synchronize(devices[0])\n\nwith d2l.Benchmark('GPU2 time'):\n    run(x_gpu2)\n    torch.cuda.synchronize(devices[1])"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "GPU1 time: 0.5028 sec\nGPU2 time: 0.5072 sec"
+    },
+    {
+      "type": "paragraph",
+      "text": "Nếu chúng ta loại bỏ câu lệnh synchronize giữa cả hai tác vụ, hệ\nthống sẽ tự do song song tính toán trên cả hai thiết bị một cách tự\nđộng."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "with d2l.Benchmark('GPU1 & GPU2'):\n    run(x_gpu1)\n    run(x_gpu2)\n    torch.cuda.synchronize()"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "GPU1 & GPU2: 0.5028 sec"
+    },
+    {
+      "type": "paragraph",
+      "text": "Trong trường hợp trên, tổng thời gian thực thi nhỏ hơn tổng các bộ phận\ncủa nó, vì khung học sâu sẽ tự động lên lịch tính toán trên cả hai thiết\nbị GPU mà không cần mã phức tạp thay mặt cho người dùng."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tinh-toan-song-song-va-truyen-thong",
+      "text": "12.3.2. Tính toán song song và truyền thông"
+    },
+    {
+      "type": "paragraph",
+      "text": "Trong nhiều trường hợp, chúng ta cần di chuyển dữ liệu giữa các thiết bị\nkhác nhau, nói giữa CPU và GPU hoặc giữa các GPU khác nhau. Ví dụ, điều\nnày xảy ra khi chúng ta muốn thực hiện tối ưu hóa phân tán, nơi chúng ta\ncần tổng hợp các gradient trên nhiều thẻ gia tốc. Chúng ta hãy mô phỏng\nđiều này bằng cách tính toán trên GPU và sau đó sao chép kết quả trở lại\nCPU."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def copy_to_cpu(x):\n    return [y.copyto(npx.cpu()) for y in x]\n\nwith d2l.Benchmark('Run on GPU1'):\n    y = run(x_gpu1)\n    npx.waitall()\n\nwith d2l.Benchmark('Copy to CPU'):\n    y_cpu = copy_to_cpu(y)\n    npx.waitall()"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "Run on GPU1: 0.5473 sec\nCopy to CPU: 2.6459 sec"
+    },
+    {
+      "type": "paragraph",
+      "text": "Điều này có phần không hiệu quả. Lưu ý rằng chúng ta đã có thể bắt đầu\nsao chép các phần của y vào CPU trong khi phần còn lại của danh sách\nvẫn đang được tính toán. Tình huống này xảy ra, ví dụ, khi chúng ta tính\ntoán gradient trên một minibatch. Độ dốc của một số tham số sẽ có sẵn\nsớm hơn so với các tham số khác. Do đó, nó hoạt động để lợi thế của\nchúng tôi để bắt đầu sử dụng băng thông bus PCI-Express trong khi GPU\nvẫn đang chạy. Loại bỏ waitall giữa cả hai phần cho phép chúng tôi\nmô phỏng kịch bản này."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "with d2l.Benchmark('Run on GPU1 and copy to CPU'):\n    y = run(x_gpu1)\n    y_cpu = copy_to_cpu(y)\n    npx.waitall()"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "Run on GPU1 and copy to CPU: 2.6850 sec"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def copy_to_cpu(x, non_blocking=False):\n    return [y.to('cpu', non_blocking=non_blocking) for y in x]\n\nwith d2l.Benchmark('Run on GPU1'):\n    y = run(x_gpu1)\n    torch.cuda.synchronize()\n\nwith d2l.Benchmark('Copy to CPU'):\n    y_cpu = copy_to_cpu(y)\n    torch.cuda.synchronize()"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "Run on GPU1: 0.5027 sec\nCopy to CPU: 2.4896 sec"
+    },
+    {
+      "type": "paragraph",
+      "text": "Điều này có phần không hiệu quả. Lưu ý rằng chúng ta đã có thể bắt đầu\nsao chép các phần của y vào CPU trong khi phần còn lại của danh sách\nvẫn đang được tính toán. Tình huống này xảy ra, ví dụ, khi chúng ta tính\ntoán gradient (backprop) trên một minibatch. Độ dốc của một số tham số\nsẽ có sẵn sớm hơn so với các tham số khác. Do đó, nó hoạt động để lợi\nthế của chúng tôi để bắt đầu sử dụng băng thông bus PCI-Express trong\nkhi GPU vẫn đang chạy. Trong PyTorch, một số chức năng như to() và copy_() thừa nhận một đối số non_blocking rõ ràng, cho phép đồng\nbộ hóa người gọi bỏ qua khi không cần thiết. Đặt non_blocking=True cho phép chúng tôi mô phỏng kịch bản này."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "with d2l.Benchmark('Run on GPU1 and copy to CPU'):\n    y = run(x_gpu1)\n    y_cpu = copy_to_cpu(y, True)\n    torch.cuda.synchronize()"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "Run on GPU1 and copy to CPU: 1.9150 sec"
+    },
+    {
+      "type": "paragraph",
+      "text": "Tổng thời gian cần thiết cho cả hai hoạt động là (như mong đợi) ít hơn\ntổng các bộ phận của chúng. Lưu ý rằng tác vụ này khác với tính toán\nsong song vì nó sử dụng một tài nguyên khác: bus giữa CPU và GPU. Trên\nthực tế, chúng ta có thể tính toán trên cả hai thiết bị và giao tiếp,\ntất cả cùng một lúc. Như đã nói ở trên, có sự phụ thuộc giữa tính toán\nvà giao tiếp: y[i] phải được tính toán trước khi nó có thể được sao\nchép vào CPU. May mắn thay, hệ thống có thể sao chép y[i-1] trong\nkhi tính toán y[i] để giảm tổng thời gian chạy."
+    },
+    {
+      "type": "paragraph",
+      "text": "Chúng tôi kết luận với một minh họa của biểu đồ tính toán và phụ thuộc\ncủa nó cho một MLP hai lớp đơn giản khi đào tạo trên CPU và hai GPU, như\nđược mô tả trong Fig. 12.3.1 . Sẽ khá đau đớn khi lên lịch\nchương trình song song kết quả từ việc này bằng tay. Đây là nơi thuận\nlợi để có một phụ trợ điện toán dựa trên đồ thị để tối ưu hóa."
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/twogpu.svg",
+      "local_path": "_images/twogpu.svg",
+      "alt": "../_images/twogpu.svg"
+    },
+    {
+      "type": "paragraph",
+      "text": "Fig. 12.3.1 The computational graph and its dependencies of a two-layer MLP on a\nCPU and two GPUs. ¶"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tom-tat",
+      "text": "12.3.3. Tóm tắt"
+    },
+    {
+      "type": "list",
+      "ordered": false,
+      "items": [
+        "Các hệ thống hiện đại có nhiều thiết bị khác nhau, chẳng hạn như\nnhiều GPU và CPU. Chúng có thể được sử dụng song song, không đồng bộ.",
+        "Các hệ thống hiện đại cũng có nhiều tài nguyên khác nhau để liên lạc,\nchẳng hạn như PCI Express, lưu trữ (điển hình là ổ đĩa trạng thái rắn\nhoặc qua mạng), và băng thông mạng. Chúng có thể được sử dụng song\nsong cho hiệu quả cao điểm.",
+        "Các phụ trợ có thể cải thiện hiệu suất thông qua tính toán song song\ntự động và giao tiếp."
+      ]
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bai-tap",
+      "text": "12.3.4. Bài tập"
+    },
+    {
+      "type": "list",
+      "ordered": true,
+      "items": [
+        "Tám thao tác đã được thực hiện trong hàm run được xác định trong\nphần này. Không có sự phụ thuộc giữa chúng. Thiết kế một thí nghiệm\nđể xem khung học sâu sẽ tự động thực hiện chúng song song hay không.",
+        "Khi khối lượng công việc của một nhà điều hành cá nhân đủ nhỏ, song\nsong có thể giúp đỡ ngay cả trên một CPU hoặc GPU duy nhất. Thiết kế\nmột thí nghiệm để xác minh điều này.",
+        "Thiết kế một thí nghiệm sử dụng tính toán song song trên CPU, GPU và\ngiao tiếp giữa cả hai thiết bị.",
+        "Sử dụng trình gỡ lỗi như Nsight của\nNVIDIA để xác minh rằng mã của bạn có hiệu quả.",
+        "Thiết kế các tác vụ tính toán bao gồm các phụ thuộc dữ liệu phức tạp\nhơn và chạy thử nghiệm để xem liệu bạn có thể có được kết quả chính\nxác trong khi cải thiện hiệu suất hay không."
+      ]
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    }
+  ],
+  "images": [
+    {
+      "original_url": "https://vi.d2l.ai/_images/twogpu.svg",
+      "local_path": "_images/twogpu.svg",
+      "alt": "../_images/twogpu.svg"
+    }
+  ],
+  "text": "12.3. Song song tự động\nCác khung học sâu (ví dụ: MXNet và PyTorch) tự động xây dựng các đồ thị\ntính toán ở phụ trợ. Sử dụng đồ thị tính toán, hệ thống nhận thức được\ntất cả các phụ thuộc, và có thể thực hiện một cách chọn lọc nhiều tác vụ\nkhông phụ thuộc lẫn nhau song song để cải thiện tốc độ. Ví dụ, Fig. 12.2.2 trong Section 12.2 khởi tạo hai biến\nmột cách độc lập. Do đó, hệ thống có thể chọn để thực hiện chúng song\nsong.\nThông thường, một toán tử duy nhất sẽ sử dụng tất cả các tài nguyên tính\ntoán trên tất cả các CPU hoặc trên một GPU duy nhất. Ví dụ, nhà điều\nhành dot sẽ sử dụng tất cả các lõi (và luồng) trên tất cả các CPU,\nngay cả khi có nhiều bộ xử lý CPU trên một máy duy nhất. Điều tương tự\ncũng áp dụng cho một GPU duy nhất. Do đó song song không phải là khá hữu\ních cho các máy tính đơn thiết bị. Với nhiều thiết bị mọi thứ quan trọng\nhơn. Mặc dù song song thường có liên quan nhất giữa nhiều GPU, việc thêm\nCPU cục bộ sẽ tăng hiệu suất một chút. Ví dụ: xem [Hadjis et al., 2016] tập trung vào đào tạo các mô\nhình thị giác máy tính kết hợp GPU và CPU. Với sự tiện lợi của một khung\nsong song tự động, chúng ta có thể thực hiện cùng một mục tiêu trong một\nvài dòng mã Python. Rộng hơn, cuộc thảo luận của chúng tôi về tính toán\nsong song tự động tập trung vào tính toán song song bằng cách sử dụng cả\nCPU và GPU, cũng như sự song song của tính toán và giao tiếp.\nLưu ý rằng chúng ta cần ít nhất hai GPU để chạy các thí nghiệm trong\nphần này.\n12.3.1. Tính toán song song trên GPU\nChúng ta hãy bắt đầu bằng cách xác định khối lượng công việc tham chiếu\nđể kiểm tra: hàm run dưới đây thực hiện 10 phép nhân ma trận trên\nthiết bị mà chúng tôi lựa chọn bằng cách sử dụng dữ liệu được phân bổ\nthành hai biến: x_gpu1 và x_gpu2 .\nBây giờ chúng ta áp dụng chức năng cho dữ liệu. Để đảm bảo rằng bộ nhớ\nđệm không đóng vai trò trong kết quả, chúng tôi làm nóng các thiết bị\nbằng cách thực hiện một lần vượt qua một trong hai trong số chúng trước\nkhi đo.\nNếu chúng ta loại bỏ câu lệnh waitall giữa cả hai tác vụ, hệ thống\nsẽ tự do song song tính toán trên cả hai thiết bị một cách tự động.\nBây giờ chúng ta áp dụng chức năng cho dữ liệu. Để đảm bảo rằng bộ nhớ\nđệm không đóng vai trò trong kết quả, chúng tôi làm nóng các thiết bị\nbằng cách thực hiện một lần vượt qua một trong hai trong số chúng trước\nkhi đo. torch.cuda.synchronize() chờ tất cả các hạt nhân trong tất\ncả các luồng trên thiết bị CIDA hoàn thành. Phải mất một đối số device , thiết bị mà chúng ta cần đồng bộ hóa. Nó sử dụng thiết bị\nhiện tại, được đưa ra bởi current_device() , nếu đối số thiết bị là None (mặc định).\nNếu chúng ta loại bỏ câu lệnh synchronize giữa cả hai tác vụ, hệ\nthống sẽ tự do song song tính toán trên cả hai thiết bị một cách tự\nđộng.\nTrong trường hợp trên, tổng thời gian thực thi nhỏ hơn tổng các bộ phận\ncủa nó, vì khung học sâu sẽ tự động lên lịch tính toán trên cả hai thiết\nbị GPU mà không cần mã phức tạp thay mặt cho người dùng.\n12.3.2. Tính toán song song và truyền thông\nTrong nhiều trường hợp, chúng ta cần di chuyển dữ liệu giữa các thiết bị\nkhác nhau, nói giữa CPU và GPU hoặc giữa các GPU khác nhau. Ví dụ, điều\nnày xảy ra khi chúng ta muốn thực hiện tối ưu hóa phân tán, nơi chúng ta\ncần tổng hợp các gradient trên nhiều thẻ gia tốc. Chúng ta hãy mô phỏng\nđiều này bằng cách tính toán trên GPU và sau đó sao chép kết quả trở lại\nCPU.\nĐiều này có phần không hiệu quả. Lưu ý rằng chúng ta đã có thể bắt đầu\nsao chép các phần của y vào CPU trong khi phần còn lại của danh sách\nvẫn đang được tính toán. Tình huống này xảy ra, ví dụ, khi chúng ta tính\ntoán gradient trên một minibatch. Độ dốc của một số tham số sẽ có sẵn\nsớm hơn so với các tham số khác. Do đó, nó hoạt động để lợi thế của\nchúng tôi để bắt đầu sử dụng băng thông bus PCI-Express trong khi GPU\nvẫn đang chạy. Loại bỏ waitall giữa cả hai phần cho phép chúng tôi\nmô phỏng kịch bản này.\nĐiều này có phần không hiệu quả. Lưu ý rằng chúng ta đã có thể bắt đầu\nsao chép các phần của y vào CPU trong khi phần còn lại của danh sách\nvẫn đang được tính toán. Tình huống này xảy ra, ví dụ, khi chúng ta tính\ntoán gradient (backprop) trên một minibatch. Độ dốc của một số tham số\nsẽ có sẵn sớm hơn so với các tham số khác. Do đó, nó hoạt động để lợi\nthế của chúng tôi để bắt đầu sử dụng băng thông bus PCI-Express trong\nkhi GPU vẫn đang chạy. Trong PyTorch, một số chức năng như to() và copy_() thừa nhận một đối số non_blocking rõ ràng, cho phép đồng\nbộ hóa người gọi bỏ qua khi không cần thiết. Đặt non_blocking=True cho phép chúng tôi mô phỏng kịch bản này.\nTổng thời gian cần thiết cho cả hai hoạt động là (như mong đợi) ít hơn\ntổng các bộ phận của chúng. Lưu ý rằng tác vụ này khác với tính toán\nsong song vì nó sử dụng một tài nguyên khác: bus giữa CPU và GPU. Trên\nthực tế, chúng ta có thể tính toán trên cả hai thiết bị và giao tiếp,\ntất cả cùng một lúc. Như đã nói ở trên, có sự phụ thuộc giữa tính toán\nvà giao tiếp: y[i] phải được tính toán trước khi nó có thể được sao\nchép vào CPU. May mắn thay, hệ thống có thể sao chép y[i-1] trong\nkhi tính toán y[i] để giảm tổng thời gian chạy.\nChúng tôi kết luận với một minh họa của biểu đồ tính toán và phụ thuộc\ncủa nó cho một MLP hai lớp đơn giản khi đào tạo trên CPU và hai GPU, như\nđược mô tả trong Fig. 12.3.1 . Sẽ khá đau đớn khi lên lịch\nchương trình song song kết quả từ việc này bằng tay. Đây là nơi thuận\nlợi để có một phụ trợ điện toán dựa trên đồ thị để tối ưu hóa.\nFig. 12.3.1 The computational graph and its dependencies of a two-layer MLP on a\nCPU and two GPUs. ¶\n12.3.3. Tóm tắt\nCác hệ thống hiện đại có nhiều thiết bị khác nhau, chẳng hạn như\nnhiều GPU và CPU. Chúng có thể được sử dụng song song, không đồng bộ.\nCác hệ thống hiện đại cũng có nhiều tài nguyên khác nhau để liên lạc,\nchẳng hạn như PCI Express, lưu trữ (điển hình là ổ đĩa trạng thái rắn\nhoặc qua mạng), và băng thông mạng. Chúng có thể được sử dụng song\nsong cho hiệu quả cao điểm.\nCác phụ trợ có thể cải thiện hiệu suất thông qua tính toán song song\ntự động và giao tiếp.\n12.3.4. Bài tập\nTám thao tác đã được thực hiện trong hàm run được xác định trong\nphần này. Không có sự phụ thuộc giữa chúng. Thiết kế một thí nghiệm\nđể xem khung học sâu sẽ tự động thực hiện chúng song song hay không.\nKhi khối lượng công việc của một nhà điều hành cá nhân đủ nhỏ, song\nsong có thể giúp đỡ ngay cả trên một CPU hoặc GPU duy nhất. Thiết kế\nmột thí nghiệm để xác minh điều này.\nThiết kế một thí nghiệm sử dụng tính toán song song trên CPU, GPU và\ngiao tiếp giữa cả hai thiết bị.\nSử dụng trình gỡ lỗi như Nsight của\nNVIDIA để xác minh rằng mã của bạn có hiệu quả.\nThiết kế các tác vụ tính toán bao gồm các phụ thuộc dữ liệu phức tạp\nhơn và chạy thử nghiệm để xem liệu bạn có thể có được kết quả chính\nxác trong khi cải thiện hiệu suất hay không.\nDiscussions\nDiscussions"
+}

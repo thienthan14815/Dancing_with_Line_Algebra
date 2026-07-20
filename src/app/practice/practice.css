@@ -1,44 +1,163 @@
 /* =============================================================================
    PRACTICE CENTER — styles. Mọi class dùng tiền tố `pc-` để KHÔNG đụng shell.css.
+   Redesign v2 "calm workspace": nền --bg, thẻ trắng viền mềm shadow --elev-1,
+   một màu nhấn (--primary) cho CTA/tiến độ, XP dùng --warn đúng nghĩa.
    Chỉ dựa vào design token toàn cục trong src/styles/global.css.
    ========================================================================== */
 
 .pc-page {
   max-width: 960px;
   margin: 0 auto;
-  padding: 24px 20px 64px;
+  padding: var(--sp-3) var(--sp-3) var(--sp-6);
 }
 
-/* ---- Hero ---------------------------------------------------------------- */
+/* ---- Tiêu đề trang + navi trong trang ------------------------------------ */
+/* Dùng chung .pc-hero-title cho typography; tăng đặc hiệu để thắng margin cũ. */
+.pc-hero-title.pc-page-title {
+  margin: 0 0 var(--sp-3);
+}
+
+.pc-nav {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: var(--sp-3);
+}
+.pc-nav-chip {
+  min-height: 44px;
+  padding: 8px 18px;
+  border-radius: var(--radius-chip);
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text-secondary);
+  font: inherit;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background var(--dur-2) var(--ease), color var(--dur-2) var(--ease),
+    border-color var(--dur-2) var(--ease);
+}
+.pc-nav-chip:hover {
+  color: var(--text);
+  border-color: var(--text-hint);
+}
+.pc-nav-chip.is-active {
+  background: var(--primary-soft);
+  color: var(--primary);
+  border-color: transparent;
+}
+
+.pc-tab {
+  animation: pc-fade var(--dur-2) var(--ease);
+}
+@keyframes pc-fade {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .pc-tab {
+    animation: none;
+  }
+}
+
+/* ---- Bubble hành động (Ôn thông minh) ------------------------------------ */
+.pc-bubbles {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: var(--sp-2);
+}
+.pc-bubble {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 170px;
+  padding: var(--sp-3);
+  border: 1px solid transparent;
+  border-radius: var(--radius);
+  background: var(--primary-soft);
+  color: var(--primary);
+  cursor: pointer;
+  text-align: center;
+  font: inherit;
+  transition: transform var(--dur-2) var(--ease), box-shadow var(--dur-2) var(--ease);
+}
+.pc-bubble:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: var(--elev-2);
+}
+.pc-bubble:active:not(:disabled) {
+  transform: scale(0.98);
+}
+.pc-bubble:disabled {
+  cursor: not-allowed;
+  background: var(--panel-2);
+  color: var(--text-hint);
+}
+.pc-bubble-icon {
+  font-size: 36px;
+  line-height: 1;
+}
+.pc-bubble-count {
+  font-size: var(--fs-heading);
+  font-weight: 700;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+.pc-bubble-title {
+  font-size: 14px;
+  font-weight: 700;
+}
+.pc-bubble-sub {
+  font-size: var(--fs-caption);
+  opacity: 0.8;
+}
+
+/* ---- Thẻ chủ đề gọn ------------------------------------------------------ */
+.pc-cat-compact {
+  gap: var(--sp-2);
+}
+
+/* ---- Hero (giữ cho tương thích) ------------------------------------------ */
 .pc-hero {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 16px;
-  margin-bottom: 24px;
+  gap: var(--sp-2);
+  margin-bottom: var(--sp-4);
 }
 .pc-hero-main {
   flex: 1 1 260px;
 }
 .pc-hero-kicker {
-  font-size: 12px;
+  font-size: var(--fs-caption);
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: var(--accent);
+  color: var(--primary);
 }
 .pc-hero-title {
   margin: 4px 0 6px;
-  font-size: 28px;
+  font-size: var(--fs-heading);
+  font-weight: 700;
+  letter-spacing: -0.02em;
   line-height: 1.2;
+  color: var(--text);
 }
 .pc-hero-sub {
   margin: 0;
-  color: var(--text-muted);
+  color: var(--text-secondary);
 }
 .pc-hero-stats {
   display: flex;
-  gap: 10px;
+  gap: var(--sp-1);
   flex-wrap: wrap;
 }
 .pc-stat {
@@ -47,26 +166,29 @@
   align-items: center;
   min-width: 84px;
   padding: 12px 14px;
-  background: var(--panel);
+  background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius);
+  box-shadow: var(--elev-1);
 }
 .pc-stat-val {
-  font-size: 22px;
-  font-weight: 800;
+  font-size: var(--fs-title);
+  font-weight: 700;
   line-height: 1;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
 }
 .pc-stat-lbl {
   margin-top: 4px;
-  font-size: 12px;
-  color: var(--text-muted);
+  font-size: var(--fs-caption);
+  color: var(--text-secondary);
 }
 
 /* ---- Grid of category cards --------------------------------------------- */
 .pc-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 16px;
+  gap: var(--sp-2);
 }
 
 .pc-cat {
@@ -87,9 +209,9 @@
   display: grid;
   place-items: center;
   font-size: 24px;
-  border-radius: 12px;
-  background: var(--panel-2);
-  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-sm);
+  background: var(--primary-soft);
+  border: 1px solid transparent;
 }
 .pc-cat-heads {
   min-width: 0;
@@ -98,11 +220,13 @@
   margin: 2px 0 2px;
   font-size: 17px;
   font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--text);
 }
 .pc-cat-sub {
   margin: 0;
-  font-size: 13px;
-  color: var(--text-muted);
+  font-size: var(--fs-caption);
+  color: var(--text-secondary);
   line-height: 1.4;
 }
 
@@ -115,10 +239,10 @@
 .pc-chip {
   font-size: 11.5px;
   padding: 3px 9px;
-  border-radius: 999px;
+  border-radius: var(--radius-chip);
   background: var(--panel-2);
   border: 1px solid var(--border-soft);
-  color: var(--text-muted);
+  color: var(--text-secondary);
   white-space: nowrap;
   max-width: 100%;
   overflow: hidden;
@@ -133,16 +257,17 @@
   gap: 12px;
 }
 .pc-count {
-  font-size: 13px;
-  color: var(--text-muted);
+  font-size: var(--fs-caption);
+  color: var(--text-secondary);
+  font-variant-numeric: tabular-nums;
 }
 .pc-count b {
   color: var(--text);
   font-size: 15px;
 }
 .pc-empty {
-  font-size: 13px;
-  color: var(--text-dim);
+  font-size: var(--fs-caption);
+  color: var(--text-hint);
   line-height: 1.4;
 }
 
@@ -150,57 +275,58 @@
 .pc-session {
   max-width: 720px;
   margin: 0 auto;
-  padding: 20px 20px 64px;
+  padding: var(--sp-3) var(--sp-3) var(--sp-6);
 }
 .pc-session-top {
   display: flex;
   align-items: center;
   gap: 12px;
-  margin-bottom: 18px;
+  margin-bottom: var(--sp-3);
 }
 .pc-close {
   flex: 0 0 auto;
-  width: 34px;
-  height: 34px;
-  border-radius: 999px;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-chip);
   border: 1px solid var(--border);
-  background: var(--panel);
-  color: var(--text-muted);
+  background: var(--surface);
+  color: var(--text-secondary);
   font-size: 15px;
   cursor: pointer;
+  transition: color var(--dur-1) var(--ease), border-color var(--dur-1) var(--ease);
 }
 .pc-close:hover {
   color: var(--text);
-  border-color: var(--text-dim);
+  border-color: var(--text-hint);
 }
 .pc-progress {
   flex: 1 1 auto;
   height: 12px;
-  border-radius: 999px;
-  background: var(--panel-2);
+  border-radius: var(--radius-chip);
+  background: var(--primary-soft);
   overflow: hidden;
 }
 .pc-progress-fill {
   display: block;
   height: 100%;
-  border-radius: 999px;
-  background: var(--good);
-  transition: width 0.35s ease;
+  border-radius: var(--radius-chip);
+  background: var(--primary);
+  transition: width var(--dur-3) var(--ease);
 }
 .pc-progress-count {
   flex: 0 0 auto;
-  font-size: 13px;
-  color: var(--text-muted);
+  font-size: var(--fs-caption);
+  color: var(--text-secondary);
   font-variant-numeric: tabular-nums;
 }
 
 .pc-session-kicker {
   display: block;
-  font-size: 12px;
+  font-size: var(--fs-caption);
   font-weight: 700;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: var(--accent);
+  color: var(--primary);
   margin-bottom: 8px;
 }
 .pc-q-head {
@@ -211,15 +337,17 @@
 .pc-prompt {
   font-size: 17px;
   line-height: 1.5;
-  margin-bottom: 16px;
+  margin-bottom: var(--sp-2);
+  color: var(--text);
 }
 .pc-hintbox {
   margin-top: 14px;
   padding: 10px 12px;
   border-radius: var(--radius-sm);
-  background: rgba(56, 189, 248, 0.08);
-  border: 1px solid rgba(56, 189, 248, 0.25);
+  background: var(--primary-soft);
+  border: 1px solid transparent;
   font-size: 14px;
+  color: var(--text);
 }
 
 /* Feedback panel */
@@ -230,12 +358,12 @@
   border: 1px solid var(--border);
 }
 .pc-feedback.good {
-  background: rgba(34, 197, 94, 0.1);
-  border-color: rgba(34, 197, 94, 0.4);
+  background: var(--good-soft);
+  border-color: color-mix(in srgb, var(--good) 30%, transparent);
 }
 .pc-feedback.bad {
-  background: rgba(239, 68, 68, 0.1);
-  border-color: rgba(239, 68, 68, 0.4);
+  background: var(--bad-soft);
+  border-color: color-mix(in srgb, var(--bad) 30%, transparent);
 }
 .pc-feedback-head {
   display: flex;
@@ -247,10 +375,10 @@
 .pc-feedback-icon {
   width: 24px;
   height: 24px;
-  border-radius: 999px;
+  border-radius: var(--radius-chip);
   display: grid;
   place-items: center;
-  color: #fff;
+  color: white;
   font-size: 14px;
 }
 .pc-feedback.good .pc-feedback-icon {
@@ -262,12 +390,13 @@
 .pc-feedback-body {
   font-size: 14.5px;
   line-height: 1.55;
+  color: var(--text);
 }
 .pc-feedback-steps {
   margin: 8px 0 0;
   padding-left: 20px;
   font-size: 13.5px;
-  color: var(--text-muted);
+  color: var(--text-secondary);
 }
 .pc-feedback-steps li {
   margin: 2px 0;
@@ -278,7 +407,7 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  margin-top: 18px;
+  margin-top: var(--sp-3);
 }
 .pc-actions-spacer {
   flex: 1 1 auto;
@@ -287,7 +416,7 @@
 /* Summary */
 .pc-summary {
   text-align: center;
-  padding: 32px 24px;
+  padding: var(--sp-4) var(--sp-3);
 }
 .pc-summary-emoji {
   font-size: 52px;
@@ -296,12 +425,15 @@
 .pc-summary-title {
   margin: 12px 0 4px;
   font-size: 24px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--text);
 }
 .pc-summary-stats {
   display: flex;
   justify-content: center;
   gap: 28px;
-  margin: 22px 0 26px;
+  margin: var(--sp-3) 0 26px;
   flex-wrap: wrap;
 }
 .pc-summary-stat {
@@ -311,14 +443,16 @@
 }
 .pc-summary-val {
   font-size: 26px;
-  font-weight: 800;
+  font-weight: 700;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
 }
 .pc-summary-val.xp {
   color: var(--warn);
 }
 .pc-summary-lbl {
-  font-size: 12px;
-  color: var(--text-muted);
+  font-size: var(--fs-caption);
+  color: var(--text-secondary);
   margin-top: 2px;
 }
 .pc-summary-actions {

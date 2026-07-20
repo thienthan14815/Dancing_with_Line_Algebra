@@ -1,21 +1,25 @@
 /* ==================================================================
    MATH WIKI — style riêng cho trang từ điển ký hiệu.
-   Dùng lại design token của app (var(--panel)...). Mọi class prefix "wiki-".
+   Design system v2 (contract): nền calm, thẻ trắng phẳng, MỘT màu nhấn
+   (--primary) chỉ cho tương tác. Token-thuần: nền phẳng, không hex
+   trần. Typography tạo hierarchy. Mọi class prefix "wiki-".
    ================================================================== */
 
 .wiki-head {
-  margin-bottom: 20px;
+  margin-bottom: var(--sp-3);
 }
 .wiki-title {
-  font-size: 30px;
-  margin: 0 0 8px;
-  background: linear-gradient(90deg, var(--accent), var(--vec-result));
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
+  font-size: var(--fs-heading);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+  color: var(--text);
+  margin: 0 0 var(--sp-1);
 }
 .wiki-lede {
-  color: var(--text-muted);
+  color: var(--text-secondary);
+  font-size: var(--fs-body);
+  line-height: 1.6;
   max-width: 640px;
   margin: 0;
 }
@@ -26,63 +30,66 @@
   flex-wrap: wrap;
   align-items: center;
   gap: 12px;
-  margin: 22px 0 12px;
+  margin: var(--sp-3) 0 var(--sp-2);
 }
 .wiki-search {
   flex: 1;
   min-width: 220px;
-  background: var(--bg-elevated);
+  min-height: 44px;
+  background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
   color: var(--text);
   font-family: var(--font);
-  font-size: 15px;
-  padding: 11px 14px;
-  transition: border 0.15s ease;
+  font-size: var(--fs-body);
+  padding: 12px 16px;
+  transition: border-color var(--dur-2) var(--ease);
 }
 .wiki-search::placeholder {
-  color: var(--text-dim);
+  color: var(--text-hint);
 }
 .wiki-search:focus {
-  outline: none;
-  border-color: var(--accent);
+  border-color: var(--primary);
 }
 .wiki-count {
-  font-size: 13px;
-  color: var(--text-dim);
+  font-size: var(--fs-caption);
+  color: var(--text-hint);
   font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
   white-space: nowrap;
 }
 .wiki-count b {
-  color: var(--accent);
+  color: var(--text);
+  font-weight: 700;
 }
 
-/* ---- Hàng chip lọc category ---- */
+/* ---- Hàng chip lọc category (pill) ---- */
 .wiki-cats {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
-  margin-bottom: 22px;
+  margin-bottom: var(--sp-3);
 }
 .wiki-chip {
-  font-size: 12.5px;
-  padding: 6px 14px;
+  font-size: var(--fs-caption);
+  padding: 8px 16px;
   background: var(--panel-2);
   border: 1px solid var(--border);
-  border-radius: 99px;
-  color: var(--text-muted);
+  border-radius: var(--radius-chip);
+  color: var(--text-secondary);
   cursor: pointer;
   font-family: var(--font);
-  transition: color 0.15s ease, border 0.15s ease, background 0.15s ease;
+  transition: color var(--dur-2) var(--ease), border-color var(--dur-2) var(--ease),
+    background var(--dur-2) var(--ease);
 }
 .wiki-chip:hover {
   color: var(--text);
-  border-color: var(--accent);
+  border-color: var(--primary);
 }
 .wiki-chip.active {
-  background: linear-gradient(90deg, rgba(56, 189, 248, 0.2), rgba(232, 121, 249, 0.15));
-  color: var(--text);
-  border-color: var(--accent);
+  background: var(--primary-soft);
+  color: var(--primary);
+  border-color: transparent;
   font-weight: 600;
 }
 
@@ -90,32 +97,34 @@
 .wiki-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 16px;
+  gap: var(--sp-2);
 }
 
 .wiki-card {
-  background: var(--panel);
+  background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  padding: 16px 18px;
+  box-shadow: var(--elev-1);
+  padding: var(--sp-3);
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  transition: transform 0.15s ease, border 0.15s ease, box-shadow 0.15s ease;
+  gap: 12px;
+  transition: transform var(--dur-2) var(--ease), box-shadow var(--dur-2) var(--ease),
+    border-color var(--dur-2) var(--ease);
 }
 .wiki-card:hover {
-  transform: translateY(-3px);
-  border-color: var(--accent);
-  box-shadow: var(--shadow);
+  transform: translateY(-1px);
+  box-shadow: var(--elev-2);
 }
 
 .wiki-card-top {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  gap: 10px;
+  gap: 12px;
 }
 .wiki-sym {
+  font-family: var(--font-mono);
   font-size: 26px;
   line-height: 1.2;
   color: var(--text);
@@ -124,14 +133,13 @@
   max-width: 100%;
 }
 .wiki-cat-tag {
-  font-size: 10.5px;
+  font-size: 11px;
   letter-spacing: 0.4px;
   text-transform: uppercase;
-  color: var(--text-dim);
+  color: var(--text-hint);
   background: var(--panel-2);
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  padding: 2px 8px;
+  border-radius: var(--radius-chip);
+  padding: 4px 12px;
   white-space: nowrap;
   flex-shrink: 0;
 }
@@ -139,35 +147,36 @@
 .wiki-names {
   display: flex;
   flex-direction: column;
-  gap: 1px;
+  gap: 2px;
 }
 .wiki-name {
   font-weight: 650;
-  font-size: 16px;
+  font-size: var(--fs-body);
   color: var(--text);
 }
 .wiki-en {
-  font-size: 12.5px;
-  color: var(--text-dim);
+  font-size: var(--fs-caption);
+  color: var(--text-hint);
   font-style: italic;
 }
 
 .wiki-meaning {
-  font-size: 13.5px;
-  color: var(--text-muted);
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--text-secondary);
   margin: 0;
 }
 
 /* ---- Danh sách "Dùng để" ---- */
 .wiki-usedfor-label {
-  font-size: 11px;
+  font-size: var(--fs-caption);
   font-weight: 700;
   letter-spacing: 0.6px;
   text-transform: uppercase;
-  color: var(--accent);
+  color: var(--text-hint);
 }
 .wiki-usedfor {
-  margin: 2px 0 0;
+  margin: 4px 0 0;
   padding-left: 18px;
   display: flex;
   flex-direction: column;
@@ -179,25 +188,24 @@
   line-height: 1.5;
 }
 .wiki-usedfor li::marker {
-  color: var(--vec-result);
+  color: var(--text-hint);
 }
 
-/* ---- Ví dụ ---- */
+/* ---- Ví dụ (callout trung tính) ---- */
 .wiki-example {
-  background: var(--bg-elevated);
-  border: 1px solid var(--border-soft);
-  border-left: 3px solid var(--accent);
+  background: var(--panel-2);
+  border: 1px solid var(--border);
   border-radius: var(--radius-sm);
-  padding: 8px 12px;
+  padding: 12px 16px;
   margin-top: 2px;
 }
 .wiki-example-note {
   font-size: 12px;
-  color: var(--text-dim);
+  color: var(--text-hint);
   margin: 4px 0 0;
 }
 
-/* ---- Link học sâu ---- */
+/* ---- Link học sâu (pill CTA — màu nhấn primary) ---- */
 .wiki-see {
   margin-top: auto;
   padding-top: 4px;
@@ -206,27 +214,27 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  font-size: 12.5px;
+  font-size: var(--fs-caption);
   font-weight: 600;
-  color: var(--accent);
-  background: rgba(56, 189, 248, 0.1);
-  border: 1px solid rgba(56, 189, 248, 0.28);
-  border-radius: 99px;
-  padding: 5px 12px;
+  color: var(--primary);
+  background: var(--primary-soft);
+  border: 1px solid transparent;
+  border-radius: var(--radius-chip);
+  padding: 6px 12px;
   text-decoration: none;
-  transition: background 0.15s ease;
+  transition: color var(--dur-2) var(--ease), background var(--dur-2) var(--ease);
 }
 .wiki-see a:hover {
-  background: rgba(56, 189, 248, 0.2);
+  color: var(--accent-strong);
   text-decoration: none;
 }
 
 /* ---- Trạng thái rỗng ---- */
 .wiki-empty {
   text-align: center;
-  padding: 48px 16px;
-  color: var(--text-dim);
-  background: var(--panel);
+  padding: var(--sp-5) var(--sp-2);
+  color: var(--text-hint);
+  background: var(--panel-2);
   border: 1px dashed var(--border);
   border-radius: var(--radius);
 }

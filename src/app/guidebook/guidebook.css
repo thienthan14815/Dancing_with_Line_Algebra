@@ -1,6 +1,8 @@
 /* =====================================================================
    SỔ TAY (Guidebook) — style riêng, prefix `gb-`.
-   Dùng lại token màu trong src/styles/global.css. KHÔNG sửa shell/global.
+   Redesign v2 "calm workspace": thẻ Section trắng viền mềm, số thứ tự
+   nền tint --primary-soft, link/nhấn dùng --primary. Token global.css.
+   KHÔNG sửa shell/global.
    ===================================================================== */
 
 .gb-page {
@@ -9,13 +11,71 @@
 
 /* ---------- Hero danh sách ---------- */
 .gb-hero {
-  margin-bottom: 22px;
+  margin-bottom: var(--sp-3);
 }
 .gb-hero-title {
-  font-size: 30px;
-  font-weight: 900;
+  font-size: var(--fs-heading);
+  font-weight: 700;
+  letter-spacing: -0.02em;
   margin: 0 0 6px;
-  letter-spacing: 0.2px;
+  color: var(--text);
+}
+
+/* ---------- Danh sách Section gọn (hàng: số + tên) ---------- */
+.gb-index {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.gb-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-height: 44px;
+  padding: 12px 16px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  text-decoration: none;
+  color: var(--text);
+  transition: border-color var(--dur-2) var(--ease), box-shadow var(--dur-2) var(--ease),
+    transform var(--dur-2) var(--ease);
+}
+.gb-row:hover {
+  text-decoration: none;
+  border-color: var(--text-hint);
+  box-shadow: var(--elev-1);
+  transform: translateY(-1px);
+}
+.gb-row-num {
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-sm);
+  display: grid;
+  place-items: center;
+  font-weight: 700;
+  font-size: 15px;
+  color: var(--primary);
+  background: var(--primary-soft);
+  font-variant-numeric: tabular-nums;
+}
+.gb-row-title {
+  flex: 1;
+  min-width: 0;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text);
+}
+.gb-row-arrow {
+  flex-shrink: 0;
+  font-size: 18px;
+  color: var(--text-hint);
+  transition: transform var(--dur-1) var(--ease), color var(--dur-1) var(--ease);
+}
+.gb-row:hover .gb-row-arrow {
+  transform: translateX(3px);
+  color: var(--primary);
 }
 
 /* ---------- Lưới Section ---------- */
@@ -42,14 +102,15 @@
   flex-shrink: 0;
   width: 42px;
   height: 42px;
-  border-radius: 12px;
+  border-radius: var(--radius-sm);
   display: grid;
   place-items: center;
-  font-weight: 900;
+  font-weight: 700;
   font-size: 18px;
-  color: var(--accent);
-  background: rgba(56, 189, 248, 0.12);
-  border: 1px solid rgba(56, 189, 248, 0.32);
+  color: var(--primary);
+  background: var(--primary-soft);
+  border: 1px solid transparent;
+  font-variant-numeric: tabular-nums;
 }
 .gb-card-body {
   flex: 1;
@@ -57,21 +118,23 @@
 }
 .gb-card-title {
   font-size: 17px;
-  font-weight: 800;
+  font-weight: 700;
+  letter-spacing: -0.01em;
   margin: 0 0 2px;
+  color: var(--text);
 }
 .gb-card-en {
   margin: 0 0 6px;
   font-size: 12.5px;
   font-weight: 700;
-  color: var(--text-dim);
+  color: var(--text-hint);
   text-transform: uppercase;
   letter-spacing: 0.4px;
 }
 .gb-card-sub {
   margin: 0 0 10px;
   font-size: 13.5px;
-  color: var(--text-muted);
+  color: var(--text-secondary);
   line-height: 1.45;
 }
 .gb-card-tags {
@@ -83,12 +146,12 @@
   flex-shrink: 0;
   align-self: center;
   font-size: 20px;
-  color: var(--text-dim);
-  transition: transform 0.15s ease, color 0.15s ease;
+  color: var(--text-hint);
+  transition: transform var(--dur-1) var(--ease), color var(--dur-1) var(--ease);
 }
 .gb-card-link:hover .gb-card-arrow {
   transform: translateX(3px);
-  color: var(--accent);
+  color: var(--primary);
 }
 
 /* ---------- Trang chi tiết ---------- */
@@ -97,47 +160,51 @@
   margin-bottom: 14px;
   font-weight: 700;
   font-size: 14px;
-  color: var(--text-muted);
+  color: var(--text-secondary);
   text-decoration: none;
 }
 .gb-back-link:hover {
-  color: var(--accent);
+  color: var(--primary);
   text-decoration: none;
 }
 .gb-detail-head {
   display: flex;
   align-items: flex-start;
-  gap: 16px;
-  margin-bottom: 20px;
+  gap: var(--sp-2);
+  margin-bottom: var(--sp-3);
 }
 .gb-detail-num {
   flex-shrink: 0;
   width: 56px;
   height: 56px;
-  border-radius: 16px;
+  border-radius: var(--radius);
   display: grid;
   place-items: center;
-  font-weight: 900;
+  font-weight: 700;
   font-size: 24px;
-  color: #fff;
-  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  color: white;
+  background: var(--primary);
+  font-variant-numeric: tabular-nums;
 }
 .gb-detail-title {
   font-size: 26px;
-  font-weight: 900;
+  font-weight: 700;
+  letter-spacing: -0.02em;
   margin: 0 0 2px;
+  color: var(--text);
 }
 .gb-detail-en {
   margin: 0 0 4px;
-  font-size: 13px;
+  font-size: var(--fs-caption);
   font-weight: 700;
-  color: var(--text-dim);
+  color: var(--text-hint);
   text-transform: uppercase;
   letter-spacing: 0.4px;
 }
 .gb-detail-sub {
   margin: 0;
   font-size: 14px;
+  color: var(--text-secondary);
 }
 
 /* ---------- Khối nội dung ---------- */
@@ -146,8 +213,10 @@
 }
 .gb-sec-title {
   font-size: 16px;
-  font-weight: 800;
+  font-weight: 700;
+  letter-spacing: -0.01em;
   margin: 0 0 12px;
+  color: var(--text);
 }
 .gb-list {
   margin: 0;
@@ -187,7 +256,7 @@
   position: absolute;
   left: 0;
   color: var(--good);
-  font-weight: 900;
+  font-weight: 700;
 }
 
 /* ---------- Ký hiệu ---------- */
@@ -201,7 +270,7 @@
   align-items: center;
   gap: 12px;
   padding: 10px 12px;
-  border-radius: 12px;
+  border-radius: var(--radius-sm);
   background: var(--panel-2);
   border: 1px solid var(--border);
 }
@@ -213,7 +282,7 @@
 }
 .gb-symbol-desc {
   font-size: 13px;
-  color: var(--text-muted);
+  color: var(--text-secondary);
   line-height: 1.4;
 }
 
@@ -225,7 +294,7 @@
 }
 .gb-formula {
   padding: 12px 14px;
-  border-radius: 12px;
+  border-radius: var(--radius-sm);
   background: var(--panel-2);
   border: 1px solid var(--border);
 }
@@ -237,7 +306,7 @@
 .gb-formula-desc {
   margin: 0;
   font-size: 13.5px;
-  color: var(--text-muted);
+  color: var(--text-secondary);
   line-height: 1.45;
 }
 
@@ -252,7 +321,7 @@
   margin-bottom: 0;
 }
 .gb-intuition {
-  border-left: 3px solid var(--accent);
+  border-left: 3px solid var(--primary);
 }
 .gb-intuition-text {
   margin: 0;
@@ -280,7 +349,7 @@
   display: flex;
   flex-direction: column;
   gap: 10px;
-  margin-top: 20px;
+  margin-top: var(--sp-3);
 }
 .gb-action-link {
   text-decoration: none;

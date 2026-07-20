@@ -1,0 +1,113 @@
+{
+  "url": "https://vi.d2l.ai/chapter_appendix-tools-for-deep-learning/colab.html",
+  "chapter": "chapter_appendix-tools-for-deep-learning",
+  "title": "19.4. Sử dụng Google Colab",
+  "crawled_at": "2026-07-20T12:41:35.826215+00:00",
+  "headings": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "su-dung-google-colab",
+      "text": "19.4. Sử dụng Google Colab"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tom-tat",
+      "text": "19.4.1. Tóm tắt"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bai-tap",
+      "text": "19.4.2. Bài tập"
+    }
+  ],
+  "content": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "su-dung-google-colab",
+      "text": "19.4. Sử dụng Google Colab"
+    },
+    {
+      "type": "paragraph",
+      "text": "Chúng tôi đã giới thiệu cách chạy cuốn sách này trên AWS trong Section 19.2 và Section 19.3 . Một tùy chọn khác đang\nchạy cuốn sách này trên Google\nColab , cung cấp GPU miễn phí nếu\nbạn có tài khoản Google."
+    },
+    {
+      "type": "paragraph",
+      "text": "Để chạy một phần trên Colab, bạn chỉ cần nhấp vào nút Colab ở bên\nphải tiêu đề của phần đó, chẳng hạn như trong Fig. 19.4.1 ."
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/colab.png",
+      "local_path": "_images/colab.png",
+      "alt": "../_images/colab.png"
+    },
+    {
+      "type": "paragraph",
+      "text": "Fig. 19.4.1 Open a section on Colab ¶"
+    },
+    {
+      "type": "paragraph",
+      "text": "Khi đây là lần đầu tiên bạn thực thi một ô mã, bạn sẽ nhận được một\nthông báo cảnh báo như thể hiện trong Fig. 19.4.2 . Bạn có thể\nnhấp vào “CHẠY ANYWAY” để bỏ qua nó."
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/colab-2.png",
+      "local_path": "_images/colab-2.png",
+      "alt": "../_images/colab-2.png"
+    },
+    {
+      "type": "paragraph",
+      "text": "Fig. 19.4.2 The warning message for running a section on Colab ¶"
+    },
+    {
+      "type": "paragraph",
+      "text": "Tiếp theo, Colab sẽ kết nối bạn với một phiên bản để chạy notebook này.\nCụ thể, nếu cần GPU, chẳng hạn như khi gọi chức năng d2l.try_gpu() ,\nchúng tôi sẽ yêu cầu Colab tự động kết nối với phiên bản GPU."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tom-tat",
+      "text": "19.4.1. Tóm tắt"
+    },
+    {
+      "type": "list",
+      "ordered": false,
+      "items": [
+        "Bạn có thể sử dụng Google Colab để chạy từng phần của cuốn sách này\nvới GPU."
+      ]
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bai-tap",
+      "text": "19.4.2. Bài tập"
+    },
+    {
+      "type": "list",
+      "ordered": true,
+      "items": [
+        "Cố gắng chỉnh sửa và chạy mã trong cuốn sách này bằng Google Colab."
+      ]
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    }
+  ],
+  "images": [
+    {
+      "original_url": "https://vi.d2l.ai/_images/colab.png",
+      "local_path": "_images/colab.png",
+      "alt": "../_images/colab.png"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/colab-2.png",
+      "local_path": "_images/colab-2.png",
+      "alt": "../_images/colab-2.png"
+    }
+  ],
+  "text": "19.4. Sử dụng Google Colab\nChúng tôi đã giới thiệu cách chạy cuốn sách này trên AWS trong Section 19.2 và Section 19.3 . Một tùy chọn khác đang\nchạy cuốn sách này trên Google\nColab , cung cấp GPU miễn phí nếu\nbạn có tài khoản Google.\nĐể chạy một phần trên Colab, bạn chỉ cần nhấp vào nút Colab ở bên\nphải tiêu đề của phần đó, chẳng hạn như trong Fig. 19.4.1 .\nFig. 19.4.1 Open a section on Colab ¶\nKhi đây là lần đầu tiên bạn thực thi một ô mã, bạn sẽ nhận được một\nthông báo cảnh báo như thể hiện trong Fig. 19.4.2 . Bạn có thể\nnhấp vào “CHẠY ANYWAY” để bỏ qua nó.\nFig. 19.4.2 The warning message for running a section on Colab ¶\nTiếp theo, Colab sẽ kết nối bạn với một phiên bản để chạy notebook này.\nCụ thể, nếu cần GPU, chẳng hạn như khi gọi chức năng d2l.try_gpu() ,\nchúng tôi sẽ yêu cầu Colab tự động kết nối với phiên bản GPU.\n19.4.1. Tóm tắt\nBạn có thể sử dụng Google Colab để chạy từng phần của cuốn sách này\nvới GPU.\n19.4.2. Bài tập\nCố gắng chỉnh sửa và chạy mã trong cuốn sách này bằng Google Colab.\nDiscussions"
+}

@@ -1,0 +1,740 @@
+{
+  "url": "https://vi.d2l.ai/chapter_appendix-mathematics-for-deep-learning/naive-bayes.html",
+  "chapter": "chapter_appendix-mathematics-for-deep-learning",
+  "title": "18.8. Bayes ngây thơ",
+  "crawled_at": "2026-07-20T12:41:29.774763+00:00",
+  "headings": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "bayes-ngay-tho",
+      "text": "18.8. Bayes ngây thơ"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "nhan-dang-ky-tu-quang",
+      "text": "18.8.1. Nhận dạng ký tự quang"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "mo-hinh-xac-suat-de-phan-loai",
+      "text": "18.8.2. Mô hình xác suất để phân loại"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "phan-loai-bayes-ngay-tho",
+      "text": "18.8.3. Phân loại Bayes ngây thơ"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "dao-tao",
+      "text": "18.8.4. Đào tạo"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tom-tat-su-dung-quy-tac-cua-bayes-mot-phan-loai-co-the-duoc-thuc-hien-bang-cach-gia-su-tat-ca-cac-tinh-nang-quan-sat-la-doc-lap-phan-loai-nay-co-the-duoc-dao-tao-tren-mot-tap-du-lieu-bang-cach-dem-so-lan-xuat-hien-cua-cac-ket-hop-cua-nhan-va-gia-tri-pixel-phan-loai-nay-la-tieu-chuan-vang-trong-nhieu-thap-ky-cho-cac-tac-vu-nhu-thu-rac-phat-hien",
+      "text": "18.8.5. Tóm tắt * Sử dụng quy tắc của Bayes’, một phân loại có thể được thực hiện bằng cách giả sử tất cả các tính năng quan sát là độc lập. * Phân loại này có thể được đào tạo trên một tập dữ liệu bằng cách đếm số lần xuất hiện của các kết hợp của nhãn và giá trị pixel * Phân loại này là tiêu chuẩn vàng trong nhiều thập kỷ cho các tác vụ như thư rác phát hiện."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bai-tap-1-xem-xet-tap-du-lieu-0-0-0-1-1-0-1-1-voi-cac-nhan-duoc-dua-ra-boi-xor-cua-hai-phan-tu-0-1-1-0-xac-suat-cho-mot-phan-loai-ngay-tho-bayes-duoc-xay-dung-tren-bo-du-lieu-nay-la-gi-no-co-phan-loai-thanh-cong-diem-cua-chung-toi-khong-neu-khong-nhung-gia-dinh-nao-bi-vi-pham-1-gia-su-rang-chung-toi-da-khong-su-dung-laplace-lam-min-khi-uoc-tinh-xac-suat-va-mot-vi-du-du-lieu-den-luc-thu-nghiem-trong-do-co-mot-gia-tri-khong-bao-gio-quan-sat-thay-trong-dao-tao-san-luong-mo-hinh-se-la-gi-1-phan-loai-bayes-ngay-tho-la-mot-vi-du-cu-the-cua-mot-mang-bayesian-trong-do-su-phu-thuoc-cua-cac-bien-ngau-nhien-duoc-ma-hoa-bang-cau-truc-do-thi-trong-khi-ly-thuyet-day-du-nam-ngoai-pham-vi-cua-phan-nay-xem-koller-friedman-2009-de-biet-chi-tiet-day-du-giai-thich-tai-sao-cho-phep-phu-thuoc-ro-rang-giua-hai-bien-dau-vao-trong-mo-hinh-xor-cho-phep-tao-ra-mot-phan-loai-thanh-cong",
+      "text": "18.8.6. Bài tập 1. Xem xét tập dữ liệu \\([[0,0], [0,1], [1,0], [1,1]]\\) với các nhãn được đưa ra bởi XOR của hai phần tử \\([0,1,1,0]\\) . Xác suất cho một phân loại ngây thơ Bayes được xây dựng trên bộ dữ liệu này là gì. Nó có phân loại thành công điểm của chúng tôi không? Nếu không, những giả định nào bị vi phạm? 1. Giả sử rằng chúng tôi đã không sử dụng Laplace làm mịn khi ước tính xác suất và một ví dụ dữ liệu đến lúc thử nghiệm trong đó có một giá trị không bao giờ quan sát thấy trong đào tạo. Sản lượng mô hình sẽ là gì? 1. Phân loại Bayes ngây thơ là một ví dụ cụ thể của một mạng Bayesian, trong đó sự phụ thuộc của các biến ngẫu nhiên được mã hóa bằng cấu trúc đồ thị. Trong khi lý thuyết đầy đủ nằm ngoài phạm vi của phần này (xem [Koller & Friedman, 2009] để biết chi tiết đầy đủ), giải thích tại sao cho phép phụ thuộc rõ ràng giữa hai biến đầu vào trong mô hình XOR cho phép tạo ra một phân loại thành công."
+    }
+  ],
+  "content": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "bayes-ngay-tho",
+      "text": "18.8. Bayes ngây thơ"
+    },
+    {
+      "type": "paragraph",
+      "text": "Trong suốt các phần trước, chúng ta đã học về lý thuyết xác suất và các\nbiến ngẫu nhiên. Để đưa lý thuyết này vào hoạt động, chúng ta hãy giới\nthiệu bộ phân loại Bayes* ngây thơ. Điều này không sử dụng gì ngoài các\nnguyên tắc cơ bản xác suất để cho phép chúng tôi thực hiện phân loại các\nchữ số."
+    },
+    {
+      "type": "paragraph",
+      "text": "Học tập là tất cả về việc đưa ra các giả định. Nếu chúng ta muốn phân\nloại một ví dụ dữ liệu mới mà chúng ta chưa bao giờ thấy trước đây chúng\nta phải đưa ra một số giả định về ví dụ dữ liệu nào tương tự nhau. Phân\nloại Bayes ngây thơ, một thuật toán phổ biến và rõ ràng đáng kể, giả\nđịnh tất cả các tính năng đều độc lập với nhau để đơn giản hóa việc tính\ntoán. Trong phần này, chúng tôi sẽ áp dụng mô hình này để nhận dạng các\nký tự trong hình ảnh."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "%matplotlib inline\nimport math\nfrom mxnet import gluon, np, npx\nfrom d2l import mxnet as d2l\n\nnpx.set_np()\nd2l.use_svg_display()"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "%matplotlib inline\nimport math\nimport torch\nimport torchvision\nfrom d2l import torch as d2l\n\nd2l.use_svg_display()"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "%matplotlib inline\nimport math\nimport tensorflow as tf\nfrom d2l import tensorflow as d2l\n\nd2l.use_svg_display()"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "nhan-dang-ky-tu-quang",
+      "text": "18.8.1. Nhận dạng ký tự quang"
+    },
+    {
+      "type": "paragraph",
+      "text": "MNIST [LeCun et al., 1998] là một trong những bộ dữ\nliệu được sử dụng rộng rãi. Nó chứa 60.000 hình ảnh để đào tạo và 10.000\nhình ảnh để xác nhận. Mỗi hình ảnh chứa một chữ số viết tay từ 0 đến 9.\nNhiệm vụ là phân loại từng hình ảnh thành chữ số tương ứng."
+    },
+    {
+      "type": "paragraph",
+      "text": "Gluon cung cấp lớp MNIST trong mô-đun data.vision để tự động lấy\ntập dữ liệu từ Internet. Sau đó, Gluon sẽ sử dụng bản sao cục bộ đã tải\nxuống. Chúng tôi chỉ định xem chúng tôi đang yêu cầu bộ đào tạo hay bộ\nthử nghiệm bằng cách đặt giá trị của tham số train thành True hoặc False tương ứng. Mỗi ảnh là một hình ảnh thang màu xám với cả\nchiều rộng và chiều cao \\(28\\) với hình dạng\n( \\(28\\) , \\(28\\) , \\(1\\) ). Chúng tôi sử dụng một chuyển đổi\ntùy chỉnh để loại bỏ kích thước kênh cuối cùng. Ngoài ra, tập dữ liệu\nđại diện cho mỗi pixel bằng một số nguyên \\(8\\) -bit không dấu. Chúng\ntôi định lượng chúng thành các tính năng nhị phân để đơn giản hóa vấn\nđề."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def transform(data, label):\n    return np.floor(data.astype('float32') / 128).squeeze(axis=-1), label\n\nmnist_train = gluon.data.vision.MNIST(train=True, transform=transform)\nmnist_test = gluon.data.vision.MNIST(train=False, transform=transform)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "data_transform = torchvision.transforms.Compose([\n    torchvision.transforms.ToTensor(),\n    lambda x: torch.floor(x * 255 / 128).squeeze(dim=0)\n])\n\nmnist_train = torchvision.datasets.MNIST(\n    root='./temp', train=True, transform=data_transform, download=True)\nmnist_test = torchvision.datasets.MNIST(\n    root='./temp', train=False, transform=data_transform, download=True)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "0.6%Downloading http://yann.lecun.com/exdb/mnist/train-images-idx3-ubyte.gz\nDownloading http://yann.lecun.com/exdb/mnist/train-images-idx3-ubyte.gz to ./temp/MNIST/raw/train-images-idx3-ubyte.gz\n100.0%\nExtracting ./temp/MNIST/raw/train-images-idx3-ubyte.gz to ./temp/MNIST/raw\n102.8%\nDownloading http://yann.lecun.com/exdb/mnist/train-labels-idx1-ubyte.gz\nDownloading http://yann.lecun.com/exdb/mnist/train-labels-idx1-ubyte.gz to ./temp/MNIST/raw/train-labels-idx1-ubyte.gz\nExtracting ./temp/MNIST/raw/train-labels-idx1-ubyte.gz to ./temp/MNIST/raw\n\nDownloading http://yann.lecun.com/exdb/mnist/t10k-images-idx3-ubyte.gz\n\n8.0%Downloading http://yann.lecun.com/exdb/mnist/t10k-images-idx3-ubyte.gz to ./temp/MNIST/raw/t10k-images-idx3-ubyte.gz\n100.0%\nExtracting ./temp/MNIST/raw/t10k-images-idx3-ubyte.gz to ./temp/MNIST/raw\n\nDownloading http://yann.lecun.com/exdb/mnist/t10k-labels-idx1-ubyte.gz\nDownloading http://yann.lecun.com/exdb/mnist/t10k-labels-idx1-ubyte.gz to ./temp/MNIST/raw/t10k-labels-idx1-ubyte.gz\n112.7%Extracting ./temp/MNIST/raw/t10k-labels-idx1-ubyte.gz to ./temp/MNIST/raw"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "((train_images, train_labels), (\n    test_images, test_labels)) = tf.keras.datasets.mnist.load_data()\n\n# Original pixel values of MNIST range from 0-255 (as the digits are stored as\n# uint8). For this section, pixel values that are greater than 128 (in the\n# original image) are converted to 1 and values that are less than 128 are\n# converted to 0. See section 18.9.2 and 18.9.3 for why\ntrain_images = tf.floor(tf.constant(train_images / 128, dtype = tf.float32))\ntest_images = tf.floor(tf.constant(test_images / 128, dtype = tf.float32))\n\ntrain_labels = tf.constant(train_labels, dtype = tf.int32)\ntest_labels = tf.constant(test_labels, dtype = tf.int32)"
+    },
+    {
+      "type": "paragraph",
+      "text": "Chúng ta có thể truy cập một ví dụ cụ thể, chứa hình ảnh và nhãn tương\nứng."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "image, label = mnist_train[2]\nimage.shape, label"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "((28, 28), array(4, dtype=int32))"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "image, label = mnist_train[2]\nimage.shape, label"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "(torch.Size([28, 28]), 4)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "image, label = train_images[2], train_labels[2]\nimage.shape, label.numpy()"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "(TensorShape([28, 28]), 4)"
+    },
+    {
+      "type": "paragraph",
+      "text": "Ví dụ của chúng tôi, được lưu trữ ở đây trong biến image , tương ứng\nvới một hình ảnh có chiều cao và chiều rộng \\(28\\) pixel."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "image.shape, image.dtype"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "((28, 28), dtype('float32'))"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "image.shape, image.dtype"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "(torch.Size([28, 28]), torch.float32)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "image.shape, image.dtype"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "(TensorShape([28, 28]), tf.float32)"
+    },
+    {
+      "type": "paragraph",
+      "text": "Mã của chúng tôi lưu trữ nhãn của mỗi hình ảnh dưới dạng vô hướng. Loại\ncủa nó là một số nguyên \\(32\\) -bit."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "label, type(label), label.dtype"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "(array(4, dtype=int32), mxnet.numpy.ndarray, dtype('int32'))"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "label, type(label)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "(4, int)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "label.numpy(), label.dtype"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "(4, tf.int32)"
+    },
+    {
+      "type": "paragraph",
+      "text": "Chúng tôi cũng có thể truy cập nhiều ví dụ cùng một lúc."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "images, labels = mnist_train[10:38]\nimages.shape, labels.shape"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "((28, 28, 28), (28,))"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "images = torch.stack([mnist_train[i][0] for i in range(10, 38)], dim=0)\nlabels = torch.tensor([mnist_train[i][1] for i in range(10, 38)])\nimages.shape, labels.shape"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "(torch.Size([28, 28, 28]), torch.Size([28]))"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "images = tf.stack([train_images[i] for i in range(10, 38)], axis=0)\nlabels = tf.constant([train_labels[i].numpy() for i in range(10, 38)])\nimages.shape, labels.shape"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "(TensorShape([28, 28, 28]), TensorShape([28]))"
+    },
+    {
+      "type": "paragraph",
+      "text": "Hãy để chúng tôi hình dung những ví dụ này."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "d2l.show_images(images, 2, 9);"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_naive-bayes_6e475d_75_0.svg",
+      "local_path": "_images/output_naive-bayes_6e475d_75_0.svg",
+      "alt": "../_images/output_naive-bayes_6e475d_75_0.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "d2l.show_images(images, 2, 9);"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_naive-bayes_6e475d_78_0.svg",
+      "local_path": "_images/output_naive-bayes_6e475d_78_0.svg",
+      "alt": "../_images/output_naive-bayes_6e475d_78_0.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "d2l.show_images(images, 2, 9);"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_naive-bayes_6e475d_81_0.svg",
+      "local_path": "_images/output_naive-bayes_6e475d_81_0.svg",
+      "alt": "../_images/output_naive-bayes_6e475d_81_0.svg"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "mo-hinh-xac-suat-de-phan-loai",
+      "text": "18.8.2. Mô hình xác suất để phân loại"
+    },
+    {
+      "type": "paragraph",
+      "text": "Trong một nhiệm vụ phân loại, chúng tôi ánh xạ một ví dụ vào một danh\nmục. Ở đây một ví dụ là một hình ảnh \\(28\\times 28\\) xám và một danh\nmục là một chữ số. (Tham khảo Section 3.4 để được giải thích\nchi tiết hơn.) Một cách tự nhiên để thể hiện nhiệm vụ phân loại là thông\nqua câu hỏi xác suất: nhãn có khả năng nhất được đưa ra các tính năng\n(tức là pixel hình ảnh) là gì? Biểu thị bởi \\(\\mathbf x\\in\\mathbb R^d\\) các tính năng của ví dụ và \\(y\\in\\mathbb R\\) nhãn. Ở đây các tính năng là pixel hình ảnh, nơi\nchúng ta có thể định hình lại hình ảnh \\(2\\) chiều thành một vectơ\nsao cho \\(d=28^2=784\\) và nhãn là chữ số. Xác suất của nhãn cho các\ntính năng là \\(p(y \\mid \\mathbf{x})\\) . Nếu chúng ta có thể tính toán\ncác xác suất này, đó là \\(p(y \\mid \\mathbf{x})\\) cho \\(y=0, \\ldots,9\\) trong ví dụ của chúng tôi, thì phân loại sẽ đưa ra\ndự đoán \\(\\hat{y}\\) được đưa ra bởi biểu thức:"
+    },
+    {
+      "type": "math",
+      "latex": "(18.8.1)¶\\[\\hat{y} = \\mathrm{argmax} \\> p(y  \\mid  \\mathbf{x}).\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Thật không may, điều này đòi hỏi chúng tôi ước tính \\(p(y \\mid \\mathbf{x})\\) cho mọi giá trị của \\(\\mathbf{x} = x_1, ..., x_d\\) . Hãy tưởng tượng rằng mỗi tính năng\ncó thể lấy một trong \\(2\\) giá trị. Ví dụ: tính năng \\(x_1 = 1\\) có thể biểu thị rằng từ apple xuất hiện trong một tài liệu nhất định và \\(x_1 = 0\\) sẽ biểu thị rằng nó không. Nếu chúng ta có \\(30\\) các tính năng nhị phân như vậy, điều đó có nghĩa là chúng ta cần phải\nchuẩn bị để phân loại bất kỳ \\(2^{30}\\) nào (hơn 1 tỷ!) giá trị có\nthể của vector đầu vào \\(\\mathbf{x}\\) ."
+    },
+    {
+      "type": "paragraph",
+      "text": "Hơn nữa, việc học ở đâu? Nếu chúng ta cần xem mọi ví dụ có thể để dự\nđoán nhãn tương ứng thì chúng ta không thực sự học một mẫu mà chỉ ghi\nnhớ tập dữ liệu."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "phan-loai-bayes-ngay-tho",
+      "text": "18.8.3. Phân loại Bayes ngây thơ"
+    },
+    {
+      "type": "paragraph",
+      "text": "May mắn thay, bằng cách đưa ra một số giả định về tính độc lập có điều\nkiện, chúng ta có thể giới thiệu một số thiên vị quy nạp và xây dựng một\nmô hình có khả năng khái quát hóa từ một lựa chọn tương đối khiêm tốn\ncác ví dụ đào tạo. Để bắt đầu, chúng ta hãy sử dụng định lý Bayes, để\nthể hiện phân loại như"
+    },
+    {
+      "type": "math",
+      "latex": "(18.8.2)¶\\[\\hat{y} = \\mathrm{argmax}_y \\> p(y  \\mid  \\mathbf{x}) = \\mathrm{argmax}_y \\> \\frac{p( \\mathbf{x}  \\mid  y) p(y)}{p(\\mathbf{x})}.\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Lưu ý rằng mẫu số là thuật ngữ bình thường hóa \\(p(\\mathbf{x})\\) mà\nkhông phụ thuộc vào giá trị của nhãn \\(y\\) . Kết quả là, chúng ta chỉ\ncần lo lắng về việc so sánh tử số trên các giá trị khác nhau của \\(y\\) . Ngay cả khi tính toán mẫu số hóa ra là khó chữa, chúng ta có\nthể thoát khỏi việc bỏ qua nó, miễn là chúng ta có thể đánh giá tử số.\nMay mắn thay, ngay cả khi chúng ta muốn phục hồi hằng số bình thường\nhóa, chúng ta có thể. Chúng tôi luôn có thể phục hồi thời hạn bình\nthường hóa kể từ \\(\\sum_y p(y \\mid \\mathbf{x}) = 1\\) ."
+    },
+    {
+      "type": "paragraph",
+      "text": "Bây giờ, chúng ta hãy tập trung vào \\(p( \\mathbf{x} \\mid y)\\) . Sử\ndụng quy tắc chuỗi xác suất, chúng ta có thể thể hiện thuật ngữ \\(p( \\mathbf{x} \\mid y)\\) như"
+    },
+    {
+      "type": "math",
+      "latex": "(18.8.3)¶\\[p(x_1  \\mid y) \\cdot p(x_2  \\mid  x_1, y) \\cdot ... \\cdot p( x_d  \\mid  x_1, ..., x_{d-1}, y).\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Bản thân nó, biểu thức này không giúp chúng ta xa hơn. Chúng ta vẫn phải\nước tính khoảng \\(2^d\\) tham số. Tuy nhiên, nếu chúng ta giả định\nrằng * các tính năng độc lập có điều kiện với nhau, với nhãn*, thì đột\nnhiên chúng ta có hình dạng tốt hơn nhiều, vì thuật ngữ này đơn giản hóa\nthành \\(\\prod_i p(x_i \\mid y)\\) , cho chúng ta bộ dự đoán"
+    },
+    {
+      "type": "math",
+      "latex": "(18.8.4)¶\\[\\hat{y} = \\mathrm{argmax}_y \\> \\prod_{i=1}^d p(x_i  \\mid  y) p(y).\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Nếu chúng ta có thể ước tính \\(p(x_i=1 \\mid y)\\) cho mỗi \\(i\\) và \\(y\\) và lưu giá trị của nó trong \\(P_{xy}[i, y]\\) , ở đây \\(P_{xy}\\) là ma trận \\(d\\times n\\) với \\(n\\) là số lớp và \\(y\\in\\{1, \\ldots, n\\}\\) , thì chúng ta cũng có thể sử dụng điều này\nđể ước tính \\(p(x_i = 0 \\mid y)\\) , tức là,"
+    },
+    {
+      "type": "math",
+      "latex": "(18.8.5)¶\\[\\begin{split}p(x_i = t_i \\mid y) =\n\\begin{cases}\n    P_{xy}[i, y] & \\text{for } t_i=1 ;\\\\\n    1 - P_{xy}[i, y] & \\text{for } t_i = 0 .\n\\end{cases}\\end{split}\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Ngoài ra, chúng tôi ước tính \\(p(y)\\) cho mỗi \\(y\\) và lưu nó\ntrong \\(P_y[y]\\) , với \\(P_y\\) một vector chiều dài \\(n\\) .\nThen, for any newMới example thí dụ \\(\\mathbf t = (t_1, t_2, \\ldots, t_d)\\) , we could computetính toán"
+    },
+    {
+      "type": "math",
+      "latex": "(18.8.6)¶\\[\\begin{split}\\begin{aligned}\\hat{y} &= \\mathrm{argmax}_ y \\ p(y)\\prod_{i=1}^d   p(x_t = t_i \\mid y) \\\\ &= \\mathrm{argmax}_y \\ P_y[y]\\prod_{i=1}^d \\ P_{xy}[i, y]^{t_i}\\, \\left(1 - P_{xy}[i, y]\\right)^{1-t_i}\\end{aligned}\\end{split}\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "for any \\(y\\) . Vì vậy, giả định của chúng tôi về sự độc lập có điều\nkiện đã lấy sự phức tạp của mô hình của chúng tôi từ sự phụ thuộc theo\ncấp số nhân vào số tính năng \\(\\mathcal{O}(2^dn)\\) đến một sự phụ\nthuộc tuyến tính, đó là \\(\\mathcal{O}(dn)\\) ."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "dao-tao",
+      "text": "18.8.4. Đào tạo"
+    },
+    {
+      "type": "paragraph",
+      "text": "Vấn đề bây giờ là chúng ta không biết \\(P_{xy}\\) và \\(P_y\\) . Vì\nvậy, chúng ta cần phải ước tính giá trị của họ cho một số dữ liệu đào\ntạo đầu tiên. Đây là * đào tạo* mô hình. Ước tính \\(P_y\\) không\nquá khó. Vì chúng ta chỉ xử lý các lớp \\(10\\) , chúng ta có thể đếm\nsố lần xuất hiện \\(n_y\\) cho mỗi chữ số và chia nó cho tổng lượng dữ\nliệu \\(n\\) . Ví dụ: nếu chữ số 8 xảy ra \\(n_8 = 5,800\\) lần và\nchúng ta có tổng cộng \\(n = 60,000\\) hình ảnh, ước tính xác suất là \\(p(y=8) = 0.0967\\) ."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "X, Y = mnist_train[:]  # All training examples\n\nn_y = np.zeros((10))\nfor y in range(10):\n    n_y[y] = (Y == y).sum()\nP_y = n_y / n_y.sum()\nP_y"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "array([0.09871667, 0.11236667, 0.0993    , 0.10218333, 0.09736667,\n       0.09035   , 0.09863333, 0.10441667, 0.09751666, 0.09915   ])"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "X = torch.stack([mnist_train[i][0] for i in range(len(mnist_train))], dim=0)\nY = torch.tensor([mnist_train[i][1] for i in range(len(mnist_train))])\n\nn_y = torch.zeros(10)\nfor y in range(10):\n    n_y[y] = (Y == y).sum()\nP_y = n_y / n_y.sum()\nP_y"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "tensor([0.0987, 0.1124, 0.0993, 0.1022, 0.0974, 0.0904, 0.0986, 0.1044, 0.0975,\n        0.0992])"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "X = train_images\nY = train_labels\n\nn_y = tf.Variable(tf.zeros(10))\nfor y in range(10):\n    n_y[y].assign(tf.reduce_sum(tf.cast(Y == y, tf.float32)))\nP_y = n_y / tf.reduce_sum(n_y)\nP_y"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "<tf.Tensor: shape=(10,), dtype=float32, numpy=\narray([0.09871667, 0.11236667, 0.0993    , 0.10218333, 0.09736667,\n       0.09035   , 0.09863333, 0.10441667, 0.09751666, 0.09915   ],\n      dtype=float32)>"
+    },
+    {
+      "type": "paragraph",
+      "text": "Bây giờ để điều hơi khó khăn hơn \\(P_{xy}\\) . Vì chúng tôi chọn hình\nảnh đen trắng, \\(p(x_i \\mid y)\\) biểu thị xác suất pixel \\(i\\) được bật cho lớp \\(y\\) . Giống như trước khi chúng ta có thể đi và\nđếm số lần \\(n_{iy}\\) sao cho một sự kiện xảy ra và chia nó cho tổng\nsố lần xuất hiện \\(y\\) , tức là \\(n_y\\) . Nhưng có một cái gì đó\nhơi rắc rối: một số pixel nhất định có thể không bao giờ có màu đen (ví\ndụ: đối với hình ảnh được cắt tốt, các pixel góc có thể luôn có màu\ntrắng). Một cách thuận tiện để các nhà thống kê giải quyết vấn đề này là\nthêm số giả cho tất cả các lần xuất hiện. Do đó, thay vì \\(n_{iy}\\) chúng tôi sử dụng \\(n_{iy}+1\\) và thay vì \\(n_y\\) chúng tôi sử\ndụng \\(n_{y} + 1\\) . Điều này còn được gọi là Laplace Smoothing . Nó\ncó vẻ đặc biệt, tuy nhiên nó có thể được thúc đẩy tốt từ một quan điểm\nBayesian."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "n_x = np.zeros((10, 28, 28))\nfor y in range(10):\n    n_x[y] = np.array(X.asnumpy()[Y.asnumpy() == y].sum(axis=0))\nP_xy = (n_x + 1) / (n_y + 1).reshape(10, 1, 1)\n\nd2l.show_images(P_xy, 2, 5);"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_naive-bayes_6e475d_99_0.svg",
+      "local_path": "_images/output_naive-bayes_6e475d_99_0.svg",
+      "alt": "../_images/output_naive-bayes_6e475d_99_0.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "n_x = torch.zeros((10, 28, 28))\nfor y in range(10):\n    n_x[y] = torch.tensor(X.numpy()[Y.numpy() == y].sum(axis=0))\nP_xy = (n_x + 1) / (n_y + 1).reshape(10, 1, 1)\n\nd2l.show_images(P_xy, 2, 5);"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_naive-bayes_6e475d_102_0.svg",
+      "local_path": "_images/output_naive-bayes_6e475d_102_0.svg",
+      "alt": "../_images/output_naive-bayes_6e475d_102_0.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "n_x = tf.Variable(tf.zeros((10, 28, 28)))\nfor y in range(10):\n    n_x[y].assign(tf.cast(tf.reduce_sum(\n        X.numpy()[Y.numpy() == y], axis=0), tf.float32))\nP_xy = (n_x + 1) / tf.reshape((n_y + 1), (10, 1, 1))\n\nd2l.show_images(P_xy, 2, 5);"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_naive-bayes_6e475d_105_0.svg",
+      "local_path": "_images/output_naive-bayes_6e475d_105_0.svg",
+      "alt": "../_images/output_naive-bayes_6e475d_105_0.svg"
+    },
+    {
+      "type": "paragraph",
+      "text": "Bằng cách hình dung các xác suất \\(10\\times 28\\times 28\\) này (đối\nvới mỗi pixel cho mỗi lớp), chúng ta có thể nhận được một số chữ số có\nvẻ trung bình."
+    },
+    {
+      "type": "paragraph",
+      "text": "Bây giờ chúng ta có thể sử dụng (18.8.6) để\ndự đoán một hình ảnh mới. Cho \\(\\mathbf x\\) , các chức năng sau tính \\(p(\\mathbf x \\mid y)p(y)\\) cho mỗi \\(y\\) ."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def bayes_pred(x):\n    x = np.expand_dims(x, axis=0)  # (28, 28) -> (1, 28, 28)\n    p_xy = P_xy * x + (1 - P_xy)*(1 - x)\n    p_xy = p_xy.reshape(10, -1).prod(axis=1)  # p(x|y)\n    return np.array(p_xy) * P_y\n\nimage, label = mnist_test[0]\nbayes_pred(image)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "array([0., 0., 0., 0., 0., 0., 0., 0., 0., 0.])"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def bayes_pred(x):\n    x = x.unsqueeze(0)  # (28, 28) -> (1, 28, 28)\n    p_xy = P_xy * x + (1 - P_xy)*(1 - x)\n    p_xy = p_xy.reshape(10, -1).prod(dim=1)  # p(x|y)\n    return p_xy * P_y\n\nimage, label = mnist_test[0]\nbayes_pred(image)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "tensor([0., 0., 0., 0., 0., 0., 0., 0., 0., 0.])"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def bayes_pred(x):\n    x = tf.expand_dims(x, axis=0)  # (28, 28) -> (1, 28, 28)\n    p_xy = P_xy * x + (1 - P_xy)*(1 - x)\n    p_xy = tf.math.reduce_prod(tf.reshape(p_xy, (10, -1)), axis=1)  # p(x|y)\n    return p_xy * P_y\n\nimage, label = train_images[0], train_labels[0]\nbayes_pred(image)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "<tf.Tensor: shape=(10,), dtype=float32, numpy=array([0., 0., 0., 0., 0., 0., 0., 0., 0., 0.], dtype=float32)>"
+    },
+    {
+      "type": "paragraph",
+      "text": "Điều này đã đi sai khủng khiếp! Để tìm hiểu lý do tại sao, chúng ta hãy\nnhìn vào xác suất trên mỗi pixel. Chúng thường là những con số giữa \\(0.001\\) và \\(1\\) . Chúng tôi đang nhân \\(784\\) trong số họ.\nTại thời điểm này, điều đáng nói là chúng ta đang tính toán những con số\nnày trên máy tính, do đó với một phạm vi cố định cho số mũ. Điều gì xảy\nra là chúng ta trải nghiệm * underflow số*, tức là, nhân tất cả các số\nnhỏ dẫn đến một cái gì đó thậm chí còn nhỏ hơn cho đến khi nó được làm\ntròn xuống 0. Chúng tôi đã thảo luận về điều này như một vấn đề lý\nthuyết trong Section 18.7 , nhưng chúng ta thấy rõ\ncác hiện tượng ở đây trong thực tế."
+    },
+    {
+      "type": "paragraph",
+      "text": "Như đã thảo luận trong phần đó, chúng tôi khắc phục điều này bằng cách\nsử dụng thực tế là \\(\\log a b = \\log a + \\log b\\) , tức là, chúng tôi\nchuyển sang tổng hợp logarit. Ngay cả khi cả \\(a\\) và \\(b\\) đều\nlà những con số nhỏ, các giá trị logarit phải nằm trong một phạm vi\nthích hợp."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "a = 0.1\nprint('underflow:', a**784)\nprint('logarithm is normal:', 784*math.log(a))"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "underflow: 0.0\nlogarithm is normal: -1805.2267129073316"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "a = 0.1\nprint('underflow:', a**784)\nprint('logarithm is normal:', 784*math.log(a))"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "underflow: 0.0\nlogarithm is normal: -1805.2267129073316"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "a = 0.1\nprint('underflow:', a**784)\nprint('logarithm is normal:', 784*tf.math.log(a).numpy())"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "underflow: 0.0\nlogarithm is normal: -1805.2267379760742"
+    },
+    {
+      "type": "paragraph",
+      "text": "Vì logarit là một hàm ngày càng tăng, chúng ta có thể viết lại (18.8.6) như"
+    },
+    {
+      "type": "math",
+      "latex": "(18.8.7)¶\\[\\hat{y} = \\mathrm{argmax}_y \\ \\log P_y[y] + \\sum_{i=1}^d \\Big[t_i\\log P_{xy}[x_i, y] + (1-t_i) \\log (1 - P_{xy}[x_i, y]) \\Big].\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Chúng ta có thể thực hiện phiên bản ổn định sau:"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "log_P_xy = np.log(P_xy)\nlog_P_xy_neg = np.log(1 - P_xy)\nlog_P_y = np.log(P_y)\n\ndef bayes_pred_stable(x):\n    x = np.expand_dims(x, axis=0)  # (28, 28) -> (1, 28, 28)\n    p_xy = log_P_xy * x + log_P_xy_neg * (1 - x)\n    p_xy = p_xy.reshape(10, -1).sum(axis=1)  # p(x|y)\n    return p_xy + log_P_y\n\npy = bayes_pred_stable(image)\npy"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "array([-269.0042 , -301.73447, -245.21458, -218.8941 , -193.46907,\n       -206.10315, -292.54315, -114.62834, -220.35619, -163.18881])"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "log_P_xy = torch.log(P_xy)\nlog_P_xy_neg = torch.log(1 - P_xy)\nlog_P_y = torch.log(P_y)\n\ndef bayes_pred_stable(x):\n    x = x.unsqueeze(0)  # (28, 28) -> (1, 28, 28)\n    p_xy = log_P_xy * x + log_P_xy_neg * (1 - x)\n    p_xy = p_xy.reshape(10, -1).sum(axis=1)  # p(x|y)\n    return p_xy + log_P_y\n\npy = bayes_pred_stable(image)\npy"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "tensor([-269.0042, -301.7345, -245.2146, -218.8941, -193.4691, -206.1031,\n        -292.5432, -114.6283, -220.3562, -163.1888])"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "log_P_xy = tf.math.log(P_xy)\nlog_P_xy_neg = tf.math.log(1 - P_xy)\nlog_P_y = tf.math.log(P_y)\n\ndef bayes_pred_stable(x):\n    x = tf.expand_dims(x, axis=0)  # (28, 28) -> (1, 28, 28)\n    p_xy = log_P_xy * x + log_P_xy_neg * (1 - x)\n    p_xy = tf.math.reduce_sum(tf.reshape(p_xy, (10, -1)), axis=1)  # p(x|y)\n    return p_xy + log_P_y\n\npy = bayes_pred_stable(image)\npy"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "<tf.Tensor: shape=(10,), dtype=float32, numpy=\narray([-266.66373, -320.79816, -261.50876, -202.63194, -295.5783 ,\n       -199.49413, -318.6671 , -266.0148 , -224.60349, -271.93506],\n      dtype=float32)>"
+    },
+    {
+      "type": "paragraph",
+      "text": "Bây giờ chúng ta có thể kiểm tra xem dự đoán có đúng không."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "# Convert label which is a scalar tensor of int32 dtype to a Python scalar\n# integer for comparison\npy.argmax(axis=0) == int(label)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "array(True)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "py.argmax(dim=0) == label"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "tensor(True)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "tf.argmax(py, axis=0, output_type = tf.int32) == label"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "<tf.Tensor: shape=(), dtype=bool, numpy=True>"
+    },
+    {
+      "type": "paragraph",
+      "text": "Nếu bây giờ chúng ta dự đoán một vài ví dụ xác nhận, chúng ta có thể\nthấy bộ phân loại Bayes hoạt động khá tốt."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def predict(X):\n    return [bayes_pred_stable(x).argmax(axis=0).astype(np.int32) for x in X]\n\nX, y = mnist_test[:18]\npreds = predict(X)\nd2l.show_images(X, 2, 9, titles=[str(d) for d in preds]);"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_naive-bayes_6e475d_159_0.svg",
+      "local_path": "_images/output_naive-bayes_6e475d_159_0.svg",
+      "alt": "../_images/output_naive-bayes_6e475d_159_0.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def predict(X):\n    return [bayes_pred_stable(x).argmax(dim=0).type(torch.int32).item()\n            for x in X]\n\nX = torch.stack([mnist_test[i][0] for i in range(18)], dim=0)\ny = torch.tensor([mnist_test[i][1] for i in range(18)])\npreds = predict(X)\nd2l.show_images(X, 2, 9, titles=[str(d) for d in preds]);"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_naive-bayes_6e475d_162_0.svg",
+      "local_path": "_images/output_naive-bayes_6e475d_162_0.svg",
+      "alt": "../_images/output_naive-bayes_6e475d_162_0.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def predict(X):\n    return [tf.argmax(\n        bayes_pred_stable(x), axis=0, output_type = tf.int32).numpy()\n            for x in X]\n\nX = tf.stack([train_images[i] for i in range(10, 38)], axis=0)\ny = tf.constant([train_labels[i].numpy() for i in range(10, 38)])\npreds = predict(X)\nd2l.show_images(X, 2, 9, titles=[str(d) for d in preds]);"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_naive-bayes_6e475d_165_0.svg",
+      "local_path": "_images/output_naive-bayes_6e475d_165_0.svg",
+      "alt": "../_images/output_naive-bayes_6e475d_165_0.svg"
+    },
+    {
+      "type": "paragraph",
+      "text": "Cuối cùng, chúng ta hãy tính toán độ chính xác tổng thể của bộ phân\nloại."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "X, y = mnist_test[:]\npreds = np.array(predict(X), dtype=np.int32)\nfloat((preds == y).sum()) / len(y)  # Validation accuracy"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "0.8426"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "X = torch.stack([mnist_test[i][0] for i in range(len(mnist_test))], dim=0)\ny = torch.tensor([mnist_test[i][1] for i in range(len(mnist_test))])\npreds = torch.tensor(predict(X), dtype=torch.int32)\nfloat((preds == y).sum()) / len(y)  # Validation accuracy"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "0.8426"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "X = test_images\ny = test_labels\npreds = tf.constant(predict(X), dtype=tf.int32)\n# Validation accuracy\ntf.reduce_sum(tf.cast(preds == y, tf.float32)).numpy() / len(y)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "0.8426"
+    },
+    {
+      "type": "paragraph",
+      "text": "Các mạng sâu hiện đại đạt được tỷ lệ lỗi dưới \\(0.01\\) . Hiệu suất\ntương đối kém là do các giả định thống kê không chính xác mà chúng tôi\nđã thực hiện trong mô hình của mình: chúng tôi giả định rằng mỗi điểm\nảnh được tạo ra * độc lập*, chỉ tùy thuộc vào nhãn. Đây rõ ràng không\nphải là cách con người viết chữ số, và giả định sai lầm này dẫn đến sự\nsụp đổ của phân loại quá ngây thơ (Bayes) của chúng ta."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tom-tat-su-dung-quy-tac-cua-bayes-mot-phan-loai-co-the-duoc-thuc-hien-bang-cach-gia-su-tat-ca-cac-tinh-nang-quan-sat-la-doc-lap-phan-loai-nay-co-the-duoc-dao-tao-tren-mot-tap-du-lieu-bang-cach-dem-so-lan-xuat-hien-cua-cac-ket-hop-cua-nhan-va-gia-tri-pixel-phan-loai-nay-la-tieu-chuan-vang-trong-nhieu-thap-ky-cho-cac-tac-vu-nhu-thu-rac-phat-hien",
+      "text": "18.8.5. Tóm tắt * Sử dụng quy tắc của Bayes’, một phân loại có thể được thực hiện bằng cách giả sử tất cả các tính năng quan sát là độc lập. * Phân loại này có thể được đào tạo trên một tập dữ liệu bằng cách đếm số lần xuất hiện của các kết hợp của nhãn và giá trị pixel * Phân loại này là tiêu chuẩn vàng trong nhiều thập kỷ cho các tác vụ như thư rác phát hiện."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bai-tap-1-xem-xet-tap-du-lieu-0-0-0-1-1-0-1-1-voi-cac-nhan-duoc-dua-ra-boi-xor-cua-hai-phan-tu-0-1-1-0-xac-suat-cho-mot-phan-loai-ngay-tho-bayes-duoc-xay-dung-tren-bo-du-lieu-nay-la-gi-no-co-phan-loai-thanh-cong-diem-cua-chung-toi-khong-neu-khong-nhung-gia-dinh-nao-bi-vi-pham-1-gia-su-rang-chung-toi-da-khong-su-dung-laplace-lam-min-khi-uoc-tinh-xac-suat-va-mot-vi-du-du-lieu-den-luc-thu-nghiem-trong-do-co-mot-gia-tri-khong-bao-gio-quan-sat-thay-trong-dao-tao-san-luong-mo-hinh-se-la-gi-1-phan-loai-bayes-ngay-tho-la-mot-vi-du-cu-the-cua-mot-mang-bayesian-trong-do-su-phu-thuoc-cua-cac-bien-ngau-nhien-duoc-ma-hoa-bang-cau-truc-do-thi-trong-khi-ly-thuyet-day-du-nam-ngoai-pham-vi-cua-phan-nay-xem-koller-friedman-2009-de-biet-chi-tiet-day-du-giai-thich-tai-sao-cho-phep-phu-thuoc-ro-rang-giua-hai-bien-dau-vao-trong-mo-hinh-xor-cho-phep-tao-ra-mot-phan-loai-thanh-cong",
+      "text": "18.8.6. Bài tập 1. Xem xét tập dữ liệu \\([[0,0], [0,1], [1,0], [1,1]]\\) với các nhãn được đưa ra bởi XOR của hai phần tử \\([0,1,1,0]\\) . Xác suất cho một phân loại ngây thơ Bayes được xây dựng trên bộ dữ liệu này là gì. Nó có phân loại thành công điểm của chúng tôi không? Nếu không, những giả định nào bị vi phạm? 1. Giả sử rằng chúng tôi đã không sử dụng Laplace làm mịn khi ước tính xác suất và một ví dụ dữ liệu đến lúc thử nghiệm trong đó có một giá trị không bao giờ quan sát thấy trong đào tạo. Sản lượng mô hình sẽ là gì? 1. Phân loại Bayes ngây thơ là một ví dụ cụ thể của một mạng Bayesian, trong đó sự phụ thuộc của các biến ngẫu nhiên được mã hóa bằng cấu trúc đồ thị. Trong khi lý thuyết đầy đủ nằm ngoài phạm vi của phần này (xem [Koller & Friedman, 2009] để biết chi tiết đầy đủ), giải thích tại sao cho phép phụ thuộc rõ ràng giữa hai biến đầu vào trong mô hình XOR cho phép tạo ra một phân loại thành công."
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    }
+  ],
+  "images": [
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_naive-bayes_6e475d_75_0.svg",
+      "local_path": "_images/output_naive-bayes_6e475d_75_0.svg",
+      "alt": "../_images/output_naive-bayes_6e475d_75_0.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_naive-bayes_6e475d_78_0.svg",
+      "local_path": "_images/output_naive-bayes_6e475d_78_0.svg",
+      "alt": "../_images/output_naive-bayes_6e475d_78_0.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_naive-bayes_6e475d_81_0.svg",
+      "local_path": "_images/output_naive-bayes_6e475d_81_0.svg",
+      "alt": "../_images/output_naive-bayes_6e475d_81_0.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_naive-bayes_6e475d_99_0.svg",
+      "local_path": "_images/output_naive-bayes_6e475d_99_0.svg",
+      "alt": "../_images/output_naive-bayes_6e475d_99_0.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_naive-bayes_6e475d_102_0.svg",
+      "local_path": "_images/output_naive-bayes_6e475d_102_0.svg",
+      "alt": "../_images/output_naive-bayes_6e475d_102_0.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_naive-bayes_6e475d_105_0.svg",
+      "local_path": "_images/output_naive-bayes_6e475d_105_0.svg",
+      "alt": "../_images/output_naive-bayes_6e475d_105_0.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_naive-bayes_6e475d_159_0.svg",
+      "local_path": "_images/output_naive-bayes_6e475d_159_0.svg",
+      "alt": "../_images/output_naive-bayes_6e475d_159_0.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_naive-bayes_6e475d_162_0.svg",
+      "local_path": "_images/output_naive-bayes_6e475d_162_0.svg",
+      "alt": "../_images/output_naive-bayes_6e475d_162_0.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_naive-bayes_6e475d_165_0.svg",
+      "local_path": "_images/output_naive-bayes_6e475d_165_0.svg",
+      "alt": "../_images/output_naive-bayes_6e475d_165_0.svg"
+    }
+  ],
+  "text": "18.8. Bayes ngây thơ\nTrong suốt các phần trước, chúng ta đã học về lý thuyết xác suất và các\nbiến ngẫu nhiên. Để đưa lý thuyết này vào hoạt động, chúng ta hãy giới\nthiệu bộ phân loại Bayes* ngây thơ. Điều này không sử dụng gì ngoài các\nnguyên tắc cơ bản xác suất để cho phép chúng tôi thực hiện phân loại các\nchữ số.\nHọc tập là tất cả về việc đưa ra các giả định. Nếu chúng ta muốn phân\nloại một ví dụ dữ liệu mới mà chúng ta chưa bao giờ thấy trước đây chúng\nta phải đưa ra một số giả định về ví dụ dữ liệu nào tương tự nhau. Phân\nloại Bayes ngây thơ, một thuật toán phổ biến và rõ ràng đáng kể, giả\nđịnh tất cả các tính năng đều độc lập với nhau để đơn giản hóa việc tính\ntoán. Trong phần này, chúng tôi sẽ áp dụng mô hình này để nhận dạng các\nký tự trong hình ảnh.\n18.8.1. Nhận dạng ký tự quang\nMNIST [LeCun et al., 1998] là một trong những bộ dữ\nliệu được sử dụng rộng rãi. Nó chứa 60.000 hình ảnh để đào tạo và 10.000\nhình ảnh để xác nhận. Mỗi hình ảnh chứa một chữ số viết tay từ 0 đến 9.\nNhiệm vụ là phân loại từng hình ảnh thành chữ số tương ứng.\nGluon cung cấp lớp MNIST trong mô-đun data.vision để tự động lấy\ntập dữ liệu từ Internet. Sau đó, Gluon sẽ sử dụng bản sao cục bộ đã tải\nxuống. Chúng tôi chỉ định xem chúng tôi đang yêu cầu bộ đào tạo hay bộ\nthử nghiệm bằng cách đặt giá trị của tham số train thành True hoặc False tương ứng. Mỗi ảnh là một hình ảnh thang màu xám với cả\nchiều rộng và chiều cao \\(28\\) với hình dạng\n( \\(28\\) , \\(28\\) , \\(1\\) ). Chúng tôi sử dụng một chuyển đổi\ntùy chỉnh để loại bỏ kích thước kênh cuối cùng. Ngoài ra, tập dữ liệu\nđại diện cho mỗi pixel bằng một số nguyên \\(8\\) -bit không dấu. Chúng\ntôi định lượng chúng thành các tính năng nhị phân để đơn giản hóa vấn\nđề.\nChúng ta có thể truy cập một ví dụ cụ thể, chứa hình ảnh và nhãn tương\nứng.\nVí dụ của chúng tôi, được lưu trữ ở đây trong biến image , tương ứng\nvới một hình ảnh có chiều cao và chiều rộng \\(28\\) pixel.\nMã của chúng tôi lưu trữ nhãn của mỗi hình ảnh dưới dạng vô hướng. Loại\ncủa nó là một số nguyên \\(32\\) -bit.\nChúng tôi cũng có thể truy cập nhiều ví dụ cùng một lúc.\nHãy để chúng tôi hình dung những ví dụ này.\n18.8.2. Mô hình xác suất để phân loại\nTrong một nhiệm vụ phân loại, chúng tôi ánh xạ một ví dụ vào một danh\nmục. Ở đây một ví dụ là một hình ảnh \\(28\\times 28\\) xám và một danh\nmục là một chữ số. (Tham khảo Section 3.4 để được giải thích\nchi tiết hơn.) Một cách tự nhiên để thể hiện nhiệm vụ phân loại là thông\nqua câu hỏi xác suất: nhãn có khả năng nhất được đưa ra các tính năng\n(tức là pixel hình ảnh) là gì? Biểu thị bởi \\(\\mathbf x\\in\\mathbb R^d\\) các tính năng của ví dụ và \\(y\\in\\mathbb R\\) nhãn. Ở đây các tính năng là pixel hình ảnh, nơi\nchúng ta có thể định hình lại hình ảnh \\(2\\) chiều thành một vectơ\nsao cho \\(d=28^2=784\\) và nhãn là chữ số. Xác suất của nhãn cho các\ntính năng là \\(p(y \\mid \\mathbf{x})\\) . Nếu chúng ta có thể tính toán\ncác xác suất này, đó là \\(p(y \\mid \\mathbf{x})\\) cho \\(y=0, \\ldots,9\\) trong ví dụ của chúng tôi, thì phân loại sẽ đưa ra\ndự đoán \\(\\hat{y}\\) được đưa ra bởi biểu thức:\nThật không may, điều này đòi hỏi chúng tôi ước tính \\(p(y \\mid \\mathbf{x})\\) cho mọi giá trị của \\(\\mathbf{x} = x_1, ..., x_d\\) . Hãy tưởng tượng rằng mỗi tính năng\ncó thể lấy một trong \\(2\\) giá trị. Ví dụ: tính năng \\(x_1 = 1\\) có thể biểu thị rằng từ apple xuất hiện trong một tài liệu nhất định và \\(x_1 = 0\\) sẽ biểu thị rằng nó không. Nếu chúng ta có \\(30\\) các tính năng nhị phân như vậy, điều đó có nghĩa là chúng ta cần phải\nchuẩn bị để phân loại bất kỳ \\(2^{30}\\) nào (hơn 1 tỷ!) giá trị có\nthể của vector đầu vào \\(\\mathbf{x}\\) .\nHơn nữa, việc học ở đâu? Nếu chúng ta cần xem mọi ví dụ có thể để dự\nđoán nhãn tương ứng thì chúng ta không thực sự học một mẫu mà chỉ ghi\nnhớ tập dữ liệu.\n18.8.3. Phân loại Bayes ngây thơ\nMay mắn thay, bằng cách đưa ra một số giả định về tính độc lập có điều\nkiện, chúng ta có thể giới thiệu một số thiên vị quy nạp và xây dựng một\nmô hình có khả năng khái quát hóa từ một lựa chọn tương đối khiêm tốn\ncác ví dụ đào tạo. Để bắt đầu, chúng ta hãy sử dụng định lý Bayes, để\nthể hiện phân loại như\nLưu ý rằng mẫu số là thuật ngữ bình thường hóa \\(p(\\mathbf{x})\\) mà\nkhông phụ thuộc vào giá trị của nhãn \\(y\\) . Kết quả là, chúng ta chỉ\ncần lo lắng về việc so sánh tử số trên các giá trị khác nhau của \\(y\\) . Ngay cả khi tính toán mẫu số hóa ra là khó chữa, chúng ta có\nthể thoát khỏi việc bỏ qua nó, miễn là chúng ta có thể đánh giá tử số.\nMay mắn thay, ngay cả khi chúng ta muốn phục hồi hằng số bình thường\nhóa, chúng ta có thể. Chúng tôi luôn có thể phục hồi thời hạn bình\nthường hóa kể từ \\(\\sum_y p(y \\mid \\mathbf{x}) = 1\\) .\nBây giờ, chúng ta hãy tập trung vào \\(p( \\mathbf{x} \\mid y)\\) . Sử\ndụng quy tắc chuỗi xác suất, chúng ta có thể thể hiện thuật ngữ \\(p( \\mathbf{x} \\mid y)\\) như\nBản thân nó, biểu thức này không giúp chúng ta xa hơn. Chúng ta vẫn phải\nước tính khoảng \\(2^d\\) tham số. Tuy nhiên, nếu chúng ta giả định\nrằng * các tính năng độc lập có điều kiện với nhau, với nhãn*, thì đột\nnhiên chúng ta có hình dạng tốt hơn nhiều, vì thuật ngữ này đơn giản hóa\nthành \\(\\prod_i p(x_i \\mid y)\\) , cho chúng ta bộ dự đoán\nNếu chúng ta có thể ước tính \\(p(x_i=1 \\mid y)\\) cho mỗi \\(i\\) và \\(y\\) và lưu giá trị của nó trong \\(P_{xy}[i, y]\\) , ở đây \\(P_{xy}\\) là ma trận \\(d\\times n\\) với \\(n\\) là số lớp và \\(y\\in\\{1, \\ldots, n\\}\\) , thì chúng ta cũng có thể sử dụng điều này\nđể ước tính \\(p(x_i = 0 \\mid y)\\) , tức là,\nNgoài ra, chúng tôi ước tính \\(p(y)\\) cho mỗi \\(y\\) và lưu nó\ntrong \\(P_y[y]\\) , với \\(P_y\\) một vector chiều dài \\(n\\) .\nThen, for any newMới example thí dụ \\(\\mathbf t = (t_1, t_2, \\ldots, t_d)\\) , we could computetính toán\nfor any \\(y\\) . Vì vậy, giả định của chúng tôi về sự độc lập có điều\nkiện đã lấy sự phức tạp của mô hình của chúng tôi từ sự phụ thuộc theo\ncấp số nhân vào số tính năng \\(\\mathcal{O}(2^dn)\\) đến một sự phụ\nthuộc tuyến tính, đó là \\(\\mathcal{O}(dn)\\) .\n18.8.4. Đào tạo\nVấn đề bây giờ là chúng ta không biết \\(P_{xy}\\) và \\(P_y\\) . Vì\nvậy, chúng ta cần phải ước tính giá trị của họ cho một số dữ liệu đào\ntạo đầu tiên. Đây là * đào tạo* mô hình. Ước tính \\(P_y\\) không\nquá khó. Vì chúng ta chỉ xử lý các lớp \\(10\\) , chúng ta có thể đếm\nsố lần xuất hiện \\(n_y\\) cho mỗi chữ số và chia nó cho tổng lượng dữ\nliệu \\(n\\) . Ví dụ: nếu chữ số 8 xảy ra \\(n_8 = 5,800\\) lần và\nchúng ta có tổng cộng \\(n = 60,000\\) hình ảnh, ước tính xác suất là \\(p(y=8) = 0.0967\\) .\nBây giờ để điều hơi khó khăn hơn \\(P_{xy}\\) . Vì chúng tôi chọn hình\nảnh đen trắng, \\(p(x_i \\mid y)\\) biểu thị xác suất pixel \\(i\\) được bật cho lớp \\(y\\) . Giống như trước khi chúng ta có thể đi và\nđếm số lần \\(n_{iy}\\) sao cho một sự kiện xảy ra và chia nó cho tổng\nsố lần xuất hiện \\(y\\) , tức là \\(n_y\\) . Nhưng có một cái gì đó\nhơi rắc rối: một số pixel nhất định có thể không bao giờ có màu đen (ví\ndụ: đối với hình ảnh được cắt tốt, các pixel góc có thể luôn có màu\ntrắng). Một cách thuận tiện để các nhà thống kê giải quyết vấn đề này là\nthêm số giả cho tất cả các lần xuất hiện. Do đó, thay vì \\(n_{iy}\\) chúng tôi sử dụng \\(n_{iy}+1\\) và thay vì \\(n_y\\) chúng tôi sử\ndụng \\(n_{y} + 1\\) . Điều này còn được gọi là Laplace Smoothing . Nó\ncó vẻ đặc biệt, tuy nhiên nó có thể được thúc đẩy tốt từ một quan điểm\nBayesian.\nBằng cách hình dung các xác suất \\(10\\times 28\\times 28\\) này (đối\nvới mỗi pixel cho mỗi lớp), chúng ta có thể nhận được một số chữ số có\nvẻ trung bình.\nBây giờ chúng ta có thể sử dụng (18.8.6) để\ndự đoán một hình ảnh mới. Cho \\(\\mathbf x\\) , các chức năng sau tính \\(p(\\mathbf x \\mid y)p(y)\\) cho mỗi \\(y\\) .\nĐiều này đã đi sai khủng khiếp! Để tìm hiểu lý do tại sao, chúng ta hãy\nnhìn vào xác suất trên mỗi pixel. Chúng thường là những con số giữa \\(0.001\\) và \\(1\\) . Chúng tôi đang nhân \\(784\\) trong số họ.\nTại thời điểm này, điều đáng nói là chúng ta đang tính toán những con số\nnày trên máy tính, do đó với một phạm vi cố định cho số mũ. Điều gì xảy\nra là chúng ta trải nghiệm * underflow số*, tức là, nhân tất cả các số\nnhỏ dẫn đến một cái gì đó thậm chí còn nhỏ hơn cho đến khi nó được làm\ntròn xuống 0. Chúng tôi đã thảo luận về điều này như một vấn đề lý\nthuyết trong Section 18.7 , nhưng chúng ta thấy rõ\ncác hiện tượng ở đây trong thực tế.\nNhư đã thảo luận trong phần đó, chúng tôi khắc phục điều này bằng cách\nsử dụng thực tế là \\(\\log a b = \\log a + \\log b\\) , tức là, chúng tôi\nchuyển sang tổng hợp logarit. Ngay cả khi cả \\(a\\) và \\(b\\) đều\nlà những con số nhỏ, các giá trị logarit phải nằm trong một phạm vi\nthích hợp.\nVì logarit là một hàm ngày càng tăng, chúng ta có thể viết lại (18.8.6) như\nChúng ta có thể thực hiện phiên bản ổn định sau:\nBây giờ chúng ta có thể kiểm tra xem dự đoán có đúng không.\nNếu bây giờ chúng ta dự đoán một vài ví dụ xác nhận, chúng ta có thể\nthấy bộ phân loại Bayes hoạt động khá tốt.\nCuối cùng, chúng ta hãy tính toán độ chính xác tổng thể của bộ phân\nloại.\nCác mạng sâu hiện đại đạt được tỷ lệ lỗi dưới \\(0.01\\) . Hiệu suất\ntương đối kém là do các giả định thống kê không chính xác mà chúng tôi\nđã thực hiện trong mô hình của mình: chúng tôi giả định rằng mỗi điểm\nảnh được tạo ra * độc lập*, chỉ tùy thuộc vào nhãn. Đây rõ ràng không\nphải là cách con người viết chữ số, và giả định sai lầm này dẫn đến sự\nsụp đổ của phân loại quá ngây thơ (Bayes) của chúng ta.\n18.8.5. Tóm tắt * Sử dụng quy tắc của Bayes’, một phân loại có thể được thực hiện bằng cách giả sử tất cả các tính năng quan sát là độc lập. * Phân loại này có thể được đào tạo trên một tập dữ liệu bằng cách đếm số lần xuất hiện của các kết hợp của nhãn và giá trị pixel * Phân loại này là tiêu chuẩn vàng trong nhiều thập kỷ cho các tác vụ như thư rác phát hiện.\n18.8.6. Bài tập 1. Xem xét tập dữ liệu \\([[0,0], [0,1], [1,0], [1,1]]\\) với các nhãn được đưa ra bởi XOR của hai phần tử \\([0,1,1,0]\\) . Xác suất cho một phân loại ngây thơ Bayes được xây dựng trên bộ dữ liệu này là gì. Nó có phân loại thành công điểm của chúng tôi không? Nếu không, những giả định nào bị vi phạm? 1. Giả sử rằng chúng tôi đã không sử dụng Laplace làm mịn khi ước tính xác suất và một ví dụ dữ liệu đến lúc thử nghiệm trong đó có một giá trị không bao giờ quan sát thấy trong đào tạo. Sản lượng mô hình sẽ là gì? 1. Phân loại Bayes ngây thơ là một ví dụ cụ thể của một mạng Bayesian, trong đó sự phụ thuộc của các biến ngẫu nhiên được mã hóa bằng cấu trúc đồ thị. Trong khi lý thuyết đầy đủ nằm ngoài phạm vi của phần này (xem [Koller & Friedman, 2009] để biết chi tiết đầy đủ), giải thích tại sao cho phép phụ thuộc rõ ràng giữa hai biến đầu vào trong mô hình XOR cho phép tạo ra một phân loại thành công.\nDiscussions\nDiscussions\nDiscussions"
+}

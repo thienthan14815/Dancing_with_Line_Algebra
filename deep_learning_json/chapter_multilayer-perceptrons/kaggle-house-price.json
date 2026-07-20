@@ -1,0 +1,745 @@
+{
+  "url": "https://vi.d2l.ai/chapter_multilayer-perceptrons/kaggle-house-price.html",
+  "chapter": "chapter_multilayer-perceptrons",
+  "title": "4.10. Dự đoán giá nhà trên Kaggle",
+  "crawled_at": "2026-07-20T12:39:33.716172+00:00",
+  "headings": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "du-doan-gia-nha-tren-kaggle",
+      "text": "4.10. Dự đoán giá nhà trên Kaggle"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tai-xuong-va-bo-du-lieu-bo-nho-dem",
+      "text": "4.10.1. Tải xuống và bộ dữ liệu bộ nhớ đệm"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "kaggle",
+      "text": "4.10.2. Kaggle"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "truy-cap-va-doc-tap-du-lieu",
+      "text": "4.10.3. Truy cập và đọc tập dữ liệu"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "xu-ly-so-bo-du-lieu",
+      "text": "4.10.4. Xử lý sơ bộ dữ liệu"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "dao-tao",
+      "text": "4.10.5. Đào tạo"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "k-xac-dinh-cheo-fold",
+      "text": "4.10.6. \\(K\\) -Xác định chéo Fold"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "model-selection",
+      "text": "4.10.7. Model Selection"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "nop-du-doan-tren-kaggle",
+      "text": "4.10.8. Nộp dự đoán trên Kaggle"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tom-tat",
+      "text": "4.10.9. Tóm tắt"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bai-tap",
+      "text": "4.10.10. Bài tập"
+    }
+  ],
+  "content": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "du-doan-gia-nha-tren-kaggle",
+      "text": "4.10. Dự đoán giá nhà trên Kaggle"
+    },
+    {
+      "type": "paragraph",
+      "text": "Bây giờ chúng tôi đã giới thiệu một số công cụ cơ bản để xây dựng và đào\ntạo các mạng lưới sâu và điều chỉnh chúng bằng các kỹ thuật bao gồm phân\nrã trọng lượng và bỏ học, chúng tôi sẵn sàng đưa tất cả kiến thức này\nvào thực tế bằng cách tham gia vào một cuộc thi Kaggle. Cuộc thi dự đoán\ngiá nhà là một nơi tuyệt vời để bắt đầu. Dữ liệu khá chung chung và\nkhông thể hiện cấu trúc kỳ lạ có thể yêu cầu các mô hình chuyên dụng\n(như âm thanh hoặc video có thể). Tập dữ liệu này, được thu thập bởi\nBart de Cock năm 2011 [DeCock, 2011] , bao gồm giá nhà ở Ames, IA\ntừ giai đoạn 2006—2010. Nó lớn hơn đáng kể so với Boston housing\ndataset nổi tiếng của Harrison và Rubinfeld (1978), tự hào với cả ví dụ hơn và\nnhiều tính năng hơn."
+    },
+    {
+      "type": "paragraph",
+      "text": "Trong phần này, chúng tôi sẽ hướng dẫn bạn thông qua các chi tiết về\ntiền xử lý dữ liệu, thiết kế mô hình và lựa chọn siêu tham số. Chúng tôi\nhy vọng rằng thông qua một cách tiếp cận thực hành, bạn sẽ có được một\nsố trực giác sẽ hướng dẫn bạn trong sự nghiệp của bạn với tư cách là một\nnhà khoa học dữ liệu."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tai-xuong-va-bo-du-lieu-bo-nho-dem",
+      "text": "4.10.1. Tải xuống và bộ dữ liệu bộ nhớ đệm"
+    },
+    {
+      "type": "paragraph",
+      "text": "Trong suốt cuốn sách, chúng tôi sẽ đào tạo và kiểm tra các mô hình trên\ncác bộ dữ liệu được tải xuống khác nhau. Ở đây, chúng tôi triển khai một\nsố chức năng tiện ích để tạo điều kiện tải dữ liệu. Đầu tiên, chúng ta\nduy trì một từ điển DATA_HUB ánh xạ một chuỗi ( tên của tập dữ\nliệu) thành một tuple chứa cả URL để định vị tập dữ liệu và khóa SHA-1\nxác minh tính toàn vẹn của tệp. Tất cả các bộ dữ liệu như vậy được lưu\ntrữ tại trang web có địa chỉ là DATA_URL ."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "import hashlib\nimport os\nimport tarfile\nimport zipfile\nimport requests\n\n#@save\nDATA_HUB = dict()\nDATA_URL = 'http://d2l-data.s3-accelerate.amazonaws.com/'"
+    },
+    {
+      "type": "paragraph",
+      "text": "Hàm download sau tải xuống một tập dữ liệu, lưu trữ nó trong một thư\nmục cục bộ ( ../data theo mặc định) và trả về tên của tệp đã tải\nxuống. Nếu một tệp tương ứng với tập dữ liệu này đã tồn tại trong thư\nmục bộ nhớ cache và SHA-1 của nó khớp với tệp được lưu trữ trong DATA_HUB , mã của chúng tôi sẽ sử dụng tệp được lưu trữ để tránh làm\ntắc nghẽn internet của bạn với tải xuống dự phòng."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def download(name, cache_dir=os.path.join('..', 'data')):  #@save\n    \"\"\"Download a file inserted into DATA_HUB, return the local filename.\"\"\"\n    assert name in DATA_HUB, f\"{name} does not exist in {DATA_HUB}.\"\n    url, sha1_hash = DATA_HUB[name]\n    os.makedirs(cache_dir, exist_ok=True)\n    fname = os.path.join(cache_dir, url.split('/')[-1])\n    if os.path.exists(fname):\n        sha1 = hashlib.sha1()\n        with open(fname, 'rb') as f:\n            while True:\n                data = f.read(1048576)\n                if not data:\n                    break\n                sha1.update(data)\n        if sha1.hexdigest() == sha1_hash:\n            return fname  # Hit cache\n    print(f'Downloading {fname} from {url}...')\n    r = requests.get(url, stream=True, verify=True)\n    with open(fname, 'wb') as f:\n        f.write(r.content)\n    return fname"
+    },
+    {
+      "type": "paragraph",
+      "text": "Chúng tôi cũng triển khai hai chức năng tiện ích bổ sung: một là tải\nxuống và trích xuất tệp zip hoặc tar và một để tải xuống tất cả các bộ\ndữ liệu được sử dụng trong cuốn sách này từ DATA_HUB vào thư mục bộ\nnhớ cache."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def download_extract(name, folder=None):  #@save\n    \"\"\"Download and extract a zip/tar file.\"\"\"\n    fname = download(name)\n    base_dir = os.path.dirname(fname)\n    data_dir, ext = os.path.splitext(fname)\n    if ext == '.zip':\n        fp = zipfile.ZipFile(fname, 'r')\n    elif ext in ('.tar', '.gz'):\n        fp = tarfile.open(fname, 'r')\n    else:\n        assert False, 'Only zip/tar files can be extracted.'\n    fp.extractall(base_dir)\n    return os.path.join(base_dir, folder) if folder else data_dir\n\ndef download_all():  #@save\n    \"\"\"Download all files in the DATA_HUB.\"\"\"\n    for name in DATA_HUB:\n        download(name)"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "kaggle",
+      "text": "4.10.2. Kaggle"
+    },
+    {
+      "type": "paragraph",
+      "text": "Kaggle là một nền tảng phổ biến tổ chức các\ncuộc thi machine learning. Mỗi cuộc thi tập trung vào một tập dữ liệu và\nnhiều người được tài trợ bởi các bên liên quan cung cấp giải thưởng cho\ncác giải pháp chiến thắng. Nền tảng này giúp người dùng tương tác qua\ncác diễn đàn và mã được chia sẻ, thúc đẩy cả hợp tác và cạnh tranh.\nTrong khi bảng xếp hạng theo đuổi thường xoắn ốc ngoài tầm kiểm soát,\nvới các nhà nghiên cứu tập trung vào các bước xử lý sơ bộ thay vì đặt\ncâu hỏi cơ bản, nhưng cũng có giá trị to lớn trong tính khách quan của\nmột nền tảng tạo điều kiện so sánh định lượng trực tiếp giữa các phương\npháp cạnh tranh cũng như mã chia sẻ để mọi người có thể tìm hiểu những\ngì đã làm và không làm việc. Nếu bạn muốn tham gia vào một cuộc thi\nKaggle, trước tiên bạn sẽ cần đăng ký tài khoản (xem Fig. 4.10.1 )."
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/kaggle.png",
+      "local_path": "_images/kaggle.png",
+      "alt": "../_images/kaggle.png"
+    },
+    {
+      "type": "paragraph",
+      "text": "Fig. 4.10.1 The Kaggle website. ¶"
+    },
+    {
+      "type": "paragraph",
+      "text": "Trên trang cạnh tranh dự đoán giá nhà, như minh họa trong Fig. 4.10.2 , bạn có thể tìm thấy bộ dữ liệu (trong tab\n“Dữ liệu”), gửi dự đoán và xem thứ hạng của bạn, URL ở ngay tại đây:"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/house-pricing.png",
+      "local_path": "_images/house-pricing.png",
+      "alt": "../_images/house-pricing.png"
+    },
+    {
+      "type": "paragraph",
+      "text": "Fig. 4.10.2 The house price prediction competition page. ¶"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "truy-cap-va-doc-tap-du-lieu",
+      "text": "4.10.3. Truy cập và đọc tập dữ liệu"
+    },
+    {
+      "type": "paragraph",
+      "text": "Lưu ý rằng dữ liệu cạnh tranh được tách thành các bộ đào tạo và kiểm\ntra. Mỗi hồ sơ bao gồm giá trị tài sản của ngôi nhà và các thuộc tính\nnhư loại đường phố, năm xây dựng, loại mái nhà, điều kiện tầng hầm, vv\nCác tính năng bao gồm các loại dữ liệu khác nhau. Ví dụ, năm xây dựng\nđược thể hiện bằng một số nguyên, kiểu mái bằng cách gán phân loại rời\nrạc và các tính năng khác bằng số điểm nổi. Và đây là nơi thực tế làm\nphức tạp mọi thứ: đối với một số ví dụ, một số dữ liệu hoàn toàn bị\nthiếu với giá trị còn thiếu được đánh dấu đơn giản là “na”. Giá của mỗi\nngôi nhà chỉ được bao gồm cho bộ đào tạo (nó là một cuộc thi sau khi tất\ncả). Chúng tôi sẽ muốn phân vùng bộ đào tạo để tạo một bộ xác thực,\nnhưng chúng tôi chỉ nhận được để đánh giá các mô hình của chúng tôi trên\nthử nghiệm chính thức thiết lập sau khi tải dự đoán lên Kaggle. Tab “Dữ\nliệu” trên tab cạnh tranh trong Fig. 4.10.2 có các\nliên kết để tải xuống dữ liệu."
+    },
+    {
+      "type": "paragraph",
+      "text": "Để bắt đầu, chúng tôi sẽ đọc và xử lý dữ liệu bằng pandas , mà chúng\ntôi đã giới thiệu trong Section 2.2 . Vì vậy, bạn sẽ muốn đảm\nbảo rằng bạn đã cài đặt pandas trước khi tiếp tục tiếp tục. May mắn\nthay, nếu bạn đang đọc trong Jupyter, chúng tôi có thể cài đặt gấu trúc\nmà không cần rời khỏi máy tính xách tay."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "# If pandas is not installed, please uncomment the following line:\n# !pip install pandas\n\n%matplotlib inline\nimport pandas as pd\nfrom mxnet import autograd, gluon, init, np, npx\nfrom mxnet.gluon import nn\nfrom d2l import mxnet as d2l\n\nnpx.set_np()"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "# If pandas is not installed, please uncomment the following line:\n# !pip install pandas\n\n%matplotlib inline\nimport numpy as np\nimport pandas as pd\nimport torch\nfrom torch import nn\nfrom d2l import torch as d2l"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "# If pandas is not installed, please uncomment the following line:\n# !pip install pandas\n\n%matplotlib inline\nimport numpy as np\nimport pandas as pd\nimport tensorflow as tf\nfrom d2l import tensorflow as d2l"
+    },
+    {
+      "type": "paragraph",
+      "text": "Để thuận tiện, chúng tôi có thể tải xuống và lưu trữ bộ dữ liệu nhà ở\nKaggle bằng cách sử dụng tập lệnh mà chúng tôi đã định nghĩa ở trên."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "DATA_HUB['kaggle_house_train'] = (  #@save\n    DATA_URL + 'kaggle_house_pred_train.csv',\n    '585e9cc93e70b39160e7921475f9bcd7d31219ce')\n\nDATA_HUB['kaggle_house_test'] = (  #@save\n    DATA_URL + 'kaggle_house_pred_test.csv',\n    'fa19780a7b011d9b009e8bff8e99922a8ee2eb90')"
+    },
+    {
+      "type": "paragraph",
+      "text": "Chúng tôi sử dụng pandas để tải hai tệp csv chứa dữ liệu đào tạo và\nkiểm tra tương ứng."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "train_data = pd.read_csv(download('kaggle_house_train'))\ntest_data = pd.read_csv(download('kaggle_house_test'))"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "Downloading ../data/kaggle_house_pred_train.csv from http://d2l-data.s3-accelerate.amazonaws.com/kaggle_house_pred_train.csv...\nDownloading ../data/kaggle_house_pred_test.csv from http://d2l-data.s3-accelerate.amazonaws.com/kaggle_house_pred_test.csv..."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "train_data = pd.read_csv(download('kaggle_house_train'))\ntest_data = pd.read_csv(download('kaggle_house_test'))"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "Downloading ../data/kaggle_house_pred_train.csv from http://d2l-data.s3-accelerate.amazonaws.com/kaggle_house_pred_train.csv...\nDownloading ../data/kaggle_house_pred_test.csv from http://d2l-data.s3-accelerate.amazonaws.com/kaggle_house_pred_test.csv..."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "train_data = pd.read_csv(download('kaggle_house_train'))\ntest_data = pd.read_csv(download('kaggle_house_test'))"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "Downloading ../data/kaggle_house_pred_train.csv from http://d2l-data.s3-accelerate.amazonaws.com/kaggle_house_pred_train.csv...\nDownloading ../data/kaggle_house_pred_test.csv from http://d2l-data.s3-accelerate.amazonaws.com/kaggle_house_pred_test.csv..."
+    },
+    {
+      "type": "paragraph",
+      "text": "Tập dữ liệu đào tạo bao gồm 1460 ví dụ, 80 tính năng và 1 nhãn, trong\nkhi dữ liệu thử nghiệm chứa 1459 ví dụ và 80 tính năng."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "print(train_data.shape)\nprint(test_data.shape)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "(1460, 81)\n(1459, 80)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "print(train_data.shape)\nprint(test_data.shape)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "(1460, 81)\n(1459, 80)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "print(train_data.shape)\nprint(test_data.shape)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "(1460, 81)\n(1459, 80)"
+    },
+    {
+      "type": "paragraph",
+      "text": "Hãy để chúng tôi hãy xem bốn tính năng đầu tiên và hai tính năng cuối\ncùng cũng như nhãn (SalePrice) từ bốn ví dụ đầu tiên."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "print(train_data.iloc[0:4, [0, 1, 2, 3, -3, -2, -1]])"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "   Id  MSSubClass MSZoning  LotFrontage SaleType SaleCondition  SalePrice\n0   1          60       RL         65.0       WD        Normal     208500\n1   2          20       RL         80.0       WD        Normal     181500\n2   3          60       RL         68.0       WD        Normal     223500\n3   4          70       RL         60.0       WD       Abnorml     140000"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "print(train_data.iloc[0:4, [0, 1, 2, 3, -3, -2, -1]])"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "   Id  MSSubClass MSZoning  LotFrontage SaleType SaleCondition  SalePrice\n0   1          60       RL         65.0       WD        Normal     208500\n1   2          20       RL         80.0       WD        Normal     181500\n2   3          60       RL         68.0       WD        Normal     223500\n3   4          70       RL         60.0       WD       Abnorml     140000"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "print(train_data.iloc[0:4, [0, 1, 2, 3, -3, -2, -1]])"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "   Id  MSSubClass MSZoning  LotFrontage SaleType SaleCondition  SalePrice\n0   1          60       RL         65.0       WD        Normal     208500\n1   2          20       RL         80.0       WD        Normal     181500\n2   3          60       RL         68.0       WD        Normal     223500\n3   4          70       RL         60.0       WD       Abnorml     140000"
+    },
+    {
+      "type": "paragraph",
+      "text": "Chúng ta có thể thấy rằng trong mỗi ví dụ, tính năng đầu tiên là ID.\nĐiều này giúp mô hình xác định từng ví dụ đào tạo. Mặc dù điều này thuận\ntiện, nó không mang bất kỳ thông tin nào cho mục đích dự đoán. Do đó,\nchúng tôi loại bỏ nó khỏi tập dữ liệu trước khi đưa dữ liệu vào mô hình."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "all_features = pd.concat((train_data.iloc[:, 1:-1], test_data.iloc[:, 1:]))"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "xu-ly-so-bo-du-lieu",
+      "text": "4.10.4. Xử lý sơ bộ dữ liệu"
+    },
+    {
+      "type": "paragraph",
+      "text": "Như đã nêu ở trên, chúng tôi có nhiều loại dữ liệu. Chúng ta sẽ cần xử\nlý trước dữ liệu trước khi chúng ta có thể bắt đầu mô hình hóa. Hãy để\nchúng tôi bắt đầu với các tính năng số. Đầu tiên, chúng ta áp dụng một\nheuristic, thay thế tất cả các giá trị còn thiếu theo ý nghĩa của tính\nnăng tương ứng. Sau đó, để đặt tất cả các tính năng trên thang điểm\nchung, chúng ta tiêu chuẩn dữ liệu bằng cách thay đổi tỷ lệ các tính\nnăng về 0 trung bình và phương sai đơn vị :"
+    },
+    {
+      "type": "math",
+      "latex": "(4.10.1)¶\\[x \\leftarrow \\frac{x - \\mu}{\\sigma},\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "trong đó \\(\\mu\\) và \\(\\sigma\\) biểu thị độ lệch trung bình và\nchuẩn, tương ứng. Để xác minh rằng điều này thực sự biến đổi tính năng\ncủa chúng tôi (biến) sao cho nó có không trung bình và phương sai đơn\nvị, lưu ý rằng \\(E[\\frac{x-\\mu}{\\sigma}] = \\frac{\\mu - \\mu}{\\sigma} = 0\\) và \\(E[(x-\\mu)^2] = (\\sigma^2 + \\mu^2) - 2\\mu^2+\\mu^2 = \\sigma^2\\) đó.\nTrực giác, chúng tôi chuẩn hóa dữ liệu vì hai lý do. Đầu tiên, nó chứng\nminh thuận tiện cho việc tối ưu hóa. Thứ hai, bởi vì chúng tôi không\nbiết a priori tính năng nào sẽ có liên quan, chúng tôi không muốn phạt\ncác hệ số được gán cho một tính năng nhiều hơn bất kỳ tính năng nào\nkhác."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "# If test data were inaccessible, mean and standard deviation could be\n# calculated from training data\nnumeric_features = all_features.dtypes[all_features.dtypes != 'object'].index\nall_features[numeric_features] = all_features[numeric_features].apply(\n    lambda x: (x - x.mean()) / (x.std()))\n# After standardizing the data all means vanish, hence we can set missing\n# values to 0\nall_features[numeric_features] = all_features[numeric_features].fillna(0)"
+    },
+    {
+      "type": "paragraph",
+      "text": "Tiếp theo chúng tôi đối phó với các giá trị rời rạc Điều này bao gồm các\ntính năng như “MSZoning”. Chúng tôi thay thế chúng bằng mã hóa một nóng\ngiống như cách mà trước đây chúng tôi đã chuyển đổi nhãn đa lớp thành\nvectơ (xem Section 3.4.1 ). Ví dụ, “MSZoning”\ngiả định các giá trị “RL” và “RM”. Thả tính năng “MSZoning”, hai tính\nnăng chỉ báo mới “MSZoning_RL” và “MSZoning_RM” được tạo ra với các\ngiá trị là 0 hoặc 1. Theo mã hóa một nóng, nếu giá trị ban đầu của\n“MSZoning” là “RL”, thì “MSZoning_RL” là 1 và “MSZoning_RM” là 0. Gói pandas thực hiện điều này tự động cho chúng tôi."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "# `Dummy_na=True` considers \"na\" (missing value) as a valid feature value, and\n# creates an indicator feature for it\nall_features = pd.get_dummies(all_features, dummy_na=True)\nall_features.shape"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "(2919, 331)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "# `Dummy_na=True` considers \"na\" (missing value) as a valid feature value, and\n# creates an indicator feature for it\nall_features = pd.get_dummies(all_features, dummy_na=True)\nall_features.shape"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "(2919, 331)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "# `Dummy_na=True` considers \"na\" (missing value) as a valid feature value, and\n# creates an indicator feature for it\nall_features = pd.get_dummies(all_features, dummy_na=True)\nall_features.shape"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "(2919, 331)"
+    },
+    {
+      "type": "paragraph",
+      "text": "Bạn có thể thấy rằng chuyển đổi này làm tăng số lượng tính năng từ 79\nlên 331. Cuối cùng, thông qua thuộc tính values , chúng ta có thể\ntrích xuất định dạng NumPy từ định dạng pandas và chuyển đổi nó\nthành biểu diễn tensor để đào tạo."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "n_train = train_data.shape[0]\ntrain_features = np.array(all_features[:n_train].values, dtype=np.float32)\ntest_features = np.array(all_features[n_train:].values, dtype=np.float32)\ntrain_labels = np.array(\n    train_data.SalePrice.values.reshape(-1, 1), dtype=np.float32)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "n_train = train_data.shape[0]\ntrain_features = torch.tensor(all_features[:n_train].values, dtype=torch.float32)\ntest_features = torch.tensor(all_features[n_train:].values, dtype=torch.float32)\ntrain_labels = torch.tensor(\n    train_data.SalePrice.values.reshape(-1, 1), dtype=torch.float32)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "n_train = train_data.shape[0]\ntrain_features = tf.constant(all_features[:n_train].values, dtype=tf.float32)\ntest_features = tf.constant(all_features[n_train:].values, dtype=tf.float32)\ntrain_labels = tf.constant(\n    train_data.SalePrice.values.reshape(-1, 1), dtype=tf.float32)"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "dao-tao",
+      "text": "4.10.5. Đào tạo"
+    },
+    {
+      "type": "paragraph",
+      "text": "Để bắt đầu, chúng tôi đào tạo một mô hình tuyến tính với tổn thất bình\nphương. Không có gì đáng ngạc nhiên, mô hình tuyến tính của chúng tôi sẽ\nkhông dẫn đến một bài nộp chiến thắng trong cuộc thi nhưng nó cung cấp\nkiểm tra sự tỉnh táo để xem liệu có thông tin có ý nghĩa trong dữ liệu\nhay không. Nếu chúng ta không thể làm tốt hơn so với đoán ngẫu nhiên ở\nđây, thì có thể có một cơ hội tốt mà chúng ta có một lỗi xử lý dữ liệu.\nVà nếu mọi thứ hoạt động, mô hình tuyến tính sẽ đóng vai trò là một\nđường cơ sở cho chúng ta một số trực giác về việc mô hình đơn giản gần\nvới các mô hình được báo cáo tốt nhất như thế nào, cho chúng ta cảm giác\nrằng chúng ta nên mong đợi bao nhiêu từ các mô hình fancier."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "loss = gluon.loss.L2Loss()\n\ndef get_net():\n    net = nn.Sequential()\n    net.add(nn.Dense(1))\n    net.initialize()\n    return net"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "loss = nn.MSELoss()\nin_features = train_features.shape[1]\n\ndef get_net():\n    net = nn.Sequential(nn.Linear(in_features,1))\n    return net"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "loss = tf.keras.losses.MeanSquaredError()\n\ndef get_net():\n    net = tf.keras.models.Sequential()\n    net.add(tf.keras.layers.Dense(\n        1, kernel_regularizer=tf.keras.regularizers.l2(weight_decay)))\n    return net"
+    },
+    {
+      "type": "paragraph",
+      "text": "Với giá nhà, như với giá cổ phiếu, chúng tôi quan tâm đến số lượng tương\nđối nhiều hơn số lượng tuyệt đối. Do đó chúng tôi có xu hướng quan tâm\nnhiều hơn về lỗi tương đối \\(\\frac{y - \\hat{y}}{y}\\) so với lỗi\ntuyệt đối \\(y - \\hat{y}\\) . Ví dụ, nếu dự đoán của chúng tôi giảm\n100.000 USD khi ước tính giá của một ngôi nhà ở nông thôn Ohio, nơi giá\ntrị của một ngôi nhà điển hình là 125.000 USD, thì có lẽ chúng ta đang\nlàm một công việc khủng khiếp. Mặt khác, nếu chúng ta sai lệch bởi số\ntiền này ở Los Altos Hills, California, điều này có thể đại diện cho một\ndự đoán chính xác đáng kinh ngạc (ở đó, giá nhà trung bình vượt quá 4\ntriệu USD)."
+    },
+    {
+      "type": "paragraph",
+      "text": "Một cách để giải quyết vấn đề này là đo lường sự khác biệt trong logarit\ncủa ước tính giá. Trên thực tế, đây cũng là biện pháp lỗi chính thức\nđược sử dụng bởi đối thủ để đánh giá chất lượng đệ trình. Rốt cuộc, một\ngiá trị nhỏ \\(\\delta\\) cho \\(|\\log y - \\log \\hat{y}| \\leq \\delta\\) dịch thành \\(e^{-\\delta} \\leq \\frac{\\hat{y}}{y} \\leq e^\\delta\\) . Điều này dẫn\nđến lỗi gốc có nghĩa là bình phương sau đây giữa logarit của giá dự đoán\nvà logarit của giá nhãn:"
+    },
+    {
+      "type": "math",
+      "latex": "(4.10.2)¶\\[\\sqrt{\\frac{1}{n}\\sum_{i=1}^n\\left(\\log y_i -\\log \\hat{y}_i\\right)^2}.\\]"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def log_rmse(net, features, labels):\n    # To further stabilize the value when the logarithm is taken, set the\n    # value less than 1 as 1\n    clipped_preds = np.clip(net(features), 1, float('inf'))\n    return np.sqrt(2 * loss(np.log(clipped_preds), np.log(labels)).mean())"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def log_rmse(net, features, labels):\n    # To further stabilize the value when the logarithm is taken, set the\n    # value less than 1 as 1\n    clipped_preds = torch.clamp(net(features), 1, float('inf'))\n    rmse = torch.sqrt(loss(torch.log(clipped_preds),\n                           torch.log(labels)))\n    return rmse.item()"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def log_rmse(y_true, y_pred):\n    # To further stabilize the value when the logarithm is taken, set the\n    # value less than 1 as 1\n    clipped_preds = tf.clip_by_value(y_pred, 1, float('inf'))\n    return tf.sqrt(tf.reduce_mean(loss(\n        tf.math.log(y_true), tf.math.log(clipped_preds))))"
+    },
+    {
+      "type": "paragraph",
+      "text": "Không giống như trong các phần trước, chức năng đào tạo của chúng tôi sẽ\ndựa vào trình tối ưu hóa Adam (chúng tôi sẽ mô tả chi tiết hơn sau) . Sự\nhấp dẫn chính của trình tối ưu hóa này là, mặc dù không làm tốt hơn (và\nđôi khi tệ hơn) được cung cấp tài nguyên không giới hạn để tối ưu hóa\nsiêu tham số, mọi người có xu hướng thấy rằng nó ít nhạy cảm hơn đáng kể\nvới tốc độ học tập ban đầu."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def train(net, train_features, train_labels, test_features, test_labels,\n          num_epochs, learning_rate, weight_decay, batch_size):\n    train_ls, test_ls = [], []\n    train_iter = d2l.load_array((train_features, train_labels), batch_size)\n    # The Adam optimization algorithm is used here\n    trainer = gluon.Trainer(net.collect_params(), 'adam', {\n        'learning_rate': learning_rate, 'wd': weight_decay})\n    for epoch in range(num_epochs):\n        for X, y in train_iter:\n            with autograd.record():\n                l = loss(net(X), y)\n            l.backward()\n            trainer.step(batch_size)\n        train_ls.append(log_rmse(net, train_features, train_labels))\n        if test_labels is not None:\n            test_ls.append(log_rmse(net, test_features, test_labels))\n    return train_ls, test_ls"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def train(net, train_features, train_labels, test_features, test_labels,\n          num_epochs, learning_rate, weight_decay, batch_size):\n    train_ls, test_ls = [], []\n    train_iter = d2l.load_array((train_features, train_labels), batch_size)\n    # The Adam optimization algorithm is used here\n    optimizer = torch.optim.Adam(net.parameters(),\n                                 lr = learning_rate,\n                                 weight_decay = weight_decay)\n    for epoch in range(num_epochs):\n        for X, y in train_iter:\n            optimizer.zero_grad()\n            l = loss(net(X), y)\n            l.backward()\n            optimizer.step()\n        train_ls.append(log_rmse(net, train_features, train_labels))\n        if test_labels is not None:\n            test_ls.append(log_rmse(net, test_features, test_labels))\n    return train_ls, test_ls"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def train(net, train_features, train_labels, test_features, test_labels,\n          num_epochs, learning_rate, weight_decay, batch_size):\n    train_ls, test_ls = [], []\n    train_iter = d2l.load_array((train_features, train_labels), batch_size)\n    # The Adam optimization algorithm is used here\n    optimizer = tf.keras.optimizers.Adam(learning_rate)\n    net.compile(loss=loss, optimizer=optimizer)\n    for epoch in range(num_epochs):\n        for X, y in train_iter:\n            with tf.GradientTape() as tape:\n                y_hat = net(X)\n                l = loss(y, y_hat)\n            params = net.trainable_variables\n            grads = tape.gradient(l, params)\n            optimizer.apply_gradients(zip(grads, params))\n        train_ls.append(log_rmse(train_labels, net(train_features)))\n        if test_labels is not None:\n            test_ls.append(log_rmse(test_labels, net(test_features)))\n    return train_ls, test_ls"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "k-xac-dinh-cheo-fold",
+      "text": "4.10.6. \\(K\\) -Xác định chéo Fold"
+    },
+    {
+      "type": "paragraph",
+      "text": "Bạn có thể nhớ lại rằng chúng tôi đã giới thiệu \\(K\\) lần xác thực\nchéo trong phần mà chúng tôi đã thảo luận về cách đối phó với lựa chọn\nmô hình ( Section 4.4 ). Chúng tôi sẽ sử dụng điều này\nđể sử dụng tốt để chọn thiết kế mô hình và điều chỉnh các siêu tham số.\nTrước tiên chúng ta cần một hàm trả về gấp \\(i^\\mathrm{th}\\) của dữ\nliệu trong quy trình xác thực chéo \\(K\\) lần. Nó tiến hành bằng cách\ncắt phân đoạn \\(i^\\mathrm{th}\\) dưới dạng dữ liệu xác thực và trả\nlại phần còn lại dưới dạng dữ liệu đào tạo. Lưu ý rằng đây không phải là\ncách xử lý dữ liệu hiệu quả nhất và chúng tôi chắc chắn sẽ làm điều gì\nđó thông minh hơn nhiều nếu tập dữ liệu của chúng tôi lớn hơn đáng kể.\nNhưng sự phức tạp bổ sung này có thể làm xáo trộn mã của chúng tôi một\ncách không cần thiết để chúng tôi có thể bỏ qua nó một cách an toàn ở\nđây do sự đơn giản của vấn đề của chúng tôi."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def get_k_fold_data(k, i, X, y):\n    assert k > 1\n    fold_size = X.shape[0] // k\n    X_train, y_train = None, None\n    for j in range(k):\n        idx = slice(j * fold_size, (j + 1) * fold_size)\n        X_part, y_part = X[idx, :], y[idx]\n        if j == i:\n            X_valid, y_valid = X_part, y_part\n        elif X_train is None:\n            X_train, y_train = X_part, y_part\n        else:\n            X_train = np.concatenate([X_train, X_part], 0)\n            y_train = np.concatenate([y_train, y_part], 0)\n    return X_train, y_train, X_valid, y_valid"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def get_k_fold_data(k, i, X, y):\n    assert k > 1\n    fold_size = X.shape[0] // k\n    X_train, y_train = None, None\n    for j in range(k):\n        idx = slice(j * fold_size, (j + 1) * fold_size)\n        X_part, y_part = X[idx, :], y[idx]\n        if j == i:\n            X_valid, y_valid = X_part, y_part\n        elif X_train is None:\n            X_train, y_train = X_part, y_part\n        else:\n            X_train = torch.cat([X_train, X_part], 0)\n            y_train = torch.cat([y_train, y_part], 0)\n    return X_train, y_train, X_valid, y_valid"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def get_k_fold_data(k, i, X, y):\n    assert k > 1\n    fold_size = X.shape[0] // k\n    X_train, y_train = None, None\n    for j in range(k):\n        idx = slice(j * fold_size, (j + 1) * fold_size)\n        X_part, y_part = X[idx, :], y[idx]\n        if j == i:\n            X_valid, y_valid = X_part, y_part\n        elif X_train is None:\n            X_train, y_train = X_part, y_part\n        else:\n            X_train = tf.concat([X_train, X_part], 0)\n            y_train = tf.concat([y_train, y_part], 0)\n    return X_train, y_train, X_valid, y_valid"
+    },
+    {
+      "type": "paragraph",
+      "text": "Trung bình lỗi đào tạo và xác minh được trả lại khi chúng tôi đào tạo \\(K\\) lần trong xác nhận chéo \\(K\\) lần."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def k_fold(k, X_train, y_train, num_epochs, learning_rate, weight_decay,\n           batch_size):\n    train_l_sum, valid_l_sum = 0, 0\n    for i in range(k):\n        data = get_k_fold_data(k, i, X_train, y_train)\n        net = get_net()\n        train_ls, valid_ls = train(net, *data, num_epochs, learning_rate,\n                                   weight_decay, batch_size)\n        train_l_sum += train_ls[-1]\n        valid_l_sum += valid_ls[-1]\n        if i == 0:\n            d2l.plot(list(range(1, num_epochs + 1)), [train_ls, valid_ls],\n                     xlabel='epoch', ylabel='rmse', xlim=[1, num_epochs],\n                     legend=['train', 'valid'], yscale='log')\n        print(f'fold {i + 1}, train log rmse {float(train_ls[-1]):f}, '\n              f'valid log rmse {float(valid_ls[-1]):f}')\n    return train_l_sum / k, valid_l_sum / k"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "model-selection",
+      "text": "4.10.7. Model Selection"
+    },
+    {
+      "type": "paragraph",
+      "text": "Trong ví dụ này, chúng tôi chọn một bộ siêu tham số không điều chỉnh và\nđể nó lên cho người đọc để cải thiện mô hình. Tìm một lựa chọn tốt có\nthể mất thời gian, tùy thuộc vào số lượng biến một tối ưu hóa hơn. Với\nmột tập dữ liệu đủ lớn và các loại siêu tham số bình thường, xác nhận\nchéo \\(K\\) có xu hướng có khả năng phục hồi hợp lý chống lại nhiều\nthử nghiệm. Tuy nhiên, nếu chúng tôi thử một số lượng lớn các tùy chọn\nbất hợp lý, chúng tôi có thể gặp may mắn và thấy rằng hiệu suất xác thực\ncủa chúng tôi không còn đại diện cho lỗi thực sự."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "k, num_epochs, lr, weight_decay, batch_size = 5, 100, 5, 0, 64\ntrain_l, valid_l = k_fold(k, train_features, train_labels, num_epochs, lr,\n                          weight_decay, batch_size)\nprint(f'{k}-fold validation: avg train log rmse: {float(train_l):f}, '\n      f'avg valid log rmse: {float(valid_l):f}')"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "[10:41:24] src/base.cc:49: GPU context requested, but no GPUs found.\nfold 1, train log rmse 0.169887, valid log rmse 0.156875\nfold 2, train log rmse 0.162074, valid log rmse 0.189478\nfold 3, train log rmse 0.163702, valid log rmse 0.167943\nfold 4, train log rmse 0.167650, valid log rmse 0.154271\nfold 5, train log rmse 0.162908, valid log rmse 0.182845\n5-fold validation: avg train log rmse: 0.165244, avg valid log rmse: 0.170282"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_kaggle-house-price_1852a7_137_1.svg",
+      "local_path": "_images/output_kaggle-house-price_1852a7_137_1.svg",
+      "alt": "../_images/output_kaggle-house-price_1852a7_137_1.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "k, num_epochs, lr, weight_decay, batch_size = 5, 100, 5, 0, 64\ntrain_l, valid_l = k_fold(k, train_features, train_labels, num_epochs, lr,\n                          weight_decay, batch_size)\nprint(f'{k}-fold validation: avg train log rmse: {float(train_l):f}, '\n      f'avg valid log rmse: {float(valid_l):f}')"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "fold 1, train log rmse 0.169845, valid log rmse 0.156327\nfold 2, train log rmse 0.162059, valid log rmse 0.189429\nfold 3, train log rmse 0.164017, valid log rmse 0.168371\nfold 4, train log rmse 0.168083, valid log rmse 0.154609\nfold 5, train log rmse 0.163392, valid log rmse 0.182799\n5-fold validation: avg train log rmse: 0.165479, avg valid log rmse: 0.170307"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_kaggle-house-price_1852a7_140_1.svg",
+      "local_path": "_images/output_kaggle-house-price_1852a7_140_1.svg",
+      "alt": "../_images/output_kaggle-house-price_1852a7_140_1.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "k, num_epochs, lr, weight_decay, batch_size = 5, 100, 5, 0, 64\ntrain_l, valid_l = k_fold(k, train_features, train_labels, num_epochs, lr,\n                          weight_decay, batch_size)\nprint(f'{k}-fold validation: avg train log rmse: {float(train_l):f}, '\n      f'avg valid log rmse: {float(valid_l):f}')"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "fold 1, train log rmse 0.170052, valid log rmse 0.156420\nfold 2, train log rmse 0.162447, valid log rmse 0.190726\nfold 3, train log rmse 0.164027, valid log rmse 0.168237\nfold 4, train log rmse 0.168684, valid log rmse 0.154824\nfold 5, train log rmse 0.162342, valid log rmse 0.182574\n5-fold validation: avg train log rmse: 0.165510, avg valid log rmse: 0.170556"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_kaggle-house-price_1852a7_143_1.svg",
+      "local_path": "_images/output_kaggle-house-price_1852a7_143_1.svg",
+      "alt": "../_images/output_kaggle-house-price_1852a7_143_1.svg"
+    },
+    {
+      "type": "paragraph",
+      "text": "Lưu ý rằng đôi khi số lượng lỗi đào tạo cho một tập hợp các siêu tham số\ncó thể rất thấp, ngay cả khi số lỗi trên \\(K\\) lần xác nhận chéo cao\nhơn đáng kể. Điều này chỉ ra rằng chúng tôi đang overfitting. Trong suốt\nquá trình đào tạo, bạn sẽ muốn theo dõi cả hai số. Ít quá mức có thể chỉ\nra rằng dữ liệu của chúng tôi có thể hỗ trợ một mô hình mạnh mẽ hơn. Đồ\nsộ có thể gợi ý rằng chúng ta có thể đạt được bằng cách kết hợp các kỹ\nthuật chính quy hóa."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "nop-du-doan-tren-kaggle",
+      "text": "4.10.8. Nộp dự đoán trên Kaggle"
+    },
+    {
+      "type": "paragraph",
+      "text": "Bây giờ chúng ta biết một lựa chọn tốt của các siêu tham số nên là gì,\nchúng ta cũng có thể sử dụng tất cả dữ liệu để đào tạo trên nó (thay vì\nchỉ \\(1-1/K\\) dữ liệu được sử dụng trong các lát xác nhận chéo). Mô\nhình mà chúng ta có được theo cách này sau đó có thể được áp dụng cho bộ\nthử nghiệm. Lưu dự đoán trong tệp csv sẽ đơn giản hóa việc tải kết quả\nlên Kaggle."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def train_and_pred(train_features, test_features, train_labels, test_data,\n                   num_epochs, lr, weight_decay, batch_size):\n    net = get_net()\n    train_ls, _ = train(net, train_features, train_labels, None, None,\n                        num_epochs, lr, weight_decay, batch_size)\n    d2l.plot(np.arange(1, num_epochs + 1), [train_ls], xlabel='epoch',\n             ylabel='log rmse', xlim=[1, num_epochs], yscale='log')\n    print(f'train log rmse {float(train_ls[-1]):f}')\n    # Apply the network to the test set\n    preds = net(test_features).asnumpy()\n    # Reformat it to export to Kaggle\n    test_data['SalePrice'] = pd.Series(preds.reshape(1, -1)[0])\n    submission = pd.concat([test_data['Id'], test_data['SalePrice']], axis=1)\n    submission.to_csv('submission.csv', index=False)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def train_and_pred(train_features, test_features, train_labels, test_data,\n                   num_epochs, lr, weight_decay, batch_size):\n    net = get_net()\n    train_ls, _ = train(net, train_features, train_labels, None, None,\n                        num_epochs, lr, weight_decay, batch_size)\n    d2l.plot(np.arange(1, num_epochs + 1), [train_ls], xlabel='epoch',\n             ylabel='log rmse', xlim=[1, num_epochs], yscale='log')\n    print(f'train log rmse {float(train_ls[-1]):f}')\n    # Apply the network to the test set\n    preds = net(test_features).detach().numpy()\n    # Reformat it to export to Kaggle\n    test_data['SalePrice'] = pd.Series(preds.reshape(1, -1)[0])\n    submission = pd.concat([test_data['Id'], test_data['SalePrice']], axis=1)\n    submission.to_csv('submission.csv', index=False)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def train_and_pred(train_features, test_features, train_labels, test_data,\n                   num_epochs, lr, weight_decay, batch_size):\n    net = get_net()\n    train_ls, _ = train(net, train_features, train_labels, None, None,\n                        num_epochs, lr, weight_decay, batch_size)\n    d2l.plot(np.arange(1, num_epochs + 1), [train_ls], xlabel='epoch',\n             ylabel='log rmse', xlim=[1, num_epochs], yscale='log')\n    print(f'train log rmse {float(train_ls[-1]):f}')\n    # Apply the network to the test set\n    preds = net(test_features).numpy()\n    # Reformat it to export to Kaggle\n    test_data['SalePrice'] = pd.Series(preds.reshape(1, -1)[0])\n    submission = pd.concat([test_data['Id'], test_data['SalePrice']], axis=1)\n    submission.to_csv('submission.csv', index=False)"
+    },
+    {
+      "type": "paragraph",
+      "text": "Một kiểm tra sự tỉnh táo tốt đẹp là xem liệu các dự đoán trên bộ thử\nnghiệm có giống với quy trình xác thực chéo \\(K\\) lần hay không. Nếu\nhọ làm vậy, đã đến lúc tải chúng lên Kaggle. Đoạn mã sau sẽ tạo ra một\ntập tin gọi là submission.csv ."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "train_and_pred(train_features, test_features, train_labels, test_data,\n               num_epochs, lr, weight_decay, batch_size)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "train log rmse 0.162696"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_kaggle-house-price_1852a7_161_1.svg",
+      "local_path": "_images/output_kaggle-house-price_1852a7_161_1.svg",
+      "alt": "../_images/output_kaggle-house-price_1852a7_161_1.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "train_and_pred(train_features, test_features, train_labels, test_data,\n               num_epochs, lr, weight_decay, batch_size)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "train log rmse 0.162519"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_kaggle-house-price_1852a7_164_1.svg",
+      "local_path": "_images/output_kaggle-house-price_1852a7_164_1.svg",
+      "alt": "../_images/output_kaggle-house-price_1852a7_164_1.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "train_and_pred(train_features, test_features, train_labels, test_data,\n               num_epochs, lr, weight_decay, batch_size)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "train log rmse 0.162325"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_kaggle-house-price_1852a7_167_1.svg",
+      "local_path": "_images/output_kaggle-house-price_1852a7_167_1.svg",
+      "alt": "../_images/output_kaggle-house-price_1852a7_167_1.svg"
+    },
+    {
+      "type": "paragraph",
+      "text": "Tiếp theo, như đã được chứng minh trong Fig. 4.10.3 ,\nchúng tôi có thể gửi dự đoán của mình về Kaggle và xem cách chúng so\nsánh với giá nhà thực tế (nhãn) trên bộ thử nghiệm. Các bước khá đơn\ngiản:"
+    },
+    {
+      "type": "list",
+      "ordered": false,
+      "items": [
+        "Đăng nhập vào trang web Kaggle và truy cập trang cạnh tranh dự đoán\ngiá nhà.",
+        "Nhấp vào nút “Gửi dự đoán” hoặc “Nộp muộn” (như văn bản này, nút nằm\nở bên phải).",
+        "Nhấp vào nút “Tải lên tệp gửi” trong hộp đứt nét ở cuối trang và chọn\ntệp dự đoán bạn muốn tải lên.",
+        "Nhấp vào nút “Make Submission” ở cuối trang để xem kết quả của bạn."
+      ]
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/kaggle-submit2.png",
+      "local_path": "_images/kaggle-submit2.png",
+      "alt": "../_images/kaggle-submit2.png"
+    },
+    {
+      "type": "paragraph",
+      "text": "Fig. 4.10.3 Submitting data to Kaggle ¶"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tom-tat",
+      "text": "4.10.9. Tóm tắt"
+    },
+    {
+      "type": "list",
+      "ordered": false,
+      "items": [
+        "Dữ liệu thực thường chứa hỗn hợp các loại dữ liệu khác nhau và cần\nđược xử lý trước.",
+        "Rescaling dữ liệu có giá trị thực thành 0 trung bình và phương sai\nđơn vị là một mặc định tốt. Vì vậy, đang thay thế các giá trị bị\nthiếu với trung bình của chúng.",
+        "Chuyển đổi các tính năng phân loại thành các tính năng chỉ báo cho\nphép chúng ta đối xử với chúng như các vectơ một nóng.",
+        "Chúng ta có thể sử dụng xác nhận chéo \\(K\\) lần để chọn mô hình\nvà điều chỉnh các siêu tham số.",
+        "Logarit rất hữu ích cho các lỗi tương đối."
+      ]
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bai-tap",
+      "text": "4.10.10. Bài tập"
+    },
+    {
+      "type": "list",
+      "ordered": true,
+      "items": [
+        "Gửi dự đoán của bạn cho phần này cho Kaggle. Dự đoán của bạn tốt như\nthế nào?",
+        "Bạn có thể cải thiện mô hình của mình bằng cách giảm thiểu lôgarit\ngiá trực tiếp không? Điều gì sẽ xảy ra nếu bạn cố gắng dự đoán\nlogarit của giá chứ không phải là giá?",
+        "Có phải luôn luôn là một ý tưởng tốt để thay thế các giá trị bị thiếu\nbằng ý nghĩa của họ? Gợi ý: bạn có thể xây dựng một tình huống mà các\ngiá trị không bị thiếu ngẫu nhiên?",
+        "Cải thiện điểm số trên Kaggle bằng cách điều chỉnh các siêu tham số\nthông qua xác nhận chéo \\(K\\) lần.",
+        "Cải thiện điểm số bằng cách cải thiện mô hình (ví dụ: lớp, phân rã\ntrọng lượng và bỏ học).",
+        "Điều gì sẽ xảy ra nếu chúng ta không chuẩn hóa các tính năng số liên\ntục như những gì chúng ta đã làm trong phần này?"
+      ]
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    }
+  ],
+  "images": [
+    {
+      "original_url": "https://vi.d2l.ai/_images/kaggle.png",
+      "local_path": "_images/kaggle.png",
+      "alt": "../_images/kaggle.png"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/house-pricing.png",
+      "local_path": "_images/house-pricing.png",
+      "alt": "../_images/house-pricing.png"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_kaggle-house-price_1852a7_137_1.svg",
+      "local_path": "_images/output_kaggle-house-price_1852a7_137_1.svg",
+      "alt": "../_images/output_kaggle-house-price_1852a7_137_1.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_kaggle-house-price_1852a7_140_1.svg",
+      "local_path": "_images/output_kaggle-house-price_1852a7_140_1.svg",
+      "alt": "../_images/output_kaggle-house-price_1852a7_140_1.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_kaggle-house-price_1852a7_143_1.svg",
+      "local_path": "_images/output_kaggle-house-price_1852a7_143_1.svg",
+      "alt": "../_images/output_kaggle-house-price_1852a7_143_1.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_kaggle-house-price_1852a7_161_1.svg",
+      "local_path": "_images/output_kaggle-house-price_1852a7_161_1.svg",
+      "alt": "../_images/output_kaggle-house-price_1852a7_161_1.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_kaggle-house-price_1852a7_164_1.svg",
+      "local_path": "_images/output_kaggle-house-price_1852a7_164_1.svg",
+      "alt": "../_images/output_kaggle-house-price_1852a7_164_1.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_kaggle-house-price_1852a7_167_1.svg",
+      "local_path": "_images/output_kaggle-house-price_1852a7_167_1.svg",
+      "alt": "../_images/output_kaggle-house-price_1852a7_167_1.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/kaggle-submit2.png",
+      "local_path": "_images/kaggle-submit2.png",
+      "alt": "../_images/kaggle-submit2.png"
+    }
+  ],
+  "text": "4.10. Dự đoán giá nhà trên Kaggle\nBây giờ chúng tôi đã giới thiệu một số công cụ cơ bản để xây dựng và đào\ntạo các mạng lưới sâu và điều chỉnh chúng bằng các kỹ thuật bao gồm phân\nrã trọng lượng và bỏ học, chúng tôi sẵn sàng đưa tất cả kiến thức này\nvào thực tế bằng cách tham gia vào một cuộc thi Kaggle. Cuộc thi dự đoán\ngiá nhà là một nơi tuyệt vời để bắt đầu. Dữ liệu khá chung chung và\nkhông thể hiện cấu trúc kỳ lạ có thể yêu cầu các mô hình chuyên dụng\n(như âm thanh hoặc video có thể). Tập dữ liệu này, được thu thập bởi\nBart de Cock năm 2011 [DeCock, 2011] , bao gồm giá nhà ở Ames, IA\ntừ giai đoạn 2006—2010. Nó lớn hơn đáng kể so với Boston housing\ndataset nổi tiếng của Harrison và Rubinfeld (1978), tự hào với cả ví dụ hơn và\nnhiều tính năng hơn.\nTrong phần này, chúng tôi sẽ hướng dẫn bạn thông qua các chi tiết về\ntiền xử lý dữ liệu, thiết kế mô hình và lựa chọn siêu tham số. Chúng tôi\nhy vọng rằng thông qua một cách tiếp cận thực hành, bạn sẽ có được một\nsố trực giác sẽ hướng dẫn bạn trong sự nghiệp của bạn với tư cách là một\nnhà khoa học dữ liệu.\n4.10.1. Tải xuống và bộ dữ liệu bộ nhớ đệm\nTrong suốt cuốn sách, chúng tôi sẽ đào tạo và kiểm tra các mô hình trên\ncác bộ dữ liệu được tải xuống khác nhau. Ở đây, chúng tôi triển khai một\nsố chức năng tiện ích để tạo điều kiện tải dữ liệu. Đầu tiên, chúng ta\nduy trì một từ điển DATA_HUB ánh xạ một chuỗi ( tên của tập dữ\nliệu) thành một tuple chứa cả URL để định vị tập dữ liệu và khóa SHA-1\nxác minh tính toàn vẹn của tệp. Tất cả các bộ dữ liệu như vậy được lưu\ntrữ tại trang web có địa chỉ là DATA_URL .\nHàm download sau tải xuống một tập dữ liệu, lưu trữ nó trong một thư\nmục cục bộ ( ../data theo mặc định) và trả về tên của tệp đã tải\nxuống. Nếu một tệp tương ứng với tập dữ liệu này đã tồn tại trong thư\nmục bộ nhớ cache và SHA-1 của nó khớp với tệp được lưu trữ trong DATA_HUB , mã của chúng tôi sẽ sử dụng tệp được lưu trữ để tránh làm\ntắc nghẽn internet của bạn với tải xuống dự phòng.\nChúng tôi cũng triển khai hai chức năng tiện ích bổ sung: một là tải\nxuống và trích xuất tệp zip hoặc tar và một để tải xuống tất cả các bộ\ndữ liệu được sử dụng trong cuốn sách này từ DATA_HUB vào thư mục bộ\nnhớ cache.\n4.10.2. Kaggle\nKaggle là một nền tảng phổ biến tổ chức các\ncuộc thi machine learning. Mỗi cuộc thi tập trung vào một tập dữ liệu và\nnhiều người được tài trợ bởi các bên liên quan cung cấp giải thưởng cho\ncác giải pháp chiến thắng. Nền tảng này giúp người dùng tương tác qua\ncác diễn đàn và mã được chia sẻ, thúc đẩy cả hợp tác và cạnh tranh.\nTrong khi bảng xếp hạng theo đuổi thường xoắn ốc ngoài tầm kiểm soát,\nvới các nhà nghiên cứu tập trung vào các bước xử lý sơ bộ thay vì đặt\ncâu hỏi cơ bản, nhưng cũng có giá trị to lớn trong tính khách quan của\nmột nền tảng tạo điều kiện so sánh định lượng trực tiếp giữa các phương\npháp cạnh tranh cũng như mã chia sẻ để mọi người có thể tìm hiểu những\ngì đã làm và không làm việc. Nếu bạn muốn tham gia vào một cuộc thi\nKaggle, trước tiên bạn sẽ cần đăng ký tài khoản (xem Fig. 4.10.1 ).\nFig. 4.10.1 The Kaggle website. ¶\nTrên trang cạnh tranh dự đoán giá nhà, như minh họa trong Fig. 4.10.2 , bạn có thể tìm thấy bộ dữ liệu (trong tab\n“Dữ liệu”), gửi dự đoán và xem thứ hạng của bạn, URL ở ngay tại đây:\nFig. 4.10.2 The house price prediction competition page. ¶\n4.10.3. Truy cập và đọc tập dữ liệu\nLưu ý rằng dữ liệu cạnh tranh được tách thành các bộ đào tạo và kiểm\ntra. Mỗi hồ sơ bao gồm giá trị tài sản của ngôi nhà và các thuộc tính\nnhư loại đường phố, năm xây dựng, loại mái nhà, điều kiện tầng hầm, vv\nCác tính năng bao gồm các loại dữ liệu khác nhau. Ví dụ, năm xây dựng\nđược thể hiện bằng một số nguyên, kiểu mái bằng cách gán phân loại rời\nrạc và các tính năng khác bằng số điểm nổi. Và đây là nơi thực tế làm\nphức tạp mọi thứ: đối với một số ví dụ, một số dữ liệu hoàn toàn bị\nthiếu với giá trị còn thiếu được đánh dấu đơn giản là “na”. Giá của mỗi\nngôi nhà chỉ được bao gồm cho bộ đào tạo (nó là một cuộc thi sau khi tất\ncả). Chúng tôi sẽ muốn phân vùng bộ đào tạo để tạo một bộ xác thực,\nnhưng chúng tôi chỉ nhận được để đánh giá các mô hình của chúng tôi trên\nthử nghiệm chính thức thiết lập sau khi tải dự đoán lên Kaggle. Tab “Dữ\nliệu” trên tab cạnh tranh trong Fig. 4.10.2 có các\nliên kết để tải xuống dữ liệu.\nĐể bắt đầu, chúng tôi sẽ đọc và xử lý dữ liệu bằng pandas , mà chúng\ntôi đã giới thiệu trong Section 2.2 . Vì vậy, bạn sẽ muốn đảm\nbảo rằng bạn đã cài đặt pandas trước khi tiếp tục tiếp tục. May mắn\nthay, nếu bạn đang đọc trong Jupyter, chúng tôi có thể cài đặt gấu trúc\nmà không cần rời khỏi máy tính xách tay.\nĐể thuận tiện, chúng tôi có thể tải xuống và lưu trữ bộ dữ liệu nhà ở\nKaggle bằng cách sử dụng tập lệnh mà chúng tôi đã định nghĩa ở trên.\nChúng tôi sử dụng pandas để tải hai tệp csv chứa dữ liệu đào tạo và\nkiểm tra tương ứng.\nTập dữ liệu đào tạo bao gồm 1460 ví dụ, 80 tính năng và 1 nhãn, trong\nkhi dữ liệu thử nghiệm chứa 1459 ví dụ và 80 tính năng.\nHãy để chúng tôi hãy xem bốn tính năng đầu tiên và hai tính năng cuối\ncùng cũng như nhãn (SalePrice) từ bốn ví dụ đầu tiên.\nChúng ta có thể thấy rằng trong mỗi ví dụ, tính năng đầu tiên là ID.\nĐiều này giúp mô hình xác định từng ví dụ đào tạo. Mặc dù điều này thuận\ntiện, nó không mang bất kỳ thông tin nào cho mục đích dự đoán. Do đó,\nchúng tôi loại bỏ nó khỏi tập dữ liệu trước khi đưa dữ liệu vào mô hình.\n4.10.4. Xử lý sơ bộ dữ liệu\nNhư đã nêu ở trên, chúng tôi có nhiều loại dữ liệu. Chúng ta sẽ cần xử\nlý trước dữ liệu trước khi chúng ta có thể bắt đầu mô hình hóa. Hãy để\nchúng tôi bắt đầu với các tính năng số. Đầu tiên, chúng ta áp dụng một\nheuristic, thay thế tất cả các giá trị còn thiếu theo ý nghĩa của tính\nnăng tương ứng. Sau đó, để đặt tất cả các tính năng trên thang điểm\nchung, chúng ta tiêu chuẩn dữ liệu bằng cách thay đổi tỷ lệ các tính\nnăng về 0 trung bình và phương sai đơn vị :\ntrong đó \\(\\mu\\) và \\(\\sigma\\) biểu thị độ lệch trung bình và\nchuẩn, tương ứng. Để xác minh rằng điều này thực sự biến đổi tính năng\ncủa chúng tôi (biến) sao cho nó có không trung bình và phương sai đơn\nvị, lưu ý rằng \\(E[\\frac{x-\\mu}{\\sigma}] = \\frac{\\mu - \\mu}{\\sigma} = 0\\) và \\(E[(x-\\mu)^2] = (\\sigma^2 + \\mu^2) - 2\\mu^2+\\mu^2 = \\sigma^2\\) đó.\nTrực giác, chúng tôi chuẩn hóa dữ liệu vì hai lý do. Đầu tiên, nó chứng\nminh thuận tiện cho việc tối ưu hóa. Thứ hai, bởi vì chúng tôi không\nbiết a priori tính năng nào sẽ có liên quan, chúng tôi không muốn phạt\ncác hệ số được gán cho một tính năng nhiều hơn bất kỳ tính năng nào\nkhác.\nTiếp theo chúng tôi đối phó với các giá trị rời rạc Điều này bao gồm các\ntính năng như “MSZoning”. Chúng tôi thay thế chúng bằng mã hóa một nóng\ngiống như cách mà trước đây chúng tôi đã chuyển đổi nhãn đa lớp thành\nvectơ (xem Section 3.4.1 ). Ví dụ, “MSZoning”\ngiả định các giá trị “RL” và “RM”. Thả tính năng “MSZoning”, hai tính\nnăng chỉ báo mới “MSZoning_RL” và “MSZoning_RM” được tạo ra với các\ngiá trị là 0 hoặc 1. Theo mã hóa một nóng, nếu giá trị ban đầu của\n“MSZoning” là “RL”, thì “MSZoning_RL” là 1 và “MSZoning_RM” là 0. Gói pandas thực hiện điều này tự động cho chúng tôi.\nBạn có thể thấy rằng chuyển đổi này làm tăng số lượng tính năng từ 79\nlên 331. Cuối cùng, thông qua thuộc tính values , chúng ta có thể\ntrích xuất định dạng NumPy từ định dạng pandas và chuyển đổi nó\nthành biểu diễn tensor để đào tạo.\n4.10.5. Đào tạo\nĐể bắt đầu, chúng tôi đào tạo một mô hình tuyến tính với tổn thất bình\nphương. Không có gì đáng ngạc nhiên, mô hình tuyến tính của chúng tôi sẽ\nkhông dẫn đến một bài nộp chiến thắng trong cuộc thi nhưng nó cung cấp\nkiểm tra sự tỉnh táo để xem liệu có thông tin có ý nghĩa trong dữ liệu\nhay không. Nếu chúng ta không thể làm tốt hơn so với đoán ngẫu nhiên ở\nđây, thì có thể có một cơ hội tốt mà chúng ta có một lỗi xử lý dữ liệu.\nVà nếu mọi thứ hoạt động, mô hình tuyến tính sẽ đóng vai trò là một\nđường cơ sở cho chúng ta một số trực giác về việc mô hình đơn giản gần\nvới các mô hình được báo cáo tốt nhất như thế nào, cho chúng ta cảm giác\nrằng chúng ta nên mong đợi bao nhiêu từ các mô hình fancier.\nVới giá nhà, như với giá cổ phiếu, chúng tôi quan tâm đến số lượng tương\nđối nhiều hơn số lượng tuyệt đối. Do đó chúng tôi có xu hướng quan tâm\nnhiều hơn về lỗi tương đối \\(\\frac{y - \\hat{y}}{y}\\) so với lỗi\ntuyệt đối \\(y - \\hat{y}\\) . Ví dụ, nếu dự đoán của chúng tôi giảm\n100.000 USD khi ước tính giá của một ngôi nhà ở nông thôn Ohio, nơi giá\ntrị của một ngôi nhà điển hình là 125.000 USD, thì có lẽ chúng ta đang\nlàm một công việc khủng khiếp. Mặt khác, nếu chúng ta sai lệch bởi số\ntiền này ở Los Altos Hills, California, điều này có thể đại diện cho một\ndự đoán chính xác đáng kinh ngạc (ở đó, giá nhà trung bình vượt quá 4\ntriệu USD).\nMột cách để giải quyết vấn đề này là đo lường sự khác biệt trong logarit\ncủa ước tính giá. Trên thực tế, đây cũng là biện pháp lỗi chính thức\nđược sử dụng bởi đối thủ để đánh giá chất lượng đệ trình. Rốt cuộc, một\ngiá trị nhỏ \\(\\delta\\) cho \\(|\\log y - \\log \\hat{y}| \\leq \\delta\\) dịch thành \\(e^{-\\delta} \\leq \\frac{\\hat{y}}{y} \\leq e^\\delta\\) . Điều này dẫn\nđến lỗi gốc có nghĩa là bình phương sau đây giữa logarit của giá dự đoán\nvà logarit của giá nhãn:\nKhông giống như trong các phần trước, chức năng đào tạo của chúng tôi sẽ\ndựa vào trình tối ưu hóa Adam (chúng tôi sẽ mô tả chi tiết hơn sau) . Sự\nhấp dẫn chính của trình tối ưu hóa này là, mặc dù không làm tốt hơn (và\nđôi khi tệ hơn) được cung cấp tài nguyên không giới hạn để tối ưu hóa\nsiêu tham số, mọi người có xu hướng thấy rằng nó ít nhạy cảm hơn đáng kể\nvới tốc độ học tập ban đầu.\n4.10.6. \\(K\\) -Xác định chéo Fold\nBạn có thể nhớ lại rằng chúng tôi đã giới thiệu \\(K\\) lần xác thực\nchéo trong phần mà chúng tôi đã thảo luận về cách đối phó với lựa chọn\nmô hình ( Section 4.4 ). Chúng tôi sẽ sử dụng điều này\nđể sử dụng tốt để chọn thiết kế mô hình và điều chỉnh các siêu tham số.\nTrước tiên chúng ta cần một hàm trả về gấp \\(i^\\mathrm{th}\\) của dữ\nliệu trong quy trình xác thực chéo \\(K\\) lần. Nó tiến hành bằng cách\ncắt phân đoạn \\(i^\\mathrm{th}\\) dưới dạng dữ liệu xác thực và trả\nlại phần còn lại dưới dạng dữ liệu đào tạo. Lưu ý rằng đây không phải là\ncách xử lý dữ liệu hiệu quả nhất và chúng tôi chắc chắn sẽ làm điều gì\nđó thông minh hơn nhiều nếu tập dữ liệu của chúng tôi lớn hơn đáng kể.\nNhưng sự phức tạp bổ sung này có thể làm xáo trộn mã của chúng tôi một\ncách không cần thiết để chúng tôi có thể bỏ qua nó một cách an toàn ở\nđây do sự đơn giản của vấn đề của chúng tôi.\nTrung bình lỗi đào tạo và xác minh được trả lại khi chúng tôi đào tạo \\(K\\) lần trong xác nhận chéo \\(K\\) lần.\n4.10.7. Model Selection\nTrong ví dụ này, chúng tôi chọn một bộ siêu tham số không điều chỉnh và\nđể nó lên cho người đọc để cải thiện mô hình. Tìm một lựa chọn tốt có\nthể mất thời gian, tùy thuộc vào số lượng biến một tối ưu hóa hơn. Với\nmột tập dữ liệu đủ lớn và các loại siêu tham số bình thường, xác nhận\nchéo \\(K\\) có xu hướng có khả năng phục hồi hợp lý chống lại nhiều\nthử nghiệm. Tuy nhiên, nếu chúng tôi thử một số lượng lớn các tùy chọn\nbất hợp lý, chúng tôi có thể gặp may mắn và thấy rằng hiệu suất xác thực\ncủa chúng tôi không còn đại diện cho lỗi thực sự.\nLưu ý rằng đôi khi số lượng lỗi đào tạo cho một tập hợp các siêu tham số\ncó thể rất thấp, ngay cả khi số lỗi trên \\(K\\) lần xác nhận chéo cao\nhơn đáng kể. Điều này chỉ ra rằng chúng tôi đang overfitting. Trong suốt\nquá trình đào tạo, bạn sẽ muốn theo dõi cả hai số. Ít quá mức có thể chỉ\nra rằng dữ liệu của chúng tôi có thể hỗ trợ một mô hình mạnh mẽ hơn. Đồ\nsộ có thể gợi ý rằng chúng ta có thể đạt được bằng cách kết hợp các kỹ\nthuật chính quy hóa.\n4.10.8. Nộp dự đoán trên Kaggle\nBây giờ chúng ta biết một lựa chọn tốt của các siêu tham số nên là gì,\nchúng ta cũng có thể sử dụng tất cả dữ liệu để đào tạo trên nó (thay vì\nchỉ \\(1-1/K\\) dữ liệu được sử dụng trong các lát xác nhận chéo). Mô\nhình mà chúng ta có được theo cách này sau đó có thể được áp dụng cho bộ\nthử nghiệm. Lưu dự đoán trong tệp csv sẽ đơn giản hóa việc tải kết quả\nlên Kaggle.\nMột kiểm tra sự tỉnh táo tốt đẹp là xem liệu các dự đoán trên bộ thử\nnghiệm có giống với quy trình xác thực chéo \\(K\\) lần hay không. Nếu\nhọ làm vậy, đã đến lúc tải chúng lên Kaggle. Đoạn mã sau sẽ tạo ra một\ntập tin gọi là submission.csv .\nTiếp theo, như đã được chứng minh trong Fig. 4.10.3 ,\nchúng tôi có thể gửi dự đoán của mình về Kaggle và xem cách chúng so\nsánh với giá nhà thực tế (nhãn) trên bộ thử nghiệm. Các bước khá đơn\ngiản:\nĐăng nhập vào trang web Kaggle và truy cập trang cạnh tranh dự đoán\ngiá nhà.\nNhấp vào nút “Gửi dự đoán” hoặc “Nộp muộn” (như văn bản này, nút nằm\nở bên phải).\nNhấp vào nút “Tải lên tệp gửi” trong hộp đứt nét ở cuối trang và chọn\ntệp dự đoán bạn muốn tải lên.\nNhấp vào nút “Make Submission” ở cuối trang để xem kết quả của bạn.\nFig. 4.10.3 Submitting data to Kaggle ¶\n4.10.9. Tóm tắt\nDữ liệu thực thường chứa hỗn hợp các loại dữ liệu khác nhau và cần\nđược xử lý trước.\nRescaling dữ liệu có giá trị thực thành 0 trung bình và phương sai\nđơn vị là một mặc định tốt. Vì vậy, đang thay thế các giá trị bị\nthiếu với trung bình của chúng.\nChuyển đổi các tính năng phân loại thành các tính năng chỉ báo cho\nphép chúng ta đối xử với chúng như các vectơ một nóng.\nChúng ta có thể sử dụng xác nhận chéo \\(K\\) lần để chọn mô hình\nvà điều chỉnh các siêu tham số.\nLogarit rất hữu ích cho các lỗi tương đối.\n4.10.10. Bài tập\nGửi dự đoán của bạn cho phần này cho Kaggle. Dự đoán của bạn tốt như\nthế nào?\nBạn có thể cải thiện mô hình của mình bằng cách giảm thiểu lôgarit\ngiá trực tiếp không? Điều gì sẽ xảy ra nếu bạn cố gắng dự đoán\nlogarit của giá chứ không phải là giá?\nCó phải luôn luôn là một ý tưởng tốt để thay thế các giá trị bị thiếu\nbằng ý nghĩa của họ? Gợi ý: bạn có thể xây dựng một tình huống mà các\ngiá trị không bị thiếu ngẫu nhiên?\nCải thiện điểm số trên Kaggle bằng cách điều chỉnh các siêu tham số\nthông qua xác nhận chéo \\(K\\) lần.\nCải thiện điểm số bằng cách cải thiện mô hình (ví dụ: lớp, phân rã\ntrọng lượng và bỏ học).\nĐiều gì sẽ xảy ra nếu chúng ta không chuẩn hóa các tính năng số liên\ntục như những gì chúng ta đã làm trong phần này?\nDiscussions\nDiscussions\nDiscussions"
+}

@@ -1,0 +1,462 @@
+{
+  "url": "https://vi.d2l.ai/chapter_computer-vision/kaggle-dog.html",
+  "chapter": "chapter_computer-vision",
+  "title": "13.14. Nhận dạng giống chó (Chó ImageNet) trên Kaggle",
+  "crawled_at": "2026-07-20T12:40:51.723050+00:00",
+  "headings": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "nhan-dang-giong-cho-cho-imagenet-tren-kaggle",
+      "text": "13.14. Nhận dạng giống chó (Chó ImageNet) trên Kaggle"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "lay-va-to-chuc-tap-du-lieu",
+      "text": "13.14.1. Lấy và tổ chức tập dữ liệu"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "tai-xuong-tap-du-lieu",
+      "text": "13.14.1.1. Tải xuống tập dữ liệu"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "torganizing-the-dataset",
+      "text": "13.14.1.2. Torganizing the Dataset"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "image-augmentation",
+      "text": "13.14.2. Image Augmentation"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "doc-du-lieu",
+      "text": "13.14.3. Đọc dữ liệu"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tinh-chinh-mot-mo-hinh-pretrained-model",
+      "text": "13.14.4. Tinh chỉnh một mô hình Pretrained Model"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "xac-dinh-chuc-nang-dao-tao",
+      "text": "13.14.5. Xác định chức năng đào tạo"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "dao-tao-va-xac-thuc-mo-hinh",
+      "text": "13.14.6. Đào tạo và xác thực mô hình"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "phan-loai-bo-thu-nghiem-va-gui-ket-qua-tren-kaggle",
+      "text": "13.14.7. Phân loại bộ thử nghiệm và gửi kết quả trên Kaggle"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tom-tat",
+      "text": "13.14.8. Tóm tắt"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bai-tap",
+      "text": "13.14.9. Bài tập"
+    }
+  ],
+  "content": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "nhan-dang-giong-cho-cho-imagenet-tren-kaggle",
+      "text": "13.14. Nhận dạng giống chó (Chó ImageNet) trên Kaggle"
+    },
+    {
+      "type": "paragraph",
+      "text": "Trong phần này, chúng tôi sẽ thực hành vấn đề nhận dạng giống chó trên\nKaggle. Địa chỉ web của cuộc thi này là https://www.kaggle.com/c/dog-breed-identification"
+    },
+    {
+      "type": "paragraph",
+      "text": "Trong cuộc thi này, 120 giống chó khác nhau sẽ được công nhận. Trên thực\ntế, tập dữ liệu cho cuộc thi này là một tập hợp con của tập dữ liệu\nImageNet. Không giống như các hình ảnh trong tập dữ liệu CIFAR-10 trong Section 13.13 , các hình ảnh trong tập dữ liệu ImageNet\nđều cao hơn và rộng hơn ở các kích thước khác nhau. Fig. 13.14.1 hiển thị thông tin trên trang web của đối\nthủ. Bạn cần một tài khoản Kaggle để gửi kết quả của mình."
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/kaggle-dog.jpg",
+      "local_path": "_images/kaggle-dog.jpg",
+      "alt": "../_images/kaggle-dog.jpg"
+    },
+    {
+      "type": "paragraph",
+      "text": "Fig. 13.14.1 The dog breed identification competition website. The competition\ndataset can be obtained by clicking the “Data” tab. ¶"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "import os\nfrom mxnet import autograd, gluon, init, npx\nfrom mxnet.gluon import nn\nfrom d2l import mxnet as d2l\n\nnpx.set_np()"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "import os\nimport torch\nimport torchvision\nfrom torch import nn\nfrom d2l import torch as d2l"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "lay-va-to-chuc-tap-du-lieu",
+      "text": "13.14.1. Lấy và tổ chức tập dữ liệu"
+    },
+    {
+      "type": "paragraph",
+      "text": "Tập dữ liệu cạnh tranh được chia thành một bộ đào tạo và một bộ thử\nnghiệm, trong đó có 10222 và 10357 hình ảnh JPEG của ba kênh RGB (màu),\ntương ứng. Trong số các tập dữ liệu huấn luyện, có 120 giống chó như\nLabradors, Poodles, Dachshunds, Samoyeds, Huskies, Chihuahua, và\nYorkshire Terriers."
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "tai-xuong-tap-du-lieu",
+      "text": "13.14.1.1. Tải xuống tập dữ liệu"
+    },
+    {
+      "type": "paragraph",
+      "text": "Sau khi đăng nhập vào Kaggle, bạn có thể nhấp vào tab “Dữ liệu” trên\ntrang web cạnh tranh được hiển thị trong Fig. 13.14.1 và\ntải xuống tập dữ liệu bằng cách nhấp vào nút “Tải xuống tất cả”. Sau khi\ngiải nén tệp đã tải xuống trong ../data , bạn sẽ tìm thấy toàn bộ tập\ndữ liệu trong các đường dẫn sau:"
+    },
+    {
+      "type": "paragraph",
+      "text": "Bạn có thể nhận thấy rằng cấu trúc trên tương tự như cấu trúc của cuộc\nthi CIFAR-10 trong Section 13.13 , trong đó các thư mục train/ và test/ chứa các hình ảnh huấn luyện và thử nghiệm hình\nảnh chó, và labels.csv chứa nhãn cho hình ảnh đào tạo. Tương tự, để\nbắt đầu dễ dàng hơn, chúng tôi cung cấp một mẫu nhỏ của bộ dữ liệu được\nđề cập ở trên: train_valid_test_tiny.zip . Nếu bạn định sử dụng bộ dữ\nliệu đầy đủ cho cuộc thi Kaggle, bạn cần thay đổi biến demo bên dưới\nthành False ."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "#@save\nd2l.DATA_HUB['dog_tiny'] = (d2l.DATA_URL + 'kaggle_dog_tiny.zip',\n                            '0cb91d09b814ecdc07b50f31f8dcad3e81d6a86d')\n\n# If you use the full dataset downloaded for the Kaggle competition, change\n# the variable below to `False`\ndemo = True\nif demo:\n    data_dir = d2l.download_extract('dog_tiny')\nelse:\n    data_dir = os.path.join('..', 'data', 'dog-breed-identification')"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "Downloading ../data/kaggle_dog_tiny.zip from http://d2l-data.s3-accelerate.amazonaws.com/kaggle_dog_tiny.zip..."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "#@save\nd2l.DATA_HUB['dog_tiny'] = (d2l.DATA_URL + 'kaggle_dog_tiny.zip',\n                            '0cb91d09b814ecdc07b50f31f8dcad3e81d6a86d')\n\n# If you use the full dataset downloaded for the Kaggle competition, change\n# the variable below to `False`\ndemo = True\nif demo:\n    data_dir = d2l.download_extract('dog_tiny')\nelse:\n    data_dir = os.path.join('..', 'data', 'dog-breed-identification')"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "Downloading ../data/kaggle_dog_tiny.zip from http://d2l-data.s3-accelerate.amazonaws.com/kaggle_dog_tiny.zip..."
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "torganizing-the-dataset",
+      "text": "13.14.1.2. Torganizing the Dataset"
+    },
+    {
+      "type": "paragraph",
+      "text": "Chúng ta có thể sắp xếp tập dữ liệu tương tự như những gì chúng ta đã\nlàm trong Section 13.13 , cụ thể là tách ra một bộ xác\nthực từ bộ đào tạo ban đầu và di chuyển hình ảnh vào các thư mục con\nđược nhóm theo nhãn."
+    },
+    {
+      "type": "paragraph",
+      "text": "Chức năng reorg_dog_data dưới đây đọc các nhãn dữ liệu đào tạo, tách\nbộ xác thực và tổ chức bộ đào tạo."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def reorg_dog_data(data_dir, valid_ratio):\n    labels = d2l.read_csv_labels(os.path.join(data_dir, 'labels.csv'))\n    d2l.reorg_train_valid(data_dir, labels, valid_ratio)\n    d2l.reorg_test(data_dir)\n\n\nbatch_size = 32 if demo else 128\nvalid_ratio = 0.1\nreorg_dog_data(data_dir, valid_ratio)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def reorg_dog_data(data_dir, valid_ratio):\n    labels = d2l.read_csv_labels(os.path.join(data_dir, 'labels.csv'))\n    d2l.reorg_train_valid(data_dir, labels, valid_ratio)\n    d2l.reorg_test(data_dir)\n\n\nbatch_size = 32 if demo else 128\nvalid_ratio = 0.1\nreorg_dog_data(data_dir, valid_ratio)"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "image-augmentation",
+      "text": "13.14.2. Image Augmentation"
+    },
+    {
+      "type": "paragraph",
+      "text": "Nhớ lại rằng tập dữ liệu giống chó này là một tập hợp con của tập dữ\nliệu ImageNet, có hình ảnh lớn hơn của tập dữ liệu CIFAR-10 vào năm Section 13.13 . Sau đây liệt kê một vài thao tác nâng\nhình ảnh có thể hữu ích cho các hình ảnh tương đối lớn hơn."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "transform_train = gluon.data.vision.transforms.Compose([\n    # Randomly crop the image to obtain an image with an area of 0.08 to 1 of\n    # the original area and height-to-width ratio between 3/4 and 4/3. Then,\n    # scale the image to create a new 224 x 224 image\n    gluon.data.vision.transforms.RandomResizedCrop(224, scale=(0.08, 1.0),\n                                                   ratio=(3.0/4.0, 4.0/3.0)),\n    gluon.data.vision.transforms.RandomFlipLeftRight(),\n    # Randomly change the brightness, contrast, and saturation\n    gluon.data.vision.transforms.RandomColorJitter(brightness=0.4,\n                                                   contrast=0.4,\n                                                   saturation=0.4),\n    # Add random noise\n    gluon.data.vision.transforms.RandomLighting(0.1),\n    gluon.data.vision.transforms.ToTensor(),\n    # Standardize each channel of the image\n    gluon.data.vision.transforms.Normalize([0.485, 0.456, 0.406],\n                                           [0.229, 0.224, 0.225])])"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "transform_train = torchvision.transforms.Compose([\n    # Randomly crop the image to obtain an image with an area of 0.08 to 1 of\n    # the original area and height-to-width ratio between 3/4 and 4/3. Then,\n    # scale the image to create a new 224 x 224 image\n    torchvision.transforms.RandomResizedCrop(224, scale=(0.08, 1.0),\n                                             ratio=(3.0/4.0, 4.0/3.0)),\n    torchvision.transforms.RandomHorizontalFlip(),\n    # Randomly change the brightness, contrast, and saturation\n    torchvision.transforms.ColorJitter(brightness=0.4,\n                                       contrast=0.4,\n                                       saturation=0.4),\n    # Add random noise\n    torchvision.transforms.ToTensor(),\n    # Standardize each channel of the image\n    torchvision.transforms.Normalize([0.485, 0.456, 0.406],\n                                     [0.229, 0.224, 0.225])])"
+    },
+    {
+      "type": "paragraph",
+      "text": "Trong quá trình dự đoán, chúng tôi chỉ sử dụng các thao tác tiền xử lý\nhình ảnh mà không có tính ngẫu nhiên."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "transform_test = gluon.data.vision.transforms.Compose([\n    gluon.data.vision.transforms.Resize(256),\n    # Crop a 224 x 224 square area from the center of the image\n    gluon.data.vision.transforms.CenterCrop(224),\n    gluon.data.vision.transforms.ToTensor(),\n    gluon.data.vision.transforms.Normalize([0.485, 0.456, 0.406],\n                                           [0.229, 0.224, 0.225])])"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "transform_test = torchvision.transforms.Compose([\n    torchvision.transforms.Resize(256),\n    # Crop a 224 x 224 square area from the center of the image\n    torchvision.transforms.CenterCrop(224),\n    torchvision.transforms.ToTensor(),\n    torchvision.transforms.Normalize([0.485, 0.456, 0.406],\n                                     [0.229, 0.224, 0.225])])"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "doc-du-lieu",
+      "text": "13.14.3. Đọc dữ liệu"
+    },
+    {
+      "type": "paragraph",
+      "text": "Như trong Section 13.13 , chúng ta có thể đọc tập dữ\nliệu có tổ chức bao gồm các tệp hình ảnh thô."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "train_ds, valid_ds, train_valid_ds, test_ds = [\n    gluon.data.vision.ImageFolderDataset(\n        os.path.join(data_dir, 'train_valid_test', folder))\n    for folder in ('train', 'valid', 'train_valid', 'test')]"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "train_ds, train_valid_ds = [torchvision.datasets.ImageFolder(\n    os.path.join(data_dir, 'train_valid_test', folder),\n    transform=transform_train) for folder in ['train', 'train_valid']]\n\nvalid_ds, test_ds = [torchvision.datasets.ImageFolder(\n    os.path.join(data_dir, 'train_valid_test', folder),\n    transform=transform_test) for folder in ['valid', 'test']]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Dưới đây chúng ta tạo các trường hợp lặp dữ liệu giống như trong Section 13.13 ."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "train_iter, train_valid_iter = [gluon.data.DataLoader(\n    dataset.transform_first(transform_train), batch_size, shuffle=True,\n    last_batch='discard') for dataset in (train_ds, train_valid_ds)]\n\nvalid_iter = gluon.data.DataLoader(\n    valid_ds.transform_first(transform_test), batch_size, shuffle=False,\n    last_batch='discard')\n\ntest_iter = gluon.data.DataLoader(\n    test_ds.transform_first(transform_test), batch_size, shuffle=False,\n    last_batch='keep')"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "train_iter, train_valid_iter = [torch.utils.data.DataLoader(\n    dataset, batch_size, shuffle=True, drop_last=True)\n    for dataset in (train_ds, train_valid_ds)]\n\nvalid_iter = torch.utils.data.DataLoader(valid_ds, batch_size, shuffle=False,\n                                         drop_last=True)\n\ntest_iter = torch.utils.data.DataLoader(test_ds, batch_size, shuffle=False,\n                                        drop_last=False)"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tinh-chinh-mot-mo-hinh-pretrained-model",
+      "text": "13.14.4. Tinh chỉnh một mô hình Pretrained Model"
+    },
+    {
+      "type": "paragraph",
+      "text": "Một lần nữa, tập dữ liệu cho cuộc thi này là một tập hợp con của tập dữ\nliệu ImageNet. Do đó, chúng ta có thể sử dụng phương pháp được thảo luận\ntrong Section 13.2 để chọn một mô hình được đào tạo trước\ntrên tập dữ liệu ImageNet đầy đủ và sử dụng nó để trích xuất các tính\nnăng hình ảnh được đưa vào mạng đầu ra quy mô nhỏ tùy chỉnh. API cấp cao\ncủa các framework deep learning cung cấp một loạt các mô hình được đào\ntạo trước trên tập dữ liệu ImageNet. Ở đây, chúng tôi chọn một mô hình\nResNet-34 được đào tạo trước, nơi chúng tôi chỉ cần sử dụng lại đầu vào\ncủa lớp đầu ra của mô hình này (tức là các tính năng được trích xuất).\nSau đó, chúng ta có thể thay thế lớp đầu ra ban đầu bằng một mạng đầu ra\ntùy chỉnh nhỏ có thể được đào tạo, chẳng hạn như xếp chồng hai lớp được\nkết nối hoàn toàn. Khác với thí nghiệm trong Section 13.2 , những điều sau đây không đào tạo lại mô\nhình được đào tạo trước được sử dụng để trích xuất tính năng. Điều này\nlàm giảm thời gian đào tạo và bộ nhớ để lưu trữ gradient."
+    },
+    {
+      "type": "paragraph",
+      "text": "Nhớ lại rằng chúng tôi chuẩn hóa hình ảnh bằng cách sử dụng phương tiện\nvà độ lệch chuẩn của ba kênh RGB cho tập dữ liệu ImageNet đầy đủ. Trên\nthực tế, điều này cũng phù hợp với hoạt động tiêu chuẩn hóa bởi mô hình\nđược đào tạo trước trên ImageNet."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def get_net(devices):\n    finetune_net = gluon.model_zoo.vision.resnet34_v2(pretrained=True)\n    # Define a new output network\n    finetune_net.output_new = nn.HybridSequential(prefix='')\n    finetune_net.output_new.add(nn.Dense(256, activation='relu'))\n    # There are 120 output categories\n    finetune_net.output_new.add(nn.Dense(120))\n    # Initialize the output network\n    finetune_net.output_new.initialize(init.Xavier(), ctx=devices)\n    # Distribute the model parameters to the CPUs or GPUs used for computation\n    finetune_net.collect_params().reset_ctx(devices)\n    return finetune_net"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def get_net(devices):\n    finetune_net = nn.Sequential()\n    finetune_net.features = torchvision.models.resnet34(pretrained=True)\n    # Define a new output network (there are 120 output categories)\n    finetune_net.output_new = nn.Sequential(nn.Linear(1000, 256),\n                                            nn.ReLU(),\n                                            nn.Linear(256, 120))\n    # Move the model to devices\n    finetune_net = finetune_net.to(devices[0])\n    # Freeze parameters of feature layers\n    for param in finetune_net.features.parameters():\n        param.requires_grad = False\n    return finetune_net"
+    },
+    {
+      "type": "paragraph",
+      "text": "Trước khi tính lấu, trước tiên chúng ta có được đầu vào của lớp đầu ra\ncủa mô hình được đào tạo sẵn, tức là tính năng trích xuất. Sau đó, chúng\ntôi sử dụng tính năng này làm đầu vào cho mạng đầu ra tùy chỉnh nhỏ của\nchúng tôi để tính toán tổn thất."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "loss = gluon.loss.SoftmaxCrossEntropyLoss()\n\ndef evaluate_loss(data_iter, net, devices):\n    l_sum, n = 0.0, 0\n    for features, labels in data_iter:\n        X_shards, y_shards = d2l.split_batch(features, labels, devices)\n        output_features = [net.features(X_shard) for X_shard in X_shards]\n        outputs = [net.output_new(feature) for feature in output_features]\n        ls = [loss(output, y_shard).sum() for output, y_shard\n              in zip(outputs, y_shards)]\n        l_sum += sum([float(l.sum()) for l in ls])\n        n += labels.size\n    return l_sum / n"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "loss = nn.CrossEntropyLoss(reduction='none')\n\ndef evaluate_loss(data_iter, net, devices):\n    l_sum, n = 0.0, 0\n    for features, labels in data_iter:\n        features, labels = features.to(devices[0]), labels.to(devices[0])\n        outputs = net(features)\n        l = loss(outputs, labels)\n        l_sum += l.sum()\n        n += labels.numel()\n    return l_sum / n"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "xac-dinh-chuc-nang-dao-tao",
+      "text": "13.14.5. Xác định chức năng đào tạo"
+    },
+    {
+      "type": "paragraph",
+      "text": "Chúng tôi sẽ chọn mô hình và điều chỉnh các siêu tham số theo hiệu suất\ncủa mô hình trên bộ xác thực. Chức năng đào tạo mô hình train chỉ\nlặp lại các thông số của mạng đầu ra tùy chỉnh nhỏ."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def train(net, train_iter, valid_iter, num_epochs, lr, wd, devices, lr_period,\n          lr_decay):\n    # Only train the small custom output network\n    trainer = gluon.Trainer(net.output_new.collect_params(), 'sgd',\n                            {'learning_rate': lr, 'momentum': 0.9, 'wd': wd})\n    num_batches, timer = len(train_iter), d2l.Timer()\n    legend = ['train loss']\n    if valid_iter is not None:\n        legend.append('valid loss')\n    animator = d2l.Animator(xlabel='epoch', xlim=[1, num_epochs],\n                            legend=legend)\n    for epoch in range(num_epochs):\n        metric = d2l.Accumulator(2)\n        if epoch > 0 and epoch % lr_period == 0:\n            trainer.set_learning_rate(trainer.learning_rate * lr_decay)\n        for i, (features, labels) in enumerate(train_iter):\n            timer.start()\n            X_shards, y_shards = d2l.split_batch(features, labels, devices)\n            output_features = [net.features(X_shard) for X_shard in X_shards]\n            with autograd.record():\n                outputs = [net.output_new(feature)\n                           for feature in output_features]\n                ls = [loss(output, y_shard).sum() for output, y_shard\n                      in zip(outputs, y_shards)]\n            for l in ls:\n                l.backward()\n            trainer.step(batch_size)\n            metric.add(sum([float(l.sum()) for l in ls]), labels.shape[0])\n            timer.stop()\n            if (i + 1) % (num_batches // 5) == 0 or i == num_batches - 1:\n                animator.add(epoch + (i + 1) / num_batches,\n                             (metric[0] / metric[1], None))\n        if valid_iter is not None:\n            valid_loss = evaluate_loss(valid_iter, net, devices)\n            animator.add(epoch + 1, (None, valid_loss))\n    measures = f'train loss {metric[0] / metric[1]:.3f}'\n    if valid_iter is not None:\n        measures += f', valid loss {valid_loss:.3f}'\n    print(measures + f'\\n{metric[1] * num_epochs / timer.sum():.1f}'\n          f' examples/sec on {str(devices)}')"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def train(net, train_iter, valid_iter, num_epochs, lr, wd, devices, lr_period,\n          lr_decay):\n    # Only train the small custom output network\n    net = nn.DataParallel(net, device_ids=devices).to(devices[0])\n    trainer = torch.optim.SGD((param for param in net.parameters()\n                               if param.requires_grad), lr=lr,\n                              momentum=0.9, weight_decay=wd)\n    scheduler = torch.optim.lr_scheduler.StepLR(trainer, lr_period, lr_decay)\n    num_batches, timer = len(train_iter), d2l.Timer()\n    legend = ['train loss']\n    if valid_iter is not None:\n        legend.append('valid loss')\n    animator = d2l.Animator(xlabel='epoch', xlim=[1, num_epochs],\n                            legend=legend)\n    for epoch in range(num_epochs):\n        metric = d2l.Accumulator(2)\n        for i, (features, labels) in enumerate(train_iter):\n            timer.start()\n            features, labels = features.to(devices[0]), labels.to(devices[0])\n            trainer.zero_grad()\n            output = net(features)\n            l = loss(output, labels).sum()\n            l.backward()\n            trainer.step()\n            metric.add(l, labels.shape[0])\n            timer.stop()\n            if (i + 1) % (num_batches // 5) == 0 or i == num_batches - 1:\n                animator.add(epoch + (i + 1) / num_batches,\n                             (metric[0] / metric[1], None))\n        measures = f'train loss {metric[0] / metric[1]:.3f}'\n        if valid_iter is not None:\n            valid_loss = evaluate_loss(valid_iter, net, devices)\n            animator.add(epoch + 1, (None, valid_loss.detach().cpu()))\n        scheduler.step()\n    if valid_iter is not None:\n        measures += f', valid loss {valid_loss:.3f}'\n    print(measures + f'\\n{metric[1] * num_epochs / timer.sum():.1f}'\n          f' examples/sec on {str(devices)}')"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "dao-tao-va-xac-thuc-mo-hinh",
+      "text": "13.14.6. Đào tạo và xác thực mô hình"
+    },
+    {
+      "type": "paragraph",
+      "text": "Bây giờ chúng ta có thể đào tạo và xác thực mô hình. Các siêu tham số\nsau đây đều có thể điều chỉnh được. Ví dụ, số lượng kỷ nguyên có thể\nđược tăng lên. Bởi vì lr_period và lr_decay được đặt thành 2 và\n0,9, tương ứng, tỷ lệ học tập của thuật toán tối ưu hóa sẽ được nhân với\n0,9 sau mỗi 2 kỷ nguyên."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "devices, num_epochs, lr, wd = d2l.try_all_gpus(), 10, 5e-3, 1e-4\nlr_period, lr_decay, net = 2, 0.9, get_net(devices)\nnet.hybridize()\ntrain(net, train_iter, valid_iter, num_epochs, lr, wd, devices, lr_period,\n      lr_decay)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "train loss 0.934, valid loss 0.889\n140.6 examples/sec on [gpu(0), gpu(1)]"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_kaggle-dog_571091_93_1.svg",
+      "local_path": "_images/output_kaggle-dog_571091_93_1.svg",
+      "alt": "../_images/output_kaggle-dog_571091_93_1.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "devices, num_epochs, lr, wd = d2l.try_all_gpus(), 10, 1e-4, 1e-4\nlr_period, lr_decay, net = 2, 0.9, get_net(devices)\ntrain(net, train_iter, valid_iter, num_epochs, lr, wd, devices, lr_period,\n      lr_decay)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "train loss 1.297, valid loss 1.324\n695.4 examples/sec on [device(type='cuda', index=0), device(type='cuda', index=1)]"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_kaggle-dog_571091_96_1.svg",
+      "local_path": "_images/output_kaggle-dog_571091_96_1.svg",
+      "alt": "../_images/output_kaggle-dog_571091_96_1.svg"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "phan-loai-bo-thu-nghiem-va-gui-ket-qua-tren-kaggle",
+      "text": "13.14.7. Phân loại bộ thử nghiệm và gửi kết quả trên Kaggle"
+    },
+    {
+      "type": "paragraph",
+      "text": "Tương tự như bước cuối cùng trong Section 13.13 , cuối\ncùng tất cả dữ liệu được dán nhãn (bao gồm cả bộ xác thực) được sử dụng\nđể đào tạo mô hình và phân loại bộ thử nghiệm. Chúng tôi sẽ sử dụng mạng\nđầu ra tùy chỉnh được đào tạo để phân loại."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "net = get_net(devices)\nnet.hybridize()\ntrain(net, train_valid_iter, None, num_epochs, lr, wd, devices, lr_period,\n      lr_decay)\n\npreds = []\nfor data, label in test_iter:\n    output_features = net.features(data.as_in_ctx(devices[0]))\n    output = npx.softmax(net.output_new(output_features))\n    preds.extend(output.asnumpy())\nids = sorted(os.listdir(\n    os.path.join(data_dir, 'train_valid_test', 'test', 'unknown')))\nwith open('submission.csv', 'w') as f:\n    f.write('id,' + ','.join(train_valid_ds.synsets) + '\\n')\n    for i, output in zip(ids, preds):\n        f.write(i.split('.')[0] + ',' + ','.join(\n            [str(num) for num in output]) + '\\n')"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "train loss 0.858\n110.1 examples/sec on [gpu(0), gpu(1)]"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_kaggle-dog_571091_102_1.svg",
+      "local_path": "_images/output_kaggle-dog_571091_102_1.svg",
+      "alt": "../_images/output_kaggle-dog_571091_102_1.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "net = get_net(devices)\ntrain(net, train_valid_iter, None, num_epochs, lr, wd, devices, lr_period,\n      lr_decay)\n\npreds = []\nfor data, label in test_iter:\n    output = torch.nn.functional.softmax(net(data.to(devices[0])), dim=0)\n    preds.extend(output.cpu().detach().numpy())\nids = sorted(os.listdir(\n    os.path.join(data_dir, 'train_valid_test', 'test', 'unknown')))\nwith open('submission.csv', 'w') as f:\n    f.write('id,' + ','.join(train_valid_ds.classes) + '\\n')\n    for i, output in zip(ids, preds):\n        f.write(i.split('.')[0] + ',' + ','.join(\n            [str(num) for num in output]) + '\\n')"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "train loss 1.225\n969.5 examples/sec on [device(type='cuda', index=0), device(type='cuda', index=1)]"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_kaggle-dog_571091_105_1.svg",
+      "local_path": "_images/output_kaggle-dog_571091_105_1.svg",
+      "alt": "../_images/output_kaggle-dog_571091_105_1.svg"
+    },
+    {
+      "type": "paragraph",
+      "text": "Đoạn mã trên sẽ tạo ra một tập tin submission.csv để gửi cho Kaggle\ntheo cách tương tự được mô tả trong Section 4.10 ."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tom-tat",
+      "text": "13.14.8. Tóm tắt"
+    },
+    {
+      "type": "list",
+      "ordered": false,
+      "items": [
+        "Hình ảnh trong tập dữ liệu ImageNet lớn hơn (với các kích thước khác\nnhau) so với hình ảnh CIFAR-10. Chúng tôi có thể sửa đổi các thao tác\nnâng hình ảnh cho các tác vụ trên một tập dữ liệu khác.",
+        "Để phân loại một tập hợp con của tập dữ liệu ImageNet, chúng ta có\nthể tận dụng các mô hình được đào tạo trước trên tập dữ liệu ImageNet\nđầy đủ để trích xuất các tính năng và chỉ đào tạo mạng đầu ra quy mô\nnhỏ tùy chỉnh. Điều này sẽ dẫn đến thời gian tính toán và chi phí bộ\nnhớ ít hơn."
+      ]
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bai-tap",
+      "text": "13.14.9. Bài tập"
+    },
+    {
+      "type": "list",
+      "ordered": true,
+      "items": [
+        "Khi sử dụng bộ dữ liệu cạnh tranh Kaggle đầy đủ, bạn có thể đạt được\nkết quả gì khi tăng batch_size (kích thước lô) và num_epochs (số thời đại) trong khi đặt một số siêu tham số khác là lr = 0.01 , lr_period = 10 và lr_decay = 0.1 ?",
+        "Bạn có nhận được kết quả tốt hơn nếu bạn sử dụng một mô hình được đào\ntạo sâu hơn? Làm thế nào để bạn điều chỉnh các siêu tham số? Bạn có\nthể cải thiện hơn nữa kết quả?"
+      ]
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    }
+  ],
+  "images": [
+    {
+      "original_url": "https://vi.d2l.ai/_images/kaggle-dog.jpg",
+      "local_path": "_images/kaggle-dog.jpg",
+      "alt": "../_images/kaggle-dog.jpg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_kaggle-dog_571091_93_1.svg",
+      "local_path": "_images/output_kaggle-dog_571091_93_1.svg",
+      "alt": "../_images/output_kaggle-dog_571091_93_1.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_kaggle-dog_571091_96_1.svg",
+      "local_path": "_images/output_kaggle-dog_571091_96_1.svg",
+      "alt": "../_images/output_kaggle-dog_571091_96_1.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_kaggle-dog_571091_102_1.svg",
+      "local_path": "_images/output_kaggle-dog_571091_102_1.svg",
+      "alt": "../_images/output_kaggle-dog_571091_102_1.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_kaggle-dog_571091_105_1.svg",
+      "local_path": "_images/output_kaggle-dog_571091_105_1.svg",
+      "alt": "../_images/output_kaggle-dog_571091_105_1.svg"
+    }
+  ],
+  "text": "13.14. Nhận dạng giống chó (Chó ImageNet) trên Kaggle\nTrong phần này, chúng tôi sẽ thực hành vấn đề nhận dạng giống chó trên\nKaggle. Địa chỉ web của cuộc thi này là https://www.kaggle.com/c/dog-breed-identification\nTrong cuộc thi này, 120 giống chó khác nhau sẽ được công nhận. Trên thực\ntế, tập dữ liệu cho cuộc thi này là một tập hợp con của tập dữ liệu\nImageNet. Không giống như các hình ảnh trong tập dữ liệu CIFAR-10 trong Section 13.13 , các hình ảnh trong tập dữ liệu ImageNet\nđều cao hơn và rộng hơn ở các kích thước khác nhau. Fig. 13.14.1 hiển thị thông tin trên trang web của đối\nthủ. Bạn cần một tài khoản Kaggle để gửi kết quả của mình.\nFig. 13.14.1 The dog breed identification competition website. The competition\ndataset can be obtained by clicking the “Data” tab. ¶\n13.14.1. Lấy và tổ chức tập dữ liệu\nTập dữ liệu cạnh tranh được chia thành một bộ đào tạo và một bộ thử\nnghiệm, trong đó có 10222 và 10357 hình ảnh JPEG của ba kênh RGB (màu),\ntương ứng. Trong số các tập dữ liệu huấn luyện, có 120 giống chó như\nLabradors, Poodles, Dachshunds, Samoyeds, Huskies, Chihuahua, và\nYorkshire Terriers.\n13.14.1.1. Tải xuống tập dữ liệu\nSau khi đăng nhập vào Kaggle, bạn có thể nhấp vào tab “Dữ liệu” trên\ntrang web cạnh tranh được hiển thị trong Fig. 13.14.1 và\ntải xuống tập dữ liệu bằng cách nhấp vào nút “Tải xuống tất cả”. Sau khi\ngiải nén tệp đã tải xuống trong ../data , bạn sẽ tìm thấy toàn bộ tập\ndữ liệu trong các đường dẫn sau:\nBạn có thể nhận thấy rằng cấu trúc trên tương tự như cấu trúc của cuộc\nthi CIFAR-10 trong Section 13.13 , trong đó các thư mục train/ và test/ chứa các hình ảnh huấn luyện và thử nghiệm hình\nảnh chó, và labels.csv chứa nhãn cho hình ảnh đào tạo. Tương tự, để\nbắt đầu dễ dàng hơn, chúng tôi cung cấp một mẫu nhỏ của bộ dữ liệu được\nđề cập ở trên: train_valid_test_tiny.zip . Nếu bạn định sử dụng bộ dữ\nliệu đầy đủ cho cuộc thi Kaggle, bạn cần thay đổi biến demo bên dưới\nthành False .\n13.14.1.2. Torganizing the Dataset\nChúng ta có thể sắp xếp tập dữ liệu tương tự như những gì chúng ta đã\nlàm trong Section 13.13 , cụ thể là tách ra một bộ xác\nthực từ bộ đào tạo ban đầu và di chuyển hình ảnh vào các thư mục con\nđược nhóm theo nhãn.\nChức năng reorg_dog_data dưới đây đọc các nhãn dữ liệu đào tạo, tách\nbộ xác thực và tổ chức bộ đào tạo.\n13.14.2. Image Augmentation\nNhớ lại rằng tập dữ liệu giống chó này là một tập hợp con của tập dữ\nliệu ImageNet, có hình ảnh lớn hơn của tập dữ liệu CIFAR-10 vào năm Section 13.13 . Sau đây liệt kê một vài thao tác nâng\nhình ảnh có thể hữu ích cho các hình ảnh tương đối lớn hơn.\nTrong quá trình dự đoán, chúng tôi chỉ sử dụng các thao tác tiền xử lý\nhình ảnh mà không có tính ngẫu nhiên.\n13.14.3. Đọc dữ liệu\nNhư trong Section 13.13 , chúng ta có thể đọc tập dữ\nliệu có tổ chức bao gồm các tệp hình ảnh thô.\nDưới đây chúng ta tạo các trường hợp lặp dữ liệu giống như trong Section 13.13 .\n13.14.4. Tinh chỉnh một mô hình Pretrained Model\nMột lần nữa, tập dữ liệu cho cuộc thi này là một tập hợp con của tập dữ\nliệu ImageNet. Do đó, chúng ta có thể sử dụng phương pháp được thảo luận\ntrong Section 13.2 để chọn một mô hình được đào tạo trước\ntrên tập dữ liệu ImageNet đầy đủ và sử dụng nó để trích xuất các tính\nnăng hình ảnh được đưa vào mạng đầu ra quy mô nhỏ tùy chỉnh. API cấp cao\ncủa các framework deep learning cung cấp một loạt các mô hình được đào\ntạo trước trên tập dữ liệu ImageNet. Ở đây, chúng tôi chọn một mô hình\nResNet-34 được đào tạo trước, nơi chúng tôi chỉ cần sử dụng lại đầu vào\ncủa lớp đầu ra của mô hình này (tức là các tính năng được trích xuất).\nSau đó, chúng ta có thể thay thế lớp đầu ra ban đầu bằng một mạng đầu ra\ntùy chỉnh nhỏ có thể được đào tạo, chẳng hạn như xếp chồng hai lớp được\nkết nối hoàn toàn. Khác với thí nghiệm trong Section 13.2 , những điều sau đây không đào tạo lại mô\nhình được đào tạo trước được sử dụng để trích xuất tính năng. Điều này\nlàm giảm thời gian đào tạo và bộ nhớ để lưu trữ gradient.\nNhớ lại rằng chúng tôi chuẩn hóa hình ảnh bằng cách sử dụng phương tiện\nvà độ lệch chuẩn của ba kênh RGB cho tập dữ liệu ImageNet đầy đủ. Trên\nthực tế, điều này cũng phù hợp với hoạt động tiêu chuẩn hóa bởi mô hình\nđược đào tạo trước trên ImageNet.\nTrước khi tính lấu, trước tiên chúng ta có được đầu vào của lớp đầu ra\ncủa mô hình được đào tạo sẵn, tức là tính năng trích xuất. Sau đó, chúng\ntôi sử dụng tính năng này làm đầu vào cho mạng đầu ra tùy chỉnh nhỏ của\nchúng tôi để tính toán tổn thất.\n13.14.5. Xác định chức năng đào tạo\nChúng tôi sẽ chọn mô hình và điều chỉnh các siêu tham số theo hiệu suất\ncủa mô hình trên bộ xác thực. Chức năng đào tạo mô hình train chỉ\nlặp lại các thông số của mạng đầu ra tùy chỉnh nhỏ.\n13.14.6. Đào tạo và xác thực mô hình\nBây giờ chúng ta có thể đào tạo và xác thực mô hình. Các siêu tham số\nsau đây đều có thể điều chỉnh được. Ví dụ, số lượng kỷ nguyên có thể\nđược tăng lên. Bởi vì lr_period và lr_decay được đặt thành 2 và\n0,9, tương ứng, tỷ lệ học tập của thuật toán tối ưu hóa sẽ được nhân với\n0,9 sau mỗi 2 kỷ nguyên.\n13.14.7. Phân loại bộ thử nghiệm và gửi kết quả trên Kaggle\nTương tự như bước cuối cùng trong Section 13.13 , cuối\ncùng tất cả dữ liệu được dán nhãn (bao gồm cả bộ xác thực) được sử dụng\nđể đào tạo mô hình và phân loại bộ thử nghiệm. Chúng tôi sẽ sử dụng mạng\nđầu ra tùy chỉnh được đào tạo để phân loại.\nĐoạn mã trên sẽ tạo ra một tập tin submission.csv để gửi cho Kaggle\ntheo cách tương tự được mô tả trong Section 4.10 .\n13.14.8. Tóm tắt\nHình ảnh trong tập dữ liệu ImageNet lớn hơn (với các kích thước khác\nnhau) so với hình ảnh CIFAR-10. Chúng tôi có thể sửa đổi các thao tác\nnâng hình ảnh cho các tác vụ trên một tập dữ liệu khác.\nĐể phân loại một tập hợp con của tập dữ liệu ImageNet, chúng ta có\nthể tận dụng các mô hình được đào tạo trước trên tập dữ liệu ImageNet\nđầy đủ để trích xuất các tính năng và chỉ đào tạo mạng đầu ra quy mô\nnhỏ tùy chỉnh. Điều này sẽ dẫn đến thời gian tính toán và chi phí bộ\nnhớ ít hơn.\n13.14.9. Bài tập\nKhi sử dụng bộ dữ liệu cạnh tranh Kaggle đầy đủ, bạn có thể đạt được\nkết quả gì khi tăng batch_size (kích thước lô) và num_epochs (số thời đại) trong khi đặt một số siêu tham số khác là lr = 0.01 , lr_period = 10 và lr_decay = 0.1 ?\nBạn có nhận được kết quả tốt hơn nếu bạn sử dụng một mô hình được đào\ntạo sâu hơn? Làm thế nào để bạn điều chỉnh các siêu tham số? Bạn có\nthể cải thiện hơn nữa kết quả?\nDiscussions\nDiscussions"
+}

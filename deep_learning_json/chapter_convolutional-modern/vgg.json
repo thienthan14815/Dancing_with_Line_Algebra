@@ -1,0 +1,339 @@
+{
+  "url": "https://vi.d2l.ai/chapter_convolutional-modern/vgg.html",
+  "chapter": "chapter_convolutional-modern",
+  "title": "7.2. Mạng sử dụng khối (VGG)",
+  "crawled_at": "2026-07-20T12:39:48.836908+00:00",
+  "headings": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "mang-su-dung-khoi-vgg",
+      "text": "7.2. Mạng sử dụng khối (VGG)"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "vgg-blocks",
+      "text": "7.2.1. VGG Blocks"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "vgg-mang",
+      "text": "7.2.2. VGG mạng"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "dao-tao",
+      "text": "7.2.3. Đào tạo"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tom-tat",
+      "text": "7.2.4. Tóm tắt"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bai-tap",
+      "text": "7.2.5. Bài tập"
+    }
+  ],
+  "content": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "mang-su-dung-khoi-vgg",
+      "text": "7.2. Mạng sử dụng khối (VGG)"
+    },
+    {
+      "type": "paragraph",
+      "text": "Trong khi AlexNet đưa ra bằng chứng thực nghiệm rằng CNN sâu có thể đạt\nđược kết quả tốt, nó không cung cấp một mẫu chung để hướng dẫn các nhà\nnghiên cứu tiếp theo trong việc thiết kế các mạng mới. Trong các phần\nsau, chúng tôi sẽ giới thiệu một số khái niệm heuristic thường được sử\ndụng để thiết kế các mạng sâu."
+    },
+    {
+      "type": "paragraph",
+      "text": "Tiến bộ trong lĩnh vực này phản ánh rằng trong thiết kế chip nơi các kỹ\nsư đã đi từ đặt bóng bán dẫn đến các yếu tố logic đến các khối logic.\nTương tự, thiết kế của các kiến trúc mạng thần kinh đã phát triển dần\ndần trừu tượng hơn, với các nhà nghiên cứu chuyển từ suy nghĩ về các tế\nbào thần kinh riêng lẻ sang toàn bộ các lớp, và bây giờ đến các khối,\nlặp lại các mô hình của các lớp."
+    },
+    {
+      "type": "paragraph",
+      "text": "Ý tưởng sử dụng các khối đầu tiên xuất hiện từ Visual Geometry\nGroup (VGG) tại Đại học Oxford,\ntrong mạng VGG eponymously-name của họ. Thật dễ dàng để thực hiện các\ncấu trúc lặp đi lặp lại này trong code với bất kỳ khuôn khổ học sâu hiện\nđại nào bằng cách sử dụng các vòng lặp và chương trình con."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "vgg-blocks",
+      "text": "7.2.1. VGG Blocks"
+    },
+    {
+      "type": "paragraph",
+      "text": "Khối xây dựng cơ bản của CNN cổ điển là một chuỗi các như sau: (i) một\nlớp tích hợp với đệm để duy trì độ phân giải, (ii) một phi tuyến tính\nnhư một ReLU, (iii) một lớp tổng hợp như một lớp tổng hợp tối đa. Một\nkhối VGG bao gồm một chuỗi các lớp phức tạp, tiếp theo là một lớp tổng\nhợp tối đa để lấy mẫu không gian. Trong giấy VGG gốc [Simonyan & Zisserman, 2014] , các tác giả đã sử dụng các phức hợp\nvới \\(3\\times3\\) hạt nhân với lớp đệm 1 (giữ chiều cao và chiều\nrộng) và \\(2 \\times 2\\) tổng hợp tối đa với sải chân là 2 (giảm một\nnửa độ phân giải sau mỗi khối). Trong đoạn code dưới đây, ta định nghĩa\nmột hàm gọi là vgg_block để thực hiện một khối VGG."
+    },
+    {
+      "type": "paragraph",
+      "text": "Hàm này có hai đối số tương ứng với số lớp phức tạp num_convs và số\nkênh đầu ra num_channels ."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "from mxnet import np, npx\nfrom mxnet.gluon import nn\nfrom d2l import mxnet as d2l\n\nnpx.set_np()\n\ndef vgg_block(num_convs, num_channels):\n    blk = nn.Sequential()\n    for _ in range(num_convs):\n        blk.add(nn.Conv2D(num_channels, kernel_size=3,\n                          padding=1, activation='relu'))\n    blk.add(nn.MaxPool2D(pool_size=2, strides=2))\n    return blk"
+    },
+    {
+      "type": "paragraph",
+      "text": "Hàm này có ba đối số tương ứng với số lớp phức tạp num_convs , số\nkênh đầu vào in_channels và số kênh đầu ra out_channels ."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "import torch\nfrom torch import nn\nfrom d2l import torch as d2l\n\n\ndef vgg_block(num_convs, in_channels, out_channels):\n    layers = []\n    for _ in range(num_convs):\n        layers.append(nn.Conv2d(in_channels, out_channels,\n                                kernel_size=3, padding=1))\n        layers.append(nn.ReLU())\n        in_channels = out_channels\n    layers.append(nn.MaxPool2d(kernel_size=2,stride=2))\n    return nn.Sequential(*layers)"
+    },
+    {
+      "type": "paragraph",
+      "text": "Hàm này có hai đối số tương ứng với số lớp phức tạp num_convs và số\nkênh đầu ra num_channels ."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "import tensorflow as tf\nfrom d2l import tensorflow as d2l\n\n\ndef vgg_block(num_convs, num_channels):\n    blk = tf.keras.models.Sequential()\n    for _ in range(num_convs):\n        blk.add(tf.keras.layers.Conv2D(num_channels,kernel_size=3,\n                                    padding='same',activation='relu'))\n    blk.add(tf.keras.layers.MaxPool2D(pool_size=2, strides=2))\n    return blk"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "vgg-mang",
+      "text": "7.2.2. VGG mạng"
+    },
+    {
+      "type": "paragraph",
+      "text": "Giống như AlexNet và LeNet, Mạng VGG có thể được phân chia thành hai\nphần: phần đầu tiên bao gồm chủ yếu là các lớp phức tạp và tập hợp và\nthứ hai bao gồm các lớp được kết nối hoàn toàn. Điều này được miêu tả\nnăm Fig. 7.2.1 ."
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/vgg.svg",
+      "local_path": "_images/vgg.svg",
+      "alt": "../_images/vgg.svg"
+    },
+    {
+      "type": "paragraph",
+      "text": "Fig. 7.2.1 From AlexNet to VGG that is designed from building blocks. ¶"
+    },
+    {
+      "type": "paragraph",
+      "text": "Phần tích tụ của mạng kết nối một số khối VGG từ Fig. 7.2.1 (cũng được định nghĩa trong hàm vgg_block ) liên tiếp. Biến sau đây conv_arch bao gồm một danh sách các tuples (một cho mỗi khối), trong\nđó mỗi khối chứa hai giá trị: số lớp phức tạp và số kênh đầu ra, đó\nchính xác là các đối số cần thiết để gọi hàm vgg_block . Phần được\nkết nối hoàn toàn của mạng VGG giống hệt với phần được bao phủ trong\nAlexNet."
+    },
+    {
+      "type": "paragraph",
+      "text": "Mạng VGG ban đầu có 5 khối phức tạp, trong đó hai khối đầu tiên có một\nlớp ghép mỗi lớp và ba khối sau chứa hai lớp ghép mỗi lớp. Khối đầu tiên\ncó 64 kênh đầu ra và mỗi khối tiếp theo tăng gấp đôi số kênh đầu ra, cho\nđến khi con số đó đạt 512. Vì mạng này sử dụng 8 lớp kết nối và 3 lớp\nkết nối hoàn toàn nên nó thường được gọi là VGG-11."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "conv_arch = ((1, 64), (1, 128), (2, 256), (2, 512), (2, 512))"
+    },
+    {
+      "type": "paragraph",
+      "text": "Mã sau đây thực hiện VGG-11. Đây là một vấn đề đơn giản của việc thực\nhiện một for-loop trên conv_arch ."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def vgg(conv_arch):\n    net = nn.Sequential()\n    # The convolutional part\n    for (num_convs, num_channels) in conv_arch:\n        net.add(vgg_block(num_convs, num_channels))\n    # The fully-connected part\n    net.add(nn.Dense(4096, activation='relu'), nn.Dropout(0.5),\n            nn.Dense(4096, activation='relu'), nn.Dropout(0.5),\n            nn.Dense(10))\n    return net\n\nnet = vgg(conv_arch)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def vgg(conv_arch):\n    conv_blks = []\n    in_channels = 1\n    # The convolutional part\n    for (num_convs, out_channels) in conv_arch:\n        conv_blks.append(vgg_block(num_convs, in_channels, out_channels))\n        in_channels = out_channels\n\n    return nn.Sequential(\n        *conv_blks, nn.Flatten(),\n        # The fully-connected part\n        nn.Linear(out_channels * 7 * 7, 4096), nn.ReLU(), nn.Dropout(0.5),\n        nn.Linear(4096, 4096), nn.ReLU(), nn.Dropout(0.5),\n        nn.Linear(4096, 10))\n\nnet = vgg(conv_arch)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def vgg(conv_arch):\n    net = tf.keras.models.Sequential()\n    # The convulational part\n    for (num_convs, num_channels) in conv_arch:\n        net.add(vgg_block(num_convs, num_channels))\n    # The fully-connected part\n    net.add(tf.keras.models.Sequential([\n        tf.keras.layers.Flatten(),\n        tf.keras.layers.Dense(4096, activation='relu'),\n        tf.keras.layers.Dropout(0.5),\n        tf.keras.layers.Dense(4096, activation='relu'),\n        tf.keras.layers.Dropout(0.5),\n        tf.keras.layers.Dense(10)]))\n    return net\n\nnet = vgg(conv_arch)"
+    },
+    {
+      "type": "paragraph",
+      "text": "Tiếp theo, chúng ta sẽ xây dựng một ví dụ dữ liệu đơn kênh với chiều cao\nvà chiều rộng từ 224 đến quan sát hình dạng đầu ra của mỗi lớp."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "net.initialize()\nX = np.random.uniform(size=(1, 1, 224, 224))\nfor blk in net:\n    X = blk(X)\n    print(blk.name, 'output shape:\\t', X.shape)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "sequential1 output shape:    (1, 64, 112, 112)\nsequential2 output shape:    (1, 128, 56, 56)\nsequential3 output shape:    (1, 256, 28, 28)\nsequential4 output shape:    (1, 512, 14, 14)\nsequential5 output shape:    (1, 512, 7, 7)\ndense0 output shape:         (1, 4096)\ndropout0 output shape:       (1, 4096)\ndense1 output shape:         (1, 4096)\ndropout1 output shape:       (1, 4096)\ndense2 output shape:         (1, 10)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "X = torch.randn(size=(1, 1, 224, 224))\nfor blk in net:\n    X = blk(X)\n    print(blk.__class__.__name__,'output shape:\\t',X.shape)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "Sequential output shape:     torch.Size([1, 64, 112, 112])\nSequential output shape:     torch.Size([1, 128, 56, 56])\nSequential output shape:     torch.Size([1, 256, 28, 28])\nSequential output shape:     torch.Size([1, 512, 14, 14])\nSequential output shape:     torch.Size([1, 512, 7, 7])\nFlatten output shape:        torch.Size([1, 25088])\nLinear output shape:         torch.Size([1, 4096])\nReLU output shape:   torch.Size([1, 4096])\nDropout output shape:        torch.Size([1, 4096])\nLinear output shape:         torch.Size([1, 4096])\nReLU output shape:   torch.Size([1, 4096])\nDropout output shape:        torch.Size([1, 4096])\nLinear output shape:         torch.Size([1, 10])"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "X = tf.random.uniform((1, 224, 224, 1))\nfor blk in net.layers:\n    X = blk(X)\n    print(blk.__class__.__name__,'output shape:\\t', X.shape)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "Sequential output shape:     (1, 112, 112, 64)\nSequential output shape:     (1, 56, 56, 128)\nSequential output shape:     (1, 28, 28, 256)\nSequential output shape:     (1, 14, 14, 512)\nSequential output shape:     (1, 7, 7, 512)\nSequential output shape:     (1, 10)"
+    },
+    {
+      "type": "paragraph",
+      "text": "Như bạn có thể thấy, chúng ta giảm một nửa chiều cao và chiều rộng tại\nmỗi khối, cuối cùng đạt đến chiều cao và chiều rộng 7 trước khi làm\nphẳng các biểu diễn để xử lý bởi phần kết nối hoàn toàn của mạng."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "dao-tao",
+      "text": "7.2.3. Đào tạo"
+    },
+    {
+      "type": "paragraph",
+      "text": "Vì VGG-11 nặng tính toán hơn AlexNet, chúng tôi xây dựng một mạng với số\nlượng kênh nhỏ hơn. Điều này là quá đủ để đào tạo về Fashion-MNIST."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "ratio = 4\nsmall_conv_arch = [(pair[0], pair[1] // ratio) for pair in conv_arch]\nnet = vgg(small_conv_arch)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "ratio = 4\nsmall_conv_arch = [(pair[0], pair[1] // ratio) for pair in conv_arch]\nnet = vgg(small_conv_arch)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "ratio = 4\nsmall_conv_arch = [(pair[0], pair[1] // ratio) for pair in conv_arch]\n# Recall that this has to be a function that will be passed to\n# `d2l.train_ch6()` so that model building/compiling need to be within\n# `strategy.scope()` in order to utilize the CPU/GPU devices that we have\nnet = lambda: vgg(small_conv_arch)"
+    },
+    {
+      "type": "paragraph",
+      "text": "Ngoài việc sử dụng tốc độ học tập lớn hơn một chút, quá trình model\ntraining cũng tương tự như của AlexNet trong Section 7.1 ."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "lr, num_epochs, batch_size = 0.05, 10, 128\ntrain_iter, test_iter = d2l.load_data_fashion_mnist(batch_size, resize=224)\nd2l.train_ch6(net, train_iter, test_iter, num_epochs, lr, d2l.try_gpu())"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "loss 0.175, train acc 0.936, test acc 0.923\n1765.4 examples/sec on gpu(0)"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_vgg_4a7574_56_1.svg",
+      "local_path": "_images/output_vgg_4a7574_56_1.svg",
+      "alt": "../_images/output_vgg_4a7574_56_1.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "lr, num_epochs, batch_size = 0.05, 10, 128\ntrain_iter, test_iter = d2l.load_data_fashion_mnist(batch_size, resize=224)\nd2l.train_ch6(net, train_iter, test_iter, num_epochs, lr, d2l.try_gpu())"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "loss 0.177, train acc 0.934, test acc 0.921\n2499.7 examples/sec on cuda:0"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_vgg_4a7574_59_1.svg",
+      "local_path": "_images/output_vgg_4a7574_59_1.svg",
+      "alt": "../_images/output_vgg_4a7574_59_1.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "lr, num_epochs, batch_size = 0.05, 10, 128\ntrain_iter, test_iter = d2l.load_data_fashion_mnist(batch_size, resize=224)\nd2l.train_ch6(net, train_iter, test_iter, num_epochs, lr, d2l.try_gpu())"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "loss 0.176, train acc 0.935, test acc 0.924\n2715.0 examples/sec on /GPU:0"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "<keras.engine.sequential.Sequential at 0x7fe4ac359970>"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_vgg_4a7574_62_2.svg",
+      "local_path": "_images/output_vgg_4a7574_62_2.svg",
+      "alt": "../_images/output_vgg_4a7574_62_2.svg"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tom-tat",
+      "text": "7.2.4. Tóm tắt"
+    },
+    {
+      "type": "list",
+      "ordered": false,
+      "items": [
+        "VGG-11 xây dựng một mạng bằng cách sử dụng các khối phức tạp có thể\ntái sử dụng. Các mô hình VGG khác nhau có thể được xác định bởi sự\nkhác biệt về số lượng lớp phức tạp và các kênh đầu ra trong mỗi khối.",
+        "Việc sử dụng các khối dẫn đến các đại diện rất nhỏ gọn của định nghĩa\nmạng. Nó cho phép thiết kế hiệu quả các mạng phức tạp.",
+        "Trong giấy VGG của họ, Simonyan và Ziserman đã thử nghiệm với nhiều\nkiến trúc khác nhau. Đặc biệt, họ phát hiện ra rằng một số lớp phức\ntạp sâu và hẹp (tức là \\(3 \\times 3\\) ) có hiệu quả hơn so với ít\nlớp phức tạp rộng hơn."
+      ]
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bai-tap",
+      "text": "7.2.5. Bài tập"
+    },
+    {
+      "type": "list",
+      "ordered": true,
+      "items": [
+        "Khi in ra kích thước của các lớp chúng ta chỉ thấy 8 kết quả hơn là\n11. Thông tin 3 lớp còn lại đã đi đâu?",
+        "So với AlexNet, VGG chậm hơn nhiều về mặt tính toán, và nó cũng cần\nnhiều bộ nhớ GPU hơn. Phân tích lý do cho việc này.",
+        "Hãy thử thay đổi chiều cao và chiều rộng của hình ảnh trong\nFashion-MNIST từ 224 đến 96. Điều này có ảnh hưởng gì đến các thí\nnghiệm?",
+        "Tham khảo Bảng 1 trong giấy VGG [Simonyan & Zisserman, 2014] để\nxây dựng các mô hình phổ biến khác, chẳng hạn như VGG-16 hoặc VGG-19."
+      ]
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    }
+  ],
+  "images": [
+    {
+      "original_url": "https://vi.d2l.ai/_images/vgg.svg",
+      "local_path": "_images/vgg.svg",
+      "alt": "../_images/vgg.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_vgg_4a7574_56_1.svg",
+      "local_path": "_images/output_vgg_4a7574_56_1.svg",
+      "alt": "../_images/output_vgg_4a7574_56_1.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_vgg_4a7574_59_1.svg",
+      "local_path": "_images/output_vgg_4a7574_59_1.svg",
+      "alt": "../_images/output_vgg_4a7574_59_1.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_vgg_4a7574_62_2.svg",
+      "local_path": "_images/output_vgg_4a7574_62_2.svg",
+      "alt": "../_images/output_vgg_4a7574_62_2.svg"
+    }
+  ],
+  "text": "7.2. Mạng sử dụng khối (VGG)\nTrong khi AlexNet đưa ra bằng chứng thực nghiệm rằng CNN sâu có thể đạt\nđược kết quả tốt, nó không cung cấp một mẫu chung để hướng dẫn các nhà\nnghiên cứu tiếp theo trong việc thiết kế các mạng mới. Trong các phần\nsau, chúng tôi sẽ giới thiệu một số khái niệm heuristic thường được sử\ndụng để thiết kế các mạng sâu.\nTiến bộ trong lĩnh vực này phản ánh rằng trong thiết kế chip nơi các kỹ\nsư đã đi từ đặt bóng bán dẫn đến các yếu tố logic đến các khối logic.\nTương tự, thiết kế của các kiến trúc mạng thần kinh đã phát triển dần\ndần trừu tượng hơn, với các nhà nghiên cứu chuyển từ suy nghĩ về các tế\nbào thần kinh riêng lẻ sang toàn bộ các lớp, và bây giờ đến các khối,\nlặp lại các mô hình của các lớp.\nÝ tưởng sử dụng các khối đầu tiên xuất hiện từ Visual Geometry\nGroup (VGG) tại Đại học Oxford,\ntrong mạng VGG eponymously-name của họ. Thật dễ dàng để thực hiện các\ncấu trúc lặp đi lặp lại này trong code với bất kỳ khuôn khổ học sâu hiện\nđại nào bằng cách sử dụng các vòng lặp và chương trình con.\n7.2.1. VGG Blocks\nKhối xây dựng cơ bản của CNN cổ điển là một chuỗi các như sau: (i) một\nlớp tích hợp với đệm để duy trì độ phân giải, (ii) một phi tuyến tính\nnhư một ReLU, (iii) một lớp tổng hợp như một lớp tổng hợp tối đa. Một\nkhối VGG bao gồm một chuỗi các lớp phức tạp, tiếp theo là một lớp tổng\nhợp tối đa để lấy mẫu không gian. Trong giấy VGG gốc [Simonyan & Zisserman, 2014] , các tác giả đã sử dụng các phức hợp\nvới \\(3\\times3\\) hạt nhân với lớp đệm 1 (giữ chiều cao và chiều\nrộng) và \\(2 \\times 2\\) tổng hợp tối đa với sải chân là 2 (giảm một\nnửa độ phân giải sau mỗi khối). Trong đoạn code dưới đây, ta định nghĩa\nmột hàm gọi là vgg_block để thực hiện một khối VGG.\nHàm này có hai đối số tương ứng với số lớp phức tạp num_convs và số\nkênh đầu ra num_channels .\nHàm này có ba đối số tương ứng với số lớp phức tạp num_convs , số\nkênh đầu vào in_channels và số kênh đầu ra out_channels .\nHàm này có hai đối số tương ứng với số lớp phức tạp num_convs và số\nkênh đầu ra num_channels .\n7.2.2. VGG mạng\nGiống như AlexNet và LeNet, Mạng VGG có thể được phân chia thành hai\nphần: phần đầu tiên bao gồm chủ yếu là các lớp phức tạp và tập hợp và\nthứ hai bao gồm các lớp được kết nối hoàn toàn. Điều này được miêu tả\nnăm Fig. 7.2.1 .\nFig. 7.2.1 From AlexNet to VGG that is designed from building blocks. ¶\nPhần tích tụ của mạng kết nối một số khối VGG từ Fig. 7.2.1 (cũng được định nghĩa trong hàm vgg_block ) liên tiếp. Biến sau đây conv_arch bao gồm một danh sách các tuples (một cho mỗi khối), trong\nđó mỗi khối chứa hai giá trị: số lớp phức tạp và số kênh đầu ra, đó\nchính xác là các đối số cần thiết để gọi hàm vgg_block . Phần được\nkết nối hoàn toàn của mạng VGG giống hệt với phần được bao phủ trong\nAlexNet.\nMạng VGG ban đầu có 5 khối phức tạp, trong đó hai khối đầu tiên có một\nlớp ghép mỗi lớp và ba khối sau chứa hai lớp ghép mỗi lớp. Khối đầu tiên\ncó 64 kênh đầu ra và mỗi khối tiếp theo tăng gấp đôi số kênh đầu ra, cho\nđến khi con số đó đạt 512. Vì mạng này sử dụng 8 lớp kết nối và 3 lớp\nkết nối hoàn toàn nên nó thường được gọi là VGG-11.\nMã sau đây thực hiện VGG-11. Đây là một vấn đề đơn giản của việc thực\nhiện một for-loop trên conv_arch .\nTiếp theo, chúng ta sẽ xây dựng một ví dụ dữ liệu đơn kênh với chiều cao\nvà chiều rộng từ 224 đến quan sát hình dạng đầu ra của mỗi lớp.\nNhư bạn có thể thấy, chúng ta giảm một nửa chiều cao và chiều rộng tại\nmỗi khối, cuối cùng đạt đến chiều cao và chiều rộng 7 trước khi làm\nphẳng các biểu diễn để xử lý bởi phần kết nối hoàn toàn của mạng.\n7.2.3. Đào tạo\nVì VGG-11 nặng tính toán hơn AlexNet, chúng tôi xây dựng một mạng với số\nlượng kênh nhỏ hơn. Điều này là quá đủ để đào tạo về Fashion-MNIST.\nNgoài việc sử dụng tốc độ học tập lớn hơn một chút, quá trình model\ntraining cũng tương tự như của AlexNet trong Section 7.1 .\n7.2.4. Tóm tắt\nVGG-11 xây dựng một mạng bằng cách sử dụng các khối phức tạp có thể\ntái sử dụng. Các mô hình VGG khác nhau có thể được xác định bởi sự\nkhác biệt về số lượng lớp phức tạp và các kênh đầu ra trong mỗi khối.\nViệc sử dụng các khối dẫn đến các đại diện rất nhỏ gọn của định nghĩa\nmạng. Nó cho phép thiết kế hiệu quả các mạng phức tạp.\nTrong giấy VGG của họ, Simonyan và Ziserman đã thử nghiệm với nhiều\nkiến trúc khác nhau. Đặc biệt, họ phát hiện ra rằng một số lớp phức\ntạp sâu và hẹp (tức là \\(3 \\times 3\\) ) có hiệu quả hơn so với ít\nlớp phức tạp rộng hơn.\n7.2.5. Bài tập\nKhi in ra kích thước của các lớp chúng ta chỉ thấy 8 kết quả hơn là\n11. Thông tin 3 lớp còn lại đã đi đâu?\nSo với AlexNet, VGG chậm hơn nhiều về mặt tính toán, và nó cũng cần\nnhiều bộ nhớ GPU hơn. Phân tích lý do cho việc này.\nHãy thử thay đổi chiều cao và chiều rộng của hình ảnh trong\nFashion-MNIST từ 224 đến 96. Điều này có ảnh hưởng gì đến các thí\nnghiệm?\nTham khảo Bảng 1 trong giấy VGG [Simonyan & Zisserman, 2014] để\nxây dựng các mô hình phổ biến khác, chẳng hạn như VGG-16 hoặc VGG-19.\nDiscussions\nDiscussions\nDiscussions"
+}

@@ -1,0 +1,532 @@
+{
+  "url": "https://vi.d2l.ai/chapter_optimization/adagrad.html",
+  "chapter": "chapter_optimization",
+  "title": "11.7. Adagrad",
+  "crawled_at": "2026-07-20T12:40:25.652832+00:00",
+  "headings": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "adagrad",
+      "text": "11.7. Adagrad"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tinh-nang-thua-thot-va-ty-le-hoc-tap",
+      "text": "11.7.1. Tính năng thưa thớt và tỷ lệ học tập"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "dieu-hoa-truoc",
+      "text": "11.7.2. Điều hòa trước"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "cac-thuat-toan",
+      "text": "11.7.3. Các thuật toán"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "thuc-hien-tu-dau",
+      "text": "11.7.4. Thực hiện từ đầu"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "thuc-hien-ngan-gon",
+      "text": "11.7.5. Thực hiện ngắn gọn"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tom-tat",
+      "text": "11.7.6. Tóm tắt"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bai-tap",
+      "text": "11.7.7. Bài tập"
+    }
+  ],
+  "content": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "adagrad",
+      "text": "11.7. Adagrad"
+    },
+    {
+      "type": "paragraph",
+      "text": "Chúng ta hãy bắt đầu bằng cách xem xét các vấn đề học tập với các tính\nnăng xảy ra không thường xuyên."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tinh-nang-thua-thot-va-ty-le-hoc-tap",
+      "text": "11.7.1. Tính năng thưa thớt và tỷ lệ học tập"
+    },
+    {
+      "type": "paragraph",
+      "text": "Hãy tưởng tượng rằng chúng ta đang đào tạo một mô hình ngôn ngữ. Để có\nđược độ chính xác tốt, chúng tôi thường muốn giảm tỷ lệ học tập khi\nchúng tôi tiếp tục đào tạo, thường ở tốc độ \\(\\mathcal{O}(t^{-\\frac{1}{2}})\\) hoặc chậm hơn. Bây giờ hãy xem xét\nmột đào tạo mô hình về các tính năng thưa thớt, tức là, các tính năng\nchỉ xảy ra không thường xuyên. Điều này là phổ biến cho ngôn ngữ tự\nnhiên, ví dụ, nó là rất ít khả năng rằng chúng ta sẽ thấy từ *\npreconditioning* so với learning . Tuy nhiên, nó cũng phổ biến ở các\nlĩnh vực khác như quảng cáo tính toán và lọc hợp tác được cá nhân hóa.\nRốt cuộc, có rất nhiều điều chỉ được quan tâm đối với một số lượng nhỏ\nngười."
+    },
+    {
+      "type": "paragraph",
+      "text": "Các tham số liên quan đến các tính năng không thường xuyên chỉ nhận được\ncập nhật có ý nghĩa bất cứ khi nào các tính năng này xảy ra. Với tốc độ\nhọc tập giảm, chúng ta có thể kết thúc trong một tình huống mà các thông\nsố cho các tính năng chung hội tụ khá nhanh đến các giá trị tối ưu của\nchúng, trong khi đối với các tính năng không thường xuyên, chúng ta vẫn\nthiếu quan sát chúng đủ thường xuyên trước khi các giá trị tối ưu của\nchúng có thể được xác định. Nói cách khác, tỷ lệ học tập giảm quá chậm\nđối với các tính năng thường xuyên hoặc quá nhanh đối với những người\nkhông thường xuyên."
+    },
+    {
+      "type": "paragraph",
+      "text": "Một hack có thể để khắc phục vấn đề này sẽ là đếm số lần chúng ta thấy\nmột tính năng cụ thể và sử dụng điều này làm đồng hồ để điều chỉnh tỷ lệ\nhọc tập. Đó là, thay vì chọn một tỷ lệ học tập của mẫu \\(\\eta = \\frac{\\eta_0}{\\sqrt{t + c}}\\) chúng ta có thể sử dụng \\(\\eta_i = \\frac{\\eta_0}{\\sqrt{s(i, t) + c}}\\) . Ở đây \\(s(i, t)\\) đếm số lượng nonzeros cho tính năng \\(i\\) mà chúng\ntôi đã quan sát đến thời gian \\(t\\) . Điều này thực sự khá dễ thực\nhiện tại không có chi phí có ý nghĩa. Tuy nhiên, nó thất bại bất cứ khi\nnào chúng ta không hoàn toàn có độ thưa thớt mà chỉ là dữ liệu mà các\ngradient thường rất nhỏ và chỉ hiếm khi lớn. Rốt cuộc, không rõ nơi\nngười ta sẽ vẽ đường giữa một cái gì đó đủ điều kiện là một tính năng\nquan sát hay không."
+    },
+    {
+      "type": "paragraph",
+      "text": "Adagrad bởi [Duchi et al., 2011] giải quyết điều này bằng\ncách thay thế bộ đếm khá thô \\(s(i, t)\\) bằng tổng hợp các ô vuông\ncủa gradient quan sát trước đó. Đặc biệt, nó sử dụng \\(s(i, t+1) = s(i, t) + \\left(\\partial_i f(\\mathbf{x})\\right)^2\\) như một phương tiện để điều chỉnh tốc độ học tập. Điều này có hai lợi\ních: đầu tiên, chúng ta không còn cần phải quyết định chỉ khi một\ngradient đủ lớn. Thứ hai, nó tự động quy mô với độ lớn của gradient. Các\ntọa độ thường xuyên tương ứng với các gradient lớn được thu nhỏ đáng kể,\ntrong khi các tọa độ khác có độ dốc nhỏ sẽ được điều trị nhẹ nhàng hơn\nnhiều. Trong thực tế, điều này dẫn đến một thủ tục tối ưu hóa rất hiệu\nquả cho quảng cáo tính toán và các vấn đề liên quan. Nhưng điều này che\ngiấu một số lợi ích bổ sung vốn có trong Adagrad được hiểu rõ nhất trong\nbối cảnh điều kiện tiên quyết."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "dieu-hoa-truoc",
+      "text": "11.7.2. Điều hòa trước"
+    },
+    {
+      "type": "paragraph",
+      "text": "Vấn đề tối ưu hóa lồi là tốt cho việc phân tích các đặc tính của thuật\ntoán. Rốt cuộc, đối với hầu hết các vấn đề không lồi, rất khó để lấy\nđược những đảm bảo lý thuyết có ý nghĩa, nhưng * trực tuyến* và * cái\nnhìn sâu thắng* thường tiếp tục. Chúng ta hãy nhìn vào vấn đề giảm\nthiểu \\(f(\\mathbf{x}) = \\frac{1}{2} \\mathbf{x}^\\top \\mathbf{Q} \\mathbf{x} + \\mathbf{c}^\\top \\mathbf{x} + b\\) ."
+    },
+    {
+      "type": "paragraph",
+      "text": "Như chúng ta đã thấy trong Section 11.6 , có thể viết lại vấn\nđề này về khả năng phân hủy \\(\\mathbf{Q} = \\mathbf{U}^\\top \\boldsymbol{\\Lambda} \\mathbf{U}\\) để\nđến một vấn đề đơn giản hóa nhiều trong đó mỗi tọa độ có thể được giải\nquyết riêng lẻ:"
+    },
+    {
+      "type": "math",
+      "latex": "(11.7.1)¶\\[f(\\mathbf{x}) = \\bar{f}(\\bar{\\mathbf{x}}) = \\frac{1}{2} \\bar{\\mathbf{x}}^\\top \\boldsymbol{\\Lambda} \\bar{\\mathbf{x}} + \\bar{\\mathbf{c}}^\\top \\bar{\\mathbf{x}} + b.\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Ở đây chúng tôi đã sử dụng \\(\\mathbf{x} = \\mathbf{U} \\mathbf{x}\\) và\ndo đó \\(\\mathbf{c} = \\mathbf{U} \\mathbf{c}\\) . Vấn đề sửa đổi có như\nminimizer của nó \\(\\bar{\\mathbf{x}} = -\\boldsymbol{\\Lambda}^{-1} \\bar{\\mathbf{c}}\\) và giá trị tối thiểu \\(-\\frac{1}{2} \\bar{\\mathbf{c}}^\\top \\boldsymbol{\\Lambda}^{-1} \\bar{\\mathbf{c}} + b\\) .\nĐiều này dễ tính toán hơn nhiều vì \\(\\boldsymbol{\\Lambda}\\) là một\nma trận chéo chứa các giá trị eigenvalues của \\(\\mathbf{Q}\\) ."
+    },
+    {
+      "type": "paragraph",
+      "text": "Nếu chúng ta làm hỏng \\(\\mathbf{c}\\) một chút, chúng tôi hy vọng sẽ\nchỉ tìm thấy những thay đổi nhỏ trong bộ giảm thiểu \\(f\\) . Thật\nkhông may đây không phải là trường hợp. Trong khi những thay đổi nhỏ\ntrong \\(\\mathbf{c}\\) dẫn đến những thay đổi nhỏ như nhau trong \\(\\bar{\\mathbf{c}}\\) , đây không phải là trường hợp cho minimizer \\(f\\) (và \\(\\bar{f}\\) tương ứng). Bất cứ khi nào giá trị\neigenvalues \\(\\boldsymbol{\\Lambda}_i\\) lớn, chúng ta sẽ chỉ thấy\nnhững thay đổi nhỏ trong \\(\\bar{x}_i\\) và tối thiểu là \\(\\bar{f}\\) . Ngược lại, đối với những thay đổi nhỏ \\(\\boldsymbol{\\Lambda}_i\\) trong \\(\\bar{x}_i\\) có thể là kịch\ntính. Tỷ lệ giữa eigenvalue lớn nhất và nhỏ nhất được gọi là số điều\nkiện của một bài toán tối ưu hóa."
+    },
+    {
+      "type": "math",
+      "latex": "(11.7.2)¶\\[\\kappa = \\frac{\\boldsymbol{\\Lambda}_1}{\\boldsymbol{\\Lambda}_d}.\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Nếu điều kiện số \\(\\kappa\\) lớn, rất khó để giải quyết vấn đề tối ưu\nhóa một cách chính xác. Chúng ta cần đảm bảo rằng chúng ta cẩn thận\ntrong việc có được một phạm vi động lớn các giá trị đúng. Phân tích của\nchúng tôi dẫn đến một câu hỏi rõ ràng, mặc dù hơi ngây thơ: chúng ta\nkhông thể chỉ đơn giản là “khắc phục” vấn đề bằng cách làm biến dạng\nkhông gian sao cho tất cả các giá trị eigenvalues là \\(1\\) . Về lý\nthuyết, điều này khá dễ dàng: chúng ta chỉ cần eigenvalues và\neigenvectors của \\(\\mathbf{Q}\\) để giải phóng vấn đề từ \\(\\mathbf{x}\\) thành một trong \\(\\mathbf{z} := \\boldsymbol{\\Lambda}^{\\frac{1}{2}} \\mathbf{U} \\mathbf{x}\\) .\nTrong hệ tọa độ mới \\(\\mathbf{x}^\\top \\mathbf{Q} \\mathbf{x}\\) có thể\nđược đơn giản hóa thành \\(\\|\\mathbf{z}\\|^2\\) . Than ôi, đây là một\ngợi ý khá không thực tế. Tính toán eigenvalues và eigenvectors nói chung\nlà * nhiều hơn* đắt hơn so với giải quyết vấn đề thực tế."
+    },
+    {
+      "type": "paragraph",
+      "text": "Trong khi tính toán eigenvalues chính xác có thể đắt tiền, đoán chúng và\ntính toán chúng thậm chí có phần xấp xỉ có thể đã tốt hơn rất nhiều so\nvới không làm bất cứ điều gì cả. Đặc biệt, chúng ta có thể sử dụng các\nmục chéo của \\(\\mathbf{Q}\\) và giải thích nó cho phù hợp. Đây là *\nnhiều* rẻ hơn so với tính toán eigenvalues."
+    },
+    {
+      "type": "math",
+      "latex": "(11.7.3)¶\\[\\tilde{\\mathbf{Q}} = \\mathrm{diag}^{-\\frac{1}{2}}(\\mathbf{Q}) \\mathbf{Q} \\mathrm{diag}^{-\\frac{1}{2}}(\\mathbf{Q}).\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Trong trường hợp này, chúng tôi có \\(\\tilde{\\mathbf{Q}}_{ij} = \\mathbf{Q}_{ij} / \\sqrt{\\mathbf{Q}_{ii} \\mathbf{Q}_{jj}}\\) và cụ thể là \\(\\tilde{\\mathbf{Q}}_{ii} = 1\\) cho tất cả \\(i\\) .\nTrong hầu hết các trường hợp, điều này đơn giản hóa số điều kiện đáng\nkể. Ví dụ, các trường hợp chúng ta đã thảo luận trước đây, điều này sẽ\nloại bỏ hoàn toàn vấn đề trong tầm tay vì vấn đề được căn chỉnh trục."
+    },
+    {
+      "type": "paragraph",
+      "text": "Thật không may, chúng ta phải đối mặt với một vấn đề khác: trong học\nsâu, chúng ta thường thậm chí không có quyền truy cập vào đạo hàm thứ\nhai của hàm khách quan: cho \\(\\mathbf{x} \\in \\mathbb{R}^d\\) , phái\nsinh thứ hai ngay cả trên một minibatch có thể yêu cầu \\(\\mathcal{O}(d^2)\\) không gian và hoạt động để tính toán, do đó làm\ncho nó thực tế không khả thi. Ý tưởng khéo léo của Adagrad là sử dụng\nmột proxy cho đường chéo khó nắm bắt của Hessian vừa tương đối rẻ để\ntính toán và hiệu quả—độ lớn của bản thân gradient."
+    },
+    {
+      "type": "paragraph",
+      "text": "Để xem lý do tại sao điều này hoạt động, chúng ta hãy nhìn vào \\(\\bar{f}(\\bar{\\mathbf{x}})\\) . Chúng tôi có điều đó"
+    },
+    {
+      "type": "math",
+      "latex": "(11.7.4)¶\\[\\partial_{\\bar{\\mathbf{x}}} \\bar{f}(\\bar{\\mathbf{x}}) = \\boldsymbol{\\Lambda} \\bar{\\mathbf{x}} + \\bar{\\mathbf{c}} = \\boldsymbol{\\Lambda} \\left(\\bar{\\mathbf{x}} - \\bar{\\mathbf{x}}_0\\right),\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "trong đó \\(\\bar{\\mathbf{x}}_0\\) là minimizer của \\(\\bar{f}\\) . Do\nđó độ lớn của gradient phụ thuộc cả vào \\(\\boldsymbol{\\Lambda}\\) và\nkhoảng cách từ độ tối ưu. Nếu \\(\\bar{\\mathbf{x}} - \\bar{\\mathbf{x}}_0\\) không thay đổi, đây sẽ là\ntất cả những gì cần thiết. Rốt cuộc, trong trường hợp này độ lớn của\ngradient \\(\\partial_{\\bar{\\mathbf{x}}} \\bar{f}(\\bar{\\mathbf{x}})\\) đủ. Vì AdaGrad là một thuật toán gốc gradient ngẫu nhiên, chúng ta sẽ\nthấy gradient với phương sai nonzero ngay cả khi tối ưu. Kết quả là\nchúng ta có thể sử dụng phương sai của gradient một cách an toàn như một\nproxy giá rẻ cho thang đo của Hessian. Một phân tích kỹ lưỡng nằm ngoài\nphạm vi của phần này (nó sẽ là một số trang). Chúng tôi giới thiệu người\nđọc đến [Duchi et al., 2011] để biết chi tiết."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "cac-thuat-toan",
+      "text": "11.7.3. Các thuật toán"
+    },
+    {
+      "type": "paragraph",
+      "text": "Hãy để chúng tôi chính thức hóa các cuộc thảo luận từ trên cao. Chúng ta\nsử dụng biến \\(\\mathbf{s}_t\\) để tích lũy phương sai gradient quá\nkhứ như sau."
+    },
+    {
+      "type": "math",
+      "latex": "(11.7.5)¶\\[\\begin{split}\\begin{aligned}\n    \\mathbf{g}_t & = \\partial_{\\mathbf{w}} l(y_t, f(\\mathbf{x}_t, \\mathbf{w})), \\\\\n    \\mathbf{s}_t & = \\mathbf{s}_{t-1} + \\mathbf{g}_t^2, \\\\\n    \\mathbf{w}_t & = \\mathbf{w}_{t-1} - \\frac{\\eta}{\\sqrt{\\mathbf{s}_t + \\epsilon}} \\cdot \\mathbf{g}_t.\n\\end{aligned}\\end{split}\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Ở đây hoạt động được áp dụng tọa độ khôn ngoan. Đó là, \\(\\mathbf{v}^2\\) có mục \\(v_i^2\\) . Tương tự như vậy \\(\\frac{1}{\\sqrt{v}}\\) có mục \\(\\frac{1}{\\sqrt{v_i}}\\) và \\(\\mathbf{u} \\cdot \\mathbf{v}\\) có mục \\(u_i v_i\\) . Như trước \\(\\eta\\) là tốc độ học tập và \\(\\epsilon\\) là một hằng số phụ\ngia đảm bảo rằng chúng ta không chia cho \\(0\\) . Cuối cùng, chúng tôi\nkhởi tạo \\(\\mathbf{s}_0 = \\mathbf{0}\\) ."
+    },
+    {
+      "type": "paragraph",
+      "text": "Cũng giống như trong trường hợp động lượng chúng ta cần phải theo dõi\nmột biến phụ trợ, trong trường hợp này để cho phép một tỷ lệ học tập cá\nnhân trên mỗi tọa độ. Điều này không làm tăng chi phí của Adagrad đáng\nkể so với SGD, đơn giản vì chi phí chính thường là tính toán \\(l(y_t, f(\\mathbf{x}_t, \\mathbf{w}))\\) và phái sinh của nó."
+    },
+    {
+      "type": "paragraph",
+      "text": "Lưu ý rằng tích lũy gradient bình phương trong \\(\\mathbf{s}_t\\) có\nnghĩa là \\(\\mathbf{s}_t\\) phát triển cơ bản ở tốc độ tuyến tính (hơi\nchậm hơn tuyến tính trong thực tế, vì độ dốc ban đầu giảm dần). Điều này\ndẫn đến tỷ lệ học tập \\(\\mathcal{O}(t^{-\\frac{1}{2}})\\) , mặc dù được\nđiều chỉnh trên cơ sở tọa độ. Đối với các vấn đề lồi, điều này là hoàn\ntoàn đầy đủ. Tuy nhiên, trong học sâu, chúng ta có thể muốn giảm tốc độ\nhọc tập khá chậm hơn. Điều này dẫn đến một số biến thể Adagrad mà chúng\nta sẽ thảo luận trong các chương tiếp theo. Bây giờ chúng ta hãy xem nó\nhoạt động như thế nào trong một bài toán lồi bậc hai. Chúng tôi sử dụng\ncùng một vấn đề như trước đây:"
+    },
+    {
+      "type": "math",
+      "latex": "(11.7.6)¶\\[f(\\mathbf{x}) = 0.1 x_1^2 + 2 x_2^2.\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Chúng tôi sẽ thực hiện Adagrad bằng cách sử dụng cùng một tốc độ học tập\ntrước đây, tức là, \\(\\eta = 0.4\\) . Như chúng ta có thể thấy, quỹ đạo\nlặp đi lặp lại của biến độc lập là mượt mà hơn. Tuy nhiên, do hiệu ứng\ntích lũy của \\(\\boldsymbol{s}_t\\) , tốc độ học tập liên tục phân rã,\ndo đó biến độc lập không di chuyển nhiều trong các giai đoạn lặp sau\nnày."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "%matplotlib inline\nimport math\nfrom mxnet import np, npx\nfrom d2l import mxnet as d2l\n\nnpx.set_np()\n\ndef adagrad_2d(x1, x2, s1, s2):\n    eps = 1e-6\n    g1, g2 = 0.2 * x1, 4 * x2\n    s1 += g1 ** 2\n    s2 += g2 ** 2\n    x1 -= eta / math.sqrt(s1 + eps) * g1\n    x2 -= eta / math.sqrt(s2 + eps) * g2\n    return x1, x2, s1, s2\n\ndef f_2d(x1, x2):\n    return 0.1 * x1 ** 2 + 2 * x2 ** 2\n\neta = 0.4\nd2l.show_trace_2d(f_2d, d2l.train_2d(adagrad_2d))"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "epoch 20, x1: -2.382563, x2: -0.158591"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_adagrad_2fb0ed_3_1.svg",
+      "local_path": "_images/output_adagrad_2fb0ed_3_1.svg",
+      "alt": "../_images/output_adagrad_2fb0ed_3_1.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "%matplotlib inline\nimport math\nimport torch\nfrom d2l import torch as d2l\n\ndef adagrad_2d(x1, x2, s1, s2):\n    eps = 1e-6\n    g1, g2 = 0.2 * x1, 4 * x2\n    s1 += g1 ** 2\n    s2 += g2 ** 2\n    x1 -= eta / math.sqrt(s1 + eps) * g1\n    x2 -= eta / math.sqrt(s2 + eps) * g2\n    return x1, x2, s1, s2\n\ndef f_2d(x1, x2):\n    return 0.1 * x1 ** 2 + 2 * x2 ** 2\n\neta = 0.4\nd2l.show_trace_2d(f_2d, d2l.train_2d(adagrad_2d))"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "epoch 20, x1: -2.382563, x2: -0.158591\n/home/d2l-worker/miniconda3/envs/d2l-vi-release-1/lib/python3.8/site-packages/torch/functional.py:568: UserWarning: torch.meshgrid: in an upcoming release, it will be required to pass the indexing argument. (Triggered internally at  ../aten/src/ATen/native/TensorShape.cpp:2228.)\n  return _VF.meshgrid(tensors, **kwargs)  # type: ignore[attr-defined]"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_adagrad_2fb0ed_6_1.svg",
+      "local_path": "_images/output_adagrad_2fb0ed_6_1.svg",
+      "alt": "../_images/output_adagrad_2fb0ed_6_1.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "%matplotlib inline\nimport math\nimport tensorflow as tf\nfrom d2l import tensorflow as d2l\n\ndef adagrad_2d(x1, x2, s1, s2):\n    eps = 1e-6\n    g1, g2 = 0.2 * x1, 4 * x2\n    s1 += g1 ** 2\n    s2 += g2 ** 2\n    x1 -= eta / math.sqrt(s1 + eps) * g1\n    x2 -= eta / math.sqrt(s2 + eps) * g2\n    return x1, x2, s1, s2\n\ndef f_2d(x1, x2):\n    return 0.1 * x1 ** 2 + 2 * x2 ** 2\n\neta = 0.4\nd2l.show_trace_2d(f_2d, d2l.train_2d(adagrad_2d))"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "epoch 20, x1: -2.382563, x2: -0.158591"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_adagrad_2fb0ed_9_1.svg",
+      "local_path": "_images/output_adagrad_2fb0ed_9_1.svg",
+      "alt": "../_images/output_adagrad_2fb0ed_9_1.svg"
+    },
+    {
+      "type": "paragraph",
+      "text": "Khi chúng ta tăng tỷ lệ học tập lên \\(2\\) , chúng ta thấy hành vi tốt\nhơn nhiều. Điều này đã chỉ ra rằng tỷ lệ học tập giảm có thể khá tích\ncực, ngay cả trong trường hợp không có tiếng ồn và chúng ta cần đảm bảo\nrằng các tham số hội tụ một cách thích hợp."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "eta = 2\nd2l.show_trace_2d(f_2d, d2l.train_2d(adagrad_2d))"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "epoch 20, x1: -0.002295, x2: -0.000000"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_adagrad_2fb0ed_15_1.svg",
+      "local_path": "_images/output_adagrad_2fb0ed_15_1.svg",
+      "alt": "../_images/output_adagrad_2fb0ed_15_1.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "eta = 2\nd2l.show_trace_2d(f_2d, d2l.train_2d(adagrad_2d))"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "epoch 20, x1: -0.002295, x2: -0.000000"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_adagrad_2fb0ed_18_1.svg",
+      "local_path": "_images/output_adagrad_2fb0ed_18_1.svg",
+      "alt": "../_images/output_adagrad_2fb0ed_18_1.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "eta = 2\nd2l.show_trace_2d(f_2d, d2l.train_2d(adagrad_2d))"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "epoch 20, x1: -0.002295, x2: -0.000000"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_adagrad_2fb0ed_21_1.svg",
+      "local_path": "_images/output_adagrad_2fb0ed_21_1.svg",
+      "alt": "../_images/output_adagrad_2fb0ed_21_1.svg"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "thuc-hien-tu-dau",
+      "text": "11.7.4. Thực hiện từ đầu"
+    },
+    {
+      "type": "paragraph",
+      "text": "Cũng giống như phương pháp động lượng, Adagrad cần duy trì một biến\ntrạng thái có hình dạng giống như các tham số."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def init_adagrad_states(feature_dim):\n    s_w = np.zeros((feature_dim, 1))\n    s_b = np.zeros(1)\n    return (s_w, s_b)\n\ndef adagrad(params, states, hyperparams):\n    eps = 1e-6\n    for p, s in zip(params, states):\n        s[:] += np.square(p.grad)\n        p[:] -= hyperparams['lr'] * p.grad / np.sqrt(s + eps)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def init_adagrad_states(feature_dim):\n    s_w = torch.zeros((feature_dim, 1))\n    s_b = torch.zeros(1)\n    return (s_w, s_b)\n\ndef adagrad(params, states, hyperparams):\n    eps = 1e-6\n    for p, s in zip(params, states):\n        with torch.no_grad():\n            s[:] += torch.square(p.grad)\n            p[:] -= hyperparams['lr'] * p.grad / torch.sqrt(s + eps)\n        p.grad.data.zero_()"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def init_adagrad_states(feature_dim):\n    s_w = tf.Variable(tf.zeros((feature_dim, 1)))\n    s_b = tf.Variable(tf.zeros(1))\n    return (s_w, s_b)\n\ndef adagrad(params, grads, states, hyperparams):\n    eps = 1e-6\n    for p, s, g in zip(params, states, grads):\n        s[:].assign(s + tf.math.square(g))\n        p[:].assign(p - hyperparams['lr'] * g / tf.math.sqrt(s + eps))"
+    },
+    {
+      "type": "paragraph",
+      "text": "So với thí nghiệm trong Section 11.5 , chúng tôi sử dụng\ntốc độ học tập lớn hơn để đào tạo mô hình."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "data_iter, feature_dim = d2l.get_data_ch11(batch_size=10)\nd2l.train_ch11(adagrad, init_adagrad_states(feature_dim),\n               {'lr': 0.1}, data_iter, feature_dim);"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "loss: 0.242, 0.509 sec/epoch"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_adagrad_2fb0ed_39_1.svg",
+      "local_path": "_images/output_adagrad_2fb0ed_39_1.svg",
+      "alt": "../_images/output_adagrad_2fb0ed_39_1.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "data_iter, feature_dim = d2l.get_data_ch11(batch_size=10)\nd2l.train_ch11(adagrad, init_adagrad_states(feature_dim),\n               {'lr': 0.1}, data_iter, feature_dim);"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "loss: 0.246, 0.014 sec/epoch"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_adagrad_2fb0ed_42_1.svg",
+      "local_path": "_images/output_adagrad_2fb0ed_42_1.svg",
+      "alt": "../_images/output_adagrad_2fb0ed_42_1.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "data_iter, feature_dim = d2l.get_data_ch11(batch_size=10)\nd2l.train_ch11(adagrad, init_adagrad_states(feature_dim),\n               {'lr': 0.1}, data_iter, feature_dim);"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "loss: 0.243, 0.112 sec/epoch"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_adagrad_2fb0ed_45_1.svg",
+      "local_path": "_images/output_adagrad_2fb0ed_45_1.svg",
+      "alt": "../_images/output_adagrad_2fb0ed_45_1.svg"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "thuc-hien-ngan-gon",
+      "text": "11.7.5. Thực hiện ngắn gọn"
+    },
+    {
+      "type": "paragraph",
+      "text": "Sử dụng phiên bản Trainer của thuật toán adagrad , chúng ta có\nthể gọi thuật toán Adagrad trong Gluon."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "d2l.train_concise_ch11('adagrad', {'learning_rate': 0.1}, data_iter)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "loss: 0.243, 0.363 sec/epoch"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_adagrad_2fb0ed_51_1.svg",
+      "local_path": "_images/output_adagrad_2fb0ed_51_1.svg",
+      "alt": "../_images/output_adagrad_2fb0ed_51_1.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "trainer = torch.optim.Adagrad\nd2l.train_concise_ch11(trainer, {'lr': 0.1}, data_iter)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "loss: 0.242, 0.013 sec/epoch"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_adagrad_2fb0ed_54_1.svg",
+      "local_path": "_images/output_adagrad_2fb0ed_54_1.svg",
+      "alt": "../_images/output_adagrad_2fb0ed_54_1.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "trainer = tf.keras.optimizers.Adagrad\nd2l.train_concise_ch11(trainer, {'learning_rate' : 0.1}, data_iter)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "loss: 0.242, 0.108 sec/epoch"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_adagrad_2fb0ed_57_1.svg",
+      "local_path": "_images/output_adagrad_2fb0ed_57_1.svg",
+      "alt": "../_images/output_adagrad_2fb0ed_57_1.svg"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tom-tat",
+      "text": "11.7.6. Tóm tắt"
+    },
+    {
+      "type": "list",
+      "ordered": false,
+      "items": [
+        "Adagrad giảm tốc độ học tập động trên cơ sở mỗi tọa độ.",
+        "Nó sử dụng độ lớn của gradient như một phương tiện để điều chỉnh mức\nđộ nhanh chóng đạt được tiến bộ - tọa độ với độ dốc lớn được bù với\ntốc độ học tập nhỏ hơn.",
+        "Tính toán đạo hàm thứ hai chính xác thường không khả thi trong các\nbài toán học sâu do các ràng buộc về trí nhớ và tính toán. Gradient\ncó thể là một proxy hữu ích.",
+        "Nếu vấn đề tối ưu hóa có cấu trúc khá không đồng đều Adagrad có thể\ngiúp giảm thiểu sự biến dạng.",
+        "Adagrad đặc biệt hiệu quả đối với các tính năng thưa thớt, nơi tỷ lệ\nhọc tập cần giảm chậm hơn cho các thuật ngữ không thường xuyên xảy\nra.",
+        "Về các vấn đề học sâu Adagrad đôi khi có thể quá tích cực trong việc\ngiảm tỷ lệ học tập. Chúng tôi sẽ thảo luận về các chiến lược để giảm\nthiểu điều này trong bối cảnh Section 11.10 ."
+      ]
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bai-tap",
+      "text": "11.7.7. Bài tập"
+    },
+    {
+      "type": "list",
+      "ordered": true,
+      "items": [
+        "Chứng minh rằng đối với một ma trận trực giao \\(\\mathbf{U}\\) và\nmột vector \\(\\mathbf{c}\\) các tổ chức sau đây: \\(\\|\\mathbf{c} - \\mathbf{\\delta}\\|_2 = \\|\\mathbf{U} \\mathbf{c} - \\mathbf{U} \\mathbf{\\delta}\\|_2\\) .\nTại sao điều này có nghĩa là độ lớn của nhiễu loạn không thay đổi sau\nkhi thay đổi trực giao của các biến?",
+        "Hãy thử Adagrad cho \\(f(\\mathbf{x}) = 0.1 x_1^2 + 2 x_2^2\\) và\ncũng cho chức năng mục tiêu đã được xoay 45 độ, tức là, \\(f(\\mathbf{x}) = 0.1 (x_1 + x_2)^2 + 2 (x_1 - x_2)^2\\) . Nó có cư\nxử khác nhau không?",
+        "Chứng minh định lý vòng tròn\nGerschgorin trong đó nói rằng eigenvalues \\(\\lambda_i\\) của một ma trận \\(\\mathbf{M}\\) thỏa mãn \\(|\\lambda_i - \\mathbf{M}_{jj}| \\leq \\sum_{k \\neq j} |\\mathbf{M}_{jk}|\\) cho ít nhất một lựa chọn \\(j\\) .",
+        "Định lý Gerschgorin cho chúng ta biết gì về giá trị eigenvalues của\nma trận điều hòa trước theo đường chéo \\(\\mathrm{diag}^{-\\frac{1}{2}}(\\mathbf{M}) \\mathbf{M} \\mathrm{diag}^{-\\frac{1}{2}}(\\mathbf{M})\\) ?",
+        "Hãy thử Adagrad cho một mạng sâu thích hợp, chẳng hạn như Section 6.6 khi áp dụng cho Fashion MNIST.",
+        "Làm thế nào bạn cần sửa đổi Adagrad để đạt được một sự phân rã ít\nhung hăng trong tốc độ học tập?"
+      ]
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    }
+  ],
+  "images": [
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_adagrad_2fb0ed_3_1.svg",
+      "local_path": "_images/output_adagrad_2fb0ed_3_1.svg",
+      "alt": "../_images/output_adagrad_2fb0ed_3_1.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_adagrad_2fb0ed_6_1.svg",
+      "local_path": "_images/output_adagrad_2fb0ed_6_1.svg",
+      "alt": "../_images/output_adagrad_2fb0ed_6_1.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_adagrad_2fb0ed_9_1.svg",
+      "local_path": "_images/output_adagrad_2fb0ed_9_1.svg",
+      "alt": "../_images/output_adagrad_2fb0ed_9_1.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_adagrad_2fb0ed_15_1.svg",
+      "local_path": "_images/output_adagrad_2fb0ed_15_1.svg",
+      "alt": "../_images/output_adagrad_2fb0ed_15_1.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_adagrad_2fb0ed_18_1.svg",
+      "local_path": "_images/output_adagrad_2fb0ed_18_1.svg",
+      "alt": "../_images/output_adagrad_2fb0ed_18_1.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_adagrad_2fb0ed_21_1.svg",
+      "local_path": "_images/output_adagrad_2fb0ed_21_1.svg",
+      "alt": "../_images/output_adagrad_2fb0ed_21_1.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_adagrad_2fb0ed_39_1.svg",
+      "local_path": "_images/output_adagrad_2fb0ed_39_1.svg",
+      "alt": "../_images/output_adagrad_2fb0ed_39_1.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_adagrad_2fb0ed_42_1.svg",
+      "local_path": "_images/output_adagrad_2fb0ed_42_1.svg",
+      "alt": "../_images/output_adagrad_2fb0ed_42_1.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_adagrad_2fb0ed_45_1.svg",
+      "local_path": "_images/output_adagrad_2fb0ed_45_1.svg",
+      "alt": "../_images/output_adagrad_2fb0ed_45_1.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_adagrad_2fb0ed_51_1.svg",
+      "local_path": "_images/output_adagrad_2fb0ed_51_1.svg",
+      "alt": "../_images/output_adagrad_2fb0ed_51_1.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_adagrad_2fb0ed_54_1.svg",
+      "local_path": "_images/output_adagrad_2fb0ed_54_1.svg",
+      "alt": "../_images/output_adagrad_2fb0ed_54_1.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_adagrad_2fb0ed_57_1.svg",
+      "local_path": "_images/output_adagrad_2fb0ed_57_1.svg",
+      "alt": "../_images/output_adagrad_2fb0ed_57_1.svg"
+    }
+  ],
+  "text": "11.7. Adagrad\nChúng ta hãy bắt đầu bằng cách xem xét các vấn đề học tập với các tính\nnăng xảy ra không thường xuyên.\n11.7.1. Tính năng thưa thớt và tỷ lệ học tập\nHãy tưởng tượng rằng chúng ta đang đào tạo một mô hình ngôn ngữ. Để có\nđược độ chính xác tốt, chúng tôi thường muốn giảm tỷ lệ học tập khi\nchúng tôi tiếp tục đào tạo, thường ở tốc độ \\(\\mathcal{O}(t^{-\\frac{1}{2}})\\) hoặc chậm hơn. Bây giờ hãy xem xét\nmột đào tạo mô hình về các tính năng thưa thớt, tức là, các tính năng\nchỉ xảy ra không thường xuyên. Điều này là phổ biến cho ngôn ngữ tự\nnhiên, ví dụ, nó là rất ít khả năng rằng chúng ta sẽ thấy từ *\npreconditioning* so với learning . Tuy nhiên, nó cũng phổ biến ở các\nlĩnh vực khác như quảng cáo tính toán và lọc hợp tác được cá nhân hóa.\nRốt cuộc, có rất nhiều điều chỉ được quan tâm đối với một số lượng nhỏ\nngười.\nCác tham số liên quan đến các tính năng không thường xuyên chỉ nhận được\ncập nhật có ý nghĩa bất cứ khi nào các tính năng này xảy ra. Với tốc độ\nhọc tập giảm, chúng ta có thể kết thúc trong một tình huống mà các thông\nsố cho các tính năng chung hội tụ khá nhanh đến các giá trị tối ưu của\nchúng, trong khi đối với các tính năng không thường xuyên, chúng ta vẫn\nthiếu quan sát chúng đủ thường xuyên trước khi các giá trị tối ưu của\nchúng có thể được xác định. Nói cách khác, tỷ lệ học tập giảm quá chậm\nđối với các tính năng thường xuyên hoặc quá nhanh đối với những người\nkhông thường xuyên.\nMột hack có thể để khắc phục vấn đề này sẽ là đếm số lần chúng ta thấy\nmột tính năng cụ thể và sử dụng điều này làm đồng hồ để điều chỉnh tỷ lệ\nhọc tập. Đó là, thay vì chọn một tỷ lệ học tập của mẫu \\(\\eta = \\frac{\\eta_0}{\\sqrt{t + c}}\\) chúng ta có thể sử dụng \\(\\eta_i = \\frac{\\eta_0}{\\sqrt{s(i, t) + c}}\\) . Ở đây \\(s(i, t)\\) đếm số lượng nonzeros cho tính năng \\(i\\) mà chúng\ntôi đã quan sát đến thời gian \\(t\\) . Điều này thực sự khá dễ thực\nhiện tại không có chi phí có ý nghĩa. Tuy nhiên, nó thất bại bất cứ khi\nnào chúng ta không hoàn toàn có độ thưa thớt mà chỉ là dữ liệu mà các\ngradient thường rất nhỏ và chỉ hiếm khi lớn. Rốt cuộc, không rõ nơi\nngười ta sẽ vẽ đường giữa một cái gì đó đủ điều kiện là một tính năng\nquan sát hay không.\nAdagrad bởi [Duchi et al., 2011] giải quyết điều này bằng\ncách thay thế bộ đếm khá thô \\(s(i, t)\\) bằng tổng hợp các ô vuông\ncủa gradient quan sát trước đó. Đặc biệt, nó sử dụng \\(s(i, t+1) = s(i, t) + \\left(\\partial_i f(\\mathbf{x})\\right)^2\\) như một phương tiện để điều chỉnh tốc độ học tập. Điều này có hai lợi\ních: đầu tiên, chúng ta không còn cần phải quyết định chỉ khi một\ngradient đủ lớn. Thứ hai, nó tự động quy mô với độ lớn của gradient. Các\ntọa độ thường xuyên tương ứng với các gradient lớn được thu nhỏ đáng kể,\ntrong khi các tọa độ khác có độ dốc nhỏ sẽ được điều trị nhẹ nhàng hơn\nnhiều. Trong thực tế, điều này dẫn đến một thủ tục tối ưu hóa rất hiệu\nquả cho quảng cáo tính toán và các vấn đề liên quan. Nhưng điều này che\ngiấu một số lợi ích bổ sung vốn có trong Adagrad được hiểu rõ nhất trong\nbối cảnh điều kiện tiên quyết.\n11.7.2. Điều hòa trước\nVấn đề tối ưu hóa lồi là tốt cho việc phân tích các đặc tính của thuật\ntoán. Rốt cuộc, đối với hầu hết các vấn đề không lồi, rất khó để lấy\nđược những đảm bảo lý thuyết có ý nghĩa, nhưng * trực tuyến* và * cái\nnhìn sâu thắng* thường tiếp tục. Chúng ta hãy nhìn vào vấn đề giảm\nthiểu \\(f(\\mathbf{x}) = \\frac{1}{2} \\mathbf{x}^\\top \\mathbf{Q} \\mathbf{x} + \\mathbf{c}^\\top \\mathbf{x} + b\\) .\nNhư chúng ta đã thấy trong Section 11.6 , có thể viết lại vấn\nđề này về khả năng phân hủy \\(\\mathbf{Q} = \\mathbf{U}^\\top \\boldsymbol{\\Lambda} \\mathbf{U}\\) để\nđến một vấn đề đơn giản hóa nhiều trong đó mỗi tọa độ có thể được giải\nquyết riêng lẻ:\nỞ đây chúng tôi đã sử dụng \\(\\mathbf{x} = \\mathbf{U} \\mathbf{x}\\) và\ndo đó \\(\\mathbf{c} = \\mathbf{U} \\mathbf{c}\\) . Vấn đề sửa đổi có như\nminimizer của nó \\(\\bar{\\mathbf{x}} = -\\boldsymbol{\\Lambda}^{-1} \\bar{\\mathbf{c}}\\) và giá trị tối thiểu \\(-\\frac{1}{2} \\bar{\\mathbf{c}}^\\top \\boldsymbol{\\Lambda}^{-1} \\bar{\\mathbf{c}} + b\\) .\nĐiều này dễ tính toán hơn nhiều vì \\(\\boldsymbol{\\Lambda}\\) là một\nma trận chéo chứa các giá trị eigenvalues của \\(\\mathbf{Q}\\) .\nNếu chúng ta làm hỏng \\(\\mathbf{c}\\) một chút, chúng tôi hy vọng sẽ\nchỉ tìm thấy những thay đổi nhỏ trong bộ giảm thiểu \\(f\\) . Thật\nkhông may đây không phải là trường hợp. Trong khi những thay đổi nhỏ\ntrong \\(\\mathbf{c}\\) dẫn đến những thay đổi nhỏ như nhau trong \\(\\bar{\\mathbf{c}}\\) , đây không phải là trường hợp cho minimizer \\(f\\) (và \\(\\bar{f}\\) tương ứng). Bất cứ khi nào giá trị\neigenvalues \\(\\boldsymbol{\\Lambda}_i\\) lớn, chúng ta sẽ chỉ thấy\nnhững thay đổi nhỏ trong \\(\\bar{x}_i\\) và tối thiểu là \\(\\bar{f}\\) . Ngược lại, đối với những thay đổi nhỏ \\(\\boldsymbol{\\Lambda}_i\\) trong \\(\\bar{x}_i\\) có thể là kịch\ntính. Tỷ lệ giữa eigenvalue lớn nhất và nhỏ nhất được gọi là số điều\nkiện của một bài toán tối ưu hóa.\nNếu điều kiện số \\(\\kappa\\) lớn, rất khó để giải quyết vấn đề tối ưu\nhóa một cách chính xác. Chúng ta cần đảm bảo rằng chúng ta cẩn thận\ntrong việc có được một phạm vi động lớn các giá trị đúng. Phân tích của\nchúng tôi dẫn đến một câu hỏi rõ ràng, mặc dù hơi ngây thơ: chúng ta\nkhông thể chỉ đơn giản là “khắc phục” vấn đề bằng cách làm biến dạng\nkhông gian sao cho tất cả các giá trị eigenvalues là \\(1\\) . Về lý\nthuyết, điều này khá dễ dàng: chúng ta chỉ cần eigenvalues và\neigenvectors của \\(\\mathbf{Q}\\) để giải phóng vấn đề từ \\(\\mathbf{x}\\) thành một trong \\(\\mathbf{z} := \\boldsymbol{\\Lambda}^{\\frac{1}{2}} \\mathbf{U} \\mathbf{x}\\) .\nTrong hệ tọa độ mới \\(\\mathbf{x}^\\top \\mathbf{Q} \\mathbf{x}\\) có thể\nđược đơn giản hóa thành \\(\\|\\mathbf{z}\\|^2\\) . Than ôi, đây là một\ngợi ý khá không thực tế. Tính toán eigenvalues và eigenvectors nói chung\nlà * nhiều hơn* đắt hơn so với giải quyết vấn đề thực tế.\nTrong khi tính toán eigenvalues chính xác có thể đắt tiền, đoán chúng và\ntính toán chúng thậm chí có phần xấp xỉ có thể đã tốt hơn rất nhiều so\nvới không làm bất cứ điều gì cả. Đặc biệt, chúng ta có thể sử dụng các\nmục chéo của \\(\\mathbf{Q}\\) và giải thích nó cho phù hợp. Đây là *\nnhiều* rẻ hơn so với tính toán eigenvalues.\nTrong trường hợp này, chúng tôi có \\(\\tilde{\\mathbf{Q}}_{ij} = \\mathbf{Q}_{ij} / \\sqrt{\\mathbf{Q}_{ii} \\mathbf{Q}_{jj}}\\) và cụ thể là \\(\\tilde{\\mathbf{Q}}_{ii} = 1\\) cho tất cả \\(i\\) .\nTrong hầu hết các trường hợp, điều này đơn giản hóa số điều kiện đáng\nkể. Ví dụ, các trường hợp chúng ta đã thảo luận trước đây, điều này sẽ\nloại bỏ hoàn toàn vấn đề trong tầm tay vì vấn đề được căn chỉnh trục.\nThật không may, chúng ta phải đối mặt với một vấn đề khác: trong học\nsâu, chúng ta thường thậm chí không có quyền truy cập vào đạo hàm thứ\nhai của hàm khách quan: cho \\(\\mathbf{x} \\in \\mathbb{R}^d\\) , phái\nsinh thứ hai ngay cả trên một minibatch có thể yêu cầu \\(\\mathcal{O}(d^2)\\) không gian và hoạt động để tính toán, do đó làm\ncho nó thực tế không khả thi. Ý tưởng khéo léo của Adagrad là sử dụng\nmột proxy cho đường chéo khó nắm bắt của Hessian vừa tương đối rẻ để\ntính toán và hiệu quả—độ lớn của bản thân gradient.\nĐể xem lý do tại sao điều này hoạt động, chúng ta hãy nhìn vào \\(\\bar{f}(\\bar{\\mathbf{x}})\\) . Chúng tôi có điều đó\ntrong đó \\(\\bar{\\mathbf{x}}_0\\) là minimizer của \\(\\bar{f}\\) . Do\nđó độ lớn của gradient phụ thuộc cả vào \\(\\boldsymbol{\\Lambda}\\) và\nkhoảng cách từ độ tối ưu. Nếu \\(\\bar{\\mathbf{x}} - \\bar{\\mathbf{x}}_0\\) không thay đổi, đây sẽ là\ntất cả những gì cần thiết. Rốt cuộc, trong trường hợp này độ lớn của\ngradient \\(\\partial_{\\bar{\\mathbf{x}}} \\bar{f}(\\bar{\\mathbf{x}})\\) đủ. Vì AdaGrad là một thuật toán gốc gradient ngẫu nhiên, chúng ta sẽ\nthấy gradient với phương sai nonzero ngay cả khi tối ưu. Kết quả là\nchúng ta có thể sử dụng phương sai của gradient một cách an toàn như một\nproxy giá rẻ cho thang đo của Hessian. Một phân tích kỹ lưỡng nằm ngoài\nphạm vi của phần này (nó sẽ là một số trang). Chúng tôi giới thiệu người\nđọc đến [Duchi et al., 2011] để biết chi tiết.\n11.7.3. Các thuật toán\nHãy để chúng tôi chính thức hóa các cuộc thảo luận từ trên cao. Chúng ta\nsử dụng biến \\(\\mathbf{s}_t\\) để tích lũy phương sai gradient quá\nkhứ như sau.\nỞ đây hoạt động được áp dụng tọa độ khôn ngoan. Đó là, \\(\\mathbf{v}^2\\) có mục \\(v_i^2\\) . Tương tự như vậy \\(\\frac{1}{\\sqrt{v}}\\) có mục \\(\\frac{1}{\\sqrt{v_i}}\\) và \\(\\mathbf{u} \\cdot \\mathbf{v}\\) có mục \\(u_i v_i\\) . Như trước \\(\\eta\\) là tốc độ học tập và \\(\\epsilon\\) là một hằng số phụ\ngia đảm bảo rằng chúng ta không chia cho \\(0\\) . Cuối cùng, chúng tôi\nkhởi tạo \\(\\mathbf{s}_0 = \\mathbf{0}\\) .\nCũng giống như trong trường hợp động lượng chúng ta cần phải theo dõi\nmột biến phụ trợ, trong trường hợp này để cho phép một tỷ lệ học tập cá\nnhân trên mỗi tọa độ. Điều này không làm tăng chi phí của Adagrad đáng\nkể so với SGD, đơn giản vì chi phí chính thường là tính toán \\(l(y_t, f(\\mathbf{x}_t, \\mathbf{w}))\\) và phái sinh của nó.\nLưu ý rằng tích lũy gradient bình phương trong \\(\\mathbf{s}_t\\) có\nnghĩa là \\(\\mathbf{s}_t\\) phát triển cơ bản ở tốc độ tuyến tính (hơi\nchậm hơn tuyến tính trong thực tế, vì độ dốc ban đầu giảm dần). Điều này\ndẫn đến tỷ lệ học tập \\(\\mathcal{O}(t^{-\\frac{1}{2}})\\) , mặc dù được\nđiều chỉnh trên cơ sở tọa độ. Đối với các vấn đề lồi, điều này là hoàn\ntoàn đầy đủ. Tuy nhiên, trong học sâu, chúng ta có thể muốn giảm tốc độ\nhọc tập khá chậm hơn. Điều này dẫn đến một số biến thể Adagrad mà chúng\nta sẽ thảo luận trong các chương tiếp theo. Bây giờ chúng ta hãy xem nó\nhoạt động như thế nào trong một bài toán lồi bậc hai. Chúng tôi sử dụng\ncùng một vấn đề như trước đây:\nChúng tôi sẽ thực hiện Adagrad bằng cách sử dụng cùng một tốc độ học tập\ntrước đây, tức là, \\(\\eta = 0.4\\) . Như chúng ta có thể thấy, quỹ đạo\nlặp đi lặp lại của biến độc lập là mượt mà hơn. Tuy nhiên, do hiệu ứng\ntích lũy của \\(\\boldsymbol{s}_t\\) , tốc độ học tập liên tục phân rã,\ndo đó biến độc lập không di chuyển nhiều trong các giai đoạn lặp sau\nnày.\nKhi chúng ta tăng tỷ lệ học tập lên \\(2\\) , chúng ta thấy hành vi tốt\nhơn nhiều. Điều này đã chỉ ra rằng tỷ lệ học tập giảm có thể khá tích\ncực, ngay cả trong trường hợp không có tiếng ồn và chúng ta cần đảm bảo\nrằng các tham số hội tụ một cách thích hợp.\n11.7.4. Thực hiện từ đầu\nCũng giống như phương pháp động lượng, Adagrad cần duy trì một biến\ntrạng thái có hình dạng giống như các tham số.\nSo với thí nghiệm trong Section 11.5 , chúng tôi sử dụng\ntốc độ học tập lớn hơn để đào tạo mô hình.\n11.7.5. Thực hiện ngắn gọn\nSử dụng phiên bản Trainer của thuật toán adagrad , chúng ta có\nthể gọi thuật toán Adagrad trong Gluon.\n11.7.6. Tóm tắt\nAdagrad giảm tốc độ học tập động trên cơ sở mỗi tọa độ.\nNó sử dụng độ lớn của gradient như một phương tiện để điều chỉnh mức\nđộ nhanh chóng đạt được tiến bộ - tọa độ với độ dốc lớn được bù với\ntốc độ học tập nhỏ hơn.\nTính toán đạo hàm thứ hai chính xác thường không khả thi trong các\nbài toán học sâu do các ràng buộc về trí nhớ và tính toán. Gradient\ncó thể là một proxy hữu ích.\nNếu vấn đề tối ưu hóa có cấu trúc khá không đồng đều Adagrad có thể\ngiúp giảm thiểu sự biến dạng.\nAdagrad đặc biệt hiệu quả đối với các tính năng thưa thớt, nơi tỷ lệ\nhọc tập cần giảm chậm hơn cho các thuật ngữ không thường xuyên xảy\nra.\nVề các vấn đề học sâu Adagrad đôi khi có thể quá tích cực trong việc\ngiảm tỷ lệ học tập. Chúng tôi sẽ thảo luận về các chiến lược để giảm\nthiểu điều này trong bối cảnh Section 11.10 .\n11.7.7. Bài tập\nChứng minh rằng đối với một ma trận trực giao \\(\\mathbf{U}\\) và\nmột vector \\(\\mathbf{c}\\) các tổ chức sau đây: \\(\\|\\mathbf{c} - \\mathbf{\\delta}\\|_2 = \\|\\mathbf{U} \\mathbf{c} - \\mathbf{U} \\mathbf{\\delta}\\|_2\\) .\nTại sao điều này có nghĩa là độ lớn của nhiễu loạn không thay đổi sau\nkhi thay đổi trực giao của các biến?\nHãy thử Adagrad cho \\(f(\\mathbf{x}) = 0.1 x_1^2 + 2 x_2^2\\) và\ncũng cho chức năng mục tiêu đã được xoay 45 độ, tức là, \\(f(\\mathbf{x}) = 0.1 (x_1 + x_2)^2 + 2 (x_1 - x_2)^2\\) . Nó có cư\nxử khác nhau không?\nChứng minh định lý vòng tròn\nGerschgorin trong đó nói rằng eigenvalues \\(\\lambda_i\\) của một ma trận \\(\\mathbf{M}\\) thỏa mãn \\(|\\lambda_i - \\mathbf{M}_{jj}| \\leq \\sum_{k \\neq j} |\\mathbf{M}_{jk}|\\) cho ít nhất một lựa chọn \\(j\\) .\nĐịnh lý Gerschgorin cho chúng ta biết gì về giá trị eigenvalues của\nma trận điều hòa trước theo đường chéo \\(\\mathrm{diag}^{-\\frac{1}{2}}(\\mathbf{M}) \\mathbf{M} \\mathrm{diag}^{-\\frac{1}{2}}(\\mathbf{M})\\) ?\nHãy thử Adagrad cho một mạng sâu thích hợp, chẳng hạn như Section 6.6 khi áp dụng cho Fashion MNIST.\nLàm thế nào bạn cần sửa đổi Adagrad để đạt được một sự phân rã ít\nhung hăng trong tốc độ học tập?\nDiscussions\nDiscussions\nDiscussions"
+}

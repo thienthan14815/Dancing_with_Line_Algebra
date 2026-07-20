@@ -1,0 +1,529 @@
+{
+  "url": "https://vi.d2l.ai/chapter_recurrent-modern/gru.html",
+  "chapter": "chapter_recurrent-modern",
+  "title": "9.1. Các đơn vị định kỳ cổng (GRU)",
+  "crawled_at": "2026-07-20T12:40:03.505553+00:00",
+  "headings": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "cac-don-vi-dinh-ky-cong-gru",
+      "text": "9.1. Các đơn vị định kỳ cổng (GRU)"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "nha-nuoc-an-gated",
+      "text": "9.1.1. Nhà nước ẩn Gated"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "cong-dat-lai-va-cong-cap-nhat",
+      "text": "9.1.1.1. Cổng đặt lại và cổng cập nhật"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "ung-vien-hidden-state",
+      "text": "9.1.1.2. Ứng viên Hidden State"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "nha-nuoc-an",
+      "text": "9.1.1.3. Nhà nước ẩn"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "thuc-hien-tu-dau",
+      "text": "9.1.2. Thực hiện từ đầu"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "initializing-model-parameters",
+      "text": "9.1.2.1. Initializing Model Parameters"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "xac-dinh-mo-hinh",
+      "text": "9.1.2.2. Xác định mô hình"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "dao-tao-va-du-doan",
+      "text": "9.1.2.3. Đào tạo và dự đoán"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "thiet-tap",
+      "text": "9.1.3. Thiết tập"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tom-tat",
+      "text": "9.1.4. Tóm tắt"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bai-tap",
+      "text": "9.1.5. Bài tập"
+    }
+  ],
+  "content": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "cac-don-vi-dinh-ky-cong-gru",
+      "text": "9.1. Các đơn vị định kỳ cổng (GRU)"
+    },
+    {
+      "type": "paragraph",
+      "text": "Trong Section 8.7 , chúng tôi đã thảo luận về cách tính độ dốc\ntrong RNNs. Đặc biệt, chúng tôi thấy rằng các sản phẩm dài của ma trận\ncó thể dẫn đến biến mất hoặc bùng nổ gradient. Chúng ta hãy suy nghĩ\nngắn gọn về những bất thường gradient như vậy có nghĩa là gì trong thực\ntế:"
+    },
+    {
+      "type": "list",
+      "ordered": false,
+      "items": [
+        "Chúng ta có thể gặp phải một tình huống mà một quan sát sớm là rất\nquan trọng để dự đoán tất cả các quan sát trong tương lai. Hãy xem\nxét trường hợp hơi contrived trong đó quan sát đầu tiên chứa một tổng\nkiểm tra và mục tiêu là để phân biệt xem tổng kiểm tra có đúng ở cuối\nchuỗi hay không. Trong trường hợp này, ảnh hưởng của mã thông báo đầu\ntiên là rất quan trọng. Chúng tôi muốn có một số cơ chế để lưu trữ\nthông tin ban đầu quan trọng trong một tế bào bộ nhớ*. Không có cơ\nchế như vậy, chúng ta sẽ phải gán một gradient rất lớn cho quan sát\nnày, vì nó ảnh hưởng đến tất cả các quan sát tiếp theo.",
+        "Chúng ta có thể gặp phải những tình huống mà một số token không có\nquan sát thích hợp. Ví dụ, khi phân tích một trang web có thể có mã\nHTML phụ trợ không liên quan với mục đích đánh giá tình cảm được\ntruyền tải trên trang. Chúng tôi muốn có một số cơ chế để * bỏ qua*\ntoken như vậy trong đại diện trạng thái tiềm ẩn.",
+        "Chúng ta có thể gặp phải các tình huống trong đó có một sự phá vỡ\nlogic giữa các phần của một chuỗi. Ví dụ, có thể có sự chuyển đổi\ngiữa các chương trong một cuốn sách hoặc chuyển đổi giữa một con gấu\nvà thị trường tăng giá cho chứng khoán. Trong trường hợp này, thật\ntuyệt khi có một phương tiện * đặt lại* đại diện trạng thái nội bộ\ncủa chúng tôi."
+      ]
+    },
+    {
+      "type": "paragraph",
+      "text": "Một số phương pháp đã được đề xuất để giải quyết vấn đề này. Một trong\nnhững sớm nhất là bộ nhớ ngắn hạn dài [Hochreiter & Schmidhuber, 1997] mà chúng ta sẽ thảo luận trong Section 9.2 . Đơn vị định kỳ gated (GRU) [Cho et al., 2014a] là một biến thể sắp xếp\nhợp lý hơn một chút thường cung cấp hiệu suất tương đương và nhanh hơn\nđáng kể để tính toán [Chung et al., 2014] . Do sự đơn\ngiản của nó, chúng ta hãy bắt đầu với GRU."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "nha-nuoc-an-gated",
+      "text": "9.1.1. Nhà nước ẩn Gated"
+    },
+    {
+      "type": "paragraph",
+      "text": "Sự khác biệt chính giữa vanilla RNNs và Grus là hỗ trợ sau này gating\ncủa trạng thái ẩn. Điều này có nghĩa là chúng ta có các cơ chế dành\nriêng cho khi một trạng thái ẩn nên được * cập nhật* và cả khi nó nên\nđược * reset*. Những cơ chế này được học và chúng giải quyết các mối\nquan tâm được liệt kê ở trên. Ví dụ, nếu token đầu tiên có tầm quan\ntrọng lớn, chúng ta sẽ học cách không cập nhật trạng thái ẩn sau lần\nquan sát đầu tiên. Tương tự như vậy, chúng ta sẽ học cách bỏ qua các\nquan sát tạm thời không liên quan. Cuối cùng, chúng ta sẽ học cách đặt\nlại trạng thái tiềm ẩn bất cứ khi nào cần thiết. Chúng tôi thảo luận chi\ntiết về điều này dưới đây."
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "cong-dat-lai-va-cong-cap-nhat",
+      "text": "9.1.1.1. Cổng đặt lại và cổng cập nhật"
+    },
+    {
+      "type": "paragraph",
+      "text": "Điều đầu tiên chúng ta cần giới thiệu là cổng * reset * và cổng cập\nnhật*. Chúng tôi kỹ sư chúng trở thành vectơ với các mục trong \\((0, 1)\\) sao cho chúng tôi có thể thực hiện các kết hợp lồi. Ví\ndụ, một cổng đặt lại sẽ cho phép chúng ta kiểm soát số lượng trạng thái\ntrước đó mà chúng ta vẫn có thể muốn nhớ. Tương tự như vậy, một cổng cập\nnhật sẽ cho phép chúng ta kiểm soát bao nhiêu trạng thái mới chỉ là một\nbản sao của trạng thái cũ."
+    },
+    {
+      "type": "paragraph",
+      "text": "Chúng tôi bắt đầu bằng kỹ thuật các cổng này. Fig. 9.1.1 minh\nhọa các đầu vào cho cả cổng đặt lại và cập nhật trong GRU, với đầu vào\ncủa bước thời gian hiện tại và trạng thái ẩn của bước thời gian trước\nđó. Các đầu ra của hai cổng được đưa ra bởi hai lớp được kết nối hoàn\ntoàn với chức năng kích hoạt sigmoid."
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/gru-1.svg",
+      "local_path": "_images/gru-1.svg",
+      "alt": "../_images/gru-1.svg"
+    },
+    {
+      "type": "paragraph",
+      "text": "Fig. 9.1.1 Computing the reset gate and the update gate in a GRU model. ¶"
+    },
+    {
+      "type": "paragraph",
+      "text": "Về mặt toán học, cho một bước thời gian nhất định \\(t\\) , giả sử rằng\nđầu vào là một minibatch \\(\\mathbf{X}_t \\in \\mathbb{R}^{n \\times d}\\) (số ví dụ: \\(n\\) ,\nsố lượng đầu vào: \\(d\\) ) và trạng thái ẩn của bước thời gian trước\nđó là \\(\\mathbf{H}_{t-1} \\in \\mathbb{R}^{n \\times h}\\) (số đơn vị\nẩn: \\(h\\) ). Sau đó, cổng đặt lại \\(\\mathbf{R}_t \\in \\mathbb{R}^{n \\times h}\\) và cổng cập nhật \\(\\mathbf{Z}_t \\in \\mathbb{R}^{n \\times h}\\) được tính như sau:"
+    },
+    {
+      "type": "math",
+      "latex": "(9.1.1)¶\\[\\begin{split}\\begin{aligned}\n\\mathbf{R}_t = \\sigma(\\mathbf{X}_t \\mathbf{W}_{xr} + \\mathbf{H}_{t-1} \\mathbf{W}_{hr} + \\mathbf{b}_r),\\\\\n\\mathbf{Z}_t = \\sigma(\\mathbf{X}_t \\mathbf{W}_{xz} + \\mathbf{H}_{t-1} \\mathbf{W}_{hz} + \\mathbf{b}_z),\n\\end{aligned}\\end{split}\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "trong đó \\(\\mathbf{W}_{xr}, \\mathbf{W}_{xz} \\in \\mathbb{R}^{d \\times h}\\) và \\(\\mathbf{W}_{hr}, \\mathbf{W}_{hz} \\in \\mathbb{R}^{h \\times h}\\) là\ncác thông số trọng lượng và \\(\\mathbf{b}_r, \\mathbf{b}_z \\in \\mathbb{R}^{1 \\times h}\\) là thiên\nvị. Lưu ý rằng phát sóng (xem Section 2.1.3 ) được kích\nhoạt trong quá trình tổng kết. Chúng tôi sử dụng các hàm sigmoid (như\nđược giới thiệu trong Section 4.1 ) để chuyển đổi các giá trị đầu\nvào thành khoảng \\((0, 1)\\) ."
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "ung-vien-hidden-state",
+      "text": "9.1.1.2. Ứng viên Hidden State"
+    },
+    {
+      "type": "paragraph",
+      "text": "Tiếp theo, chúng ta hãy tích hợp cổng đặt lại \\(\\mathbf{R}_t\\) với\ncơ chế cập nhật trạng thái tiềm ẩn thông thường trong (8.4.5) . Nó dẫn đến những điều sau đây * trạng thái\nẩn ứng cử viên * \\(\\tilde{\\mathbf{H}}_t \\in \\mathbb{R}^{n \\times h}\\) tại bước thời\ngian \\(t\\) :"
+    },
+    {
+      "type": "math",
+      "latex": "(9.1.2)¶\\[\\tilde{\\mathbf{H}}_t = \\tanh(\\mathbf{X}_t \\mathbf{W}_{xh} + \\left(\\mathbf{R}_t \\odot \\mathbf{H}_{t-1}\\right) \\mathbf{W}_{hh} + \\mathbf{b}_h),\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "trong đó \\(\\mathbf{W}_{xh} \\in \\mathbb{R}^{d \\times h}\\) và \\(\\mathbf{W}_{hh} \\in \\mathbb{R}^{h \\times h}\\) là các thông số\ntrọng lượng, \\(\\mathbf{b}_h \\in \\mathbb{R}^{1 \\times h}\\) là thiên\nvị và ký hiệu \\(\\odot\\) là nhà điều hành sản phẩm Hadamard\n(elementwise). Ở đây chúng ta sử dụng một phi tuyến dưới dạng tanh để\nđảm bảo rằng các giá trị trong trạng thái ẩn ứng viên vẫn còn trong\nkhoảng \\((-1, 1)\\) ."
+    },
+    {
+      "type": "paragraph",
+      "text": "Kết quả là ứng cử viên vì chúng ta vẫn cần kết hợp hành động của cổng\ncập nhật. So sánh với (8.4.5) , bây giờ ảnh hưởng của\ncác trạng thái trước đó có thể được giảm với phép nhân elementwise \\(\\mathbf{R}_t\\) và \\(\\mathbf{H}_{t-1}\\) trong (9.1.2) . Bất cứ khi nào các mục trong cổng đặt lại \\(\\mathbf{R}_t\\) gần 1, chúng tôi phục hồi một RNN vani như trong (8.4.5) . Đối với tất cả các mục của cổng đặt lại \\(\\mathbf{R}_t\\) gần 0, trạng thái ẩn ứng cử viên là kết quả của MLP\nvới \\(\\mathbf{X}_t\\) làm đầu vào. Do đó, bất kỳ trạng thái ẩn đã tồn\ntại trước nào là * đặt lại* thành mặc định."
+    },
+    {
+      "type": "paragraph",
+      "text": "Fig. 9.1.2 minh họa dòng tính toán sau khi áp dụng cổng đặt\nlại."
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/gru-2.svg",
+      "local_path": "_images/gru-2.svg",
+      "alt": "../_images/gru-2.svg"
+    },
+    {
+      "type": "paragraph",
+      "text": "Fig. 9.1.2 Computing the candidate hidden state in a GRU model. ¶"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "nha-nuoc-an",
+      "text": "9.1.1.3. Nhà nước ẩn"
+    },
+    {
+      "type": "paragraph",
+      "text": "Cuối cùng, chúng ta cần kết hợp hiệu ứng của cổng cập nhật \\(\\mathbf{Z}_t\\) . Điều này xác định mức độ mà trạng thái ẩn mới \\(\\mathbf{H}_t \\in \\mathbb{R}^{n \\times h}\\) chỉ là trạng thái cũ \\(\\mathbf{H}_{t-1}\\) và bằng cách sử dụng nhà nước ứng cử viên mới \\(\\tilde{\\mathbf{H}}_t\\) . Cổng cập nhật \\(\\mathbf{Z}_t\\) có thể\nđược sử dụng cho mục đích này, đơn giản bằng cách dùng kết hợp lồi\nelementwise giữa cả \\(\\mathbf{H}_{t-1}\\) và \\(\\tilde{\\mathbf{H}}_t\\) . Điều này dẫn đến phương trình cập nhật\ncuối cùng cho GRU:"
+    },
+    {
+      "type": "math",
+      "latex": "(9.1.3)¶\\[\\mathbf{H}_t = \\mathbf{Z}_t \\odot \\mathbf{H}_{t-1}  + (1 - \\mathbf{Z}_t) \\odot \\tilde{\\mathbf{H}}_t.\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Bất cứ khi nào cổng cập nhật \\(\\mathbf{Z}_t\\) gần 1, chúng tôi chỉ\nđơn giản là giữ lại trạng thái cũ. Trong trường hợp này, thông tin từ \\(\\mathbf{X}_t\\) về cơ bản bị bỏ qua, có hiệu quả bỏ qua bước thời\ngian \\(t\\) trong chuỗi phụ thuộc. Ngược lại, bất cứ khi nào \\(\\mathbf{Z}_t\\) gần 0, trạng thái tiềm ẩn mới \\(\\mathbf{H}_t\\) tiếp cận trạng thái tiềm ẩn ứng cử viên \\(\\tilde{\\mathbf{H}}_t\\) .\nNhững thiết kế này có thể giúp chúng ta đối phó với vấn đề gradient biến\nmất trong RNNs và nắm bắt các phụ thuộc tốt hơn cho các chuỗi với khoảng\ncách bước thời gian lớn. Ví dụ, nếu cổng cập nhật đã gần 1 cho tất cả\ncác bước thời gian của toàn bộ dãy con, trạng thái ẩn cũ tại bước thời\ngian bắt đầu của nó sẽ dễ dàng được giữ lại và truyền đến cuối của nó,\nbất kể độ dài của dãy con."
+    },
+    {
+      "type": "paragraph",
+      "text": "Fig. 9.1.3 minh họa luồng tính toán sau khi cổng cập nhật\nđang hoạt động."
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/gru-3.svg",
+      "local_path": "_images/gru-3.svg",
+      "alt": "../_images/gru-3.svg"
+    },
+    {
+      "type": "paragraph",
+      "text": "Fig. 9.1.3 Computing the hidden state in a GRU model. ¶"
+    },
+    {
+      "type": "paragraph",
+      "text": "Tóm lại, Grus có hai đặc điểm phân biệt sau:"
+    },
+    {
+      "type": "list",
+      "ordered": false,
+      "items": [
+        "Đặt lại cổng giúp nắm bắt các phụ thuộc ngắn hạn trong chuỗi.",
+        "Cập nhật cổng giúp nắm bắt các phụ thuộc dài hạn trong chuỗi."
+      ]
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "thuc-hien-tu-dau",
+      "text": "9.1.2. Thực hiện từ đầu"
+    },
+    {
+      "type": "paragraph",
+      "text": "Để hiểu rõ hơn về mô hình GRU, chúng ta hãy thực hiện nó từ đầu. Chúng\ntôi bắt đầu bằng cách đọc tập dữ liệu máy thời gian mà chúng tôi đã sử\ndụng trong Section 8.5 . Mã để đọc tập dữ liệu được đưa\nra dưới đây."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "from mxnet import np, npx\nfrom mxnet.gluon import rnn\nfrom d2l import mxnet as d2l\n\nnpx.set_np()\n\nbatch_size, num_steps = 32, 35\ntrain_iter, vocab = d2l.load_data_time_machine(batch_size, num_steps)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "import torch\nfrom torch import nn\nfrom d2l import torch as d2l\n\nbatch_size, num_steps = 32, 35\ntrain_iter, vocab = d2l.load_data_time_machine(batch_size, num_steps)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "import tensorflow as tf\nfrom d2l import tensorflow as d2l\n\nbatch_size, num_steps = 32, 35\ntrain_iter, vocab = d2l.load_data_time_machine(batch_size, num_steps)"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "initializing-model-parameters",
+      "text": "9.1.2.1. Initializing Model Parameters"
+    },
+    {
+      "type": "paragraph",
+      "text": "Bước tiếp theo là khởi tạo các tham số mô hình. Chúng tôi vẽ các trọng\nlượng từ phân phối Gaussian với độ lệch chuẩn là 0,01 và đặt thiên vị\nthành 0. Siêu tham số num_hiddens xác định số đơn vị ẩn. Chúng tôi\nkhởi tạo tất cả các trọng lượng và thành kiến liên quan đến cổng cập\nnhật, cổng đặt lại, trạng thái ẩn ứng cử viên và lớp đầu ra."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def get_params(vocab_size, num_hiddens, device):\n    num_inputs = num_outputs = vocab_size\n\n    def normal(shape):\n        return np.random.normal(scale=0.01, size=shape, ctx=device)\n\n    def three():\n        return (normal((num_inputs, num_hiddens)),\n                normal((num_hiddens, num_hiddens)),\n                np.zeros(num_hiddens, ctx=device))\n\n    W_xz, W_hz, b_z = three()  # Update gate parameters\n    W_xr, W_hr, b_r = three()  # Reset gate parameters\n    W_xh, W_hh, b_h = three()  # Candidate hidden state parameters\n    # Output layer parameters\n    W_hq = normal((num_hiddens, num_outputs))\n    b_q = np.zeros(num_outputs, ctx=device)\n    # Attach gradients\n    params = [W_xz, W_hz, b_z, W_xr, W_hr, b_r, W_xh, W_hh, b_h, W_hq, b_q]\n    for param in params:\n        param.attach_grad()\n    return params"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def get_params(vocab_size, num_hiddens, device):\n    num_inputs = num_outputs = vocab_size\n\n    def normal(shape):\n        return torch.randn(size=shape, device=device)*0.01\n\n    def three():\n        return (normal((num_inputs, num_hiddens)),\n                normal((num_hiddens, num_hiddens)),\n                torch.zeros(num_hiddens, device=device))\n\n    W_xz, W_hz, b_z = three()  # Update gate parameters\n    W_xr, W_hr, b_r = three()  # Reset gate parameters\n    W_xh, W_hh, b_h = three()  # Candidate hidden state parameters\n    # Output layer parameters\n    W_hq = normal((num_hiddens, num_outputs))\n    b_q = torch.zeros(num_outputs, device=device)\n    # Attach gradients\n    params = [W_xz, W_hz, b_z, W_xr, W_hr, b_r, W_xh, W_hh, b_h, W_hq, b_q]\n    for param in params:\n        param.requires_grad_(True)\n    return params"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def get_params(vocab_size, num_hiddens):\n    num_inputs = num_outputs = vocab_size\n\n    def normal(shape):\n        return tf.random.normal(shape=shape,stddev=0.01,mean=0,dtype=tf.float32)\n\n    def three():\n        return (tf.Variable(normal((num_inputs, num_hiddens)), dtype=tf.float32),\n                tf.Variable(normal((num_hiddens, num_hiddens)), dtype=tf.float32),\n                tf.Variable(tf.zeros(num_hiddens), dtype=tf.float32))\n\n    W_xz, W_hz, b_z = three()  # Update gate parameters\n    W_xr, W_hr, b_r = three()  # Reset gate parameters\n    W_xh, W_hh, b_h = three()  # Candidate hidden state parameters\n    # Output layer parameters\n    W_hq = tf.Variable(normal((num_hiddens, num_outputs)), dtype=tf.float32)\n    b_q = tf.Variable(tf.zeros(num_outputs), dtype=tf.float32)\n    params = [W_xz, W_hz, b_z, W_xr, W_hr, b_r, W_xh, W_hh, b_h, W_hq, b_q]\n    return params"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "xac-dinh-mo-hinh",
+      "text": "9.1.2.2. Xác định mô hình"
+    },
+    {
+      "type": "paragraph",
+      "text": "Bây giờ chúng ta sẽ định nghĩa chức năng khởi tạo trạng thái ẩn init_gru_state . Cũng giống như hàm init_rnn_state được định\nnghĩa trong Section 8.5 , hàm này trả về một tensor với\nmột hình dạng (kích thước lô, số đơn vị ẩn) có giá trị là tất cả các số\nkhông."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def init_gru_state(batch_size, num_hiddens, device):\n    return (np.zeros(shape=(batch_size, num_hiddens), ctx=device), )"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def init_gru_state(batch_size, num_hiddens, device):\n    return (torch.zeros((batch_size, num_hiddens), device=device), )"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def init_gru_state(batch_size, num_hiddens):\n    return (tf.zeros((batch_size, num_hiddens)), )"
+    },
+    {
+      "type": "paragraph",
+      "text": "Bây giờ chúng tôi đã sẵn sàng để xác định mô hình GRU. Cấu trúc của nó\ngiống như của ô RNN cơ bản, ngoại trừ các phương trình cập nhật phức tạp\nhơn."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def gru(inputs, state, params):\n    W_xz, W_hz, b_z, W_xr, W_hr, b_r, W_xh, W_hh, b_h, W_hq, b_q = params\n    H, = state\n    outputs = []\n    for X in inputs:\n        Z = npx.sigmoid(np.dot(X, W_xz) + np.dot(H, W_hz) + b_z)\n        R = npx.sigmoid(np.dot(X, W_xr) + np.dot(H, W_hr) + b_r)\n        H_tilda = np.tanh(np.dot(X, W_xh) + np.dot(R * H, W_hh) + b_h)\n        H = Z * H + (1 - Z) * H_tilda\n        Y = np.dot(H, W_hq) + b_q\n        outputs.append(Y)\n    return np.concatenate(outputs, axis=0), (H,)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def gru(inputs, state, params):\n    W_xz, W_hz, b_z, W_xr, W_hr, b_r, W_xh, W_hh, b_h, W_hq, b_q = params\n    H, = state\n    outputs = []\n    for X in inputs:\n        Z = torch.sigmoid((X @ W_xz) + (H @ W_hz) + b_z)\n        R = torch.sigmoid((X @ W_xr) + (H @ W_hr) + b_r)\n        H_tilda = torch.tanh((X @ W_xh) + ((R * H) @ W_hh) + b_h)\n        H = Z * H + (1 - Z) * H_tilda\n        Y = H @ W_hq + b_q\n        outputs.append(Y)\n    return torch.cat(outputs, dim=0), (H,)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def gru(inputs, state, params):\n    W_xz, W_hz, b_z, W_xr, W_hr, b_r, W_xh, W_hh, b_h, W_hq, b_q = params\n    H, = state\n    outputs = []\n    for X in inputs:\n        X = tf.reshape(X,[-1,W_xh.shape[0]])\n        Z = tf.sigmoid(tf.matmul(X, W_xz) + tf.matmul(H, W_hz) + b_z)\n        R = tf.sigmoid(tf.matmul(X, W_xr) + tf.matmul(H, W_hr) + b_r)\n        H_tilda = tf.tanh(tf.matmul(X, W_xh) + tf.matmul(R * H, W_hh) + b_h)\n        H = Z * H + (1 - Z) * H_tilda\n        Y = tf.matmul(H, W_hq) + b_q\n        outputs.append(Y)\n    return tf.concat(outputs, axis=0), (H,)"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "dao-tao-va-du-doan",
+      "text": "9.1.2.3. Đào tạo và dự đoán"
+    },
+    {
+      "type": "paragraph",
+      "text": "Đào tạo và dự đoán hoạt động theo cách chính xác giống như trong Section 8.5 . Sau khi đào tạo, chúng tôi in ra sự bối rối\ntrên bộ đào tạo và trình tự dự đoán theo các tiền tố được cung cấp\n“khách du lịch thời gian” và “khách du lịch”, tương ứng."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "vocab_size, num_hiddens, device = len(vocab), 256, d2l.try_gpu()\nnum_epochs, lr = 500, 1\nmodel = d2l.RNNModelScratch(len(vocab), num_hiddens, device, get_params,\n                            init_gru_state, gru)\nd2l.train_ch8(model, train_iter, vocab, lr, num_epochs, device)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "perplexity 1.1, 12012.8 tokens/sec on gpu(0)\ntime travelleryou can show black is white by argument said filby\ntravelleryou can show black is white by argument said filby"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_gru_b77a34_51_1.svg",
+      "local_path": "_images/output_gru_b77a34_51_1.svg",
+      "alt": "../_images/output_gru_b77a34_51_1.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "vocab_size, num_hiddens, device = len(vocab), 256, d2l.try_gpu()\nnum_epochs, lr = 500, 1\nmodel = d2l.RNNModelScratch(len(vocab), num_hiddens, device, get_params,\n                            init_gru_state, gru)\nd2l.train_ch8(model, train_iter, vocab, lr, num_epochs, device)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "perplexity 1.1, 26525.7 tokens/sec on cuda:0\ntime travelleryou can show black is white by argument said filby\ntravelleryou can show black is white by argument said filby"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_gru_b77a34_54_1.svg",
+      "local_path": "_images/output_gru_b77a34_54_1.svg",
+      "alt": "../_images/output_gru_b77a34_54_1.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "vocab_size, num_hiddens, device_name = len(vocab), 256, d2l.try_gpu()._device_name\n# defining tensorflow training strategy\nstrategy = tf.distribute.OneDeviceStrategy(device_name)\nnum_epochs, lr = 500, 1\nwith strategy.scope():\n    model = d2l.RNNModelScratch(len(vocab), num_hiddens, init_gru_state, gru, get_params)\n\nd2l.train_ch8(model, train_iter, vocab, lr, num_epochs, strategy)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "perplexity 1.1, 4322.5 tokens/sec on /GPU:0\ntime traveller for so it will be convenient to speak of himwas e\ntravelleryou can show black is white by argument said filby"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_gru_b77a34_57_1.svg",
+      "local_path": "_images/output_gru_b77a34_57_1.svg",
+      "alt": "../_images/output_gru_b77a34_57_1.svg"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "thiet-tap",
+      "text": "9.1.3. Thiết tập"
+    },
+    {
+      "type": "paragraph",
+      "text": "Trong các API cấp cao, chúng ta có thể trực tiếp khởi tạo mô hình GPU.\nĐiều này đóng gói tất cả các chi tiết cấu hình mà chúng tôi đã thực hiện\nrõ ràng ở trên. Mã này nhanh hơn đáng kể vì nó sử dụng các toán tử được\nbiên dịch hơn là Python cho nhiều chi tiết mà chúng tôi đã nêu ra trước\nđó."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "gru_layer = rnn.GRU(num_hiddens)\nmodel = d2l.RNNModel(gru_layer, len(vocab))\nd2l.train_ch8(model, train_iter, vocab, lr, num_epochs, device)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "perplexity 1.1, 171219.5 tokens/sec on gpu(0)\ntime traveller cfreed dimensions we call the three planes of spa\ntravelleryou can show black is white by argument said filby"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_gru_b77a34_63_1.svg",
+      "local_path": "_images/output_gru_b77a34_63_1.svg",
+      "alt": "../_images/output_gru_b77a34_63_1.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "num_inputs = vocab_size\ngru_layer = nn.GRU(num_inputs, num_hiddens)\nmodel = d2l.RNNModel(gru_layer, len(vocab))\nmodel = model.to(device)\nd2l.train_ch8(model, train_iter, vocab, lr, num_epochs, device)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "perplexity 1.0, 323876.1 tokens/sec on cuda:0\ntime travelleryou can show black is white by argument said filby\ntravelleryou can show black is white by argument said filby"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_gru_b77a34_66_1.svg",
+      "local_path": "_images/output_gru_b77a34_66_1.svg",
+      "alt": "../_images/output_gru_b77a34_66_1.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "gru_cell = tf.keras.layers.GRUCell(num_hiddens,\n    kernel_initializer='glorot_uniform')\ngru_layer = tf.keras.layers.RNN(gru_cell, time_major=True,\n    return_sequences=True, return_state=True)\n\ndevice_name = d2l.try_gpu()._device_name\nstrategy = tf.distribute.OneDeviceStrategy(device_name)\nwith strategy.scope():\n    model = d2l.RNNModel(gru_layer, vocab_size=len(vocab))\n\nd2l.train_ch8(model, train_iter, vocab, lr, num_epochs, strategy)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "perplexity 1.0, 7141.4 tokens/sec on /GPU:0\ntime traveller for so it will be convenient to speak of himwas e\ntraveller with a slight accession ofcheerfulness really thi"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_gru_b77a34_69_1.svg",
+      "local_path": "_images/output_gru_b77a34_69_1.svg",
+      "alt": "../_images/output_gru_b77a34_69_1.svg"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tom-tat",
+      "text": "9.1.4. Tóm tắt"
+    },
+    {
+      "type": "list",
+      "ordered": false,
+      "items": [
+        "Các RNN có cổng có thể nắm bắt các phụ thuộc tốt hơn cho các trình tự\nvới khoảng cách bước thời gian lớn.",
+        "Đặt lại cổng giúp nắm bắt các phụ thuộc ngắn hạn trong chuỗi.",
+        "Cập nhật cổng giúp nắm bắt các phụ thuộc dài hạn trong chuỗi.",
+        "Grus chứa RNN cơ bản làm trường hợp cực đoan của chúng bất cứ khi nào\ncổng đặt lại được bật. Họ cũng có thể bỏ qua dãy con bằng cách bật\ncổng cập nhật."
+      ]
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bai-tap",
+      "text": "9.1.5. Bài tập"
+    },
+    {
+      "type": "list",
+      "ordered": true,
+      "items": [
+        "Giả sử rằng chúng ta chỉ muốn sử dụng đầu vào tại bước thời gian \\(t'\\) để dự đoán đầu ra tại bước thời gian \\(t > t'\\) . Các\ngiá trị tốt nhất cho các thiết lập lại và cập nhật cổng cho mỗi bước\nthời gian là gì?",
+        "Điều chỉnh các siêu tham số và phân tích ảnh hưởng của chúng đối với\nthời gian chạy, bối rối và trình tự đầu ra.",
+        "So sánh thời gian chạy, bối rối và các chuỗi đầu ra cho rnn.RNN và rnn.GRU triển khai với nhau.",
+        "Điều gì xảy ra nếu bạn chỉ triển khai các phần của GRU, ví dụ, chỉ\nvới một cổng đặt lại hoặc chỉ một cổng cập nhật?"
+      ]
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    }
+  ],
+  "images": [
+    {
+      "original_url": "https://vi.d2l.ai/_images/gru-1.svg",
+      "local_path": "_images/gru-1.svg",
+      "alt": "../_images/gru-1.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/gru-2.svg",
+      "local_path": "_images/gru-2.svg",
+      "alt": "../_images/gru-2.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/gru-3.svg",
+      "local_path": "_images/gru-3.svg",
+      "alt": "../_images/gru-3.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_gru_b77a34_51_1.svg",
+      "local_path": "_images/output_gru_b77a34_51_1.svg",
+      "alt": "../_images/output_gru_b77a34_51_1.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_gru_b77a34_54_1.svg",
+      "local_path": "_images/output_gru_b77a34_54_1.svg",
+      "alt": "../_images/output_gru_b77a34_54_1.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_gru_b77a34_57_1.svg",
+      "local_path": "_images/output_gru_b77a34_57_1.svg",
+      "alt": "../_images/output_gru_b77a34_57_1.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_gru_b77a34_63_1.svg",
+      "local_path": "_images/output_gru_b77a34_63_1.svg",
+      "alt": "../_images/output_gru_b77a34_63_1.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_gru_b77a34_66_1.svg",
+      "local_path": "_images/output_gru_b77a34_66_1.svg",
+      "alt": "../_images/output_gru_b77a34_66_1.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_gru_b77a34_69_1.svg",
+      "local_path": "_images/output_gru_b77a34_69_1.svg",
+      "alt": "../_images/output_gru_b77a34_69_1.svg"
+    }
+  ],
+  "text": "9.1. Các đơn vị định kỳ cổng (GRU)\nTrong Section 8.7 , chúng tôi đã thảo luận về cách tính độ dốc\ntrong RNNs. Đặc biệt, chúng tôi thấy rằng các sản phẩm dài của ma trận\ncó thể dẫn đến biến mất hoặc bùng nổ gradient. Chúng ta hãy suy nghĩ\nngắn gọn về những bất thường gradient như vậy có nghĩa là gì trong thực\ntế:\nChúng ta có thể gặp phải một tình huống mà một quan sát sớm là rất\nquan trọng để dự đoán tất cả các quan sát trong tương lai. Hãy xem\nxét trường hợp hơi contrived trong đó quan sát đầu tiên chứa một tổng\nkiểm tra và mục tiêu là để phân biệt xem tổng kiểm tra có đúng ở cuối\nchuỗi hay không. Trong trường hợp này, ảnh hưởng của mã thông báo đầu\ntiên là rất quan trọng. Chúng tôi muốn có một số cơ chế để lưu trữ\nthông tin ban đầu quan trọng trong một tế bào bộ nhớ*. Không có cơ\nchế như vậy, chúng ta sẽ phải gán một gradient rất lớn cho quan sát\nnày, vì nó ảnh hưởng đến tất cả các quan sát tiếp theo.\nChúng ta có thể gặp phải những tình huống mà một số token không có\nquan sát thích hợp. Ví dụ, khi phân tích một trang web có thể có mã\nHTML phụ trợ không liên quan với mục đích đánh giá tình cảm được\ntruyền tải trên trang. Chúng tôi muốn có một số cơ chế để * bỏ qua*\ntoken như vậy trong đại diện trạng thái tiềm ẩn.\nChúng ta có thể gặp phải các tình huống trong đó có một sự phá vỡ\nlogic giữa các phần của một chuỗi. Ví dụ, có thể có sự chuyển đổi\ngiữa các chương trong một cuốn sách hoặc chuyển đổi giữa một con gấu\nvà thị trường tăng giá cho chứng khoán. Trong trường hợp này, thật\ntuyệt khi có một phương tiện * đặt lại* đại diện trạng thái nội bộ\ncủa chúng tôi.\nMột số phương pháp đã được đề xuất để giải quyết vấn đề này. Một trong\nnhững sớm nhất là bộ nhớ ngắn hạn dài [Hochreiter & Schmidhuber, 1997] mà chúng ta sẽ thảo luận trong Section 9.2 . Đơn vị định kỳ gated (GRU) [Cho et al., 2014a] là một biến thể sắp xếp\nhợp lý hơn một chút thường cung cấp hiệu suất tương đương và nhanh hơn\nđáng kể để tính toán [Chung et al., 2014] . Do sự đơn\ngiản của nó, chúng ta hãy bắt đầu với GRU.\n9.1.1. Nhà nước ẩn Gated\nSự khác biệt chính giữa vanilla RNNs và Grus là hỗ trợ sau này gating\ncủa trạng thái ẩn. Điều này có nghĩa là chúng ta có các cơ chế dành\nriêng cho khi một trạng thái ẩn nên được * cập nhật* và cả khi nó nên\nđược * reset*. Những cơ chế này được học và chúng giải quyết các mối\nquan tâm được liệt kê ở trên. Ví dụ, nếu token đầu tiên có tầm quan\ntrọng lớn, chúng ta sẽ học cách không cập nhật trạng thái ẩn sau lần\nquan sát đầu tiên. Tương tự như vậy, chúng ta sẽ học cách bỏ qua các\nquan sát tạm thời không liên quan. Cuối cùng, chúng ta sẽ học cách đặt\nlại trạng thái tiềm ẩn bất cứ khi nào cần thiết. Chúng tôi thảo luận chi\ntiết về điều này dưới đây.\n9.1.1.1. Cổng đặt lại và cổng cập nhật\nĐiều đầu tiên chúng ta cần giới thiệu là cổng * reset * và cổng cập\nnhật*. Chúng tôi kỹ sư chúng trở thành vectơ với các mục trong \\((0, 1)\\) sao cho chúng tôi có thể thực hiện các kết hợp lồi. Ví\ndụ, một cổng đặt lại sẽ cho phép chúng ta kiểm soát số lượng trạng thái\ntrước đó mà chúng ta vẫn có thể muốn nhớ. Tương tự như vậy, một cổng cập\nnhật sẽ cho phép chúng ta kiểm soát bao nhiêu trạng thái mới chỉ là một\nbản sao của trạng thái cũ.\nChúng tôi bắt đầu bằng kỹ thuật các cổng này. Fig. 9.1.1 minh\nhọa các đầu vào cho cả cổng đặt lại và cập nhật trong GRU, với đầu vào\ncủa bước thời gian hiện tại và trạng thái ẩn của bước thời gian trước\nđó. Các đầu ra của hai cổng được đưa ra bởi hai lớp được kết nối hoàn\ntoàn với chức năng kích hoạt sigmoid.\nFig. 9.1.1 Computing the reset gate and the update gate in a GRU model. ¶\nVề mặt toán học, cho một bước thời gian nhất định \\(t\\) , giả sử rằng\nđầu vào là một minibatch \\(\\mathbf{X}_t \\in \\mathbb{R}^{n \\times d}\\) (số ví dụ: \\(n\\) ,\nsố lượng đầu vào: \\(d\\) ) và trạng thái ẩn của bước thời gian trước\nđó là \\(\\mathbf{H}_{t-1} \\in \\mathbb{R}^{n \\times h}\\) (số đơn vị\nẩn: \\(h\\) ). Sau đó, cổng đặt lại \\(\\mathbf{R}_t \\in \\mathbb{R}^{n \\times h}\\) và cổng cập nhật \\(\\mathbf{Z}_t \\in \\mathbb{R}^{n \\times h}\\) được tính như sau:\ntrong đó \\(\\mathbf{W}_{xr}, \\mathbf{W}_{xz} \\in \\mathbb{R}^{d \\times h}\\) và \\(\\mathbf{W}_{hr}, \\mathbf{W}_{hz} \\in \\mathbb{R}^{h \\times h}\\) là\ncác thông số trọng lượng và \\(\\mathbf{b}_r, \\mathbf{b}_z \\in \\mathbb{R}^{1 \\times h}\\) là thiên\nvị. Lưu ý rằng phát sóng (xem Section 2.1.3 ) được kích\nhoạt trong quá trình tổng kết. Chúng tôi sử dụng các hàm sigmoid (như\nđược giới thiệu trong Section 4.1 ) để chuyển đổi các giá trị đầu\nvào thành khoảng \\((0, 1)\\) .\n9.1.1.2. Ứng viên Hidden State\nTiếp theo, chúng ta hãy tích hợp cổng đặt lại \\(\\mathbf{R}_t\\) với\ncơ chế cập nhật trạng thái tiềm ẩn thông thường trong (8.4.5) . Nó dẫn đến những điều sau đây * trạng thái\nẩn ứng cử viên * \\(\\tilde{\\mathbf{H}}_t \\in \\mathbb{R}^{n \\times h}\\) tại bước thời\ngian \\(t\\) :\ntrong đó \\(\\mathbf{W}_{xh} \\in \\mathbb{R}^{d \\times h}\\) và \\(\\mathbf{W}_{hh} \\in \\mathbb{R}^{h \\times h}\\) là các thông số\ntrọng lượng, \\(\\mathbf{b}_h \\in \\mathbb{R}^{1 \\times h}\\) là thiên\nvị và ký hiệu \\(\\odot\\) là nhà điều hành sản phẩm Hadamard\n(elementwise). Ở đây chúng ta sử dụng một phi tuyến dưới dạng tanh để\nđảm bảo rằng các giá trị trong trạng thái ẩn ứng viên vẫn còn trong\nkhoảng \\((-1, 1)\\) .\nKết quả là ứng cử viên vì chúng ta vẫn cần kết hợp hành động của cổng\ncập nhật. So sánh với (8.4.5) , bây giờ ảnh hưởng của\ncác trạng thái trước đó có thể được giảm với phép nhân elementwise \\(\\mathbf{R}_t\\) và \\(\\mathbf{H}_{t-1}\\) trong (9.1.2) . Bất cứ khi nào các mục trong cổng đặt lại \\(\\mathbf{R}_t\\) gần 1, chúng tôi phục hồi một RNN vani như trong (8.4.5) . Đối với tất cả các mục của cổng đặt lại \\(\\mathbf{R}_t\\) gần 0, trạng thái ẩn ứng cử viên là kết quả của MLP\nvới \\(\\mathbf{X}_t\\) làm đầu vào. Do đó, bất kỳ trạng thái ẩn đã tồn\ntại trước nào là * đặt lại* thành mặc định.\nFig. 9.1.2 minh họa dòng tính toán sau khi áp dụng cổng đặt\nlại.\nFig. 9.1.2 Computing the candidate hidden state in a GRU model. ¶\n9.1.1.3. Nhà nước ẩn\nCuối cùng, chúng ta cần kết hợp hiệu ứng của cổng cập nhật \\(\\mathbf{Z}_t\\) . Điều này xác định mức độ mà trạng thái ẩn mới \\(\\mathbf{H}_t \\in \\mathbb{R}^{n \\times h}\\) chỉ là trạng thái cũ \\(\\mathbf{H}_{t-1}\\) và bằng cách sử dụng nhà nước ứng cử viên mới \\(\\tilde{\\mathbf{H}}_t\\) . Cổng cập nhật \\(\\mathbf{Z}_t\\) có thể\nđược sử dụng cho mục đích này, đơn giản bằng cách dùng kết hợp lồi\nelementwise giữa cả \\(\\mathbf{H}_{t-1}\\) và \\(\\tilde{\\mathbf{H}}_t\\) . Điều này dẫn đến phương trình cập nhật\ncuối cùng cho GRU:\nBất cứ khi nào cổng cập nhật \\(\\mathbf{Z}_t\\) gần 1, chúng tôi chỉ\nđơn giản là giữ lại trạng thái cũ. Trong trường hợp này, thông tin từ \\(\\mathbf{X}_t\\) về cơ bản bị bỏ qua, có hiệu quả bỏ qua bước thời\ngian \\(t\\) trong chuỗi phụ thuộc. Ngược lại, bất cứ khi nào \\(\\mathbf{Z}_t\\) gần 0, trạng thái tiềm ẩn mới \\(\\mathbf{H}_t\\) tiếp cận trạng thái tiềm ẩn ứng cử viên \\(\\tilde{\\mathbf{H}}_t\\) .\nNhững thiết kế này có thể giúp chúng ta đối phó với vấn đề gradient biến\nmất trong RNNs và nắm bắt các phụ thuộc tốt hơn cho các chuỗi với khoảng\ncách bước thời gian lớn. Ví dụ, nếu cổng cập nhật đã gần 1 cho tất cả\ncác bước thời gian của toàn bộ dãy con, trạng thái ẩn cũ tại bước thời\ngian bắt đầu của nó sẽ dễ dàng được giữ lại và truyền đến cuối của nó,\nbất kể độ dài của dãy con.\nFig. 9.1.3 minh họa luồng tính toán sau khi cổng cập nhật\nđang hoạt động.\nFig. 9.1.3 Computing the hidden state in a GRU model. ¶\nTóm lại, Grus có hai đặc điểm phân biệt sau:\nĐặt lại cổng giúp nắm bắt các phụ thuộc ngắn hạn trong chuỗi.\nCập nhật cổng giúp nắm bắt các phụ thuộc dài hạn trong chuỗi.\n9.1.2. Thực hiện từ đầu\nĐể hiểu rõ hơn về mô hình GRU, chúng ta hãy thực hiện nó từ đầu. Chúng\ntôi bắt đầu bằng cách đọc tập dữ liệu máy thời gian mà chúng tôi đã sử\ndụng trong Section 8.5 . Mã để đọc tập dữ liệu được đưa\nra dưới đây.\n9.1.2.1. Initializing Model Parameters\nBước tiếp theo là khởi tạo các tham số mô hình. Chúng tôi vẽ các trọng\nlượng từ phân phối Gaussian với độ lệch chuẩn là 0,01 và đặt thiên vị\nthành 0. Siêu tham số num_hiddens xác định số đơn vị ẩn. Chúng tôi\nkhởi tạo tất cả các trọng lượng và thành kiến liên quan đến cổng cập\nnhật, cổng đặt lại, trạng thái ẩn ứng cử viên và lớp đầu ra.\n9.1.2.2. Xác định mô hình\nBây giờ chúng ta sẽ định nghĩa chức năng khởi tạo trạng thái ẩn init_gru_state . Cũng giống như hàm init_rnn_state được định\nnghĩa trong Section 8.5 , hàm này trả về một tensor với\nmột hình dạng (kích thước lô, số đơn vị ẩn) có giá trị là tất cả các số\nkhông.\nBây giờ chúng tôi đã sẵn sàng để xác định mô hình GRU. Cấu trúc của nó\ngiống như của ô RNN cơ bản, ngoại trừ các phương trình cập nhật phức tạp\nhơn.\n9.1.2.3. Đào tạo và dự đoán\nĐào tạo và dự đoán hoạt động theo cách chính xác giống như trong Section 8.5 . Sau khi đào tạo, chúng tôi in ra sự bối rối\ntrên bộ đào tạo và trình tự dự đoán theo các tiền tố được cung cấp\n“khách du lịch thời gian” và “khách du lịch”, tương ứng.\n9.1.3. Thiết tập\nTrong các API cấp cao, chúng ta có thể trực tiếp khởi tạo mô hình GPU.\nĐiều này đóng gói tất cả các chi tiết cấu hình mà chúng tôi đã thực hiện\nrõ ràng ở trên. Mã này nhanh hơn đáng kể vì nó sử dụng các toán tử được\nbiên dịch hơn là Python cho nhiều chi tiết mà chúng tôi đã nêu ra trước\nđó.\n9.1.4. Tóm tắt\nCác RNN có cổng có thể nắm bắt các phụ thuộc tốt hơn cho các trình tự\nvới khoảng cách bước thời gian lớn.\nĐặt lại cổng giúp nắm bắt các phụ thuộc ngắn hạn trong chuỗi.\nCập nhật cổng giúp nắm bắt các phụ thuộc dài hạn trong chuỗi.\nGrus chứa RNN cơ bản làm trường hợp cực đoan của chúng bất cứ khi nào\ncổng đặt lại được bật. Họ cũng có thể bỏ qua dãy con bằng cách bật\ncổng cập nhật.\n9.1.5. Bài tập\nGiả sử rằng chúng ta chỉ muốn sử dụng đầu vào tại bước thời gian \\(t'\\) để dự đoán đầu ra tại bước thời gian \\(t > t'\\) . Các\ngiá trị tốt nhất cho các thiết lập lại và cập nhật cổng cho mỗi bước\nthời gian là gì?\nĐiều chỉnh các siêu tham số và phân tích ảnh hưởng của chúng đối với\nthời gian chạy, bối rối và trình tự đầu ra.\nSo sánh thời gian chạy, bối rối và các chuỗi đầu ra cho rnn.RNN và rnn.GRU triển khai với nhau.\nĐiều gì xảy ra nếu bạn chỉ triển khai các phần của GRU, ví dụ, chỉ\nvới một cổng đặt lại hoặc chỉ một cổng cập nhật?\nDiscussions\nDiscussions"
+}

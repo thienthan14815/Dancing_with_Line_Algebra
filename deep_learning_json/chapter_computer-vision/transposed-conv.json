@@ -1,0 +1,408 @@
+{
+  "url": "https://vi.d2l.ai/chapter_computer-vision/transposed-conv.html",
+  "chapter": "chapter_computer-vision",
+  "title": "13.10. Chuyển đổi Convolution",
+  "crawled_at": "2026-07-20T12:40:47.958482+00:00",
+  "headings": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "chuyen-doi-convolution",
+      "text": "13.10. Chuyển đổi Convolution"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "hoat-dong-co-ban",
+      "text": "13.10.1. Hoạt động cơ bản"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "dem-sai-buoc-va-nhieu-kenh",
+      "text": "13.10.2. Đệm, sải bước và nhiều kênh"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "ket-noi-voi-ma-tran-transposition",
+      "text": "13.10.3. Kết nối với Ma trận Transposition"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tom-tat",
+      "text": "13.10.4. Tóm tắt"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bai-tap",
+      "text": "13.10.5. Bài tập"
+    }
+  ],
+  "content": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "chuyen-doi-convolution",
+      "text": "13.10. Chuyển đổi Convolution"
+    },
+    {
+      "type": "paragraph",
+      "text": "Các lớp CNN chúng ta đã thấy cho đến nay, chẳng hạn như các lớp phức tạp\n( Section 6.2 ) và các lớp tổng hợp\n( Section 6.5 ), thường làm giảm (downsample) kích thước không\ngian (chiều cao và chiều rộng) của đầu vào, hoặc giữ chúng không thay\nđổi. Trong phân đoạn ngữ nghĩa phân loại ở cấp pixel, sẽ thuận tiện nếu\nkích thước không gian của đầu vào và đầu ra giống nhau. Ví dụ: kích\nthước kênh tại một điểm ảnh đầu ra có thể giữ kết quả phân loại cho\npixel đầu vào ở cùng một vị trí không gian."
+    },
+    {
+      "type": "paragraph",
+      "text": "Để đạt được điều này, đặc biệt là sau khi các kích thước không gian bị\ngiảm bởi các lớp CNN, chúng ta có thể sử dụng một loại lớp CNN khác có\nthể tăng (upsample) kích thước không gian của bản đồ tính năng trung\ngian. Trong phần này, chúng tôi sẽ giới thiệu chuyển đổi , mà còn được\ngọi là * phân số strided convolution* [Dumoulin & Visin, 2016] ,\nđể đảo ngược các hoạt động lấy mẫu xuống bằng sự covolution."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "from mxnet import init, np, npx\nfrom mxnet.gluon import nn\nfrom d2l import mxnet as d2l\n\nnpx.set_np()"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "import torch\nfrom torch import nn\nfrom d2l import torch as d2l"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "hoat-dong-co-ban",
+      "text": "13.10.1. Hoạt động cơ bản"
+    },
+    {
+      "type": "paragraph",
+      "text": "Bỏ qua các kênh bây giờ, chúng ta hãy bắt đầu với hoạt động phức tạp\nchuyển tiếp cơ bản với sải chân 1 và không có đệm. Giả sử rằng chúng ta\nđược đưa ra một tensor đầu vào \\(n_h \\times n_w\\) và một hạt nhân \\(k_h \\times k_w\\) . Trượt cửa sổ hạt nhân với sải chân 1 cho \\(n_w\\) lần trong mỗi hàng và \\(n_h\\) lần trong mỗi cột mang lại\ntổng cộng \\(n_h n_w\\) kết quả trung gian. Mỗi kết quả trung gian là\nmột tensor \\((n_h + k_h - 1) \\times (n_w + k_w - 1)\\) được khởi tạo\ndưới dạng số không. Để tính từng tensor trung gian, mỗi phần tử trong\ntensor đầu vào được nhân với hạt nhân sao cho tensor \\(k_h \\times k_w\\) kết quả thay thế một phần trong mỗi tensor trung\ngian. Lưu ý rằng vị trí của phần thay thế trong mỗi tensor trung gian\ntương ứng với vị trí của phần tử trong tensor đầu vào được sử dụng cho\ntính toán. Cuối cùng, tất cả các kết quả trung gian được tóm tắt để tạo\nra đầu ra."
+    },
+    {
+      "type": "paragraph",
+      "text": "Ví dụ, Fig. 13.10.1 minh họa cách chuyển đổi phức tạp với\nmột hạt nhân \\(2\\times 2\\) được tính toán cho một tensor đầu vào \\(2\\times 2\\) ."
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/trans_conv.svg",
+      "local_path": "_images/trans_conv.svg",
+      "alt": "../_images/trans_conv.svg"
+    },
+    {
+      "type": "paragraph",
+      "text": "Fig. 13.10.1 Transposed convolution with a \\(2\\times 2\\) kernel. The shaded\nportions are a portion of an intermediate tensor as well as the input\nand kernel tensor elements used for the computation. ¶"
+    },
+    {
+      "type": "paragraph",
+      "text": "Chúng ta có thể triển khai hoạt động chuyển tiếp cơ bản này trans_conv cho một ma trận đầu vào X và một ma trận hạt nhân K ."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def trans_conv(X, K):\n    h, w = K.shape\n    Y = np.zeros((X.shape[0] + h - 1, X.shape[1] + w - 1))\n    for i in range(X.shape[0]):\n        for j in range(X.shape[1]):\n            Y[i: i + h, j: j + w] += X[i, j] * K\n    return Y"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def trans_conv(X, K):\n    h, w = K.shape\n    Y = torch.zeros((X.shape[0] + h - 1, X.shape[1] + w - 1))\n    for i in range(X.shape[0]):\n        for j in range(X.shape[1]):\n            Y[i: i + h, j: j + w] += X[i, j] * K\n    return Y"
+    },
+    {
+      "type": "paragraph",
+      "text": "Trái ngược với sự phức tạp thông thường (trong Section 6.2 ) mà * giảm các yếu tố đầu vào thông qua hạt\nnhân, sự biến đổi chuyển đổi * phát sóng * yếu tố đầu vào thông qua hạt\nnhân, do đó tạo ra một đầu ra lớn hơn đầu vào. Chúng ta có thể xây dựng\ntensor đầu vào X và tensor kernel K từ Fig. 13.10.1 đến xác nhận đầu ra của việc triển khai ở\ntrên của hoạt động phức tạp chuyển tiếp hai chiều cơ bản."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "X = np.array([[0.0, 1.0], [2.0, 3.0]])\nK = np.array([[0.0, 1.0], [2.0, 3.0]])\ntrans_conv(X, K)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "array([[ 0.,  0.,  1.],\n       [ 0.,  4.,  6.],\n       [ 4., 12.,  9.]])"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "X = torch.tensor([[0.0, 1.0], [2.0, 3.0]])\nK = torch.tensor([[0.0, 1.0], [2.0, 3.0]])\ntrans_conv(X, K)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "tensor([[ 0.,  0.,  1.],\n        [ 0.,  4.,  6.],\n        [ 4., 12.,  9.]])"
+    },
+    {
+      "type": "paragraph",
+      "text": "Ngoài ra, khi đầu vào X và hạt nhân K đều là hàng chục bốn\nchiều, chúng ta có thể sử dụng API cấp cao để có được kết quả tương tự."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "X, K = X.reshape(1, 1, 2, 2), K.reshape(1, 1, 2, 2)\ntconv = nn.Conv2DTranspose(1, kernel_size=2)\ntconv.initialize(init.Constant(K))\ntconv(X)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "array([[[[ 0.,  0.,  1.],\n         [ 0.,  4.,  6.],\n         [ 4., 12.,  9.]]]])"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "X, K = X.reshape(1, 1, 2, 2), K.reshape(1, 1, 2, 2)\ntconv = nn.ConvTranspose2d(1, 1, kernel_size=2, bias=False)\ntconv.weight.data = K\ntconv(X)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "tensor([[[[ 0.,  0.,  1.],\n          [ 0.,  4.,  6.],\n          [ 4., 12.,  9.]]]], grad_fn=<ConvolutionBackward0>)"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "dem-sai-buoc-va-nhieu-kenh",
+      "text": "13.10.2. Đệm, sải bước và nhiều kênh"
+    },
+    {
+      "type": "paragraph",
+      "text": "Khác với trong sự phức tạp thông thường nơi đệm được áp dụng cho đầu\nvào, nó được áp dụng cho đầu ra trong quá trình chuyển đổi. Ví dụ: khi\nchỉ định số đệm ở hai bên của chiều cao và chiều rộng là 1, các hàng và\ncột đầu tiên và cuối cùng sẽ bị xóa khỏi đầu ra phức tạp được chuyển\nđổi."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "tconv = nn.Conv2DTranspose(1, kernel_size=2, padding=1)\ntconv.initialize(init.Constant(K))\ntconv(X)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "array([[[[4.]]]])"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "tconv = nn.ConvTranspose2d(1, 1, kernel_size=2, padding=1, bias=False)\ntconv.weight.data = K\ntconv(X)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "tensor([[[[4.]]]], grad_fn=<ConvolutionBackward0>)"
+    },
+    {
+      "type": "paragraph",
+      "text": "Trong quá trình chuyển đổi, các bước tiến được chỉ định cho các kết quả\ntrung gian (do đó đầu ra), không phải cho đầu vào. Sử dụng cùng một đầu\nvào và kernel tenors từ Fig. 13.10.1 , thay đổi sải chân từ\n1 đến 2 làm tăng cả chiều cao và trọng lượng của hàng chục trung gian,\ndo đó tensor đầu ra trong Fig. 13.10.2 ."
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/trans_conv_stride2.svg",
+      "local_path": "_images/trans_conv_stride2.svg",
+      "alt": "../_images/trans_conv_stride2.svg"
+    },
+    {
+      "type": "paragraph",
+      "text": "Fig. 13.10.2 Transposed convolution with a \\(2\\times 2\\) kernel with stride of\n2. The shaded portions are a portion of an intermediate tensor as\nwell as the input and kernel tensor elements used for the\ncomputation. ¶"
+    },
+    {
+      "type": "paragraph",
+      "text": "Đoạn mã sau đây có thể xác nhận đầu ra phức tạp transposed cho sải chân\ncủa 2 trong Fig. 13.10.2 ."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "tconv = nn.Conv2DTranspose(1, kernel_size=2, strides=2)\ntconv.initialize(init.Constant(K))\ntconv(X)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "array([[[[0., 0., 0., 1.],\n         [0., 0., 2., 3.],\n         [0., 2., 0., 3.],\n         [4., 6., 6., 9.]]]])"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "tconv = nn.ConvTranspose2d(1, 1, kernel_size=2, stride=2, bias=False)\ntconv.weight.data = K\ntconv(X)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "tensor([[[[0., 0., 0., 1.],\n          [0., 0., 2., 3.],\n          [0., 2., 0., 3.],\n          [4., 6., 6., 9.]]]], grad_fn=<ConvolutionBackward0>)"
+    },
+    {
+      "type": "paragraph",
+      "text": "Đối với nhiều kênh đầu vào và đầu ra, sự tích tụ được chuyển tiếp hoạt\nđộng theo cách tương tự như sự phức tạp thông thường. Giả sử rằng đầu\nvào có \\(c_i\\) các kênh và sự phức tạp transposed gán một tensor hạt\nnhân \\(k_h\\times k_w\\) cho mỗi kênh đầu vào. Khi nhiều kênh đầu ra\nđược chỉ định, chúng tôi sẽ có hạt nhân \\(c_i\\times k_h\\times k_w\\) cho mỗi kênh đầu ra."
+    },
+    {
+      "type": "paragraph",
+      "text": "Như trong tất cả, nếu chúng ta cung cấp \\(\\mathsf{X}\\) vào một lớp\nphức tạp \\(f\\) để xuất ra \\(\\mathsf{Y}=f(\\mathsf{X})\\) và tạo ra\nmột lớp tích hợp chuyển đổi \\(g\\) với các siêu tham số tương tự như \\(f\\) ngoại trừ số lượng kênh đầu ra là số kênh trong \\(\\mathsf{X}\\) , sau đó \\(g(Y)\\) sẽ có hình dạng tương tự như \\(\\mathsf{X}\\) . Điều này có thể được minh họa trong ví dụ sau."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "X = np.random.uniform(size=(1, 10, 16, 16))\nconv = nn.Conv2D(20, kernel_size=5, padding=2, strides=3)\ntconv = nn.Conv2DTranspose(10, kernel_size=5, padding=2, strides=3)\nconv.initialize()\ntconv.initialize()\ntconv(conv(X)).shape == X.shape"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "True"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "X = torch.rand(size=(1, 10, 16, 16))\nconv = nn.Conv2d(10, 20, kernel_size=5, padding=2, stride=3)\ntconv = nn.ConvTranspose2d(20, 10, kernel_size=5, padding=2, stride=3)\ntconv(conv(X)).shape == X.shape"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "True"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "ket-noi-voi-ma-tran-transposition",
+      "text": "13.10.3. Kết nối với Ma trận Transposition"
+    },
+    {
+      "type": "paragraph",
+      "text": "Sự phức tạp chuyển tiếp được đặt tên theo chuyển vị ma trận. Để giải\nthích, trước tiên chúng ta hãy xem làm thế nào để thực hiện các phức tạp\nbằng cách sử dụng phép nhân ma trận. Trong ví dụ dưới đây, chúng ta định\nnghĩa một \\(3\\times 3\\) đầu vào X và một hạt nhân ghép \\(2\\times 2\\) K , và sau đó sử dụng hàm corr2d để tính toán\nđầu ra phức tạp Y ."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "X = np.arange(9.0).reshape(3, 3)\nK = np.array([[1.0, 2.0], [3.0, 4.0]])\nY = d2l.corr2d(X, K)\nY"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "array([[27., 37.],\n       [57., 67.]])"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "X = torch.arange(9.0).reshape(3, 3)\nK = torch.tensor([[1.0, 2.0], [3.0, 4.0]])\nY = d2l.corr2d(X, K)\nY"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "tensor([[27., 37.],\n        [57., 67.]])"
+    },
+    {
+      "type": "paragraph",
+      "text": "Tiếp theo, chúng ta viết lại hạt nhân phức tạp K dưới dạng ma trận\ntrọng lượng thưa W chứa rất nhiều số không. Hình dạng của ma trận\ntrọng lượng là ( \\(4\\) , \\(9\\) ), trong đó các phần tử phi bằng\nkhông đến từ hạt nhân phức tạp K ."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def kernel2matrix(K):\n    k, W = np.zeros(5), np.zeros((4, 9))\n    k[:2], k[3:5] = K[0, :], K[1, :]\n    W[0, :5], W[1, 1:6], W[2, 3:8], W[3, 4:] = k, k, k, k\n    return W\n\nW = kernel2matrix(K)\nW"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "array([[1., 2., 0., 3., 4., 0., 0., 0., 0.],\n       [0., 1., 2., 0., 3., 4., 0., 0., 0.],\n       [0., 0., 0., 1., 2., 0., 3., 4., 0.],\n       [0., 0., 0., 0., 1., 2., 0., 3., 4.]])"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def kernel2matrix(K):\n    k, W = torch.zeros(5), torch.zeros((4, 9))\n    k[:2], k[3:5] = K[0, :], K[1, :]\n    W[0, :5], W[1, 1:6], W[2, 3:8], W[3, 4:] = k, k, k, k\n    return W\n\nW = kernel2matrix(K)\nW"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "tensor([[1., 2., 0., 3., 4., 0., 0., 0., 0.],\n        [0., 1., 2., 0., 3., 4., 0., 0., 0.],\n        [0., 0., 0., 1., 2., 0., 3., 4., 0.],\n        [0., 0., 0., 0., 1., 2., 0., 3., 4.]])"
+    },
+    {
+      "type": "paragraph",
+      "text": "Nối đầu vào X từng hàng để có được một vectơ có chiều dài 9. Sau đó,\nphép nhân ma trận của W và X vectơ hóa cho một vectơ có chiều\ndài 4. Sau khi định hình lại nó, chúng ta có thể thu được kết quả tương\ntự Y từ hoạt động phức tạp ban đầu ở trên: chúng ta chỉ thực hiện\ncác phép phức tạp bằng cách sử dụng phép nhân ma trận."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "Y == np.dot(W, X.reshape(-1)).reshape(2, 2)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "array([[ True,  True],\n       [ True,  True]])"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "Y == torch.matmul(W, X.reshape(-1)).reshape(2, 2)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "tensor([[True, True],\n        [True, True]])"
+    },
+    {
+      "type": "paragraph",
+      "text": "Tương tự như vậy, chúng ta có thể thực hiện các phép chuyển đổi bằng\ncách sử dụng phép nhân ma trận. Trong ví dụ sau, chúng ta lấy đầu ra \\(2 \\times 2\\) Y từ sự phức tạp thông thường ở trên làm đầu vào\ncho sự phức tạp được chuyển tiếp. Để thực hiện thao tác này bằng cách\nnhân ma trận, chúng ta chỉ cần chuyển vị ma trận trọng lượng W với\nhình dạng mới \\((9, 4)\\) ."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "Z = trans_conv(Y, K)\nZ == np.dot(W.T, Y.reshape(-1)).reshape(3, 3)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "array([[ True,  True,  True],\n       [ True,  True,  True],\n       [ True,  True,  True]])"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "Z = trans_conv(Y, K)\nZ == torch.matmul(W.T, Y.reshape(-1)).reshape(3, 3)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "tensor([[True, True, True],\n        [True, True, True],\n        [True, True, True]])"
+    },
+    {
+      "type": "paragraph",
+      "text": "Cân nhắc việc thực hiện sự phức tạp bằng cách nhân ma trận. Với một\nvector đầu vào \\(\\mathbf{x}\\) và một ma trận trọng lượng \\(\\mathbf{W}\\) , chức năng lan truyền chuyển tiếp của sự phức tạp có\nthể được thực hiện bằng cách nhân đầu vào của nó với ma trận trọng lượng\nvà xuất ra một vector \\(\\mathbf{y}=\\mathbf{W}\\mathbf{x}\\) . Kể từ khi\nbackpropagation tuân theo quy tắc chuỗi và \\(\\nabla_{\\mathbf{x}}\\mathbf{y}=\\mathbf{W}^\\top\\) , chức năng truyền\nngược của sự phức tạp có thể được thực hiện bằng cách nhân đầu vào của\nnó với ma trận trọng lượng transposed \\(\\mathbf{W}^\\top\\) . Do đó,\nlớp tích lũy chuyển tiếp chỉ có thể trao đổi chức năng lan truyền về\nphía trước và chức năng lan truyền ngược của lớp ghép: các chức năng lan\ntruyền về phía trước và lan truyền ngược của nó nhân vectơ đầu vào của\nchúng với \\(\\mathbf{W}^\\top\\) và \\(\\mathbf{W}\\) , tương ứng."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tom-tat",
+      "text": "13.10.4. Tóm tắt"
+    },
+    {
+      "type": "list",
+      "ordered": false,
+      "items": [
+        "Ngược lại với sự phức tạp thông thường làm giảm các phần tử đầu vào\nthông qua hạt nhân, sự phức tạp chuyển phát các phần tử đầu vào thông\nqua hạt nhân, từ đó tạo ra một đầu ra lớn hơn đầu vào.",
+        "Nếu chúng ta cho \\(\\mathsf{X}\\) vào một lớp phức hợp \\(f\\) để\nxuất ra \\(\\mathsf{Y}=f(\\mathsf{X})\\) và tạo ra một lớp tích hợp\nchuyển đổi \\(g\\) với các siêu tham số tương tự như \\(f\\) ngoại trừ số lượng kênh đầu ra là số kênh trong \\(\\mathsf{X}\\) ,\nthì \\(g(Y)\\) sẽ có hình dạng tương tự như \\(\\mathsf{X}\\) .",
+        "Chúng ta có thể thực hiện các phức tạp bằng cách sử dụng phép nhân ma\ntrận. Lớp ghép chuyển tiếp chỉ có thể trao đổi chức năng lan truyền\nvề phía trước và chức năng lan truyền ngược của lớp ghép."
+      ]
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bai-tap",
+      "text": "13.10.5. Bài tập"
+    },
+    {
+      "type": "list",
+      "ordered": true,
+      "items": [
+        "Trong Section 13.10.3 , đầu vào\ncovolution X và đầu ra phức tạp transposed Z có hình dạng\ntương tự. Họ có cùng giá trị không? Tại sao?",
+        "Có hiệu quả khi sử dụng phép nhân ma trận để thực hiện các phức tạp\nkhông? Tại sao?"
+      ]
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    }
+  ],
+  "images": [
+    {
+      "original_url": "https://vi.d2l.ai/_images/trans_conv.svg",
+      "local_path": "_images/trans_conv.svg",
+      "alt": "../_images/trans_conv.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/trans_conv_stride2.svg",
+      "local_path": "_images/trans_conv_stride2.svg",
+      "alt": "../_images/trans_conv_stride2.svg"
+    }
+  ],
+  "text": "13.10. Chuyển đổi Convolution\nCác lớp CNN chúng ta đã thấy cho đến nay, chẳng hạn như các lớp phức tạp\n( Section 6.2 ) và các lớp tổng hợp\n( Section 6.5 ), thường làm giảm (downsample) kích thước không\ngian (chiều cao và chiều rộng) của đầu vào, hoặc giữ chúng không thay\nđổi. Trong phân đoạn ngữ nghĩa phân loại ở cấp pixel, sẽ thuận tiện nếu\nkích thước không gian của đầu vào và đầu ra giống nhau. Ví dụ: kích\nthước kênh tại một điểm ảnh đầu ra có thể giữ kết quả phân loại cho\npixel đầu vào ở cùng một vị trí không gian.\nĐể đạt được điều này, đặc biệt là sau khi các kích thước không gian bị\ngiảm bởi các lớp CNN, chúng ta có thể sử dụng một loại lớp CNN khác có\nthể tăng (upsample) kích thước không gian của bản đồ tính năng trung\ngian. Trong phần này, chúng tôi sẽ giới thiệu chuyển đổi , mà còn được\ngọi là * phân số strided convolution* [Dumoulin & Visin, 2016] ,\nđể đảo ngược các hoạt động lấy mẫu xuống bằng sự covolution.\n13.10.1. Hoạt động cơ bản\nBỏ qua các kênh bây giờ, chúng ta hãy bắt đầu với hoạt động phức tạp\nchuyển tiếp cơ bản với sải chân 1 và không có đệm. Giả sử rằng chúng ta\nđược đưa ra một tensor đầu vào \\(n_h \\times n_w\\) và một hạt nhân \\(k_h \\times k_w\\) . Trượt cửa sổ hạt nhân với sải chân 1 cho \\(n_w\\) lần trong mỗi hàng và \\(n_h\\) lần trong mỗi cột mang lại\ntổng cộng \\(n_h n_w\\) kết quả trung gian. Mỗi kết quả trung gian là\nmột tensor \\((n_h + k_h - 1) \\times (n_w + k_w - 1)\\) được khởi tạo\ndưới dạng số không. Để tính từng tensor trung gian, mỗi phần tử trong\ntensor đầu vào được nhân với hạt nhân sao cho tensor \\(k_h \\times k_w\\) kết quả thay thế một phần trong mỗi tensor trung\ngian. Lưu ý rằng vị trí của phần thay thế trong mỗi tensor trung gian\ntương ứng với vị trí của phần tử trong tensor đầu vào được sử dụng cho\ntính toán. Cuối cùng, tất cả các kết quả trung gian được tóm tắt để tạo\nra đầu ra.\nVí dụ, Fig. 13.10.1 minh họa cách chuyển đổi phức tạp với\nmột hạt nhân \\(2\\times 2\\) được tính toán cho một tensor đầu vào \\(2\\times 2\\) .\nFig. 13.10.1 Transposed convolution with a \\(2\\times 2\\) kernel. The shaded\nportions are a portion of an intermediate tensor as well as the input\nand kernel tensor elements used for the computation. ¶\nChúng ta có thể triển khai hoạt động chuyển tiếp cơ bản này trans_conv cho một ma trận đầu vào X và một ma trận hạt nhân K .\nTrái ngược với sự phức tạp thông thường (trong Section 6.2 ) mà * giảm các yếu tố đầu vào thông qua hạt\nnhân, sự biến đổi chuyển đổi * phát sóng * yếu tố đầu vào thông qua hạt\nnhân, do đó tạo ra một đầu ra lớn hơn đầu vào. Chúng ta có thể xây dựng\ntensor đầu vào X và tensor kernel K từ Fig. 13.10.1 đến xác nhận đầu ra của việc triển khai ở\ntrên của hoạt động phức tạp chuyển tiếp hai chiều cơ bản.\nNgoài ra, khi đầu vào X và hạt nhân K đều là hàng chục bốn\nchiều, chúng ta có thể sử dụng API cấp cao để có được kết quả tương tự.\n13.10.2. Đệm, sải bước và nhiều kênh\nKhác với trong sự phức tạp thông thường nơi đệm được áp dụng cho đầu\nvào, nó được áp dụng cho đầu ra trong quá trình chuyển đổi. Ví dụ: khi\nchỉ định số đệm ở hai bên của chiều cao và chiều rộng là 1, các hàng và\ncột đầu tiên và cuối cùng sẽ bị xóa khỏi đầu ra phức tạp được chuyển\nđổi.\nTrong quá trình chuyển đổi, các bước tiến được chỉ định cho các kết quả\ntrung gian (do đó đầu ra), không phải cho đầu vào. Sử dụng cùng một đầu\nvào và kernel tenors từ Fig. 13.10.1 , thay đổi sải chân từ\n1 đến 2 làm tăng cả chiều cao và trọng lượng của hàng chục trung gian,\ndo đó tensor đầu ra trong Fig. 13.10.2 .\nFig. 13.10.2 Transposed convolution with a \\(2\\times 2\\) kernel with stride of\n2. The shaded portions are a portion of an intermediate tensor as\nwell as the input and kernel tensor elements used for the\ncomputation. ¶\nĐoạn mã sau đây có thể xác nhận đầu ra phức tạp transposed cho sải chân\ncủa 2 trong Fig. 13.10.2 .\nĐối với nhiều kênh đầu vào và đầu ra, sự tích tụ được chuyển tiếp hoạt\nđộng theo cách tương tự như sự phức tạp thông thường. Giả sử rằng đầu\nvào có \\(c_i\\) các kênh và sự phức tạp transposed gán một tensor hạt\nnhân \\(k_h\\times k_w\\) cho mỗi kênh đầu vào. Khi nhiều kênh đầu ra\nđược chỉ định, chúng tôi sẽ có hạt nhân \\(c_i\\times k_h\\times k_w\\) cho mỗi kênh đầu ra.\nNhư trong tất cả, nếu chúng ta cung cấp \\(\\mathsf{X}\\) vào một lớp\nphức tạp \\(f\\) để xuất ra \\(\\mathsf{Y}=f(\\mathsf{X})\\) và tạo ra\nmột lớp tích hợp chuyển đổi \\(g\\) với các siêu tham số tương tự như \\(f\\) ngoại trừ số lượng kênh đầu ra là số kênh trong \\(\\mathsf{X}\\) , sau đó \\(g(Y)\\) sẽ có hình dạng tương tự như \\(\\mathsf{X}\\) . Điều này có thể được minh họa trong ví dụ sau.\n13.10.3. Kết nối với Ma trận Transposition\nSự phức tạp chuyển tiếp được đặt tên theo chuyển vị ma trận. Để giải\nthích, trước tiên chúng ta hãy xem làm thế nào để thực hiện các phức tạp\nbằng cách sử dụng phép nhân ma trận. Trong ví dụ dưới đây, chúng ta định\nnghĩa một \\(3\\times 3\\) đầu vào X và một hạt nhân ghép \\(2\\times 2\\) K , và sau đó sử dụng hàm corr2d để tính toán\nđầu ra phức tạp Y .\nTiếp theo, chúng ta viết lại hạt nhân phức tạp K dưới dạng ma trận\ntrọng lượng thưa W chứa rất nhiều số không. Hình dạng của ma trận\ntrọng lượng là ( \\(4\\) , \\(9\\) ), trong đó các phần tử phi bằng\nkhông đến từ hạt nhân phức tạp K .\nNối đầu vào X từng hàng để có được một vectơ có chiều dài 9. Sau đó,\nphép nhân ma trận của W và X vectơ hóa cho một vectơ có chiều\ndài 4. Sau khi định hình lại nó, chúng ta có thể thu được kết quả tương\ntự Y từ hoạt động phức tạp ban đầu ở trên: chúng ta chỉ thực hiện\ncác phép phức tạp bằng cách sử dụng phép nhân ma trận.\nTương tự như vậy, chúng ta có thể thực hiện các phép chuyển đổi bằng\ncách sử dụng phép nhân ma trận. Trong ví dụ sau, chúng ta lấy đầu ra \\(2 \\times 2\\) Y từ sự phức tạp thông thường ở trên làm đầu vào\ncho sự phức tạp được chuyển tiếp. Để thực hiện thao tác này bằng cách\nnhân ma trận, chúng ta chỉ cần chuyển vị ma trận trọng lượng W với\nhình dạng mới \\((9, 4)\\) .\nCân nhắc việc thực hiện sự phức tạp bằng cách nhân ma trận. Với một\nvector đầu vào \\(\\mathbf{x}\\) và một ma trận trọng lượng \\(\\mathbf{W}\\) , chức năng lan truyền chuyển tiếp của sự phức tạp có\nthể được thực hiện bằng cách nhân đầu vào của nó với ma trận trọng lượng\nvà xuất ra một vector \\(\\mathbf{y}=\\mathbf{W}\\mathbf{x}\\) . Kể từ khi\nbackpropagation tuân theo quy tắc chuỗi và \\(\\nabla_{\\mathbf{x}}\\mathbf{y}=\\mathbf{W}^\\top\\) , chức năng truyền\nngược của sự phức tạp có thể được thực hiện bằng cách nhân đầu vào của\nnó với ma trận trọng lượng transposed \\(\\mathbf{W}^\\top\\) . Do đó,\nlớp tích lũy chuyển tiếp chỉ có thể trao đổi chức năng lan truyền về\nphía trước và chức năng lan truyền ngược của lớp ghép: các chức năng lan\ntruyền về phía trước và lan truyền ngược của nó nhân vectơ đầu vào của\nchúng với \\(\\mathbf{W}^\\top\\) và \\(\\mathbf{W}\\) , tương ứng.\n13.10.4. Tóm tắt\nNgược lại với sự phức tạp thông thường làm giảm các phần tử đầu vào\nthông qua hạt nhân, sự phức tạp chuyển phát các phần tử đầu vào thông\nqua hạt nhân, từ đó tạo ra một đầu ra lớn hơn đầu vào.\nNếu chúng ta cho \\(\\mathsf{X}\\) vào một lớp phức hợp \\(f\\) để\nxuất ra \\(\\mathsf{Y}=f(\\mathsf{X})\\) và tạo ra một lớp tích hợp\nchuyển đổi \\(g\\) với các siêu tham số tương tự như \\(f\\) ngoại trừ số lượng kênh đầu ra là số kênh trong \\(\\mathsf{X}\\) ,\nthì \\(g(Y)\\) sẽ có hình dạng tương tự như \\(\\mathsf{X}\\) .\nChúng ta có thể thực hiện các phức tạp bằng cách sử dụng phép nhân ma\ntrận. Lớp ghép chuyển tiếp chỉ có thể trao đổi chức năng lan truyền\nvề phía trước và chức năng lan truyền ngược của lớp ghép.\n13.10.5. Bài tập\nTrong Section 13.10.3 , đầu vào\ncovolution X và đầu ra phức tạp transposed Z có hình dạng\ntương tự. Họ có cùng giá trị không? Tại sao?\nCó hiệu quả khi sử dụng phép nhân ma trận để thực hiện các phức tạp\nkhông? Tại sao?\nDiscussions\nDiscussions"
+}

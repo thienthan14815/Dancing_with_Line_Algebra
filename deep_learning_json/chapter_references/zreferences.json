@@ -1,0 +1,704 @@
+{
+  "url": "https://vi.d2l.ai/chapter_references/zreferences.html",
+  "chapter": "chapter_references",
+  "title": "Tài liệu tham khảo",
+  "crawled_at": "2026-07-20T12:41:39.946042+00:00",
+  "headings": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "tai-lieu-tham-khao",
+      "text": "Tài liệu tham khảo"
+    }
+  ],
+  "content": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "tai-lieu-tham-khao",
+      "text": "Tài liệu tham khảo"
+    },
+    {
+      "type": "paragraph",
+      "text": "Ahmed et al., 2012 Ahmed, A., Aly, M., Gonzalez, J., Narayanamurthy, S., & Smola, A. J. (2012). Scalable inference in latent variable models. Proceedings of the fifth ACM international conference on Web search and data mining (pp. 123–132). Aji & McEliece, 2000 Aji, S. M., & McEliece, R. J. (2000). The generalized distributive law. IEEE transactions on Information Theory , 46 (2), 325–343. Bahdanau et al., 2014 Bahdanau, D., Cho, K., & Bengio, Y. (2014). Neural machine translation by jointly learning to align and translate. arXiv preprint arXiv:1409.0473 . Bay et al., 2006 Bay, H., Tuytelaars, T., & Van Gool, L. (2006). Surf: speeded up robust features. European conference on computer vision (pp. 404–417). Bishop, 1995 Bishop, C. M. (1995). Training with noise is equivalent to tikhonov regularization. Neural computation , 7 (1), 108–116. Bishop, 2006 Bishop, C. M. (2006). Pattern recognition and machine learning . springer. Bojanowski et al., 2017 Bojanowski, P., Grave, E., Joulin, A., & Mikolov, T. (2017). Enriching word vectors with subword information. Transactions of the Association for Computational Linguistics , 5 , 135–146. Bollobas, 1999 Bollobás, B. (1999). Linear analysis . Cambridge University Press, Cambridge. Bowman et al., 2015 Bowman, S. R., Angeli, G., Potts, C., & Manning, C. D. (2015). A large annotated corpus for learning natural language inference. arXiv preprint arXiv:1508.05326 . Boyd & Vandenberghe, 2004 Boyd, S., & Vandenberghe, L. (2004). Convex Optimization . Cambridge, England: Cambridge University Press. Brown & Sandholm, 2017 Brown, N., & Sandholm, T. (2017). Libratus: the superhuman ai for no-limit poker. IJCAI (pp. 5226–5228). Brown et al., 1990 Brown, P. F., Cocke, J., Della Pietra, S. A., Della Pietra, V. J., Jelinek, F., Lafferty, J., … Roossin, P. S. (1990). A statistical approach to machine translation. Computational linguistics , 16 (2), 79–85. Brown et al., 1988 Brown, P. F., Cocke, J., Della Pietra, S. A., Della Pietra, V. J., Jelinek, F., Mercer, R. L., & Roossin, P. (1988). A statistical approach to language translation. Coling Budapest 1988 Volume 1: International Conference on Computational Linguistics . Campbell et al., 2002 Campbell, M., Hoane Jr, A. J., & Hsu, F.-h. (2002). Deep blue. Artificial intelligence , 134 (1-2), 57–83. Canny, 1987 Canny, J. (1987). A computational approach to edge detection. Readings in computer vision (pp. 184–203). Elsevier. Cer et al., 2017 Cer, D., Diab, M., Agirre, E., Lopez-Gazpio, I., & Specia, L. (2017). Semeval-2017 task 1: semantic textual similarity multilingual and crosslingual focused evaluation. Proceedings of the 11th International Workshop on Semantic Evaluation (SemEval-2017) (pp. 1–14). Cho et al., 2014a Cho, K., Van Merriënboer, B., Bahdanau, D., & Bengio, Y. (2014). On the properties of neural machine translation: encoder-decoder approaches. arXiv preprint arXiv:1409.1259 . Cho et al., 2014b Cho, K., Van Merriënboer, B., Gulcehre, C., Bahdanau, D., Bougares, F., Schwenk, H., & Bengio, Y. (2014). Learning phrase representations using rnn encoder-decoder for statistical machine translation. arXiv preprint arXiv:1406.1078 . Chung et al., 2014 Chung, J., Gulcehre, C., Cho, K., & Bengio, Y. (2014). Empirical evaluation of gated recurrent neural networks on sequence modeling. arXiv preprint arXiv:1412.3555 . Csiszar, 2008 Csiszár, I. (2008). Axiomatic characterizations of information measures. Entropy , 10 (3), 261–273. Dalal & Triggs, 2005 Dalal, N., & Triggs, B. (2005). Histograms of oriented gradients for human detection. 2005 IEEE computer society conference on computer vision and pattern recognition (CVPR’05) (pp. 886–893). DeCock, 2011 De Cock, D. (2011). Ames, iowa: alternative to the boston housing data as an end of semester regression project. Journal of Statistics Education , 19 (3). DeCandia et al., 2007 DeCandia, G., Hastorun, D., Jampani, M., Kakulapati, G., Lakshman, A., Pilchin, A., … Vogels, W. (2007). Dynamo: amazon’s highly available key-value store. ACM SIGOPS operating systems review (pp. 205–220). Devlin et al., 2018 Devlin, J., Chang, M.-W., Lee, K., & Toutanova, K. (2018). Bert: pre-training of deep bidirectional transformers for language understanding. arXiv preprint arXiv:1810.04805 . Doucet et al., 2001 Doucet, A., De Freitas, N., & Gordon, N. (2001). An introduction to sequential monte carlo methods. Sequential Monte Carlo methods in practice (pp. 3–14). Springer. Duchi et al., 2011 Duchi, J., Hazan, E., & Singer, Y. (2011). Adaptive subgradient methods for online learning and stochastic optimization. Journal of Machine Learning Research , 12 (Jul), 2121–2159. Dumoulin & Visin, 2016 Dumoulin, V., & Visin, F. (2016). A guide to convolution arithmetic for deep learning. arXiv preprint arXiv:1603.07285 . Flammarion & Bach, 2015 Flammarion, N., & Bach, F. (2015). From averaging to acceleration, there is only a step-size. Conference on Learning Theory (pp. 658–695). Gatys et al., 2016 Gatys, L. A., Ecker, A. S., & Bethge, M. (2016). Image style transfer using convolutional neural networks. Proceedings of the IEEE conference on computer vision and pattern recognition (pp. 2414–2423). Girshick, 2015 Girshick, R. (2015). Fast r-cnn. Proceedings of the IEEE international conference on computer vision (pp. 1440–1448). Girshick et al., 2014 Girshick, R., Donahue, J., Darrell, T., & Malik, J. (2014). Rich feature hierarchies for accurate object detection and semantic segmentation. Proceedings of the IEEE conference on computer vision and pattern recognition (pp. 580–587). Glorot & Bengio, 2010 Glorot, X., & Bengio, Y. (2010). Understanding the difficulty of training deep feedforward neural networks. Proceedings of the thirteenth international conference on artificial intelligence and statistics (pp. 249–256). Goh, 2017 Goh, G. (2017). Why momentum really works. Distill . URL: http://distill.pub/2017/momentum , doi:10.23915/distill.00006 Goldberg et al., 1992 Goldberg, D., Nichols, D., Oki, B. M., & Terry, D. (1992). Using collaborative filtering to weave an information tapestry. Communications of the ACM , 35 (12), 61–71. Goodfellow et al., 2016 Goodfellow, I., Bengio, Y., & Courville, A. (2016). Deep Learning . MIT Press. http://www.deeplearningbook.org. Goodfellow et al., 2014 Goodfellow, I., Pouget-Abadie, J., Mirza, M., Xu, B., Warde-Farley, D., Ozair, S., … Bengio, Y. (2014). Generative adversarial nets. Advances in neural information processing systems (pp. 2672–2680). Gotmare et al., 2018 Gotmare, A., Keskar, N. S., Xiong, C., & Socher, R. (2018). A closer look at deep learning heuristics: learning rate restarts, warmup and distillation. arXiv preprint arXiv:1810.13243 . Graves & Schmidhuber, 2005 Graves, A., & Schmidhuber, J. (2005). Framewise phoneme classification with bidirectional lstm and other neural network architectures. Neural networks , 18 (5-6), 602–610. Gunawardana & Shani, 2015 Gunawardana, A., & Shani, G. (2015). Evaluating recommender systems. Recommender systems handbook (pp. 265–308). Springer. Guo et al., 2017 Guo, H., Tang, R., Ye, Y., Li, Z., & He, X. (2017). Deepfm: a factorization-machine based neural network for ctr prediction. Proceedings of the 26th International Joint Conference on Artificial Intelligence (pp. 1725–1731). Hadjis et al., 2016 Hadjis, S., Zhang, C., Mitliagkas, I., Iter, D., & Ré, C. (2016). Omnivore: an optimizer for multi-device deep learning on cpus and gpus. arXiv preprint arXiv:1606.04487 . He et al., 2017a He, K., Gkioxari, G., Dollár, P., & Girshick, R. (2017). Mask r-cnn. Proceedings of the IEEE international conference on computer vision (pp. 2961–2969). He et al., 2015 He, K., Zhang, X., Ren, S., & Sun, J. (2015). Delving deep into rectifiers: surpassing human-level performance on imagenet classification. Proceedings of the IEEE international conference on computer vision (pp. 1026–1034). He et al., 2016a He, K., Zhang, X., Ren, S., & Sun, J. (2016). Deep residual learning for image recognition. Proceedings of the IEEE conference on computer vision and pattern recognition (pp. 770–778). He et al., 2016b He, K., Zhang, X., Ren, S., & Sun, J. (2016). Identity mappings in deep residual networks. European conference on computer vision (pp. 630–645). He & Chua, 2017 He, X., & Chua, T.-S. (2017). Neural factorization machines for sparse predictive analytics. Proceedings of the 40th International ACM SIGIR conference on Research and Development in Information Retrieval (pp. 355–364). He et al., 2017b He, X., Liao, L., Zhang, H., Nie, L., Hu, X., & Chua, T.-S. (2017). Neural collaborative filtering. Proceedings of the 26th international conference on world wide web (pp. 173–182). Hebb & Hebb, 1949 Hebb, D. O., & Hebb, D. (1949). The organization of behavior . Vol. 65. Wiley New York. Hendrycks & Gimpel, 2016 Hendrycks, D., & Gimpel, K. (2016). Gaussian error linear units (gelus). arXiv preprint arXiv:1606.08415 . Hennessy & Patterson, 2011 Hennessy, J. L., & Patterson, D. A. (2011). Computer architecture: a quantitative approach . Elsevier. Herlocker et al., 1999 Herlocker, J. L., Konstan, J. A., Borchers, A., & Riedl, J. (1999). An algorithmic framework for performing collaborative filtering. 22nd Annual International ACM SIGIR Conference on Research and Development in Information Retrieval, SIGIR 1999 (pp. 230–237). Hidasi et al., 2015 Hidasi, B., Karatzoglou, A., Baltrunas, L., & Tikk, D. (2015). Session-based recommendations with recurrent neural networks. arXiv preprint arXiv:1511.06939 . Hochreiter & Schmidhuber, 1997 Hochreiter, S., & Schmidhuber, J. (1997). Long short-term memory. Neural computation , 9 (8), 1735–1780. Hoyer et al., 2009 Hoyer, P. O., Janzing, D., Mooij, J. M., Peters, J., & Schölkopf, B. (2009). Nonlinear causal discovery with additive noise models. Advances in neural information processing systems (pp. 689–696). Hu et al., 2018 Hu, J., Shen, L., & Sun, G. (2018). Squeeze-and-excitation networks. Proceedings of the IEEE conference on computer vision and pattern recognition (pp. 7132–7141). Hu et al., 2008 Hu, Y., Koren, Y., & Volinsky, C. (2008). Collaborative filtering for implicit feedback datasets. 2008 Eighth IEEE International Conference on Data Mining (pp. 263–272). Huang et al., 2017 Huang, G., Liu, Z., Van Der Maaten, L., & Weinberger, K. Q. (2017). Densely connected convolutional networks. Proceedings of the IEEE conference on computer vision and pattern recognition (pp. 4700–4708). Ioffe, 2017 Ioffe, S. (2017). Batch renormalization: towards reducing minibatch dependence in batch-normalized models. Advances in neural information processing systems (pp. 1945–1953). Ioffe & Szegedy, 2015 Ioffe, S., & Szegedy, C. (2015). Batch normalization: accelerating deep network training by reducing internal covariate shift. arXiv preprint arXiv:1502.03167 . Izmailov et al., 2018 Izmailov, P., Podoprikhin, D., Garipov, T., Vetrov, D., & Wilson, A. G. (2018). Averaging weights leads to wider optima and better generalization. arXiv preprint arXiv:1803.05407 . Jaeger, 2002 Jaeger, H. (2002). Tutorial on training recurrent neural networks, covering BPPT, RTRL, EKF and the” echo state network” approach . Vol. 5. GMD-Forschungszentrum Informationstechnik Bonn. Jia et al., 2018 Jia, X., Song, S., He, W., Wang, Y., Rong, H., Zhou, F., … others. (2018). Highly scalable deep learning training system with mixed-precision: training imagenet in four minutes. arXiv preprint arXiv:1807.11205 . Jouppi et al., 2017 Jouppi, N. P., Young, C., Patil, N., Patterson, D., Agrawal, G., Bajwa, R., … others. (2017). In-datacenter performance analysis of a tensor processing unit. 2017 ACM/IEEE 44th Annual International Symposium on Computer Architecture (ISCA) (pp. 1–12). Karras et al., 2017 Karras, T., Aila, T., Laine, S., & Lehtinen, J. (2017). Progressive growing of gans for improved quality, stability, and variation. arXiv preprint arXiv:1710.10196 . Kim, 2014 Kim, Y. (2014). Convolutional neural networks for sentence classification. arXiv preprint arXiv:1408.5882 . Kingma & Ba, 2014 Kingma, D. P., & Ba, J. (2014). Adam: a method for stochastic optimization. arXiv preprint arXiv:1412.6980 . Koller & Friedman, 2009 Koller, D., & Friedman, N. (2009). Probabilistic graphical models: principles and techniques . MIT press. Kolter, 2008 Kolter, Z. (2008). Linear algebra review and reference. Available online: http . Koren, 2009 Koren, Y. (2009). Collaborative filtering with temporal dynamics. Proceedings of the 15th ACM SIGKDD international conference on Knowledge discovery and data mining (pp. 447–456). Koren et al., 2009 Koren, Y., Bell, R., & Volinsky, C. (2009). Matrix factorization techniques for recommender systems. Computer , pp. 30–37. Krizhevsky et al., 2012 Krizhevsky, A., Sutskever, I., & Hinton, G. E. (2012). Imagenet classification with deep convolutional neural networks. Advances in neural information processing systems (pp. 1097–1105). Kung, 1988 Kung, S. Y. (1988). Vlsi array processors. Englewood Cliffs, NJ, Prentice Hall, 1988, 685 p. Research supported by the Semiconductor Research Corp., SDIO, NSF, and US Navy. LeCun et al., 1998 LeCun, Y., Bottou, L., Bengio, Y., Haffner, P., & others. (1998). Gradient-based learning applied to document recognition. Proceedings of the IEEE , 86 (11), 2278–2324. Li, 2017 Li, M. (2017). Scaling Distributed Machine Learning with System and Algorithm Co-design (Doctoral dissertation). PhD Thesis, CMU. Li et al., 2014 Li, M., Andersen, D. G., Park, J. W., Smola, A. J., Ahmed, A., Josifovski, V., … Su, B.-Y. (2014). Scaling distributed machine learning with the parameter server. 11th $\\$USENIX$\\$ Symposium on Operating Systems Design and Implementation ($\\$OSDI$\\$ 14) (pp. 583–598). Lin et al., 2013 Lin, M., Chen, Q., & Yan, S. (2013). Network in network. arXiv preprint arXiv:1312.4400 . Lin et al., 2017 Lin, T.-Y., Goyal, P., Girshick, R., He, K., & Dollár, P. (2017). Focal loss for dense object detection. Proceedings of the IEEE international conference on computer vision (pp. 2980–2988). Lin et al., 2010 Lin, Y., Lv, F., Zhu, S., Yang, M., Cour, T., Yu, K., … others. (2010). Imagenet classification: fast descriptor coding and large-scale svm training. Large scale visual recognition challenge . Lipton & Steinhardt, 2018 Lipton, Z. C., & Steinhardt, J. (2018). Troubling trends in machine learning scholarship. arXiv preprint arXiv:1807.03341 . Liu et al., 2016 Liu, W., Anguelov, D., Erhan, D., Szegedy, C., Reed, S., Fu, C.-Y., & Berg, A. C. (2016). Ssd: single shot multibox detector. European conference on computer vision (pp. 21–37). Liu et al., 2019 Liu, Y., Ott, M., Goyal, N., Du, J., Joshi, M., Chen, D., … Stoyanov, V. (2019). Roberta: a robustly optimized bert pretraining approach. arXiv preprint arXiv:1907.11692 . Long et al., 2015 Long, J., Shelhamer, E., & Darrell, T. (2015). Fully convolutional networks for semantic segmentation. Proceedings of the IEEE conference on computer vision and pattern recognition (pp. 3431–3440). Loshchilov & Hutter, 2016 Loshchilov, I., & Hutter, F. (2016). Sgdr: stochastic gradient descent with warm restarts. arXiv preprint arXiv:1608.03983 . Lowe, 2004 Lowe, D. G. (2004). Distinctive image features from scale-invariant keypoints. International journal of computer vision , 60 (2), 91–110. Luo et al., 2018 Luo, P., Wang, X., Shao, W., & Peng, Z. (2018). Towards understanding regularization in batch normalization. arXiv preprint . Maas et al., 2011 Maas, A. L., Daly, R. E., Pham, P. T., Huang, D., Ng, A. Y., & Potts, C. (2011). Learning word vectors for sentiment analysis. Proceedings of the 49th annual meeting of the association for computational linguistics: Human language technologies-volume 1 (pp. 142–150). McCann et al., 2017 McCann, B., Bradbury, J., Xiong, C., & Socher, R. (2017). Learned in translation: contextualized word vectors. Advances in Neural Information Processing Systems (pp. 6294–6305). McCulloch & Pitts, 1943 McCulloch, W. S., & Pitts, W. (1943). A logical calculus of the ideas immanent in nervous activity. The bulletin of mathematical biophysics , 5 (4), 115–133. McMahan et al., 2013 McMahan, H. B., Holt, G., Sculley, D., Young, M., Ebner, D., Grady, J., … others. (2013). Ad click prediction: a view from the trenches. Proceedings of the 19th ACM SIGKDD international conference on Knowledge discovery and data mining (pp. 1222–1230). Merity et al., 2016 Merity, S., Xiong, C., Bradbury, J., & Socher, R. (2016). Pointer sentinel mixture models. arXiv preprint arXiv:1609.07843 . Mikolov et al., 2013a Mikolov, T., Chen, K., Corrado, G., & Dean, J. (2013). Efficient estimation of word representations in vector space. arXiv preprint arXiv:1301.3781 . Mikolov et al., 2013b Mikolov, T., Sutskever, I., Chen, K., Corrado, G. S., & Dean, J. (2013). Distributed representations of words and phrases and their compositionality. Advances in neural information processing systems (pp. 3111–3119). Mirhoseini et al., 2017 Mirhoseini, A., Pham, H., Le, Q. V., Steiner, B., Larsen, R., Zhou, Y., … Dean, J. (2017). Device placement optimization with reinforcement learning. Proceedings of the 34th International Conference on Machine Learning-Volume 70 (pp. 2430–2439). Morey et al., 2016 Morey, R. D., Hoekstra, R., Rouder, J. N., Lee, M. D., & Wagenmakers, E.-J. (2016). The fallacy of placing confidence in confidence intervals. Psychonomic bulletin & review , 23 (1), 103–123. Nesterov & Vial, 2000 Nesterov, Y., & Vial, J.-P. (2000). Confidence level solutions for stochastic programming, Stochastic Programming E-Print Series . Nesterov, 2018 Nesterov, Y. (2018). Lectures on convex optimization . Vol. 137. Springer. Neyman, 1937 Neyman, J. (1937). Outline of a theory of statistical estimation based on the classical theory of probability. Philosophical Transactions of the Royal Society of London. Series A, Mathematical and Physical Sciences , 236 (767), 333–380. Papineni et al., 2002 Papineni, K., Roukos, S., Ward, T., & Zhu, W.-J. (2002). Bleu: a method for automatic evaluation of machine translation. Proceedings of the 40th annual meeting of the Association for Computational Linguistics (pp. 311–318). Parikh et al., 2016 Parikh, A. P., Täckström, O., Das, D., & Uszkoreit, J. (2016). A decomposable attention model for natural language inference. arXiv preprint arXiv:1606.01933 . Park et al., 2019 Park, T., Liu, M.-Y., Wang, T.-C., & Zhu, J.-Y. (2019). Semantic image synthesis with spatially-adaptive normalization. Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition (pp. 2337–2346). Pennington et al., 2017 Pennington, J., Schoenholz, S., & Ganguli, S. (2017). Resurrecting the sigmoid in deep learning through dynamical isometry: theory and practice. Advances in neural information processing systems (pp. 4785–4795). Pennington et al., 2014 Pennington, J., Socher, R., & Manning, C. (2014). Glove: global vectors for word representation. Proceedings of the 2014 conference on empirical methods in natural language processing (EMNLP) (pp. 1532–1543). Peters et al., 2017a Peters, J., Janzing, D., & Schölkopf, B. (2017). Elements of causal inference: foundations and learning algorithms . MIT press. Peters et al., 2017b Peters, M., Ammar, W., Bhagavatula, C., & Power, R. (2017). Semi-supervised sequence tagging with bidirectional language models. Proceedings of the 55th Annual Meeting of the Association for Computational Linguistics (Volume 1: Long Papers) (pp. 1756–1765). Peters et al., 2018 Peters, M., Neumann, M., Iyyer, M., Gardner, M., Clark, C., Lee, K., & Zettlemoyer, L. (2018). Deep contextualized word representations. Proceedings of the 2018 Conference of the North American Chapter of the Association for Computational Linguistics: Human Language Technologies, Volume 1 (Long Papers) (pp. 2227–2237). Petersen et al., 2008 Petersen, K. B., Pedersen, M. S., & others. (2008). The matrix cookbook. Technical University of Denmark , 7 (15), 510. Polyak, 1964 Polyak, B. T. (1964). Some methods of speeding up the convergence of iteration methods. USSR Computational Mathematics and Mathematical Physics , 4 (5), 1–17. Quadrana et al., 2018 Quadrana, M., Cremonesi, P., & Jannach, D. (2018). Sequence-aware recommender systems. ACM Computing Surveys (CSUR) , 51 (4), 66. Radford et al., 2015 Radford, A., Metz, L., & Chintala, S. (2015). Unsupervised representation learning with deep convolutional generative adversarial networks. arXiv preprint arXiv:1511.06434 . Radford et al., 2018 Radford, A., Narasimhan, K., Salimans, T., & Sutskever, I. (2018). Improving language understanding by generative pre-training. OpenAI . Radford et al., 2019 Radford, A., Wu, J., Child, R., Luan, D., Amodei, D., & Sutskever, I. (2019). Language models are unsupervised multitask learners. OpenAI Blog , 1 (8), 9. Rajpurkar et al., 2016 Rajpurkar, P., Zhang, J., Lopyrev, K., & Liang, P. (2016). Squad: 100,000+ questions for machine comprehension of text. arXiv preprint arXiv:1606.05250 . Reddi et al., 2019 Reddi, S. J., Kale, S., & Kumar, S. (2019). On the convergence of adam and beyond. arXiv preprint arXiv:1904.09237 . Reed & DeFreitas, 2015 Reed, S., & De Freitas, N. (2015). Neural programmer-interpreters. arXiv preprint arXiv:1511.06279 . Ren et al., 2015 Ren, S., He, K., Girshick, R., & Sun, J. (2015). Faster r-cnn: towards real-time object detection with region proposal networks. Advances in neural information processing systems (pp. 91–99). Rendle, 2010 Rendle, S. (2010). Factorization machines. 2010 IEEE International Conference on Data Mining (pp. 995–1000). Rendle et al., 2009 Rendle, S., Freudenthaler, C., Gantner, Z., & Schmidt-Thieme, L. (2009). Bpr: bayesian personalized ranking from implicit feedback. Proceedings of the twenty-fifth conference on uncertainty in artificial intelligence (pp. 452–461). Russell & Norvig, 2016 Russell, S. J., & Norvig, P. (2016). Artificial intelligence: a modern approach . Malaysia; Pearson Education Limited,. Santurkar et al., 2018 Santurkar, S., Tsipras, D., Ilyas, A., & Madry, A. (2018). How does batch normalization help optimization? Advances in Neural Information Processing Systems (pp. 2483–2493). Sarwar et al., 2001 Sarwar, B. M., Karypis, G., Konstan, J. A., Riedl, J., & others. (2001). Item-based collaborative filtering recommendation algorithms. Www , 1 , 285–295. Schein et al., 2002 Schein, A. I., Popescul, A., Ungar, L. H., & Pennock, D. M. (2002). Methods and metrics for cold-start recommendations. Proceedings of the 25th annual international ACM SIGIR conference on Research and development in information retrieval (pp. 253–260). Schuster & Paliwal, 1997 Schuster, M., & Paliwal, K. K. (1997). Bidirectional recurrent neural networks. IEEE Transactions on Signal Processing , 45 (11), 2673–2681. Sedhain et al., 2015 Sedhain, S., Menon, A. K., Sanner, S., & Xie, L. (2015). Autorec: autoencoders meet collaborative filtering. Proceedings of the 24th International Conference on World Wide Web (pp. 111–112). Sennrich et al., 2015 Sennrich, R., Haddow, B., & Birch, A. (2015). Neural machine translation of rare words with subword units. arXiv preprint arXiv:1508.07909 . Sergeev & DelBalso, 2018 Sergeev, A., & Del Balso, M. (2018). Horovod: fast and easy distributed deep learning in tensorflow. arXiv preprint arXiv:1802.05799 . Shannon, 1948 Shannon, C. E. (1948 , 7). A mathematical theory of communication. The Bell System Technical Journal , 27 (3), 379–423. Shao et al., 2020 Shao, H., Yao, S., Sun, D., Zhang, A., Liu, S., Liu, D., … Abdelzaher, T. (2020). Controlvae: controllable variational autoencoder. Proceedings of the 37th International Conference on Machine Learning . Silver et al., 2016 Silver, D., Huang, A., Maddison, C. J., Guez, A., Sifre, L., Van Den Driessche, G., … others. (2016). Mastering the game of go with deep neural networks and tree search. nature , 529 (7587), 484. Simonyan & Zisserman, 2014 Simonyan, K., & Zisserman, A. (2014). Very deep convolutional networks for large-scale image recognition. arXiv preprint arXiv:1409.1556 . Smola & Narayanamurthy, 2010 Smola, A., & Narayanamurthy, S. (2010). An architecture for parallel topic models. Proceedings of the VLDB Endowment , 3 (1-2), 703–710. Srivastava et al., 2014 Srivastava, N., Hinton, G., Krizhevsky, A., Sutskever, I., & Salakhutdinov, R. (2014). Dropout: a simple way to prevent neural networks from overfitting. The Journal of Machine Learning Research , 15 (1), 1929–1958. Strang, 1993 Strang, G. (1993). Introduction to linear algebra . Vol. 3. Wellesley-Cambridge Press Wellesley, MA. Su & Khoshgoftaar, 2009 Su, X., & Khoshgoftaar, T. M. (2009). A survey of collaborative filtering techniques. Advances in artificial intelligence , 2009 . Sukhbaatar et al., 2015 Sukhbaatar, S., Weston, J., Fergus, R., & others. (2015). End-to-end memory networks. Advances in neural information processing systems (pp. 2440–2448). Sutskever et al., 2013 Sutskever, I., Martens, J., Dahl, G., & Hinton, G. (2013). On the importance of initialization and momentum in deep learning. International conference on machine learning (pp. 1139–1147). Sutskever et al., 2014 Sutskever, I., Vinyals, O., & Le, Q. V. (2014). Sequence to sequence learning with neural networks. Advances in neural information processing systems (pp. 3104–3112). Szegedy et al., 2017 Szegedy, C., Ioffe, S., Vanhoucke, V., & Alemi, A. A. (2017). Inception-v4, inception-resnet and the impact of residual connections on learning. Thirty-First AAAI Conference on Artificial Intelligence . Szegedy et al., 2015 Szegedy, C., Liu, W., Jia, Y., Sermanet, P., Reed, S., Anguelov, D., … Rabinovich, A. (2015). Going deeper with convolutions. Proceedings of the IEEE conference on computer vision and pattern recognition (pp. 1–9). Szegedy et al., 2016 Szegedy, C., Vanhoucke, V., Ioffe, S., Shlens, J., & Wojna, Z. (2016). Rethinking the inception architecture for computer vision. Proceedings of the IEEE conference on computer vision and pattern recognition (pp. 2818–2826). Tallec & Ollivier, 2017 Tallec, C., & Ollivier, Y. (2017). Unbiasing truncated backpropagation through time. arXiv preprint arXiv:1705.08209 . Tang & Wang, 2018 Tang, J., & Wang, K. (2018). Personalized top-n sequential recommendation via convolutional sequence embedding. Proceedings of the Eleventh ACM International Conference on Web Search and Data Mining (pp. 565–573). Teye et al., 2018 Teye, M., Azizpour, H., & Smith, K. (2018). Bayesian uncertainty estimation for batch normalized deep networks. arXiv preprint arXiv:1802.06455 . Tieleman & Hinton, 2012 Tieleman, T., & Hinton, G. (2012). Lecture 6.5-rmsprop: divide the gradient by a running average of its recent magnitude. COURSERA: Neural networks for machine learning , 4 (2), 26–31. Turing, 1950 Turing, A. (1950). Computing machinery and intelligence. Mind , 59 (236), 433. Toscher et al., 2009 Töscher, A., Jahrer, M., & Bell, R. M. (2009). The bigchaos solution to the netflix grand prize. Netflix prize documentation , pp. 1–52. Uijlings et al., 2013 Uijlings, J. R., Van De Sande, K. E., Gevers, T., & Smeulders, A. W. (2013). Selective search for object recognition. International journal of computer vision , 104 (2), 154–171. VanLoan & Golub, 1983 Van Loan, C. F., & Golub, G. H. (1983). Matrix computations . Johns Hopkins University Press. Vaswani et al., 2017 Vaswani, A., Shazeer, N., Parmar, N., Uszkoreit, J., Jones, L., Gomez, A. N., … Polosukhin, I. (2017). Attention is all you need. Advances in neural information processing systems (pp. 5998–6008). Wang et al., 2018 Wang, L., Li, M., Liberty, E., & Smola, A. J. (2018). Optimal message scheduling for aggregation. NETWORKS , 2 (3), 2–3. Wang et al., 2016 Wang, Y., Davidson, A., Pan, Y., Wu, Y., Riffel, A., & Owens, J. D. (2016). Gunrock: a high-performance graph processing library on the gpu. ACM SIGPLAN Notices (p. 11). Warstadt et al., 2019 Warstadt, A., Singh, A., & Bowman, S. R. (2019). Neural network acceptability judgments. Transactions of the Association for Computational Linguistics , 7 , 625–641. Wasserman, 2013 Wasserman, L. (2013). All of statistics: a concise course in statistical inference . Springer Science & Business Media. Watkins & Dayan, 1992 Watkins, C. J., & Dayan, P. (1992). Q-learning. Machine learning , 8 (3-4), 279–292. Welling & Teh, 2011 Welling, M., & Teh, Y. W. (2011). Bayesian learning via stochastic gradient langevin dynamics. Proceedings of the 28th international conference on machine learning (ICML-11) (pp. 681–688). Werbos, 1990 Werbos, P. J. (1990). Backpropagation through time: what it does and how to do it. Proceedings of the IEEE , 78 (10), 1550–1560. Wigner, 1958 Wigner, E. P. (1958). On the distribution of the roots of certain symmetric matrices. Ann. Math (pp. 325–327). Wood et al., 2011 Wood, F., Gasthaus, J., Archambeau, C., James, L., & Teh, Y. W. (2011). The sequence memoizer. Communications of the ACM , 54 (2), 91–98. Wu et al., 2017 Wu, C.-Y., Ahmed, A., Beutel, A., Smola, A. J., & Jing, H. (2017). Recurrent recommender networks. Proceedings of the tenth ACM international conference on web search and data mining (pp. 495–503). Wu et al., 2016 Wu, Y., Schuster, M., Chen, Z., Le, Q. V., Norouzi, M., Macherey, W., … others. (2016). Google’s neural machine translation system: bridging the gap between human and machine translation. arXiv preprint arXiv:1609.08144 . Xiao et al., 2017 Xiao, H., Rasul, K., & Vollgraf, R. (2017). Fashion-mnist: a novel image dataset for benchmarking machine learning algorithms. arXiv preprint arXiv:1708.07747 . Xiao et al., 2018 Xiao, L., Bahri, Y., Sohl-Dickstein, J., Schoenholz, S., & Pennington, J. (2018). Dynamical isometry and a mean field theory of cnns: how to train 10,000-layer vanilla convolutional neural networks. International Conference on Machine Learning (pp. 5393–5402). Xiong et al., 2018 Xiong, W., Wu, L., Alleva, F., Droppo, J., Huang, X., & Stolcke, A. (2018). The microsoft 2017 conversational speech recognition system. 2018 IEEE International Conference on Acoustics, Speech and Signal Processing (ICASSP) (pp. 5934–5938). Ye et al., 2011 Ye, M., Yin, P., Lee, W.-C., & Lee, D.-L. (2011). Exploiting geographical influence for collaborative point-of-interest recommendation. Proceedings of the 34th international ACM SIGIR conference on Research and development in Information Retrieval (pp. 325–334). You et al., 2017 You, Y., Gitman, I., & Ginsburg, B. (2017). Large batch training of convolutional networks. arXiv preprint arXiv:1708.03888 . Zaheer et al., 2018 Zaheer, M., Reddi, S., Sachan, D., Kale, S., & Kumar, S. (2018). Adaptive methods for nonconvex optimization. Advances in Neural Information Processing Systems (pp. 9793–9803). Zeiler, 2012 Zeiler, M. D. (2012). Adadelta: an adaptive learning rate method. arXiv preprint arXiv:1212.5701 . Zhang et al., 2019 Zhang, S., Yao, L., Sun, A., & Tay, Y. (2019). Deep learning based recommender system: a survey and new perspectives. ACM Computing Surveys (CSUR) , 52 (1), 5. Zhu et al., 2017 Zhu, J.-Y., Park, T., Isola, P., & Efros, A. A. (2017). Unpaired image-to-image translation using cycle-consistent adversarial networks. Proceedings of the IEEE international conference on computer vision (pp. 2223–2232). Zhu et al., 2015 Zhu, Y., Kiros, R., Zemel, R., Salakhutdinov, R., Urtasun, R., Torralba, A., & Fidler, S. (2015). Aligning books and movies: towards story-like visual explanations by watching movies and reading books. Proceedings of the IEEE international conference on computer vision (pp. 19–27)."
+    },
+    {
+      "type": "paragraph",
+      "text": "Ahmed, A., Aly, M., Gonzalez, J., Narayanamurthy, S., & Smola, A. J. (2012). Scalable inference in latent variable models. Proceedings of the fifth ACM international conference on Web search and data mining (pp. 123–132)."
+    },
+    {
+      "type": "paragraph",
+      "text": "Aji, S. M., & McEliece, R. J. (2000). The generalized distributive law. IEEE transactions on Information Theory , 46 (2), 325–343."
+    },
+    {
+      "type": "paragraph",
+      "text": "Bahdanau, D., Cho, K., & Bengio, Y. (2014). Neural machine translation by jointly learning to align and translate. arXiv preprint arXiv:1409.0473 ."
+    },
+    {
+      "type": "paragraph",
+      "text": "Bay, H., Tuytelaars, T., & Van Gool, L. (2006). Surf: speeded up robust features. European conference on computer vision (pp. 404–417)."
+    },
+    {
+      "type": "paragraph",
+      "text": "Bishop, C. M. (1995). Training with noise is equivalent to tikhonov regularization. Neural computation , 7 (1), 108–116."
+    },
+    {
+      "type": "paragraph",
+      "text": "Bishop, C. M. (2006). Pattern recognition and machine learning . springer."
+    },
+    {
+      "type": "paragraph",
+      "text": "Bojanowski, P., Grave, E., Joulin, A., & Mikolov, T. (2017). Enriching word vectors with subword information. Transactions of the Association for Computational Linguistics , 5 , 135–146."
+    },
+    {
+      "type": "paragraph",
+      "text": "Bollobás, B. (1999). Linear analysis . Cambridge University Press, Cambridge."
+    },
+    {
+      "type": "paragraph",
+      "text": "Bowman, S. R., Angeli, G., Potts, C., & Manning, C. D. (2015). A large annotated corpus for learning natural language inference. arXiv preprint arXiv:1508.05326 ."
+    },
+    {
+      "type": "paragraph",
+      "text": "Boyd, S., & Vandenberghe, L. (2004). Convex Optimization . Cambridge, England: Cambridge University Press."
+    },
+    {
+      "type": "paragraph",
+      "text": "Brown, N., & Sandholm, T. (2017). Libratus: the superhuman ai for no-limit poker. IJCAI (pp. 5226–5228)."
+    },
+    {
+      "type": "paragraph",
+      "text": "Brown, P. F., Cocke, J., Della Pietra, S. A., Della Pietra, V. J., Jelinek, F., Lafferty, J., … Roossin, P. S. (1990). A statistical approach to machine translation. Computational linguistics , 16 (2), 79–85."
+    },
+    {
+      "type": "paragraph",
+      "text": "Brown, P. F., Cocke, J., Della Pietra, S. A., Della Pietra, V. J., Jelinek, F., Mercer, R. L., & Roossin, P. (1988). A statistical approach to language translation. Coling Budapest 1988 Volume 1: International Conference on Computational Linguistics ."
+    },
+    {
+      "type": "paragraph",
+      "text": "Campbell, M., Hoane Jr, A. J., & Hsu, F.-h. (2002). Deep blue. Artificial intelligence , 134 (1-2), 57–83."
+    },
+    {
+      "type": "paragraph",
+      "text": "Canny, J. (1987). A computational approach to edge detection. Readings in computer vision (pp. 184–203). Elsevier."
+    },
+    {
+      "type": "paragraph",
+      "text": "Cer, D., Diab, M., Agirre, E., Lopez-Gazpio, I., & Specia, L. (2017). Semeval-2017 task 1: semantic textual similarity multilingual and crosslingual focused evaluation. Proceedings of the 11th International Workshop on Semantic Evaluation (SemEval-2017) (pp. 1–14)."
+    },
+    {
+      "type": "paragraph",
+      "text": "Cho, K., Van Merriënboer, B., Bahdanau, D., & Bengio, Y. (2014). On the properties of neural machine translation: encoder-decoder approaches. arXiv preprint arXiv:1409.1259 ."
+    },
+    {
+      "type": "paragraph",
+      "text": "Cho, K., Van Merriënboer, B., Gulcehre, C., Bahdanau, D., Bougares, F., Schwenk, H., & Bengio, Y. (2014). Learning phrase representations using rnn encoder-decoder for statistical machine translation. arXiv preprint arXiv:1406.1078 ."
+    },
+    {
+      "type": "paragraph",
+      "text": "Chung, J., Gulcehre, C., Cho, K., & Bengio, Y. (2014). Empirical evaluation of gated recurrent neural networks on sequence modeling. arXiv preprint arXiv:1412.3555 ."
+    },
+    {
+      "type": "paragraph",
+      "text": "Csiszár, I. (2008). Axiomatic characterizations of information measures. Entropy , 10 (3), 261–273."
+    },
+    {
+      "type": "paragraph",
+      "text": "Dalal, N., & Triggs, B. (2005). Histograms of oriented gradients for human detection. 2005 IEEE computer society conference on computer vision and pattern recognition (CVPR’05) (pp. 886–893)."
+    },
+    {
+      "type": "paragraph",
+      "text": "De Cock, D. (2011). Ames, iowa: alternative to the boston housing data as an end of semester regression project. Journal of Statistics Education , 19 (3)."
+    },
+    {
+      "type": "paragraph",
+      "text": "DeCandia, G., Hastorun, D., Jampani, M., Kakulapati, G., Lakshman, A., Pilchin, A., … Vogels, W. (2007). Dynamo: amazon’s highly available key-value store. ACM SIGOPS operating systems review (pp. 205–220)."
+    },
+    {
+      "type": "paragraph",
+      "text": "Devlin, J., Chang, M.-W., Lee, K., & Toutanova, K. (2018). Bert: pre-training of deep bidirectional transformers for language understanding. arXiv preprint arXiv:1810.04805 ."
+    },
+    {
+      "type": "paragraph",
+      "text": "Doucet, A., De Freitas, N., & Gordon, N. (2001). An introduction to sequential monte carlo methods. Sequential Monte Carlo methods in practice (pp. 3–14). Springer."
+    },
+    {
+      "type": "paragraph",
+      "text": "Duchi, J., Hazan, E., & Singer, Y. (2011). Adaptive subgradient methods for online learning and stochastic optimization. Journal of Machine Learning Research , 12 (Jul), 2121–2159."
+    },
+    {
+      "type": "paragraph",
+      "text": "Dumoulin, V., & Visin, F. (2016). A guide to convolution arithmetic for deep learning. arXiv preprint arXiv:1603.07285 ."
+    },
+    {
+      "type": "paragraph",
+      "text": "Flammarion, N., & Bach, F. (2015). From averaging to acceleration, there is only a step-size. Conference on Learning Theory (pp. 658–695)."
+    },
+    {
+      "type": "paragraph",
+      "text": "Gatys, L. A., Ecker, A. S., & Bethge, M. (2016). Image style transfer using convolutional neural networks. Proceedings of the IEEE conference on computer vision and pattern recognition (pp. 2414–2423)."
+    },
+    {
+      "type": "paragraph",
+      "text": "Girshick, R. (2015). Fast r-cnn. Proceedings of the IEEE international conference on computer vision (pp. 1440–1448)."
+    },
+    {
+      "type": "paragraph",
+      "text": "Girshick, R., Donahue, J., Darrell, T., & Malik, J. (2014). Rich feature hierarchies for accurate object detection and semantic segmentation. Proceedings of the IEEE conference on computer vision and pattern recognition (pp. 580–587)."
+    },
+    {
+      "type": "paragraph",
+      "text": "Glorot, X., & Bengio, Y. (2010). Understanding the difficulty of training deep feedforward neural networks. Proceedings of the thirteenth international conference on artificial intelligence and statistics (pp. 249–256)."
+    },
+    {
+      "type": "paragraph",
+      "text": "Goh, G. (2017). Why momentum really works. Distill . URL: http://distill.pub/2017/momentum , doi:10.23915/distill.00006"
+    },
+    {
+      "type": "paragraph",
+      "text": "Goldberg, D., Nichols, D., Oki, B. M., & Terry, D. (1992). Using collaborative filtering to weave an information tapestry. Communications of the ACM , 35 (12), 61–71."
+    },
+    {
+      "type": "paragraph",
+      "text": "Goodfellow, I., Bengio, Y., & Courville, A. (2016). Deep Learning . MIT Press. http://www.deeplearningbook.org."
+    },
+    {
+      "type": "paragraph",
+      "text": "Goodfellow, I., Pouget-Abadie, J., Mirza, M., Xu, B., Warde-Farley, D., Ozair, S., … Bengio, Y. (2014). Generative adversarial nets. Advances in neural information processing systems (pp. 2672–2680)."
+    },
+    {
+      "type": "paragraph",
+      "text": "Gotmare, A., Keskar, N. S., Xiong, C., & Socher, R. (2018). A closer look at deep learning heuristics: learning rate restarts, warmup and distillation. arXiv preprint arXiv:1810.13243 ."
+    },
+    {
+      "type": "paragraph",
+      "text": "Graves, A., & Schmidhuber, J. (2005). Framewise phoneme classification with bidirectional lstm and other neural network architectures. Neural networks , 18 (5-6), 602–610."
+    },
+    {
+      "type": "paragraph",
+      "text": "Gunawardana, A., & Shani, G. (2015). Evaluating recommender systems. Recommender systems handbook (pp. 265–308). Springer."
+    },
+    {
+      "type": "paragraph",
+      "text": "Guo, H., Tang, R., Ye, Y., Li, Z., & He, X. (2017). Deepfm: a factorization-machine based neural network for ctr prediction. Proceedings of the 26th International Joint Conference on Artificial Intelligence (pp. 1725–1731)."
+    },
+    {
+      "type": "paragraph",
+      "text": "Hadjis, S., Zhang, C., Mitliagkas, I., Iter, D., & Ré, C. (2016). Omnivore: an optimizer for multi-device deep learning on cpus and gpus. arXiv preprint arXiv:1606.04487 ."
+    },
+    {
+      "type": "paragraph",
+      "text": "He, K., Gkioxari, G., Dollár, P., & Girshick, R. (2017). Mask r-cnn. Proceedings of the IEEE international conference on computer vision (pp. 2961–2969)."
+    },
+    {
+      "type": "paragraph",
+      "text": "He, K., Zhang, X., Ren, S., & Sun, J. (2015). Delving deep into rectifiers: surpassing human-level performance on imagenet classification. Proceedings of the IEEE international conference on computer vision (pp. 1026–1034)."
+    },
+    {
+      "type": "paragraph",
+      "text": "He, K., Zhang, X., Ren, S., & Sun, J. (2016). Deep residual learning for image recognition. Proceedings of the IEEE conference on computer vision and pattern recognition (pp. 770–778)."
+    },
+    {
+      "type": "paragraph",
+      "text": "He, K., Zhang, X., Ren, S., & Sun, J. (2016). Identity mappings in deep residual networks. European conference on computer vision (pp. 630–645)."
+    },
+    {
+      "type": "paragraph",
+      "text": "He, X., & Chua, T.-S. (2017). Neural factorization machines for sparse predictive analytics. Proceedings of the 40th International ACM SIGIR conference on Research and Development in Information Retrieval (pp. 355–364)."
+    },
+    {
+      "type": "paragraph",
+      "text": "He, X., Liao, L., Zhang, H., Nie, L., Hu, X., & Chua, T.-S. (2017). Neural collaborative filtering. Proceedings of the 26th international conference on world wide web (pp. 173–182)."
+    },
+    {
+      "type": "paragraph",
+      "text": "Hebb, D. O., & Hebb, D. (1949). The organization of behavior . Vol. 65. Wiley New York."
+    },
+    {
+      "type": "paragraph",
+      "text": "Hendrycks, D., & Gimpel, K. (2016). Gaussian error linear units (gelus). arXiv preprint arXiv:1606.08415 ."
+    },
+    {
+      "type": "paragraph",
+      "text": "Hennessy, J. L., & Patterson, D. A. (2011). Computer architecture: a quantitative approach . Elsevier."
+    },
+    {
+      "type": "paragraph",
+      "text": "Herlocker, J. L., Konstan, J. A., Borchers, A., & Riedl, J. (1999). An algorithmic framework for performing collaborative filtering. 22nd Annual International ACM SIGIR Conference on Research and Development in Information Retrieval, SIGIR 1999 (pp. 230–237)."
+    },
+    {
+      "type": "paragraph",
+      "text": "Hidasi, B., Karatzoglou, A., Baltrunas, L., & Tikk, D. (2015). Session-based recommendations with recurrent neural networks. arXiv preprint arXiv:1511.06939 ."
+    },
+    {
+      "type": "paragraph",
+      "text": "Hochreiter, S., & Schmidhuber, J. (1997). Long short-term memory. Neural computation , 9 (8), 1735–1780."
+    },
+    {
+      "type": "paragraph",
+      "text": "Hoyer, P. O., Janzing, D., Mooij, J. M., Peters, J., & Schölkopf, B. (2009). Nonlinear causal discovery with additive noise models. Advances in neural information processing systems (pp. 689–696)."
+    },
+    {
+      "type": "paragraph",
+      "text": "Hu, J., Shen, L., & Sun, G. (2018). Squeeze-and-excitation networks. Proceedings of the IEEE conference on computer vision and pattern recognition (pp. 7132–7141)."
+    },
+    {
+      "type": "paragraph",
+      "text": "Hu, Y., Koren, Y., & Volinsky, C. (2008). Collaborative filtering for implicit feedback datasets. 2008 Eighth IEEE International Conference on Data Mining (pp. 263–272)."
+    },
+    {
+      "type": "paragraph",
+      "text": "Huang, G., Liu, Z., Van Der Maaten, L., & Weinberger, K. Q. (2017). Densely connected convolutional networks. Proceedings of the IEEE conference on computer vision and pattern recognition (pp. 4700–4708)."
+    },
+    {
+      "type": "paragraph",
+      "text": "Ioffe, S. (2017). Batch renormalization: towards reducing minibatch dependence in batch-normalized models. Advances in neural information processing systems (pp. 1945–1953)."
+    },
+    {
+      "type": "paragraph",
+      "text": "Ioffe, S., & Szegedy, C. (2015). Batch normalization: accelerating deep network training by reducing internal covariate shift. arXiv preprint arXiv:1502.03167 ."
+    },
+    {
+      "type": "paragraph",
+      "text": "Izmailov, P., Podoprikhin, D., Garipov, T., Vetrov, D., & Wilson, A. G. (2018). Averaging weights leads to wider optima and better generalization. arXiv preprint arXiv:1803.05407 ."
+    },
+    {
+      "type": "paragraph",
+      "text": "Jaeger, H. (2002). Tutorial on training recurrent neural networks, covering BPPT, RTRL, EKF and the” echo state network” approach . Vol. 5. GMD-Forschungszentrum Informationstechnik Bonn."
+    },
+    {
+      "type": "paragraph",
+      "text": "Jia, X., Song, S., He, W., Wang, Y., Rong, H., Zhou, F., … others. (2018). Highly scalable deep learning training system with mixed-precision: training imagenet in four minutes. arXiv preprint arXiv:1807.11205 ."
+    },
+    {
+      "type": "paragraph",
+      "text": "Jouppi, N. P., Young, C., Patil, N., Patterson, D., Agrawal, G., Bajwa, R., … others. (2017). In-datacenter performance analysis of a tensor processing unit. 2017 ACM/IEEE 44th Annual International Symposium on Computer Architecture (ISCA) (pp. 1–12)."
+    },
+    {
+      "type": "paragraph",
+      "text": "Karras, T., Aila, T., Laine, S., & Lehtinen, J. (2017). Progressive growing of gans for improved quality, stability, and variation. arXiv preprint arXiv:1710.10196 ."
+    },
+    {
+      "type": "paragraph",
+      "text": "Kim, Y. (2014). Convolutional neural networks for sentence classification. arXiv preprint arXiv:1408.5882 ."
+    },
+    {
+      "type": "paragraph",
+      "text": "Kingma, D. P., & Ba, J. (2014). Adam: a method for stochastic optimization. arXiv preprint arXiv:1412.6980 ."
+    },
+    {
+      "type": "paragraph",
+      "text": "Koller, D., & Friedman, N. (2009). Probabilistic graphical models: principles and techniques . MIT press."
+    },
+    {
+      "type": "paragraph",
+      "text": "Kolter, Z. (2008). Linear algebra review and reference. Available online: http ."
+    },
+    {
+      "type": "paragraph",
+      "text": "Koren, Y. (2009). Collaborative filtering with temporal dynamics. Proceedings of the 15th ACM SIGKDD international conference on Knowledge discovery and data mining (pp. 447–456)."
+    },
+    {
+      "type": "paragraph",
+      "text": "Koren, Y., Bell, R., & Volinsky, C. (2009). Matrix factorization techniques for recommender systems. Computer , pp. 30–37."
+    },
+    {
+      "type": "paragraph",
+      "text": "Krizhevsky, A., Sutskever, I., & Hinton, G. E. (2012). Imagenet classification with deep convolutional neural networks. Advances in neural information processing systems (pp. 1097–1105)."
+    },
+    {
+      "type": "paragraph",
+      "text": "Kung, S. Y. (1988). Vlsi array processors. Englewood Cliffs, NJ, Prentice Hall, 1988, 685 p. Research supported by the Semiconductor Research Corp., SDIO, NSF, and US Navy."
+    },
+    {
+      "type": "paragraph",
+      "text": "LeCun, Y., Bottou, L., Bengio, Y., Haffner, P., & others. (1998). Gradient-based learning applied to document recognition. Proceedings of the IEEE , 86 (11), 2278–2324."
+    },
+    {
+      "type": "paragraph",
+      "text": "Li, M. (2017). Scaling Distributed Machine Learning with System and Algorithm Co-design (Doctoral dissertation). PhD Thesis, CMU."
+    },
+    {
+      "type": "paragraph",
+      "text": "Li, M., Andersen, D. G., Park, J. W., Smola, A. J., Ahmed, A., Josifovski, V., … Su, B.-Y. (2014). Scaling distributed machine learning with the parameter server. 11th $\\$USENIX$\\$ Symposium on Operating Systems Design and Implementation ($\\$OSDI$\\$ 14) (pp. 583–598)."
+    },
+    {
+      "type": "paragraph",
+      "text": "Lin, M., Chen, Q., & Yan, S. (2013). Network in network. arXiv preprint arXiv:1312.4400 ."
+    },
+    {
+      "type": "paragraph",
+      "text": "Lin, T.-Y., Goyal, P., Girshick, R., He, K., & Dollár, P. (2017). Focal loss for dense object detection. Proceedings of the IEEE international conference on computer vision (pp. 2980–2988)."
+    },
+    {
+      "type": "paragraph",
+      "text": "Lin, Y., Lv, F., Zhu, S., Yang, M., Cour, T., Yu, K., … others. (2010). Imagenet classification: fast descriptor coding and large-scale svm training. Large scale visual recognition challenge ."
+    },
+    {
+      "type": "paragraph",
+      "text": "Lipton, Z. C., & Steinhardt, J. (2018). Troubling trends in machine learning scholarship. arXiv preprint arXiv:1807.03341 ."
+    },
+    {
+      "type": "paragraph",
+      "text": "Liu, W., Anguelov, D., Erhan, D., Szegedy, C., Reed, S., Fu, C.-Y., & Berg, A. C. (2016). Ssd: single shot multibox detector. European conference on computer vision (pp. 21–37)."
+    },
+    {
+      "type": "paragraph",
+      "text": "Liu, Y., Ott, M., Goyal, N., Du, J., Joshi, M., Chen, D., … Stoyanov, V. (2019). Roberta: a robustly optimized bert pretraining approach. arXiv preprint arXiv:1907.11692 ."
+    },
+    {
+      "type": "paragraph",
+      "text": "Long, J., Shelhamer, E., & Darrell, T. (2015). Fully convolutional networks for semantic segmentation. Proceedings of the IEEE conference on computer vision and pattern recognition (pp. 3431–3440)."
+    },
+    {
+      "type": "paragraph",
+      "text": "Loshchilov, I., & Hutter, F. (2016). Sgdr: stochastic gradient descent with warm restarts. arXiv preprint arXiv:1608.03983 ."
+    },
+    {
+      "type": "paragraph",
+      "text": "Lowe, D. G. (2004). Distinctive image features from scale-invariant keypoints. International journal of computer vision , 60 (2), 91–110."
+    },
+    {
+      "type": "paragraph",
+      "text": "Luo, P., Wang, X., Shao, W., & Peng, Z. (2018). Towards understanding regularization in batch normalization. arXiv preprint ."
+    },
+    {
+      "type": "paragraph",
+      "text": "Maas, A. L., Daly, R. E., Pham, P. T., Huang, D., Ng, A. Y., & Potts, C. (2011). Learning word vectors for sentiment analysis. Proceedings of the 49th annual meeting of the association for computational linguistics: Human language technologies-volume 1 (pp. 142–150)."
+    },
+    {
+      "type": "paragraph",
+      "text": "McCann, B., Bradbury, J., Xiong, C., & Socher, R. (2017). Learned in translation: contextualized word vectors. Advances in Neural Information Processing Systems (pp. 6294–6305)."
+    },
+    {
+      "type": "paragraph",
+      "text": "McCulloch, W. S., & Pitts, W. (1943). A logical calculus of the ideas immanent in nervous activity. The bulletin of mathematical biophysics , 5 (4), 115–133."
+    },
+    {
+      "type": "paragraph",
+      "text": "McMahan, H. B., Holt, G., Sculley, D., Young, M., Ebner, D., Grady, J., … others. (2013). Ad click prediction: a view from the trenches. Proceedings of the 19th ACM SIGKDD international conference on Knowledge discovery and data mining (pp. 1222–1230)."
+    },
+    {
+      "type": "paragraph",
+      "text": "Merity, S., Xiong, C., Bradbury, J., & Socher, R. (2016). Pointer sentinel mixture models. arXiv preprint arXiv:1609.07843 ."
+    },
+    {
+      "type": "paragraph",
+      "text": "Mikolov, T., Chen, K., Corrado, G., & Dean, J. (2013). Efficient estimation of word representations in vector space. arXiv preprint arXiv:1301.3781 ."
+    },
+    {
+      "type": "paragraph",
+      "text": "Mikolov, T., Sutskever, I., Chen, K., Corrado, G. S., & Dean, J. (2013). Distributed representations of words and phrases and their compositionality. Advances in neural information processing systems (pp. 3111–3119)."
+    },
+    {
+      "type": "paragraph",
+      "text": "Mirhoseini, A., Pham, H., Le, Q. V., Steiner, B., Larsen, R., Zhou, Y., … Dean, J. (2017). Device placement optimization with reinforcement learning. Proceedings of the 34th International Conference on Machine Learning-Volume 70 (pp. 2430–2439)."
+    },
+    {
+      "type": "paragraph",
+      "text": "Morey, R. D., Hoekstra, R., Rouder, J. N., Lee, M. D., & Wagenmakers, E.-J. (2016). The fallacy of placing confidence in confidence intervals. Psychonomic bulletin & review , 23 (1), 103–123."
+    },
+    {
+      "type": "paragraph",
+      "text": "Nesterov, Y., & Vial, J.-P. (2000). Confidence level solutions for stochastic programming, Stochastic Programming E-Print Series ."
+    },
+    {
+      "type": "paragraph",
+      "text": "Nesterov, Y. (2018). Lectures on convex optimization . Vol. 137. Springer."
+    },
+    {
+      "type": "paragraph",
+      "text": "Neyman, J. (1937). Outline of a theory of statistical estimation based on the classical theory of probability. Philosophical Transactions of the Royal Society of London. Series A, Mathematical and Physical Sciences , 236 (767), 333–380."
+    },
+    {
+      "type": "paragraph",
+      "text": "Papineni, K., Roukos, S., Ward, T., & Zhu, W.-J. (2002). Bleu: a method for automatic evaluation of machine translation. Proceedings of the 40th annual meeting of the Association for Computational Linguistics (pp. 311–318)."
+    },
+    {
+      "type": "paragraph",
+      "text": "Parikh, A. P., Täckström, O., Das, D., & Uszkoreit, J. (2016). A decomposable attention model for natural language inference. arXiv preprint arXiv:1606.01933 ."
+    },
+    {
+      "type": "paragraph",
+      "text": "Park, T., Liu, M.-Y., Wang, T.-C., & Zhu, J.-Y. (2019). Semantic image synthesis with spatially-adaptive normalization. Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition (pp. 2337–2346)."
+    },
+    {
+      "type": "paragraph",
+      "text": "Pennington, J., Schoenholz, S., & Ganguli, S. (2017). Resurrecting the sigmoid in deep learning through dynamical isometry: theory and practice. Advances in neural information processing systems (pp. 4785–4795)."
+    },
+    {
+      "type": "paragraph",
+      "text": "Pennington, J., Socher, R., & Manning, C. (2014). Glove: global vectors for word representation. Proceedings of the 2014 conference on empirical methods in natural language processing (EMNLP) (pp. 1532–1543)."
+    },
+    {
+      "type": "paragraph",
+      "text": "Peters, J., Janzing, D., & Schölkopf, B. (2017). Elements of causal inference: foundations and learning algorithms . MIT press."
+    },
+    {
+      "type": "paragraph",
+      "text": "Peters, M., Ammar, W., Bhagavatula, C., & Power, R. (2017). Semi-supervised sequence tagging with bidirectional language models. Proceedings of the 55th Annual Meeting of the Association for Computational Linguistics (Volume 1: Long Papers) (pp. 1756–1765)."
+    },
+    {
+      "type": "paragraph",
+      "text": "Peters, M., Neumann, M., Iyyer, M., Gardner, M., Clark, C., Lee, K., & Zettlemoyer, L. (2018). Deep contextualized word representations. Proceedings of the 2018 Conference of the North American Chapter of the Association for Computational Linguistics: Human Language Technologies, Volume 1 (Long Papers) (pp. 2227–2237)."
+    },
+    {
+      "type": "paragraph",
+      "text": "Petersen, K. B., Pedersen, M. S., & others. (2008). The matrix cookbook. Technical University of Denmark , 7 (15), 510."
+    },
+    {
+      "type": "paragraph",
+      "text": "Polyak, B. T. (1964). Some methods of speeding up the convergence of iteration methods. USSR Computational Mathematics and Mathematical Physics , 4 (5), 1–17."
+    },
+    {
+      "type": "paragraph",
+      "text": "Quadrana, M., Cremonesi, P., & Jannach, D. (2018). Sequence-aware recommender systems. ACM Computing Surveys (CSUR) , 51 (4), 66."
+    },
+    {
+      "type": "paragraph",
+      "text": "Radford, A., Metz, L., & Chintala, S. (2015). Unsupervised representation learning with deep convolutional generative adversarial networks. arXiv preprint arXiv:1511.06434 ."
+    },
+    {
+      "type": "paragraph",
+      "text": "Radford, A., Narasimhan, K., Salimans, T., & Sutskever, I. (2018). Improving language understanding by generative pre-training. OpenAI ."
+    },
+    {
+      "type": "paragraph",
+      "text": "Radford, A., Wu, J., Child, R., Luan, D., Amodei, D., & Sutskever, I. (2019). Language models are unsupervised multitask learners. OpenAI Blog , 1 (8), 9."
+    },
+    {
+      "type": "paragraph",
+      "text": "Rajpurkar, P., Zhang, J., Lopyrev, K., & Liang, P. (2016). Squad: 100,000+ questions for machine comprehension of text. arXiv preprint arXiv:1606.05250 ."
+    },
+    {
+      "type": "paragraph",
+      "text": "Reddi, S. J., Kale, S., & Kumar, S. (2019). On the convergence of adam and beyond. arXiv preprint arXiv:1904.09237 ."
+    },
+    {
+      "type": "paragraph",
+      "text": "Reed, S., & De Freitas, N. (2015). Neural programmer-interpreters. arXiv preprint arXiv:1511.06279 ."
+    },
+    {
+      "type": "paragraph",
+      "text": "Ren, S., He, K., Girshick, R., & Sun, J. (2015). Faster r-cnn: towards real-time object detection with region proposal networks. Advances in neural information processing systems (pp. 91–99)."
+    },
+    {
+      "type": "paragraph",
+      "text": "Rendle, S. (2010). Factorization machines. 2010 IEEE International Conference on Data Mining (pp. 995–1000)."
+    },
+    {
+      "type": "paragraph",
+      "text": "Rendle, S., Freudenthaler, C., Gantner, Z., & Schmidt-Thieme, L. (2009). Bpr: bayesian personalized ranking from implicit feedback. Proceedings of the twenty-fifth conference on uncertainty in artificial intelligence (pp. 452–461)."
+    },
+    {
+      "type": "paragraph",
+      "text": "Russell, S. J., & Norvig, P. (2016). Artificial intelligence: a modern approach . Malaysia; Pearson Education Limited,."
+    },
+    {
+      "type": "paragraph",
+      "text": "Santurkar, S., Tsipras, D., Ilyas, A., & Madry, A. (2018). How does batch normalization help optimization? Advances in Neural Information Processing Systems (pp. 2483–2493)."
+    },
+    {
+      "type": "paragraph",
+      "text": "Sarwar, B. M., Karypis, G., Konstan, J. A., Riedl, J., & others. (2001). Item-based collaborative filtering recommendation algorithms. Www , 1 , 285–295."
+    },
+    {
+      "type": "paragraph",
+      "text": "Schein, A. I., Popescul, A., Ungar, L. H., & Pennock, D. M. (2002). Methods and metrics for cold-start recommendations. Proceedings of the 25th annual international ACM SIGIR conference on Research and development in information retrieval (pp. 253–260)."
+    },
+    {
+      "type": "paragraph",
+      "text": "Schuster, M., & Paliwal, K. K. (1997). Bidirectional recurrent neural networks. IEEE Transactions on Signal Processing , 45 (11), 2673–2681."
+    },
+    {
+      "type": "paragraph",
+      "text": "Sedhain, S., Menon, A. K., Sanner, S., & Xie, L. (2015). Autorec: autoencoders meet collaborative filtering. Proceedings of the 24th International Conference on World Wide Web (pp. 111–112)."
+    },
+    {
+      "type": "paragraph",
+      "text": "Sennrich, R., Haddow, B., & Birch, A. (2015). Neural machine translation of rare words with subword units. arXiv preprint arXiv:1508.07909 ."
+    },
+    {
+      "type": "paragraph",
+      "text": "Sergeev, A., & Del Balso, M. (2018). Horovod: fast and easy distributed deep learning in tensorflow. arXiv preprint arXiv:1802.05799 ."
+    },
+    {
+      "type": "paragraph",
+      "text": "Shannon, C. E. (1948 , 7). A mathematical theory of communication. The Bell System Technical Journal , 27 (3), 379–423."
+    },
+    {
+      "type": "paragraph",
+      "text": "Shao, H., Yao, S., Sun, D., Zhang, A., Liu, S., Liu, D., … Abdelzaher, T. (2020). Controlvae: controllable variational autoencoder. Proceedings of the 37th International Conference on Machine Learning ."
+    },
+    {
+      "type": "paragraph",
+      "text": "Silver, D., Huang, A., Maddison, C. J., Guez, A., Sifre, L., Van Den Driessche, G., … others. (2016). Mastering the game of go with deep neural networks and tree search. nature , 529 (7587), 484."
+    },
+    {
+      "type": "paragraph",
+      "text": "Simonyan, K., & Zisserman, A. (2014). Very deep convolutional networks for large-scale image recognition. arXiv preprint arXiv:1409.1556 ."
+    },
+    {
+      "type": "paragraph",
+      "text": "Smola, A., & Narayanamurthy, S. (2010). An architecture for parallel topic models. Proceedings of the VLDB Endowment , 3 (1-2), 703–710."
+    },
+    {
+      "type": "paragraph",
+      "text": "Srivastava, N., Hinton, G., Krizhevsky, A., Sutskever, I., & Salakhutdinov, R. (2014). Dropout: a simple way to prevent neural networks from overfitting. The Journal of Machine Learning Research , 15 (1), 1929–1958."
+    },
+    {
+      "type": "paragraph",
+      "text": "Strang, G. (1993). Introduction to linear algebra . Vol. 3. Wellesley-Cambridge Press Wellesley, MA."
+    },
+    {
+      "type": "paragraph",
+      "text": "Su, X., & Khoshgoftaar, T. M. (2009). A survey of collaborative filtering techniques. Advances in artificial intelligence , 2009 ."
+    },
+    {
+      "type": "paragraph",
+      "text": "Sukhbaatar, S., Weston, J., Fergus, R., & others. (2015). End-to-end memory networks. Advances in neural information processing systems (pp. 2440–2448)."
+    },
+    {
+      "type": "paragraph",
+      "text": "Sutskever, I., Martens, J., Dahl, G., & Hinton, G. (2013). On the importance of initialization and momentum in deep learning. International conference on machine learning (pp. 1139–1147)."
+    },
+    {
+      "type": "paragraph",
+      "text": "Sutskever, I., Vinyals, O., & Le, Q. V. (2014). Sequence to sequence learning with neural networks. Advances in neural information processing systems (pp. 3104–3112)."
+    },
+    {
+      "type": "paragraph",
+      "text": "Szegedy, C., Ioffe, S., Vanhoucke, V., & Alemi, A. A. (2017). Inception-v4, inception-resnet and the impact of residual connections on learning. Thirty-First AAAI Conference on Artificial Intelligence ."
+    },
+    {
+      "type": "paragraph",
+      "text": "Szegedy, C., Liu, W., Jia, Y., Sermanet, P., Reed, S., Anguelov, D., … Rabinovich, A. (2015). Going deeper with convolutions. Proceedings of the IEEE conference on computer vision and pattern recognition (pp. 1–9)."
+    },
+    {
+      "type": "paragraph",
+      "text": "Szegedy, C., Vanhoucke, V., Ioffe, S., Shlens, J., & Wojna, Z. (2016). Rethinking the inception architecture for computer vision. Proceedings of the IEEE conference on computer vision and pattern recognition (pp. 2818–2826)."
+    },
+    {
+      "type": "paragraph",
+      "text": "Tallec, C., & Ollivier, Y. (2017). Unbiasing truncated backpropagation through time. arXiv preprint arXiv:1705.08209 ."
+    },
+    {
+      "type": "paragraph",
+      "text": "Tang, J., & Wang, K. (2018). Personalized top-n sequential recommendation via convolutional sequence embedding. Proceedings of the Eleventh ACM International Conference on Web Search and Data Mining (pp. 565–573)."
+    },
+    {
+      "type": "paragraph",
+      "text": "Teye, M., Azizpour, H., & Smith, K. (2018). Bayesian uncertainty estimation for batch normalized deep networks. arXiv preprint arXiv:1802.06455 ."
+    },
+    {
+      "type": "paragraph",
+      "text": "Tieleman, T., & Hinton, G. (2012). Lecture 6.5-rmsprop: divide the gradient by a running average of its recent magnitude. COURSERA: Neural networks for machine learning , 4 (2), 26–31."
+    },
+    {
+      "type": "paragraph",
+      "text": "Turing, A. (1950). Computing machinery and intelligence. Mind , 59 (236), 433."
+    },
+    {
+      "type": "paragraph",
+      "text": "Töscher, A., Jahrer, M., & Bell, R. M. (2009). The bigchaos solution to the netflix grand prize. Netflix prize documentation , pp. 1–52."
+    },
+    {
+      "type": "paragraph",
+      "text": "Uijlings, J. R., Van De Sande, K. E., Gevers, T., & Smeulders, A. W. (2013). Selective search for object recognition. International journal of computer vision , 104 (2), 154–171."
+    },
+    {
+      "type": "paragraph",
+      "text": "Van Loan, C. F., & Golub, G. H. (1983). Matrix computations . Johns Hopkins University Press."
+    },
+    {
+      "type": "paragraph",
+      "text": "Vaswani, A., Shazeer, N., Parmar, N., Uszkoreit, J., Jones, L., Gomez, A. N., … Polosukhin, I. (2017). Attention is all you need. Advances in neural information processing systems (pp. 5998–6008)."
+    },
+    {
+      "type": "paragraph",
+      "text": "Wang, L., Li, M., Liberty, E., & Smola, A. J. (2018). Optimal message scheduling for aggregation. NETWORKS , 2 (3), 2–3."
+    },
+    {
+      "type": "paragraph",
+      "text": "Wang, Y., Davidson, A., Pan, Y., Wu, Y., Riffel, A., & Owens, J. D. (2016). Gunrock: a high-performance graph processing library on the gpu. ACM SIGPLAN Notices (p. 11)."
+    },
+    {
+      "type": "paragraph",
+      "text": "Warstadt, A., Singh, A., & Bowman, S. R. (2019). Neural network acceptability judgments. Transactions of the Association for Computational Linguistics , 7 , 625–641."
+    },
+    {
+      "type": "paragraph",
+      "text": "Wasserman, L. (2013). All of statistics: a concise course in statistical inference . Springer Science & Business Media."
+    },
+    {
+      "type": "paragraph",
+      "text": "Watkins, C. J., & Dayan, P. (1992). Q-learning. Machine learning , 8 (3-4), 279–292."
+    },
+    {
+      "type": "paragraph",
+      "text": "Welling, M., & Teh, Y. W. (2011). Bayesian learning via stochastic gradient langevin dynamics. Proceedings of the 28th international conference on machine learning (ICML-11) (pp. 681–688)."
+    },
+    {
+      "type": "paragraph",
+      "text": "Werbos, P. J. (1990). Backpropagation through time: what it does and how to do it. Proceedings of the IEEE , 78 (10), 1550–1560."
+    },
+    {
+      "type": "paragraph",
+      "text": "Wigner, E. P. (1958). On the distribution of the roots of certain symmetric matrices. Ann. Math (pp. 325–327)."
+    },
+    {
+      "type": "paragraph",
+      "text": "Wood, F., Gasthaus, J., Archambeau, C., James, L., & Teh, Y. W. (2011). The sequence memoizer. Communications of the ACM , 54 (2), 91–98."
+    },
+    {
+      "type": "paragraph",
+      "text": "Wu, C.-Y., Ahmed, A., Beutel, A., Smola, A. J., & Jing, H. (2017). Recurrent recommender networks. Proceedings of the tenth ACM international conference on web search and data mining (pp. 495–503)."
+    },
+    {
+      "type": "paragraph",
+      "text": "Wu, Y., Schuster, M., Chen, Z., Le, Q. V., Norouzi, M., Macherey, W., … others. (2016). Google’s neural machine translation system: bridging the gap between human and machine translation. arXiv preprint arXiv:1609.08144 ."
+    },
+    {
+      "type": "paragraph",
+      "text": "Xiao, H., Rasul, K., & Vollgraf, R. (2017). Fashion-mnist: a novel image dataset for benchmarking machine learning algorithms. arXiv preprint arXiv:1708.07747 ."
+    },
+    {
+      "type": "paragraph",
+      "text": "Xiao, L., Bahri, Y., Sohl-Dickstein, J., Schoenholz, S., & Pennington, J. (2018). Dynamical isometry and a mean field theory of cnns: how to train 10,000-layer vanilla convolutional neural networks. International Conference on Machine Learning (pp. 5393–5402)."
+    },
+    {
+      "type": "paragraph",
+      "text": "Xiong, W., Wu, L., Alleva, F., Droppo, J., Huang, X., & Stolcke, A. (2018). The microsoft 2017 conversational speech recognition system. 2018 IEEE International Conference on Acoustics, Speech and Signal Processing (ICASSP) (pp. 5934–5938)."
+    },
+    {
+      "type": "paragraph",
+      "text": "Ye, M., Yin, P., Lee, W.-C., & Lee, D.-L. (2011). Exploiting geographical influence for collaborative point-of-interest recommendation. Proceedings of the 34th international ACM SIGIR conference on Research and development in Information Retrieval (pp. 325–334)."
+    },
+    {
+      "type": "paragraph",
+      "text": "You, Y., Gitman, I., & Ginsburg, B. (2017). Large batch training of convolutional networks. arXiv preprint arXiv:1708.03888 ."
+    },
+    {
+      "type": "paragraph",
+      "text": "Zaheer, M., Reddi, S., Sachan, D., Kale, S., & Kumar, S. (2018). Adaptive methods for nonconvex optimization. Advances in Neural Information Processing Systems (pp. 9793–9803)."
+    },
+    {
+      "type": "paragraph",
+      "text": "Zeiler, M. D. (2012). Adadelta: an adaptive learning rate method. arXiv preprint arXiv:1212.5701 ."
+    },
+    {
+      "type": "paragraph",
+      "text": "Zhang, S., Yao, L., Sun, A., & Tay, Y. (2019). Deep learning based recommender system: a survey and new perspectives. ACM Computing Surveys (CSUR) , 52 (1), 5."
+    },
+    {
+      "type": "paragraph",
+      "text": "Zhu, J.-Y., Park, T., Isola, P., & Efros, A. A. (2017). Unpaired image-to-image translation using cycle-consistent adversarial networks. Proceedings of the IEEE international conference on computer vision (pp. 2223–2232)."
+    },
+    {
+      "type": "paragraph",
+      "text": "Zhu, Y., Kiros, R., Zemel, R., Salakhutdinov, R., Urtasun, R., Torralba, A., & Fidler, S. (2015). Aligning books and movies: towards story-like visual explanations by watching movies and reading books. Proceedings of the IEEE international conference on computer vision (pp. 19–27)."
+    }
+  ],
+  "images": [],
+  "text": "Tài liệu tham khảo\nAhmed et al., 2012 Ahmed, A., Aly, M., Gonzalez, J., Narayanamurthy, S., & Smola, A. J. (2012). Scalable inference in latent variable models. Proceedings of the fifth ACM international conference on Web search and data mining (pp. 123–132). Aji & McEliece, 2000 Aji, S. M., & McEliece, R. J. (2000). The generalized distributive law. IEEE transactions on Information Theory , 46 (2), 325–343. Bahdanau et al., 2014 Bahdanau, D., Cho, K., & Bengio, Y. (2014). Neural machine translation by jointly learning to align and translate. arXiv preprint arXiv:1409.0473 . Bay et al., 2006 Bay, H., Tuytelaars, T., & Van Gool, L. (2006). Surf: speeded up robust features. European conference on computer vision (pp. 404–417). Bishop, 1995 Bishop, C. M. (1995). Training with noise is equivalent to tikhonov regularization. Neural computation , 7 (1), 108–116. Bishop, 2006 Bishop, C. M. (2006). Pattern recognition and machine learning . springer. Bojanowski et al., 2017 Bojanowski, P., Grave, E., Joulin, A., & Mikolov, T. (2017). Enriching word vectors with subword information. Transactions of the Association for Computational Linguistics , 5 , 135–146. Bollobas, 1999 Bollobás, B. (1999). Linear analysis . Cambridge University Press, Cambridge. Bowman et al., 2015 Bowman, S. R., Angeli, G., Potts, C., & Manning, C. D. (2015). A large annotated corpus for learning natural language inference. arXiv preprint arXiv:1508.05326 . Boyd & Vandenberghe, 2004 Boyd, S., & Vandenberghe, L. (2004). Convex Optimization . Cambridge, England: Cambridge University Press. Brown & Sandholm, 2017 Brown, N., & Sandholm, T. (2017). Libratus: the superhuman ai for no-limit poker. IJCAI (pp. 5226–5228). Brown et al., 1990 Brown, P. F., Cocke, J., Della Pietra, S. A., Della Pietra, V. J., Jelinek, F., Lafferty, J., … Roossin, P. S. (1990). A statistical approach to machine translation. Computational linguistics , 16 (2), 79–85. Brown et al., 1988 Brown, P. F., Cocke, J., Della Pietra, S. A., Della Pietra, V. J., Jelinek, F., Mercer, R. L., & Roossin, P. (1988). A statistical approach to language translation. Coling Budapest 1988 Volume 1: International Conference on Computational Linguistics . Campbell et al., 2002 Campbell, M., Hoane Jr, A. J., & Hsu, F.-h. (2002). Deep blue. Artificial intelligence , 134 (1-2), 57–83. Canny, 1987 Canny, J. (1987). A computational approach to edge detection. Readings in computer vision (pp. 184–203). Elsevier. Cer et al., 2017 Cer, D., Diab, M., Agirre, E., Lopez-Gazpio, I., & Specia, L. (2017). Semeval-2017 task 1: semantic textual similarity multilingual and crosslingual focused evaluation. Proceedings of the 11th International Workshop on Semantic Evaluation (SemEval-2017) (pp. 1–14). Cho et al., 2014a Cho, K., Van Merriënboer, B., Bahdanau, D., & Bengio, Y. (2014). On the properties of neural machine translation: encoder-decoder approaches. arXiv preprint arXiv:1409.1259 . Cho et al., 2014b Cho, K., Van Merriënboer, B., Gulcehre, C., Bahdanau, D., Bougares, F., Schwenk, H., & Bengio, Y. (2014). Learning phrase representations using rnn encoder-decoder for statistical machine translation. arXiv preprint arXiv:1406.1078 . Chung et al., 2014 Chung, J., Gulcehre, C., Cho, K., & Bengio, Y. (2014). Empirical evaluation of gated recurrent neural networks on sequence modeling. arXiv preprint arXiv:1412.3555 . Csiszar, 2008 Csiszár, I. (2008). Axiomatic characterizations of information measures. Entropy , 10 (3), 261–273. Dalal & Triggs, 2005 Dalal, N., & Triggs, B. (2005). Histograms of oriented gradients for human detection. 2005 IEEE computer society conference on computer vision and pattern recognition (CVPR’05) (pp. 886–893). DeCock, 2011 De Cock, D. (2011). Ames, iowa: alternative to the boston housing data as an end of semester regression project. Journal of Statistics Education , 19 (3). DeCandia et al., 2007 DeCandia, G., Hastorun, D., Jampani, M., Kakulapati, G., Lakshman, A., Pilchin, A., … Vogels, W. (2007). Dynamo: amazon’s highly available key-value store. ACM SIGOPS operating systems review (pp. 205–220). Devlin et al., 2018 Devlin, J., Chang, M.-W., Lee, K., & Toutanova, K. (2018). Bert: pre-training of deep bidirectional transformers for language understanding. arXiv preprint arXiv:1810.04805 . Doucet et al., 2001 Doucet, A., De Freitas, N., & Gordon, N. (2001). An introduction to sequential monte carlo methods. Sequential Monte Carlo methods in practice (pp. 3–14). Springer. Duchi et al., 2011 Duchi, J., Hazan, E., & Singer, Y. (2011). Adaptive subgradient methods for online learning and stochastic optimization. Journal of Machine Learning Research , 12 (Jul), 2121–2159. Dumoulin & Visin, 2016 Dumoulin, V., & Visin, F. (2016). A guide to convolution arithmetic for deep learning. arXiv preprint arXiv:1603.07285 . Flammarion & Bach, 2015 Flammarion, N., & Bach, F. (2015). From averaging to acceleration, there is only a step-size. Conference on Learning Theory (pp. 658–695). Gatys et al., 2016 Gatys, L. A., Ecker, A. S., & Bethge, M. (2016). Image style transfer using convolutional neural networks. Proceedings of the IEEE conference on computer vision and pattern recognition (pp. 2414–2423). Girshick, 2015 Girshick, R. (2015). Fast r-cnn. Proceedings of the IEEE international conference on computer vision (pp. 1440–1448). Girshick et al., 2014 Girshick, R., Donahue, J., Darrell, T., & Malik, J. (2014). Rich feature hierarchies for accurate object detection and semantic segmentation. Proceedings of the IEEE conference on computer vision and pattern recognition (pp. 580–587). Glorot & Bengio, 2010 Glorot, X., & Bengio, Y. (2010). Understanding the difficulty of training deep feedforward neural networks. Proceedings of the thirteenth international conference on artificial intelligence and statistics (pp. 249–256). Goh, 2017 Goh, G. (2017). Why momentum really works. Distill . URL: http://distill.pub/2017/momentum , doi:10.23915/distill.00006 Goldberg et al., 1992 Goldberg, D., Nichols, D., Oki, B. M., & Terry, D. (1992). Using collaborative filtering to weave an information tapestry. Communications of the ACM , 35 (12), 61–71. Goodfellow et al., 2016 Goodfellow, I., Bengio, Y., & Courville, A. (2016). Deep Learning . MIT Press. http://www.deeplearningbook.org. Goodfellow et al., 2014 Goodfellow, I., Pouget-Abadie, J., Mirza, M., Xu, B., Warde-Farley, D., Ozair, S., … Bengio, Y. (2014). Generative adversarial nets. Advances in neural information processing systems (pp. 2672–2680). Gotmare et al., 2018 Gotmare, A., Keskar, N. S., Xiong, C., & Socher, R. (2018). A closer look at deep learning heuristics: learning rate restarts, warmup and distillation. arXiv preprint arXiv:1810.13243 . Graves & Schmidhuber, 2005 Graves, A., & Schmidhuber, J. (2005). Framewise phoneme classification with bidirectional lstm and other neural network architectures. Neural networks , 18 (5-6), 602–610. Gunawardana & Shani, 2015 Gunawardana, A., & Shani, G. (2015). Evaluating recommender systems. Recommender systems handbook (pp. 265–308). Springer. Guo et al., 2017 Guo, H., Tang, R., Ye, Y., Li, Z., & He, X. (2017). Deepfm: a factorization-machine based neural network for ctr prediction. Proceedings of the 26th International Joint Conference on Artificial Intelligence (pp. 1725–1731). Hadjis et al., 2016 Hadjis, S., Zhang, C., Mitliagkas, I., Iter, D., & Ré, C. (2016). Omnivore: an optimizer for multi-device deep learning on cpus and gpus. arXiv preprint arXiv:1606.04487 . He et al., 2017a He, K., Gkioxari, G., Dollár, P., & Girshick, R. (2017). Mask r-cnn. Proceedings of the IEEE international conference on computer vision (pp. 2961–2969). He et al., 2015 He, K., Zhang, X., Ren, S., & Sun, J. (2015). Delving deep into rectifiers: surpassing human-level performance on imagenet classification. Proceedings of the IEEE international conference on computer vision (pp. 1026–1034). He et al., 2016a He, K., Zhang, X., Ren, S., & Sun, J. (2016). Deep residual learning for image recognition. Proceedings of the IEEE conference on computer vision and pattern recognition (pp. 770–778). He et al., 2016b He, K., Zhang, X., Ren, S., & Sun, J. (2016). Identity mappings in deep residual networks. European conference on computer vision (pp. 630–645). He & Chua, 2017 He, X., & Chua, T.-S. (2017). Neural factorization machines for sparse predictive analytics. Proceedings of the 40th International ACM SIGIR conference on Research and Development in Information Retrieval (pp. 355–364). He et al., 2017b He, X., Liao, L., Zhang, H., Nie, L., Hu, X., & Chua, T.-S. (2017). Neural collaborative filtering. Proceedings of the 26th international conference on world wide web (pp. 173–182). Hebb & Hebb, 1949 Hebb, D. O., & Hebb, D. (1949). The organization of behavior . Vol. 65. Wiley New York. Hendrycks & Gimpel, 2016 Hendrycks, D., & Gimpel, K. (2016). Gaussian error linear units (gelus). arXiv preprint arXiv:1606.08415 . Hennessy & Patterson, 2011 Hennessy, J. L., & Patterson, D. A. (2011). Computer architecture: a quantitative approach . Elsevier. Herlocker et al., 1999 Herlocker, J. L., Konstan, J. A., Borchers, A., & Riedl, J. (1999). An algorithmic framework for performing collaborative filtering. 22nd Annual International ACM SIGIR Conference on Research and Development in Information Retrieval, SIGIR 1999 (pp. 230–237). Hidasi et al., 2015 Hidasi, B., Karatzoglou, A., Baltrunas, L., & Tikk, D. (2015). Session-based recommendations with recurrent neural networks. arXiv preprint arXiv:1511.06939 . Hochreiter & Schmidhuber, 1997 Hochreiter, S., & Schmidhuber, J. (1997). Long short-term memory. Neural computation , 9 (8), 1735–1780. Hoyer et al., 2009 Hoyer, P. O., Janzing, D., Mooij, J. M., Peters, J., & Schölkopf, B. (2009). Nonlinear causal discovery with additive noise models. Advances in neural information processing systems (pp. 689–696). Hu et al., 2018 Hu, J., Shen, L., & Sun, G. (2018). Squeeze-and-excitation networks. Proceedings of the IEEE conference on computer vision and pattern recognition (pp. 7132–7141). Hu et al., 2008 Hu, Y., Koren, Y., & Volinsky, C. (2008). Collaborative filtering for implicit feedback datasets. 2008 Eighth IEEE International Conference on Data Mining (pp. 263–272). Huang et al., 2017 Huang, G., Liu, Z., Van Der Maaten, L., & Weinberger, K. Q. (2017). Densely connected convolutional networks. Proceedings of the IEEE conference on computer vision and pattern recognition (pp. 4700–4708). Ioffe, 2017 Ioffe, S. (2017). Batch renormalization: towards reducing minibatch dependence in batch-normalized models. Advances in neural information processing systems (pp. 1945–1953). Ioffe & Szegedy, 2015 Ioffe, S., & Szegedy, C. (2015). Batch normalization: accelerating deep network training by reducing internal covariate shift. arXiv preprint arXiv:1502.03167 . Izmailov et al., 2018 Izmailov, P., Podoprikhin, D., Garipov, T., Vetrov, D., & Wilson, A. G. (2018). Averaging weights leads to wider optima and better generalization. arXiv preprint arXiv:1803.05407 . Jaeger, 2002 Jaeger, H. (2002). Tutorial on training recurrent neural networks, covering BPPT, RTRL, EKF and the” echo state network” approach . Vol. 5. GMD-Forschungszentrum Informationstechnik Bonn. Jia et al., 2018 Jia, X., Song, S., He, W., Wang, Y., Rong, H., Zhou, F., … others. (2018). Highly scalable deep learning training system with mixed-precision: training imagenet in four minutes. arXiv preprint arXiv:1807.11205 . Jouppi et al., 2017 Jouppi, N. P., Young, C., Patil, N., Patterson, D., Agrawal, G., Bajwa, R., … others. (2017). In-datacenter performance analysis of a tensor processing unit. 2017 ACM/IEEE 44th Annual International Symposium on Computer Architecture (ISCA) (pp. 1–12). Karras et al., 2017 Karras, T., Aila, T., Laine, S., & Lehtinen, J. (2017). Progressive growing of gans for improved quality, stability, and variation. arXiv preprint arXiv:1710.10196 . Kim, 2014 Kim, Y. (2014). Convolutional neural networks for sentence classification. arXiv preprint arXiv:1408.5882 . Kingma & Ba, 2014 Kingma, D. P., & Ba, J. (2014). Adam: a method for stochastic optimization. arXiv preprint arXiv:1412.6980 . Koller & Friedman, 2009 Koller, D., & Friedman, N. (2009). Probabilistic graphical models: principles and techniques . MIT press. Kolter, 2008 Kolter, Z. (2008). Linear algebra review and reference. Available online: http . Koren, 2009 Koren, Y. (2009). Collaborative filtering with temporal dynamics. Proceedings of the 15th ACM SIGKDD international conference on Knowledge discovery and data mining (pp. 447–456). Koren et al., 2009 Koren, Y., Bell, R., & Volinsky, C. (2009). Matrix factorization techniques for recommender systems. Computer , pp. 30–37. Krizhevsky et al., 2012 Krizhevsky, A., Sutskever, I., & Hinton, G. E. (2012). Imagenet classification with deep convolutional neural networks. Advances in neural information processing systems (pp. 1097–1105). Kung, 1988 Kung, S. Y. (1988). Vlsi array processors. Englewood Cliffs, NJ, Prentice Hall, 1988, 685 p. Research supported by the Semiconductor Research Corp., SDIO, NSF, and US Navy. LeCun et al., 1998 LeCun, Y., Bottou, L., Bengio, Y., Haffner, P., & others. (1998). Gradient-based learning applied to document recognition. Proceedings of the IEEE , 86 (11), 2278–2324. Li, 2017 Li, M. (2017). Scaling Distributed Machine Learning with System and Algorithm Co-design (Doctoral dissertation). PhD Thesis, CMU. Li et al., 2014 Li, M., Andersen, D. G., Park, J. W., Smola, A. J., Ahmed, A., Josifovski, V., … Su, B.-Y. (2014). Scaling distributed machine learning with the parameter server. 11th $\\$USENIX$\\$ Symposium on Operating Systems Design and Implementation ($\\$OSDI$\\$ 14) (pp. 583–598). Lin et al., 2013 Lin, M., Chen, Q., & Yan, S. (2013). Network in network. arXiv preprint arXiv:1312.4400 . Lin et al., 2017 Lin, T.-Y., Goyal, P., Girshick, R., He, K., & Dollár, P. (2017). Focal loss for dense object detection. Proceedings of the IEEE international conference on computer vision (pp. 2980–2988). Lin et al., 2010 Lin, Y., Lv, F., Zhu, S., Yang, M., Cour, T., Yu, K., … others. (2010). Imagenet classification: fast descriptor coding and large-scale svm training. Large scale visual recognition challenge . Lipton & Steinhardt, 2018 Lipton, Z. C., & Steinhardt, J. (2018). Troubling trends in machine learning scholarship. arXiv preprint arXiv:1807.03341 . Liu et al., 2016 Liu, W., Anguelov, D., Erhan, D., Szegedy, C., Reed, S., Fu, C.-Y., & Berg, A. C. (2016). Ssd: single shot multibox detector. European conference on computer vision (pp. 21–37). Liu et al., 2019 Liu, Y., Ott, M., Goyal, N., Du, J., Joshi, M., Chen, D., … Stoyanov, V. (2019). Roberta: a robustly optimized bert pretraining approach. arXiv preprint arXiv:1907.11692 . Long et al., 2015 Long, J., Shelhamer, E., & Darrell, T. (2015). Fully convolutional networks for semantic segmentation. Proceedings of the IEEE conference on computer vision and pattern recognition (pp. 3431–3440). Loshchilov & Hutter, 2016 Loshchilov, I., & Hutter, F. (2016). Sgdr: stochastic gradient descent with warm restarts. arXiv preprint arXiv:1608.03983 . Lowe, 2004 Lowe, D. G. (2004). Distinctive image features from scale-invariant keypoints. International journal of computer vision , 60 (2), 91–110. Luo et al., 2018 Luo, P., Wang, X., Shao, W., & Peng, Z. (2018). Towards understanding regularization in batch normalization. arXiv preprint . Maas et al., 2011 Maas, A. L., Daly, R. E., Pham, P. T., Huang, D., Ng, A. Y., & Potts, C. (2011). Learning word vectors for sentiment analysis. Proceedings of the 49th annual meeting of the association for computational linguistics: Human language technologies-volume 1 (pp. 142–150). McCann et al., 2017 McCann, B., Bradbury, J., Xiong, C., & Socher, R. (2017). Learned in translation: contextualized word vectors. Advances in Neural Information Processing Systems (pp. 6294–6305). McCulloch & Pitts, 1943 McCulloch, W. S., & Pitts, W. (1943). A logical calculus of the ideas immanent in nervous activity. The bulletin of mathematical biophysics , 5 (4), 115–133. McMahan et al., 2013 McMahan, H. B., Holt, G., Sculley, D., Young, M., Ebner, D., Grady, J., … others. (2013). Ad click prediction: a view from the trenches. Proceedings of the 19th ACM SIGKDD international conference on Knowledge discovery and data mining (pp. 1222–1230). Merity et al., 2016 Merity, S., Xiong, C., Bradbury, J., & Socher, R. (2016). Pointer sentinel mixture models. arXiv preprint arXiv:1609.07843 . Mikolov et al., 2013a Mikolov, T., Chen, K., Corrado, G., & Dean, J. (2013). Efficient estimation of word representations in vector space. arXiv preprint arXiv:1301.3781 . Mikolov et al., 2013b Mikolov, T., Sutskever, I., Chen, K., Corrado, G. S., & Dean, J. (2013). Distributed representations of words and phrases and their compositionality. Advances in neural information processing systems (pp. 3111–3119). Mirhoseini et al., 2017 Mirhoseini, A., Pham, H., Le, Q. V., Steiner, B., Larsen, R., Zhou, Y., … Dean, J. (2017). Device placement optimization with reinforcement learning. Proceedings of the 34th International Conference on Machine Learning-Volume 70 (pp. 2430–2439). Morey et al., 2016 Morey, R. D., Hoekstra, R., Rouder, J. N., Lee, M. D., & Wagenmakers, E.-J. (2016). The fallacy of placing confidence in confidence intervals. Psychonomic bulletin & review , 23 (1), 103–123. Nesterov & Vial, 2000 Nesterov, Y., & Vial, J.-P. (2000). Confidence level solutions for stochastic programming, Stochastic Programming E-Print Series . Nesterov, 2018 Nesterov, Y. (2018). Lectures on convex optimization . Vol. 137. Springer. Neyman, 1937 Neyman, J. (1937). Outline of a theory of statistical estimation based on the classical theory of probability. Philosophical Transactions of the Royal Society of London. Series A, Mathematical and Physical Sciences , 236 (767), 333–380. Papineni et al., 2002 Papineni, K., Roukos, S., Ward, T., & Zhu, W.-J. (2002). Bleu: a method for automatic evaluation of machine translation. Proceedings of the 40th annual meeting of the Association for Computational Linguistics (pp. 311–318). Parikh et al., 2016 Parikh, A. P., Täckström, O., Das, D., & Uszkoreit, J. (2016). A decomposable attention model for natural language inference. arXiv preprint arXiv:1606.01933 . Park et al., 2019 Park, T., Liu, M.-Y., Wang, T.-C., & Zhu, J.-Y. (2019). Semantic image synthesis with spatially-adaptive normalization. Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition (pp. 2337–2346). Pennington et al., 2017 Pennington, J., Schoenholz, S., & Ganguli, S. (2017). Resurrecting the sigmoid in deep learning through dynamical isometry: theory and practice. Advances in neural information processing systems (pp. 4785–4795). Pennington et al., 2014 Pennington, J., Socher, R., & Manning, C. (2014). Glove: global vectors for word representation. Proceedings of the 2014 conference on empirical methods in natural language processing (EMNLP) (pp. 1532–1543). Peters et al., 2017a Peters, J., Janzing, D., & Schölkopf, B. (2017). Elements of causal inference: foundations and learning algorithms . MIT press. Peters et al., 2017b Peters, M., Ammar, W., Bhagavatula, C., & Power, R. (2017). Semi-supervised sequence tagging with bidirectional language models. Proceedings of the 55th Annual Meeting of the Association for Computational Linguistics (Volume 1: Long Papers) (pp. 1756–1765). Peters et al., 2018 Peters, M., Neumann, M., Iyyer, M., Gardner, M., Clark, C., Lee, K., & Zettlemoyer, L. (2018). Deep contextualized word representations. Proceedings of the 2018 Conference of the North American Chapter of the Association for Computational Linguistics: Human Language Technologies, Volume 1 (Long Papers) (pp. 2227–2237). Petersen et al., 2008 Petersen, K. B., Pedersen, M. S., & others. (2008). The matrix cookbook. Technical University of Denmark , 7 (15), 510. Polyak, 1964 Polyak, B. T. (1964). Some methods of speeding up the convergence of iteration methods. USSR Computational Mathematics and Mathematical Physics , 4 (5), 1–17. Quadrana et al., 2018 Quadrana, M., Cremonesi, P., & Jannach, D. (2018). Sequence-aware recommender systems. ACM Computing Surveys (CSUR) , 51 (4), 66. Radford et al., 2015 Radford, A., Metz, L., & Chintala, S. (2015). Unsupervised representation learning with deep convolutional generative adversarial networks. arXiv preprint arXiv:1511.06434 . Radford et al., 2018 Radford, A., Narasimhan, K., Salimans, T., & Sutskever, I. (2018). Improving language understanding by generative pre-training. OpenAI . Radford et al., 2019 Radford, A., Wu, J., Child, R., Luan, D., Amodei, D., & Sutskever, I. (2019). Language models are unsupervised multitask learners. OpenAI Blog , 1 (8), 9. Rajpurkar et al., 2016 Rajpurkar, P., Zhang, J., Lopyrev, K., & Liang, P. (2016). Squad: 100,000+ questions for machine comprehension of text. arXiv preprint arXiv:1606.05250 . Reddi et al., 2019 Reddi, S. J., Kale, S., & Kumar, S. (2019). On the convergence of adam and beyond. arXiv preprint arXiv:1904.09237 . Reed & DeFreitas, 2015 Reed, S., & De Freitas, N. (2015). Neural programmer-interpreters. arXiv preprint arXiv:1511.06279 . Ren et al., 2015 Ren, S., He, K., Girshick, R., & Sun, J. (2015). Faster r-cnn: towards real-time object detection with region proposal networks. Advances in neural information processing systems (pp. 91–99). Rendle, 2010 Rendle, S. (2010). Factorization machines. 2010 IEEE International Conference on Data Mining (pp. 995–1000). Rendle et al., 2009 Rendle, S., Freudenthaler, C., Gantner, Z., & Schmidt-Thieme, L. (2009). Bpr: bayesian personalized ranking from implicit feedback. Proceedings of the twenty-fifth conference on uncertainty in artificial intelligence (pp. 452–461). Russell & Norvig, 2016 Russell, S. J., & Norvig, P. (2016). Artificial intelligence: a modern approach . Malaysia; Pearson Education Limited,. Santurkar et al., 2018 Santurkar, S., Tsipras, D., Ilyas, A., & Madry, A. (2018). How does batch normalization help optimization? Advances in Neural Information Processing Systems (pp. 2483–2493). Sarwar et al., 2001 Sarwar, B. M., Karypis, G., Konstan, J. A., Riedl, J., & others. (2001). Item-based collaborative filtering recommendation algorithms. Www , 1 , 285–295. Schein et al., 2002 Schein, A. I., Popescul, A., Ungar, L. H., & Pennock, D. M. (2002). Methods and metrics for cold-start recommendations. Proceedings of the 25th annual international ACM SIGIR conference on Research and development in information retrieval (pp. 253–260). Schuster & Paliwal, 1997 Schuster, M., & Paliwal, K. K. (1997). Bidirectional recurrent neural networks. IEEE Transactions on Signal Processing , 45 (11), 2673–2681. Sedhain et al., 2015 Sedhain, S., Menon, A. K., Sanner, S., & Xie, L. (2015). Autorec: autoencoders meet collaborative filtering. Proceedings of the 24th International Conference on World Wide Web (pp. 111–112). Sennrich et al., 2015 Sennrich, R., Haddow, B., & Birch, A. (2015). Neural machine translation of rare words with subword units. arXiv preprint arXiv:1508.07909 . Sergeev & DelBalso, 2018 Sergeev, A., & Del Balso, M. (2018). Horovod: fast and easy distributed deep learning in tensorflow. arXiv preprint arXiv:1802.05799 . Shannon, 1948 Shannon, C. E. (1948 , 7). A mathematical theory of communication. The Bell System Technical Journal , 27 (3), 379–423. Shao et al., 2020 Shao, H., Yao, S., Sun, D., Zhang, A., Liu, S., Liu, D., … Abdelzaher, T. (2020). Controlvae: controllable variational autoencoder. Proceedings of the 37th International Conference on Machine Learning . Silver et al., 2016 Silver, D., Huang, A., Maddison, C. J., Guez, A., Sifre, L., Van Den Driessche, G., … others. (2016). Mastering the game of go with deep neural networks and tree search. nature , 529 (7587), 484. Simonyan & Zisserman, 2014 Simonyan, K., & Zisserman, A. (2014). Very deep convolutional networks for large-scale image recognition. arXiv preprint arXiv:1409.1556 . Smola & Narayanamurthy, 2010 Smola, A., & Narayanamurthy, S. (2010). An architecture for parallel topic models. Proceedings of the VLDB Endowment , 3 (1-2), 703–710. Srivastava et al., 2014 Srivastava, N., Hinton, G., Krizhevsky, A., Sutskever, I., & Salakhutdinov, R. (2014). Dropout: a simple way to prevent neural networks from overfitting. The Journal of Machine Learning Research , 15 (1), 1929–1958. Strang, 1993 Strang, G. (1993). Introduction to linear algebra . Vol. 3. Wellesley-Cambridge Press Wellesley, MA. Su & Khoshgoftaar, 2009 Su, X., & Khoshgoftaar, T. M. (2009). A survey of collaborative filtering techniques. Advances in artificial intelligence , 2009 . Sukhbaatar et al., 2015 Sukhbaatar, S., Weston, J., Fergus, R., & others. (2015). End-to-end memory networks. Advances in neural information processing systems (pp. 2440–2448). Sutskever et al., 2013 Sutskever, I., Martens, J., Dahl, G., & Hinton, G. (2013). On the importance of initialization and momentum in deep learning. International conference on machine learning (pp. 1139–1147). Sutskever et al., 2014 Sutskever, I., Vinyals, O., & Le, Q. V. (2014). Sequence to sequence learning with neural networks. Advances in neural information processing systems (pp. 3104–3112). Szegedy et al., 2017 Szegedy, C., Ioffe, S., Vanhoucke, V., & Alemi, A. A. (2017). Inception-v4, inception-resnet and the impact of residual connections on learning. Thirty-First AAAI Conference on Artificial Intelligence . Szegedy et al., 2015 Szegedy, C., Liu, W., Jia, Y., Sermanet, P., Reed, S., Anguelov, D., … Rabinovich, A. (2015). Going deeper with convolutions. Proceedings of the IEEE conference on computer vision and pattern recognition (pp. 1–9). Szegedy et al., 2016 Szegedy, C., Vanhoucke, V., Ioffe, S., Shlens, J., & Wojna, Z. (2016). Rethinking the inception architecture for computer vision. Proceedings of the IEEE conference on computer vision and pattern recognition (pp. 2818–2826). Tallec & Ollivier, 2017 Tallec, C., & Ollivier, Y. (2017). Unbiasing truncated backpropagation through time. arXiv preprint arXiv:1705.08209 . Tang & Wang, 2018 Tang, J., & Wang, K. (2018). Personalized top-n sequential recommendation via convolutional sequence embedding. Proceedings of the Eleventh ACM International Conference on Web Search and Data Mining (pp. 565–573). Teye et al., 2018 Teye, M., Azizpour, H., & Smith, K. (2018). Bayesian uncertainty estimation for batch normalized deep networks. arXiv preprint arXiv:1802.06455 . Tieleman & Hinton, 2012 Tieleman, T., & Hinton, G. (2012). Lecture 6.5-rmsprop: divide the gradient by a running average of its recent magnitude. COURSERA: Neural networks for machine learning , 4 (2), 26–31. Turing, 1950 Turing, A. (1950). Computing machinery and intelligence. Mind , 59 (236), 433. Toscher et al., 2009 Töscher, A., Jahrer, M., & Bell, R. M. (2009). The bigchaos solution to the netflix grand prize. Netflix prize documentation , pp. 1–52. Uijlings et al., 2013 Uijlings, J. R., Van De Sande, K. E., Gevers, T., & Smeulders, A. W. (2013). Selective search for object recognition. International journal of computer vision , 104 (2), 154–171. VanLoan & Golub, 1983 Van Loan, C. F., & Golub, G. H. (1983). Matrix computations . Johns Hopkins University Press. Vaswani et al., 2017 Vaswani, A., Shazeer, N., Parmar, N., Uszkoreit, J., Jones, L., Gomez, A. N., … Polosukhin, I. (2017). Attention is all you need. Advances in neural information processing systems (pp. 5998–6008). Wang et al., 2018 Wang, L., Li, M., Liberty, E., & Smola, A. J. (2018). Optimal message scheduling for aggregation. NETWORKS , 2 (3), 2–3. Wang et al., 2016 Wang, Y., Davidson, A., Pan, Y., Wu, Y., Riffel, A., & Owens, J. D. (2016). Gunrock: a high-performance graph processing library on the gpu. ACM SIGPLAN Notices (p. 11). Warstadt et al., 2019 Warstadt, A., Singh, A., & Bowman, S. R. (2019). Neural network acceptability judgments. Transactions of the Association for Computational Linguistics , 7 , 625–641. Wasserman, 2013 Wasserman, L. (2013). All of statistics: a concise course in statistical inference . Springer Science & Business Media. Watkins & Dayan, 1992 Watkins, C. J., & Dayan, P. (1992). Q-learning. Machine learning , 8 (3-4), 279–292. Welling & Teh, 2011 Welling, M., & Teh, Y. W. (2011). Bayesian learning via stochastic gradient langevin dynamics. Proceedings of the 28th international conference on machine learning (ICML-11) (pp. 681–688). Werbos, 1990 Werbos, P. J. (1990). Backpropagation through time: what it does and how to do it. Proceedings of the IEEE , 78 (10), 1550–1560. Wigner, 1958 Wigner, E. P. (1958). On the distribution of the roots of certain symmetric matrices. Ann. Math (pp. 325–327). Wood et al., 2011 Wood, F., Gasthaus, J., Archambeau, C., James, L., & Teh, Y. W. (2011). The sequence memoizer. Communications of the ACM , 54 (2), 91–98. Wu et al., 2017 Wu, C.-Y., Ahmed, A., Beutel, A., Smola, A. J., & Jing, H. (2017). Recurrent recommender networks. Proceedings of the tenth ACM international conference on web search and data mining (pp. 495–503). Wu et al., 2016 Wu, Y., Schuster, M., Chen, Z., Le, Q. V., Norouzi, M., Macherey, W., … others. (2016). Google’s neural machine translation system: bridging the gap between human and machine translation. arXiv preprint arXiv:1609.08144 . Xiao et al., 2017 Xiao, H., Rasul, K., & Vollgraf, R. (2017). Fashion-mnist: a novel image dataset for benchmarking machine learning algorithms. arXiv preprint arXiv:1708.07747 . Xiao et al., 2018 Xiao, L., Bahri, Y., Sohl-Dickstein, J., Schoenholz, S., & Pennington, J. (2018). Dynamical isometry and a mean field theory of cnns: how to train 10,000-layer vanilla convolutional neural networks. International Conference on Machine Learning (pp. 5393–5402). Xiong et al., 2018 Xiong, W., Wu, L., Alleva, F., Droppo, J., Huang, X., & Stolcke, A. (2018). The microsoft 2017 conversational speech recognition system. 2018 IEEE International Conference on Acoustics, Speech and Signal Processing (ICASSP) (pp. 5934–5938). Ye et al., 2011 Ye, M., Yin, P., Lee, W.-C., & Lee, D.-L. (2011). Exploiting geographical influence for collaborative point-of-interest recommendation. Proceedings of the 34th international ACM SIGIR conference on Research and development in Information Retrieval (pp. 325–334). You et al., 2017 You, Y., Gitman, I., & Ginsburg, B. (2017). Large batch training of convolutional networks. arXiv preprint arXiv:1708.03888 . Zaheer et al., 2018 Zaheer, M., Reddi, S., Sachan, D., Kale, S., & Kumar, S. (2018). Adaptive methods for nonconvex optimization. Advances in Neural Information Processing Systems (pp. 9793–9803). Zeiler, 2012 Zeiler, M. D. (2012). Adadelta: an adaptive learning rate method. arXiv preprint arXiv:1212.5701 . Zhang et al., 2019 Zhang, S., Yao, L., Sun, A., & Tay, Y. (2019). Deep learning based recommender system: a survey and new perspectives. ACM Computing Surveys (CSUR) , 52 (1), 5. Zhu et al., 2017 Zhu, J.-Y., Park, T., Isola, P., & Efros, A. A. (2017). Unpaired image-to-image translation using cycle-consistent adversarial networks. Proceedings of the IEEE international conference on computer vision (pp. 2223–2232). Zhu et al., 2015 Zhu, Y., Kiros, R., Zemel, R., Salakhutdinov, R., Urtasun, R., Torralba, A., & Fidler, S. (2015). Aligning books and movies: towards story-like visual explanations by watching movies and reading books. Proceedings of the IEEE international conference on computer vision (pp. 19–27).\nAhmed, A., Aly, M., Gonzalez, J., Narayanamurthy, S., & Smola, A. J. (2012). Scalable inference in latent variable models. Proceedings of the fifth ACM international conference on Web search and data mining (pp. 123–132).\nAji, S. M., & McEliece, R. J. (2000). The generalized distributive law. IEEE transactions on Information Theory , 46 (2), 325–343.\nBahdanau, D., Cho, K., & Bengio, Y. (2014). Neural machine translation by jointly learning to align and translate. arXiv preprint arXiv:1409.0473 .\nBay, H., Tuytelaars, T., & Van Gool, L. (2006). Surf: speeded up robust features. European conference on computer vision (pp. 404–417).\nBishop, C. M. (1995). Training with noise is equivalent to tikhonov regularization. Neural computation , 7 (1), 108–116.\nBishop, C. M. (2006). Pattern recognition and machine learning . springer.\nBojanowski, P., Grave, E., Joulin, A., & Mikolov, T. (2017). Enriching word vectors with subword information. Transactions of the Association for Computational Linguistics , 5 , 135–146.\nBollobás, B. (1999). Linear analysis . Cambridge University Press, Cambridge.\nBowman, S. R., Angeli, G., Potts, C., & Manning, C. D. (2015). A large annotated corpus for learning natural language inference. arXiv preprint arXiv:1508.05326 .\nBoyd, S., & Vandenberghe, L. (2004). Convex Optimization . Cambridge, England: Cambridge University Press.\nBrown, N., & Sandholm, T. (2017). Libratus: the superhuman ai for no-limit poker. IJCAI (pp. 5226–5228).\nBrown, P. F., Cocke, J., Della Pietra, S. A., Della Pietra, V. J., Jelinek, F., Lafferty, J., … Roossin, P. S. (1990). A statistical approach to machine translation. Computational linguistics , 16 (2), 79–85.\nBrown, P. F., Cocke, J., Della Pietra, S. A., Della Pietra, V. J., Jelinek, F., Mercer, R. L., & Roossin, P. (1988). A statistical approach to language translation. Coling Budapest 1988 Volume 1: International Conference on Computational Linguistics .\nCampbell, M., Hoane Jr, A. J., & Hsu, F.-h. (2002). Deep blue. Artificial intelligence , 134 (1-2), 57–83.\nCanny, J. (1987). A computational approach to edge detection. Readings in computer vision (pp. 184–203). Elsevier.\nCer, D., Diab, M., Agirre, E., Lopez-Gazpio, I., & Specia, L. (2017). Semeval-2017 task 1: semantic textual similarity multilingual and crosslingual focused evaluation. Proceedings of the 11th International Workshop on Semantic Evaluation (SemEval-2017) (pp. 1–14).\nCho, K., Van Merriënboer, B., Bahdanau, D., & Bengio, Y. (2014). On the properties of neural machine translation: encoder-decoder approaches. arXiv preprint arXiv:1409.1259 .\nCho, K., Van Merriënboer, B., Gulcehre, C., Bahdanau, D., Bougares, F., Schwenk, H., & Bengio, Y. (2014). Learning phrase representations using rnn encoder-decoder for statistical machine translation. arXiv preprint arXiv:1406.1078 .\nChung, J., Gulcehre, C., Cho, K., & Bengio, Y. (2014). Empirical evaluation of gated recurrent neural networks on sequence modeling. arXiv preprint arXiv:1412.3555 .\nCsiszár, I. (2008). Axiomatic characterizations of information measures. Entropy , 10 (3), 261–273.\nDalal, N., & Triggs, B. (2005). Histograms of oriented gradients for human detection. 2005 IEEE computer society conference on computer vision and pattern recognition (CVPR’05) (pp. 886–893).\nDe Cock, D. (2011). Ames, iowa: alternative to the boston housing data as an end of semester regression project. Journal of Statistics Education , 19 (3).\nDeCandia, G., Hastorun, D., Jampani, M., Kakulapati, G., Lakshman, A., Pilchin, A., … Vogels, W. (2007). Dynamo: amazon’s highly available key-value store. ACM SIGOPS operating systems review (pp. 205–220).\nDevlin, J., Chang, M.-W., Lee, K., & Toutanova, K. (2018). Bert: pre-training of deep bidirectional transformers for language understanding. arXiv preprint arXiv:1810.04805 .\nDoucet, A., De Freitas, N., & Gordon, N. (2001). An introduction to sequential monte carlo methods. Sequential Monte Carlo methods in practice (pp. 3–14). Springer.\nDuchi, J., Hazan, E., & Singer, Y. (2011). Adaptive subgradient methods for online learning and stochastic optimization. Journal of Machine Learning Research , 12 (Jul), 2121–2159.\nDumoulin, V., & Visin, F. (2016). A guide to convolution arithmetic for deep learning. arXiv preprint arXiv:1603.07285 .\nFlammarion, N., & Bach, F. (2015). From averaging to acceleration, there is only a step-size. Conference on Learning Theory (pp. 658–695).\nGatys, L. A., Ecker, A. S., & Bethge, M. (2016). Image style transfer using convolutional neural networks. Proceedings of the IEEE conference on computer vision and pattern recognition (pp. 2414–2423).\nGirshick, R. (2015). Fast r-cnn. Proceedings of the IEEE international conference on computer vision (pp. 1440–1448).\nGirshick, R., Donahue, J., Darrell, T., & Malik, J. (2014). Rich feature hierarchies for accurate object detection and semantic segmentation. Proceedings of the IEEE conference on computer vision and pattern recognition (pp. 580–587).\nGlorot, X., & Bengio, Y. (2010). Understanding the difficulty of training deep feedforward neural networks. Proceedings of the thirteenth international conference on artificial intelligence and statistics (pp. 249–256).\nGoh, G. (2017). Why momentum really works. Distill . URL: http://distill.pub/2017/momentum , doi:10.23915/distill.00006\nGoldberg, D., Nichols, D., Oki, B. M., & Terry, D. (1992). Using collaborative filtering to weave an information tapestry. Communications of the ACM , 35 (12), 61–71.\nGoodfellow, I., Bengio, Y., & Courville, A. (2016). Deep Learning . MIT Press. http://www.deeplearningbook.org.\nGoodfellow, I., Pouget-Abadie, J., Mirza, M., Xu, B., Warde-Farley, D., Ozair, S., … Bengio, Y. (2014). Generative adversarial nets. Advances in neural information processing systems (pp. 2672–2680).\nGotmare, A., Keskar, N. S., Xiong, C., & Socher, R. (2018). A closer look at deep learning heuristics: learning rate restarts, warmup and distillation. arXiv preprint arXiv:1810.13243 .\nGraves, A., & Schmidhuber, J. (2005). Framewise phoneme classification with bidirectional lstm and other neural network architectures. Neural networks , 18 (5-6), 602–610.\nGunawardana, A., & Shani, G. (2015). Evaluating recommender systems. Recommender systems handbook (pp. 265–308). Springer.\nGuo, H., Tang, R., Ye, Y., Li, Z., & He, X. (2017). Deepfm: a factorization-machine based neural network for ctr prediction. Proceedings of the 26th International Joint Conference on Artificial Intelligence (pp. 1725–1731).\nHadjis, S., Zhang, C., Mitliagkas, I., Iter, D., & Ré, C. (2016). Omnivore: an optimizer for multi-device deep learning on cpus and gpus. arXiv preprint arXiv:1606.04487 .\nHe, K., Gkioxari, G., Dollár, P., & Girshick, R. (2017). Mask r-cnn. Proceedings of the IEEE international conference on computer vision (pp. 2961–2969).\nHe, K., Zhang, X., Ren, S., & Sun, J. (2015). Delving deep into rectifiers: surpassing human-level performance on imagenet classification. Proceedings of the IEEE international conference on computer vision (pp. 1026–1034).\nHe, K., Zhang, X., Ren, S., & Sun, J. (2016). Deep residual learning for image recognition. Proceedings of the IEEE conference on computer vision and pattern recognition (pp. 770–778).\nHe, K., Zhang, X., Ren, S., & Sun, J. (2016). Identity mappings in deep residual networks. European conference on computer vision (pp. 630–645).\nHe, X., & Chua, T.-S. (2017). Neural factorization machines for sparse predictive analytics. Proceedings of the 40th International ACM SIGIR conference on Research and Development in Information Retrieval (pp. 355–364).\nHe, X., Liao, L., Zhang, H., Nie, L., Hu, X., & Chua, T.-S. (2017). Neural collaborative filtering. Proceedings of the 26th international conference on world wide web (pp. 173–182).\nHebb, D. O., & Hebb, D. (1949). The organization of behavior . Vol. 65. Wiley New York.\nHendrycks, D., & Gimpel, K. (2016). Gaussian error linear units (gelus). arXiv preprint arXiv:1606.08415 .\nHennessy, J. L., & Patterson, D. A. (2011). Computer architecture: a quantitative approach . Elsevier.\nHerlocker, J. L., Konstan, J. A., Borchers, A., & Riedl, J. (1999). An algorithmic framework for performing collaborative filtering. 22nd Annual International ACM SIGIR Conference on Research and Development in Information Retrieval, SIGIR 1999 (pp. 230–237).\nHidasi, B., Karatzoglou, A., Baltrunas, L., & Tikk, D. (2015). Session-based recommendations with recurrent neural networks. arXiv preprint arXiv:1511.06939 .\nHochreiter, S., & Schmidhuber, J. (1997). Long short-term memory. Neural computation , 9 (8), 1735–1780.\nHoyer, P. O., Janzing, D., Mooij, J. M., Peters, J., & Schölkopf, B. (2009). Nonlinear causal discovery with additive noise models. Advances in neural information processing systems (pp. 689–696).\nHu, J., Shen, L., & Sun, G. (2018). Squeeze-and-excitation networks. Proceedings of the IEEE conference on computer vision and pattern recognition (pp. 7132–7141).\nHu, Y., Koren, Y., & Volinsky, C. (2008). Collaborative filtering for implicit feedback datasets. 2008 Eighth IEEE International Conference on Data Mining (pp. 263–272).\nHuang, G., Liu, Z., Van Der Maaten, L., & Weinberger, K. Q. (2017). Densely connected convolutional networks. Proceedings of the IEEE conference on computer vision and pattern recognition (pp. 4700–4708).\nIoffe, S. (2017). Batch renormalization: towards reducing minibatch dependence in batch-normalized models. Advances in neural information processing systems (pp. 1945–1953).\nIoffe, S., & Szegedy, C. (2015). Batch normalization: accelerating deep network training by reducing internal covariate shift. arXiv preprint arXiv:1502.03167 .\nIzmailov, P., Podoprikhin, D., Garipov, T., Vetrov, D., & Wilson, A. G. (2018). Averaging weights leads to wider optima and better generalization. arXiv preprint arXiv:1803.05407 .\nJaeger, H. (2002). Tutorial on training recurrent neural networks, covering BPPT, RTRL, EKF and the” echo state network” approach . Vol. 5. GMD-Forschungszentrum Informationstechnik Bonn.\nJia, X., Song, S., He, W., Wang, Y., Rong, H., Zhou, F., … others. (2018). Highly scalable deep learning training system with mixed-precision: training imagenet in four minutes. arXiv preprint arXiv:1807.11205 .\nJouppi, N. P., Young, C., Patil, N., Patterson, D., Agrawal, G., Bajwa, R., … others. (2017). In-datacenter performance analysis of a tensor processing unit. 2017 ACM/IEEE 44th Annual International Symposium on Computer Architecture (ISCA) (pp. 1–12).\nKarras, T., Aila, T., Laine, S., & Lehtinen, J. (2017). Progressive growing of gans for improved quality, stability, and variation. arXiv preprint arXiv:1710.10196 .\nKim, Y. (2014). Convolutional neural networks for sentence classification. arXiv preprint arXiv:1408.5882 .\nKingma, D. P., & Ba, J. (2014). Adam: a method for stochastic optimization. arXiv preprint arXiv:1412.6980 .\nKoller, D., & Friedman, N. (2009). Probabilistic graphical models: principles and techniques . MIT press.\nKolter, Z. (2008). Linear algebra review and reference. Available online: http .\nKoren, Y. (2009). Collaborative filtering with temporal dynamics. Proceedings of the 15th ACM SIGKDD international conference on Knowledge discovery and data mining (pp. 447–456).\nKoren, Y., Bell, R., & Volinsky, C. (2009). Matrix factorization techniques for recommender systems. Computer , pp. 30–37.\nKrizhevsky, A., Sutskever, I., & Hinton, G. E. (2012). Imagenet classification with deep convolutional neural networks. Advances in neural information processing systems (pp. 1097–1105).\nKung, S. Y. (1988). Vlsi array processors. Englewood Cliffs, NJ, Prentice Hall, 1988, 685 p. Research supported by the Semiconductor Research Corp., SDIO, NSF, and US Navy.\nLeCun, Y., Bottou, L., Bengio, Y., Haffner, P., & others. (1998). Gradient-based learning applied to document recognition. Proceedings of the IEEE , 86 (11), 2278–2324.\nLi, M. (2017). Scaling Distributed Machine Learning with System and Algorithm Co-design (Doctoral dissertation). PhD Thesis, CMU.\nLi, M., Andersen, D. G., Park, J. W., Smola, A. J., Ahmed, A., Josifovski, V., … Su, B.-Y. (2014). Scaling distributed machine learning with the parameter server. 11th $\\$USENIX$\\$ Symposium on Operating Systems Design and Implementation ($\\$OSDI$\\$ 14) (pp. 583–598).\nLin, M., Chen, Q., & Yan, S. (2013). Network in network. arXiv preprint arXiv:1312.4400 .\nLin, T.-Y., Goyal, P., Girshick, R., He, K., & Dollár, P. (2017). Focal loss for dense object detection. Proceedings of the IEEE international conference on computer vision (pp. 2980–2988).\nLin, Y., Lv, F., Zhu, S., Yang, M., Cour, T., Yu, K., … others. (2010). Imagenet classification: fast descriptor coding and large-scale svm training. Large scale visual recognition challenge .\nLipton, Z. C., & Steinhardt, J. (2018). Troubling trends in machine learning scholarship. arXiv preprint arXiv:1807.03341 .\nLiu, W., Anguelov, D., Erhan, D., Szegedy, C., Reed, S., Fu, C.-Y., & Berg, A. C. (2016). Ssd: single shot multibox detector. European conference on computer vision (pp. 21–37).\nLiu, Y., Ott, M., Goyal, N., Du, J., Joshi, M., Chen, D., … Stoyanov, V. (2019). Roberta: a robustly optimized bert pretraining approach. arXiv preprint arXiv:1907.11692 .\nLong, J., Shelhamer, E., & Darrell, T. (2015). Fully convolutional networks for semantic segmentation. Proceedings of the IEEE conference on computer vision and pattern recognition (pp. 3431–3440).\nLoshchilov, I., & Hutter, F. (2016). Sgdr: stochastic gradient descent with warm restarts. arXiv preprint arXiv:1608.03983 .\nLowe, D. G. (2004). Distinctive image features from scale-invariant keypoints. International journal of computer vision , 60 (2), 91–110.\nLuo, P., Wang, X., Shao, W., & Peng, Z. (2018). Towards understanding regularization in batch normalization. arXiv preprint .\nMaas, A. L., Daly, R. E., Pham, P. T., Huang, D., Ng, A. Y., & Potts, C. (2011). Learning word vectors for sentiment analysis. Proceedings of the 49th annual meeting of the association for computational linguistics: Human language technologies-volume 1 (pp. 142–150).\nMcCann, B., Bradbury, J., Xiong, C., & Socher, R. (2017). Learned in translation: contextualized word vectors. Advances in Neural Information Processing Systems (pp. 6294–6305).\nMcCulloch, W. S., & Pitts, W. (1943). A logical calculus of the ideas immanent in nervous activity. The bulletin of mathematical biophysics , 5 (4), 115–133.\nMcMahan, H. B., Holt, G., Sculley, D., Young, M., Ebner, D., Grady, J., … others. (2013). Ad click prediction: a view from the trenches. Proceedings of the 19th ACM SIGKDD international conference on Knowledge discovery and data mining (pp. 1222–1230).\nMerity, S., Xiong, C., Bradbury, J., & Socher, R. (2016). Pointer sentinel mixture models. arXiv preprint arXiv:1609.07843 .\nMikolov, T., Chen, K., Corrado, G., & Dean, J. (2013). Efficient estimation of word representations in vector space. arXiv preprint arXiv:1301.3781 .\nMikolov, T., Sutskever, I., Chen, K., Corrado, G. S., & Dean, J. (2013). Distributed representations of words and phrases and their compositionality. Advances in neural information processing systems (pp. 3111–3119).\nMirhoseini, A., Pham, H., Le, Q. V., Steiner, B., Larsen, R., Zhou, Y., … Dean, J. (2017). Device placement optimization with reinforcement learning. Proceedings of the 34th International Conference on Machine Learning-Volume 70 (pp. 2430–2439).\nMorey, R. D., Hoekstra, R., Rouder, J. N., Lee, M. D., & Wagenmakers, E.-J. (2016). The fallacy of placing confidence in confidence intervals. Psychonomic bulletin & review , 23 (1), 103–123.\nNesterov, Y., & Vial, J.-P. (2000). Confidence level solutions for stochastic programming, Stochastic Programming E-Print Series .\nNesterov, Y. (2018). Lectures on convex optimization . Vol. 137. Springer.\nNeyman, J. (1937). Outline of a theory of statistical estimation based on the classical theory of probability. Philosophical Transactions of the Royal Society of London. Series A, Mathematical and Physical Sciences , 236 (767), 333–380.\nPapineni, K., Roukos, S., Ward, T., & Zhu, W.-J. (2002). Bleu: a method for automatic evaluation of machine translation. Proceedings of the 40th annual meeting of the Association for Computational Linguistics (pp. 311–318).\nParikh, A. P., Täckström, O., Das, D., & Uszkoreit, J. (2016). A decomposable attention model for natural language inference. arXiv preprint arXiv:1606.01933 .\nPark, T., Liu, M.-Y., Wang, T.-C., & Zhu, J.-Y. (2019). Semantic image synthesis with spatially-adaptive normalization. Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition (pp. 2337–2346).\nPennington, J., Schoenholz, S., & Ganguli, S. (2017). Resurrecting the sigmoid in deep learning through dynamical isometry: theory and practice. Advances in neural information processing systems (pp. 4785–4795).\nPennington, J., Socher, R., & Manning, C. (2014). Glove: global vectors for word representation. Proceedings of the 2014 conference on empirical methods in natural language processing (EMNLP) (pp. 1532–1543).\nPeters, J., Janzing, D., & Schölkopf, B. (2017). Elements of causal inference: foundations and learning algorithms . MIT press.\nPeters, M., Ammar, W., Bhagavatula, C., & Power, R. (2017). Semi-supervised sequence tagging with bidirectional language models. Proceedings of the 55th Annual Meeting of the Association for Computational Linguistics (Volume 1: Long Papers) (pp. 1756–1765).\nPeters, M., Neumann, M., Iyyer, M., Gardner, M., Clark, C., Lee, K., & Zettlemoyer, L. (2018). Deep contextualized word representations. Proceedings of the 2018 Conference of the North American Chapter of the Association for Computational Linguistics: Human Language Technologies, Volume 1 (Long Papers) (pp. 2227–2237).\nPetersen, K. B., Pedersen, M. S., & others. (2008). The matrix cookbook. Technical University of Denmark , 7 (15), 510.\nPolyak, B. T. (1964). Some methods of speeding up the convergence of iteration methods. USSR Computational Mathematics and Mathematical Physics , 4 (5), 1–17.\nQuadrana, M., Cremonesi, P., & Jannach, D. (2018). Sequence-aware recommender systems. ACM Computing Surveys (CSUR) , 51 (4), 66.\nRadford, A., Metz, L., & Chintala, S. (2015). Unsupervised representation learning with deep convolutional generative adversarial networks. arXiv preprint arXiv:1511.06434 .\nRadford, A., Narasimhan, K., Salimans, T., & Sutskever, I. (2018). Improving language understanding by generative pre-training. OpenAI .\nRadford, A., Wu, J., Child, R., Luan, D., Amodei, D., & Sutskever, I. (2019). Language models are unsupervised multitask learners. OpenAI Blog , 1 (8), 9.\nRajpurkar, P., Zhang, J., Lopyrev, K., & Liang, P. (2016). Squad: 100,000+ questions for machine comprehension of text. arXiv preprint arXiv:1606.05250 .\nReddi, S. J., Kale, S., & Kumar, S. (2019). On the convergence of adam and beyond. arXiv preprint arXiv:1904.09237 .\nReed, S., & De Freitas, N. (2015). Neural programmer-interpreters. arXiv preprint arXiv:1511.06279 .\nRen, S., He, K., Girshick, R., & Sun, J. (2015). Faster r-cnn: towards real-time object detection with region proposal networks. Advances in neural information processing systems (pp. 91–99).\nRendle, S. (2010). Factorization machines. 2010 IEEE International Conference on Data Mining (pp. 995–1000).\nRendle, S., Freudenthaler, C., Gantner, Z., & Schmidt-Thieme, L. (2009). Bpr: bayesian personalized ranking from implicit feedback. Proceedings of the twenty-fifth conference on uncertainty in artificial intelligence (pp. 452–461).\nRussell, S. J., & Norvig, P. (2016). Artificial intelligence: a modern approach . Malaysia; Pearson Education Limited,.\nSanturkar, S., Tsipras, D., Ilyas, A., & Madry, A. (2018). How does batch normalization help optimization? Advances in Neural Information Processing Systems (pp. 2483–2493).\nSarwar, B. M., Karypis, G., Konstan, J. A., Riedl, J., & others. (2001). Item-based collaborative filtering recommendation algorithms. Www , 1 , 285–295.\nSchein, A. I., Popescul, A., Ungar, L. H., & Pennock, D. M. (2002). Methods and metrics for cold-start recommendations. Proceedings of the 25th annual international ACM SIGIR conference on Research and development in information retrieval (pp. 253–260).\nSchuster, M., & Paliwal, K. K. (1997). Bidirectional recurrent neural networks. IEEE Transactions on Signal Processing , 45 (11), 2673–2681.\nSedhain, S., Menon, A. K., Sanner, S., & Xie, L. (2015). Autorec: autoencoders meet collaborative filtering. Proceedings of the 24th International Conference on World Wide Web (pp. 111–112).\nSennrich, R., Haddow, B., & Birch, A. (2015). Neural machine translation of rare words with subword units. arXiv preprint arXiv:1508.07909 .\nSergeev, A., & Del Balso, M. (2018). Horovod: fast and easy distributed deep learning in tensorflow. arXiv preprint arXiv:1802.05799 .\nShannon, C. E. (1948 , 7). A mathematical theory of communication. The Bell System Technical Journal , 27 (3), 379–423.\nShao, H., Yao, S., Sun, D., Zhang, A., Liu, S., Liu, D., … Abdelzaher, T. (2020). Controlvae: controllable variational autoencoder. Proceedings of the 37th International Conference on Machine Learning .\nSilver, D., Huang, A., Maddison, C. J., Guez, A., Sifre, L., Van Den Driessche, G., … others. (2016). Mastering the game of go with deep neural networks and tree search. nature , 529 (7587), 484.\nSimonyan, K., & Zisserman, A. (2014). Very deep convolutional networks for large-scale image recognition. arXiv preprint arXiv:1409.1556 .\nSmola, A., & Narayanamurthy, S. (2010). An architecture for parallel topic models. Proceedings of the VLDB Endowment , 3 (1-2), 703–710.\nSrivastava, N., Hinton, G., Krizhevsky, A., Sutskever, I., & Salakhutdinov, R. (2014). Dropout: a simple way to prevent neural networks from overfitting. The Journal of Machine Learning Research , 15 (1), 1929–1958.\nStrang, G. (1993). Introduction to linear algebra . Vol. 3. Wellesley-Cambridge Press Wellesley, MA.\nSu, X., & Khoshgoftaar, T. M. (2009). A survey of collaborative filtering techniques. Advances in artificial intelligence , 2009 .\nSukhbaatar, S., Weston, J., Fergus, R., & others. (2015). End-to-end memory networks. Advances in neural information processing systems (pp. 2440–2448).\nSutskever, I., Martens, J., Dahl, G., & Hinton, G. (2013). On the importance of initialization and momentum in deep learning. International conference on machine learning (pp. 1139–1147).\nSutskever, I., Vinyals, O., & Le, Q. V. (2014). Sequence to sequence learning with neural networks. Advances in neural information processing systems (pp. 3104–3112).\nSzegedy, C., Ioffe, S., Vanhoucke, V., & Alemi, A. A. (2017). Inception-v4, inception-resnet and the impact of residual connections on learning. Thirty-First AAAI Conference on Artificial Intelligence .\nSzegedy, C., Liu, W., Jia, Y., Sermanet, P., Reed, S., Anguelov, D., … Rabinovich, A. (2015). Going deeper with convolutions. Proceedings of the IEEE conference on computer vision and pattern recognition (pp. 1–9).\nSzegedy, C., Vanhoucke, V., Ioffe, S., Shlens, J., & Wojna, Z. (2016). Rethinking the inception architecture for computer vision. Proceedings of the IEEE conference on computer vision and pattern recognition (pp. 2818–2826).\nTallec, C., & Ollivier, Y. (2017). Unbiasing truncated backpropagation through time. arXiv preprint arXiv:1705.08209 .\nTang, J., & Wang, K. (2018). Personalized top-n sequential recommendation via convolutional sequence embedding. Proceedings of the Eleventh ACM International Conference on Web Search and Data Mining (pp. 565–573).\nTeye, M., Azizpour, H., & Smith, K. (2018). Bayesian uncertainty estimation for batch normalized deep networks. arXiv preprint arXiv:1802.06455 .\nTieleman, T., & Hinton, G. (2012). Lecture 6.5-rmsprop: divide the gradient by a running average of its recent magnitude. COURSERA: Neural networks for machine learning , 4 (2), 26–31.\nTuring, A. (1950). Computing machinery and intelligence. Mind , 59 (236), 433.\nTöscher, A., Jahrer, M., & Bell, R. M. (2009). The bigchaos solution to the netflix grand prize. Netflix prize documentation , pp. 1–52.\nUijlings, J. R., Van De Sande, K. E., Gevers, T., & Smeulders, A. W. (2013). Selective search for object recognition. International journal of computer vision , 104 (2), 154–171.\nVan Loan, C. F., & Golub, G. H. (1983). Matrix computations . Johns Hopkins University Press.\nVaswani, A., Shazeer, N., Parmar, N., Uszkoreit, J., Jones, L., Gomez, A. N., … Polosukhin, I. (2017). Attention is all you need. Advances in neural information processing systems (pp. 5998–6008).\nWang, L., Li, M., Liberty, E., & Smola, A. J. (2018). Optimal message scheduling for aggregation. NETWORKS , 2 (3), 2–3.\nWang, Y., Davidson, A., Pan, Y., Wu, Y., Riffel, A., & Owens, J. D. (2016). Gunrock: a high-performance graph processing library on the gpu. ACM SIGPLAN Notices (p. 11).\nWarstadt, A., Singh, A., & Bowman, S. R. (2019). Neural network acceptability judgments. Transactions of the Association for Computational Linguistics , 7 , 625–641.\nWasserman, L. (2013). All of statistics: a concise course in statistical inference . Springer Science & Business Media.\nWatkins, C. J., & Dayan, P. (1992). Q-learning. Machine learning , 8 (3-4), 279–292.\nWelling, M., & Teh, Y. W. (2011). Bayesian learning via stochastic gradient langevin dynamics. Proceedings of the 28th international conference on machine learning (ICML-11) (pp. 681–688).\nWerbos, P. J. (1990). Backpropagation through time: what it does and how to do it. Proceedings of the IEEE , 78 (10), 1550–1560.\nWigner, E. P. (1958). On the distribution of the roots of certain symmetric matrices. Ann. Math (pp. 325–327).\nWood, F., Gasthaus, J., Archambeau, C., James, L., & Teh, Y. W. (2011). The sequence memoizer. Communications of the ACM , 54 (2), 91–98.\nWu, C.-Y., Ahmed, A., Beutel, A., Smola, A. J., & Jing, H. (2017). Recurrent recommender networks. Proceedings of the tenth ACM international conference on web search and data mining (pp. 495–503).\nWu, Y., Schuster, M., Chen, Z., Le, Q. V., Norouzi, M., Macherey, W., … others. (2016). Google’s neural machine translation system: bridging the gap between human and machine translation. arXiv preprint arXiv:1609.08144 .\nXiao, H., Rasul, K., & Vollgraf, R. (2017). Fashion-mnist: a novel image dataset for benchmarking machine learning algorithms. arXiv preprint arXiv:1708.07747 .\nXiao, L., Bahri, Y., Sohl-Dickstein, J., Schoenholz, S., & Pennington, J. (2018). Dynamical isometry and a mean field theory of cnns: how to train 10,000-layer vanilla convolutional neural networks. International Conference on Machine Learning (pp. 5393–5402).\nXiong, W., Wu, L., Alleva, F., Droppo, J., Huang, X., & Stolcke, A. (2018). The microsoft 2017 conversational speech recognition system. 2018 IEEE International Conference on Acoustics, Speech and Signal Processing (ICASSP) (pp. 5934–5938).\nYe, M., Yin, P., Lee, W.-C., & Lee, D.-L. (2011). Exploiting geographical influence for collaborative point-of-interest recommendation. Proceedings of the 34th international ACM SIGIR conference on Research and development in Information Retrieval (pp. 325–334).\nYou, Y., Gitman, I., & Ginsburg, B. (2017). Large batch training of convolutional networks. arXiv preprint arXiv:1708.03888 .\nZaheer, M., Reddi, S., Sachan, D., Kale, S., & Kumar, S. (2018). Adaptive methods for nonconvex optimization. Advances in Neural Information Processing Systems (pp. 9793–9803).\nZeiler, M. D. (2012). Adadelta: an adaptive learning rate method. arXiv preprint arXiv:1212.5701 .\nZhang, S., Yao, L., Sun, A., & Tay, Y. (2019). Deep learning based recommender system: a survey and new perspectives. ACM Computing Surveys (CSUR) , 52 (1), 5.\nZhu, J.-Y., Park, T., Isola, P., & Efros, A. A. (2017). Unpaired image-to-image translation using cycle-consistent adversarial networks. Proceedings of the IEEE international conference on computer vision (pp. 2223–2232).\nZhu, Y., Kiros, R., Zemel, R., Salakhutdinov, R., Urtasun, R., Torralba, A., & Fidler, S. (2015). Aligning books and movies: towards story-like visual explanations by watching movies and reading books. Proceedings of the IEEE international conference on computer vision (pp. 19–27)."
+}

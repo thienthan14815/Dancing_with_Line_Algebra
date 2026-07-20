@@ -1,44 +1,89 @@
 import { NavLink } from 'react-router-dom';
+import {
+  Home,
+  BookOpen,
+  PencilLine,
+  Sparkles,
+  ChartLine,
+  CircleUser,
+  Settings,
+} from 'lucide-react';
 
 export interface SideNavProps {
   collapsed: boolean;
 }
 
+/** Kiểu component icon của lucide-react (mọi icon dùng chung một type). */
+type IconCmp = typeof Home;
+
 interface NavItem {
   to: string;
-  icon: string;
+  icon: IconCmp;
   label: string;
   /** Khớp chính xác (dùng cho "/"). */
   end?: boolean;
+  /** Ẩn khỏi thanh điều hướng đáy trên mobile (giữ trên sidebar desktop). */
+  hideOnBar?: boolean;
 }
 
-const ITEMS: NavItem[] = [
-  { to: '/', icon: '🏠', label: 'Học', end: true },
-  { to: '/luyen', icon: '🔁', label: 'Ôn tập' },
-  { to: '/luyen-tap', icon: '✍️', label: 'Bài tập' },
-  { to: '/so-tay', icon: '📖', label: 'Sổ tay' },
-  { to: '/tien-do', icon: '📊', label: 'Tiến độ' },
-  { to: '/ho-so', icon: '👤', label: 'Hồ sơ' },
-  { to: '/lo-trinh', icon: '🗺️', label: 'Lộ trình' },
-  { to: '/wiki', icon: '📚', label: 'Wiki' },
+interface NavSection {
+  /** Nhãn nhóm (uppercase nhỏ); bỏ trống = nhóm không nhãn. */
+  label?: string;
+  items: NavItem[];
+}
+
+// IA v2 — đúng 6 mục chính, chia nhóm rõ ràng, tối giản kiểu Linear.app.
+const SECTIONS: NavSection[] = [
+  {
+    items: [{ to: '/', icon: Home, label: 'Trang chủ', end: true }],
+  },
+  {
+    label: 'Học tập',
+    items: [
+      { to: '/chapters', icon: BookOpen, label: 'Bài học' },
+      { to: '/luyen', icon: PencilLine, label: 'Luyện tập', hideOnBar: true },
+      { to: '/tutor', icon: Sparkles, label: 'Gia sư AI' },
+    ],
+  },
+  {
+    label: 'Cá nhân',
+    items: [
+      { to: '/tien-do', icon: ChartLine, label: 'Tiến độ' },
+      { to: '/ho-so', icon: CircleUser, label: 'Hồ sơ' },
+    ],
+  },
 ];
 
-/** Điều hướng chính, có thể thu gọn thành icon. */
+/** Điều hướng chính, có thể thu gọn thành icon; ở mobile thành bottom-nav. */
 export default function SideNav({ collapsed }: SideNavProps) {
   return (
     <nav className={`dl-sidenav ${collapsed ? 'collapsed' : ''}`}>
       <div className="dl-sidenav-items">
-        {ITEMS.map((it) => (
-          <NavLink
-            key={it.to}
-            to={it.to}
-            end={it.end}
-            className={({ isActive }) => `dl-nav-item ${isActive ? 'active' : ''}`}
-            title={it.label}
-          >
-            <span className="dl-nav-icon">{it.icon}</span>
-            <span className="dl-nav-label">{it.label}</span>
-          </NavLink>
+        {SECTIONS.map((sec, i) => (
+          <div className="dl-nav-section" key={sec.label ?? `sec-${i}`}>
+            {sec.label && <div className="dl-nav-section-label">{sec.label}</div>}
+            {sec.items.map((it) => {
+              const Icon = it.icon;
+              return (
+                <NavLink
+                  key={it.to}
+                  to={it.to}
+                  end={it.end}
+                  className={({ isActive }) =>
+                    `dl-nav-item ${it.hideOnBar ? 'dl-nav-hide-mobile' : ''} ${
+                      isActive ? 'active' : ''
+                    }`.replace(/\s+/g, ' ').trim()
+                  }
+                  title={it.label}
+                >
+                  <span className="dl-nav-icon">
+                    <Icon size={20} strokeWidth={1.75} />
+                  </span>
+                  <span className="dl-nav-label">{it.label}</span>
+                </NavLink>
+              );
+            })}
+          </div>
         ))}
       </div>
 
@@ -48,16 +93,10 @@ export default function SideNav({ collapsed }: SideNavProps) {
           className={({ isActive }) => `dl-nav-item ${isActive ? 'active' : ''}`}
           title="Cài đặt"
         >
-          <span className="dl-nav-icon">⚙️</span>
+          <span className="dl-nav-icon">
+            <Settings size={20} strokeWidth={1.75} />
+          </span>
           <span className="dl-nav-label">Cài đặt</span>
-        </NavLink>
-        <NavLink
-          to="/chapters"
-          className={({ isActive }) => `dl-nav-item dl-nav-classic ${isActive ? 'active' : ''}`}
-          title="Chương (cổ điển)"
-        >
-          <span className="dl-nav-icon">📚</span>
-          <span className="dl-nav-label">Chương (cổ điển)</span>
         </NavLink>
       </div>
     </nav>

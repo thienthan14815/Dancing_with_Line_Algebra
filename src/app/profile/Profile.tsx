@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { useLearnStore } from '../../core/progress/store';
 import { isQuestComplete } from '../../core/progress/quests';
 import { Card, Badge, Button, ProgressRing } from '../ui';
@@ -28,6 +28,14 @@ const ACHIEVEMENT_ICONS: Record<string, string> = {
   'skill-master': '🧠',
 };
 
+/** Tab nội dung trong trang — mỗi lúc chỉ hiện MỘT khối. */
+type ProfileTab = 'stats' | 'achievements' | 'quests';
+const PROFILE_TABS: { id: ProfileTab; label: string }[] = [
+  { id: 'stats', label: 'Chỉ số' },
+  { id: 'achievements', label: 'Thành tựu' },
+  { id: 'quests', label: 'Nhiệm vụ' },
+];
+
 function formatDate(iso: string | undefined): string {
   if (!iso) return '';
   const d = new Date(iso);
@@ -46,6 +54,8 @@ export default function Profile() {
   const achievements = useLearnStore((s) => s.achievements);
   const quests = useLearnStore((s) => s.quests);
   const resetProgress = useLearnStore((s) => s.resetProgress);
+
+  const [tab, setTab] = useState<ProfileTab>('stats');
 
   const accuracy = attempts.length
     ? attempts.filter((a) => a.isCorrect).length / attempts.length
@@ -73,7 +83,7 @@ export default function Profile() {
 
   return (
     <div className="dl-page pf-page">
-      {/* ---------- Header hồ sơ ---------- */}
+      {/* ---------- Header hồ sơ: avatar + tên ---------- */}
       <Card className="pf-hero">
         <div className="pf-avatar" aria-hidden>
           {initial}
@@ -84,123 +94,153 @@ export default function Profile() {
             {goalLabel && <Badge tone="accent">{goalLabel}</Badge>}
             {levelLabel && <Badge tone="muted">{levelLabel}</Badge>}
           </div>
+        </div>
+      </Card>
+
+      {/* ---------- 2 bubble tiêu điểm ---------- */}
+      <div className="pf-bubbles">
+        <div className="pf-bubble">
+          <div className="pf-bubble-circle pf-bubble-streak">{streak}</div>
+          <span className="pf-bubble-lbl">🔥 Chuỗi ngày</span>
+        </div>
+        <div className="pf-bubble">
+          <div className="pf-bubble-circle">{xpTotal}</div>
+          <span className="pf-bubble-lbl">⚡ Tổng XP</span>
+        </div>
+      </div>
+
+      {/* ---------- Navi trong trang ---------- */}
+      <div className="pf-nav" role="tablist" aria-label="Mục hồ sơ">
+        {PROFILE_TABS.map((t) => (
+          <button
+            key={t.id}
+            type="button"
+            role="tab"
+            aria-selected={tab === t.id}
+            className={`pf-nav-chip${tab === t.id ? ' is-active' : ''}`}
+            onClick={() => setTab(t.id)}
+          >
+            {t.label}
+          </button>
+        ))}
+      </div>
+
+      {/* ---------- Tab: Chỉ số ---------- */}
+      {tab === 'stats' && (
+        <div className="pf-tab" key="stats">
+          <div className="pf-stat-grid">
+            <Card className="pf-stat">
+              <span className="pf-stat-icon">🔥</span>
+              <span className="pf-stat-num">{streak}</span>
+              <span className="pf-stat-lbl">Chuỗi ngày · kỷ lục {longest}</span>
+            </Card>
+            <Card className="pf-stat">
+              <span className="pf-stat-icon">⚡</span>
+              <span className="pf-stat-num">{xpTotal}</span>
+              <span className="pf-stat-lbl">Tổng XP · hôm nay +{xpToday}</span>
+            </Card>
+            <Card className="pf-stat">
+              <span className="pf-stat-icon">✅</span>
+              <span className="pf-stat-num">{lessonsCompleted}</span>
+              <span className="pf-stat-lbl">Bài đã hoàn thành</span>
+            </Card>
+            <Card className="pf-stat">
+              <span className="pf-stat-icon">🎯</span>
+              <span className="pf-stat-num">{Math.round(accuracy * 100)}%</span>
+              <span className="pf-stat-lbl">Độ chính xác · {attempts.length} lượt</span>
+            </Card>
+          </div>
           {profile.createdAt && (
-            <p className="dl-muted pf-since">
-              Thành viên từ {formatDate(profile.createdAt)}
-            </p>
+            <p className="dl-muted pf-since">Thành viên từ {formatDate(profile.createdAt)}</p>
           )}
-        </div>
-      </Card>
-
-      {/* ---------- Thẻ chỉ số lớn ---------- */}
-      <div className="pf-stat-grid">
-        <Card className="pf-stat">
-          <span className="pf-stat-icon">🔥</span>
-          <span className="pf-stat-num">{streak}</span>
-          <span className="pf-stat-lbl">Chuỗi ngày · kỷ lục {longest}</span>
-        </Card>
-        <Card className="pf-stat">
-          <span className="pf-stat-icon">⚡</span>
-          <span className="pf-stat-num">{xpTotal}</span>
-          <span className="pf-stat-lbl">Tổng XP · hôm nay +{xpToday}</span>
-        </Card>
-        <Card className="pf-stat">
-          <span className="pf-stat-icon">✅</span>
-          <span className="pf-stat-num">{lessonsCompleted}</span>
-          <span className="pf-stat-lbl">Bài đã hoàn thành</span>
-        </Card>
-        <Card className="pf-stat">
-          <span className="pf-stat-icon">🎯</span>
-          <span className="pf-stat-num">{Math.round(accuracy * 100)}%</span>
-          <span className="pf-stat-lbl">Độ chính xác · {attempts.length} lượt</span>
-        </Card>
-      </div>
-
-      {/* ---------- Thành tựu ---------- */}
-      <Card className="pf-sec">
-        <div className="pf-sec-head">
-          <h2 className="pf-sec-title">Thành tựu</h2>
-          <Badge tone="xp">
-            {unlockedCount}/{achievements.length} mở khóa
-          </Badge>
-        </div>
-        <div className="pf-ach-grid">
-          {achievements.map((a) => {
-            const unlocked = !!a.unlockedAt;
-            return (
-              <div
-                key={a.id}
-                className={`pf-ach ${unlocked ? 'unlocked' : 'locked'}`}
-                title={a.desc}
-              >
-                <span className="pf-ach-icon">
-                  {unlocked ? ACHIEVEMENT_ICONS[a.id] ?? '🏅' : '🔒'}
-                </span>
-                <span className="pf-ach-title">{a.title}</span>
-                <span className="pf-ach-desc">{a.desc}</span>
-                {unlocked && (
-                  <span className="pf-ach-date">Mở khóa {formatDate(a.unlockedAt)}</span>
-                )}
-              </div>
-            );
-          })}
-        </div>
-      </Card>
-
-      {/* ---------- Nhiệm vụ hôm nay ---------- */}
-      <Card className="pf-sec">
-        <div className="pf-sec-head">
-          <h2 className="pf-sec-title">Nhiệm vụ hôm nay</h2>
-          <Badge tone="good">
-            {quests.filter(isQuestComplete).length}/{quests.length} xong
-          </Badge>
-        </div>
-        <div className="pf-quests">
-          {quests.map((q) => {
-            const pct = q.target > 0 ? Math.min(1, q.progress / q.target) : 0;
-            const done = isQuestComplete(q);
-            return (
-              <div key={q.id} className="pf-quest">
-                <ProgressRing
-                  progress={pct}
-                  size={46}
-                  stroke={6}
-                  color={done ? 'var(--good)' : 'var(--accent)'}
-                  label={<span className="pf-quest-ring">{done ? '✓' : `${Math.round(pct * 100)}%`}</span>}
-                />
-                <div className="pf-quest-body">
-                  <span className="pf-quest-title">{q.title}</span>
-                  <span className="pf-quest-prog">
-                    {q.progress}/{q.target}
-                  </span>
-                </div>
-                {done && <Badge tone="good">Hoàn thành</Badge>}
-              </div>
-            );
-          })}
-        </div>
-      </Card>
-
-      {/* ---------- Leaderboard / Bạn bè (placeholder) ---------- */}
-      <Card className="pf-sec pf-social">
-        <h2 className="pf-sec-title">Bảng xếp hạng &amp; Bạn bè</h2>
-        <div className="pf-social-body">
-          <span className="pf-social-icon" aria-hidden>
-            👥
-          </span>
-          <p className="dl-muted pf-social-text">
-            Tính năng xã hội (bảng xếp hạng, kết bạn, thi đua) cần máy chủ backend —
-            sắp có. Hiện tại mọi tiến độ được lưu riêng trên thiết bị của bạn.
+          <p className="dl-muted pf-social-note">
+            Bảng xếp hạng &amp; bạn bè cần máy chủ backend — sắp có. Hiện mọi tiến độ lưu riêng
+            trên thiết bị của bạn.
           </p>
+          <div className="pf-foot">
+            <Button variant="danger" size="sm" onClick={onReset}>
+              Đặt lại tiến độ
+            </Button>
+          </div>
         </div>
-      </Card>
+      )}
 
-      {/* ---------- Đặt lại tiến độ ---------- */}
-      <div className="pf-foot">
-        <Button variant="danger" size="sm" onClick={onReset}>
-          Đặt lại tiến độ
-        </Button>
-      </div>
+      {/* ---------- Tab: Thành tựu ---------- */}
+      {tab === 'achievements' && (
+        <div className="pf-tab" key="achievements">
+          <Card className="pf-sec">
+            <div className="pf-sec-head">
+              <h2 className="pf-sec-title">Thành tựu</h2>
+              <Badge tone="xp">
+                {unlockedCount}/{achievements.length} mở khóa
+              </Badge>
+            </div>
+            <div className="pf-ach-grid">
+              {achievements.map((a) => {
+                const unlocked = !!a.unlockedAt;
+                return (
+                  <div
+                    key={a.id}
+                    className={`pf-ach ${unlocked ? 'unlocked' : 'locked'}`}
+                    title={a.desc}
+                  >
+                    <span className="pf-ach-icon">
+                      {unlocked ? ACHIEVEMENT_ICONS[a.id] ?? '🏅' : '🔒'}
+                    </span>
+                    <span className="pf-ach-title">{a.title}</span>
+                    <span className="pf-ach-desc">{a.desc}</span>
+                    {unlocked && (
+                      <span className="pf-ach-date">Mở khóa {formatDate(a.unlockedAt)}</span>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </Card>
+        </div>
+      )}
+
+      {/* ---------- Tab: Nhiệm vụ ---------- */}
+      {tab === 'quests' && (
+        <div className="pf-tab" key="quests">
+          <Card className="pf-sec">
+            <div className="pf-sec-head">
+              <h2 className="pf-sec-title">Nhiệm vụ hôm nay</h2>
+              <Badge tone="good">
+                {quests.filter(isQuestComplete).length}/{quests.length} xong
+              </Badge>
+            </div>
+            <div className="pf-quests">
+              {quests.map((q) => {
+                const pct = q.target > 0 ? Math.min(1, q.progress / q.target) : 0;
+                const done = isQuestComplete(q);
+                return (
+                  <div key={q.id} className="pf-quest">
+                    <ProgressRing
+                      progress={pct}
+                      size={46}
+                      stroke={6}
+                      color={done ? 'var(--good)' : 'var(--primary)'}
+                      label={
+                        <span className="pf-quest-ring">
+                          {done ? '✓' : `${Math.round(pct * 100)}%`}
+                        </span>
+                      }
+                    />
+                    <div className="pf-quest-body">
+                      <span className="pf-quest-title">{q.title}</span>
+                      <span className="pf-quest-prog">
+                        {q.progress}/{q.target}
+                      </span>
+                    </div>
+                    {done && <Badge tone="good">Hoàn thành</Badge>}
+                  </div>
+                );
+              })}
+            </div>
+          </Card>
+        </div>
+      )}
     </div>
   );
 }

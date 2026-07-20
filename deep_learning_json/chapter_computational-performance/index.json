@@ -1,0 +1,83 @@
+{
+  "url": "https://vi.d2l.ai/chapter_computational-performance/index.html",
+  "chapter": "chapter_computational-performance",
+  "title": "12. Hiệu suất tính toán",
+  "crawled_at": "2026-07-20T12:40:30.200230+00:00",
+  "headings": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "hieu-suat-tinh-toan",
+      "text": "12. Hiệu suất tính toán"
+    }
+  ],
+  "content": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "hieu-suat-tinh-toan",
+      "text": "12. Hiệu suất tính toán"
+    },
+    {
+      "type": "paragraph",
+      "text": "Trong học sâu, các tập dữ liệu và mô hình thường lớn, liên quan đến tính\ntoán nặng. Do đó, hiệu suất tính toán rất quan trọng. Chương này sẽ tập\ntrung vào các yếu tố chính ảnh hưởng đến hiệu suất tính toán: lập trình\nbắt buộc, lập trình tượng trưng, tính toán không đồng bộ, song song tự\nđộng và tính toán đa GPU. Bằng cách nghiên cứu chương này, bạn có thể\ncải thiện hơn nữa hiệu suất tính toán của các mô hình được thực hiện\ntrong các chương trước, ví dụ, bằng cách giảm thời gian đào tạo mà không\nảnh hưởng đến độ chính xác."
+    },
+    {
+      "type": "list",
+      "ordered": false,
+      "items": [
+        "12.1. Trình biên dịch và phiên dịch 12.1.1. Lập trình tượng trưng 12.1.2. Lập trình lai 12.1.3. Lai tạo lớp Sequential 12.1.4. Tóm tắt 12.1.5. Bài tập",
+        "12.1.1. Lập trình tượng trưng",
+        "12.1.2. Lập trình lai",
+        "12.1.3. Lai tạo lớp Sequential",
+        "12.1.4. Tóm tắt",
+        "12.1.5. Bài tập",
+        "12.2. Tính toán không đồng bộ 12.2.1. Asynchrony qua Backend 12.2.2. Rào cản và chặn 12.2.3. Cải thiện tính toán 12.2.4. Tóm tắt 12.2.5. Bài tập",
+        "12.2.1. Asynchrony qua Backend",
+        "12.2.2. Rào cản và chặn",
+        "12.2.3. Cải thiện tính toán",
+        "12.2.4. Tóm tắt",
+        "12.2.5. Bài tập",
+        "12.3. Song song tự động 12.3.1. Tính toán song song trên GPU 12.3.2. Tính toán song song và truyền thông 12.3.3. Tóm tắt 12.3.4. Bài tập",
+        "12.3.1. Tính toán song song trên GPU",
+        "12.3.2. Tính toán song song và truyền thông",
+        "12.3.3. Tóm tắt",
+        "12.3.4. Bài tập",
+        "12.4. Phần cứng 12.4.1. Máy vi tính 12.4.2. Bộ nhớ 12.4.3. Lưu trữ 12.4.4. CPU 12.4.5. GPU và các bộ tăng tốc khác 12.4.6. Mạng và xe buýt 12.4.7. Nhiều số độ trễ hơn 12.4.8. Tóm tắt 12.4.9. Bài tập",
+        "12.4.1. Máy vi tính",
+        "12.4.2. Bộ nhớ",
+        "12.4.3. Lưu trữ",
+        "12.4.4. CPU",
+        "12.4.5. GPU và các bộ tăng tốc khác",
+        "12.4.6. Mạng và xe buýt",
+        "12.4.7. Nhiều số độ trễ hơn",
+        "12.4.8. Tóm tắt",
+        "12.4.9. Bài tập",
+        "12.5. Đào tạo về nhiều GPU 12.5.1. Chia tách vấn đề 12.5.2. Dữ liệu song song 12.5.3. Một mạng đồ chơi 12.5.4. Đồng bộ hóa dữ liệu 12.5.5. Phân phối dữ liệu 12.5.6. Đào tạo 12.5.7. Tóm tắt 12.5.8. Bài tập",
+        "12.5.1. Chia tách vấn đề",
+        "12.5.2. Dữ liệu song song",
+        "12.5.3. Một mạng đồ chơi",
+        "12.5.4. Đồng bộ hóa dữ liệu",
+        "12.5.5. Phân phối dữ liệu",
+        "12.5.6. Đào tạo",
+        "12.5.7. Tóm tắt",
+        "12.5.8. Bài tập",
+        "12.6. Triển khai ngắn gọn cho nhiều GPU 12.6.1. Một mạng đồ chơi 12.6.2. Khởi tạo mạng 12.6.3. Đào tạo 12.6.4. Tóm tắt 12.6.5. Bài tập",
+        "12.6.1. Một mạng đồ chơi",
+        "12.6.2. Khởi tạo mạng",
+        "12.6.3. Đào tạo",
+        "12.6.4. Tóm tắt",
+        "12.6.5. Bài tập",
+        "12.7. Máy chủ tham số 12.7.1. Đào tạo dữ liệu song song 12.7.2. Đồng bộ hóa vòng 12.7.3. Đào tạo đa máy 12.7.4. Cửa hàng Key — Value 12.7.5. Tóm tắt 12.7.6. Bài tập",
+        "12.7.1. Đào tạo dữ liệu song song",
+        "12.7.2. Đồng bộ hóa vòng",
+        "12.7.3. Đào tạo đa máy",
+        "12.7.4. Cửa hàng Key — Value",
+        "12.7.5. Tóm tắt",
+        "12.7.6. Bài tập"
+      ]
+    }
+  ],
+  "images": [],
+  "text": "12. Hiệu suất tính toán\nTrong học sâu, các tập dữ liệu và mô hình thường lớn, liên quan đến tính\ntoán nặng. Do đó, hiệu suất tính toán rất quan trọng. Chương này sẽ tập\ntrung vào các yếu tố chính ảnh hưởng đến hiệu suất tính toán: lập trình\nbắt buộc, lập trình tượng trưng, tính toán không đồng bộ, song song tự\nđộng và tính toán đa GPU. Bằng cách nghiên cứu chương này, bạn có thể\ncải thiện hơn nữa hiệu suất tính toán của các mô hình được thực hiện\ntrong các chương trước, ví dụ, bằng cách giảm thời gian đào tạo mà không\nảnh hưởng đến độ chính xác.\n12.1. Trình biên dịch và phiên dịch 12.1.1. Lập trình tượng trưng 12.1.2. Lập trình lai 12.1.3. Lai tạo lớp Sequential 12.1.4. Tóm tắt 12.1.5. Bài tập\n12.1.1. Lập trình tượng trưng\n12.1.2. Lập trình lai\n12.1.3. Lai tạo lớp Sequential\n12.1.4. Tóm tắt\n12.1.5. Bài tập\n12.2. Tính toán không đồng bộ 12.2.1. Asynchrony qua Backend 12.2.2. Rào cản và chặn 12.2.3. Cải thiện tính toán 12.2.4. Tóm tắt 12.2.5. Bài tập\n12.2.1. Asynchrony qua Backend\n12.2.2. Rào cản và chặn\n12.2.3. Cải thiện tính toán\n12.2.4. Tóm tắt\n12.2.5. Bài tập\n12.3. Song song tự động 12.3.1. Tính toán song song trên GPU 12.3.2. Tính toán song song và truyền thông 12.3.3. Tóm tắt 12.3.4. Bài tập\n12.3.1. Tính toán song song trên GPU\n12.3.2. Tính toán song song và truyền thông\n12.3.3. Tóm tắt\n12.3.4. Bài tập\n12.4. Phần cứng 12.4.1. Máy vi tính 12.4.2. Bộ nhớ 12.4.3. Lưu trữ 12.4.4. CPU 12.4.5. GPU và các bộ tăng tốc khác 12.4.6. Mạng và xe buýt 12.4.7. Nhiều số độ trễ hơn 12.4.8. Tóm tắt 12.4.9. Bài tập\n12.4.1. Máy vi tính\n12.4.2. Bộ nhớ\n12.4.3. Lưu trữ\n12.4.4. CPU\n12.4.5. GPU và các bộ tăng tốc khác\n12.4.6. Mạng và xe buýt\n12.4.7. Nhiều số độ trễ hơn\n12.4.8. Tóm tắt\n12.4.9. Bài tập\n12.5. Đào tạo về nhiều GPU 12.5.1. Chia tách vấn đề 12.5.2. Dữ liệu song song 12.5.3. Một mạng đồ chơi 12.5.4. Đồng bộ hóa dữ liệu 12.5.5. Phân phối dữ liệu 12.5.6. Đào tạo 12.5.7. Tóm tắt 12.5.8. Bài tập\n12.5.1. Chia tách vấn đề\n12.5.2. Dữ liệu song song\n12.5.3. Một mạng đồ chơi\n12.5.4. Đồng bộ hóa dữ liệu\n12.5.5. Phân phối dữ liệu\n12.5.6. Đào tạo\n12.5.7. Tóm tắt\n12.5.8. Bài tập\n12.6. Triển khai ngắn gọn cho nhiều GPU 12.6.1. Một mạng đồ chơi 12.6.2. Khởi tạo mạng 12.6.3. Đào tạo 12.6.4. Tóm tắt 12.6.5. Bài tập\n12.6.1. Một mạng đồ chơi\n12.6.2. Khởi tạo mạng\n12.6.3. Đào tạo\n12.6.4. Tóm tắt\n12.6.5. Bài tập\n12.7. Máy chủ tham số 12.7.1. Đào tạo dữ liệu song song 12.7.2. Đồng bộ hóa vòng 12.7.3. Đào tạo đa máy 12.7.4. Cửa hàng Key — Value 12.7.5. Tóm tắt 12.7.6. Bài tập\n12.7.1. Đào tạo dữ liệu song song\n12.7.2. Đồng bộ hóa vòng\n12.7.3. Đào tạo đa máy\n12.7.4. Cửa hàng Key — Value\n12.7.5. Tóm tắt\n12.7.6. Bài tập"
+}

@@ -1,0 +1,754 @@
+{
+  "url": "https://vi.d2l.ai/chapter_computer-vision/anchor.html",
+  "chapter": "chapter_computer-vision",
+  "title": "13.4. Hộp neo",
+  "crawled_at": "2026-07-20T12:40:41.813313+00:00",
+  "headings": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "hop-neo",
+      "text": "13.4. Hộp neo"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tao-nhieu-hop-neo",
+      "text": "13.4.1. Tạo nhiều hộp neo"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "giao-lo-qua-union-iou",
+      "text": "13.4.2. Giao lộ qua Union (IoU)"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "dan-nhan-hop-neo-trong-du-lieu-dao-tao",
+      "text": "13.4.3. Dán nhãn hộp neo trong dữ liệu đào tạo"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "gan-cac-hop-gioi-han-mat-dat-truth-cho-hop-neo",
+      "text": "13.4.3.1. Gán các hộp giới hạn mặt đất-Truth cho Hộp neo"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "cac-lop-ghi-nhan-va-do-lech",
+      "text": "13.4.3.2. Các lớp ghi nhãn và độ lệch"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "mot-vi-du",
+      "text": "13.4.3.3. Một ví dụ"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "du-doan-cac-hop-gioi-han-voi-uc-che-khong-toi-da",
+      "text": "13.4.4. Dự đoán các hộp giới hạn với ức chế không tối đa"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tom-tat",
+      "text": "13.4.5. Tóm tắt"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bai-tap",
+      "text": "13.4.6. Bài tập"
+    }
+  ],
+  "content": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "hop-neo",
+      "text": "13.4. Hộp neo"
+    },
+    {
+      "type": "paragraph",
+      "text": "Thuật toán phát hiện đối tượng thường lấy mẫu một số lượng lớn các vùng\ntrong hình ảnh đầu vào, xác định xem các vùng này có chứa các đối tượng\nquan tâm hay không, và điều chỉnh ranh giới của các vùng để dự đoán hộp\ngiới hạn đất-truth of the objects các đối tượng more accurately chính\nxác. Các mô hình khác nhau có thể áp dụng các sơ đồ lấy mẫu khu vực khác\nnhau. Ở đây chúng tôi giới thiệu một trong những phương pháp như vậy: nó\ntạo ra nhiều hộp giới hạn với tỷ lệ khác nhau và tỷ lệ khung hình tập\ntrung vào mỗi pixel. Các hộp giới hạn này được gọi là hộp neo *. Chúng\ntôi sẽ thiết kế một mô hình phát hiện đối tượng dựa trên các hộp neo\ntrong Section 13.7 ."
+    },
+    {
+      "type": "paragraph",
+      "text": "Đầu tiên, chúng ta hãy sửa đổi độ chính xác in ấn chỉ để kết quả đầu ra\nngắn gọn hơn."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "%matplotlib inline\nfrom mxnet import gluon, image, np, npx\nfrom d2l import mxnet as d2l\n\nnp.set_printoptions(2)  # Simplify printing accuracy\nnpx.set_np()"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "%matplotlib inline\nimport torch\nfrom d2l import torch as d2l\n\ntorch.set_printoptions(2)  # Simplify printing accuracy"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tao-nhieu-hop-neo",
+      "text": "13.4.1. Tạo nhiều hộp neo"
+    },
+    {
+      "type": "paragraph",
+      "text": "Giả sử hình ảnh đầu vào có chiều cao \\(h\\) và chiều rộng \\(w\\) .\nChúng tôi tạo ra các hộp neo với các hình dạng khác nhau tập trung vào\ntừng pixel của hình ảnh. Hãy để quy mô là \\(s\\in (0, 1]\\) và tỷ lệ\nkhung hình* (tỷ lệ chiều rộng trên chiều cao) là \\(r > 0\\) . Sau đó\nchiều rộng và chiều cao của hộp neo là \\(ws\\sqrt{r}\\) và \\(hs/\\sqrt{r}\\) , tôn trọng. Lưu ý rằng khi vị trí trung tâm được đưa\nra, một hộp neo có chiều rộng và chiều cao đã biết được xác định."
+    },
+    {
+      "type": "paragraph",
+      "text": "Để tạo ra nhiều hộp neo với các hình dạng khác nhau, chúng ta hãy đặt\nmột loạt các thang đo \\(s_1,\\ldots, s_n\\) và một loạt các tỷ lệ\nkhung hình \\(r_1,\\ldots, r_m\\) . Khi sử dụng tất cả các kết hợp của\ncác thang đo và tỷ lệ khung hình này với mỗi pixel làm trung tâm, hình\nảnh đầu vào sẽ có tổng cộng \\(whnm\\) hộp neo. Mặc dù các hộp neo này\ncó thể bao gồm tất cả các hộp giới hạn sự thật mặt đất, độ phức tạp tính\ntoán dễ dàng quá cao. Trong thực tế, chúng ta chỉ có thể xem xét những\nkết hợp chứng \\(s_1\\) hoặc \\(r_1\\) :"
+    },
+    {
+      "type": "math",
+      "latex": "(13.4.1)¶\\[(s_1, r_1), (s_1, r_2), \\ldots, (s_1, r_m), (s_2, r_1), (s_3, r_1), \\ldots, (s_n, r_1).\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Điều đó có nghĩa là, số lượng hộp neo tập trung vào cùng một điểm ảnh là \\(n+m-1\\) . Đối với toàn bộ hình ảnh đầu vào, chúng tôi sẽ tạo tổng\ncộng \\(wh(n+m-1)\\) hộp neo."
+    },
+    {
+      "type": "paragraph",
+      "text": "Phương pháp tạo hộp neo trên được thực hiện trong chức năng multibox_prior sau đây. Chúng tôi chỉ định hình ảnh đầu vào, danh\nsách các thang đo và danh sách các tỷ lệ khung hình, sau đó chức năng\nnày sẽ trả về tất cả các hộp neo."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "#@save\ndef multibox_prior(data, sizes, ratios):\n    \"\"\"Generate anchor boxes with different shapes centered on each pixel.\"\"\"\n    in_height, in_width = data.shape[-2:]\n    device, num_sizes, num_ratios = data.ctx, len(sizes), len(ratios)\n    boxes_per_pixel = (num_sizes + num_ratios - 1)\n    size_tensor = np.array(sizes, ctx=device)\n    ratio_tensor = np.array(ratios, ctx=device)\n    # Offsets are required to move the anchor to the center of a pixel. Since\n    # a pixel has height=1 and width=1, we choose to offset our centers by 0.5\n    offset_h, offset_w = 0.5, 0.5\n    steps_h = 1.0 / in_height  # Scaled steps in y-axis\n    steps_w = 1.0 / in_width  # Scaled steps in x-axis\n\n    # Generate all center points for the anchor boxes\n    center_h = (np.arange(in_height, ctx=device) + offset_h) * steps_h\n    center_w = (np.arange(in_width, ctx=device) + offset_w) * steps_w\n    shift_x, shift_y = np.meshgrid(center_w, center_h)\n    shift_x, shift_y = shift_x.reshape(-1), shift_y.reshape(-1)\n\n    # Generate `boxes_per_pixel` number of heights and widths that are later\n    # used to create anchor box corner coordinates (xmin, xmax, ymin, ymax)\n    w = np.concatenate((size_tensor * np.sqrt(ratio_tensor[0]),\n                        sizes[0] * np.sqrt(ratio_tensor[1:]))) \\\n                        * in_height / in_width  # Handle rectangular inputs\n    h = np.concatenate((size_tensor / np.sqrt(ratio_tensor[0]),\n                        sizes[0] / np.sqrt(ratio_tensor[1:])))\n    # Divide by 2 to get half height and half width\n    anchor_manipulations = np.tile(np.stack((-w, -h, w, h)).T,\n                                   (in_height * in_width, 1)) / 2\n\n    # Each center point will have `boxes_per_pixel` number of anchor boxes, so\n    # generate a grid of all anchor box centers with `boxes_per_pixel` repeats\n    out_grid = np.stack([shift_x, shift_y, shift_x, shift_y],\n                         axis=1).repeat(boxes_per_pixel, axis=0)\n    output = out_grid + anchor_manipulations\n    return np.expand_dims(output, axis=0)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "#@save\ndef multibox_prior(data, sizes, ratios):\n    \"\"\"Generate anchor boxes with different shapes centered on each pixel.\"\"\"\n    in_height, in_width = data.shape[-2:]\n    device, num_sizes, num_ratios = data.device, len(sizes), len(ratios)\n    boxes_per_pixel = (num_sizes + num_ratios - 1)\n    size_tensor = torch.tensor(sizes, device=device)\n    ratio_tensor = torch.tensor(ratios, device=device)\n    # Offsets are required to move the anchor to the center of a pixel. Since\n    # a pixel has height=1 and width=1, we choose to offset our centers by 0.5\n    offset_h, offset_w = 0.5, 0.5\n    steps_h = 1.0 / in_height  # Scaled steps in y axis\n    steps_w = 1.0 / in_width  # Scaled steps in x axis\n\n    # Generate all center points for the anchor boxes\n    center_h = (torch.arange(in_height, device=device) + offset_h) * steps_h\n    center_w = (torch.arange(in_width, device=device) + offset_w) * steps_w\n    shift_y, shift_x = torch.meshgrid(center_h, center_w)\n    shift_y, shift_x = shift_y.reshape(-1), shift_x.reshape(-1)\n\n    # Generate `boxes_per_pixel` number of heights and widths that are later\n    # used to create anchor box corner coordinates (xmin, xmax, ymin, ymax)\n    w = torch.cat((size_tensor * torch.sqrt(ratio_tensor[0]),\n                   sizes[0] * torch.sqrt(ratio_tensor[1:])))\\\n                   * in_height / in_width  # Handle rectangular inputs\n    h = torch.cat((size_tensor / torch.sqrt(ratio_tensor[0]),\n                   sizes[0] / torch.sqrt(ratio_tensor[1:])))\n    # Divide by 2 to get half height and half width\n    anchor_manipulations = torch.stack((-w, -h, w, h)).T.repeat(\n                                        in_height * in_width, 1) / 2\n\n    # Each center point will have `boxes_per_pixel` number of anchor boxes, so\n    # generate a grid of all anchor box centers with `boxes_per_pixel` repeats\n    out_grid = torch.stack([shift_x, shift_y, shift_x, shift_y],\n                dim=1).repeat_interleave(boxes_per_pixel, dim=0)\n    output = out_grid + anchor_manipulations\n    return output.unsqueeze(0)"
+    },
+    {
+      "type": "paragraph",
+      "text": "Chúng ta có thể thấy rằng hình dạng của biến hộp neo trả về Y là\n(kích thước lô, số lượng hộp neo, 4)."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "img = image.imread('../img/catdog.jpg').asnumpy()\nh, w = img.shape[:2]\n\nprint(h, w)\nX = np.random.uniform(size=(1, 3, h, w))  # Construct input data\nY = multibox_prior(X, sizes=[0.75, 0.5, 0.25], ratios=[1, 2, 0.5])\nY.shape"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "561 728"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "(1, 2042040, 4)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "img = d2l.plt.imread('../img/catdog.jpg')\nh, w = img.shape[:2]\n\nprint(h, w)\nX = torch.rand(size=(1, 3, h, w))  # Construct input data\nY = multibox_prior(X, sizes=[0.75, 0.5, 0.25], ratios=[1, 2, 0.5])\nY.shape"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "561 728\n/home/d2l-worker/miniconda3/envs/d2l-vi-release-1/lib/python3.8/site-packages/torch/functional.py:568: UserWarning: torch.meshgrid: in an upcoming release, it will be required to pass the indexing argument. (Triggered internally at  ../aten/src/ATen/native/TensorShape.cpp:2228.)\n  return _VF.meshgrid(tensors, **kwargs)  # type: ignore[attr-defined]"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "torch.Size([1, 2042040, 4])"
+    },
+    {
+      "type": "paragraph",
+      "text": "Sau khi thay đổi hình dạng của biến hộp neo Y thành (chiều cao hình\nảnh, chiều rộng hình ảnh, số hộp neo tập trung vào cùng một điểm ảnh,\n4), chúng ta có thể lấy tất cả các hộp neo tập trung vào một vị trí\npixel được chỉ định. Sau đây, chúng ta truy cập hộp neo đầu tiên tập\ntrung vào (250, 250) . Nó có bốn phần tử: tọa độ \\((x, y)\\) -trục ở\ngóc trên bên trái và trục \\((x, y)\\) -tọa độ ở góc dưới bên phải của\nhộp neo. Các giá trị tọa độ của cả hai trục được chia cho chiều rộng và\nchiều cao của hình ảnh, tương ứng; do đó, phạm vi nằm trong khoảng từ 0\nđến 1."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "boxes = Y.reshape(h, w, 5, 4)\nboxes[250, 250, 0, :]"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "array([0.06, 0.07, 0.63, 0.82])"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "boxes = Y.reshape(h, w, 5, 4)\nboxes[250, 250, 0, :]"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "tensor([0.06, 0.07, 0.63, 0.82])"
+    },
+    {
+      "type": "paragraph",
+      "text": "Để hiển thị tất cả các hộp neo tập trung vào một pixel trong image,\nchúng tôi xác định hàm show_bboxes sau để vẽ nhiều hộp giới hạn trên\nảnh."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "#@save\ndef show_bboxes(axes, bboxes, labels=None, colors=None):\n    \"\"\"Show bounding boxes.\"\"\"\n\n    def make_list(obj, default_values=None):\n        if obj is None:\n            obj = default_values\n        elif not isinstance(obj, (list, tuple)):\n            obj = [obj]\n        return obj\n\n    labels = make_list(labels)\n    colors = make_list(colors, ['b', 'g', 'r', 'm', 'c'])\n    for i, bbox in enumerate(bboxes):\n        color = colors[i % len(colors)]\n        rect = d2l.bbox_to_rect(bbox.asnumpy(), color)\n        axes.add_patch(rect)\n        if labels and len(labels) > i:\n            text_color = 'k' if color == 'w' else 'w'\n            axes.text(rect.xy[0], rect.xy[1], labels[i],\n                      va='center', ha='center', fontsize=9, color=text_color,\n                      bbox=dict(facecolor=color, lw=0))"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "#@save\ndef show_bboxes(axes, bboxes, labels=None, colors=None):\n    \"\"\"Show bounding boxes.\"\"\"\n\n    def make_list(obj, default_values=None):\n        if obj is None:\n            obj = default_values\n        elif not isinstance(obj, (list, tuple)):\n            obj = [obj]\n        return obj\n\n    labels = make_list(labels)\n    colors = make_list(colors, ['b', 'g', 'r', 'm', 'c'])\n    for i, bbox in enumerate(bboxes):\n        color = colors[i % len(colors)]\n        rect = d2l.bbox_to_rect(bbox.detach().numpy(), color)\n        axes.add_patch(rect)\n        if labels and len(labels) > i:\n            text_color = 'k' if color == 'w' else 'w'\n            axes.text(rect.xy[0], rect.xy[1], labels[i],\n                      va='center', ha='center', fontsize=9, color=text_color,\n                      bbox=dict(facecolor=color, lw=0))"
+    },
+    {
+      "type": "paragraph",
+      "text": "Như chúng ta vừa thấy, các giá trị tọa độ của các trục \\(x\\) và \\(y\\) trong biến boxes đã được chia cho chiều rộng và chiều cao\ncủa hình ảnh, tương ứng. Khi vẽ các hộp neo, chúng ta cần khôi phục các\ngiá trị tọa độ ban đầu của chúng; do đó, chúng ta định nghĩa biến bbox_scale bên dưới. Bây giờ, chúng ta có thể vẽ tất cả các hộp neo\ntập trung vào (250, 250) trong hình ảnh. Như bạn có thể thấy, hộp neo\nmàu xanh lam với thang điểm 0,75 và tỷ lệ khung hình là 1 bao quanh chó\ntrong hình ảnh."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "d2l.set_figsize()\nbbox_scale = np.array((w, h, w, h))\nfig = d2l.plt.imshow(img)\nshow_bboxes(fig.axes, boxes[250, 250, :, :] * bbox_scale,\n            ['s=0.75, r=1', 's=0.5, r=1', 's=0.25, r=1', 's=0.75, r=2',\n             's=0.75, r=0.5'])"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_anchor_f592d1_48_0.svg",
+      "local_path": "_images/output_anchor_f592d1_48_0.svg",
+      "alt": "../_images/output_anchor_f592d1_48_0.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "d2l.set_figsize()\nbbox_scale = torch.tensor((w, h, w, h))\nfig = d2l.plt.imshow(img)\nshow_bboxes(fig.axes, boxes[250, 250, :, :] * bbox_scale,\n            ['s=0.75, r=1', 's=0.5, r=1', 's=0.25, r=1', 's=0.75, r=2',\n             's=0.75, r=0.5'])"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_anchor_f592d1_51_0.svg",
+      "local_path": "_images/output_anchor_f592d1_51_0.svg",
+      "alt": "../_images/output_anchor_f592d1_51_0.svg"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "giao-lo-qua-union-iou",
+      "text": "13.4.2. Giao lộ qua Union (IoU)"
+    },
+    {
+      "type": "paragraph",
+      "text": "Chúng tôi chỉ đề cập rằng một hộp neo “tốt” bao quanh chú chó trong hình\nảnh. Nếu hộp giới hạn đất-chân lý của đối tượng được biết, làm thế nào\ncó thể “tốt” ở đây được định lượng? Bằng trực giác, chúng ta có thể đo\nsự tương đồng giữa hộp neo và hộp giới hạn chân lý mặt đất. Chúng tôi\nbiết rằng chỉ số Jaccard có thể đo lường sự tương đồng giữa hai bộ.\nĐưa ra các bộ \\(\\mathcal{A}\\) và \\(\\mathcal{B}\\) , chỉ số Jaccard\ncủa chúng là kích thước giao điểm của chúng chia cho kích thước của công\nđoàn của chúng:"
+    },
+    {
+      "type": "math",
+      "latex": "(13.4.2)¶\\[J(\\mathcal{A},\\mathcal{B}) = \\frac{\\left|\\mathcal{A} \\cap \\mathcal{B}\\right|}{\\left| \\mathcal{A} \\cup \\mathcal{B}\\right|}.\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Trên thực tế, chúng ta có thể xem xét khu vực pixel của bất kỳ hộp giới\nhạn nào là một tập hợp các pixel. Bằng cách này, chúng ta có thể đo sự\ngiống nhau của hai hộp giới hạn bằng chỉ số Jaccard của các bộ pixel của\nchúng. Đối với hai hộp giới hạn, chúng ta thường tham khảo chỉ số\nJaccard của chúng là * giao lộ qua công đoàn * (* IoU*), đó là tỷ lệ\ngiữa khu vực giao nhau của chúng với khu vực công đoàn của chúng, như\nthể hiện trong Fig. 13.4.1 . Phạm vi của một IoU nằm trong khoảng\ntừ 0 đến 1:0 có nghĩa là hai hộp giới hạn hoàn toàn không chồng lên\nnhau, trong khi 1 chỉ ra rằng hai hộp giới hạn bằng nhau."
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/iou.svg",
+      "local_path": "_images/iou.svg",
+      "alt": "../_images/iou.svg"
+    },
+    {
+      "type": "paragraph",
+      "text": "Fig. 13.4.1 IoU is the ratio of the intersection area to the union area of two\nbounding boxes. ¶"
+    },
+    {
+      "type": "paragraph",
+      "text": "Đối với phần còn lại của phần này, chúng tôi sẽ sử dụng IoU để đo sự\ntương đồng giữa các hộp neo và các hộp giới hạn chân lý mặt đất và giữa\ncác hộp neo khác nhau. Cho hai danh sách các hộp neo hoặc đường viền, box_iou sau sẽ tính toán IoU cặp của chúng trong hai danh sách này."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "#@save\ndef box_iou(boxes1, boxes2):\n    \"\"\"Compute pairwise IoU across two lists of anchor or bounding boxes.\"\"\"\n    box_area = lambda boxes: ((boxes[:, 2] - boxes[:, 0]) *\n                              (boxes[:, 3] - boxes[:, 1]))\n    # Shape of `boxes1`, `boxes2`, `areas1`, `areas2`: (no. of boxes1, 4),\n    # (no. of boxes2, 4), (no. of boxes1,), (no. of boxes2,)\n    areas1 = box_area(boxes1)\n    areas2 = box_area(boxes2)\n    # Shape of `inter_upperlefts`, `inter_lowerrights`, `inters`: (no. of\n    # boxes1, no. of boxes2, 2)\n    inter_upperlefts = np.maximum(boxes1[:, None, :2], boxes2[:, :2])\n    inter_lowerrights = np.minimum(boxes1[:, None, 2:], boxes2[:, 2:])\n    inters = (inter_lowerrights - inter_upperlefts).clip(min=0)\n    # Shape of `inter_areas` and `union_areas`: (no. of boxes1, no. of boxes2)\n    inter_areas = inters[:, :, 0] * inters[:, :, 1]\n    union_areas = areas1[:, None] + areas2 - inter_areas\n    return inter_areas / union_areas"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "#@save\ndef box_iou(boxes1, boxes2):\n    \"\"\"Compute pairwise IoU across two lists of anchor or bounding boxes.\"\"\"\n    box_area = lambda boxes: ((boxes[:, 2] - boxes[:, 0]) *\n                              (boxes[:, 3] - boxes[:, 1]))\n    # Shape of `boxes1`, `boxes2`, `areas1`, `areas2`: (no. of boxes1, 4),\n    # (no. of boxes2, 4), (no. of boxes1,), (no. of boxes2,)\n    areas1 = box_area(boxes1)\n    areas2 = box_area(boxes2)\n    # Shape of `inter_upperlefts`, `inter_lowerrights`, `inters`: (no. of\n    # boxes1, no. of boxes2, 2)\n    inter_upperlefts = torch.max(boxes1[:, None, :2], boxes2[:, :2])\n    inter_lowerrights = torch.min(boxes1[:, None, 2:], boxes2[:, 2:])\n    inters = (inter_lowerrights - inter_upperlefts).clamp(min=0)\n    # Shape of `inter_areas` and `union_areas`: (no. of boxes1, no. of boxes2)\n    inter_areas = inters[:, :, 0] * inters[:, :, 1]\n    union_areas = areas1[:, None] + areas2 - inter_areas\n    return inter_areas / union_areas"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "dan-nhan-hop-neo-trong-du-lieu-dao-tao",
+      "text": "13.4.3. Dán nhãn hộp neo trong dữ liệu đào tạo"
+    },
+    {
+      "type": "paragraph",
+      "text": "Trong một tập dữ liệu đào tạo, chúng tôi coi mỗi hộp neo là một ví dụ\nđào tạo. Để đào tạo một mô hình phát hiện đối tượng, chúng ta cần nhãn\n* class* và offset cho mỗi hộp neo, trong đó trước đây là lớp của\nđối tượng có liên quan đến hộp neo và sau này là phần bù của hộp giới\nhạn sự thật mặt đất so với hộp neo. Trong quá trình dự đoán, đối với mỗi\nhình ảnh, chúng tôi tạo ra nhiều hộp neo, dự đoán các lớp và bù đắp cho\ntất cả các hộp neo, điều chỉnh vị trí của chúng theo các bù đắp dự đoán\nđể có được các hộp giới hạn dự đoán và cuối cùng chỉ xuất ra những hộp\ngiới hạn dự đoán đáp ứng các tiêu chí nhất định."
+    },
+    {
+      "type": "paragraph",
+      "text": "Như chúng ta đã biết, một bộ đào tạo phát hiện đối tượng đi kèm với nhãn\ncho các vị trí của các hộp giới hạn * đất-chân thất* và các lớp của\ncác đối tượng được bao quanh của chúng. Để gắn nhãn bất kỳ hộp neo *\nđược tạo ra , chúng tôi đề cập đến vị trí được dán nhãn và lớp của hộp\ngiới hạn đất được chỉ định * của nó gần nhất với hộp neo. Sau đây,\nchúng tôi mô tả một thuật toán để gán các hộp giới hạn sự thật gần nhất\ncho các hộp neo."
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "gan-cac-hop-gioi-han-mat-dat-truth-cho-hop-neo",
+      "text": "13.4.3.1. Gán các hộp giới hạn mặt đất-Truth cho Hộp neo"
+    },
+    {
+      "type": "paragraph",
+      "text": "Với một hình ảnh, giả sử rằng các hộp neo là \\(A_1, A_2, \\ldots, A_{n_a}\\) và các hộp giới hạn đất-chân lý là \\(B_1, B_2, \\ldots, B_{n_b}\\) , trong đó \\(n_a \\geq n_b\\) . Chúng\nta hãy xác định một ma trận \\(\\mathbf{X} \\in \\mathbb{R}^{n_a \\times n_b}\\) , có phần tử \\(x_{ij}\\) trong hàng \\(i^\\mathrm{th}\\) và cột \\(j^\\mathrm{th}\\) là IoU của hộp neo \\(A_i\\) và hộp giới hạn sự\nthật mặt đất \\(B_j\\) . Thuật toán bao gồm các bước sau:"
+    },
+    {
+      "type": "list",
+      "ordered": true,
+      "items": [
+        "Tìm phần tử lớn nhất trong ma trận \\(\\mathbf{X}\\) và biểu thị các\nchỉ số hàng và cột của nó là \\(i_1\\) và \\(j_1\\) , tương ứng.\nSau đó, hộp giới hạn sự thật mặt đất \\(B_{j_1}\\) được gán cho hộp\nneo \\(A_{i_1}\\) . Điều này khá trực quan vì \\(A_{i_1}\\) và \\(B_{j_1}\\) là gần nhất trong số tất cả các cặp hộp neo và hộp\ngiới hạn sự thật mặt đất. Sau khi gán đầu tiên, loại bỏ tất cả các\nphần tử trong hàng \\({i_1}^\\mathrm{th}\\) và cột \\({j_1}^\\mathrm{th}\\) trong ma trận \\(\\mathbf{X}\\) .",
+        "Tìm lớn nhất trong số các phần tử còn lại trong ma trận \\(\\mathbf{X}\\) và biểu thị các chỉ số hàng và cột của nó là \\(i_2\\) và \\(j_2\\) , tương ứng. Chúng tôi gán hộp giới hạn sự\nthật mặt đất \\(B_{j_2}\\) để neo hộp \\(A_{i_2}\\) và loại bỏ\ntất cả các yếu tố trong hàng \\({i_2}^\\mathrm{th}\\) và cột \\({j_2}^\\mathrm{th}\\) trong ma trận \\(\\mathbf{X}\\) .",
+        "Tại thời điểm này, các phần tử trong hai hàng và hai cột trong ma\ntrận \\(\\mathbf{X}\\) đã bị loại bỏ. Chúng tôi tiến hành cho đến\nkhi tất cả các phần tử trong \\(n_b\\) cột trong ma trận \\(\\mathbf{X}\\) bị loại bỏ. Tại thời điểm này, chúng tôi đã chỉ\nđịnh một hộp giới hạn chân lý mặt đất cho mỗi hộp neo \\(n_b\\) .",
+        "Chỉ đi qua các hộp neo \\(n_a - n_b\\) còn lại. Ví dụ, đưa ra bất\nkỳ hộp neo nào \\(A_i\\) , hãy tìm hộp giới hạn chân lý mặt đất \\(B_j\\) với IoU lớn nhất với \\(A_i\\) trong suốt hàng \\(i^\\mathrm{th}\\) của ma trận \\(\\mathbf{X}\\) và gán \\(B_j\\) cho \\(A_i\\) chỉ khi IoU này lớn hơn ngưỡng được xác\nđịnh trước."
+      ]
+    },
+    {
+      "type": "paragraph",
+      "text": "Hãy để chúng tôi minh họa thuật toán trên bằng cách sử dụng một ví dụ cụ\nthể. Như thể hiện trong Fig. 13.4.2 (trái), giả sử rằng\ngiá trị lớn nhất trong ma trận \\(\\mathbf{X}\\) là \\(x_{23}\\) ,\nchúng tôi gán hộp giới hạn sự thật mặt đất \\(B_3\\) vào hộp neo \\(A_2\\) . Sau đó, chúng ta loại bỏ tất cả các phần tử trong hàng 2 và\ncột 3 của ma trận, tìm \\(x_{71}\\) lớn nhất trong các phần tử còn lại\n(khu vực bóng mờ) và gán hộp giới hạn sự thật mặt đất \\(B_1\\) vào\nhộp neo \\(A_7\\) . Tiếp theo, như thể hiện trong Fig. 13.4.2 (giữa), loại bỏ tất cả các phần tử trong\nhàng 7 và cột 1 của ma trận, tìm \\(x_{54}\\) lớn nhất trong các phần\ntử còn lại (khu vực bóng mờ) và gán hộp giới hạn sự thật mặt đất \\(B_4\\) vào hộp neo \\(A_5\\) . Cuối cùng, như thể hiện trong Fig. 13.4.2 (phải), loại bỏ tất cả các phần tử trong\nhàng 5 và cột 4 của ma trận, tìm \\(x_{92}\\) lớn nhất trong các phần\ntử còn lại (khu vực bóng mờ) và gán hộp giới hạn đất-chân lý \\(B_2\\) vào hộp neo \\(A_9\\) . Sau đó, chúng ta chỉ cần đi qua các hộp neo còn\nlại \\(A_1, A_3, A_4, A_6, A_8\\) và xác định xem có nên gán cho chúng\ncác hộp giới hạn chân lý mặt đất theo ngưỡng hay không."
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/anchor-label.svg",
+      "local_path": "_images/anchor-label.svg",
+      "alt": "../_images/anchor-label.svg"
+    },
+    {
+      "type": "paragraph",
+      "text": "Fig. 13.4.2 Assigning ground-truth bounding boxes to anchor boxes. ¶"
+    },
+    {
+      "type": "paragraph",
+      "text": "Thuật toán này được thực hiện trong hàm assign_anchor_to_bbox sau."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "#@save\ndef assign_anchor_to_bbox(ground_truth, anchors, device, iou_threshold=0.5):\n    \"\"\"Assign closest ground-truth bounding boxes to anchor boxes.\"\"\"\n    num_anchors, num_gt_boxes = anchors.shape[0], ground_truth.shape[0]\n    # Element x_ij in the i-th row and j-th column is the IoU of the anchor\n    # box i and the ground-truth bounding box j\n    jaccard = box_iou(anchors, ground_truth)\n    # Initialize the tensor to hold the assigned ground-truth bounding box for\n    # each anchor\n    anchors_bbox_map = np.full((num_anchors,), -1, dtype=np.int32, ctx=device)\n    # Assign ground-truth bounding boxes according to the threshold\n    max_ious, indices = np.max(jaccard, axis=1), np.argmax(jaccard, axis=1)\n    anc_i = np.nonzero(max_ious >= 0.5)[0]\n    box_j = indices[max_ious >= 0.5]\n    anchors_bbox_map[anc_i] = box_j\n    col_discard = np.full((num_anchors,), -1)\n    row_discard = np.full((num_gt_boxes,), -1)\n    for _ in range(num_gt_boxes):\n        max_idx = np.argmax(jaccard)  # Find the largest IoU\n        box_idx = (max_idx % num_gt_boxes).astype('int32')\n        anc_idx = (max_idx / num_gt_boxes).astype('int32')\n        anchors_bbox_map[anc_idx] = box_idx\n        jaccard[:, box_idx] = col_discard\n        jaccard[anc_idx, :] = row_discard\n    return anchors_bbox_map"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "#@save\ndef assign_anchor_to_bbox(ground_truth, anchors, device, iou_threshold=0.5):\n    \"\"\"Assign closest ground-truth bounding boxes to anchor boxes.\"\"\"\n    num_anchors, num_gt_boxes = anchors.shape[0], ground_truth.shape[0]\n    # Element x_ij in the i-th row and j-th column is the IoU of the anchor\n    # box i and the ground-truth bounding box j\n    jaccard = box_iou(anchors, ground_truth)\n    # Initialize the tensor to hold the assigned ground-truth bounding box for\n    # each anchor\n    anchors_bbox_map = torch.full((num_anchors,), -1, dtype=torch.long,\n                                  device=device)\n    # Assign ground-truth bounding boxes according to the threshold\n    max_ious, indices = torch.max(jaccard, dim=1)\n    anc_i = torch.nonzero(max_ious >= 0.5).reshape(-1)\n    box_j = indices[max_ious >= 0.5]\n    anchors_bbox_map[anc_i] = box_j\n    col_discard = torch.full((num_anchors,), -1)\n    row_discard = torch.full((num_gt_boxes,), -1)\n    for _ in range(num_gt_boxes):\n        max_idx = torch.argmax(jaccard)  # Find the largest IoU\n        box_idx = (max_idx % num_gt_boxes).long()\n        anc_idx = (max_idx / num_gt_boxes).long()\n        anchors_bbox_map[anc_idx] = box_idx\n        jaccard[:, box_idx] = col_discard\n        jaccard[anc_idx, :] = row_discard\n    return anchors_bbox_map"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "cac-lop-ghi-nhan-va-do-lech",
+      "text": "13.4.3.2. Các lớp ghi nhãn và độ lệch"
+    },
+    {
+      "type": "paragraph",
+      "text": "Bây giờ chúng ta có thể dán nhãn lớp và bù đắp cho mỗi hộp neo. Giả sử\nrằng một hộp neo \\(A\\) được gán một hộp giới hạn đất-chân lý \\(B\\) . Một mặt, lớp của hộp neo \\(A\\) sẽ được dán nhãn là của \\(B\\) . Mặt khác, độ lệch của hộp neo \\(A\\) sẽ được dán nhãn theo\nvị trí tương đối giữa tọa độ trung tâm là \\(B\\) và \\(A\\) cùng\nvới kích thước tương đối giữa hai hộp này. Với các vị trí và kích thước\nkhác nhau của các hộp khác nhau trong tập dữ liệu, chúng ta có thể áp\ndụng các biến đổi cho các vị trí và kích thước tương đối có thể dẫn đến\ncác bù phân bố đồng đều hơn dễ phù hợp hơn. Ở đây chúng tôi mô tả một sự\nchuyển đổi chung. Cho tọa độ trung tâm của \\(A\\) và \\(B\\) là \\((x_a, y_a)\\) và \\((x_b, y_b)\\) , chiều rộng của chúng là \\(w_a\\) và \\(w_b\\) , và chiều cao của chúng tương ứng là \\(h_a\\) và \\(h_b\\) . Chúng tôi có thể dán nhãn phần bù của \\(A\\) như"
+    },
+    {
+      "type": "math",
+      "latex": "(13.4.3)¶\\[\\left( \\frac{ \\frac{x_b - x_a}{w_a} - \\mu_x }{\\sigma_x},\n\\frac{ \\frac{y_b - y_a}{h_a} - \\mu_y }{\\sigma_y},\n\\frac{ \\log \\frac{w_b}{w_a} - \\mu_w }{\\sigma_w},\n\\frac{ \\log \\frac{h_b}{h_a} - \\mu_h }{\\sigma_h}\\right),\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "where default values of the constants are \\(\\mu_x = \\mu_y = \\mu_w = \\mu_h = 0, \\sigma_x=\\sigma_y=0.1\\) , and \\(\\sigma_w=\\sigma_h=0.2\\) . This transformation is implemented below\nin the offset_boxes function."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "#@save\ndef offset_boxes(anchors, assigned_bb, eps=1e-6):\n    \"\"\"Transform for anchor box offsets.\"\"\"\n    c_anc = d2l.box_corner_to_center(anchors)\n    c_assigned_bb = d2l.box_corner_to_center(assigned_bb)\n    offset_xy = 10 * (c_assigned_bb[:, :2] - c_anc[:, :2]) / c_anc[:, 2:]\n    offset_wh = 5 * np.log(eps + c_assigned_bb[:, 2:] / c_anc[:, 2:])\n    offset = np.concatenate([offset_xy, offset_wh], axis=1)\n    return offset"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "#@save\ndef offset_boxes(anchors, assigned_bb, eps=1e-6):\n    \"\"\"Transform for anchor box offsets.\"\"\"\n    c_anc = d2l.box_corner_to_center(anchors)\n    c_assigned_bb = d2l.box_corner_to_center(assigned_bb)\n    offset_xy = 10 * (c_assigned_bb[:, :2] - c_anc[:, :2]) / c_anc[:, 2:]\n    offset_wh = 5 * torch.log(eps + c_assigned_bb[:, 2:] / c_anc[:, 2:])\n    offset = torch.cat([offset_xy, offset_wh], axis=1)\n    return offset"
+    },
+    {
+      "type": "paragraph",
+      "text": "Nếu một hộp neo không được gán một hộp giới hạn đất-truth, chúng ta chỉ\ncần dán nhãn lớp của hộp neo là “background”. Các hộp neo có lớp nền\nthường được gọi là hộp neo * tiêu cực* và phần còn lại được gọi là hộp\nneo * tích cực*. Chúng tôi thực hiện hàm multibox_target sau để ** label class and offsets for anchor\nboxes** bằng cách sử dụng các hộp\nbounding ground-truth (đối số labels ). Hàm này đặt lớp nền thành 0\nvà tăng chỉ số số nguyên của một lớp mới bằng một."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "#@save\ndef multibox_target(anchors, labels):\n    \"\"\"Label anchor boxes using ground-truth bounding boxes.\"\"\"\n    batch_size, anchors = labels.shape[0], anchors.squeeze(0)\n    batch_offset, batch_mask, batch_class_labels = [], [], []\n    device, num_anchors = anchors.ctx, anchors.shape[0]\n    for i in range(batch_size):\n        label = labels[i, :, :]\n        anchors_bbox_map = assign_anchor_to_bbox(\n            label[:, 1:], anchors, device)\n        bbox_mask = np.tile((np.expand_dims((anchors_bbox_map >= 0),\n                                            axis=-1)), (1, 4)).astype('int32')\n        # Initialize class labels and assigned bounding box coordinates with\n        # zeros\n        class_labels = np.zeros(num_anchors, dtype=np.int32, ctx=device)\n        assigned_bb = np.zeros((num_anchors, 4), dtype=np.float32,\n                                ctx=device)\n        # Label classes of anchor boxes using their assigned ground-truth\n        # bounding boxes. If an anchor box is not assigned any, we label its\n        # class as background (the value remains zero)\n        indices_true = np.nonzero(anchors_bbox_map >= 0)[0]\n        bb_idx = anchors_bbox_map[indices_true]\n        class_labels[indices_true] = label[bb_idx, 0].astype('int32') + 1\n        assigned_bb[indices_true] = label[bb_idx, 1:]\n        # Offset transformation\n        offset = offset_boxes(anchors, assigned_bb) * bbox_mask\n        batch_offset.append(offset.reshape(-1))\n        batch_mask.append(bbox_mask.reshape(-1))\n        batch_class_labels.append(class_labels)\n    bbox_offset = np.stack(batch_offset)\n    bbox_mask = np.stack(batch_mask)\n    class_labels = np.stack(batch_class_labels)\n    return (bbox_offset, bbox_mask, class_labels)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "#@save\ndef multibox_target(anchors, labels):\n    \"\"\"Label anchor boxes using ground-truth bounding boxes.\"\"\"\n    batch_size, anchors = labels.shape[0], anchors.squeeze(0)\n    batch_offset, batch_mask, batch_class_labels = [], [], []\n    device, num_anchors = anchors.device, anchors.shape[0]\n    for i in range(batch_size):\n        label = labels[i, :, :]\n        anchors_bbox_map = assign_anchor_to_bbox(\n            label[:, 1:], anchors, device)\n        bbox_mask = ((anchors_bbox_map >= 0).float().unsqueeze(-1)).repeat(\n            1, 4)\n        # Initialize class labels and assigned bounding box coordinates with\n        # zeros\n        class_labels = torch.zeros(num_anchors, dtype=torch.long,\n                                   device=device)\n        assigned_bb = torch.zeros((num_anchors, 4), dtype=torch.float32,\n                                  device=device)\n        # Label classes of anchor boxes using their assigned ground-truth\n        # bounding boxes. If an anchor box is not assigned any, we label its\n        # class as background (the value remains zero)\n        indices_true = torch.nonzero(anchors_bbox_map >= 0)\n        bb_idx = anchors_bbox_map[indices_true]\n        class_labels[indices_true] = label[bb_idx, 0].long() + 1\n        assigned_bb[indices_true] = label[bb_idx, 1:]\n        # Offset transformation\n        offset = offset_boxes(anchors, assigned_bb) * bbox_mask\n        batch_offset.append(offset.reshape(-1))\n        batch_mask.append(bbox_mask.reshape(-1))\n        batch_class_labels.append(class_labels)\n    bbox_offset = torch.stack(batch_offset)\n    bbox_mask = torch.stack(batch_mask)\n    class_labels = torch.stack(batch_class_labels)\n    return (bbox_offset, bbox_mask, class_labels)"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "mot-vi-du",
+      "text": "13.4.3.3. Một ví dụ"
+    },
+    {
+      "type": "paragraph",
+      "text": "Hãy để chúng tôi minh họa ghi nhãn hộp neo thông qua một ví dụ cụ thể.\nChúng tôi xác định các hộp giới hạn đất cho chó và mèo trong hình ảnh\nđược tải, trong đó phần tử đầu tiên là lớp (0 cho chó và 1 cho mèo) và\nbốn yếu tố còn lại là tọa độ \\((x, y)\\) -trục ở góc trên bên trái và\ngóc dưới bên phải (phạm vi nằm trong khoảng từ 0 đến 1). Chúng tôi cũng\nxây dựng năm hộp neo được dán nhãn bằng cách sử dụng tọa độ của góc trên\nbên trái và góc dưới bên phải: \\(A_0, \\ldots, A_4\\) (chỉ số bắt đầu\ntừ 0). Sau đó, chúng ta vẽ các hộp giới hạn mặt đất và hộp neo trong\nhình ảnh"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "ground_truth = np.array([[0, 0.1, 0.08, 0.52, 0.92],\n                         [1, 0.55, 0.2, 0.9, 0.88]])\nanchors = np.array([[0, 0.1, 0.2, 0.3], [0.15, 0.2, 0.4, 0.4],\n                    [0.63, 0.05, 0.88, 0.98], [0.66, 0.45, 0.8, 0.8],\n                    [0.57, 0.3, 0.92, 0.9]])\n\nfig = d2l.plt.imshow(img)\nshow_bboxes(fig.axes, ground_truth[:, 1:] * bbox_scale, ['dog', 'cat'], 'k')\nshow_bboxes(fig.axes, anchors * bbox_scale, ['0', '1', '2', '3', '4']);"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_anchor_f592d1_93_0.svg",
+      "local_path": "_images/output_anchor_f592d1_93_0.svg",
+      "alt": "../_images/output_anchor_f592d1_93_0.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "ground_truth = torch.tensor([[0, 0.1, 0.08, 0.52, 0.92],\n                         [1, 0.55, 0.2, 0.9, 0.88]])\nanchors = torch.tensor([[0, 0.1, 0.2, 0.3], [0.15, 0.2, 0.4, 0.4],\n                    [0.63, 0.05, 0.88, 0.98], [0.66, 0.45, 0.8, 0.8],\n                    [0.57, 0.3, 0.92, 0.9]])\n\nfig = d2l.plt.imshow(img)\nshow_bboxes(fig.axes, ground_truth[:, 1:] * bbox_scale, ['dog', 'cat'], 'k')\nshow_bboxes(fig.axes, anchors * bbox_scale, ['0', '1', '2', '3', '4']);"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_anchor_f592d1_96_0.svg",
+      "local_path": "_images/output_anchor_f592d1_96_0.svg",
+      "alt": "../_images/output_anchor_f592d1_96_0.svg"
+    },
+    {
+      "type": "paragraph",
+      "text": "Sử dụng hàm multibox_target được xác định ở trên, chúng ta có thể\nlabel class và offset của các hộp neo này dựa trên các hộp giới hạn\nđất-chân thất cho chó và mèo. Trong ví dụ này, các chỉ số của các lớp\nnền, chó và mèo lần lượt là 0, 1 và 2. Dưới đây chúng tôi thêm một kích\nthước cho các ví dụ về hộp neo và các hộp giới hạn đất-chân lý."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "labels = multibox_target(np.expand_dims(anchors, axis=0),\n                         np.expand_dims(ground_truth, axis=0))"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "labels = multibox_target(anchors.unsqueeze(dim=0),\n                         ground_truth.unsqueeze(dim=0))"
+    },
+    {
+      "type": "paragraph",
+      "text": "Có ba mục trong kết quả trả về, tất cả đều ở định dạng tensor. Mục thứ\nba chứa các lớp được dán nhãn của các hộp neo đầu vào."
+    },
+    {
+      "type": "paragraph",
+      "text": "Chúng ta hãy phân tích các nhãn lớp trả về dưới đây dựa trên hộp neo và\nvị trí hộp giới hạn đất-chân lý trong hình ảnh. Đầu tiên, trong số tất\ncả các cặp hộp neo và hộp giới hạn sự thật mặt đất, IoU của hộp neo \\(A_4\\) và hộp giới hạn sự thật mặt đất của con mèo là lớn nhất. Do\nđó, lớp \\(A_4\\) được dán nhãn là con mèo. Lấy ra các cặp chứa \\(A_4\\) hoặc hộp giới hạn sự thật mặt đất của con mèo, trong số các\ncặp còn lại của hộp neo \\(A_1\\) và hộp giới hạn sự thật mặt đất của\nchó có IoU lớn nhất. Vì vậy, lớp \\(A_1\\) được dán nhãn là chó. Tiếp\ntheo, chúng ta cần phải đi qua ba hộp neo chưa được dán nhãn còn lại: \\(A_0\\) , \\(A_2\\) và \\(A_3\\) . Đối với \\(A_0\\) , lớp của\nhộp giới hạn chân thất-chân lý với IoU lớn nhất là chó, nhưng IoU nằm\ndưới ngưỡng được xác định trước (0,5), vì vậy lớp được dán nhãn là nền;\nđối với \\(A_2\\) , lớp của hộp giới hạn sự thật mặt đất với IoU lớn\nnhất là con mèo và IoU vượt quá ngưỡng, vì vậy lớp được dán nhãn là con\nmèo; đối với \\(A_3\\) , lớp của hộp giới hạn đất-chân lý với IoU lớn\nnhất là con mèo, nhưng giá trị nằm dưới ngưỡng, do đó lớp được dán nhãn\nlà nền."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "labels[2]"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "array([[0, 1, 2, 0, 2]], dtype=int32)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "labels[2]"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "tensor([[0, 1, 2, 0, 2]])"
+    },
+    {
+      "type": "paragraph",
+      "text": "Mục trả về thứ hai là một biến mặt nạ của hình dạng (kích thước lô, gấp\nbốn lần số hộp neo). Mỗi bốn phần tử trong biến mask tương ứng với bốn\ngiá trị bù của mỗi hộp neo. Vì chúng ta không quan tâm đến việc phát\nhiện nền, sự bù đắp của lớp phủ định này không nên ảnh hưởng đến hàm\nkhách quan. Thông qua phép nhân elementwise, các số không trong biến\nmask sẽ lọc ra các bù lớp âm trước khi tính hàm mục tiêu."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "labels[1]"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "array([[0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1]],\n      dtype=int32)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "labels[1]"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "tensor([[0., 0., 0., 0., 1., 1., 1., 1., 1., 1., 1., 1., 0., 0., 0., 0., 1., 1.,\n         1., 1.]])"
+    },
+    {
+      "type": "paragraph",
+      "text": "Mục trả về đầu tiên chứa bốn giá trị bù được dán nhãn cho mỗi hộp neo.\nLưu ý rằng các bù đắp của các hộp neo lớp âm được dán nhãn là số không."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "labels[0]"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "array([[-0.00e+00, -0.00e+00, -0.00e+00, -0.00e+00,  1.40e+00,  1.00e+01,\n         2.59e+00,  7.18e+00, -1.20e+00,  2.69e-01,  1.68e+00, -1.57e+00,\n        -0.00e+00, -0.00e+00, -0.00e+00, -0.00e+00, -5.71e-01, -1.00e+00,\n         4.17e-06,  6.26e-01]])"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "labels[0]"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "tensor([[-0.00e+00, -0.00e+00, -0.00e+00, -0.00e+00,  1.40e+00,  1.00e+01,\n          2.59e+00,  7.18e+00, -1.20e+00,  2.69e-01,  1.68e+00, -1.57e+00,\n         -0.00e+00, -0.00e+00, -0.00e+00, -0.00e+00, -5.71e-01, -1.00e+00,\n          4.17e-06,  6.26e-01]])"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "du-doan-cac-hop-gioi-han-voi-uc-che-khong-toi-da",
+      "text": "13.4.4. Dự đoán các hộp giới hạn với ức chế không tối đa"
+    },
+    {
+      "type": "paragraph",
+      "text": "Trong quá trình dự đoán, chúng tôi tạo ra nhiều hộp neo cho hình ảnh và\ndự đoán các lớp và bù đắp cho mỗi hộp. Do đó, một hộp giới hạn dự đoán\n* thu được theo một hộp neo với độ lệch dự đoán của nó. Dưới đây chúng\ntôi thực hiện hàm offset_inverse có các neo và dự đoán bù đắp làm\nđầu vào và áp dụng các biến đổi bù ngược để trả về phối hợp hộp giới hạn\ndự đoán ."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "#@save\ndef offset_inverse(anchors, offset_preds):\n    \"\"\"Predict bounding boxes based on anchor boxes with predicted offsets.\"\"\"\n    anc = d2l.box_corner_to_center(anchors)\n    pred_bbox_xy = (offset_preds[:, :2] * anc[:, 2:] / 10) + anc[:, :2]\n    pred_bbox_wh = np.exp(offset_preds[:, 2:] / 5) * anc[:, 2:]\n    pred_bbox = np.concatenate((pred_bbox_xy, pred_bbox_wh), axis=1)\n    predicted_bbox = d2l.box_center_to_corner(pred_bbox)\n    return predicted_bbox"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "#@save\ndef offset_inverse(anchors, offset_preds):\n    \"\"\"Predict bounding boxes based on anchor boxes with predicted offsets.\"\"\"\n    anc = d2l.box_corner_to_center(anchors)\n    pred_bbox_xy = (offset_preds[:, :2] * anc[:, 2:] / 10) + anc[:, :2]\n    pred_bbox_wh = torch.exp(offset_preds[:, 2:] / 5) * anc[:, 2:]\n    pred_bbox = torch.cat((pred_bbox_xy, pred_bbox_wh), axis=1)\n    predicted_bbox = d2l.box_center_to_corner(pred_bbox)\n    return predicted_bbox"
+    },
+    {
+      "type": "paragraph",
+      "text": "Khi có nhiều hộp neo, nhiều hộp giới hạn dự đoán tương tự (với sự chồng\nchéo đáng kể) có thể có khả năng xuất ra cho xung quanh cùng một đối\ntượng. Để đơn giản hóa đầu ra, chúng ta có thể hợp nhất các hộp giới hạn\ndự đoán tương tự thuộc về cùng một đối tượng bằng cách sử dụng non-maximression (NMS)."
+    },
+    {
+      "type": "paragraph",
+      "text": "Đây là cách ức chế không tối đa hoạt động. Đối với một hộp giới hạn dự\nđoán \\(B\\) , mô hình phát hiện đối tượng tính toán khả năng dự đoán\ncho mỗi lớp. Biểu thị bởi \\(p\\) khả năng dự đoán lớn nhất, lớp tương\nứng với xác suất này là lớp dự đoán cho \\(B\\) . Cụ thể, chúng tôi đề\ncập đến \\(p\\) là sự tự tin (điểm) của hộp giới hạn dự đoán \\(B\\) . Trên cùng một hình ảnh, tất cả các hộp giới hạn không nền\nđược dự đoán được sắp xếp theo sự tự tin theo thứ tự giảm dần để tạo ra\nmột danh sách \\(L\\) . Sau đó, chúng tôi thao tác danh sách được sắp\nxếp \\(L\\) trong các bước sau:"
+    },
+    {
+      "type": "list",
+      "ordered": true,
+      "items": [
+        "Chọn hộp giới hạn dự đoán \\(B_1\\) với độ tin cậy cao nhất từ \\(L\\) làm cơ sở và loại bỏ tất cả các hộp giới hạn dự đoán không\ncơ sở có IoU với \\(B_1\\) vượt quá ngưỡng được xác định trước \\(\\epsilon\\) từ \\(L\\) . Tại thời điểm này, \\(L\\) giữ hộp\ngiới hạn dự đoán với sự tự tin cao nhất nhưng giảm những người khác\nquá giống với nó. Tóm lại, những người có không tối đa điểm tin cậy\nlà * bị ức chế *.",
+        "Chọn hộp giới hạn dự đoán \\(B_2\\) với độ tin cậy cao thứ hai từ \\(L\\) làm cơ sở khác và loại bỏ tất cả các hộp giới hạn dự đoán\nkhông cơ sở có IoU với \\(B_2\\) vượt quá \\(\\epsilon\\) từ \\(L\\) .",
+        "Lặp lại quy trình trên cho đến khi tất cả các hộp giới hạn dự đoán\ntrong \\(L\\) đã được sử dụng làm cơ sở. Tại thời điểm này, IoU của\nbất kỳ cặp hộp giới hạn dự đoán nào trong \\(L\\) nằm dưới ngưỡng \\(\\epsilon\\) ; do đó, không có cặp nào quá giống nhau.",
+        "Xuất tất cả các hộp giới hạn dự đoán trong danh sách \\(L\\) ."
+      ]
+    },
+    {
+      "type": "paragraph",
+      "text": "Hàm nms sau đây sắp xếp điểm tin cậy theo thứ tự giảm dần và trả về\ncác chỉ số của chúng."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "#@save\ndef nms(boxes, scores, iou_threshold):\n    \"\"\"Sort confidence scores of predicted bounding boxes.\"\"\"\n    B = scores.argsort()[::-1]\n    keep = []  # Indices of predicted bounding boxes that will be kept\n    while B.size > 0:\n        i = B[0]\n        keep.append(i)\n        if B.size == 1: break\n        iou = box_iou(boxes[i, :].reshape(-1, 4),\n                      boxes[B[1:], :].reshape(-1, 4)).reshape(-1)\n        inds = np.nonzero(iou <= iou_threshold)[0]\n        B = B[inds + 1]\n    return np.array(keep, dtype=np.int32, ctx=boxes.ctx)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "#@save\ndef nms(boxes, scores, iou_threshold):\n    \"\"\"Sort confidence scores of predicted bounding boxes.\"\"\"\n    B = torch.argsort(scores, dim=-1, descending=True)\n    keep = []  # Indices of predicted bounding boxes that will be kept\n    while B.numel() > 0:\n        i = B[0]\n        keep.append(i)\n        if B.numel() == 1: break\n        iou = box_iou(boxes[i, :].reshape(-1, 4),\n                      boxes[B[1:], :].reshape(-1, 4)).reshape(-1)\n        inds = torch.nonzero(iou <= iou_threshold).reshape(-1)\n        B = B[inds + 1]\n    return torch.tensor(keep, device=boxes.device)"
+    },
+    {
+      "type": "paragraph",
+      "text": "Chúng tôi xác định multibox_detection sau đây để áp dụng ức chế\nkhông tối đa để dự đoán các hộp giới hộp. Đừng lo lắng nếu bạn thấy việc\nthực hiện một chút phức tạp: chúng tôi sẽ chỉ ra cách nó hoạt động với\nmột ví dụ cụ thể ngay sau khi thực hiện."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "#@save\ndef multibox_detection(cls_probs, offset_preds, anchors, nms_threshold=0.5,\n                       pos_threshold=0.009999999):\n    \"\"\"Predict bounding boxes using non-maximum suppression.\"\"\"\n    device, batch_size = cls_probs.ctx, cls_probs.shape[0]\n    anchors = np.squeeze(anchors, axis=0)\n    num_classes, num_anchors = cls_probs.shape[1], cls_probs.shape[2]\n    out = []\n    for i in range(batch_size):\n        cls_prob, offset_pred = cls_probs[i], offset_preds[i].reshape(-1, 4)\n        conf, class_id = np.max(cls_prob[1:], 0), np.argmax(cls_prob[1:], 0)\n        predicted_bb = offset_inverse(anchors, offset_pred)\n        keep = nms(predicted_bb, conf, nms_threshold)\n        # Find all non-`keep` indices and set the class to background\n        all_idx = np.arange(num_anchors, dtype=np.int32, ctx=device)\n        combined = np.concatenate((keep, all_idx))\n        unique, counts = np.unique(combined, return_counts=True)\n        non_keep = unique[counts == 1]\n        all_id_sorted = np.concatenate((keep, non_keep))\n        class_id[non_keep] = -1\n        class_id = class_id[all_id_sorted].astype('float32')\n        conf, predicted_bb = conf[all_id_sorted], predicted_bb[all_id_sorted]\n        # Here `pos_threshold` is a threshold for positive (non-background)\n        # predictions\n        below_min_idx = (conf < pos_threshold)\n        class_id[below_min_idx] = -1\n        conf[below_min_idx] = 1 - conf[below_min_idx]\n        pred_info = np.concatenate((np.expand_dims(class_id, axis=1),\n                                np.expand_dims(conf, axis=1),\n                                predicted_bb), axis=1)\n        out.append(pred_info)\n    return np.stack(out)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "#@save\ndef multibox_detection(cls_probs, offset_preds, anchors, nms_threshold=0.5,\n                       pos_threshold=0.009999999):\n    \"\"\"Predict bounding boxes using non-maximum suppression.\"\"\"\n    device, batch_size = cls_probs.device, cls_probs.shape[0]\n    anchors = anchors.squeeze(0)\n    num_classes, num_anchors = cls_probs.shape[1], cls_probs.shape[2]\n    out = []\n    for i in range(batch_size):\n        cls_prob, offset_pred = cls_probs[i], offset_preds[i].reshape(-1, 4)\n        conf, class_id = torch.max(cls_prob[1:], 0)\n        predicted_bb = offset_inverse(anchors, offset_pred)\n        keep = nms(predicted_bb, conf, nms_threshold)\n        # Find all non-`keep` indices and set the class to background\n        all_idx = torch.arange(num_anchors, dtype=torch.long, device=device)\n        combined = torch.cat((keep, all_idx))\n        uniques, counts = combined.unique(return_counts=True)\n        non_keep = uniques[counts == 1]\n        all_id_sorted = torch.cat((keep, non_keep))\n        class_id[non_keep] = -1\n        class_id = class_id[all_id_sorted]\n        conf, predicted_bb = conf[all_id_sorted], predicted_bb[all_id_sorted]\n        # Here `pos_threshold` is a threshold for positive (non-background)\n        # predictions\n        below_min_idx = (conf < pos_threshold)\n        class_id[below_min_idx] = -1\n        conf[below_min_idx] = 1 - conf[below_min_idx]\n        pred_info = torch.cat((class_id.unsqueeze(1),\n                               conf.unsqueeze(1),\n                               predicted_bb), dim=1)\n        out.append(pred_info)\n    return torch.stack(out)"
+    },
+    {
+      "type": "paragraph",
+      "text": "Bây giờ chúng ta hãy áp dụng các triển khai trên cho một ví dụ cụ thể\nvới bốn hộp neo. Để đơn giản, chúng tôi giả định rằng các bù dự đoán là\ntất cả các số không. Điều này có nghĩa là các hộp giới hạn dự đoán là\nhộp neo. Đối với mỗi lớp trong số nền, chó và mèo, chúng tôi cũng xác\nđịnh khả năng dự đoán của nó."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "anchors = np.array([[0.1, 0.08, 0.52, 0.92], [0.08, 0.2, 0.56, 0.95],\n                      [0.15, 0.3, 0.62, 0.91], [0.55, 0.2, 0.9, 0.88]])\noffset_preds = np.array([0] * d2l.size(anchors))\ncls_probs = np.array([[0] * 4,  # Predicted background likelihood\n                      [0.9, 0.8, 0.7, 0.1],  # Predicted dog likelihood\n                      [0.1, 0.2, 0.3, 0.9]])  # Predicted cat likelihood"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "anchors = torch.tensor([[0.1, 0.08, 0.52, 0.92], [0.08, 0.2, 0.56, 0.95],\n                      [0.15, 0.3, 0.62, 0.91], [0.55, 0.2, 0.9, 0.88]])\noffset_preds = torch.tensor([0] * anchors.numel())\ncls_probs = torch.tensor([[0] * 4,  # Predicted background likelihood\n                      [0.9, 0.8, 0.7, 0.1],  # Predicted dog likelihood\n                      [0.1, 0.2, 0.3, 0.9]])  # Predicted cat likelihood"
+    },
+    {
+      "type": "paragraph",
+      "text": "Chúng ta có thể vẽ những hộp giới hạn dự đoán này với sự tự tin của họ\nvề hình ảnh"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "fig = d2l.plt.imshow(img)\nshow_bboxes(fig.axes, anchors * bbox_scale,\n            ['dog=0.9', 'dog=0.8', 'dog=0.7', 'cat=0.9'])"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_anchor_f592d1_174_0.svg",
+      "local_path": "_images/output_anchor_f592d1_174_0.svg",
+      "alt": "../_images/output_anchor_f592d1_174_0.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "fig = d2l.plt.imshow(img)\nshow_bboxes(fig.axes, anchors * bbox_scale,\n            ['dog=0.9', 'dog=0.8', 'dog=0.7', 'cat=0.9'])"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_anchor_f592d1_177_0.svg",
+      "local_path": "_images/output_anchor_f592d1_177_0.svg",
+      "alt": "../_images/output_anchor_f592d1_177_0.svg"
+    },
+    {
+      "type": "paragraph",
+      "text": "Bây giờ chúng ta có thể gọi hàm multibox_detection để thực hiện\ntriệt tiêu không tối đa, trong đó ngưỡng được đặt thành 0,5. Lưu ý rằng\nchúng ta thêm một chiều cho các ví dụ trong đầu vào tensor."
+    },
+    {
+      "type": "paragraph",
+      "text": "Chúng ta có thể thấy rằng hình dạng của kết quả trả về là (kích thước\nlô, số hộp neo, 6). Sáu yếu tố trong chiều trong cùng cung cấp thông tin\nđầu ra cho cùng một hộp giới hạn dự đoán. Phần tử đầu tiên là chỉ số lớp\ndự đoán, bắt đầu từ 0 (0 là chó và 1 là mèo). Giá trị -1 cho biết nền\nhoặc loại bỏ trong ức chế không tối đa. Yếu tố thứ hai là sự tự tin của\nhộp giới hạn dự đoán. Bốn phần tử còn lại là tọa độ \\((x, y)\\) -trục\ncủa góc trên bên trái và góc dưới bên phải của hộp giới hạn dự đoán,\ntương ứng (phạm vi nằm trong khoảng từ 0 đến 1)."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "output = multibox_detection(np.expand_dims(cls_probs, axis=0),\n                            np.expand_dims(offset_preds, axis=0),\n                            np.expand_dims(anchors, axis=0),\n                            nms_threshold=0.5)\noutput"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "array([[[ 1.  ,  0.9 ,  0.55,  0.2 ,  0.9 ,  0.88],\n        [ 0.  ,  0.9 ,  0.1 ,  0.08,  0.52,  0.92],\n        [-1.  ,  0.8 ,  0.08,  0.2 ,  0.56,  0.95],\n        [-1.  ,  0.7 ,  0.15,  0.3 ,  0.62,  0.91]]])"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "output = multibox_detection(cls_probs.unsqueeze(dim=0),\n                            offset_preds.unsqueeze(dim=0),\n                            anchors.unsqueeze(dim=0),\n                            nms_threshold=0.5)\noutput"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "tensor([[[ 0.00,  0.90,  0.10,  0.08,  0.52,  0.92],\n         [ 1.00,  0.90,  0.55,  0.20,  0.90,  0.88],\n         [-1.00,  0.80,  0.08,  0.20,  0.56,  0.95],\n         [-1.00,  0.70,  0.15,  0.30,  0.62,  0.91]]])"
+    },
+    {
+      "type": "paragraph",
+      "text": "Sau khi loại bỏ những hộp giới hạn dự đoán của lớp -1, chúng ta có thể\noutput the final predicted bounding box giữ bởi non-maximression."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "fig = d2l.plt.imshow(img)\nfor i in output[0].asnumpy():\n    if i[0] == -1:\n        continue\n    label = ('dog=', 'cat=')[int(i[0])] + str(i[1])\n    show_bboxes(fig.axes, [np.array(i[2:]) * bbox_scale], label)"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_anchor_f592d1_192_0.svg",
+      "local_path": "_images/output_anchor_f592d1_192_0.svg",
+      "alt": "../_images/output_anchor_f592d1_192_0.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "fig = d2l.plt.imshow(img)\nfor i in output[0].detach().numpy():\n    if i[0] == -1:\n        continue\n    label = ('dog=', 'cat=')[int(i[0])] + str(i[1])\n    show_bboxes(fig.axes, [torch.tensor(i[2:]) * bbox_scale], label)"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_anchor_f592d1_195_0.svg",
+      "local_path": "_images/output_anchor_f592d1_195_0.svg",
+      "alt": "../_images/output_anchor_f592d1_195_0.svg"
+    },
+    {
+      "type": "paragraph",
+      "text": "Trong thực tế, chúng ta có thể loại bỏ các hộp giới hạn dự đoán với độ\ntin cậy thấp hơn ngay cả trước khi thực hiện triệt tiêu không tối đa, do\nđó làm giảm tính toán trong thuật toán này. Chúng tôi cũng có thể xử lý\nhậu kỳ đầu ra của ức chế không tối đa, ví dụ, bằng cách chỉ giữ kết quả\nvới sự tự tin cao hơn trong đầu ra cuối cùng."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tom-tat",
+      "text": "13.4.5. Tóm tắt"
+    },
+    {
+      "type": "list",
+      "ordered": false,
+      "items": [
+        "Chúng tôi tạo ra các hộp neo với các hình dạng khác nhau tập trung\nvào từng pixel của hình ảnh.",
+        "Giao lộ qua liên kết (IoU), còn được gọi là chỉ số Jaccard, đo sự\ntương đồng của hai hộp giới hạn. Đó là tỷ lệ của khu vực giao nhau\ncủa họ với khu vực công đoàn của họ.",
+        "Trong một bộ đào tạo, chúng ta cần hai loại nhãn cho mỗi hộp neo. Một\nlà lớp của đối tượng có liên quan đến hộp neo và cái còn lại là độ\nlệch của hộp giới hạn đất-chân lý so với hộp neo.",
+        "Trong quá trình dự đoán, chúng ta có thể sử dụng triệt tiêu không tối\nđa (NMS) để loại bỏ các hộp giới hạn dự đoán tương tự, từ đó đơn giản\nhóa đầu ra."
+      ]
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bai-tap",
+      "text": "13.4.6. Bài tập"
+    },
+    {
+      "type": "list",
+      "ordered": true,
+      "items": [
+        "Thay đổi giá trị của sizes và ratios trong hàm multibox_prior . Những thay đổi đối với các hộp neo được tạo ra là\ngì?",
+        "Xây dựng và hình dung hai hộp giới hạn với IoU 0,5. Làm thế nào để họ\nchồng chéo với nhau?",
+        "Sửa đổi các biến anchors trong Section 13.4.3 và Section 13.4.4 . Làm thế nào để kết\nquả thay đổi?",
+        "Ức chế không tối đa là một thuật toán tham lam ngăn chặn các hộp giới\nhạn dự đoán bằng cách * xóa* chúng. Có thể một số trong những cái\nbị xóa này thực sự hữu ích? Làm thế nào thuật toán này có thể được\nsửa đổi để ngăn chặn softly ? Bạn có thể tham khảo Soft-NMS [Bodla.Singh.Chellappa.ea.2017] .",
+        "Thay vì được làm thủ công, có thể học được sự đàn áp không tối đa\nkhông?"
+      ]
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    }
+  ],
+  "images": [
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_anchor_f592d1_48_0.svg",
+      "local_path": "_images/output_anchor_f592d1_48_0.svg",
+      "alt": "../_images/output_anchor_f592d1_48_0.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_anchor_f592d1_51_0.svg",
+      "local_path": "_images/output_anchor_f592d1_51_0.svg",
+      "alt": "../_images/output_anchor_f592d1_51_0.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/iou.svg",
+      "local_path": "_images/iou.svg",
+      "alt": "../_images/iou.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/anchor-label.svg",
+      "local_path": "_images/anchor-label.svg",
+      "alt": "../_images/anchor-label.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_anchor_f592d1_93_0.svg",
+      "local_path": "_images/output_anchor_f592d1_93_0.svg",
+      "alt": "../_images/output_anchor_f592d1_93_0.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_anchor_f592d1_96_0.svg",
+      "local_path": "_images/output_anchor_f592d1_96_0.svg",
+      "alt": "../_images/output_anchor_f592d1_96_0.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_anchor_f592d1_174_0.svg",
+      "local_path": "_images/output_anchor_f592d1_174_0.svg",
+      "alt": "../_images/output_anchor_f592d1_174_0.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_anchor_f592d1_177_0.svg",
+      "local_path": "_images/output_anchor_f592d1_177_0.svg",
+      "alt": "../_images/output_anchor_f592d1_177_0.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_anchor_f592d1_192_0.svg",
+      "local_path": "_images/output_anchor_f592d1_192_0.svg",
+      "alt": "../_images/output_anchor_f592d1_192_0.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_anchor_f592d1_195_0.svg",
+      "local_path": "_images/output_anchor_f592d1_195_0.svg",
+      "alt": "../_images/output_anchor_f592d1_195_0.svg"
+    }
+  ],
+  "text": "13.4. Hộp neo\nThuật toán phát hiện đối tượng thường lấy mẫu một số lượng lớn các vùng\ntrong hình ảnh đầu vào, xác định xem các vùng này có chứa các đối tượng\nquan tâm hay không, và điều chỉnh ranh giới của các vùng để dự đoán hộp\ngiới hạn đất-truth of the objects các đối tượng more accurately chính\nxác. Các mô hình khác nhau có thể áp dụng các sơ đồ lấy mẫu khu vực khác\nnhau. Ở đây chúng tôi giới thiệu một trong những phương pháp như vậy: nó\ntạo ra nhiều hộp giới hạn với tỷ lệ khác nhau và tỷ lệ khung hình tập\ntrung vào mỗi pixel. Các hộp giới hạn này được gọi là hộp neo *. Chúng\ntôi sẽ thiết kế một mô hình phát hiện đối tượng dựa trên các hộp neo\ntrong Section 13.7 .\nĐầu tiên, chúng ta hãy sửa đổi độ chính xác in ấn chỉ để kết quả đầu ra\nngắn gọn hơn.\n13.4.1. Tạo nhiều hộp neo\nGiả sử hình ảnh đầu vào có chiều cao \\(h\\) và chiều rộng \\(w\\) .\nChúng tôi tạo ra các hộp neo với các hình dạng khác nhau tập trung vào\ntừng pixel của hình ảnh. Hãy để quy mô là \\(s\\in (0, 1]\\) và tỷ lệ\nkhung hình* (tỷ lệ chiều rộng trên chiều cao) là \\(r > 0\\) . Sau đó\nchiều rộng và chiều cao của hộp neo là \\(ws\\sqrt{r}\\) và \\(hs/\\sqrt{r}\\) , tôn trọng. Lưu ý rằng khi vị trí trung tâm được đưa\nra, một hộp neo có chiều rộng và chiều cao đã biết được xác định.\nĐể tạo ra nhiều hộp neo với các hình dạng khác nhau, chúng ta hãy đặt\nmột loạt các thang đo \\(s_1,\\ldots, s_n\\) và một loạt các tỷ lệ\nkhung hình \\(r_1,\\ldots, r_m\\) . Khi sử dụng tất cả các kết hợp của\ncác thang đo và tỷ lệ khung hình này với mỗi pixel làm trung tâm, hình\nảnh đầu vào sẽ có tổng cộng \\(whnm\\) hộp neo. Mặc dù các hộp neo này\ncó thể bao gồm tất cả các hộp giới hạn sự thật mặt đất, độ phức tạp tính\ntoán dễ dàng quá cao. Trong thực tế, chúng ta chỉ có thể xem xét những\nkết hợp chứng \\(s_1\\) hoặc \\(r_1\\) :\nĐiều đó có nghĩa là, số lượng hộp neo tập trung vào cùng một điểm ảnh là \\(n+m-1\\) . Đối với toàn bộ hình ảnh đầu vào, chúng tôi sẽ tạo tổng\ncộng \\(wh(n+m-1)\\) hộp neo.\nPhương pháp tạo hộp neo trên được thực hiện trong chức năng multibox_prior sau đây. Chúng tôi chỉ định hình ảnh đầu vào, danh\nsách các thang đo và danh sách các tỷ lệ khung hình, sau đó chức năng\nnày sẽ trả về tất cả các hộp neo.\nChúng ta có thể thấy rằng hình dạng của biến hộp neo trả về Y là\n(kích thước lô, số lượng hộp neo, 4).\nSau khi thay đổi hình dạng của biến hộp neo Y thành (chiều cao hình\nảnh, chiều rộng hình ảnh, số hộp neo tập trung vào cùng một điểm ảnh,\n4), chúng ta có thể lấy tất cả các hộp neo tập trung vào một vị trí\npixel được chỉ định. Sau đây, chúng ta truy cập hộp neo đầu tiên tập\ntrung vào (250, 250) . Nó có bốn phần tử: tọa độ \\((x, y)\\) -trục ở\ngóc trên bên trái và trục \\((x, y)\\) -tọa độ ở góc dưới bên phải của\nhộp neo. Các giá trị tọa độ của cả hai trục được chia cho chiều rộng và\nchiều cao của hình ảnh, tương ứng; do đó, phạm vi nằm trong khoảng từ 0\nđến 1.\nĐể hiển thị tất cả các hộp neo tập trung vào một pixel trong image,\nchúng tôi xác định hàm show_bboxes sau để vẽ nhiều hộp giới hạn trên\nảnh.\nNhư chúng ta vừa thấy, các giá trị tọa độ của các trục \\(x\\) và \\(y\\) trong biến boxes đã được chia cho chiều rộng và chiều cao\ncủa hình ảnh, tương ứng. Khi vẽ các hộp neo, chúng ta cần khôi phục các\ngiá trị tọa độ ban đầu của chúng; do đó, chúng ta định nghĩa biến bbox_scale bên dưới. Bây giờ, chúng ta có thể vẽ tất cả các hộp neo\ntập trung vào (250, 250) trong hình ảnh. Như bạn có thể thấy, hộp neo\nmàu xanh lam với thang điểm 0,75 và tỷ lệ khung hình là 1 bao quanh chó\ntrong hình ảnh.\n13.4.2. Giao lộ qua Union (IoU)\nChúng tôi chỉ đề cập rằng một hộp neo “tốt” bao quanh chú chó trong hình\nảnh. Nếu hộp giới hạn đất-chân lý của đối tượng được biết, làm thế nào\ncó thể “tốt” ở đây được định lượng? Bằng trực giác, chúng ta có thể đo\nsự tương đồng giữa hộp neo và hộp giới hạn chân lý mặt đất. Chúng tôi\nbiết rằng chỉ số Jaccard có thể đo lường sự tương đồng giữa hai bộ.\nĐưa ra các bộ \\(\\mathcal{A}\\) và \\(\\mathcal{B}\\) , chỉ số Jaccard\ncủa chúng là kích thước giao điểm của chúng chia cho kích thước của công\nđoàn của chúng:\nTrên thực tế, chúng ta có thể xem xét khu vực pixel của bất kỳ hộp giới\nhạn nào là một tập hợp các pixel. Bằng cách này, chúng ta có thể đo sự\ngiống nhau của hai hộp giới hạn bằng chỉ số Jaccard của các bộ pixel của\nchúng. Đối với hai hộp giới hạn, chúng ta thường tham khảo chỉ số\nJaccard của chúng là * giao lộ qua công đoàn * (* IoU*), đó là tỷ lệ\ngiữa khu vực giao nhau của chúng với khu vực công đoàn của chúng, như\nthể hiện trong Fig. 13.4.1 . Phạm vi của một IoU nằm trong khoảng\ntừ 0 đến 1:0 có nghĩa là hai hộp giới hạn hoàn toàn không chồng lên\nnhau, trong khi 1 chỉ ra rằng hai hộp giới hạn bằng nhau.\nFig. 13.4.1 IoU is the ratio of the intersection area to the union area of two\nbounding boxes. ¶\nĐối với phần còn lại của phần này, chúng tôi sẽ sử dụng IoU để đo sự\ntương đồng giữa các hộp neo và các hộp giới hạn chân lý mặt đất và giữa\ncác hộp neo khác nhau. Cho hai danh sách các hộp neo hoặc đường viền, box_iou sau sẽ tính toán IoU cặp của chúng trong hai danh sách này.\n13.4.3. Dán nhãn hộp neo trong dữ liệu đào tạo\nTrong một tập dữ liệu đào tạo, chúng tôi coi mỗi hộp neo là một ví dụ\nđào tạo. Để đào tạo một mô hình phát hiện đối tượng, chúng ta cần nhãn\n* class* và offset cho mỗi hộp neo, trong đó trước đây là lớp của\nđối tượng có liên quan đến hộp neo và sau này là phần bù của hộp giới\nhạn sự thật mặt đất so với hộp neo. Trong quá trình dự đoán, đối với mỗi\nhình ảnh, chúng tôi tạo ra nhiều hộp neo, dự đoán các lớp và bù đắp cho\ntất cả các hộp neo, điều chỉnh vị trí của chúng theo các bù đắp dự đoán\nđể có được các hộp giới hạn dự đoán và cuối cùng chỉ xuất ra những hộp\ngiới hạn dự đoán đáp ứng các tiêu chí nhất định.\nNhư chúng ta đã biết, một bộ đào tạo phát hiện đối tượng đi kèm với nhãn\ncho các vị trí của các hộp giới hạn * đất-chân thất* và các lớp của\ncác đối tượng được bao quanh của chúng. Để gắn nhãn bất kỳ hộp neo *\nđược tạo ra , chúng tôi đề cập đến vị trí được dán nhãn và lớp của hộp\ngiới hạn đất được chỉ định * của nó gần nhất với hộp neo. Sau đây,\nchúng tôi mô tả một thuật toán để gán các hộp giới hạn sự thật gần nhất\ncho các hộp neo.\n13.4.3.1. Gán các hộp giới hạn mặt đất-Truth cho Hộp neo\nVới một hình ảnh, giả sử rằng các hộp neo là \\(A_1, A_2, \\ldots, A_{n_a}\\) và các hộp giới hạn đất-chân lý là \\(B_1, B_2, \\ldots, B_{n_b}\\) , trong đó \\(n_a \\geq n_b\\) . Chúng\nta hãy xác định một ma trận \\(\\mathbf{X} \\in \\mathbb{R}^{n_a \\times n_b}\\) , có phần tử \\(x_{ij}\\) trong hàng \\(i^\\mathrm{th}\\) và cột \\(j^\\mathrm{th}\\) là IoU của hộp neo \\(A_i\\) và hộp giới hạn sự\nthật mặt đất \\(B_j\\) . Thuật toán bao gồm các bước sau:\nTìm phần tử lớn nhất trong ma trận \\(\\mathbf{X}\\) và biểu thị các\nchỉ số hàng và cột của nó là \\(i_1\\) và \\(j_1\\) , tương ứng.\nSau đó, hộp giới hạn sự thật mặt đất \\(B_{j_1}\\) được gán cho hộp\nneo \\(A_{i_1}\\) . Điều này khá trực quan vì \\(A_{i_1}\\) và \\(B_{j_1}\\) là gần nhất trong số tất cả các cặp hộp neo và hộp\ngiới hạn sự thật mặt đất. Sau khi gán đầu tiên, loại bỏ tất cả các\nphần tử trong hàng \\({i_1}^\\mathrm{th}\\) và cột \\({j_1}^\\mathrm{th}\\) trong ma trận \\(\\mathbf{X}\\) .\nTìm lớn nhất trong số các phần tử còn lại trong ma trận \\(\\mathbf{X}\\) và biểu thị các chỉ số hàng và cột của nó là \\(i_2\\) và \\(j_2\\) , tương ứng. Chúng tôi gán hộp giới hạn sự\nthật mặt đất \\(B_{j_2}\\) để neo hộp \\(A_{i_2}\\) và loại bỏ\ntất cả các yếu tố trong hàng \\({i_2}^\\mathrm{th}\\) và cột \\({j_2}^\\mathrm{th}\\) trong ma trận \\(\\mathbf{X}\\) .\nTại thời điểm này, các phần tử trong hai hàng và hai cột trong ma\ntrận \\(\\mathbf{X}\\) đã bị loại bỏ. Chúng tôi tiến hành cho đến\nkhi tất cả các phần tử trong \\(n_b\\) cột trong ma trận \\(\\mathbf{X}\\) bị loại bỏ. Tại thời điểm này, chúng tôi đã chỉ\nđịnh một hộp giới hạn chân lý mặt đất cho mỗi hộp neo \\(n_b\\) .\nChỉ đi qua các hộp neo \\(n_a - n_b\\) còn lại. Ví dụ, đưa ra bất\nkỳ hộp neo nào \\(A_i\\) , hãy tìm hộp giới hạn chân lý mặt đất \\(B_j\\) với IoU lớn nhất với \\(A_i\\) trong suốt hàng \\(i^\\mathrm{th}\\) của ma trận \\(\\mathbf{X}\\) và gán \\(B_j\\) cho \\(A_i\\) chỉ khi IoU này lớn hơn ngưỡng được xác\nđịnh trước.\nHãy để chúng tôi minh họa thuật toán trên bằng cách sử dụng một ví dụ cụ\nthể. Như thể hiện trong Fig. 13.4.2 (trái), giả sử rằng\ngiá trị lớn nhất trong ma trận \\(\\mathbf{X}\\) là \\(x_{23}\\) ,\nchúng tôi gán hộp giới hạn sự thật mặt đất \\(B_3\\) vào hộp neo \\(A_2\\) . Sau đó, chúng ta loại bỏ tất cả các phần tử trong hàng 2 và\ncột 3 của ma trận, tìm \\(x_{71}\\) lớn nhất trong các phần tử còn lại\n(khu vực bóng mờ) và gán hộp giới hạn sự thật mặt đất \\(B_1\\) vào\nhộp neo \\(A_7\\) . Tiếp theo, như thể hiện trong Fig. 13.4.2 (giữa), loại bỏ tất cả các phần tử trong\nhàng 7 và cột 1 của ma trận, tìm \\(x_{54}\\) lớn nhất trong các phần\ntử còn lại (khu vực bóng mờ) và gán hộp giới hạn sự thật mặt đất \\(B_4\\) vào hộp neo \\(A_5\\) . Cuối cùng, như thể hiện trong Fig. 13.4.2 (phải), loại bỏ tất cả các phần tử trong\nhàng 5 và cột 4 của ma trận, tìm \\(x_{92}\\) lớn nhất trong các phần\ntử còn lại (khu vực bóng mờ) và gán hộp giới hạn đất-chân lý \\(B_2\\) vào hộp neo \\(A_9\\) . Sau đó, chúng ta chỉ cần đi qua các hộp neo còn\nlại \\(A_1, A_3, A_4, A_6, A_8\\) và xác định xem có nên gán cho chúng\ncác hộp giới hạn chân lý mặt đất theo ngưỡng hay không.\nFig. 13.4.2 Assigning ground-truth bounding boxes to anchor boxes. ¶\nThuật toán này được thực hiện trong hàm assign_anchor_to_bbox sau.\n13.4.3.2. Các lớp ghi nhãn và độ lệch\nBây giờ chúng ta có thể dán nhãn lớp và bù đắp cho mỗi hộp neo. Giả sử\nrằng một hộp neo \\(A\\) được gán một hộp giới hạn đất-chân lý \\(B\\) . Một mặt, lớp của hộp neo \\(A\\) sẽ được dán nhãn là của \\(B\\) . Mặt khác, độ lệch của hộp neo \\(A\\) sẽ được dán nhãn theo\nvị trí tương đối giữa tọa độ trung tâm là \\(B\\) và \\(A\\) cùng\nvới kích thước tương đối giữa hai hộp này. Với các vị trí và kích thước\nkhác nhau của các hộp khác nhau trong tập dữ liệu, chúng ta có thể áp\ndụng các biến đổi cho các vị trí và kích thước tương đối có thể dẫn đến\ncác bù phân bố đồng đều hơn dễ phù hợp hơn. Ở đây chúng tôi mô tả một sự\nchuyển đổi chung. Cho tọa độ trung tâm của \\(A\\) và \\(B\\) là \\((x_a, y_a)\\) và \\((x_b, y_b)\\) , chiều rộng của chúng là \\(w_a\\) và \\(w_b\\) , và chiều cao của chúng tương ứng là \\(h_a\\) và \\(h_b\\) . Chúng tôi có thể dán nhãn phần bù của \\(A\\) như\nwhere default values of the constants are \\(\\mu_x = \\mu_y = \\mu_w = \\mu_h = 0, \\sigma_x=\\sigma_y=0.1\\) , and \\(\\sigma_w=\\sigma_h=0.2\\) . This transformation is implemented below\nin the offset_boxes function.\nNếu một hộp neo không được gán một hộp giới hạn đất-truth, chúng ta chỉ\ncần dán nhãn lớp của hộp neo là “background”. Các hộp neo có lớp nền\nthường được gọi là hộp neo * tiêu cực* và phần còn lại được gọi là hộp\nneo * tích cực*. Chúng tôi thực hiện hàm multibox_target sau để ** label class and offsets for anchor\nboxes** bằng cách sử dụng các hộp\nbounding ground-truth (đối số labels ). Hàm này đặt lớp nền thành 0\nvà tăng chỉ số số nguyên của một lớp mới bằng một.\n13.4.3.3. Một ví dụ\nHãy để chúng tôi minh họa ghi nhãn hộp neo thông qua một ví dụ cụ thể.\nChúng tôi xác định các hộp giới hạn đất cho chó và mèo trong hình ảnh\nđược tải, trong đó phần tử đầu tiên là lớp (0 cho chó và 1 cho mèo) và\nbốn yếu tố còn lại là tọa độ \\((x, y)\\) -trục ở góc trên bên trái và\ngóc dưới bên phải (phạm vi nằm trong khoảng từ 0 đến 1). Chúng tôi cũng\nxây dựng năm hộp neo được dán nhãn bằng cách sử dụng tọa độ của góc trên\nbên trái và góc dưới bên phải: \\(A_0, \\ldots, A_4\\) (chỉ số bắt đầu\ntừ 0). Sau đó, chúng ta vẽ các hộp giới hạn mặt đất và hộp neo trong\nhình ảnh\nSử dụng hàm multibox_target được xác định ở trên, chúng ta có thể\nlabel class và offset của các hộp neo này dựa trên các hộp giới hạn\nđất-chân thất cho chó và mèo. Trong ví dụ này, các chỉ số của các lớp\nnền, chó và mèo lần lượt là 0, 1 và 2. Dưới đây chúng tôi thêm một kích\nthước cho các ví dụ về hộp neo và các hộp giới hạn đất-chân lý.\nCó ba mục trong kết quả trả về, tất cả đều ở định dạng tensor. Mục thứ\nba chứa các lớp được dán nhãn của các hộp neo đầu vào.\nChúng ta hãy phân tích các nhãn lớp trả về dưới đây dựa trên hộp neo và\nvị trí hộp giới hạn đất-chân lý trong hình ảnh. Đầu tiên, trong số tất\ncả các cặp hộp neo và hộp giới hạn sự thật mặt đất, IoU của hộp neo \\(A_4\\) và hộp giới hạn sự thật mặt đất của con mèo là lớn nhất. Do\nđó, lớp \\(A_4\\) được dán nhãn là con mèo. Lấy ra các cặp chứa \\(A_4\\) hoặc hộp giới hạn sự thật mặt đất của con mèo, trong số các\ncặp còn lại của hộp neo \\(A_1\\) và hộp giới hạn sự thật mặt đất của\nchó có IoU lớn nhất. Vì vậy, lớp \\(A_1\\) được dán nhãn là chó. Tiếp\ntheo, chúng ta cần phải đi qua ba hộp neo chưa được dán nhãn còn lại: \\(A_0\\) , \\(A_2\\) và \\(A_3\\) . Đối với \\(A_0\\) , lớp của\nhộp giới hạn chân thất-chân lý với IoU lớn nhất là chó, nhưng IoU nằm\ndưới ngưỡng được xác định trước (0,5), vì vậy lớp được dán nhãn là nền;\nđối với \\(A_2\\) , lớp của hộp giới hạn sự thật mặt đất với IoU lớn\nnhất là con mèo và IoU vượt quá ngưỡng, vì vậy lớp được dán nhãn là con\nmèo; đối với \\(A_3\\) , lớp của hộp giới hạn đất-chân lý với IoU lớn\nnhất là con mèo, nhưng giá trị nằm dưới ngưỡng, do đó lớp được dán nhãn\nlà nền.\nMục trả về thứ hai là một biến mặt nạ của hình dạng (kích thước lô, gấp\nbốn lần số hộp neo). Mỗi bốn phần tử trong biến mask tương ứng với bốn\ngiá trị bù của mỗi hộp neo. Vì chúng ta không quan tâm đến việc phát\nhiện nền, sự bù đắp của lớp phủ định này không nên ảnh hưởng đến hàm\nkhách quan. Thông qua phép nhân elementwise, các số không trong biến\nmask sẽ lọc ra các bù lớp âm trước khi tính hàm mục tiêu.\nMục trả về đầu tiên chứa bốn giá trị bù được dán nhãn cho mỗi hộp neo.\nLưu ý rằng các bù đắp của các hộp neo lớp âm được dán nhãn là số không.\n13.4.4. Dự đoán các hộp giới hạn với ức chế không tối đa\nTrong quá trình dự đoán, chúng tôi tạo ra nhiều hộp neo cho hình ảnh và\ndự đoán các lớp và bù đắp cho mỗi hộp. Do đó, một hộp giới hạn dự đoán\n* thu được theo một hộp neo với độ lệch dự đoán của nó. Dưới đây chúng\ntôi thực hiện hàm offset_inverse có các neo và dự đoán bù đắp làm\nđầu vào và áp dụng các biến đổi bù ngược để trả về phối hợp hộp giới hạn\ndự đoán .\nKhi có nhiều hộp neo, nhiều hộp giới hạn dự đoán tương tự (với sự chồng\nchéo đáng kể) có thể có khả năng xuất ra cho xung quanh cùng một đối\ntượng. Để đơn giản hóa đầu ra, chúng ta có thể hợp nhất các hộp giới hạn\ndự đoán tương tự thuộc về cùng một đối tượng bằng cách sử dụng non-maximression (NMS).\nĐây là cách ức chế không tối đa hoạt động. Đối với một hộp giới hạn dự\nđoán \\(B\\) , mô hình phát hiện đối tượng tính toán khả năng dự đoán\ncho mỗi lớp. Biểu thị bởi \\(p\\) khả năng dự đoán lớn nhất, lớp tương\nứng với xác suất này là lớp dự đoán cho \\(B\\) . Cụ thể, chúng tôi đề\ncập đến \\(p\\) là sự tự tin (điểm) của hộp giới hạn dự đoán \\(B\\) . Trên cùng một hình ảnh, tất cả các hộp giới hạn không nền\nđược dự đoán được sắp xếp theo sự tự tin theo thứ tự giảm dần để tạo ra\nmột danh sách \\(L\\) . Sau đó, chúng tôi thao tác danh sách được sắp\nxếp \\(L\\) trong các bước sau:\nChọn hộp giới hạn dự đoán \\(B_1\\) với độ tin cậy cao nhất từ \\(L\\) làm cơ sở và loại bỏ tất cả các hộp giới hạn dự đoán không\ncơ sở có IoU với \\(B_1\\) vượt quá ngưỡng được xác định trước \\(\\epsilon\\) từ \\(L\\) . Tại thời điểm này, \\(L\\) giữ hộp\ngiới hạn dự đoán với sự tự tin cao nhất nhưng giảm những người khác\nquá giống với nó. Tóm lại, những người có không tối đa điểm tin cậy\nlà * bị ức chế *.\nChọn hộp giới hạn dự đoán \\(B_2\\) với độ tin cậy cao thứ hai từ \\(L\\) làm cơ sở khác và loại bỏ tất cả các hộp giới hạn dự đoán\nkhông cơ sở có IoU với \\(B_2\\) vượt quá \\(\\epsilon\\) từ \\(L\\) .\nLặp lại quy trình trên cho đến khi tất cả các hộp giới hạn dự đoán\ntrong \\(L\\) đã được sử dụng làm cơ sở. Tại thời điểm này, IoU của\nbất kỳ cặp hộp giới hạn dự đoán nào trong \\(L\\) nằm dưới ngưỡng \\(\\epsilon\\) ; do đó, không có cặp nào quá giống nhau.\nXuất tất cả các hộp giới hạn dự đoán trong danh sách \\(L\\) .\nHàm nms sau đây sắp xếp điểm tin cậy theo thứ tự giảm dần và trả về\ncác chỉ số của chúng.\nChúng tôi xác định multibox_detection sau đây để áp dụng ức chế\nkhông tối đa để dự đoán các hộp giới hộp. Đừng lo lắng nếu bạn thấy việc\nthực hiện một chút phức tạp: chúng tôi sẽ chỉ ra cách nó hoạt động với\nmột ví dụ cụ thể ngay sau khi thực hiện.\nBây giờ chúng ta hãy áp dụng các triển khai trên cho một ví dụ cụ thể\nvới bốn hộp neo. Để đơn giản, chúng tôi giả định rằng các bù dự đoán là\ntất cả các số không. Điều này có nghĩa là các hộp giới hạn dự đoán là\nhộp neo. Đối với mỗi lớp trong số nền, chó và mèo, chúng tôi cũng xác\nđịnh khả năng dự đoán của nó.\nChúng ta có thể vẽ những hộp giới hạn dự đoán này với sự tự tin của họ\nvề hình ảnh\nBây giờ chúng ta có thể gọi hàm multibox_detection để thực hiện\ntriệt tiêu không tối đa, trong đó ngưỡng được đặt thành 0,5. Lưu ý rằng\nchúng ta thêm một chiều cho các ví dụ trong đầu vào tensor.\nChúng ta có thể thấy rằng hình dạng của kết quả trả về là (kích thước\nlô, số hộp neo, 6). Sáu yếu tố trong chiều trong cùng cung cấp thông tin\nđầu ra cho cùng một hộp giới hạn dự đoán. Phần tử đầu tiên là chỉ số lớp\ndự đoán, bắt đầu từ 0 (0 là chó và 1 là mèo). Giá trị -1 cho biết nền\nhoặc loại bỏ trong ức chế không tối đa. Yếu tố thứ hai là sự tự tin của\nhộp giới hạn dự đoán. Bốn phần tử còn lại là tọa độ \\((x, y)\\) -trục\ncủa góc trên bên trái và góc dưới bên phải của hộp giới hạn dự đoán,\ntương ứng (phạm vi nằm trong khoảng từ 0 đến 1).\nSau khi loại bỏ những hộp giới hạn dự đoán của lớp -1, chúng ta có thể\noutput the final predicted bounding box giữ bởi non-maximression.\nTrong thực tế, chúng ta có thể loại bỏ các hộp giới hạn dự đoán với độ\ntin cậy thấp hơn ngay cả trước khi thực hiện triệt tiêu không tối đa, do\nđó làm giảm tính toán trong thuật toán này. Chúng tôi cũng có thể xử lý\nhậu kỳ đầu ra của ức chế không tối đa, ví dụ, bằng cách chỉ giữ kết quả\nvới sự tự tin cao hơn trong đầu ra cuối cùng.\n13.4.5. Tóm tắt\nChúng tôi tạo ra các hộp neo với các hình dạng khác nhau tập trung\nvào từng pixel của hình ảnh.\nGiao lộ qua liên kết (IoU), còn được gọi là chỉ số Jaccard, đo sự\ntương đồng của hai hộp giới hạn. Đó là tỷ lệ của khu vực giao nhau\ncủa họ với khu vực công đoàn của họ.\nTrong một bộ đào tạo, chúng ta cần hai loại nhãn cho mỗi hộp neo. Một\nlà lớp của đối tượng có liên quan đến hộp neo và cái còn lại là độ\nlệch của hộp giới hạn đất-chân lý so với hộp neo.\nTrong quá trình dự đoán, chúng ta có thể sử dụng triệt tiêu không tối\nđa (NMS) để loại bỏ các hộp giới hạn dự đoán tương tự, từ đó đơn giản\nhóa đầu ra.\n13.4.6. Bài tập\nThay đổi giá trị của sizes và ratios trong hàm multibox_prior . Những thay đổi đối với các hộp neo được tạo ra là\ngì?\nXây dựng và hình dung hai hộp giới hạn với IoU 0,5. Làm thế nào để họ\nchồng chéo với nhau?\nSửa đổi các biến anchors trong Section 13.4.3 và Section 13.4.4 . Làm thế nào để kết\nquả thay đổi?\nỨc chế không tối đa là một thuật toán tham lam ngăn chặn các hộp giới\nhạn dự đoán bằng cách * xóa* chúng. Có thể một số trong những cái\nbị xóa này thực sự hữu ích? Làm thế nào thuật toán này có thể được\nsửa đổi để ngăn chặn softly ? Bạn có thể tham khảo Soft-NMS [Bodla.Singh.Chellappa.ea.2017] .\nThay vì được làm thủ công, có thể học được sự đàn áp không tối đa\nkhông?\nDiscussions\nDiscussions"
+}

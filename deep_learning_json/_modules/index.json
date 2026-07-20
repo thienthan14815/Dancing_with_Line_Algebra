@@ -1,0 +1,33 @@
+{
+  "url": "https://vi.d2l.ai/_modules/index.html",
+  "chapter": "root",
+  "title": "All modules for which code is available",
+  "crawled_at": "2026-07-20T12:41:47.307071+00:00",
+  "headings": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": null,
+      "text": "All modules for which code is available"
+    }
+  ],
+  "content": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": null,
+      "text": "All modules for which code is available"
+    },
+    {
+      "type": "list",
+      "ordered": false,
+      "items": [
+        "d2l.mxnet",
+        "d2l.tensorflow",
+        "d2l.torch"
+      ]
+    }
+  ],
+  "images": [],
+  "text": "All modules for which code is available\nd2l.mxnet\nd2l.tensorflow\nd2l.torch"
+}

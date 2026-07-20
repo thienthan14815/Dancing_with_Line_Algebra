@@ -1,0 +1,547 @@
+{
+  "url": "https://vi.d2l.ai/chapter_optimization/sgd.html",
+  "chapter": "chapter_optimization",
+  "title": "11.4. Stochastic Gradient Descent",
+  "crawled_at": "2026-07-20T12:40:22.446881+00:00",
+  "headings": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "stochastic-gradient-descent",
+      "text": "11.4. Stochastic Gradient Descent"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "stochastic-gradient-nhung-thong-tin-cap-nhap",
+      "text": "11.4.1. Stochastic Gradient Những Thông Tin Cập Nhập"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "toc-do-hoc-dong",
+      "text": "11.4.2. Tốc độ học động"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "phan-tich-hoi-tu-cho-muc-tieu-loi",
+      "text": "11.4.3. Phân tích hội tụ cho mục tiêu lồi"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "gradient-stochastic-va-mau-huu-han",
+      "text": "11.4.4. Gradient Stochastic và mẫu hữu hạn"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tom-tat",
+      "text": "11.4.5. Tóm tắt"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bai-tap",
+      "text": "11.4.6. Bài tập"
+    }
+  ],
+  "content": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "stochastic-gradient-descent",
+      "text": "11.4. Stochastic Gradient Descent"
+    },
+    {
+      "type": "paragraph",
+      "text": "Tuy nhiên, trong các chương trước, chúng tôi tiếp tục sử dụng gốc\ngradient ngẫu nhiên trong quy trình đào tạo của chúng tôi, tuy nhiên, mà\nkhông giải thích lý do tại sao nó hoạt động. Để làm sáng tỏ nó, chúng\ntôi chỉ mô tả các nguyên tắc cơ bản của gradient gốc trong Section 11.3 . Trong phần này, chúng tôi tiếp tục thảo luận xuống\ndốc ngẫu nhiên chi tiết hơn."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "%matplotlib inline\nimport math\nfrom mxnet import np, npx\nfrom d2l import mxnet as d2l\n\nnpx.set_np()"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "%matplotlib inline\nimport math\nimport torch\nfrom d2l import torch as d2l"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "%matplotlib inline\nimport math\nimport tensorflow as tf\nfrom d2l import tensorflow as d2l"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "stochastic-gradient-nhung-thong-tin-cap-nhap",
+      "text": "11.4.1. Stochastic Gradient Những Thông Tin Cập Nhập"
+    },
+    {
+      "type": "paragraph",
+      "text": "Trong học sâu, chức năng khách quan thường là trung bình của các hàm mất\ncho mỗi ví dụ trong tập dữ liệu đào tạo. Với một tập dữ liệu đào tạo \\(n\\) ví dụ, chúng tôi giả định rằng \\(f_i(\\mathbf{x})\\) là hàm\nmất liên quan đến ví dụ đào tạo của chỉ số \\(i\\) , trong đó \\(\\mathbf{x}\\) là vectơ tham số. Sau đó, chúng tôi đến chức năng mục\ntiêu"
+    },
+    {
+      "type": "math",
+      "latex": "(11.4.1)¶\\[f(\\mathbf{x}) = \\frac{1}{n} \\sum_{i = 1}^n f_i(\\mathbf{x}).\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Gradient của hàm khách quan tại \\(\\mathbf{x}\\) được tính là"
+    },
+    {
+      "type": "math",
+      "latex": "(11.4.2)¶\\[\\nabla f(\\mathbf{x}) = \\frac{1}{n} \\sum_{i = 1}^n \\nabla f_i(\\mathbf{x}).\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Nếu sử dụng gradient descent, chi phí tính toán cho mỗi lần lặp biến độc\nlập là \\(\\mathcal{O}(n)\\) , phát triển tuyến tính với \\(n\\) . Do\nđó, khi tập dữ liệu đào tạo lớn hơn, chi phí của gradient descent cho\nmỗi lần lặp sẽ cao hơn."
+    },
+    {
+      "type": "paragraph",
+      "text": "Stochastic gradient descent (SGD) giảm chi phí tính toán tại mỗi lần lặp\nlại. Tại mỗi lần lặp lại của dòng dốc ngẫu nhiên, chúng tôi lấy mẫu\nthống nhất một chỉ số \\(i\\in\\{1,\\ldots, n\\}\\) cho các ví dụ dữ liệu\nmột cách ngẫu nhiên và tính toán gradient \\(\\nabla f_i(\\mathbf{x})\\) để cập nhật \\(\\mathbf{x}\\) :"
+    },
+    {
+      "type": "math",
+      "latex": "(11.4.3)¶\\[\\mathbf{x} \\leftarrow \\mathbf{x} - \\eta \\nabla f_i(\\mathbf{x}),\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "trong đó \\(\\eta\\) là tỷ lệ học tập. Chúng ta có thể thấy rằng chi\nphí tính toán cho mỗi lần lặp giảm từ \\(\\mathcal{O}(n)\\) của\ngradient gốc xuống hằng số \\(\\mathcal{O}(1)\\) . Hơn nữa, chúng tôi\nmuốn nhấn mạnh rằng gradient ngẫu nhiên \\(\\nabla f_i(\\mathbf{x})\\) là một ước tính không thiên vị của gradient đầy đủ \\(\\nabla f(\\mathbf{x})\\) bởi vì"
+    },
+    {
+      "type": "math",
+      "latex": "(11.4.4)¶\\[\\mathbb{E}_i \\nabla f_i(\\mathbf{x}) = \\frac{1}{n} \\sum_{i = 1}^n \\nabla f_i(\\mathbf{x}) = \\nabla f(\\mathbf{x}).\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Điều này có nghĩa là, trung bình, gradient stochastic là một ước tính\ntốt của gradient."
+    },
+    {
+      "type": "paragraph",
+      "text": "Bây giờ, chúng ta sẽ so sánh nó với gradient descent bằng cách thêm\nnhiễu ngẫu nhiên với trung bình 0 và phương sai 1 với gradient để mô\nphỏng một gradient gốc ngẫu nhiên."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def f(x1, x2):  # Objective function\n    return x1 ** 2 + 2 * x2 ** 2\n\ndef f_grad(x1, x2):  # Gradient of the objective function\n    return 2 * x1, 4 * x2\n\ndef sgd(x1, x2, s1, s2, f_grad):\n    g1, g2 = f_grad(x1, x2)\n    # Simulate noisy gradient\n    g1 += np.random.normal(0.0, 1, (1,))\n    g2 += np.random.normal(0.0, 1, (1,))\n    eta_t = eta * lr()\n    return (x1 - eta_t * g1, x2 - eta_t * g2, 0, 0)\n\ndef constant_lr():\n    return 1\n\neta = 0.1\nlr = constant_lr  # Constant learning rate\nd2l.show_trace_2d(f, d2l.train_2d(sgd, steps=50, f_grad=f_grad))"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "epoch 50, x1: -0.472513, x2: 0.110780\n/home/d2l-worker/miniconda3/envs/d2l-vi-release-1/lib/python3.8/site-packages/numpy/core/shape_base.py:65: VisibleDeprecationWarning: Creating an ndarray from ragged nested sequences (which is a list-or-tuple of lists-or-tuples-or ndarrays with different lengths or shapes) is deprecated. If you meant to do this, you must specify 'dtype=object' when creating the ndarray.\n  ary = asanyarray(ary)"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_sgd_baca77_15_1.svg",
+      "local_path": "_images/output_sgd_baca77_15_1.svg",
+      "alt": "../_images/output_sgd_baca77_15_1.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def f(x1, x2):  # Objective function\n    return x1 ** 2 + 2 * x2 ** 2\n\ndef f_grad(x1, x2):  # Gradient of the objective function\n    return 2 * x1, 4 * x2\n\ndef sgd(x1, x2, s1, s2, f_grad):\n    g1, g2 = f_grad(x1, x2)\n    # Simulate noisy gradient\n    g1 += torch.normal(0.0, 1, (1,))\n    g2 += torch.normal(0.0, 1, (1,))\n    eta_t = eta * lr()\n    return (x1 - eta_t * g1, x2 - eta_t * g2, 0, 0)\n\ndef constant_lr():\n    return 1\n\neta = 0.1\nlr = constant_lr  # Constant learning rate\nd2l.show_trace_2d(f, d2l.train_2d(sgd, steps=50, f_grad=f_grad))"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "epoch 50, x1: 0.100386, x2: 0.117807\n/home/d2l-worker/miniconda3/envs/d2l-vi-release-1/lib/python3.8/site-packages/numpy/core/shape_base.py:65: VisibleDeprecationWarning: Creating an ndarray from ragged nested sequences (which is a list-or-tuple of lists-or-tuples-or ndarrays with different lengths or shapes) is deprecated. If you meant to do this, you must specify 'dtype=object' when creating the ndarray.\n  ary = asanyarray(ary)\n/home/d2l-worker/miniconda3/envs/d2l-vi-release-1/lib/python3.8/site-packages/torch/functional.py:568: UserWarning: torch.meshgrid: in an upcoming release, it will be required to pass the indexing argument. (Triggered internally at  ../aten/src/ATen/native/TensorShape.cpp:2228.)\n  return _VF.meshgrid(tensors, **kwargs)  # type: ignore[attr-defined]"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_sgd_baca77_18_1.svg",
+      "local_path": "_images/output_sgd_baca77_18_1.svg",
+      "alt": "../_images/output_sgd_baca77_18_1.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def f(x1, x2):  # Objective function\n    return x1 ** 2 + 2 * x2 ** 2\n\ndef f_grad(x1, x2):  # Gradient of the objective function\n    return 2 * x1, 4 * x2\n\ndef sgd(x1, x2, s1, s2, f_grad):\n    g1, g2 = f_grad(x1, x2)\n    # Simulate noisy gradient\n    g1 += tf.random.normal([1], 0.0, 1)\n    g2 += tf.random.normal([1], 0.0, 1)\n    eta_t = eta * lr()\n    return (x1 - eta_t * g1, x2 - eta_t * g2, 0, 0)\n\ndef constant_lr():\n    return 1\n\neta = 0.1\nlr = constant_lr  # Constant learning rate\nd2l.show_trace_2d(f, d2l.train_2d(sgd, steps=50, f_grad=f_grad))"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "epoch 50, x1: 0.065599, x2: -0.002330\n/home/d2l-worker/miniconda3/envs/d2l-vi-release-1/lib/python3.8/site-packages/numpy/core/shape_base.py:65: VisibleDeprecationWarning: Creating an ndarray from ragged nested sequences (which is a list-or-tuple of lists-or-tuples-or ndarrays with different lengths or shapes) is deprecated. If you meant to do this, you must specify 'dtype=object' when creating the ndarray.\n  ary = asanyarray(ary)"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_sgd_baca77_21_1.svg",
+      "local_path": "_images/output_sgd_baca77_21_1.svg",
+      "alt": "../_images/output_sgd_baca77_21_1.svg"
+    },
+    {
+      "type": "paragraph",
+      "text": "Như chúng ta có thể thấy, quỹ đạo của các biến trong gốc gradient ngẫu\nnhiên ồn hơn nhiều so với quỹ đạo mà chúng ta quan sát thấy trong\ngradient gốc trong Section 11.3 . Điều này là do tính chất ngẫu\nnhiên của gradient. Đó là, ngay cả khi chúng tôi đến gần mức tối thiểu,\nchúng tôi vẫn phải chịu sự không chắc chắn được tiêm bởi gradient tức\nthời qua \\(\\eta \\nabla f_i(\\mathbf{x})\\) . Ngay cả sau 50 bước chất\nlượng vẫn không tốt như vậy. Thậm chí tệ hơn, nó sẽ không cải thiện sau\ncác bước bổ sung (chúng tôi khuyến khích bạn thử nghiệm với một số lượng\nlớn hơn các bước để xác nhận điều này). Điều này để lại cho chúng ta sự\nthay thế duy nhất: thay đổi tỷ lệ học tập \\(\\eta\\) . Tuy nhiên, nếu\nchúng ta chọn điều này quá nhỏ, ban đầu chúng ta sẽ không đạt được bất\nkỳ tiến bộ có ý nghĩa nào. Mặt khác, nếu chúng ta chọn nó quá lớn, chúng\nta sẽ không nhận được một giải pháp tốt, như đã thấy ở trên. Cách duy\nnhất để giải quyết các mục tiêu mâu thuẫn này là giảm tỷ lệ học tập *\nnăng lượng* khi tối ưu hóa tiến triển."
+    },
+    {
+      "type": "paragraph",
+      "text": "Đây cũng là lý do để thêm một hàm tốc độ học tập lr vào hàm bước sgd . Trong ví dụ trên bất kỳ chức năng nào để lập kế hoạch tỷ lệ học\ntập nằm không hoạt động khi chúng ta đặt hàm lr liên quan là hằng\nsố."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "toc-do-hoc-dong",
+      "text": "11.4.2. Tốc độ học động"
+    },
+    {
+      "type": "paragraph",
+      "text": "Thay thế \\(\\eta\\) bằng tốc độ học tập phụ thuộc vào thời gian \\(\\eta(t)\\) thêm vào sự phức tạp của việc kiểm soát sự hội tụ của\nmột thuật toán tối ưu hóa. Đặc biệt, chúng ta cần tìm ra cách nhanh\nchóng \\(\\eta\\) sẽ phân rã. Nếu quá nhanh, chúng tôi sẽ ngừng tối ưu\nhóa sớm. Nếu chúng ta giảm nó quá chậm, chúng ta lãng phí quá nhiều thời\ngian để tối ưu hóa. Sau đây là một vài chiến lược cơ bản được sử dụng để\nđiều chỉnh \\(\\eta\\) theo thời gian (chúng tôi sẽ thảo luận về các\nchiến lược nâng cao hơn sau):"
+    },
+    {
+      "type": "math",
+      "latex": "(11.4.5)¶\\[\\begin{split}\\begin{aligned}\n    \\eta(t) & = \\eta_i \\text{ if } t_i \\leq t \\leq t_{i+1}  && \\text{piecewise constant} \\\\\n    \\eta(t) & = \\eta_0 \\cdot e^{-\\lambda t} && \\text{exponential decay} \\\\\n    \\eta(t) & = \\eta_0 \\cdot (\\beta t + 1)^{-\\alpha} && \\text{polynomial decay}\n\\end{aligned}\\end{split}\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Trong kịch bản piecewise constant đầu tiên, chúng tôi giảm tỷ lệ học\ntập, ví dụ, bất cứ khi nào tiến bộ trong các quầy hàng tối ưu hóa. Đây\nlà một chiến lược phổ biến để đào tạo các mạng sâu. Ngoài ra, chúng ta\ncó thể giảm nó mạnh mẽ hơn nhiều bởi sự phân rã theo cấp số nhân * . Thật\nkhông may điều này thường dẫn đến dừng sớm trước khi thuật toán đã hội\ntụ. Một lựa chọn phổ biến là * phân rã đa thứ* với \\(\\alpha = 0.5\\) . Trong trường hợp tối ưu hóa lồi, có một số bằng\nchứng cho thấy tỷ lệ này được cư xử tốt."
+    },
+    {
+      "type": "paragraph",
+      "text": "Chúng ta hãy xem sự phân rã theo cấp số nhân trông như thế nào trong\nthực tế."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def exponential_lr():\n    # Global variable that is defined outside this function and updated inside\n    global t\n    t += 1\n    return math.exp(-0.1 * t)\n\nt = 1\nlr = exponential_lr\nd2l.show_trace_2d(f, d2l.train_2d(sgd, steps=1000, f_grad=f_grad))"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "epoch 1000, x1: -0.820458, x2: 0.004701"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_sgd_baca77_27_1.svg",
+      "local_path": "_images/output_sgd_baca77_27_1.svg",
+      "alt": "../_images/output_sgd_baca77_27_1.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def exponential_lr():\n    # Global variable that is defined outside this function and updated inside\n    global t\n    t += 1\n    return math.exp(-0.1 * t)\n\nt = 1\nlr = exponential_lr\nd2l.show_trace_2d(f, d2l.train_2d(sgd, steps=1000, f_grad=f_grad))"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "epoch 1000, x1: -0.866443, x2: -0.070251"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_sgd_baca77_30_1.svg",
+      "local_path": "_images/output_sgd_baca77_30_1.svg",
+      "alt": "../_images/output_sgd_baca77_30_1.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def exponential_lr():\n    # Global variable that is defined outside this function and updated inside\n    global t\n    t += 1\n    return math.exp(-0.1 * t)\n\nt = 1\nlr = exponential_lr\nd2l.show_trace_2d(f, d2l.train_2d(sgd, steps=1000, f_grad=f_grad))"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "epoch 1000, x1: -0.950308, x2: 0.075469"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_sgd_baca77_33_1.svg",
+      "local_path": "_images/output_sgd_baca77_33_1.svg",
+      "alt": "../_images/output_sgd_baca77_33_1.svg"
+    },
+    {
+      "type": "paragraph",
+      "text": "Đúng như dự đoán, phương sai trong các thông số được giảm đáng kể. Tuy\nnhiên, điều này đến với chi phí không hội tụ với giải pháp tối ưu \\(\\mathbf{x} = (0, 0)\\) . Ngay cả sau 1000 bước lặp lại chúng ta vẫn\ncòn rất xa giải pháp tối ưu. Thật vậy, thuật toán không hội tụ ở tất cả.\nMặt khác, nếu chúng ta sử dụng phân rã đa thức trong đó tốc độ học tập\nphân rã với căn bậc hai nghịch đảo của số bước, sự hội tụ sẽ tốt hơn chỉ\nsau 50 bước."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def polynomial_lr():\n    # Global variable that is defined outside this function and updated inside\n    global t\n    t += 1\n    return (1 + 0.1 * t) ** (-0.5)\n\nt = 1\nlr = polynomial_lr\nd2l.show_trace_2d(f, d2l.train_2d(sgd, steps=50, f_grad=f_grad))"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "epoch 50, x1: 0.025029, x2: 0.115820"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_sgd_baca77_39_1.svg",
+      "local_path": "_images/output_sgd_baca77_39_1.svg",
+      "alt": "../_images/output_sgd_baca77_39_1.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def polynomial_lr():\n    # Global variable that is defined outside this function and updated inside\n    global t\n    t += 1\n    return (1 + 0.1 * t) ** (-0.5)\n\nt = 1\nlr = polynomial_lr\nd2l.show_trace_2d(f, d2l.train_2d(sgd, steps=50, f_grad=f_grad))"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "epoch 50, x1: -0.011478, x2: 0.051227"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_sgd_baca77_42_1.svg",
+      "local_path": "_images/output_sgd_baca77_42_1.svg",
+      "alt": "../_images/output_sgd_baca77_42_1.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def polynomial_lr():\n    # Global variable that is defined outside this function and updated inside\n    global t\n    t += 1\n    return (1 + 0.1 * t) ** (-0.5)\n\nt = 1\nlr = polynomial_lr\nd2l.show_trace_2d(f, d2l.train_2d(sgd, steps=50, f_grad=f_grad))"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "epoch 50, x1: 0.118743, x2: -0.097886"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_sgd_baca77_45_1.svg",
+      "local_path": "_images/output_sgd_baca77_45_1.svg",
+      "alt": "../_images/output_sgd_baca77_45_1.svg"
+    },
+    {
+      "type": "paragraph",
+      "text": "Tồn tại nhiều lựa chọn hơn cho cách thiết lập tỷ lệ học tập. Ví dụ,\nchúng ta có thể bắt đầu với một tốc độ nhỏ, sau đó nhanh chóng tăng lên\nvà sau đó giảm nó một lần nữa, mặc dù chậm hơn. Chúng tôi thậm chí có\nthể thay thế giữa tỷ lệ học tập nhỏ hơn và lớn hơn. Có tồn tại một loạt\ncác lịch trình như vậy. Bây giờ chúng ta hãy tập trung vào lịch trình\nhọc tập mà có thể phân tích lý thuyết toàn diện, tức là về tốc độ học\ntập trong một môi trường lồi. Đối với các bài toán phi lồi nói chung,\nrất khó để có được những đảm bảo hội tụ có ý nghĩa, vì nói chung giảm\nthiểu các bài toán phi lồi phi tuyến là NP cứng. Đối với một cuộc khảo\nsát xem ví dụ, xuất sắc bài giảng ghi\nchú của Tibshirani 2015."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "phan-tich-hoi-tu-cho-muc-tieu-loi",
+      "text": "11.4.3. Phân tích hội tụ cho mục tiêu lồi"
+    },
+    {
+      "type": "paragraph",
+      "text": "Phân tích hội tụ sau đây của gốc gradient ngẫu nhiên cho các chức năng\nmục tiêu lồi là tùy chọn và chủ yếu phục vụ để truyền đạt nhiều trực\ngiác hơn về vấn đề. Chúng tôi giới hạn bản thân mình với một trong những\nbằng chứng đơn giản nhất [Nesterov & Vial, 2000] . Các kỹ thuật\nchứng minh tiên tiến hơn đáng kể tồn tại, ví dụ, bất cứ khi nào chức\nnăng mục tiêu được cư xử đặc biệt tốt."
+    },
+    {
+      "type": "paragraph",
+      "text": "Giả sử hàm khách quan \\(f(\\boldsymbol{\\xi}, \\mathbf{x})\\) là lồi\ntrong \\(\\mathbf{x}\\) cho tất cả \\(\\boldsymbol{\\xi}\\) . Cụ thể\nhơn, chúng tôi xem xét bản cập nhật gradient gốc stochastic:"
+    },
+    {
+      "type": "math",
+      "latex": "(11.4.6)¶\\[\\mathbf{x}_{t+1} = \\mathbf{x}_{t} - \\eta_t \\partial_\\mathbf{x} f(\\boldsymbol{\\xi}_t, \\mathbf{x}),\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "trong đó \\(f(\\boldsymbol{\\xi}_t, \\mathbf{x})\\) là chức năng khách\nquan đối với ví dụ đào tạo \\(\\boldsymbol{\\xi}_t\\) rút ra từ một số\nphân phối ở bước \\(t\\) và \\(\\mathbf{x}\\) là tham số mô hình.\nBiểu thị bởi"
+    },
+    {
+      "type": "math",
+      "latex": "(11.4.7)¶\\[R(\\mathbf{x}) = E_{\\boldsymbol{\\xi}}[f(\\boldsymbol{\\xi}, \\mathbf{x})]\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "rủi ro dự kiến và đến \\(R^*\\) mức tối thiểu của nó đối với \\(\\mathbf{x}\\) . Cuối cùng cho phép \\(\\mathbf{x}^*\\) là minimizer\n(chúng tôi giả định rằng nó tồn tại trong miền nơi \\(\\mathbf{x}\\) được xác định). Trong trường hợp này, chúng ta có thể theo dõi khoảng\ncách giữa tham số hiện tại \\(\\mathbf{x}_t\\) tại thời điểm \\(t\\) và bộ giảm thiểu rủi ro \\(\\mathbf{x}^*\\) và xem liệu nó có cải thiện\ntheo thời gian hay không:"
+    },
+    {
+      "type": "math",
+      "latex": "(11.4.8)¶\\[\\begin{split}\\begin{aligned}    &\\|\\mathbf{x}_{t+1} - \\mathbf{x}^*\\|^2 \\\\ =& \\|\\mathbf{x}_{t} - \\eta_t \\partial_\\mathbf{x} f(\\boldsymbol{\\xi}_t, \\mathbf{x}) - \\mathbf{x}^*\\|^2 \\\\    =& \\|\\mathbf{x}_{t} - \\mathbf{x}^*\\|^2 + \\eta_t^2 \\|\\partial_\\mathbf{x} f(\\boldsymbol{\\xi}_t, \\mathbf{x})\\|^2 - 2 \\eta_t    \\left\\langle \\mathbf{x}_t - \\mathbf{x}^*, \\partial_\\mathbf{x} f(\\boldsymbol{\\xi}_t, \\mathbf{x})\\right\\rangle.   \\end{aligned}\\end{split}\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Chúng tôi giả định rằng định mức \\(L_2\\) của gradient ngẫu nhiên \\(\\partial_\\mathbf{x} f(\\boldsymbol{\\xi}_t, \\mathbf{x})\\) được giới\nhạn bởi một số hằng số \\(L\\) , do đó chúng tôi có"
+    },
+    {
+      "type": "math",
+      "latex": "(11.4.9)¶\\[\\eta_t^2 \\|\\partial_\\mathbf{x} f(\\boldsymbol{\\xi}_t, \\mathbf{x})\\|^2 \\leq \\eta_t^2 L^2.\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Chúng tôi chủ yếu quan tâm đến khoảng cách giữa \\(\\mathbf{x}_t\\) và \\(\\mathbf{x}^*\\) thay đổi như thế nào theo mong đợ . Trên thực tế,\nđối với bất kỳ trình tự cụ thể nào của các bước, khoảng cách có thể tăng\nlên, tùy thuộc vào bất kỳ \\(\\boldsymbol{\\xi}_t\\) nào chúng ta gặp\nphải. Do đó chúng ta cần phải ràng buộc các sản phẩm dot. Kể từ khi đối\nvới bất kỳ chức năng lồi \\(f\\) nó giữ rằng \\(f(\\mathbf{y}) \\geq f(\\mathbf{x}) + \\langle f'(\\mathbf{x}), \\mathbf{y} - \\mathbf{x} \\rangle\\) cho tất cả \\(\\mathbf{x}\\) và \\(\\mathbf{y}\\) , bởi lồi chúng tôi\ncó"
+    },
+    {
+      "type": "math",
+      "latex": "(11.4.10)¶\\[f(\\boldsymbol{\\xi}_t, \\mathbf{x}^*) \\geq f(\\boldsymbol{\\xi}_t, \\mathbf{x}_t) + \\left\\langle \\mathbf{x}^* - \\mathbf{x}_t, \\partial_{\\mathbf{x}} f(\\boldsymbol{\\xi}_t, \\mathbf{x}_t) \\right\\rangle.\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Cắm cả hai bất đẳng thức (11.4.9) và (11.4.10) vào (11.4.8) chúng tôi\ncó được một ràng buộc về khoảng cách giữa các tham số tại thời điểm \\(t+1\\) như sau:"
+    },
+    {
+      "type": "math",
+      "latex": "(11.4.11)¶\\[\\|\\mathbf{x}_{t} - \\mathbf{x}^*\\|^2 - \\|\\mathbf{x}_{t+1} - \\mathbf{x}^*\\|^2 \\geq 2 \\eta_t (f(\\boldsymbol{\\xi}_t, \\mathbf{x}_t) - f(\\boldsymbol{\\xi}_t, \\mathbf{x}^*)) - \\eta_t^2 L^2.\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Điều này có nghĩa là chúng tôi đạt được tiến bộ miễn là sự khác biệt\ngiữa tổn thất hiện tại và tổn thất tối ưu lớn hơn \\(\\eta_t L^2/2\\) .\nVì sự khác biệt này được ràng buộc để hội tụ với 0 nên sau đó tỷ lệ học\ntập \\(\\eta_t\\) cũng cần phải * biến mất *."
+    },
+    {
+      "type": "paragraph",
+      "text": "Tiếp theo, chúng tôi có kỳ vọng hơn (11.4.11) . This\nyields năng suất"
+    },
+    {
+      "type": "math",
+      "latex": "(11.4.12)¶\\[E\\left[\\|\\mathbf{x}_{t} - \\mathbf{x}^*\\|^2\\right] - E\\left[\\|\\mathbf{x}_{t+1} - \\mathbf{x}^*\\|^2\\right] \\geq 2 \\eta_t [E[R(\\mathbf{x}_t)] - R^*] -  \\eta_t^2 L^2.\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Bước cuối cùng liên quan đến việc tổng hợp các bất bình đẳng cho \\(t \\in \\{1, \\ldots, T\\}\\) . Kể từ khi tổng kính thiên văn và bằng\ncách giảm thuật ngữ thấp hơn, chúng tôi thu được"
+    },
+    {
+      "type": "math",
+      "latex": "(11.4.13)¶\\[\\|\\mathbf{x}_1 - \\mathbf{x}^*\\|^2 \\geq 2 \\left (\\sum_{t=1}^T   \\eta_t \\right) [E[R(\\mathbf{x}_t)] - R^*] - L^2 \\sum_{t=1}^T \\eta_t^2.\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Lưu ý rằng chúng tôi đã khai thác rằng \\(\\mathbf{x}_1\\) được đưa ra\nvà do đó kỳ vọng có thể được giảm xuống. Định nghĩa cuối"
+    },
+    {
+      "type": "math",
+      "latex": "(11.4.14)¶\\[\\bar{\\mathbf{x}} \\stackrel{\\mathrm{def}}{=} \\frac{\\sum_{t=1}^T \\eta_t \\mathbf{x}_t}{\\sum_{t=1}^T \\eta_t}.\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Kể từ"
+    },
+    {
+      "type": "math",
+      "latex": "(11.4.15)¶\\[E\\left(\\frac{\\sum_{t=1}^T \\eta_t R(\\mathbf{x}_t)}{\\sum_{t=1}^T \\eta_t}\\right) = \\frac{\\sum_{t=1}^T \\eta_t E[R(\\mathbf{x}_t)]}{\\sum_{t=1}^T \\eta_t} = E[R(\\mathbf{x}_t)],\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "bởi sự bất bình đẳng của Jensen (thiết lập \\(i=t\\) , \\(\\alpha_i = \\eta_t/\\sum_{t=1}^T \\eta_t\\) trong (11.2.3) ) và độ lồi của \\(R\\) nó theo sau đó \\(E[R(\\mathbf{x}_t)] \\geq E[R(\\bar{\\mathbf{x}})]\\) , do đó"
+    },
+    {
+      "type": "math",
+      "latex": "(11.4.16)¶\\[\\sum_{t=1}^T \\eta_t E[R(\\mathbf{x}_t)] \\geq \\sum_{t=1}^T \\eta_t  E\\left[R(\\bar{\\mathbf{x}})\\right].\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Cắm này vào bất bình đẳng (11.4.13) mang lại sự ràng\nbuộc"
+    },
+    {
+      "type": "math",
+      "latex": "(11.4.17)¶\\[\\left[E[\\bar{\\mathbf{x}}]\\right] - R^* \\leq \\frac{r^2 + L^2 \\sum_{t=1}^T \\eta_t^2}{2 \\sum_{t=1}^T \\eta_t},\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "trong đó \\(r^2 \\stackrel{\\mathrm{def}}{=} \\|\\mathbf{x}_1 - \\mathbf{x}^*\\|^2\\) là một ràng buộc về khoảng cách giữa sự lựa chọn ban đầu của các tham số\nvà kết quả cuối cùng. Nói tóm lại, tốc độ hội tụ phụ thuộc vào cách định\nmức của gradient ngẫu nhiên được giới hạn ( \\(L\\) ) và cách tối ưu giá\ntrị tham số ban đầu là bao xa ( \\(r\\) ). Lưu ý rằng sự ràng buộc là về \\(\\bar{\\mathbf{x}}\\) chứ không phải là \\(\\mathbf{x}_T\\) . Đây là\ntrường hợp vì \\(\\bar{\\mathbf{x}}\\) là một phiên bản được làm mịn của\nđường dẫn tối ưu hóa. Bất cứ khi nào \\(r, L\\) , và \\(T\\) được\nbiết đến, chúng tôi có thể chọn tỷ lệ học tập \\(\\eta = r/(L \\sqrt{T})\\) . Điều này mang lại như trên ràng buộc \\(rL/\\sqrt{T}\\) . Đó là, chúng tôi hội tụ với tỷ lệ \\(\\mathcal{O}(1/\\sqrt{T})\\) đến giải pháp tối ưu."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "gradient-stochastic-va-mau-huu-han",
+      "text": "11.4.4. Gradient Stochastic và mẫu hữu hạn"
+    },
+    {
+      "type": "paragraph",
+      "text": "Cho đến nay chúng tôi đã chơi một chút nhanh và lỏng lẻo khi nói về gốc\ngradient ngẫu nhiên. Chúng tôi xác định rằng chúng tôi vẽ các trường hợp \\(x_i\\) , thường với nhãn \\(y_i\\) từ một số phân phối \\(p(x, y)\\) và chúng tôi sử dụng điều này để cập nhật các tham số mô\nhình theo một cách nào đó. Đặc biệt, đối với một kích thước mẫu hữu hạn,\nchúng tôi chỉ đơn giản lập luận rằng phân phối rời rạc \\(p(x, y) = \\frac{1}{n} \\sum_{i=1}^n \\delta_{x_i}(x) \\delta_{y_i}(y)\\) cho một số chức năng \\(\\delta_{x_i}\\) và \\(\\delta_{y_i}\\) cho\nphép chúng tôi thực hiện chuyển đổi gradient ngẫu nhiên trên nó."
+    },
+    {
+      "type": "paragraph",
+      "text": "Tuy nhiên, đây không thực sự là những gì chúng tôi đã làm. Trong các ví\ndụ đồ chơi trong phần hiện tại, chúng tôi chỉ cần thêm tiếng ồn vào một\ngradient không ngẫu nhiên khác, tức là, chúng tôi giả vờ có cặp \\((x_i, y_i)\\) . Nó chỉ ra rằng điều này là hợp lý ở đây (xem các bài\ntập để thảo luận chi tiết). Rắc rối hơn là trong tất cả các cuộc thảo\nluận trước đó, chúng tôi rõ ràng đã không làm điều này. Thay vào đó,\nchúng tôi lặp lại tất cả các phiên bản * chính xác một lầu * . Để xem\nlý do tại sao điều này là thích hợp hơn, hãy xem xét cuộc trò chuyện, cụ\nthể là chúng tôi đang lấy mẫu \\(n\\) quan sát từ phân phối rời rạc *\nvới thay thế * . Xác suất chọn một phần tử \\(i\\) ngẫu nhiên là \\(1/n\\) . Do đó để chọn nó * ít nhất* một lần là"
+    },
+    {
+      "type": "math",
+      "latex": "(11.4.18)¶\\[P(\\mathrm{choose~} i) = 1 - P(\\mathrm{omit~} i) = 1 - (1-1/n)^n \\approx 1-e^{-1} \\approx 0.63.\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Một lý do tương tự cho thấy xác suất chọn một số mẫu (tức là ví dụ đào\ntạo) * chính xác một lầu* được đưa ra bởi"
+    },
+    {
+      "type": "math",
+      "latex": "(11.4.19)¶\\[{n \\choose 1} \\frac{1}{n} \\left(1-\\frac{1}{n}\\right)^{n-1} = \\frac{n}{n-1} \\left(1-\\frac{1}{n}\\right)^{n} \\approx e^{-1} \\approx 0.37.\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Điều này dẫn đến sự gia tăng phương sai và giảm hiệu quả dữ liệu so với\nlấy mẫu * mà không thay thế * . Do đó, trong thực tế, chúng tôi thực\nhiện sau này (và đây là lựa chọn mặc định trong suốt cuốn sách này). Lưu\ný cuối cùng rằng lặp đi lặp lại qua tập dữ liệu đào tạo đi qua nó theo\nthứ tự ngẫu nhiên * khác nhau*."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tom-tat",
+      "text": "11.4.5. Tóm tắt"
+    },
+    {
+      "type": "list",
+      "ordered": false,
+      "items": [
+        "Đối với các vấn đề lồi, chúng ta có thể chứng minh rằng đối với một\nsự lựa chọn rộng của tỷ lệ học tập stochastic gradient gốc sẽ hội tụ\nvới giải pháp tối ưu.",
+        "Đối với học sâu, điều này thường không phải là trường hợp. Tuy nhiên,\nviệc phân tích các bài toán lồi cho chúng ta cái nhìn sâu sắc hữu ích\nvề cách tiếp cận tối ưu hóa, cụ thể là giảm tốc độ học tập dần dần,\nmặc dù không quá nhanh.",
+        "Vấn đề xảy ra khi tỷ lệ học tập quá nhỏ hoặc quá lớn. Trong thực tế,\nmột tỷ lệ học tập phù hợp thường chỉ được tìm thấy sau nhiều thí\nnghiệm.",
+        "Khi có nhiều ví dụ hơn trong tập dữ liệu đào tạo, chi phí nhiều hơn\nđể tính toán mỗi lần lặp cho gradient descent, do đó, stochastic\ngradient descent được ưa thích trong những trường hợp này.",
+        "Đảm bảo tối ưu cho dòng dốc ngẫu nhiên nói chung không có sẵn trong\ncác trường hợp không lồi vì số lượng minima cục bộ yêu cầu kiểm tra\ncũng có thể là cấp số nhân."
+      ]
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bai-tap",
+      "text": "11.4.6. Bài tập"
+    },
+    {
+      "type": "list",
+      "ordered": true,
+      "items": [
+        "Thử nghiệm với các lịch trình tỷ lệ học tập khác nhau cho gốc\ngradient ngẫu nhiên và với các số lần lặp khác nhau. Đặc biệt, vẽ\nkhoảng cách từ giải pháp tối ưu \\((0, 0)\\) như một hàm của số lần\nlặp lại.",
+        "Chứng minh rằng đối với hàm \\(f(x_1, x_2) = x_1^2 + 2 x_2^2\\) thêm nhiễu bình thường vào gradient tương đương với việc giảm thiểu\nhàm mất \\(f(\\mathbf{x}, \\mathbf{w}) = (x_1 - w_1)^2 + 2 (x_2 - w_2)^2\\) trong đó \\(\\mathbf{x}\\) được rút ra từ một phân phối bình thường.",
+        "So sánh sự hội tụ của gốc gradient ngẫu nhiên khi bạn lấy mẫu từ \\(\\{(x_1, y_1), \\ldots, (x_n, y_n)\\}\\) với sự thay thế và khi bạn\nlấy mẫu mà không cần thay thế.",
+        "Làm thế nào bạn sẽ thay đổi các stochastic gradient descent solver\nnếu một số gradient (hoặc đúng hơn là một số phối hợp liên quan đến\nnó) đã luôn lớn hơn tất cả các gradient khác?",
+        "Giả sử rằng \\(f(x) = x^2 (1 + \\sin x)\\) . \\(f\\) có bao nhiêu\nminima địa phương? Bạn có thể thay đổi \\(f\\) theo cách để giảm\nthiểu nó, người ta cần đánh giá tất cả các minima địa phương không?"
+      ]
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    }
+  ],
+  "images": [
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_sgd_baca77_15_1.svg",
+      "local_path": "_images/output_sgd_baca77_15_1.svg",
+      "alt": "../_images/output_sgd_baca77_15_1.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_sgd_baca77_18_1.svg",
+      "local_path": "_images/output_sgd_baca77_18_1.svg",
+      "alt": "../_images/output_sgd_baca77_18_1.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_sgd_baca77_21_1.svg",
+      "local_path": "_images/output_sgd_baca77_21_1.svg",
+      "alt": "../_images/output_sgd_baca77_21_1.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_sgd_baca77_27_1.svg",
+      "local_path": "_images/output_sgd_baca77_27_1.svg",
+      "alt": "../_images/output_sgd_baca77_27_1.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_sgd_baca77_30_1.svg",
+      "local_path": "_images/output_sgd_baca77_30_1.svg",
+      "alt": "../_images/output_sgd_baca77_30_1.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_sgd_baca77_33_1.svg",
+      "local_path": "_images/output_sgd_baca77_33_1.svg",
+      "alt": "../_images/output_sgd_baca77_33_1.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_sgd_baca77_39_1.svg",
+      "local_path": "_images/output_sgd_baca77_39_1.svg",
+      "alt": "../_images/output_sgd_baca77_39_1.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_sgd_baca77_42_1.svg",
+      "local_path": "_images/output_sgd_baca77_42_1.svg",
+      "alt": "../_images/output_sgd_baca77_42_1.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_sgd_baca77_45_1.svg",
+      "local_path": "_images/output_sgd_baca77_45_1.svg",
+      "alt": "../_images/output_sgd_baca77_45_1.svg"
+    }
+  ],
+  "text": "11.4. Stochastic Gradient Descent\nTuy nhiên, trong các chương trước, chúng tôi tiếp tục sử dụng gốc\ngradient ngẫu nhiên trong quy trình đào tạo của chúng tôi, tuy nhiên, mà\nkhông giải thích lý do tại sao nó hoạt động. Để làm sáng tỏ nó, chúng\ntôi chỉ mô tả các nguyên tắc cơ bản của gradient gốc trong Section 11.3 . Trong phần này, chúng tôi tiếp tục thảo luận xuống\ndốc ngẫu nhiên chi tiết hơn.\n11.4.1. Stochastic Gradient Những Thông Tin Cập Nhập\nTrong học sâu, chức năng khách quan thường là trung bình của các hàm mất\ncho mỗi ví dụ trong tập dữ liệu đào tạo. Với một tập dữ liệu đào tạo \\(n\\) ví dụ, chúng tôi giả định rằng \\(f_i(\\mathbf{x})\\) là hàm\nmất liên quan đến ví dụ đào tạo của chỉ số \\(i\\) , trong đó \\(\\mathbf{x}\\) là vectơ tham số. Sau đó, chúng tôi đến chức năng mục\ntiêu\nGradient của hàm khách quan tại \\(\\mathbf{x}\\) được tính là\nNếu sử dụng gradient descent, chi phí tính toán cho mỗi lần lặp biến độc\nlập là \\(\\mathcal{O}(n)\\) , phát triển tuyến tính với \\(n\\) . Do\nđó, khi tập dữ liệu đào tạo lớn hơn, chi phí của gradient descent cho\nmỗi lần lặp sẽ cao hơn.\nStochastic gradient descent (SGD) giảm chi phí tính toán tại mỗi lần lặp\nlại. Tại mỗi lần lặp lại của dòng dốc ngẫu nhiên, chúng tôi lấy mẫu\nthống nhất một chỉ số \\(i\\in\\{1,\\ldots, n\\}\\) cho các ví dụ dữ liệu\nmột cách ngẫu nhiên và tính toán gradient \\(\\nabla f_i(\\mathbf{x})\\) để cập nhật \\(\\mathbf{x}\\) :\ntrong đó \\(\\eta\\) là tỷ lệ học tập. Chúng ta có thể thấy rằng chi\nphí tính toán cho mỗi lần lặp giảm từ \\(\\mathcal{O}(n)\\) của\ngradient gốc xuống hằng số \\(\\mathcal{O}(1)\\) . Hơn nữa, chúng tôi\nmuốn nhấn mạnh rằng gradient ngẫu nhiên \\(\\nabla f_i(\\mathbf{x})\\) là một ước tính không thiên vị của gradient đầy đủ \\(\\nabla f(\\mathbf{x})\\) bởi vì\nĐiều này có nghĩa là, trung bình, gradient stochastic là một ước tính\ntốt của gradient.\nBây giờ, chúng ta sẽ so sánh nó với gradient descent bằng cách thêm\nnhiễu ngẫu nhiên với trung bình 0 và phương sai 1 với gradient để mô\nphỏng một gradient gốc ngẫu nhiên.\nNhư chúng ta có thể thấy, quỹ đạo của các biến trong gốc gradient ngẫu\nnhiên ồn hơn nhiều so với quỹ đạo mà chúng ta quan sát thấy trong\ngradient gốc trong Section 11.3 . Điều này là do tính chất ngẫu\nnhiên của gradient. Đó là, ngay cả khi chúng tôi đến gần mức tối thiểu,\nchúng tôi vẫn phải chịu sự không chắc chắn được tiêm bởi gradient tức\nthời qua \\(\\eta \\nabla f_i(\\mathbf{x})\\) . Ngay cả sau 50 bước chất\nlượng vẫn không tốt như vậy. Thậm chí tệ hơn, nó sẽ không cải thiện sau\ncác bước bổ sung (chúng tôi khuyến khích bạn thử nghiệm với một số lượng\nlớn hơn các bước để xác nhận điều này). Điều này để lại cho chúng ta sự\nthay thế duy nhất: thay đổi tỷ lệ học tập \\(\\eta\\) . Tuy nhiên, nếu\nchúng ta chọn điều này quá nhỏ, ban đầu chúng ta sẽ không đạt được bất\nkỳ tiến bộ có ý nghĩa nào. Mặt khác, nếu chúng ta chọn nó quá lớn, chúng\nta sẽ không nhận được một giải pháp tốt, như đã thấy ở trên. Cách duy\nnhất để giải quyết các mục tiêu mâu thuẫn này là giảm tỷ lệ học tập *\nnăng lượng* khi tối ưu hóa tiến triển.\nĐây cũng là lý do để thêm một hàm tốc độ học tập lr vào hàm bước sgd . Trong ví dụ trên bất kỳ chức năng nào để lập kế hoạch tỷ lệ học\ntập nằm không hoạt động khi chúng ta đặt hàm lr liên quan là hằng\nsố.\n11.4.2. Tốc độ học động\nThay thế \\(\\eta\\) bằng tốc độ học tập phụ thuộc vào thời gian \\(\\eta(t)\\) thêm vào sự phức tạp của việc kiểm soát sự hội tụ của\nmột thuật toán tối ưu hóa. Đặc biệt, chúng ta cần tìm ra cách nhanh\nchóng \\(\\eta\\) sẽ phân rã. Nếu quá nhanh, chúng tôi sẽ ngừng tối ưu\nhóa sớm. Nếu chúng ta giảm nó quá chậm, chúng ta lãng phí quá nhiều thời\ngian để tối ưu hóa. Sau đây là một vài chiến lược cơ bản được sử dụng để\nđiều chỉnh \\(\\eta\\) theo thời gian (chúng tôi sẽ thảo luận về các\nchiến lược nâng cao hơn sau):\nTrong kịch bản piecewise constant đầu tiên, chúng tôi giảm tỷ lệ học\ntập, ví dụ, bất cứ khi nào tiến bộ trong các quầy hàng tối ưu hóa. Đây\nlà một chiến lược phổ biến để đào tạo các mạng sâu. Ngoài ra, chúng ta\ncó thể giảm nó mạnh mẽ hơn nhiều bởi sự phân rã theo cấp số nhân * . Thật\nkhông may điều này thường dẫn đến dừng sớm trước khi thuật toán đã hội\ntụ. Một lựa chọn phổ biến là * phân rã đa thứ* với \\(\\alpha = 0.5\\) . Trong trường hợp tối ưu hóa lồi, có một số bằng\nchứng cho thấy tỷ lệ này được cư xử tốt.\nChúng ta hãy xem sự phân rã theo cấp số nhân trông như thế nào trong\nthực tế.\nĐúng như dự đoán, phương sai trong các thông số được giảm đáng kể. Tuy\nnhiên, điều này đến với chi phí không hội tụ với giải pháp tối ưu \\(\\mathbf{x} = (0, 0)\\) . Ngay cả sau 1000 bước lặp lại chúng ta vẫn\ncòn rất xa giải pháp tối ưu. Thật vậy, thuật toán không hội tụ ở tất cả.\nMặt khác, nếu chúng ta sử dụng phân rã đa thức trong đó tốc độ học tập\nphân rã với căn bậc hai nghịch đảo của số bước, sự hội tụ sẽ tốt hơn chỉ\nsau 50 bước.\nTồn tại nhiều lựa chọn hơn cho cách thiết lập tỷ lệ học tập. Ví dụ,\nchúng ta có thể bắt đầu với một tốc độ nhỏ, sau đó nhanh chóng tăng lên\nvà sau đó giảm nó một lần nữa, mặc dù chậm hơn. Chúng tôi thậm chí có\nthể thay thế giữa tỷ lệ học tập nhỏ hơn và lớn hơn. Có tồn tại một loạt\ncác lịch trình như vậy. Bây giờ chúng ta hãy tập trung vào lịch trình\nhọc tập mà có thể phân tích lý thuyết toàn diện, tức là về tốc độ học\ntập trong một môi trường lồi. Đối với các bài toán phi lồi nói chung,\nrất khó để có được những đảm bảo hội tụ có ý nghĩa, vì nói chung giảm\nthiểu các bài toán phi lồi phi tuyến là NP cứng. Đối với một cuộc khảo\nsát xem ví dụ, xuất sắc bài giảng ghi\nchú của Tibshirani 2015.\n11.4.3. Phân tích hội tụ cho mục tiêu lồi\nPhân tích hội tụ sau đây của gốc gradient ngẫu nhiên cho các chức năng\nmục tiêu lồi là tùy chọn và chủ yếu phục vụ để truyền đạt nhiều trực\ngiác hơn về vấn đề. Chúng tôi giới hạn bản thân mình với một trong những\nbằng chứng đơn giản nhất [Nesterov & Vial, 2000] . Các kỹ thuật\nchứng minh tiên tiến hơn đáng kể tồn tại, ví dụ, bất cứ khi nào chức\nnăng mục tiêu được cư xử đặc biệt tốt.\nGiả sử hàm khách quan \\(f(\\boldsymbol{\\xi}, \\mathbf{x})\\) là lồi\ntrong \\(\\mathbf{x}\\) cho tất cả \\(\\boldsymbol{\\xi}\\) . Cụ thể\nhơn, chúng tôi xem xét bản cập nhật gradient gốc stochastic:\ntrong đó \\(f(\\boldsymbol{\\xi}_t, \\mathbf{x})\\) là chức năng khách\nquan đối với ví dụ đào tạo \\(\\boldsymbol{\\xi}_t\\) rút ra từ một số\nphân phối ở bước \\(t\\) và \\(\\mathbf{x}\\) là tham số mô hình.\nBiểu thị bởi\nrủi ro dự kiến và đến \\(R^*\\) mức tối thiểu của nó đối với \\(\\mathbf{x}\\) . Cuối cùng cho phép \\(\\mathbf{x}^*\\) là minimizer\n(chúng tôi giả định rằng nó tồn tại trong miền nơi \\(\\mathbf{x}\\) được xác định). Trong trường hợp này, chúng ta có thể theo dõi khoảng\ncách giữa tham số hiện tại \\(\\mathbf{x}_t\\) tại thời điểm \\(t\\) và bộ giảm thiểu rủi ro \\(\\mathbf{x}^*\\) và xem liệu nó có cải thiện\ntheo thời gian hay không:\nChúng tôi giả định rằng định mức \\(L_2\\) của gradient ngẫu nhiên \\(\\partial_\\mathbf{x} f(\\boldsymbol{\\xi}_t, \\mathbf{x})\\) được giới\nhạn bởi một số hằng số \\(L\\) , do đó chúng tôi có\nChúng tôi chủ yếu quan tâm đến khoảng cách giữa \\(\\mathbf{x}_t\\) và \\(\\mathbf{x}^*\\) thay đổi như thế nào theo mong đợ . Trên thực tế,\nđối với bất kỳ trình tự cụ thể nào của các bước, khoảng cách có thể tăng\nlên, tùy thuộc vào bất kỳ \\(\\boldsymbol{\\xi}_t\\) nào chúng ta gặp\nphải. Do đó chúng ta cần phải ràng buộc các sản phẩm dot. Kể từ khi đối\nvới bất kỳ chức năng lồi \\(f\\) nó giữ rằng \\(f(\\mathbf{y}) \\geq f(\\mathbf{x}) + \\langle f'(\\mathbf{x}), \\mathbf{y} - \\mathbf{x} \\rangle\\) cho tất cả \\(\\mathbf{x}\\) và \\(\\mathbf{y}\\) , bởi lồi chúng tôi\ncó\nCắm cả hai bất đẳng thức (11.4.9) và (11.4.10) vào (11.4.8) chúng tôi\ncó được một ràng buộc về khoảng cách giữa các tham số tại thời điểm \\(t+1\\) như sau:\nĐiều này có nghĩa là chúng tôi đạt được tiến bộ miễn là sự khác biệt\ngiữa tổn thất hiện tại và tổn thất tối ưu lớn hơn \\(\\eta_t L^2/2\\) .\nVì sự khác biệt này được ràng buộc để hội tụ với 0 nên sau đó tỷ lệ học\ntập \\(\\eta_t\\) cũng cần phải * biến mất *.\nTiếp theo, chúng tôi có kỳ vọng hơn (11.4.11) . This\nyields năng suất\nBước cuối cùng liên quan đến việc tổng hợp các bất bình đẳng cho \\(t \\in \\{1, \\ldots, T\\}\\) . Kể từ khi tổng kính thiên văn và bằng\ncách giảm thuật ngữ thấp hơn, chúng tôi thu được\nLưu ý rằng chúng tôi đã khai thác rằng \\(\\mathbf{x}_1\\) được đưa ra\nvà do đó kỳ vọng có thể được giảm xuống. Định nghĩa cuối\nKể từ\nbởi sự bất bình đẳng của Jensen (thiết lập \\(i=t\\) , \\(\\alpha_i = \\eta_t/\\sum_{t=1}^T \\eta_t\\) trong (11.2.3) ) và độ lồi của \\(R\\) nó theo sau đó \\(E[R(\\mathbf{x}_t)] \\geq E[R(\\bar{\\mathbf{x}})]\\) , do đó\nCắm này vào bất bình đẳng (11.4.13) mang lại sự ràng\nbuộc\ntrong đó \\(r^2 \\stackrel{\\mathrm{def}}{=} \\|\\mathbf{x}_1 - \\mathbf{x}^*\\|^2\\) là một ràng buộc về khoảng cách giữa sự lựa chọn ban đầu của các tham số\nvà kết quả cuối cùng. Nói tóm lại, tốc độ hội tụ phụ thuộc vào cách định\nmức của gradient ngẫu nhiên được giới hạn ( \\(L\\) ) và cách tối ưu giá\ntrị tham số ban đầu là bao xa ( \\(r\\) ). Lưu ý rằng sự ràng buộc là về \\(\\bar{\\mathbf{x}}\\) chứ không phải là \\(\\mathbf{x}_T\\) . Đây là\ntrường hợp vì \\(\\bar{\\mathbf{x}}\\) là một phiên bản được làm mịn của\nđường dẫn tối ưu hóa. Bất cứ khi nào \\(r, L\\) , và \\(T\\) được\nbiết đến, chúng tôi có thể chọn tỷ lệ học tập \\(\\eta = r/(L \\sqrt{T})\\) . Điều này mang lại như trên ràng buộc \\(rL/\\sqrt{T}\\) . Đó là, chúng tôi hội tụ với tỷ lệ \\(\\mathcal{O}(1/\\sqrt{T})\\) đến giải pháp tối ưu.\n11.4.4. Gradient Stochastic và mẫu hữu hạn\nCho đến nay chúng tôi đã chơi một chút nhanh và lỏng lẻo khi nói về gốc\ngradient ngẫu nhiên. Chúng tôi xác định rằng chúng tôi vẽ các trường hợp \\(x_i\\) , thường với nhãn \\(y_i\\) từ một số phân phối \\(p(x, y)\\) và chúng tôi sử dụng điều này để cập nhật các tham số mô\nhình theo một cách nào đó. Đặc biệt, đối với một kích thước mẫu hữu hạn,\nchúng tôi chỉ đơn giản lập luận rằng phân phối rời rạc \\(p(x, y) = \\frac{1}{n} \\sum_{i=1}^n \\delta_{x_i}(x) \\delta_{y_i}(y)\\) cho một số chức năng \\(\\delta_{x_i}\\) và \\(\\delta_{y_i}\\) cho\nphép chúng tôi thực hiện chuyển đổi gradient ngẫu nhiên trên nó.\nTuy nhiên, đây không thực sự là những gì chúng tôi đã làm. Trong các ví\ndụ đồ chơi trong phần hiện tại, chúng tôi chỉ cần thêm tiếng ồn vào một\ngradient không ngẫu nhiên khác, tức là, chúng tôi giả vờ có cặp \\((x_i, y_i)\\) . Nó chỉ ra rằng điều này là hợp lý ở đây (xem các bài\ntập để thảo luận chi tiết). Rắc rối hơn là trong tất cả các cuộc thảo\nluận trước đó, chúng tôi rõ ràng đã không làm điều này. Thay vào đó,\nchúng tôi lặp lại tất cả các phiên bản * chính xác một lầu * . Để xem\nlý do tại sao điều này là thích hợp hơn, hãy xem xét cuộc trò chuyện, cụ\nthể là chúng tôi đang lấy mẫu \\(n\\) quan sát từ phân phối rời rạc *\nvới thay thế * . Xác suất chọn một phần tử \\(i\\) ngẫu nhiên là \\(1/n\\) . Do đó để chọn nó * ít nhất* một lần là\nMột lý do tương tự cho thấy xác suất chọn một số mẫu (tức là ví dụ đào\ntạo) * chính xác một lầu* được đưa ra bởi\nĐiều này dẫn đến sự gia tăng phương sai và giảm hiệu quả dữ liệu so với\nlấy mẫu * mà không thay thế * . Do đó, trong thực tế, chúng tôi thực\nhiện sau này (và đây là lựa chọn mặc định trong suốt cuốn sách này). Lưu\ný cuối cùng rằng lặp đi lặp lại qua tập dữ liệu đào tạo đi qua nó theo\nthứ tự ngẫu nhiên * khác nhau*.\n11.4.5. Tóm tắt\nĐối với các vấn đề lồi, chúng ta có thể chứng minh rằng đối với một\nsự lựa chọn rộng của tỷ lệ học tập stochastic gradient gốc sẽ hội tụ\nvới giải pháp tối ưu.\nĐối với học sâu, điều này thường không phải là trường hợp. Tuy nhiên,\nviệc phân tích các bài toán lồi cho chúng ta cái nhìn sâu sắc hữu ích\nvề cách tiếp cận tối ưu hóa, cụ thể là giảm tốc độ học tập dần dần,\nmặc dù không quá nhanh.\nVấn đề xảy ra khi tỷ lệ học tập quá nhỏ hoặc quá lớn. Trong thực tế,\nmột tỷ lệ học tập phù hợp thường chỉ được tìm thấy sau nhiều thí\nnghiệm.\nKhi có nhiều ví dụ hơn trong tập dữ liệu đào tạo, chi phí nhiều hơn\nđể tính toán mỗi lần lặp cho gradient descent, do đó, stochastic\ngradient descent được ưa thích trong những trường hợp này.\nĐảm bảo tối ưu cho dòng dốc ngẫu nhiên nói chung không có sẵn trong\ncác trường hợp không lồi vì số lượng minima cục bộ yêu cầu kiểm tra\ncũng có thể là cấp số nhân.\n11.4.6. Bài tập\nThử nghiệm với các lịch trình tỷ lệ học tập khác nhau cho gốc\ngradient ngẫu nhiên và với các số lần lặp khác nhau. Đặc biệt, vẽ\nkhoảng cách từ giải pháp tối ưu \\((0, 0)\\) như một hàm của số lần\nlặp lại.\nChứng minh rằng đối với hàm \\(f(x_1, x_2) = x_1^2 + 2 x_2^2\\) thêm nhiễu bình thường vào gradient tương đương với việc giảm thiểu\nhàm mất \\(f(\\mathbf{x}, \\mathbf{w}) = (x_1 - w_1)^2 + 2 (x_2 - w_2)^2\\) trong đó \\(\\mathbf{x}\\) được rút ra từ một phân phối bình thường.\nSo sánh sự hội tụ của gốc gradient ngẫu nhiên khi bạn lấy mẫu từ \\(\\{(x_1, y_1), \\ldots, (x_n, y_n)\\}\\) với sự thay thế và khi bạn\nlấy mẫu mà không cần thay thế.\nLàm thế nào bạn sẽ thay đổi các stochastic gradient descent solver\nnếu một số gradient (hoặc đúng hơn là một số phối hợp liên quan đến\nnó) đã luôn lớn hơn tất cả các gradient khác?\nGiả sử rằng \\(f(x) = x^2 (1 + \\sin x)\\) . \\(f\\) có bao nhiêu\nminima địa phương? Bạn có thể thay đổi \\(f\\) theo cách để giảm\nthiểu nó, người ta cần đánh giá tất cả các minima địa phương không?\nDiscussions\nDiscussions\nDiscussions"
+}

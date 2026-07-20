@@ -1,0 +1,903 @@
+{
+  "url": "https://vi.d2l.ai/index.html",
+  "chapter": "root",
+  "title": "Đắm mình vào Học Sâu",
+  "crawled_at": "2026-07-20T12:39:07.903452+00:00",
+  "headings": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "dam-minh-vao-hoc-sau",
+      "text": "Đắm mình vào Học Sâu"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": null,
+      "text": "Dive into Deep Learning"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": null,
+      "text": "Announcements"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": null,
+      "text": "Authors"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": null,
+      "text": "Aston Zhang"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": null,
+      "text": "Zack C. Lipton"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": null,
+      "text": "Mu Li"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": null,
+      "text": "Alex J. Smola"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": null,
+      "text": "Vol.2 Chapter Authors"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": null,
+      "text": "Brent Werness"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": null,
+      "text": "Rachel Hu"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": null,
+      "text": "Shuai Zhang"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": null,
+      "text": "Yi Tay"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": null,
+      "text": "Framework Adaptation Authors"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": null,
+      "text": "Anirudh Dagar"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": null,
+      "text": "Yuan Tang"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": null,
+      "text": "We thank all the community contributors for making this open source book better for everyone."
+    },
+    {
+      "type": "heading",
+      "level": 4,
+      "id": null,
+      "text": "Contribute to the book."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": null,
+      "text": "Each section is an executable Jupyter notebook"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": null,
+      "text": "Mathematics + Figures + Code"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": null,
+      "text": "Active community support"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "textbook",
+      "text": "D2L as a textbook or a reference book"
+    },
+    {
+      "type": "heading",
+      "level": 4,
+      "id": "textbook",
+      "text": "If you use (or will use) D2L to teach and would like to receive a free hardcopy,\n        please contact us ."
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": null,
+      "text": "BibTeX entry for citing the book"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "dam-minh-vao-hoc-sau",
+      "text": "Table of contents"
+    }
+  ],
+  "content": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "dam-minh-vao-hoc-sau",
+      "text": "Đắm mình vào Học Sâu"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/front.png",
+      "local_path": "_images/front.png",
+      "alt": ""
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": null,
+      "text": "Dive into Deep Learning"
+    },
+    {
+      "type": "paragraph",
+      "text": "Interactive deep learning book with code, math, and discussions Implemented with NumPy/MXNet , PyTorch , and TensorFlow Adopted at 300 universities from 55 countries Star"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": null,
+      "text": "Announcements"
+    },
+    {
+      "type": "list",
+      "ordered": false,
+      "items": [
+        "[Dec 2021] We added a new option to run this book for free: check out SageMaker Studio Lab .",
+        "[Jul 2021] We have improved the content and added TensorFlow implementations up to Chapter 11.\n          To keep track of the latest updates, just follow D2L's open-source project .",
+        "[Jan 2021] Check out the brand-new Chapter: Attention Mechanisms .\n          We have also added PyTorch implementations.",
+        "[Apr 2020] We have revamped Chapter: NLP pretraining and Chapter: NLP applications ,\n        and added sections of BERT and natural language inference.",
+        "[Jul 2019]\n      The Chinese version is the No. 1 best seller of new books in \"Computers and Internet\" at the largest Chinese online bookstore.",
+        "[May 2019]\n      Slides, Jupyter notebooks, assignments, and videos of the Berkeley course can be found at the syllabus page ."
+      ]
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": null,
+      "text": "Authors"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/aston.jpg",
+      "local_path": "_images/aston.jpg",
+      "alt": ""
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": null,
+      "text": "Aston Zhang"
+    },
+    {
+      "type": "paragraph",
+      "text": "Amazon Senior Scientist"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/zack.jpg",
+      "local_path": "_images/zack.jpg",
+      "alt": ""
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": null,
+      "text": "Zack C. Lipton"
+    },
+    {
+      "type": "paragraph",
+      "text": "Amazon Scientist CMU Assistant Professor"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/mu.jpg",
+      "local_path": "_images/mu.jpg",
+      "alt": ""
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": null,
+      "text": "Mu Li"
+    },
+    {
+      "type": "paragraph",
+      "text": "Amazon Senior Principal Scientist"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/alex.jpg",
+      "local_path": "_images/alex.jpg",
+      "alt": ""
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": null,
+      "text": "Alex J. Smola"
+    },
+    {
+      "type": "paragraph",
+      "text": "Amazon VP/Distinguished Scientist"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": null,
+      "text": "Vol.2 Chapter Authors"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/brent.jpg",
+      "local_path": "_images/brent.jpg",
+      "alt": ""
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": null,
+      "text": "Brent Werness"
+    },
+    {
+      "type": "paragraph",
+      "text": "Amazon Senior Scientist Mathematics\n        for Deep Learning"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/rachel.jpeg",
+      "local_path": "_images/rachel.jpeg",
+      "alt": ""
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": null,
+      "text": "Rachel Hu"
+    },
+    {
+      "type": "paragraph",
+      "text": "Amazon Scientist Mathematics\n        for Deep Learning"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/shuai.jpg",
+      "local_path": "_images/shuai.jpg",
+      "alt": ""
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": null,
+      "text": "Shuai Zhang"
+    },
+    {
+      "type": "paragraph",
+      "text": "ETH Zürich Postdoctoral Researcher Recommender Systems"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/yi.jpg",
+      "local_path": "_images/yi.jpg",
+      "alt": ""
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": null,
+      "text": "Yi Tay"
+    },
+    {
+      "type": "paragraph",
+      "text": "Google Scientist Recommender Systems"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": null,
+      "text": "Framework Adaptation Authors"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/anirudh.jpg",
+      "local_path": "_images/anirudh.jpg",
+      "alt": ""
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": null,
+      "text": "Anirudh Dagar"
+    },
+    {
+      "type": "paragraph",
+      "text": "IIT Roorkee Student PyTorch Adaptation"
+    },
+    {
+      "type": "image",
+      "original_url": "https://terrytangyuan.github.io/img/avatar.jpg",
+      "local_path": "img/avatar.jpg",
+      "alt": ""
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": null,
+      "text": "Yuan Tang"
+    },
+    {
+      "type": "paragraph",
+      "text": "Akuity Founding Engineer TensorFlow Adaptation"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": null,
+      "text": "We thank all the community contributors for making this open source book better for everyone."
+    },
+    {
+      "type": "heading",
+      "level": 4,
+      "id": null,
+      "text": "Contribute to the book."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": null,
+      "text": "Each section is an executable Jupyter notebook"
+    },
+    {
+      "type": "paragraph",
+      "text": "You can modify the code and tune hyperparameters to get instant\n      feedback to accumulate practical experiences in deep learning."
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/laptop_jupyter.png",
+      "local_path": "_images/laptop_jupyter.png",
+      "alt": ""
+    },
+    {
+      "type": "paragraph",
+      "text": "Run locally"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/logos/sagemaker-studio-lab.png",
+      "local_path": "_images/logos/sagemaker-studio-lab.png",
+      "alt": ""
+    },
+    {
+      "type": "paragraph",
+      "text": "Amazon SageMaker Studio Lab"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/logos/sagemaker.png",
+      "local_path": "_images/logos/sagemaker.png",
+      "alt": ""
+    },
+    {
+      "type": "paragraph",
+      "text": "Amazon SageMaker"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/logos/colab.png",
+      "local_path": "_images/logos/colab.png",
+      "alt": ""
+    },
+    {
+      "type": "paragraph",
+      "text": "Google Colab"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/notebook.gif",
+      "local_path": "_images/notebook.gif",
+      "alt": ""
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": null,
+      "text": "Mathematics + Figures + Code"
+    },
+    {
+      "type": "paragraph",
+      "text": "We offer an interactive learning experience with mathematics, figures,\n  code, text, and discussions, where concepts and techniques are illustrated\n    and implemented with experiments on real data sets."
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/eq.jpg",
+      "local_path": "_images/eq.jpg",
+      "alt": ""
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/figure.jpg",
+      "local_path": "_images/figure.jpg",
+      "alt": ""
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/code.jpg",
+      "local_path": "_images/code.jpg",
+      "alt": ""
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/forum.gif",
+      "local_path": "_images/forum.gif",
+      "alt": ""
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": null,
+      "text": "Active community support"
+    },
+    {
+      "type": "paragraph",
+      "text": "You can discuss and learn with thousands of peers in the community\n        through the link provided in each section."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "textbook",
+      "text": "D2L as a textbook or a reference book"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/logos/logoimg1.png",
+      "local_path": "_images/logos/logoimg1.png",
+      "alt": ""
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/logos/logoimg2.png",
+      "local_path": "_images/logos/logoimg2.png",
+      "alt": ""
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/logos/logoimg3.png",
+      "local_path": "_images/logos/logoimg3.png",
+      "alt": ""
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/logos/logoimg4.png",
+      "local_path": "_images/logos/logoimg4.png",
+      "alt": ""
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/logos/logoimg5.png",
+      "local_path": "_images/logos/logoimg5.png",
+      "alt": ""
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/logos/logoimg6.png",
+      "local_path": "_images/logos/logoimg6.png",
+      "alt": ""
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/logos/logoimg7.png",
+      "local_path": "_images/logos/logoimg7.png",
+      "alt": ""
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/map.png",
+      "local_path": "_images/map.png",
+      "alt": ""
+    },
+    {
+      "type": "heading",
+      "level": 4,
+      "id": "textbook",
+      "text": "If you use (or will use) D2L to teach and would like to receive a free hardcopy,\n        please contact us ."
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": null,
+      "text": "BibTeX entry for citing the book"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "@article{zhang2021dive,\n    title={Dive into Deep Learning},\n    author={Zhang, Aston and Lipton, Zachary C. and Li, Mu and Smola, Alexander J.},\n    journal={arXiv preprint arXiv:2106.11342},\n    year={2021}\n}"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "dam-minh-vao-hoc-sau",
+      "text": "Table of contents"
+    },
+    {
+      "type": "list",
+      "ordered": false,
+      "items": [
+        "Lời nói đầu",
+        "Cài đặt",
+        "Ký hiệu"
+      ]
+    },
+    {
+      "type": "list",
+      "ordered": false,
+      "items": [
+        "1. Giới thiệu 1.1. Một ví dụ động lực 1.2. Các thành phần chính 1.3. Các loại vấn đề về máy học 1.4. Rễ 1.5. Con đường đến sâu học 1.6. Câu chuyện thành công 1.7. các điểm 1.8. Tóm tắt 1.9. Bài tập",
+        "1.1. Một ví dụ động lực",
+        "1.2. Các thành phần chính",
+        "1.3. Các loại vấn đề về máy học",
+        "1.4. Rễ",
+        "1.5. Con đường đến sâu học",
+        "1.6. Câu chuyện thành công",
+        "1.7. các điểm",
+        "1.8. Tóm tắt",
+        "1.9. Bài tập",
+        "2. Sơ bộ 2.1. Thao tác dữ liệu 2.2. Xử lý sơ bộ dữ liệu 2.3. Đại số tuyến tính 2.4. Calculus (Giải tích) 2.5. Sự khác biệt tự động 2.6. Xác suất 2.7. Documentation",
+        "2.1. Thao tác dữ liệu",
+        "2.2. Xử lý sơ bộ dữ liệu",
+        "2.3. Đại số tuyến tính",
+        "2.4. Calculus (Giải tích)",
+        "2.5. Sự khác biệt tự động",
+        "2.6. Xác suất",
+        "2.7. Documentation",
+        "3. Mạng thần kinh tuyến tính 3.1. Hồi quy tuyến tính 3.2. Thực hiện hồi quy tuyến tính từ đầu 3.3. Thực hiện ngắn gọn của hồi quy tuyến tính 3.4. Hồi quy Softmax 3.5. Tập dữ liệu phân loại hình ảnh 3.6. Thực hiện hồi quy Softmax từ đầu 3.7. Thực hiện ngắn gọn về hồi quy Softmax",
+        "3.1. Hồi quy tuyến tính",
+        "3.2. Thực hiện hồi quy tuyến tính từ đầu",
+        "3.3. Thực hiện ngắn gọn của hồi quy tuyến tính",
+        "3.4. Hồi quy Softmax",
+        "3.5. Tập dữ liệu phân loại hình ảnh",
+        "3.6. Thực hiện hồi quy Softmax từ đầu",
+        "3.7. Thực hiện ngắn gọn về hồi quy Softmax",
+        "4. Multilayer Perceptrons 4.1. Multilayer Perceptrons 4.2. Thực hiện các Perceptrons đa lớp từ đầu 4.3. Thực hiện ngắn gọn của Multilayer Perceptrons 4.4. Lựa chọn mô hình, Underfitting, và Overfitting 4.5. Trọng lượng phân rã 4.6. Bỏ học 4.7. Chuyển tiếp tuyên truyền, tuyên truyền ngược, và đồ thị tính toán 4.8. Tính ổn định số và khởi tạo 4.9. Môi trường và phân phối Shift 4.10. Dự đoán giá nhà trên Kaggle",
+        "4.1. Multilayer Perceptrons",
+        "4.2. Thực hiện các Perceptrons đa lớp từ đầu",
+        "4.3. Thực hiện ngắn gọn của Multilayer Perceptrons",
+        "4.4. Lựa chọn mô hình, Underfitting, và Overfitting",
+        "4.5. Trọng lượng phân rã",
+        "4.6. Bỏ học",
+        "4.7. Chuyển tiếp tuyên truyền, tuyên truyền ngược, và đồ thị tính toán",
+        "4.8. Tính ổn định số và khởi tạo",
+        "4.9. Môi trường và phân phối Shift",
+        "4.10. Dự đoán giá nhà trên Kaggle",
+        "5. Tính toán học sâu 5.1. Lớp và khối 5.2. Quản lý tham số 5.3. Khởi tạo hoãn lại 5.4. Layers tùy chỉnh 5.5. Tệp I/O 5.6. GPU",
+        "5.1. Lớp và khối",
+        "5.2. Quản lý tham số",
+        "5.3. Khởi tạo hoãn lại",
+        "5.4. Layers tùy chỉnh",
+        "5.5. Tệp I/O",
+        "5.6. GPU",
+        "6. Mạng thần kinh phức tạp 6.1. Từ các lớp được kết nối hoàn toàn đến sự phức tạp 6.2. Sự phức tạp cho hình ảnh 6.3. Đệm và sải chân 6.4. Nhiều kênh đầu vào và nhiều đầu ra 6.5. Pooling 6.6. Mạng thần kinh phức tạp (LeNet)",
+        "6.1. Từ các lớp được kết nối hoàn toàn đến sự phức tạp",
+        "6.2. Sự phức tạp cho hình ảnh",
+        "6.3. Đệm và sải chân",
+        "6.4. Nhiều kênh đầu vào và nhiều đầu ra",
+        "6.5. Pooling",
+        "6.6. Mạng thần kinh phức tạp (LeNet)",
+        "7. Mạng thần kinh phức tạp hiện đại 7.1. Mạng thần kinh phức tạp sâu (AlexNet) 7.2. Mạng sử dụng khối (VGG) 7.3. Mạng trong mạng (Nin) 7.4. Mạng có kết nối song song (GoogLeNet) 7.5. Chuẩn hóa hàng loạt 7.6. Mạng dư (ResNet) 7.7. Mạng kết nối mật độ (DenseNet)",
+        "7.1. Mạng thần kinh phức tạp sâu (AlexNet)",
+        "7.2. Mạng sử dụng khối (VGG)",
+        "7.3. Mạng trong mạng (Nin)",
+        "7.4. Mạng có kết nối song song (GoogLeNet)",
+        "7.5. Chuẩn hóa hàng loạt",
+        "7.6. Mạng dư (ResNet)",
+        "7.7. Mạng kết nối mật độ (DenseNet)",
+        "8. Mạng nơ-ron tái phát 8.1. Mô hình trình tự 8.2. Xử lý sơ bộ văn bản 8.3. Mô hình ngôn ngữ và bộ dữ liệu 8.4. Mạng nơ-ron tái phát 8.5. Thực hiện các mạng nơ-ron tái phát từ đầu 8.6. Thực hiện ngắn gọn các mạng nơ-ron tái phát 8.7. Backpropagation qua thời gian",
+        "8.1. Mô hình trình tự",
+        "8.2. Xử lý sơ bộ văn bản",
+        "8.3. Mô hình ngôn ngữ và bộ dữ liệu",
+        "8.4. Mạng nơ-ron tái phát",
+        "8.5. Thực hiện các mạng nơ-ron tái phát từ đầu",
+        "8.6. Thực hiện ngắn gọn các mạng nơ-ron tái phát",
+        "8.7. Backpropagation qua thời gian",
+        "9. Mạng thần kinh tái phát hiện đại 9.1. Các đơn vị định kỳ cổng (GRU) 9.2. Bộ nhớ ngắn hạn dài (LSTM) 9.3. Mạng thần kinh tái phát sâu 9.4. Mạng nơ-ron định kỳ hai chiều 9.5. Dịch máy và bộ dữ liệu 9.6. Kiến trúc mã hóa-Decoder 9.7. Trình tự để học trình tự 9.8. Tìm kiếm chùm",
+        "9.1. Các đơn vị định kỳ cổng (GRU)",
+        "9.2. Bộ nhớ ngắn hạn dài (LSTM)",
+        "9.3. Mạng thần kinh tái phát sâu",
+        "9.4. Mạng nơ-ron định kỳ hai chiều",
+        "9.5. Dịch máy và bộ dữ liệu",
+        "9.6. Kiến trúc mã hóa-Decoder",
+        "9.7. Trình tự để học trình tự",
+        "9.8. Tìm kiếm chùm",
+        "10. Cơ chế chú ý 10.1. Chú ý tín hiệu 10.2. Chú ý Pooling: Hồi quy hạt nhân Nadaraya-Watson 10.3. Chức năng chấm điểm chú ý 10.4. Bahdanau Chú ý 10.5. Chú ý nhiều đầu 10.6. Tự ghi nhận và mã hóa vị trí 10.7. Máy biến áp",
+        "10.1. Chú ý tín hiệu",
+        "10.2. Chú ý Pooling: Hồi quy hạt nhân Nadaraya-Watson",
+        "10.3. Chức năng chấm điểm chú ý",
+        "10.4. Bahdanau Chú ý",
+        "10.5. Chú ý nhiều đầu",
+        "10.6. Tự ghi nhận và mã hóa vị trí",
+        "10.7. Máy biến áp",
+        "11. Thuật toán tối ưu hóa 11.1. Tối ưu hóa và học sâu 11.2. Độ lồi 11.3. Gradient Descent 11.4. Stochastic Gradient Descent 11.5. Minibatch Stochastic Gradient Descent 11.6. Đà 11.7. Adagrad 11.8. RMSProp 11.9. Adadelta 11.10. Ađam 11.11. Lập kế hoạch tỷ lệ học tập",
+        "11.1. Tối ưu hóa và học sâu",
+        "11.2. Độ lồi",
+        "11.3. Gradient Descent",
+        "11.4. Stochastic Gradient Descent",
+        "11.5. Minibatch Stochastic Gradient Descent",
+        "11.6. Đà",
+        "11.7. Adagrad",
+        "11.8. RMSProp",
+        "11.9. Adadelta",
+        "11.10. Ađam",
+        "11.11. Lập kế hoạch tỷ lệ học tập",
+        "12. Hiệu suất tính toán 12.1. Trình biên dịch và phiên dịch 12.2. Tính toán không đồng bộ 12.3. Song song tự động 12.4. Phần cứng 12.5. Đào tạo về nhiều GPU 12.6. Triển khai ngắn gọn cho nhiều GPU 12.7. Máy chủ tham số",
+        "12.1. Trình biên dịch và phiên dịch",
+        "12.2. Tính toán không đồng bộ",
+        "12.3. Song song tự động",
+        "12.4. Phần cứng",
+        "12.5. Đào tạo về nhiều GPU",
+        "12.6. Triển khai ngắn gọn cho nhiều GPU",
+        "12.7. Máy chủ tham số",
+        "13. Tầm nhìn máy tính 13.1. Hình ảnh Augmentation 13.2. Tinh chỉnh 13.3. Hộp phát hiện và giới hạn đối tượng 13.4. Hộp neo 13.5. Phát hiện đối tượng đa quy mô 13.6. Bộ dữ liệu phát hiện đối tượng 13.7. Phát hiện Multibox Shot đơn 13.8. CNN dựa trên khu vực (R-CNN) 13.9. Phân đoạn ngữ nghĩa và tập dữ liệu 13.10. Chuyển đổi Convolution 13.11. Mạng kết nối hoàn toàn 13.12. Chuyển kiểu thần kinh 13.13. Phân loại hình ảnh (CIFAR-10) trên Kaggle 13.14. Nhận dạng giống chó (Chó ImageNet) trên Kaggle",
+        "13.1. Hình ảnh Augmentation",
+        "13.2. Tinh chỉnh",
+        "13.3. Hộp phát hiện và giới hạn đối tượng",
+        "13.4. Hộp neo",
+        "13.5. Phát hiện đối tượng đa quy mô",
+        "13.6. Bộ dữ liệu phát hiện đối tượng",
+        "13.7. Phát hiện Multibox Shot đơn",
+        "13.8. CNN dựa trên khu vực (R-CNN)",
+        "13.9. Phân đoạn ngữ nghĩa và tập dữ liệu",
+        "13.10. Chuyển đổi Convolution",
+        "13.11. Mạng kết nối hoàn toàn",
+        "13.12. Chuyển kiểu thần kinh",
+        "13.13. Phân loại hình ảnh (CIFAR-10) trên Kaggle",
+        "13.14. Nhận dạng giống chó (Chó ImageNet) trên Kaggle",
+        "14. Chế biến ngôn ngữ tự nhiên: Pretraining 14.1. Từ nhúng (word2vec) 14.2. Đào tạo gần đúng 14.3. Các Dataset cho Pretraining Word Embeddings 14.4. Pretraining word2vec 14.5. Word Nhúng với Vectơ toàn cầu (Glove) 14.6. Subword Nhúng 14.7. Từ tương tự và tương tự 14.8. Đại diện bộ mã hóa hai chiều từ Transformers (BERT) 14.9. Tập dữ liệu cho Pretraining BERT 14.10. Pretraining BERT",
+        "14.1. Từ nhúng (word2vec)",
+        "14.2. Đào tạo gần đúng",
+        "14.3. Các Dataset cho Pretraining Word Embeddings",
+        "14.4. Pretraining word2vec",
+        "14.5. Word Nhúng với Vectơ toàn cầu (Glove)",
+        "14.6. Subword Nhúng",
+        "14.7. Từ tương tự và tương tự",
+        "14.8. Đại diện bộ mã hóa hai chiều từ Transformers (BERT)",
+        "14.9. Tập dữ liệu cho Pretraining BERT",
+        "14.10. Pretraining BERT",
+        "15. Xử lý ngôn ngữ tự nhiên: Ứng dụng 15.1. Phân tích tình cảm và tập dữ liệu 15.2. Phân tích tình cảm: Sử dụng mạng nơ-ron tái phát 15.3. Phân tích tình cảm: Sử dụng mạng thần kinh phức tạp 15.4. Suy luận ngôn ngữ tự nhiên và tập dữ liệu 15.5. Suy luận ngôn ngữ tự nhiên: Sử dụng sự chú ý 15.6. Tinh chỉnh BERT cho các ứng dụng cấp Sequence-Level và Token-Level 15.7. Suy luận ngôn ngữ tự nhiên: Tinh chỉnh BERT",
+        "15.1. Phân tích tình cảm và tập dữ liệu",
+        "15.2. Phân tích tình cảm: Sử dụng mạng nơ-ron tái phát",
+        "15.3. Phân tích tình cảm: Sử dụng mạng thần kinh phức tạp",
+        "15.4. Suy luận ngôn ngữ tự nhiên và tập dữ liệu",
+        "15.5. Suy luận ngôn ngữ tự nhiên: Sử dụng sự chú ý",
+        "15.6. Tinh chỉnh BERT cho các ứng dụng cấp Sequence-Level và Token-Level",
+        "15.7. Suy luận ngôn ngữ tự nhiên: Tinh chỉnh BERT",
+        "16. Hệ thống Recommender 16.1. Tổng quan về hệ thống Recommender 16.2. Bộ dữ liệu MovieLens 16.3. Matrận Factorization 16.4. AutoRec: Dự đoán xếp hạng với Autoencoders 16.5. Xếp hạng được cá nhân hóa cho hệ thống giới thiệu 16.6. Lọc hợp tác thần kinh để xếp hạng cá nhân hóa 16.7. Hệ thống khuyến cáo Sequence-Aware 16.8. Hệ thống giới thiệu giàu tính năng 16.9. Máy Factorization 16.10. Sâu Factorization Máy móc",
+        "16.1. Tổng quan về hệ thống Recommender",
+        "16.2. Bộ dữ liệu MovieLens",
+        "16.3. Matrận Factorization",
+        "16.4. AutoRec: Dự đoán xếp hạng với Autoencoders",
+        "16.5. Xếp hạng được cá nhân hóa cho hệ thống giới thiệu",
+        "16.6. Lọc hợp tác thần kinh để xếp hạng cá nhân hóa",
+        "16.7. Hệ thống khuyến cáo Sequence-Aware",
+        "16.8. Hệ thống giới thiệu giàu tính năng",
+        "16.9. Máy Factorization",
+        "16.10. Sâu Factorization Máy móc",
+        "17. Mạng đối thủ thế hệ 17.1. Mạng đối thủ thế hệ 17.2. Mạng đối thủ tạo phức tạp sâu",
+        "17.1. Mạng đối thủ thế hệ",
+        "17.2. Mạng đối thủ tạo phức tạp sâu",
+        "18. Phụ lục: Toán học cho Deep Learning 18.1. Hình học và các hoạt động đại số tuyến tính 18.2. Eigendecompositions 18.3. Tính toán biến đơn 18.4. Tính toán đa năng 18.5. Integral Calculus 18.6. Biến ngẫu nhiên 18.7. Khả năng tối đa 18.8. Bayes ngây thơ 18.9. Thống kê 18.10. Lý thuyết thông tin",
+        "18.1. Hình học và các hoạt động đại số tuyến tính",
+        "18.2. Eigendecompositions",
+        "18.3. Tính toán biến đơn",
+        "18.4. Tính toán đa năng",
+        "18.5. Integral Calculus",
+        "18.6. Biến ngẫu nhiên",
+        "18.7. Khả năng tối đa",
+        "18.8. Bayes ngây thơ",
+        "18.9. Thống kê",
+        "18.10. Lý thuyết thông tin",
+        "19. Phụ lục: Các công cụ cho Deep Learning 19.1. Sử dụng Jupyter 19.2. Sử dụng Amazon SageMaker 19.3. Sử dụng phiên bản AWS EC2 19.4. Sử dụng Google Colab 19.5. Chọn máy chủ và GPU 19.6. Đóng góp cho cuốn sách này 19.7. d2l Tài liệu API",
+        "19.1. Sử dụng Jupyter",
+        "19.2. Sử dụng Amazon SageMaker",
+        "19.3. Sử dụng phiên bản AWS EC2",
+        "19.4. Sử dụng Google Colab",
+        "19.5. Chọn máy chủ và GPU",
+        "19.6. Đóng góp cho cuốn sách này",
+        "19.7. d2l Tài liệu API"
+      ]
+    },
+    {
+      "type": "list",
+      "ordered": false,
+      "items": [
+        "Tài liệu tham khảo"
+      ]
+    }
+  ],
+  "images": [
+    {
+      "original_url": "https://vi.d2l.ai/_images/front.png",
+      "local_path": "_images/front.png",
+      "alt": ""
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/aston.jpg",
+      "local_path": "_images/aston.jpg",
+      "alt": ""
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/zack.jpg",
+      "local_path": "_images/zack.jpg",
+      "alt": ""
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/mu.jpg",
+      "local_path": "_images/mu.jpg",
+      "alt": ""
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/alex.jpg",
+      "local_path": "_images/alex.jpg",
+      "alt": ""
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/brent.jpg",
+      "local_path": "_images/brent.jpg",
+      "alt": ""
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/rachel.jpeg",
+      "local_path": "_images/rachel.jpeg",
+      "alt": ""
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/shuai.jpg",
+      "local_path": "_images/shuai.jpg",
+      "alt": ""
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/yi.jpg",
+      "local_path": "_images/yi.jpg",
+      "alt": ""
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/anirudh.jpg",
+      "local_path": "_images/anirudh.jpg",
+      "alt": ""
+    },
+    {
+      "original_url": "https://terrytangyuan.github.io/img/avatar.jpg",
+      "local_path": "img/avatar.jpg",
+      "alt": ""
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/laptop_jupyter.png",
+      "local_path": "_images/laptop_jupyter.png",
+      "alt": ""
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/logos/sagemaker-studio-lab.png",
+      "local_path": "_images/logos/sagemaker-studio-lab.png",
+      "alt": ""
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/logos/sagemaker.png",
+      "local_path": "_images/logos/sagemaker.png",
+      "alt": ""
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/logos/colab.png",
+      "local_path": "_images/logos/colab.png",
+      "alt": ""
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/notebook.gif",
+      "local_path": "_images/notebook.gif",
+      "alt": ""
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/eq.jpg",
+      "local_path": "_images/eq.jpg",
+      "alt": ""
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/figure.jpg",
+      "local_path": "_images/figure.jpg",
+      "alt": ""
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/code.jpg",
+      "local_path": "_images/code.jpg",
+      "alt": ""
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/forum.gif",
+      "local_path": "_images/forum.gif",
+      "alt": ""
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/logos/logoimg1.png",
+      "local_path": "_images/logos/logoimg1.png",
+      "alt": ""
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/logos/logoimg2.png",
+      "local_path": "_images/logos/logoimg2.png",
+      "alt": ""
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/logos/logoimg3.png",
+      "local_path": "_images/logos/logoimg3.png",
+      "alt": ""
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/logos/logoimg4.png",
+      "local_path": "_images/logos/logoimg4.png",
+      "alt": ""
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/logos/logoimg5.png",
+      "local_path": "_images/logos/logoimg5.png",
+      "alt": ""
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/logos/logoimg6.png",
+      "local_path": "_images/logos/logoimg6.png",
+      "alt": ""
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/logos/logoimg7.png",
+      "local_path": "_images/logos/logoimg7.png",
+      "alt": ""
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/map.png",
+      "local_path": "_images/map.png",
+      "alt": ""
+    }
+  ],
+  "text": "Đắm mình vào Học Sâu\nDive into Deep Learning\nInteractive deep learning book with code, math, and discussions Implemented with NumPy/MXNet , PyTorch , and TensorFlow Adopted at 300 universities from 55 countries Star\nAnnouncements\n[Dec 2021] We added a new option to run this book for free: check out SageMaker Studio Lab .\n[Jul 2021] We have improved the content and added TensorFlow implementations up to Chapter 11.\n          To keep track of the latest updates, just follow D2L's open-source project .\n[Jan 2021] Check out the brand-new Chapter: Attention Mechanisms .\n          We have also added PyTorch implementations.\n[Apr 2020] We have revamped Chapter: NLP pretraining and Chapter: NLP applications ,\n        and added sections of BERT and natural language inference.\n[Jul 2019]\n      The Chinese version is the No. 1 best seller of new books in \"Computers and Internet\" at the largest Chinese online bookstore.\n[May 2019]\n      Slides, Jupyter notebooks, assignments, and videos of the Berkeley course can be found at the syllabus page .\nAuthors\nAston Zhang\nAmazon Senior Scientist\nZack C. Lipton\nAmazon Scientist CMU Assistant Professor\nMu Li\nAmazon Senior Principal Scientist\nAlex J. Smola\nAmazon VP/Distinguished Scientist\nVol.2 Chapter Authors\nBrent Werness\nAmazon Senior Scientist Mathematics\n        for Deep Learning\nRachel Hu\nAmazon Scientist Mathematics\n        for Deep Learning\nShuai Zhang\nETH Zürich Postdoctoral Researcher Recommender Systems\nYi Tay\nGoogle Scientist Recommender Systems\nFramework Adaptation Authors\nAnirudh Dagar\nIIT Roorkee Student PyTorch Adaptation\nYuan Tang\nAkuity Founding Engineer TensorFlow Adaptation\nWe thank all the community contributors for making this open source book better for everyone.\nContribute to the book.\nEach section is an executable Jupyter notebook\nYou can modify the code and tune hyperparameters to get instant\n      feedback to accumulate practical experiences in deep learning.\nRun locally\nAmazon SageMaker Studio Lab\nAmazon SageMaker\nGoogle Colab\nMathematics + Figures + Code\nWe offer an interactive learning experience with mathematics, figures,\n  code, text, and discussions, where concepts and techniques are illustrated\n    and implemented with experiments on real data sets.\nActive community support\nYou can discuss and learn with thousands of peers in the community\n        through the link provided in each section.\nD2L as a textbook or a reference book\nIf you use (or will use) D2L to teach and would like to receive a free hardcopy,\n        please contact us .\nBibTeX entry for citing the book\nTable of contents\nLời nói đầu\nCài đặt\nKý hiệu\n1. Giới thiệu 1.1. Một ví dụ động lực 1.2. Các thành phần chính 1.3. Các loại vấn đề về máy học 1.4. Rễ 1.5. Con đường đến sâu học 1.6. Câu chuyện thành công 1.7. các điểm 1.8. Tóm tắt 1.9. Bài tập\n1.1. Một ví dụ động lực\n1.2. Các thành phần chính\n1.3. Các loại vấn đề về máy học\n1.4. Rễ\n1.5. Con đường đến sâu học\n1.6. Câu chuyện thành công\n1.7. các điểm\n1.8. Tóm tắt\n1.9. Bài tập\n2. Sơ bộ 2.1. Thao tác dữ liệu 2.2. Xử lý sơ bộ dữ liệu 2.3. Đại số tuyến tính 2.4. Calculus (Giải tích) 2.5. Sự khác biệt tự động 2.6. Xác suất 2.7. Documentation\n2.1. Thao tác dữ liệu\n2.2. Xử lý sơ bộ dữ liệu\n2.3. Đại số tuyến tính\n2.4. Calculus (Giải tích)\n2.5. Sự khác biệt tự động\n2.6. Xác suất\n2.7. Documentation\n3. Mạng thần kinh tuyến tính 3.1. Hồi quy tuyến tính 3.2. Thực hiện hồi quy tuyến tính từ đầu 3.3. Thực hiện ngắn gọn của hồi quy tuyến tính 3.4. Hồi quy Softmax 3.5. Tập dữ liệu phân loại hình ảnh 3.6. Thực hiện hồi quy Softmax từ đầu 3.7. Thực hiện ngắn gọn về hồi quy Softmax\n3.1. Hồi quy tuyến tính\n3.2. Thực hiện hồi quy tuyến tính từ đầu\n3.3. Thực hiện ngắn gọn của hồi quy tuyến tính\n3.4. Hồi quy Softmax\n3.5. Tập dữ liệu phân loại hình ảnh\n3.6. Thực hiện hồi quy Softmax từ đầu\n3.7. Thực hiện ngắn gọn về hồi quy Softmax\n4. Multilayer Perceptrons 4.1. Multilayer Perceptrons 4.2. Thực hiện các Perceptrons đa lớp từ đầu 4.3. Thực hiện ngắn gọn của Multilayer Perceptrons 4.4. Lựa chọn mô hình, Underfitting, và Overfitting 4.5. Trọng lượng phân rã 4.6. Bỏ học 4.7. Chuyển tiếp tuyên truyền, tuyên truyền ngược, và đồ thị tính toán 4.8. Tính ổn định số và khởi tạo 4.9. Môi trường và phân phối Shift 4.10. Dự đoán giá nhà trên Kaggle\n4.1. Multilayer Perceptrons\n4.2. Thực hiện các Perceptrons đa lớp từ đầu\n4.3. Thực hiện ngắn gọn của Multilayer Perceptrons\n4.4. Lựa chọn mô hình, Underfitting, và Overfitting\n4.5. Trọng lượng phân rã\n4.6. Bỏ học\n4.7. Chuyển tiếp tuyên truyền, tuyên truyền ngược, và đồ thị tính toán\n4.8. Tính ổn định số và khởi tạo\n4.9. Môi trường và phân phối Shift\n4.10. Dự đoán giá nhà trên Kaggle\n5. Tính toán học sâu 5.1. Lớp và khối 5.2. Quản lý tham số 5.3. Khởi tạo hoãn lại 5.4. Layers tùy chỉnh 5.5. Tệp I/O 5.6. GPU\n5.1. Lớp và khối\n5.2. Quản lý tham số\n5.3. Khởi tạo hoãn lại\n5.4. Layers tùy chỉnh\n5.5. Tệp I/O\n5.6. GPU\n6. Mạng thần kinh phức tạp 6.1. Từ các lớp được kết nối hoàn toàn đến sự phức tạp 6.2. Sự phức tạp cho hình ảnh 6.3. Đệm và sải chân 6.4. Nhiều kênh đầu vào và nhiều đầu ra 6.5. Pooling 6.6. Mạng thần kinh phức tạp (LeNet)\n6.1. Từ các lớp được kết nối hoàn toàn đến sự phức tạp\n6.2. Sự phức tạp cho hình ảnh\n6.3. Đệm và sải chân\n6.4. Nhiều kênh đầu vào và nhiều đầu ra\n6.5. Pooling\n6.6. Mạng thần kinh phức tạp (LeNet)\n7. Mạng thần kinh phức tạp hiện đại 7.1. Mạng thần kinh phức tạp sâu (AlexNet) 7.2. Mạng sử dụng khối (VGG) 7.3. Mạng trong mạng (Nin) 7.4. Mạng có kết nối song song (GoogLeNet) 7.5. Chuẩn hóa hàng loạt 7.6. Mạng dư (ResNet) 7.7. Mạng kết nối mật độ (DenseNet)\n7.1. Mạng thần kinh phức tạp sâu (AlexNet)\n7.2. Mạng sử dụng khối (VGG)\n7.3. Mạng trong mạng (Nin)\n7.4. Mạng có kết nối song song (GoogLeNet)\n7.5. Chuẩn hóa hàng loạt\n7.6. Mạng dư (ResNet)\n7.7. Mạng kết nối mật độ (DenseNet)\n8. Mạng nơ-ron tái phát 8.1. Mô hình trình tự 8.2. Xử lý sơ bộ văn bản 8.3. Mô hình ngôn ngữ và bộ dữ liệu 8.4. Mạng nơ-ron tái phát 8.5. Thực hiện các mạng nơ-ron tái phát từ đầu 8.6. Thực hiện ngắn gọn các mạng nơ-ron tái phát 8.7. Backpropagation qua thời gian\n8.1. Mô hình trình tự\n8.2. Xử lý sơ bộ văn bản\n8.3. Mô hình ngôn ngữ và bộ dữ liệu\n8.4. Mạng nơ-ron tái phát\n8.5. Thực hiện các mạng nơ-ron tái phát từ đầu\n8.6. Thực hiện ngắn gọn các mạng nơ-ron tái phát\n8.7. Backpropagation qua thời gian\n9. Mạng thần kinh tái phát hiện đại 9.1. Các đơn vị định kỳ cổng (GRU) 9.2. Bộ nhớ ngắn hạn dài (LSTM) 9.3. Mạng thần kinh tái phát sâu 9.4. Mạng nơ-ron định kỳ hai chiều 9.5. Dịch máy và bộ dữ liệu 9.6. Kiến trúc mã hóa-Decoder 9.7. Trình tự để học trình tự 9.8. Tìm kiếm chùm\n9.1. Các đơn vị định kỳ cổng (GRU)\n9.2. Bộ nhớ ngắn hạn dài (LSTM)\n9.3. Mạng thần kinh tái phát sâu\n9.4. Mạng nơ-ron định kỳ hai chiều\n9.5. Dịch máy và bộ dữ liệu\n9.6. Kiến trúc mã hóa-Decoder\n9.7. Trình tự để học trình tự\n9.8. Tìm kiếm chùm\n10. Cơ chế chú ý 10.1. Chú ý tín hiệu 10.2. Chú ý Pooling: Hồi quy hạt nhân Nadaraya-Watson 10.3. Chức năng chấm điểm chú ý 10.4. Bahdanau Chú ý 10.5. Chú ý nhiều đầu 10.6. Tự ghi nhận và mã hóa vị trí 10.7. Máy biến áp\n10.1. Chú ý tín hiệu\n10.2. Chú ý Pooling: Hồi quy hạt nhân Nadaraya-Watson\n10.3. Chức năng chấm điểm chú ý\n10.4. Bahdanau Chú ý\n10.5. Chú ý nhiều đầu\n10.6. Tự ghi nhận và mã hóa vị trí\n10.7. Máy biến áp\n11. Thuật toán tối ưu hóa 11.1. Tối ưu hóa và học sâu 11.2. Độ lồi 11.3. Gradient Descent 11.4. Stochastic Gradient Descent 11.5. Minibatch Stochastic Gradient Descent 11.6. Đà 11.7. Adagrad 11.8. RMSProp 11.9. Adadelta 11.10. Ađam 11.11. Lập kế hoạch tỷ lệ học tập\n11.1. Tối ưu hóa và học sâu\n11.2. Độ lồi\n11.3. Gradient Descent\n11.4. Stochastic Gradient Descent\n11.5. Minibatch Stochastic Gradient Descent\n11.6. Đà\n11.7. Adagrad\n11.8. RMSProp\n11.9. Adadelta\n11.10. Ađam\n11.11. Lập kế hoạch tỷ lệ học tập\n12. Hiệu suất tính toán 12.1. Trình biên dịch và phiên dịch 12.2. Tính toán không đồng bộ 12.3. Song song tự động 12.4. Phần cứng 12.5. Đào tạo về nhiều GPU 12.6. Triển khai ngắn gọn cho nhiều GPU 12.7. Máy chủ tham số\n12.1. Trình biên dịch và phiên dịch\n12.2. Tính toán không đồng bộ\n12.3. Song song tự động\n12.4. Phần cứng\n12.5. Đào tạo về nhiều GPU\n12.6. Triển khai ngắn gọn cho nhiều GPU\n12.7. Máy chủ tham số\n13. Tầm nhìn máy tính 13.1. Hình ảnh Augmentation 13.2. Tinh chỉnh 13.3. Hộp phát hiện và giới hạn đối tượng 13.4. Hộp neo 13.5. Phát hiện đối tượng đa quy mô 13.6. Bộ dữ liệu phát hiện đối tượng 13.7. Phát hiện Multibox Shot đơn 13.8. CNN dựa trên khu vực (R-CNN) 13.9. Phân đoạn ngữ nghĩa và tập dữ liệu 13.10. Chuyển đổi Convolution 13.11. Mạng kết nối hoàn toàn 13.12. Chuyển kiểu thần kinh 13.13. Phân loại hình ảnh (CIFAR-10) trên Kaggle 13.14. Nhận dạng giống chó (Chó ImageNet) trên Kaggle\n13.1. Hình ảnh Augmentation\n13.2. Tinh chỉnh\n13.3. Hộp phát hiện và giới hạn đối tượng\n13.4. Hộp neo\n13.5. Phát hiện đối tượng đa quy mô\n13.6. Bộ dữ liệu phát hiện đối tượng\n13.7. Phát hiện Multibox Shot đơn\n13.8. CNN dựa trên khu vực (R-CNN)\n13.9. Phân đoạn ngữ nghĩa và tập dữ liệu\n13.10. Chuyển đổi Convolution\n13.11. Mạng kết nối hoàn toàn\n13.12. Chuyển kiểu thần kinh\n13.13. Phân loại hình ảnh (CIFAR-10) trên Kaggle\n13.14. Nhận dạng giống chó (Chó ImageNet) trên Kaggle\n14. Chế biến ngôn ngữ tự nhiên: Pretraining 14.1. Từ nhúng (word2vec) 14.2. Đào tạo gần đúng 14.3. Các Dataset cho Pretraining Word Embeddings 14.4. Pretraining word2vec 14.5. Word Nhúng với Vectơ toàn cầu (Glove) 14.6. Subword Nhúng 14.7. Từ tương tự và tương tự 14.8. Đại diện bộ mã hóa hai chiều từ Transformers (BERT) 14.9. Tập dữ liệu cho Pretraining BERT 14.10. Pretraining BERT\n14.1. Từ nhúng (word2vec)\n14.2. Đào tạo gần đúng\n14.3. Các Dataset cho Pretraining Word Embeddings\n14.4. Pretraining word2vec\n14.5. Word Nhúng với Vectơ toàn cầu (Glove)\n14.6. Subword Nhúng\n14.7. Từ tương tự và tương tự\n14.8. Đại diện bộ mã hóa hai chiều từ Transformers (BERT)\n14.9. Tập dữ liệu cho Pretraining BERT\n14.10. Pretraining BERT\n15. Xử lý ngôn ngữ tự nhiên: Ứng dụng 15.1. Phân tích tình cảm và tập dữ liệu 15.2. Phân tích tình cảm: Sử dụng mạng nơ-ron tái phát 15.3. Phân tích tình cảm: Sử dụng mạng thần kinh phức tạp 15.4. Suy luận ngôn ngữ tự nhiên và tập dữ liệu 15.5. Suy luận ngôn ngữ tự nhiên: Sử dụng sự chú ý 15.6. Tinh chỉnh BERT cho các ứng dụng cấp Sequence-Level và Token-Level 15.7. Suy luận ngôn ngữ tự nhiên: Tinh chỉnh BERT\n15.1. Phân tích tình cảm và tập dữ liệu\n15.2. Phân tích tình cảm: Sử dụng mạng nơ-ron tái phát\n15.3. Phân tích tình cảm: Sử dụng mạng thần kinh phức tạp\n15.4. Suy luận ngôn ngữ tự nhiên và tập dữ liệu\n15.5. Suy luận ngôn ngữ tự nhiên: Sử dụng sự chú ý\n15.6. Tinh chỉnh BERT cho các ứng dụng cấp Sequence-Level và Token-Level\n15.7. Suy luận ngôn ngữ tự nhiên: Tinh chỉnh BERT\n16. Hệ thống Recommender 16.1. Tổng quan về hệ thống Recommender 16.2. Bộ dữ liệu MovieLens 16.3. Matrận Factorization 16.4. AutoRec: Dự đoán xếp hạng với Autoencoders 16.5. Xếp hạng được cá nhân hóa cho hệ thống giới thiệu 16.6. Lọc hợp tác thần kinh để xếp hạng cá nhân hóa 16.7. Hệ thống khuyến cáo Sequence-Aware 16.8. Hệ thống giới thiệu giàu tính năng 16.9. Máy Factorization 16.10. Sâu Factorization Máy móc\n16.1. Tổng quan về hệ thống Recommender\n16.2. Bộ dữ liệu MovieLens\n16.3. Matrận Factorization\n16.4. AutoRec: Dự đoán xếp hạng với Autoencoders\n16.5. Xếp hạng được cá nhân hóa cho hệ thống giới thiệu\n16.6. Lọc hợp tác thần kinh để xếp hạng cá nhân hóa\n16.7. Hệ thống khuyến cáo Sequence-Aware\n16.8. Hệ thống giới thiệu giàu tính năng\n16.9. Máy Factorization\n16.10. Sâu Factorization Máy móc\n17. Mạng đối thủ thế hệ 17.1. Mạng đối thủ thế hệ 17.2. Mạng đối thủ tạo phức tạp sâu\n17.1. Mạng đối thủ thế hệ\n17.2. Mạng đối thủ tạo phức tạp sâu\n18. Phụ lục: Toán học cho Deep Learning 18.1. Hình học và các hoạt động đại số tuyến tính 18.2. Eigendecompositions 18.3. Tính toán biến đơn 18.4. Tính toán đa năng 18.5. Integral Calculus 18.6. Biến ngẫu nhiên 18.7. Khả năng tối đa 18.8. Bayes ngây thơ 18.9. Thống kê 18.10. Lý thuyết thông tin\n18.1. Hình học và các hoạt động đại số tuyến tính\n18.2. Eigendecompositions\n18.3. Tính toán biến đơn\n18.4. Tính toán đa năng\n18.5. Integral Calculus\n18.6. Biến ngẫu nhiên\n18.7. Khả năng tối đa\n18.8. Bayes ngây thơ\n18.9. Thống kê\n18.10. Lý thuyết thông tin\n19. Phụ lục: Các công cụ cho Deep Learning 19.1. Sử dụng Jupyter 19.2. Sử dụng Amazon SageMaker 19.3. Sử dụng phiên bản AWS EC2 19.4. Sử dụng Google Colab 19.5. Chọn máy chủ và GPU 19.6. Đóng góp cho cuốn sách này 19.7. d2l Tài liệu API\n19.1. Sử dụng Jupyter\n19.2. Sử dụng Amazon SageMaker\n19.3. Sử dụng phiên bản AWS EC2\n19.4. Sử dụng Google Colab\n19.5. Chọn máy chủ và GPU\n19.6. Đóng góp cho cuốn sách này\n19.7. d2l Tài liệu API\nTài liệu tham khảo"
+}

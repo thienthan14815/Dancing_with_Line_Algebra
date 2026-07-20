@@ -1,0 +1,548 @@
+{
+  "url": "https://vi.d2l.ai/chapter_recurrent-modern/lstm.html",
+  "chapter": "chapter_recurrent-modern",
+  "title": "9.2. Bộ nhớ ngắn hạn dài (LSTM)",
+  "crawled_at": "2026-07-20T12:40:04.416735+00:00",
+  "headings": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "bo-nho-ngan-han-dai-lstm",
+      "text": "9.2. Bộ nhớ ngắn hạn dài (LSTM)"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "gated-memory-cell",
+      "text": "9.2.1. Gated Memory Cell"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "cong-dau-vao-cong-quen-va-cong-dau-ra",
+      "text": "9.2.1.1. Cổng đầu vào, Cổng quên và Cổng đầu ra"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "te-bao-bo-nho-ung-cu-vien",
+      "text": "9.2.1.2. Tế bào bộ nhớ ứng cử viên"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "bo-nho-cell",
+      "text": "9.2.1.3. Bộ nhớ Cell"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "nha-nuoc-an",
+      "text": "9.2.1.4. Nhà nước ẩn"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "thuc-hien-tu-dau",
+      "text": "9.2.2. Thực hiện từ đầu"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "initializing-model-parameters",
+      "text": "9.2.2.1. Initializing Model Parameters"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "xac-dinh-mo-hinh",
+      "text": "9.2.2.2. Xác định mô hình"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "dao-tao-va-du-doan",
+      "text": "9.2.2.3. Đào tạo và Dự đoán"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "thiet-tap",
+      "text": "9.2.3. Thiết tập"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tom-tat",
+      "text": "9.2.4. Tóm tắt"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bai-tap",
+      "text": "9.2.5. Bài tập"
+    }
+  ],
+  "content": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "bo-nho-ngan-han-dai-lstm",
+      "text": "9.2. Bộ nhớ ngắn hạn dài (LSTM)"
+    },
+    {
+      "type": "paragraph",
+      "text": "Thách thức giải quyết việc bảo tồn thông tin dài hạn và bỏ qua đầu vào\nngắn hạn trong các mô hình biến tiềm ẩn đã tồn tại trong một thời gian\ndài. Một trong những cách tiếp cận sớm nhất để giải quyết vấn đề này là\nbộ nhớ ngắn hạn dài (LSTM) [Hochreiter & Schmidhuber, 1997] . Nó\nchia sẻ nhiều tài sản của GRU. Điều thú vị là LSTMs có thiết kế phức tạp\nhơn một chút so với Grus nhưng trước Grus gần hai thập kỷ."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "gated-memory-cell",
+      "text": "9.2.1. Gated Memory Cell"
+    },
+    {
+      "type": "paragraph",
+      "text": "Được cho là thiết kế của LSTM được lấy cảm hứng từ cổng logic của máy\ntính. LSTM giới thiệu một tế bào memory cell (hoặc cell nói ngắn) có\nhình dạng giống như trạng thái ẩn (một số văn học coi ô nhớ là một loại\nđặc biệt của trạng thái ẩn), được thiết kế để ghi lại thông tin bổ sung.\nĐể kiểm soát tế bào bộ nhớ, chúng ta cần một số cổng. Một cổng là cần\nthiết để đọc các mục từ ô. Chúng tôi sẽ đề cập đến điều này là cổng đầu\nra . Một cổng thứ hai là cần thiết để quyết định khi nào nên đọc dữ liệu\nvào ô. Chúng tôi gọi đây là cổng đầu vào **. Cuối cùng, chúng ta cần\nmột cơ chế để thiết lập lại nội dung của ô, được chi phối bởi một cổng\n* quên *. Động lực cho một thiết kế như vậy giống như của Grus, cụ thể\nlà có thể quyết định khi nào cần nhớ và khi nào bỏ qua các đầu vào ở\ntrạng thái ẩn thông qua một cơ chế chuyên dụng. Hãy để chúng tôi xem làm\nthế nào điều này hoạt động trong thực tế."
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "cong-dau-vao-cong-quen-va-cong-dau-ra",
+      "text": "9.2.1.1. Cổng đầu vào, Cổng quên và Cổng đầu ra"
+    },
+    {
+      "type": "paragraph",
+      "text": "Cũng giống như trong Grus, việc cấp dữ liệu vào cổng LSTM là đầu vào ở\nbước thời gian hiện tại và trạng thái ẩn của bước thời gian trước đó,\nnhư minh họa trong Fig. 9.2.1 . Chúng được xử lý bởi ba lớp được\nkết nối hoàn toàn với chức năng kích hoạt sigmoid để tính toán các giá\ntrị của đầu vào, quê. và cổng đầu ra. Kết quả là, các giá trị của ba\ncổng nằm trong khoảng \\((0, 1)\\) ."
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/lstm-0.svg",
+      "local_path": "_images/lstm-0.svg",
+      "alt": "../_images/lstm-0.svg"
+    },
+    {
+      "type": "paragraph",
+      "text": "Fig. 9.2.1 Computing the input gate, the forget gate, and the output gate in an\nLSTM model. ¶"
+    },
+    {
+      "type": "paragraph",
+      "text": "Về mặt toán học, giả sử rằng có \\(h\\) đơn vị ẩn, kích thước lô là \\(n\\) và số lượng đầu vào là \\(d\\) . Do đó, đầu vào là \\(\\mathbf{X}_t \\in \\mathbb{R}^{n \\times d}\\) và trạng thái ẩn của\nbước thời gian trước là \\(\\mathbf{H}_{t-1} \\in \\mathbb{R}^{n \\times h}\\) . Tương ứng, các\ncổng tại bước thời điểm \\(t\\) được định nghĩa như sau: cổng đầu vào\nlà \\(\\mathbf{I}_t \\in \\mathbb{R}^{n \\times h}\\) , cổng quên là \\(\\mathbf{F}_t \\in \\mathbb{R}^{n \\times h}\\) và cổng đầu ra là \\(\\mathbf{O}_t \\in \\mathbb{R}^{n \\times h}\\) . Chúng được tính như\nsau:"
+    },
+    {
+      "type": "math",
+      "latex": "(9.2.1)¶\\[\\begin{split}\\begin{aligned}\n\\mathbf{I}_t &= \\sigma(\\mathbf{X}_t \\mathbf{W}_{xi} + \\mathbf{H}_{t-1} \\mathbf{W}_{hi} + \\mathbf{b}_i),\\\\\n\\mathbf{F}_t &= \\sigma(\\mathbf{X}_t \\mathbf{W}_{xf} + \\mathbf{H}_{t-1} \\mathbf{W}_{hf} + \\mathbf{b}_f),\\\\\n\\mathbf{O}_t &= \\sigma(\\mathbf{X}_t \\mathbf{W}_{xo} + \\mathbf{H}_{t-1} \\mathbf{W}_{ho} + \\mathbf{b}_o),\n\\end{aligned}\\end{split}\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "trong đó \\(\\mathbf{W}_{xi}, \\mathbf{W}_{xf}, \\mathbf{W}_{xo} \\in \\mathbb{R}^{d \\times h}\\) và \\(\\mathbf{W}_{hi}, \\mathbf{W}_{hf}, \\mathbf{W}_{ho} \\in \\mathbb{R}^{h \\times h}\\) là các thông số trọng lượng và \\(\\mathbf{b}_i, \\mathbf{b}_f, \\mathbf{b}_o \\in \\mathbb{R}^{1 \\times h}\\) là các thông số thiên vị."
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "te-bao-bo-nho-ung-cu-vien",
+      "text": "9.2.1.2. Tế bào bộ nhớ ứng cử viên"
+    },
+    {
+      "type": "paragraph",
+      "text": "Tiếp theo chúng tôi thiết kế các tế bào bộ nhớ. Vì chúng tôi chưa chỉ\nđịnh hành động của các cổng khác nhau, trước tiên chúng tôi giới thiệu\ntế bào bộ nhớ *ứng cử viên \\(\\tilde{\\mathbf{C}}_t \\in \\mathbb{R}^{n \\times h}\\) . Tính toán của\nnó tương tự như của ba cổng được mô tả ở trên, nhưng sử dụng hàm \\(\\tanh\\) với phạm vi giá trị cho \\((-1, 1)\\) làm hàm kích hoạt.\nĐiều này dẫn đến phương trình sau tại bước thời điểm \\(t\\) :"
+    },
+    {
+      "type": "math",
+      "latex": "(9.2.2)¶\\[\\tilde{\\mathbf{C}}_t = \\text{tanh}(\\mathbf{X}_t \\mathbf{W}_{xc} + \\mathbf{H}_{t-1} \\mathbf{W}_{hc} + \\mathbf{b}_c),\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "trong đó \\(\\mathbf{W}_{xc} \\in \\mathbb{R}^{d \\times h}\\) và \\(\\mathbf{W}_{hc} \\in \\mathbb{R}^{h \\times h}\\) là các thông số\ntrọng lượng và \\(\\mathbf{b}_c \\in \\mathbb{R}^{1 \\times h}\\) là một\ntham số thiên vị."
+    },
+    {
+      "type": "paragraph",
+      "text": "Một minh họa nhanh chóng của tế bào bộ nhớ ứng cử viên được thể hiện\ntrong Fig. 9.2.2 ."
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/lstm-1.svg",
+      "local_path": "_images/lstm-1.svg",
+      "alt": "../_images/lstm-1.svg"
+    },
+    {
+      "type": "paragraph",
+      "text": "Fig. 9.2.2 Computing the candidate memory cell in an LSTM model. ¶"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "bo-nho-cell",
+      "text": "9.2.1.3. Bộ nhớ Cell"
+    },
+    {
+      "type": "paragraph",
+      "text": "Trong Grus, chúng ta có một cơ chế để chi phối đầu vào và quên (hoặc bỏ\nqua). Tương tự, trong LSTMs, chúng tôi có hai cổng chuyên dụng cho các\nmục đích như vậy: cổng đầu vào \\(\\mathbf{I}_t\\) chi phối số lượng\nchúng tôi tính đến dữ liệu mới thông qua \\(\\tilde{\\mathbf{C}}_t\\) và\ncổng quên \\(\\mathbf{F}_t\\) giải quyết bao nhiêu nội dung tế bào bộ\nnhớ cũ \\(\\mathbf{C}_{t-1} \\in \\mathbb{R}^{n \\times h}\\) chúng tôi\ngiữ lại. Sử dụng cùng một thủ thuật nhân theo chiều ngang như trước đây,\nchúng tôi đến phương trình cập nhật sau:"
+    },
+    {
+      "type": "math",
+      "latex": "(9.2.3)¶\\[\\mathbf{C}_t = \\mathbf{F}_t \\odot \\mathbf{C}_{t-1} + \\mathbf{I}_t \\odot \\tilde{\\mathbf{C}}_t.\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Nếu cổng quên luôn xấp xỉ 1 và cổng đầu vào luôn xấp xỉ 0, các ô bộ nhớ\nquá khứ \\(\\mathbf{C}_{t-1}\\) sẽ được lưu theo thời gian và được\nchuyển sang bước thời gian hiện tại. Thiết kế này được giới thiệu để\ngiảm bớt vấn đề gradient biến mất và để nắm bắt tốt hơn các phụ thuộc\ntầm xa trong chuỗi."
+    },
+    {
+      "type": "paragraph",
+      "text": "Do đó, chúng tôi đến sơ đồ dòng chảy trong Fig. 9.2.3 ."
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/lstm-2.svg",
+      "local_path": "_images/lstm-2.svg",
+      "alt": "../_images/lstm-2.svg"
+    },
+    {
+      "type": "paragraph",
+      "text": "Fig. 9.2.3 Computing the memory cell in an LSTM model. ¶"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "nha-nuoc-an",
+      "text": "9.2.1.4. Nhà nước ẩn"
+    },
+    {
+      "type": "paragraph",
+      "text": "Cuối cùng, chúng ta cần xác định cách tính trạng thái ẩn \\(\\mathbf{H}_t \\in \\mathbb{R}^{n \\times h}\\) . Đây là nơi cổng đầu ra\nphát huy tác dụng. Trong LSTM, nó chỉ đơn giản là một phiên bản cổng của \\(\\tanh\\) của tế bào bộ nhớ. Điều này đảm bảo rằng các giá trị của \\(\\mathbf{H}_t\\) luôn nằm trong khoảng \\((-1, 1)\\) ."
+    },
+    {
+      "type": "math",
+      "latex": "(9.2.4)¶\\[\\mathbf{H}_t = \\mathbf{O}_t \\odot \\tanh(\\mathbf{C}_t).\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Bất cứ khi nào cổng đầu ra xấp xỉ 1, chúng tôi có hiệu quả truyền tất cả\nthông tin bộ nhớ đến bộ dự đoán, trong khi đối với cổng đầu ra gần 0,\nchúng tôi chỉ giữ lại tất cả thông tin trong ô nhớ và không thực hiện xử\nlý thêm."
+    },
+    {
+      "type": "paragraph",
+      "text": "Fig. 9.2.4 có một minh họa đồ họa của luồng dữ liệu."
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/lstm-3.svg",
+      "local_path": "_images/lstm-3.svg",
+      "alt": "../_images/lstm-3.svg"
+    },
+    {
+      "type": "paragraph",
+      "text": "Fig. 9.2.4 Computing the hidden state in an LSTM model. ¶"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "thuc-hien-tu-dau",
+      "text": "9.2.2. Thực hiện từ đầu"
+    },
+    {
+      "type": "paragraph",
+      "text": "Bây giờ chúng ta hãy thực hiện một LSTM từ đầu. Giống như các thí nghiệm\ntrong Section 8.5 , lần đầu tiên chúng ta tải tập dữ liệu\nmáy thời gian."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "from mxnet import np, npx\nfrom mxnet.gluon import rnn\nfrom d2l import mxnet as d2l\n\nnpx.set_np()\n\nbatch_size, num_steps = 32, 35\ntrain_iter, vocab = d2l.load_data_time_machine(batch_size, num_steps)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "import torch\nfrom torch import nn\nfrom d2l import torch as d2l\n\nbatch_size, num_steps = 32, 35\ntrain_iter, vocab = d2l.load_data_time_machine(batch_size, num_steps)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "import tensorflow as tf\nfrom d2l import tensorflow as d2l\n\nbatch_size, num_steps = 32, 35\ntrain_iter, vocab = d2l.load_data_time_machine(batch_size, num_steps)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "Downloading ../data/timemachine.txt from http://d2l-data.s3-accelerate.amazonaws.com/timemachine.txt..."
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "initializing-model-parameters",
+      "text": "9.2.2.1. Initializing Model Parameters"
+    },
+    {
+      "type": "paragraph",
+      "text": "Tiếp theo chúng ta cần xác định và khởi tạo các tham số mô hình. Như\ntrước đây, siêu tham số num_hiddens xác định số đơn vị ẩn. Chúng tôi\nkhởi tạo các trọng lượng sau một phân phối Gaussian với 0,01 độ lệch\nchuẩn, và chúng tôi đặt các thành kiến là 0."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def get_lstm_params(vocab_size, num_hiddens, device):\n    num_inputs = num_outputs = vocab_size\n\n    def normal(shape):\n        return np.random.normal(scale=0.01, size=shape, ctx=device)\n\n    def three():\n        return (normal((num_inputs, num_hiddens)),\n                normal((num_hiddens, num_hiddens)),\n                np.zeros(num_hiddens, ctx=device))\n\n    W_xi, W_hi, b_i = three()  # Input gate parameters\n    W_xf, W_hf, b_f = three()  # Forget gate parameters\n    W_xo, W_ho, b_o = three()  # Output gate parameters\n    W_xc, W_hc, b_c = three()  # Candidate memory cell parameters\n    # Output layer parameters\n    W_hq = normal((num_hiddens, num_outputs))\n    b_q = np.zeros(num_outputs, ctx=device)\n    # Attach gradients\n    params = [W_xi, W_hi, b_i, W_xf, W_hf, b_f, W_xo, W_ho, b_o, W_xc, W_hc,\n              b_c, W_hq, b_q]\n    for param in params:\n        param.attach_grad()\n    return params"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def get_lstm_params(vocab_size, num_hiddens, device):\n    num_inputs = num_outputs = vocab_size\n\n    def normal(shape):\n        return torch.randn(size=shape, device=device)*0.01\n\n    def three():\n        return (normal((num_inputs, num_hiddens)),\n                normal((num_hiddens, num_hiddens)),\n                torch.zeros(num_hiddens, device=device))\n\n    W_xi, W_hi, b_i = three()  # Input gate parameters\n    W_xf, W_hf, b_f = three()  # Forget gate parameters\n    W_xo, W_ho, b_o = three()  # Output gate parameters\n    W_xc, W_hc, b_c = three()  # Candidate memory cell parameters\n    # Output layer parameters\n    W_hq = normal((num_hiddens, num_outputs))\n    b_q = torch.zeros(num_outputs, device=device)\n    # Attach gradients\n    params = [W_xi, W_hi, b_i, W_xf, W_hf, b_f, W_xo, W_ho, b_o, W_xc, W_hc,\n              b_c, W_hq, b_q]\n    for param in params:\n        param.requires_grad_(True)\n    return params"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def get_lstm_params(vocab_size, num_hiddens):\n    num_inputs = num_outputs = vocab_size\n\n    def normal(shape):\n        return tf.Variable(tf.random.normal(shape=shape, stddev=0.01,\n                                            mean=0, dtype=tf.float32))\n    def three():\n        return (normal((num_inputs, num_hiddens)),\n                normal((num_hiddens, num_hiddens)),\n                tf.Variable(tf.zeros(num_hiddens), dtype=tf.float32))\n\n    W_xi, W_hi, b_i = three()  # Input gate parameters\n    W_xf, W_hf, b_f = three()  # Forget gate parameters\n    W_xo, W_ho, b_o = three()  # Output gate parameters\n    W_xc, W_hc, b_c = three()  # Candidate memory cell parameters\n    # Output layer parameters\n    W_hq = normal((num_hiddens, num_outputs))\n    b_q = tf.Variable(tf.zeros(num_outputs), dtype=tf.float32)\n    # Attach gradients\n    params = [W_xi, W_hi, b_i, W_xf, W_hf, b_f, W_xo, W_ho, b_o, W_xc, W_hc,\n              b_c, W_hq, b_q]\n    return params"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "xac-dinh-mo-hinh",
+      "text": "9.2.2.2. Xác định mô hình"
+    },
+    {
+      "type": "paragraph",
+      "text": "Trong the initialization function, trạng thái ẩn của LSTM cần trả về một\nô bộ nhớ additional với giá trị 0 và hình dạng (kích thước lô, số đơn\nvị ẩn). Do đó chúng tôi nhận được sự khởi tạo trạng thái sau đây."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def init_lstm_state(batch_size, num_hiddens, device):\n    return (np.zeros((batch_size, num_hiddens), ctx=device),\n            np.zeros((batch_size, num_hiddens), ctx=device))"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def init_lstm_state(batch_size, num_hiddens, device):\n    return (torch.zeros((batch_size, num_hiddens), device=device),\n            torch.zeros((batch_size, num_hiddens), device=device))"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def init_lstm_state(batch_size, num_hiddens):\n    return (tf.zeros(shape=(batch_size, num_hiddens)),\n            tf.zeros(shape=(batch_size, num_hiddens)))"
+    },
+    {
+      "type": "paragraph",
+      "text": "mô hình thực tế được định nghĩa giống như những gì chúng ta đã thảo luận\ntrước đây: cung cấp ba cổng và một tế bào bộ nhớ phụ trợ. Lưu ý rằng chỉ\ncó trạng thái ẩn được chuyển đến lớp đầu ra. Các tế bào bộ nhớ \\(\\mathbf{C}_t\\) không trực tiếp tham gia vào việc tính toán đầu ra."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def lstm(inputs, state, params):\n    [W_xi, W_hi, b_i, W_xf, W_hf, b_f, W_xo, W_ho, b_o, W_xc, W_hc, b_c,\n     W_hq, b_q] = params\n    (H, C) = state\n    outputs = []\n    for X in inputs:\n        I = npx.sigmoid(np.dot(X, W_xi) + np.dot(H, W_hi) + b_i)\n        F = npx.sigmoid(np.dot(X, W_xf) + np.dot(H, W_hf) + b_f)\n        O = npx.sigmoid(np.dot(X, W_xo) + np.dot(H, W_ho) + b_o)\n        C_tilda = np.tanh(np.dot(X, W_xc) + np.dot(H, W_hc) + b_c)\n        C = F * C + I * C_tilda\n        H = O * np.tanh(C)\n        Y = np.dot(H, W_hq) + b_q\n        outputs.append(Y)\n    return np.concatenate(outputs, axis=0), (H, C)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def lstm(inputs, state, params):\n    [W_xi, W_hi, b_i, W_xf, W_hf, b_f, W_xo, W_ho, b_o, W_xc, W_hc, b_c,\n     W_hq, b_q] = params\n    (H, C) = state\n    outputs = []\n    for X in inputs:\n        I = torch.sigmoid((X @ W_xi) + (H @ W_hi) + b_i)\n        F = torch.sigmoid((X @ W_xf) + (H @ W_hf) + b_f)\n        O = torch.sigmoid((X @ W_xo) + (H @ W_ho) + b_o)\n        C_tilda = torch.tanh((X @ W_xc) + (H @ W_hc) + b_c)\n        C = F * C + I * C_tilda\n        H = O * torch.tanh(C)\n        Y = (H @ W_hq) + b_q\n        outputs.append(Y)\n    return torch.cat(outputs, dim=0), (H, C)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def lstm(inputs, state, params):\n    W_xi, W_hi, b_i, W_xf, W_hf, b_f, W_xo, W_ho, b_o, W_xc, W_hc, b_c, W_hq, b_q = params\n    (H, C) = state\n    outputs = []\n    for X in inputs:\n        X=tf.reshape(X,[-1,W_xi.shape[0]])\n        I = tf.sigmoid(tf.matmul(X, W_xi) + tf.matmul(H, W_hi) + b_i)\n        F = tf.sigmoid(tf.matmul(X, W_xf) + tf.matmul(H, W_hf) + b_f)\n        O = tf.sigmoid(tf.matmul(X, W_xo) + tf.matmul(H, W_ho) + b_o)\n        C_tilda = tf.tanh(tf.matmul(X, W_xc) + tf.matmul(H, W_hc) + b_c)\n        C = F * C + I * C_tilda\n        H = O * tf.tanh(C)\n        Y = tf.matmul(H, W_hq) + b_q\n        outputs.append(Y)\n    return tf.concat(outputs, axis=0), (H,C)"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "dao-tao-va-du-doan",
+      "text": "9.2.2.3. Đào tạo và Dự đoán"
+    },
+    {
+      "type": "paragraph",
+      "text": "Chúng ta hãy đào tạo một LSTM giống như những gì chúng tôi đã làm trong Section 9.1 , bằng cách khởi tạo lớp RNNModelScratch như được\ngiới thiệu trong Section 8.5 ."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "vocab_size, num_hiddens, device = len(vocab), 256, d2l.try_gpu()\nnum_epochs, lr = 500, 1\nmodel = d2l.RNNModelScratch(len(vocab), num_hiddens, device, get_lstm_params,\n                            init_lstm_state, lstm)\nd2l.train_ch8(model, train_iter, vocab, lr, num_epochs, device)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "perplexity 1.2, 9030.1 tokens/sec on gpu(0)\ntime travellerit s against reason said filbywh w beewhith of man\ntravellery off the bredarsoncacimitabdeat fil so walk thisk"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_lstm_86eb9f_51_1.svg",
+      "local_path": "_images/output_lstm_86eb9f_51_1.svg",
+      "alt": "../_images/output_lstm_86eb9f_51_1.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "vocab_size, num_hiddens, device = len(vocab), 256, d2l.try_gpu()\nnum_epochs, lr = 500, 1\nmodel = d2l.RNNModelScratch(len(vocab), num_hiddens, device, get_lstm_params,\n                            init_lstm_state, lstm)\nd2l.train_ch8(model, train_iter, vocab, lr, num_epochs, device)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "perplexity 1.1, 21930.5 tokens/sec on cuda:0\ntime travelleryou can show black is white by argument said filby\ntraveller a forescereopeer three dimensions and the latter"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_lstm_86eb9f_54_1.svg",
+      "local_path": "_images/output_lstm_86eb9f_54_1.svg",
+      "alt": "../_images/output_lstm_86eb9f_54_1.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "vocab_size, num_hiddens, device_name = len(vocab), 256, d2l.try_gpu()._device_name\nnum_epochs, lr = 500, 1\nstrategy = tf.distribute.OneDeviceStrategy(device_name)\nwith strategy.scope():\n    model = d2l.RNNModelScratch(len(vocab), num_hiddens, init_lstm_state, lstm, get_lstm_params)\nd2l.train_ch8(model, train_iter, vocab, lr, num_epochs, strategy)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "perplexity 1.1, 3704.1 tokens/sec on /GPU:0\ntime traveller for so it will be convenient to speak of himwas e\ntravellerification of this know a feetsmin sfiflly thus thi"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_lstm_86eb9f_57_1.svg",
+      "local_path": "_images/output_lstm_86eb9f_57_1.svg",
+      "alt": "../_images/output_lstm_86eb9f_57_1.svg"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "thiet-tap",
+      "text": "9.2.3. Thiết tập"
+    },
+    {
+      "type": "paragraph",
+      "text": "Sử dụng API cấp cao, chúng ta có thể khởi tạo trực tiếp một mô hình LSTM . Điều này đóng gói tất cả các chi tiết cấu hình mà chúng tôi đã\nthực hiện rõ ràng ở trên. Mã này nhanh hơn đáng kể vì nó sử dụng các\ntoán tử được biên dịch hơn là Python cho nhiều chi tiết mà chúng tôi đã\nnêu chi tiết trước đây."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "lstm_layer = rnn.LSTM(num_hiddens)\nmodel = d2l.RNNModel(lstm_layer, len(vocab))\nd2l.train_ch8(model, train_iter, vocab, lr, num_epochs, device)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "perplexity 1.1, 158023.4 tokens/sec on gpu(0)\ntime traveller but now you begin to seethe object of my investig\ntraveller he way be able to stop oraccelerate his drift alo"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_lstm_86eb9f_63_1.svg",
+      "local_path": "_images/output_lstm_86eb9f_63_1.svg",
+      "alt": "../_images/output_lstm_86eb9f_63_1.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "num_inputs = vocab_size\nlstm_layer = nn.LSTM(num_inputs, num_hiddens)\nmodel = d2l.RNNModel(lstm_layer, len(vocab))\nmodel = model.to(device)\nd2l.train_ch8(model, train_iter, vocab, lr, num_epochs, device)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "perplexity 1.0, 311960.7 tokens/sec on cuda:0\ntime traveller with a slight accession ofcheerfulness really thi\ntravelleryou can show black is white by argument said filby"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_lstm_86eb9f_66_1.svg",
+      "local_path": "_images/output_lstm_86eb9f_66_1.svg",
+      "alt": "../_images/output_lstm_86eb9f_66_1.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "lstm_cell = tf.keras.layers.LSTMCell(num_hiddens,\n    kernel_initializer='glorot_uniform')\nlstm_layer = tf.keras.layers.RNN(lstm_cell, time_major=True,\n    return_sequences=True, return_state=True)\ndevice_name = d2l.try_gpu()._device_name\nstrategy = tf.distribute.OneDeviceStrategy(device_name)\nwith strategy.scope():\n    model = d2l.RNNModel(lstm_layer, vocab_size=len(vocab))\nd2l.train_ch8(model, train_iter, vocab, lr, num_epochs, strategy)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "perplexity 1.0, 8551.9 tokens/sec on /GPU:0\ntime traveller for so it will be convenient to speak of himwas e\ntraveller with a slight accession ofcheerfulness really thi"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_lstm_86eb9f_69_1.svg",
+      "local_path": "_images/output_lstm_86eb9f_69_1.svg",
+      "alt": "../_images/output_lstm_86eb9f_69_1.svg"
+    },
+    {
+      "type": "paragraph",
+      "text": "LSTMs là mô hình autoregressive biến tiềm ẩn nguyên mẫu với điều khiển\ntrạng thái không tầm thường. Nhiều biến thể của chúng đã được đề xuất\ntrong những năm qua, ví dụ, nhiều lớp, kết nối còn lại, các loại chính\nquy hóa khác nhau. Tuy nhiên, việc đào tạo LSTMs và các mô hình trình tự\nkhác (chẳng hạn như Grus) khá tốn kém do sự phụ thuộc tầm xa của trình\ntự. Sau đó chúng ta sẽ gặp phải các mô hình thay thế như máy biến áp có\nthể được sử dụng trong một số trường hợp."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tom-tat",
+      "text": "9.2.4. Tóm tắt"
+    },
+    {
+      "type": "list",
+      "ordered": false,
+      "items": [
+        "LSTMs có ba loại cổng: cổng đầu vào, cổng quên và cổng đầu ra kiểm\nsoát luồng thông tin.",
+        "Đầu ra lớp ẩn của LSTM bao gồm trạng thái ẩn và ô nhớ. Chỉ có trạng\nthái ẩn được truyền vào lớp đầu ra. Tế bào bộ nhớ hoàn toàn bên\ntrong.",
+        "LSTMs có thể làm giảm bớt độ dốc biến mất và bùng nổ."
+      ]
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bai-tap",
+      "text": "9.2.5. Bài tập"
+    },
+    {
+      "type": "list",
+      "ordered": true,
+      "items": [
+        "Điều chỉnh các siêu tham số và phân tích ảnh hưởng của chúng đối với\nthời gian chạy, bối rối và trình tự đầu ra.",
+        "Làm thế nào bạn sẽ cần phải thay đổi mô hình để tạo ra các từ thích\nhợp như trái ngược với chuỗi các ký tự?",
+        "So sánh chi phí tính toán cho Grus, LSTMs và RNN thông thường cho một\nchiều ẩn nhất định. Đặc biệt chú ý đến chi phí đào tạo và suy luận.",
+        "Vì ô bộ nhớ ứng cử viên đảm bảo rằng phạm vi giá trị nằm trong khoảng \\(-1\\) và \\(1\\) bằng cách sử dụng hàm \\(\\tanh\\) , tại sao\ntrạng thái ẩn cần sử dụng lại chức năng \\(\\tanh\\) để đảm bảo rằng\nphạm vi giá trị đầu ra nằm trong khoảng từ \\(-1\\) và \\(1\\) ?",
+        "Triển khai một mô hình LSTM cho dự đoán chuỗi thời gian hơn là dự\nđoán chuỗi ký tự."
+      ]
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    }
+  ],
+  "images": [
+    {
+      "original_url": "https://vi.d2l.ai/_images/lstm-0.svg",
+      "local_path": "_images/lstm-0.svg",
+      "alt": "../_images/lstm-0.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/lstm-1.svg",
+      "local_path": "_images/lstm-1.svg",
+      "alt": "../_images/lstm-1.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/lstm-2.svg",
+      "local_path": "_images/lstm-2.svg",
+      "alt": "../_images/lstm-2.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/lstm-3.svg",
+      "local_path": "_images/lstm-3.svg",
+      "alt": "../_images/lstm-3.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_lstm_86eb9f_51_1.svg",
+      "local_path": "_images/output_lstm_86eb9f_51_1.svg",
+      "alt": "../_images/output_lstm_86eb9f_51_1.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_lstm_86eb9f_54_1.svg",
+      "local_path": "_images/output_lstm_86eb9f_54_1.svg",
+      "alt": "../_images/output_lstm_86eb9f_54_1.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_lstm_86eb9f_57_1.svg",
+      "local_path": "_images/output_lstm_86eb9f_57_1.svg",
+      "alt": "../_images/output_lstm_86eb9f_57_1.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_lstm_86eb9f_63_1.svg",
+      "local_path": "_images/output_lstm_86eb9f_63_1.svg",
+      "alt": "../_images/output_lstm_86eb9f_63_1.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_lstm_86eb9f_66_1.svg",
+      "local_path": "_images/output_lstm_86eb9f_66_1.svg",
+      "alt": "../_images/output_lstm_86eb9f_66_1.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_lstm_86eb9f_69_1.svg",
+      "local_path": "_images/output_lstm_86eb9f_69_1.svg",
+      "alt": "../_images/output_lstm_86eb9f_69_1.svg"
+    }
+  ],
+  "text": "9.2. Bộ nhớ ngắn hạn dài (LSTM)\nThách thức giải quyết việc bảo tồn thông tin dài hạn và bỏ qua đầu vào\nngắn hạn trong các mô hình biến tiềm ẩn đã tồn tại trong một thời gian\ndài. Một trong những cách tiếp cận sớm nhất để giải quyết vấn đề này là\nbộ nhớ ngắn hạn dài (LSTM) [Hochreiter & Schmidhuber, 1997] . Nó\nchia sẻ nhiều tài sản của GRU. Điều thú vị là LSTMs có thiết kế phức tạp\nhơn một chút so với Grus nhưng trước Grus gần hai thập kỷ.\n9.2.1. Gated Memory Cell\nĐược cho là thiết kế của LSTM được lấy cảm hứng từ cổng logic của máy\ntính. LSTM giới thiệu một tế bào memory cell (hoặc cell nói ngắn) có\nhình dạng giống như trạng thái ẩn (một số văn học coi ô nhớ là một loại\nđặc biệt của trạng thái ẩn), được thiết kế để ghi lại thông tin bổ sung.\nĐể kiểm soát tế bào bộ nhớ, chúng ta cần một số cổng. Một cổng là cần\nthiết để đọc các mục từ ô. Chúng tôi sẽ đề cập đến điều này là cổng đầu\nra . Một cổng thứ hai là cần thiết để quyết định khi nào nên đọc dữ liệu\nvào ô. Chúng tôi gọi đây là cổng đầu vào **. Cuối cùng, chúng ta cần\nmột cơ chế để thiết lập lại nội dung của ô, được chi phối bởi một cổng\n* quên *. Động lực cho một thiết kế như vậy giống như của Grus, cụ thể\nlà có thể quyết định khi nào cần nhớ và khi nào bỏ qua các đầu vào ở\ntrạng thái ẩn thông qua một cơ chế chuyên dụng. Hãy để chúng tôi xem làm\nthế nào điều này hoạt động trong thực tế.\n9.2.1.1. Cổng đầu vào, Cổng quên và Cổng đầu ra\nCũng giống như trong Grus, việc cấp dữ liệu vào cổng LSTM là đầu vào ở\nbước thời gian hiện tại và trạng thái ẩn của bước thời gian trước đó,\nnhư minh họa trong Fig. 9.2.1 . Chúng được xử lý bởi ba lớp được\nkết nối hoàn toàn với chức năng kích hoạt sigmoid để tính toán các giá\ntrị của đầu vào, quê. và cổng đầu ra. Kết quả là, các giá trị của ba\ncổng nằm trong khoảng \\((0, 1)\\) .\nFig. 9.2.1 Computing the input gate, the forget gate, and the output gate in an\nLSTM model. ¶\nVề mặt toán học, giả sử rằng có \\(h\\) đơn vị ẩn, kích thước lô là \\(n\\) và số lượng đầu vào là \\(d\\) . Do đó, đầu vào là \\(\\mathbf{X}_t \\in \\mathbb{R}^{n \\times d}\\) và trạng thái ẩn của\nbước thời gian trước là \\(\\mathbf{H}_{t-1} \\in \\mathbb{R}^{n \\times h}\\) . Tương ứng, các\ncổng tại bước thời điểm \\(t\\) được định nghĩa như sau: cổng đầu vào\nlà \\(\\mathbf{I}_t \\in \\mathbb{R}^{n \\times h}\\) , cổng quên là \\(\\mathbf{F}_t \\in \\mathbb{R}^{n \\times h}\\) và cổng đầu ra là \\(\\mathbf{O}_t \\in \\mathbb{R}^{n \\times h}\\) . Chúng được tính như\nsau:\ntrong đó \\(\\mathbf{W}_{xi}, \\mathbf{W}_{xf}, \\mathbf{W}_{xo} \\in \\mathbb{R}^{d \\times h}\\) và \\(\\mathbf{W}_{hi}, \\mathbf{W}_{hf}, \\mathbf{W}_{ho} \\in \\mathbb{R}^{h \\times h}\\) là các thông số trọng lượng và \\(\\mathbf{b}_i, \\mathbf{b}_f, \\mathbf{b}_o \\in \\mathbb{R}^{1 \\times h}\\) là các thông số thiên vị.\n9.2.1.2. Tế bào bộ nhớ ứng cử viên\nTiếp theo chúng tôi thiết kế các tế bào bộ nhớ. Vì chúng tôi chưa chỉ\nđịnh hành động của các cổng khác nhau, trước tiên chúng tôi giới thiệu\ntế bào bộ nhớ *ứng cử viên \\(\\tilde{\\mathbf{C}}_t \\in \\mathbb{R}^{n \\times h}\\) . Tính toán của\nnó tương tự như của ba cổng được mô tả ở trên, nhưng sử dụng hàm \\(\\tanh\\) với phạm vi giá trị cho \\((-1, 1)\\) làm hàm kích hoạt.\nĐiều này dẫn đến phương trình sau tại bước thời điểm \\(t\\) :\ntrong đó \\(\\mathbf{W}_{xc} \\in \\mathbb{R}^{d \\times h}\\) và \\(\\mathbf{W}_{hc} \\in \\mathbb{R}^{h \\times h}\\) là các thông số\ntrọng lượng và \\(\\mathbf{b}_c \\in \\mathbb{R}^{1 \\times h}\\) là một\ntham số thiên vị.\nMột minh họa nhanh chóng của tế bào bộ nhớ ứng cử viên được thể hiện\ntrong Fig. 9.2.2 .\nFig. 9.2.2 Computing the candidate memory cell in an LSTM model. ¶\n9.2.1.3. Bộ nhớ Cell\nTrong Grus, chúng ta có một cơ chế để chi phối đầu vào và quên (hoặc bỏ\nqua). Tương tự, trong LSTMs, chúng tôi có hai cổng chuyên dụng cho các\nmục đích như vậy: cổng đầu vào \\(\\mathbf{I}_t\\) chi phối số lượng\nchúng tôi tính đến dữ liệu mới thông qua \\(\\tilde{\\mathbf{C}}_t\\) và\ncổng quên \\(\\mathbf{F}_t\\) giải quyết bao nhiêu nội dung tế bào bộ\nnhớ cũ \\(\\mathbf{C}_{t-1} \\in \\mathbb{R}^{n \\times h}\\) chúng tôi\ngiữ lại. Sử dụng cùng một thủ thuật nhân theo chiều ngang như trước đây,\nchúng tôi đến phương trình cập nhật sau:\nNếu cổng quên luôn xấp xỉ 1 và cổng đầu vào luôn xấp xỉ 0, các ô bộ nhớ\nquá khứ \\(\\mathbf{C}_{t-1}\\) sẽ được lưu theo thời gian và được\nchuyển sang bước thời gian hiện tại. Thiết kế này được giới thiệu để\ngiảm bớt vấn đề gradient biến mất và để nắm bắt tốt hơn các phụ thuộc\ntầm xa trong chuỗi.\nDo đó, chúng tôi đến sơ đồ dòng chảy trong Fig. 9.2.3 .\nFig. 9.2.3 Computing the memory cell in an LSTM model. ¶\n9.2.1.4. Nhà nước ẩn\nCuối cùng, chúng ta cần xác định cách tính trạng thái ẩn \\(\\mathbf{H}_t \\in \\mathbb{R}^{n \\times h}\\) . Đây là nơi cổng đầu ra\nphát huy tác dụng. Trong LSTM, nó chỉ đơn giản là một phiên bản cổng của \\(\\tanh\\) của tế bào bộ nhớ. Điều này đảm bảo rằng các giá trị của \\(\\mathbf{H}_t\\) luôn nằm trong khoảng \\((-1, 1)\\) .\nBất cứ khi nào cổng đầu ra xấp xỉ 1, chúng tôi có hiệu quả truyền tất cả\nthông tin bộ nhớ đến bộ dự đoán, trong khi đối với cổng đầu ra gần 0,\nchúng tôi chỉ giữ lại tất cả thông tin trong ô nhớ và không thực hiện xử\nlý thêm.\nFig. 9.2.4 có một minh họa đồ họa của luồng dữ liệu.\nFig. 9.2.4 Computing the hidden state in an LSTM model. ¶\n9.2.2. Thực hiện từ đầu\nBây giờ chúng ta hãy thực hiện một LSTM từ đầu. Giống như các thí nghiệm\ntrong Section 8.5 , lần đầu tiên chúng ta tải tập dữ liệu\nmáy thời gian.\n9.2.2.1. Initializing Model Parameters\nTiếp theo chúng ta cần xác định và khởi tạo các tham số mô hình. Như\ntrước đây, siêu tham số num_hiddens xác định số đơn vị ẩn. Chúng tôi\nkhởi tạo các trọng lượng sau một phân phối Gaussian với 0,01 độ lệch\nchuẩn, và chúng tôi đặt các thành kiến là 0.\n9.2.2.2. Xác định mô hình\nTrong the initialization function, trạng thái ẩn của LSTM cần trả về một\nô bộ nhớ additional với giá trị 0 và hình dạng (kích thước lô, số đơn\nvị ẩn). Do đó chúng tôi nhận được sự khởi tạo trạng thái sau đây.\nmô hình thực tế được định nghĩa giống như những gì chúng ta đã thảo luận\ntrước đây: cung cấp ba cổng và một tế bào bộ nhớ phụ trợ. Lưu ý rằng chỉ\ncó trạng thái ẩn được chuyển đến lớp đầu ra. Các tế bào bộ nhớ \\(\\mathbf{C}_t\\) không trực tiếp tham gia vào việc tính toán đầu ra.\n9.2.2.3. Đào tạo và Dự đoán\nChúng ta hãy đào tạo một LSTM giống như những gì chúng tôi đã làm trong Section 9.1 , bằng cách khởi tạo lớp RNNModelScratch như được\ngiới thiệu trong Section 8.5 .\n9.2.3. Thiết tập\nSử dụng API cấp cao, chúng ta có thể khởi tạo trực tiếp một mô hình LSTM . Điều này đóng gói tất cả các chi tiết cấu hình mà chúng tôi đã\nthực hiện rõ ràng ở trên. Mã này nhanh hơn đáng kể vì nó sử dụng các\ntoán tử được biên dịch hơn là Python cho nhiều chi tiết mà chúng tôi đã\nnêu chi tiết trước đây.\nLSTMs là mô hình autoregressive biến tiềm ẩn nguyên mẫu với điều khiển\ntrạng thái không tầm thường. Nhiều biến thể của chúng đã được đề xuất\ntrong những năm qua, ví dụ, nhiều lớp, kết nối còn lại, các loại chính\nquy hóa khác nhau. Tuy nhiên, việc đào tạo LSTMs và các mô hình trình tự\nkhác (chẳng hạn như Grus) khá tốn kém do sự phụ thuộc tầm xa của trình\ntự. Sau đó chúng ta sẽ gặp phải các mô hình thay thế như máy biến áp có\nthể được sử dụng trong một số trường hợp.\n9.2.4. Tóm tắt\nLSTMs có ba loại cổng: cổng đầu vào, cổng quên và cổng đầu ra kiểm\nsoát luồng thông tin.\nĐầu ra lớp ẩn của LSTM bao gồm trạng thái ẩn và ô nhớ. Chỉ có trạng\nthái ẩn được truyền vào lớp đầu ra. Tế bào bộ nhớ hoàn toàn bên\ntrong.\nLSTMs có thể làm giảm bớt độ dốc biến mất và bùng nổ.\n9.2.5. Bài tập\nĐiều chỉnh các siêu tham số và phân tích ảnh hưởng của chúng đối với\nthời gian chạy, bối rối và trình tự đầu ra.\nLàm thế nào bạn sẽ cần phải thay đổi mô hình để tạo ra các từ thích\nhợp như trái ngược với chuỗi các ký tự?\nSo sánh chi phí tính toán cho Grus, LSTMs và RNN thông thường cho một\nchiều ẩn nhất định. Đặc biệt chú ý đến chi phí đào tạo và suy luận.\nVì ô bộ nhớ ứng cử viên đảm bảo rằng phạm vi giá trị nằm trong khoảng \\(-1\\) và \\(1\\) bằng cách sử dụng hàm \\(\\tanh\\) , tại sao\ntrạng thái ẩn cần sử dụng lại chức năng \\(\\tanh\\) để đảm bảo rằng\nphạm vi giá trị đầu ra nằm trong khoảng từ \\(-1\\) và \\(1\\) ?\nTriển khai một mô hình LSTM cho dự đoán chuỗi thời gian hơn là dự\nđoán chuỗi ký tự.\nDiscussions\nDiscussions"
+}

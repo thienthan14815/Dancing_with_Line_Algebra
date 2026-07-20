@@ -1,51 +1,159 @@
 /* =====================================================================
    HỒ SƠ / THÀNH TỰU — style riêng, prefix `pf-`.
-   Dùng lại token màu trong src/styles/global.css. KHÔNG sửa shell/global.
+   Redesign v2 "calm workspace": mọi thẻ nền --surface viền mềm (kể cả
+   thẻ tổng quan — navy chỉ dành cho panel toán/code), thành tựu mở khóa
+   dùng --good, XP/streak dùng status color đúng nghĩa. Token global.css.
    ===================================================================== */
 
-/* ---------- Header hồ sơ ---------- */
-.pf-hero {
+/* ---------- Header hồ sơ (thẻ tổng quan trắng, calm) ---------- */
+/* .pf-page tăng specificity để thắng .dl-card (shell) bất kể thứ tự nạp CSS. */
+.pf-page .pf-hero {
   display: flex;
   align-items: center;
-  gap: 18px;
-  margin-bottom: 16px;
+  gap: var(--sp-2);
+  margin-bottom: var(--sp-2);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  box-shadow: var(--elev-1);
+  color: var(--text);
 }
 .pf-avatar {
   flex-shrink: 0;
   width: 72px;
   height: 72px;
-  border-radius: 20px;
+  border-radius: var(--radius-sm);
   display: grid;
   place-items: center;
   font-size: 32px;
-  font-weight: 900;
-  color: #fff;
-  background: linear-gradient(135deg, var(--accent), var(--vec-result));
+  font-weight: 800;
+  color: white;
+  background: var(--primary);
 }
 .pf-hero-body {
   min-width: 0;
 }
-.pf-name {
-  font-size: 24px;
-  font-weight: 900;
+.pf-hero .pf-name {
+  font-size: var(--fs-title);
+  font-weight: 700;
+  letter-spacing: -0.02em;
   margin: 0 0 8px;
+  color: var(--text);
 }
 .pf-hero-tags {
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
 }
-.pf-since {
+.pf-hero .pf-since {
   margin: 8px 0 0;
-  font-size: 13px;
+  font-size: var(--fs-caption);
+  color: var(--text-secondary);
 }
 
-/* ---------- Thẻ chỉ số ---------- */
+/* ---------- 2 bubble tiêu điểm (số liệu tròn) ---------- */
+.pf-bubbles {
+  display: flex;
+  gap: var(--sp-3);
+  flex-wrap: wrap;
+  margin-bottom: var(--sp-3);
+}
+.pf-bubble {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+.pf-bubble-circle {
+  width: 104px;
+  height: 104px;
+  border-radius: var(--radius-chip);
+  display: grid;
+  place-items: center;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  box-shadow: var(--elev-1);
+  font-size: var(--fs-heading);
+  font-weight: 700;
+  line-height: 1;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+}
+.pf-bubble-streak {
+  color: var(--warn);
+}
+.pf-bubble-lbl {
+  font-size: var(--fs-caption);
+  color: var(--text-secondary);
+}
+
+/* ---------- Navi trong trang (chip segmented) ---------- */
+.pf-nav {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: var(--sp-3);
+}
+.pf-nav-chip {
+  min-height: 44px;
+  padding: 8px 18px;
+  border-radius: var(--radius-chip);
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text-secondary);
+  font: inherit;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background var(--dur-2) var(--ease), color var(--dur-2) var(--ease),
+    border-color var(--dur-2) var(--ease);
+}
+.pf-nav-chip:hover {
+  color: var(--text);
+  border-color: var(--text-hint);
+}
+.pf-nav-chip.is-active {
+  background: var(--primary-soft);
+  color: var(--primary);
+  border-color: transparent;
+}
+
+/* ---------- Khối tab (fade nhẹ khi chuyển) ---------- */
+.pf-tab {
+  animation: pf-fade var(--dur-2) var(--ease);
+}
+@keyframes pf-fade {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.pf-since {
+  margin: 0;
+  font-size: var(--fs-caption);
+  color: var(--text-secondary);
+}
+.pf-social-note {
+  margin: 8px 0 0;
+  font-size: var(--fs-caption);
+  line-height: 1.5;
+  color: var(--text-secondary);
+}
+@media (prefers-reduced-motion: reduce) {
+  .pf-tab {
+    animation: none;
+  }
+}
+
+/* ---------- Thẻ chỉ số (trắng nổi) ---------- */
 .pf-stat-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 12px;
-  margin-bottom: 16px;
+  margin-bottom: var(--sp-2);
 }
 .pf-stat {
   display: flex;
@@ -53,25 +161,27 @@
   align-items: center;
   text-align: center;
   gap: 4px;
-  padding: 16px 10px;
+  padding: var(--sp-2) 10px;
 }
 .pf-stat-icon {
   font-size: 24px;
 }
 .pf-stat-num {
   font-size: 26px;
-  font-weight: 900;
+  font-weight: 700;
   line-height: 1.1;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
 }
 .pf-stat-lbl {
-  font-size: 12px;
-  color: var(--text-muted);
+  font-size: var(--fs-caption);
+  color: var(--text-secondary);
   line-height: 1.35;
 }
 
 /* ---------- Khối chung ---------- */
 .pf-sec {
-  margin-bottom: 16px;
+  margin-bottom: var(--sp-2);
 }
 .pf-sec-head {
   display: flex;
@@ -82,8 +192,10 @@
 }
 .pf-sec-title {
   font-size: 18px;
-  font-weight: 800;
+  font-weight: 700;
+  letter-spacing: -0.01em;
   margin: 0;
+  color: var(--text);
 }
 
 /* ---------- Thành tựu ---------- */
@@ -98,17 +210,17 @@
   align-items: center;
   text-align: center;
   gap: 5px;
-  padding: 16px 12px;
-  border-radius: 16px;
+  padding: var(--sp-2) 12px;
+  border-radius: var(--radius-sm);
   border: 1px solid var(--border);
   background: var(--panel-2);
 }
 .pf-ach.unlocked {
-  border-color: rgba(245, 197, 24, 0.4);
-  background: rgba(245, 197, 24, 0.08);
+  border-color: color-mix(in srgb, var(--good) 35%, transparent);
+  background: var(--good-soft);
 }
 .pf-ach.locked {
-  opacity: 0.5;
+  opacity: 0.55;
   filter: grayscale(0.6);
 }
 .pf-ach-icon {
@@ -117,18 +229,19 @@
 }
 .pf-ach-title {
   font-size: 14px;
-  font-weight: 800;
+  font-weight: 700;
+  color: var(--text);
 }
 .pf-ach-desc {
   font-size: 11.5px;
-  color: var(--text-muted);
+  color: var(--text-secondary);
   line-height: 1.35;
 }
 .pf-ach-date {
   margin-top: 2px;
   font-size: 11px;
   font-weight: 700;
-  color: #f5c518;
+  color: var(--good);
 }
 
 /* ---------- Nhiệm vụ ---------- */
@@ -142,13 +255,14 @@
   align-items: center;
   gap: 14px;
   padding: 12px 14px;
-  border-radius: 14px;
+  border-radius: var(--radius-sm);
   background: var(--panel-2);
   border: 1px solid var(--border);
 }
 .pf-quest-ring {
   font-size: 12px;
-  font-weight: 800;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
 }
 .pf-quest-body {
   flex: 1;
@@ -160,17 +274,19 @@
 .pf-quest-title {
   font-weight: 700;
   font-size: 14.5px;
+  color: var(--text);
 }
 .pf-quest-prog {
   font-size: 12.5px;
-  color: var(--text-muted);
+  color: var(--text-secondary);
+  font-variant-numeric: tabular-nums;
 }
 
 /* ---------- Social placeholder ---------- */
 .pf-social-body {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: var(--sp-2);
 }
 .pf-social-icon {
   font-size: 40px;

@@ -1,0 +1,341 @@
+{
+  "url": "https://vi.d2l.ai/chapter_computational-performance/async-computation.html",
+  "chapter": "chapter_computational-performance",
+  "title": "12.2. Tính toán không đồng bộ",
+  "crawled_at": "2026-07-20T12:40:32.174776+00:00",
+  "headings": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "tinh-toan-khong-dong-bo",
+      "text": "12.2. Tính toán không đồng bộ"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "asynchrony-qua-backend",
+      "text": "12.2.1. Asynchrony qua Backend"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "rao-can-va-chan",
+      "text": "12.2.2. Rào cản và chặn"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "cai-thien-tinh-toan",
+      "text": "12.2.3. Cải thiện tính toán"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tom-tat",
+      "text": "12.2.4. Tóm tắt"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bai-tap",
+      "text": "12.2.5. Bài tập"
+    }
+  ],
+  "content": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "tinh-toan-khong-dong-bo",
+      "text": "12.2. Tính toán không đồng bộ"
+    },
+    {
+      "type": "paragraph",
+      "text": "Máy tính ngày nay là các hệ thống song song cao, bao gồm nhiều lõi CPU\n(thường là nhiều luồng trên mỗi lõi), nhiều yếu tố xử lý trên mỗi GPU,\nvà thường là nhiều GPU trên mỗi thiết bị. Nói tóm lại, chúng ta có thể\nxử lý nhiều thứ khác nhau cùng một lúc, thường là trên các thiết bị khác\nnhau. Thật không may Python không phải là một cách tuyệt vời để viết mã\nsong song và không đồng bộ, ít nhất là không có một số trợ giúp bổ sung.\nRốt cuộc, Python là một luồng và điều này không có khả năng thay đổi\ntrong tương lai. Các khuôn khổ học sâu như MXNet và TensorFlow áp dụng\nmô hình lập trình không đồng bộ* * để cải thiện hiệu suất, trong khi\nPyTorch sử dụng trình lập lịch riêng của Python dẫn đến sự đánh đổi hiệu\nsuất khác. Đối với PyTorch, theo mặc định, các hoạt động GPU là không\nđồng bộ. Khi bạn gọi một chức năng sử dụng GPU, các hoạt động được xếp\nhàng vào thiết bị cụ thể, nhưng không nhất thiết phải được thực hiện cho\nđến sau này. Điều này cho phép chúng tôi thực hiện song song nhiều tính\ntoán hơn, bao gồm các hoạt động trên CPU hoặc các GPU khác."
+    },
+    {
+      "type": "paragraph",
+      "text": "Do đó, hiểu cách thức hoạt động của lập trình không đồng bộ giúp chúng\nta phát triển các chương trình hiệu quả hơn, bằng cách chủ động giảm các\nyêu cầu tính toán và phụ thuộc lẫn nhau. Điều này cho phép chúng tôi\ngiảm chi phí bộ nhớ và tăng mức sử dụng bộ xử lý."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "import os\nimport subprocess\nimport numpy\nfrom mxnet import autograd, gluon, np, npx\nfrom mxnet.gluon import nn\nfrom d2l import mxnet as d2l\n\nnpx.set_np()"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "import os\nimport subprocess\nimport numpy\nimport torch\nfrom torch import nn\nfrom d2l import torch as d2l"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "asynchrony-qua-backend",
+      "text": "12.2.1. Asynchrony qua Backend"
+    },
+    {
+      "type": "paragraph",
+      "text": "Đối với một khởi động hãy xem xét vấn đề đồ chơi sau: chúng tôi muốn tạo\nra một ma trận ngẫu nhiên và nhân nó. Chúng ta hãy làm điều đó cả trong\nNumPy và năm mxnet.np để thấy sự khác biệt."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "with d2l.Benchmark('numpy'):\n    for _ in range(10):\n        a = numpy.random.normal(size=(1000, 1000))\n        b = numpy.dot(a, a)\n\nwith d2l.Benchmark('mxnet.np'):\n    for _ in range(10):\n        a = np.random.normal(size=(1000, 1000))\n        b = np.dot(a, a)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "numpy: 1.0968 sec\nmxnet.np: 0.0255 sec"
+    },
+    {
+      "type": "paragraph",
+      "text": "Đầu ra điểm chuẩn thông qua MXNet là các đơn đặt hàng cường độ nhanh\nhơn. Vì cả hai đều được thực hiện trên cùng một bộ xử lý một cái gì đó\nkhác phải xảy ra. Buộc MXNet để hoàn thành tất cả các tính toán backend\ntrước khi trả về cho thấy những gì đã xảy ra trước đây: tính toán được\nthực hiện bởi backend trong khi frontend trả về kiểm soát Python."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "with d2l.Benchmark():\n    for _ in range(10):\n        a = np.random.normal(size=(1000, 1000))\n        b = np.dot(a, a)\n    npx.waitall()"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "Done: 0.8279 sec"
+    },
+    {
+      "type": "paragraph",
+      "text": "Nói rộng ra, MXNet có một lối vào cho tương tác trực tiếp với người\ndùng, ví dụ, thông qua Python, cũng như một phụ trợ được sử dụng bởi hệ\nthống để thực hiện tính toán. Như thể hiện trong Fig. 12.2.1 , người dùng có thể viết các chương trình MXNet\nbằng nhiều ngôn ngữ lối vào khác nhau, chẳng hạn như Python, R, Scala và\nC ++. Bất kể ngôn ngữ lập trình lối vào được sử dụng, việc thực hiện các\nchương trình MXNet xảy ra chủ yếu trong phần phụ trợ của triển khai C\n++. Các hoạt động do ngôn ngữ frontend phát hành được chuyển sang phần\nphụ trợ để thực hiện. Phụ trợ quản lý các luồng riêng của nó liên tục\nthu thập và thực hiện các nhiệm vụ xếp hàng đợi. Lưu ý rằng để làm việc\nnày, phụ trợ phải có khả năng theo dõi các phụ thuộc giữa các bước khác\nnhau trong biểu đồ tính toán. Do đó, không thể song song hóa các hoạt\nđộng phụ thuộc vào nhau."
+    },
+    {
+      "type": "paragraph",
+      "text": "Đối với một khởi động hãy xem xét vấn đề đồ chơi sau: chúng tôi muốn tạo\nra một ma trận ngẫu nhiên và nhân nó. Chúng ta hãy làm điều đó cả trong\nNumPy và trong tensor PyTorch để thấy sự khác biệt. Lưu ý rằng PyTorch tensor được xác định trên GPU."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "# Warmup for GPU computation\ndevice = d2l.try_gpu()\na = torch.randn(size=(1000, 1000), device=device)\nb = torch.mm(a, a)\n\nwith d2l.Benchmark('numpy'):\n    for _ in range(10):\n        a = numpy.random.normal(size=(1000, 1000))\n        b = numpy.dot(a, a)\n\nwith d2l.Benchmark('torch'):\n    for _ in range(10):\n        a = torch.randn(size=(1000, 1000), device=device)\n        b = torch.mm(a, a)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "numpy: 1.0858 sec\ntorch: 0.0013 sec"
+    },
+    {
+      "type": "paragraph",
+      "text": "Đầu ra điểm chuẩn thông qua PyTorch là đơn đặt hàng cường độ nhanh hơn.\nSản phẩm chấm NumPy được thực thi trên bộ xử lý CPU trong khi phép nhân\nma trận PyTorch được thực thi trên GPU và do đó sau này dự kiến sẽ nhanh\nhơn nhiều. Nhưng sự khác biệt thời gian rất lớn cho thấy một cái gì đó\nkhác phải xảy ra. Theo mặc định, các hoạt động GPU không đồng bộ trong\nPyTorch. Buộc PyTorch hoàn thành tất cả các tính toán trước khi trả về\ncho thấy những gì đã xảy ra trước đây: tính toán đang được thực hiện bởi\nbackend trong khi frontend trả về kiểm soát Python."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "with d2l.Benchmark():\n    for _ in range(10):\n        a = torch.randn(size=(1000, 1000), device=device)\n        b = torch.mm(a, a)\n    torch.cuda.synchronize(device)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "Done: 0.0029 sec"
+    },
+    {
+      "type": "paragraph",
+      "text": "Nói rộng ra, PyTorch có lối vào để tương tác trực tiếp với người dùng,\nví dụ, thông qua Python, cũng như một phụ trợ được hệ thống sử dụng để\nthực hiện tính toán. Như thể hiện trong Fig. 12.2.1 , người\ndùng có thể viết các chương trình PyTorch bằng nhiều ngôn ngữ lối vào\nkhác nhau, chẳng hạn như Python và C ++. Bất kể ngôn ngữ lập trình lối\nvào được sử dụng, việc thực hiện các chương trình PyTorch xảy ra chủ yếu\ntrong phần phụ trợ của các triển khai C ++. Các hoạt động do ngôn ngữ\nfrontend phát hành được chuyển sang phần phụ trợ để thực hiện. Phụ trợ\nquản lý các luồng riêng của nó liên tục thu thập và thực hiện các nhiệm\nvụ xếp hàng đợi. Lưu ý rằng để làm việc này, phụ trợ phải có khả năng\ntheo dõi các phụ thuộc giữa các bước khác nhau trong biểu đồ tính toán.\nDo đó, không thể song song hóa các hoạt động phụ thuộc vào nhau."
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/frontends.png",
+      "local_path": "_images/frontends.png",
+      "alt": "../_images/frontends.png"
+    },
+    {
+      "type": "paragraph",
+      "text": "Fig. 12.2.1 Programming language frontends and deep learning framework backends. ¶"
+    },
+    {
+      "type": "paragraph",
+      "text": "Chúng ta hãy nhìn vào một ví dụ đồ chơi khác để hiểu biểu đồ phụ thuộc\ntốt hơn một chút."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "x = np.ones((1, 2))\ny = np.ones((1, 2))\nz = x * y + 2\nz"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "array([[3., 3.]])"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "x = torch.ones((1, 2), device=device)\ny = torch.ones((1, 2), device=device)\nz = x * y + 2\nz"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "tensor([[3., 3.]], device='cuda:0')"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/asyncgraph.svg",
+      "local_path": "_images/asyncgraph.svg",
+      "alt": "../_images/asyncgraph.svg"
+    },
+    {
+      "type": "paragraph",
+      "text": "Fig. 12.2.2 The backend tracks dependencies between various steps in the\ncomputational graph. ¶"
+    },
+    {
+      "type": "paragraph",
+      "text": "Đoạn mã ở trên cũng được minh họa trong Fig. 12.2.2 . Bất\ncứ khi nào Python frontend thread thực hiện một trong ba câu lệnh đầu\ntiên, nó chỉ đơn giản trả về nhiệm vụ cho hàng đợi phụ trợ. Khi kết quả\ncủa câu lệnh cuối cùng cần phải được * printed*, luồng giao diện người\ndùng Python sẽ chờ thread phụ trợ C++ kết thúc tính toán kết quả của\nbiến z . Một lợi ích của thiết kế này là luồng giao diện người dùng\nPython không cần phải thực hiện các tính toán thực tế. Do đó, có rất ít\ntác động đến hiệu suất tổng thể của chương trình, bất kể hiệu suất của\nPython. Fig. 12.2.3 minh họa cách giao diện người dùng và\nphụ trợ tương tác."
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/threading.svg",
+      "local_path": "_images/threading.svg",
+      "alt": "../_images/threading.svg"
+    },
+    {
+      "type": "paragraph",
+      "text": "Fig. 12.2.3 Interactions of the frontend and backend. ¶"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "rao-can-va-chan",
+      "text": "12.2.2. Rào cản và chặn"
+    },
+    {
+      "type": "paragraph",
+      "text": "Có một số hoạt động sẽ buộc Python phải chờ hoàn thành:"
+    },
+    {
+      "type": "list",
+      "ordered": false,
+      "items": [
+        "Rõ ràng nhất là npx.waitall() chờ đợi cho đến khi tất cả các tính\ntoán đã hoàn thành, bất kể khi nào các hướng dẫn tính toán được ban\nhành. Trong thực tế, việc sử dụng toán tử này là một ý tưởng tồi trừ\nkhi hoàn toàn cần thiết vì nó có thể dẫn đến hiệu suất kém.",
+        "Nếu chúng ta chỉ muốn đợi cho đến khi một biến cụ thể có sẵn, chúng\nta có thể gọi z.wait_to_read() . Trong trường hợp này các khối\nMXNet trở lại Python cho đến khi biến z đã được tính toán. Các\ntính toán khác cũng có thể tiếp tục sau đó."
+      ]
+    },
+    {
+      "type": "paragraph",
+      "text": "Hãy để chúng tôi xem làm thế nào điều này hoạt động trong thực tế."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "with d2l.Benchmark('waitall'):\n    b = np.dot(a, a)\n    npx.waitall()\n\nwith d2l.Benchmark('wait_to_read'):\n    b = np.dot(a, a)\n    b.wait_to_read()"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "waitall: 0.0186 sec\nwait_to_read: 0.0157 sec"
+    },
+    {
+      "type": "paragraph",
+      "text": "Cả hai hoạt động đều mất khoảng cùng thời gian để hoàn thành. Bên cạnh\ncác hoạt động chặn rõ ràng, chúng tôi khuyên bạn nên biết về trình chặn\n* ngụ ý*. In một biến rõ ràng yêu cầu biến phải có sẵn và do đó là một\ntrình chặn. Cuối cùng, chuyển đổi sang NumPy qua z.asnumpy() và\nchuyển đổi sang vô hướng qua z.item() đang chặn, vì NumPy không có\nkhái niệm không đồng bộ. Nó cần truy cập vào các giá trị giống như chức\nnăng print ."
+    },
+    {
+      "type": "paragraph",
+      "text": "Sao chép một lượng nhỏ dữ liệu thường xuyên từ phạm vi của MXNet sang\nNumPy và trở lại có thể phá hủy hiệu suất của một mã hiệu quả khác, vì\nmỗi thao tác như vậy yêu cầu biểu đồ tính toán để đánh giá tất cả các\nkết quả trung gian cần thiết để có được thuật ngữ có liên quan *\ntrước* bất cứ điều gì khác có thể được thực hiện."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "with d2l.Benchmark('numpy conversion'):\n    b = np.dot(a, a)\n    b.asnumpy()\n\nwith d2l.Benchmark('scalar conversion'):\n    b = np.dot(a, a)\n    b.sum().item()"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "numpy conversion: 0.0148 sec\nscalar conversion: 0.0365 sec"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "cai-thien-tinh-toan",
+      "text": "12.2.3. Cải thiện tính toán"
+    },
+    {
+      "type": "paragraph",
+      "text": "Trên một hệ thống đa luồng nặng nề (thậm chí máy tính xách tay thông\nthường có 4 luồng trở lên và trên các máy chủ đa ổ cắm, con số này có\nthể vượt quá 256) chi phí của các hoạt động lên lịch có thể trở nên đáng\nkể. Đây là lý do tại sao nó là rất mong muốn để có tính toán và lập kế\nhoạch xảy ra không đồng bộ và song song. Để minh họa lợi ích của việc\nlàm như vậy, chúng ta hãy xem những gì sẽ xảy ra nếu chúng ta tăng một\nbiến thêm 1 nhiều lần, cả theo thứ tự hoặc không đồng bộ. Chúng tôi mô\nphỏng thực hiện đồng bộ bằng cách chèn một rào cản wait_to_read ở\ngiữa mỗi lần bổ sung."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "with d2l.Benchmark('synchronous'):\n    for _ in range(10000):\n        y = x + 1\n        y.wait_to_read()\n\nwith d2l.Benchmark('asynchronous'):\n    for _ in range(10000):\n        y = x + 1\n    npx.waitall()"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "synchronous: 1.0459 sec\nasynchronous: 0.7777 sec"
+    },
+    {
+      "type": "paragraph",
+      "text": "Một tương tác đơn giản hóa một chút giữa chuỗi giao diện Python và luồng\nphụ trợ C++ có thể được tóm tắt như sau: 1. Lối vào ra lệnh backend để\nchèn nhiệm vụ tính toán y = x + 1 vào hàng đợi. 1. Backend sau đó\nnhận được các nhiệm vụ tính toán từ hàng đợi và thực hiện các tính toán\nthực tế. 1. Backend sau đó trả về kết quả tính toán cho lối vào. Giả sử\nrằng thời lượng của ba giai đoạn này lần lượt là \\(t_1, t_2\\) và \\(t_3\\) . Nếu chúng ta không sử dụng lập trình không đồng bộ, tổng\nthời gian thực hiện để thực hiện 10000 tính toán là khoảng \\(10000 (t_1+ t_2 + t_3)\\) . Nếu lập trình không đồng bộ được sử\ndụng, tổng thời gian thực hiện để thực hiện 10000 tính toán có thể được\ngiảm xuống còn \\(t_1 + 10000 t_2 + t_3\\) (giả sử \\(10000 t_2 > 9999t_1\\) ), vì lối vào không phải đợi backend trả về\nkết quả tính toán cho mỗi vòng lặp."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tom-tat",
+      "text": "12.2.4. Tóm tắt"
+    },
+    {
+      "type": "list",
+      "ordered": false,
+      "items": [
+        "Các khuôn khổ học sâu có thể tách các lối vào Python từ một phụ trợ\nthực thi. Điều này cho phép chèn nhanh không đồng bộ các lệnh vào phụ\ntrợ và song song liên quan.",
+        "Asynchrony dẫn đến một lối vào khá đáp ứng. Tuy nhiên, hãy thận trọng\nkhông để lấp đầy hàng đợi tác vụ vì nó có thể dẫn đến tiêu thụ bộ nhớ\nquá mức. Bạn nên đồng bộ hóa cho mỗi minibatch để giữ lối vào và phụ\ntrợ xấp xỉ đồng bộ hóa.",
+        "Các nhà cung cấp chip cung cấp các công cụ phân tích hiệu suất tinh\nvi để có được cái nhìn sâu sắc hơn nhiều về hiệu quả của việc học\nsâu."
+      ]
+    },
+    {
+      "type": "list",
+      "ordered": false,
+      "items": [
+        "Hãy nhận thức được thực tế là chuyển đổi từ quản lý bộ nhớ của MXNet\nsang Python sẽ buộc phụ trợ phải đợi cho đến khi biến cụ thể đã sẵn\nsàng. Các chức năng như print , asnumpy và item đều có tác\ndụng này. Điều này có thể là mong muốn nhưng việc sử dụng đồng bộ hóa\nbất cẩn có thể làm hỏng hiệu suất."
+      ]
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bai-tap",
+      "text": "12.2.5. Bài tập"
+    },
+    {
+      "type": "list",
+      "ordered": true,
+      "items": [
+        "Chúng tôi đã đề cập ở trên rằng việc sử dụng tính toán không đồng bộ\ncó thể làm giảm tổng lượng thời gian cần thiết để thực hiện 10000\ntính toán xuống \\(t_1 + 10000 t_2 + t_3\\) . Tại sao chúng ta phải\ngiả định \\(10000 t_2 > 9999 t_1\\) ở đây?",
+        "Đo sự khác biệt giữa waitall và wait_to_read . Gợi ý: thực\nhiện một số hướng dẫn và đồng bộ hóa cho một kết quả trung gian."
+      ]
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    },
+    {
+      "type": "list",
+      "ordered": true,
+      "items": [
+        "Trên CPU, điểm chuẩn các hoạt động nhân ma trận tương tự trong phần\nnày. Bạn vẫn có thể quan sát sự không đồng bộ thông qua backend?"
+      ]
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    }
+  ],
+  "images": [
+    {
+      "original_url": "https://vi.d2l.ai/_images/frontends.png",
+      "local_path": "_images/frontends.png",
+      "alt": "../_images/frontends.png"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/asyncgraph.svg",
+      "local_path": "_images/asyncgraph.svg",
+      "alt": "../_images/asyncgraph.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/threading.svg",
+      "local_path": "_images/threading.svg",
+      "alt": "../_images/threading.svg"
+    }
+  ],
+  "text": "12.2. Tính toán không đồng bộ\nMáy tính ngày nay là các hệ thống song song cao, bao gồm nhiều lõi CPU\n(thường là nhiều luồng trên mỗi lõi), nhiều yếu tố xử lý trên mỗi GPU,\nvà thường là nhiều GPU trên mỗi thiết bị. Nói tóm lại, chúng ta có thể\nxử lý nhiều thứ khác nhau cùng một lúc, thường là trên các thiết bị khác\nnhau. Thật không may Python không phải là một cách tuyệt vời để viết mã\nsong song và không đồng bộ, ít nhất là không có một số trợ giúp bổ sung.\nRốt cuộc, Python là một luồng và điều này không có khả năng thay đổi\ntrong tương lai. Các khuôn khổ học sâu như MXNet và TensorFlow áp dụng\nmô hình lập trình không đồng bộ* * để cải thiện hiệu suất, trong khi\nPyTorch sử dụng trình lập lịch riêng của Python dẫn đến sự đánh đổi hiệu\nsuất khác. Đối với PyTorch, theo mặc định, các hoạt động GPU là không\nđồng bộ. Khi bạn gọi một chức năng sử dụng GPU, các hoạt động được xếp\nhàng vào thiết bị cụ thể, nhưng không nhất thiết phải được thực hiện cho\nđến sau này. Điều này cho phép chúng tôi thực hiện song song nhiều tính\ntoán hơn, bao gồm các hoạt động trên CPU hoặc các GPU khác.\nDo đó, hiểu cách thức hoạt động của lập trình không đồng bộ giúp chúng\nta phát triển các chương trình hiệu quả hơn, bằng cách chủ động giảm các\nyêu cầu tính toán và phụ thuộc lẫn nhau. Điều này cho phép chúng tôi\ngiảm chi phí bộ nhớ và tăng mức sử dụng bộ xử lý.\n12.2.1. Asynchrony qua Backend\nĐối với một khởi động hãy xem xét vấn đề đồ chơi sau: chúng tôi muốn tạo\nra một ma trận ngẫu nhiên và nhân nó. Chúng ta hãy làm điều đó cả trong\nNumPy và năm mxnet.np để thấy sự khác biệt.\nĐầu ra điểm chuẩn thông qua MXNet là các đơn đặt hàng cường độ nhanh\nhơn. Vì cả hai đều được thực hiện trên cùng một bộ xử lý một cái gì đó\nkhác phải xảy ra. Buộc MXNet để hoàn thành tất cả các tính toán backend\ntrước khi trả về cho thấy những gì đã xảy ra trước đây: tính toán được\nthực hiện bởi backend trong khi frontend trả về kiểm soát Python.\nNói rộng ra, MXNet có một lối vào cho tương tác trực tiếp với người\ndùng, ví dụ, thông qua Python, cũng như một phụ trợ được sử dụng bởi hệ\nthống để thực hiện tính toán. Như thể hiện trong Fig. 12.2.1 , người dùng có thể viết các chương trình MXNet\nbằng nhiều ngôn ngữ lối vào khác nhau, chẳng hạn như Python, R, Scala và\nC ++. Bất kể ngôn ngữ lập trình lối vào được sử dụng, việc thực hiện các\nchương trình MXNet xảy ra chủ yếu trong phần phụ trợ của triển khai C\n++. Các hoạt động do ngôn ngữ frontend phát hành được chuyển sang phần\nphụ trợ để thực hiện. Phụ trợ quản lý các luồng riêng của nó liên tục\nthu thập và thực hiện các nhiệm vụ xếp hàng đợi. Lưu ý rằng để làm việc\nnày, phụ trợ phải có khả năng theo dõi các phụ thuộc giữa các bước khác\nnhau trong biểu đồ tính toán. Do đó, không thể song song hóa các hoạt\nđộng phụ thuộc vào nhau.\nĐối với một khởi động hãy xem xét vấn đề đồ chơi sau: chúng tôi muốn tạo\nra một ma trận ngẫu nhiên và nhân nó. Chúng ta hãy làm điều đó cả trong\nNumPy và trong tensor PyTorch để thấy sự khác biệt. Lưu ý rằng PyTorch tensor được xác định trên GPU.\nĐầu ra điểm chuẩn thông qua PyTorch là đơn đặt hàng cường độ nhanh hơn.\nSản phẩm chấm NumPy được thực thi trên bộ xử lý CPU trong khi phép nhân\nma trận PyTorch được thực thi trên GPU và do đó sau này dự kiến sẽ nhanh\nhơn nhiều. Nhưng sự khác biệt thời gian rất lớn cho thấy một cái gì đó\nkhác phải xảy ra. Theo mặc định, các hoạt động GPU không đồng bộ trong\nPyTorch. Buộc PyTorch hoàn thành tất cả các tính toán trước khi trả về\ncho thấy những gì đã xảy ra trước đây: tính toán đang được thực hiện bởi\nbackend trong khi frontend trả về kiểm soát Python.\nNói rộng ra, PyTorch có lối vào để tương tác trực tiếp với người dùng,\nví dụ, thông qua Python, cũng như một phụ trợ được hệ thống sử dụng để\nthực hiện tính toán. Như thể hiện trong Fig. 12.2.1 , người\ndùng có thể viết các chương trình PyTorch bằng nhiều ngôn ngữ lối vào\nkhác nhau, chẳng hạn như Python và C ++. Bất kể ngôn ngữ lập trình lối\nvào được sử dụng, việc thực hiện các chương trình PyTorch xảy ra chủ yếu\ntrong phần phụ trợ của các triển khai C ++. Các hoạt động do ngôn ngữ\nfrontend phát hành được chuyển sang phần phụ trợ để thực hiện. Phụ trợ\nquản lý các luồng riêng của nó liên tục thu thập và thực hiện các nhiệm\nvụ xếp hàng đợi. Lưu ý rằng để làm việc này, phụ trợ phải có khả năng\ntheo dõi các phụ thuộc giữa các bước khác nhau trong biểu đồ tính toán.\nDo đó, không thể song song hóa các hoạt động phụ thuộc vào nhau.\nFig. 12.2.1 Programming language frontends and deep learning framework backends. ¶\nChúng ta hãy nhìn vào một ví dụ đồ chơi khác để hiểu biểu đồ phụ thuộc\ntốt hơn một chút.\nFig. 12.2.2 The backend tracks dependencies between various steps in the\ncomputational graph. ¶\nĐoạn mã ở trên cũng được minh họa trong Fig. 12.2.2 . Bất\ncứ khi nào Python frontend thread thực hiện một trong ba câu lệnh đầu\ntiên, nó chỉ đơn giản trả về nhiệm vụ cho hàng đợi phụ trợ. Khi kết quả\ncủa câu lệnh cuối cùng cần phải được * printed*, luồng giao diện người\ndùng Python sẽ chờ thread phụ trợ C++ kết thúc tính toán kết quả của\nbiến z . Một lợi ích của thiết kế này là luồng giao diện người dùng\nPython không cần phải thực hiện các tính toán thực tế. Do đó, có rất ít\ntác động đến hiệu suất tổng thể của chương trình, bất kể hiệu suất của\nPython. Fig. 12.2.3 minh họa cách giao diện người dùng và\nphụ trợ tương tác.\nFig. 12.2.3 Interactions of the frontend and backend. ¶\n12.2.2. Rào cản và chặn\nCó một số hoạt động sẽ buộc Python phải chờ hoàn thành:\nRõ ràng nhất là npx.waitall() chờ đợi cho đến khi tất cả các tính\ntoán đã hoàn thành, bất kể khi nào các hướng dẫn tính toán được ban\nhành. Trong thực tế, việc sử dụng toán tử này là một ý tưởng tồi trừ\nkhi hoàn toàn cần thiết vì nó có thể dẫn đến hiệu suất kém.\nNếu chúng ta chỉ muốn đợi cho đến khi một biến cụ thể có sẵn, chúng\nta có thể gọi z.wait_to_read() . Trong trường hợp này các khối\nMXNet trở lại Python cho đến khi biến z đã được tính toán. Các\ntính toán khác cũng có thể tiếp tục sau đó.\nHãy để chúng tôi xem làm thế nào điều này hoạt động trong thực tế.\nCả hai hoạt động đều mất khoảng cùng thời gian để hoàn thành. Bên cạnh\ncác hoạt động chặn rõ ràng, chúng tôi khuyên bạn nên biết về trình chặn\n* ngụ ý*. In một biến rõ ràng yêu cầu biến phải có sẵn và do đó là một\ntrình chặn. Cuối cùng, chuyển đổi sang NumPy qua z.asnumpy() và\nchuyển đổi sang vô hướng qua z.item() đang chặn, vì NumPy không có\nkhái niệm không đồng bộ. Nó cần truy cập vào các giá trị giống như chức\nnăng print .\nSao chép một lượng nhỏ dữ liệu thường xuyên từ phạm vi của MXNet sang\nNumPy và trở lại có thể phá hủy hiệu suất của một mã hiệu quả khác, vì\nmỗi thao tác như vậy yêu cầu biểu đồ tính toán để đánh giá tất cả các\nkết quả trung gian cần thiết để có được thuật ngữ có liên quan *\ntrước* bất cứ điều gì khác có thể được thực hiện.\n12.2.3. Cải thiện tính toán\nTrên một hệ thống đa luồng nặng nề (thậm chí máy tính xách tay thông\nthường có 4 luồng trở lên và trên các máy chủ đa ổ cắm, con số này có\nthể vượt quá 256) chi phí của các hoạt động lên lịch có thể trở nên đáng\nkể. Đây là lý do tại sao nó là rất mong muốn để có tính toán và lập kế\nhoạch xảy ra không đồng bộ và song song. Để minh họa lợi ích của việc\nlàm như vậy, chúng ta hãy xem những gì sẽ xảy ra nếu chúng ta tăng một\nbiến thêm 1 nhiều lần, cả theo thứ tự hoặc không đồng bộ. Chúng tôi mô\nphỏng thực hiện đồng bộ bằng cách chèn một rào cản wait_to_read ở\ngiữa mỗi lần bổ sung.\nMột tương tác đơn giản hóa một chút giữa chuỗi giao diện Python và luồng\nphụ trợ C++ có thể được tóm tắt như sau: 1. Lối vào ra lệnh backend để\nchèn nhiệm vụ tính toán y = x + 1 vào hàng đợi. 1. Backend sau đó\nnhận được các nhiệm vụ tính toán từ hàng đợi và thực hiện các tính toán\nthực tế. 1. Backend sau đó trả về kết quả tính toán cho lối vào. Giả sử\nrằng thời lượng của ba giai đoạn này lần lượt là \\(t_1, t_2\\) và \\(t_3\\) . Nếu chúng ta không sử dụng lập trình không đồng bộ, tổng\nthời gian thực hiện để thực hiện 10000 tính toán là khoảng \\(10000 (t_1+ t_2 + t_3)\\) . Nếu lập trình không đồng bộ được sử\ndụng, tổng thời gian thực hiện để thực hiện 10000 tính toán có thể được\ngiảm xuống còn \\(t_1 + 10000 t_2 + t_3\\) (giả sử \\(10000 t_2 > 9999t_1\\) ), vì lối vào không phải đợi backend trả về\nkết quả tính toán cho mỗi vòng lặp.\n12.2.4. Tóm tắt\nCác khuôn khổ học sâu có thể tách các lối vào Python từ một phụ trợ\nthực thi. Điều này cho phép chèn nhanh không đồng bộ các lệnh vào phụ\ntrợ và song song liên quan.\nAsynchrony dẫn đến một lối vào khá đáp ứng. Tuy nhiên, hãy thận trọng\nkhông để lấp đầy hàng đợi tác vụ vì nó có thể dẫn đến tiêu thụ bộ nhớ\nquá mức. Bạn nên đồng bộ hóa cho mỗi minibatch để giữ lối vào và phụ\ntrợ xấp xỉ đồng bộ hóa.\nCác nhà cung cấp chip cung cấp các công cụ phân tích hiệu suất tinh\nvi để có được cái nhìn sâu sắc hơn nhiều về hiệu quả của việc học\nsâu.\nHãy nhận thức được thực tế là chuyển đổi từ quản lý bộ nhớ của MXNet\nsang Python sẽ buộc phụ trợ phải đợi cho đến khi biến cụ thể đã sẵn\nsàng. Các chức năng như print , asnumpy và item đều có tác\ndụng này. Điều này có thể là mong muốn nhưng việc sử dụng đồng bộ hóa\nbất cẩn có thể làm hỏng hiệu suất.\n12.2.5. Bài tập\nChúng tôi đã đề cập ở trên rằng việc sử dụng tính toán không đồng bộ\ncó thể làm giảm tổng lượng thời gian cần thiết để thực hiện 10000\ntính toán xuống \\(t_1 + 10000 t_2 + t_3\\) . Tại sao chúng ta phải\ngiả định \\(10000 t_2 > 9999 t_1\\) ở đây?\nĐo sự khác biệt giữa waitall và wait_to_read . Gợi ý: thực\nhiện một số hướng dẫn và đồng bộ hóa cho một kết quả trung gian.\nDiscussions\nTrên CPU, điểm chuẩn các hoạt động nhân ma trận tương tự trong phần\nnày. Bạn vẫn có thể quan sát sự không đồng bộ thông qua backend?\nDiscussions"
+}

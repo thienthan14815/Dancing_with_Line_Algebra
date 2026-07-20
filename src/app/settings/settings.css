@@ -1,12 +1,14 @@
 /* =====================================================================
    LinAlgLab — Màn Cài đặt / Đồng bộ backend. Mọi class prefix `st-`.
-   Dùng lại token màu trong src/styles/global.css.
+   Redesign v2 "calm workspace": form nền trắng, input viền --border focus
+   --primary, khối giải thích nền tint mềm, segmented control chọn giao diện.
+   Dùng token trong src/styles/global.css.
    ===================================================================== */
 
 .st-page {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: var(--sp-2);
 }
 
 /* ---------- Hero ---------- */
@@ -17,30 +19,76 @@
 }
 .st-title {
   margin: 0;
-  font-size: 1.6rem;
-  font-weight: 800;
+  font-size: var(--fs-heading);
+  font-weight: 700;
+  letter-spacing: -0.02em;
   color: var(--text);
+}
+
+/* ---------- Khối tab / drill-in (fade nhẹ) ---------- */
+.st-tab {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+  animation: st-fade var(--dur-2) var(--ease);
+}
+@keyframes st-fade {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .st-tab {
+    animation: none;
+  }
+}
+
+/* ---------- Nút quay lại ---------- */
+.st-back {
+  align-self: flex-start;
+  min-height: 44px;
+  padding: 8px 4px;
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  font: inherit;
+  font-weight: 700;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: color var(--dur-1) var(--ease);
+}
+.st-back:hover {
+  color: var(--primary);
 }
 
 /* ---------- Card chung ---------- */
 .st-note,
 .st-form,
-.st-contract {
+.st-contract,
+.st-theme {
   display: flex;
   flex-direction: column;
   gap: 12px;
-  padding: 18px 20px;
+  padding: var(--sp-2) 20px;
 }
 
-/* ---------- Khối giải thích trung thực ---------- */
-.st-note {
-  border-left: 4px solid var(--accent);
+/* ---------- Khối giải thích trung thực (tint mềm) ---------- */
+/* .st-page tăng specificity để nền tint thắng .dl-card (shell). */
+.st-page .st-note {
+  border-left: 4px solid var(--primary);
+  background: var(--primary-soft);
 }
 .st-note-head {
   display: flex;
   align-items: center;
   gap: 8px;
   font-size: 1.02rem;
+  color: var(--text);
 }
 .st-note-icon {
   font-size: 1.15rem;
@@ -48,12 +96,53 @@
 .st-note p {
   margin: 0;
   line-height: 1.55;
-  color: var(--text-dim, var(--text));
+  color: var(--text);
 }
 .st-note-warn {
   padding: 10px 12px;
-  border-radius: var(--radius-sm, 8px);
-  background: color-mix(in srgb, var(--warn) 14%, transparent);
+  border-radius: var(--radius-sm);
+  background: var(--warn-soft);
+}
+
+/* ---------- Giao diện (segmented control) ---------- */
+.st-seg {
+  display: inline-flex;
+  gap: 4px;
+  padding: 4px;
+  background: var(--panel-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-btn);
+  width: fit-content;
+  max-width: 100%;
+}
+.st-seg-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 8px 18px;
+  border: none;
+  border-radius: calc(var(--radius-btn) - 4px);
+  background: transparent;
+  color: var(--text-secondary);
+  font: inherit;
+  font-size: 0.92rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background var(--dur-2) var(--ease), color var(--dur-2) var(--ease);
+}
+.st-seg-btn:hover {
+  color: var(--text);
+}
+.st-seg-btn.is-active {
+  background: var(--surface);
+  color: var(--primary);
+  box-shadow: var(--elev-1);
+}
+.st-seg-icon {
+  font-size: 1.05rem;
+  line-height: 1;
 }
 
 /* ---------- Form ---------- */
@@ -72,21 +161,21 @@
   box-sizing: border-box;
   padding: 10px 12px;
   border: 1px solid var(--border);
-  border-radius: var(--radius-sm, 8px);
-  background: var(--bg);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
   color: var(--text);
   font: inherit;
   font-family: var(--font-mono, monospace);
   font-size: 0.92rem;
-  transition: border-color 0.15s ease;
+  transition: border-color var(--dur-1) var(--ease), box-shadow var(--dur-1) var(--ease);
 }
 .st-input:focus {
-  outline: none;
-  border-color: var(--accent);
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 15%, transparent);
 }
 .st-hint {
   font-size: 0.82rem;
-  color: var(--text-muted);
+  color: var(--text-secondary);
   line-height: 1.4;
 }
 
@@ -101,7 +190,7 @@
 .st-toggle input {
   width: 18px;
   height: 18px;
-  accent-color: var(--accent);
+  accent-color: var(--primary);
   cursor: pointer;
 }
 
@@ -116,21 +205,21 @@
 .st-msg {
   margin: 0;
   padding: 10px 12px;
-  border-radius: var(--radius-sm, 8px);
+  border-radius: var(--radius-sm);
   font-size: 0.9rem;
   line-height: 1.45;
 }
 .st-msg-good {
-  background: color-mix(in srgb, var(--good) 16%, transparent);
+  background: var(--good-soft);
   color: var(--good);
 }
 .st-msg-bad {
-  background: color-mix(in srgb, var(--bad) 16%, transparent);
+  background: var(--bad-soft);
   color: var(--bad);
 }
 .st-msg-muted {
-  background: var(--panel);
-  color: var(--text-muted);
+  background: var(--panel-2);
+  color: var(--text-secondary);
 }
 
 .st-status {
@@ -145,15 +234,16 @@
 .st-h2 {
   margin: 0;
   font-size: 1.15rem;
-  font-weight: 800;
+  font-weight: 700;
+  letter-spacing: -0.01em;
   color: var(--text);
 }
 .st-contract code {
   font-family: var(--font-mono, monospace);
   font-size: 0.85em;
   padding: 1px 5px;
-  border-radius: 4px;
-  background: var(--panel);
+  border-radius: 6px;
+  background: var(--panel-2);
 }
 .st-endpoints {
   display: flex;
@@ -166,27 +256,29 @@
   align-items: center;
   gap: 10px;
   padding: 8px 10px;
-  border: 1px solid var(--border-soft, var(--border));
-  border-radius: var(--radius-sm, 8px);
-  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--panel-2);
 }
 .st-verb {
   text-align: center;
-  font-weight: 800;
+  font-weight: 700;
   font-size: 0.72rem;
   letter-spacing: 0.03em;
   padding: 3px 6px;
   border-radius: 6px;
-  color: #fff;
 }
 .st-verb-get {
-  background: var(--good);
+  background: var(--good-soft);
+  color: var(--good);
 }
 .st-verb-put {
-  background: var(--accent);
+  background: var(--primary-soft);
+  color: var(--primary);
 }
 .st-verb-delete {
-  background: var(--bad);
+  background: var(--bad-soft);
+  color: var(--bad);
 }
 .st-path {
   font-family: var(--font-mono, monospace);

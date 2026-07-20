@@ -1,0 +1,444 @@
+{
+  "url": "https://vi.d2l.ai/chapter_natural-language-processing-pretraining/similarity-analogy.html",
+  "chapter": "chapter_natural-language-processing-pretraining",
+  "title": "14.7. Từ tương tự và tương tự",
+  "crawled_at": "2026-07-20T12:40:58.577791+00:00",
+  "headings": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "tu-tuong-tu-va-tuong-tu",
+      "text": "14.7. Từ tương tự và tương tự"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "dang-tai-pretrained-word-vecto",
+      "text": "14.7.1. Đang tải Pretrained Word Vectơ"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "ap-dung-vecto-word-pretrained",
+      "text": "14.7.2. Áp dụng vectơ Word Pretrained"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "tu-tuong-tu",
+      "text": "14.7.2.1. Từ tương tự"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "id1",
+      "text": "14.7.2.2. Từ tương tự"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tom-tat",
+      "text": "14.7.3. Tóm tắt"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bai-tap",
+      "text": "14.7.4. Bài tập"
+    }
+  ],
+  "content": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "tu-tuong-tu-va-tuong-tu",
+      "text": "14.7. Từ tương tự và tương tự"
+    },
+    {
+      "type": "paragraph",
+      "text": "Trong Section 14.4 , chúng tôi đã đào tạo một mô\nhình word2vec trên một tập dữ liệu nhỏ và áp dụng nó để tìm các từ tương\ntự về mặt ngữ nghĩa cho một từ đầu vào. Trong thực tế, các vectơ từ được\nđào tạo trước trên thể lớn có thể được áp dụng cho các nhiệm vụ xử lý\nngôn ngữ tự nhiên hạ nguồn, sẽ được đề cập sau này vào năm Section 15 . Để chứng minh ngữ nghĩa của vectơ từ được đào\ntạo trước từ thể lớn một cách đơn giản, chúng ta hãy áp dụng chúng trong\ncác nhiệm vụ tương tự và tương tự từ."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "import os\nfrom mxnet import np, npx\nfrom d2l import mxnet as d2l\n\nnpx.set_np()"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "import os\nimport torch\nfrom torch import nn\nfrom d2l import torch as d2l"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "dang-tai-pretrained-word-vecto",
+      "text": "14.7.1. Đang tải Pretrained Word Vectơ"
+    },
+    {
+      "type": "paragraph",
+      "text": "Dưới đây liệt kê các bản nhúng Glove được đào tạo trước có kích thước\n50, 100 và 300, có thể tải xuống từ GloVe\nwebsite . Các bản nhúng\nfastText được đào tạo trước có sẵn bằng nhiều ngôn ngữ. Ở đây chúng tôi\nxem xét một phiên bản tiếng Anh (300-dimensional “wiki.en”) có thể được\ntải xuống từ fastText website ."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "#@save\nd2l.DATA_HUB['glove.6b.50d'] = (d2l.DATA_URL + 'glove.6B.50d.zip',\n                                '0b8703943ccdb6eb788e6f091b8946e82231bc4d')\n\n#@save\nd2l.DATA_HUB['glove.6b.100d'] = (d2l.DATA_URL + 'glove.6B.100d.zip',\n                                 'cd43bfb07e44e6f27cbcc7bc9ae3d80284fdaf5a')\n\n#@save\nd2l.DATA_HUB['glove.42b.300d'] = (d2l.DATA_URL + 'glove.42B.300d.zip',\n                                  'b5116e234e9eb9076672cfeabf5469f3eec904fa')\n\n#@save\nd2l.DATA_HUB['wiki.en'] = (d2l.DATA_URL + 'wiki.en.zip',\n                           'c1816da3821ae9f43899be655002f6c723e91b88')"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "#@save\nd2l.DATA_HUB['glove.6b.50d'] = (d2l.DATA_URL + 'glove.6B.50d.zip',\n                                '0b8703943ccdb6eb788e6f091b8946e82231bc4d')\n\n#@save\nd2l.DATA_HUB['glove.6b.100d'] = (d2l.DATA_URL + 'glove.6B.100d.zip',\n                                 'cd43bfb07e44e6f27cbcc7bc9ae3d80284fdaf5a')\n\n#@save\nd2l.DATA_HUB['glove.42b.300d'] = (d2l.DATA_URL + 'glove.42B.300d.zip',\n                                  'b5116e234e9eb9076672cfeabf5469f3eec904fa')\n\n#@save\nd2l.DATA_HUB['wiki.en'] = (d2l.DATA_URL + 'wiki.en.zip',\n                           'c1816da3821ae9f43899be655002f6c723e91b88')"
+    },
+    {
+      "type": "paragraph",
+      "text": "Để tải các Glove được đào tạo trước này và các embeddings fastText,\nchúng tôi xác định lớp TokenEmbedding sau."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "#@save\nclass TokenEmbedding:\n    \"\"\"Token Embedding.\"\"\"\n    def __init__(self, embedding_name):\n        self.idx_to_token, self.idx_to_vec = self._load_embedding(\n            embedding_name)\n        self.unknown_idx = 0\n        self.token_to_idx = {token: idx for idx, token in\n                             enumerate(self.idx_to_token)}\n\n    def _load_embedding(self, embedding_name):\n        idx_to_token, idx_to_vec = ['<unk>'], []\n        data_dir = d2l.download_extract(embedding_name)\n        # GloVe website: https://nlp.stanford.edu/projects/glove/\n        # fastText website: https://fasttext.cc/\n        with open(os.path.join(data_dir, 'vec.txt'), 'r') as f:\n            for line in f:\n                elems = line.rstrip().split(' ')\n                token, elems = elems[0], [float(elem) for elem in elems[1:]]\n                # Skip header information, such as the top row in fastText\n                if len(elems) > 1:\n                    idx_to_token.append(token)\n                    idx_to_vec.append(elems)\n        idx_to_vec = [[0] * len(idx_to_vec[0])] + idx_to_vec\n        return idx_to_token, np.array(idx_to_vec)\n\n    def __getitem__(self, tokens):\n        indices = [self.token_to_idx.get(token, self.unknown_idx)\n                   for token in tokens]\n        vecs = self.idx_to_vec[np.array(indices)]\n        return vecs\n\n    def __len__(self):\n        return len(self.idx_to_token)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "#@save\nclass TokenEmbedding:\n    \"\"\"Token Embedding.\"\"\"\n    def __init__(self, embedding_name):\n        self.idx_to_token, self.idx_to_vec = self._load_embedding(\n            embedding_name)\n        self.unknown_idx = 0\n        self.token_to_idx = {token: idx for idx, token in\n                             enumerate(self.idx_to_token)}\n\n    def _load_embedding(self, embedding_name):\n        idx_to_token, idx_to_vec = ['<unk>'], []\n        data_dir = d2l.download_extract(embedding_name)\n        # GloVe website: https://nlp.stanford.edu/projects/glove/\n        # fastText website: https://fasttext.cc/\n        with open(os.path.join(data_dir, 'vec.txt'), 'r') as f:\n            for line in f:\n                elems = line.rstrip().split(' ')\n                token, elems = elems[0], [float(elem) for elem in elems[1:]]\n                # Skip header information, such as the top row in fastText\n                if len(elems) > 1:\n                    idx_to_token.append(token)\n                    idx_to_vec.append(elems)\n        idx_to_vec = [[0] * len(idx_to_vec[0])] + idx_to_vec\n        return idx_to_token, torch.tensor(idx_to_vec)\n\n    def __getitem__(self, tokens):\n        indices = [self.token_to_idx.get(token, self.unknown_idx)\n                   for token in tokens]\n        vecs = self.idx_to_vec[torch.tensor(indices)]\n        return vecs\n\n    def __len__(self):\n        return len(self.idx_to_token)"
+    },
+    {
+      "type": "paragraph",
+      "text": "Dưới đây chúng tôi tải các nhúng Glove 50 chiều (được đào tạo trước trên\nmột tập con Wikipedia). Khi tạo phiên bản TokenEmbedding , tệp nhúng\nđược chỉ định phải được tải xuống nếu chưa."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "glove_6b50d = TokenEmbedding('glove.6b.50d')"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "Downloading ../data/glove.6B.50d.zip from http://d2l-data.s3-accelerate.amazonaws.com/glove.6B.50d.zip..."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "glove_6b50d = TokenEmbedding('glove.6b.50d')"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "Downloading ../data/glove.6B.50d.zip from http://d2l-data.s3-accelerate.amazonaws.com/glove.6B.50d.zip..."
+    },
+    {
+      "type": "paragraph",
+      "text": "Xuất kích thước từ vựng. Từ vựng chứa 400000 từ (mã thông báo) và một mã\nthông báo không xác định đặc biệt."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "len(glove_6b50d)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "400001"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "len(glove_6b50d)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "400001"
+    },
+    {
+      "type": "paragraph",
+      "text": "Chúng ta có thể lấy chỉ mục của một từ trong từ vựng, và ngược lại."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "glove_6b50d.token_to_idx['beautiful'], glove_6b50d.idx_to_token[3367]"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "(3367, 'beautiful')"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "glove_6b50d.token_to_idx['beautiful'], glove_6b50d.idx_to_token[3367]"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "(3367, 'beautiful')"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "ap-dung-vecto-word-pretrained",
+      "text": "14.7.2. Áp dụng vectơ Word Pretrained"
+    },
+    {
+      "type": "paragraph",
+      "text": "Sử dụng các vectơ Glove được tải, chúng tôi sẽ chứng minh ngữ nghĩa của\nchúng bằng cách áp dụng chúng trong các tác vụ tương tự và tương tự từ\nsau đây."
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "tu-tuong-tu",
+      "text": "14.7.2.1. Từ tương tự"
+    },
+    {
+      "type": "paragraph",
+      "text": "Tương tự như Section 14.4.3 , để tìm các từ tương tự\nvề mặt ngữ nghĩa cho một từ đầu vào dựa trên sự tương đồng cosin giữa\ncác vectơ từ, chúng tôi thực hiện hàm knn ( \\(k\\) -láng giềng gần\nnhất) sau đây."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def knn(W, x, k):\n    # Add 1e-9 for numerical stability\n    cos = np.dot(W, x.reshape(-1,)) / (\n        np.sqrt(np.sum(W * W, axis=1) + 1e-9) * np.sqrt((x * x).sum()))\n    topk = npx.topk(cos, k=k, ret_typ='indices')\n    return topk, [cos[int(i)] for i in topk]"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def knn(W, x, k):\n    # Add 1e-9 for numerical stability\n    cos = torch.mv(W, x.reshape(-1,)) / (\n        torch.sqrt(torch.sum(W * W, axis=1) + 1e-9) *\n        torch.sqrt((x * x).sum()))\n    _, topk = torch.topk(cos, k=k)\n    return topk, [cos[int(i)] for i in topk]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Sau đó, chúng ta tìm kiếm các từ tương tự bằng cách sử dụng vectơ từ\nđược đào tạo trước từ trường hợp TokenEmbedding embed ."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def get_similar_tokens(query_token, k, embed):\n    topk, cos = knn(embed.idx_to_vec, embed[[query_token]], k + 1)\n    for i, c in zip(topk[1:], cos[1:]):  # Exclude the input word\n        print(f'cosine sim={float(c):.3f}: {embed.idx_to_token[int(i)]}')"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def get_similar_tokens(query_token, k, embed):\n    topk, cos = knn(embed.idx_to_vec, embed[[query_token]], k + 1)\n    for i, c in zip(topk[1:], cos[1:]):  # Exclude the input word\n        print(f'cosine sim={float(c):.3f}: {embed.idx_to_token[int(i)]}')"
+    },
+    {
+      "type": "paragraph",
+      "text": "Từ vựng của các vectơ từ được đào tạo trước trong glove_6b50d chứa\n400000 từ và một mã thông báo không xác định đặc biệt. Không bao gồm từ\nđầu vào và mã thông báo không xác định, trong số từ vựng này cho phép\nchúng ta tìm thấy ba từ tương tự về mặt ngữ nghĩa nhất với từ “chip”."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "get_similar_tokens('chip', 3, glove_6b50d)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "cosine sim=0.856: chips\ncosine sim=0.749: intel\ncosine sim=0.749: electronics"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "get_similar_tokens('chip', 3, glove_6b50d)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "cosine sim=0.856: chips\ncosine sim=0.749: intel\ncosine sim=0.749: electronics"
+    },
+    {
+      "type": "paragraph",
+      "text": "Dưới đây xuất ra các từ tương tự như “em bé” và “đẹp”."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "get_similar_tokens('baby', 3, glove_6b50d)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "cosine sim=0.839: babies\ncosine sim=0.800: boy\ncosine sim=0.792: girl"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "get_similar_tokens('beautiful', 3, glove_6b50d)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "cosine sim=0.921: lovely\ncosine sim=0.893: gorgeous\ncosine sim=0.830: wonderful"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "get_similar_tokens('baby', 3, glove_6b50d)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "cosine sim=0.839: babies\ncosine sim=0.800: boy\ncosine sim=0.792: girl"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "get_similar_tokens('beautiful', 3, glove_6b50d)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "cosine sim=0.921: lovely\ncosine sim=0.893: gorgeous\ncosine sim=0.830: wonderful"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "id1",
+      "text": "14.7.2.2. Từ tương tự"
+    },
+    {
+      "type": "paragraph",
+      "text": "Bên cạnh việc tìm các từ tương tự, chúng ta cũng có thể áp dụng vectơ từ\ncho các tác vụ tương tự từ. Ví dụ, “man”: “woman”:: “con trai”: “con\ngái” là hình thức của một từ tương tự: “người đàn ông” là “người phụ nữ”\nlà “con trai” là “con gái”. Cụ thể, nhiệm vụ hoàn thành từ tương tự có\nthể được định nghĩa là: đối với một từ tương tự \\(a : b :: c : d\\) ,\ncho ba từ đầu tiên \\(a\\) , \\(b\\) và \\(c\\) , tìm \\(d\\) .\nBiểu thị vector của từ \\(w\\) bởi \\(\\text{vec}(w)\\) . Để hoàn\nthành sự tương tự, chúng ta sẽ tìm thấy từ có vector tương tự nhất với\nkết quả của \\(\\text{vec}(c)+\\text{vec}(b)-\\text{vec}(a)\\) ."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def get_analogy(token_a, token_b, token_c, embed):\n    vecs = embed[[token_a, token_b, token_c]]\n    x = vecs[1] - vecs[0] + vecs[2]\n    topk, cos = knn(embed.idx_to_vec, x, 1)\n    return embed.idx_to_token[int(topk[0])]  # Remove unknown words"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def get_analogy(token_a, token_b, token_c, embed):\n    vecs = embed[[token_a, token_b, token_c]]\n    x = vecs[1] - vecs[0] + vecs[2]\n    topk, cos = knn(embed.idx_to_vec, x, 1)\n    return embed.idx_to_token[int(topk[0])]  # Remove unknown words"
+    },
+    {
+      "type": "paragraph",
+      "text": "Hãy để chúng tôi xác minh sự tương tự “nam-nữ” bằng cách sử dụng các\nvectơ từ được tải."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "get_analogy('man', 'woman', 'son', glove_6b50d)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "'daughter'"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "get_analogy('man', 'woman', 'son', glove_6b50d)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "'daughter'"
+    },
+    {
+      "type": "paragraph",
+      "text": "Dưới đây hoàn thành một cách tương tự “thủ đô-quốc gia”: “beijing”:\n“china”:: “tokyo”: “japan”. Điều này thể hiện ngữ nghĩa trong vectơ từ\nđược đào tạo trước."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "get_analogy('beijing', 'china', 'tokyo', glove_6b50d)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "'japan'"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "get_analogy('beijing', 'china', 'tokyo', glove_6b50d)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "'japan'"
+    },
+    {
+      "type": "paragraph",
+      "text": "Đối với tính từ tương tự “tính từ siêu” như “bad”: “worst”:: “big”:\n“big”: “biggest”, chúng ta có thể thấy rằng các vectơ từ được đào tạo\ntrước có thể nắm bắt thông tin cú pháp."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "get_analogy('bad', 'worst', 'big', glove_6b50d)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "'biggest'"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "get_analogy('bad', 'worst', 'big', glove_6b50d)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "'biggest'"
+    },
+    {
+      "type": "paragraph",
+      "text": "Để thể hiện khái niệm bị bắt về thì quá khứ trong vectơ từ được đào tạo\ntrước, chúng ta có thể kiểm tra cú pháp bằng cách sử dụng tương tự “thì\nquá khứ hiện tại”: “do”: “did”:: “go”: “went”."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "get_analogy('do', 'did', 'go', glove_6b50d)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "'went'"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "get_analogy('do', 'did', 'go', glove_6b50d)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "'went'"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tom-tat",
+      "text": "14.7.3. Tóm tắt"
+    },
+    {
+      "type": "list",
+      "ordered": false,
+      "items": [
+        "Trong thực tế, các vectơ từ được đào tạo trước trên thể lớn có thể\nđược áp dụng cho các nhiệm vụ xử lý ngôn ngữ tự nhiên hạ nguồn.",
+        "Vectơ từ được đào tạo trước có thể được áp dụng cho các tác vụ tương\ntự và tương tự từ."
+      ]
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bai-tap",
+      "text": "14.7.4. Bài tập"
+    },
+    {
+      "type": "list",
+      "ordered": true,
+      "items": [
+        "Kiểm tra kết quả fastText bằng cách sử dụng TokenEmbedding('wiki.en') .",
+        "Khi từ vựng cực kỳ lớn, làm thế nào chúng ta có thể tìm thấy các từ\ntương tự hoặc hoàn thành một từ tương tự nhanh hơn?"
+      ]
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    }
+  ],
+  "images": [],
+  "text": "14.7. Từ tương tự và tương tự\nTrong Section 14.4 , chúng tôi đã đào tạo một mô\nhình word2vec trên một tập dữ liệu nhỏ và áp dụng nó để tìm các từ tương\ntự về mặt ngữ nghĩa cho một từ đầu vào. Trong thực tế, các vectơ từ được\nđào tạo trước trên thể lớn có thể được áp dụng cho các nhiệm vụ xử lý\nngôn ngữ tự nhiên hạ nguồn, sẽ được đề cập sau này vào năm Section 15 . Để chứng minh ngữ nghĩa của vectơ từ được đào\ntạo trước từ thể lớn một cách đơn giản, chúng ta hãy áp dụng chúng trong\ncác nhiệm vụ tương tự và tương tự từ.\n14.7.1. Đang tải Pretrained Word Vectơ\nDưới đây liệt kê các bản nhúng Glove được đào tạo trước có kích thước\n50, 100 và 300, có thể tải xuống từ GloVe\nwebsite . Các bản nhúng\nfastText được đào tạo trước có sẵn bằng nhiều ngôn ngữ. Ở đây chúng tôi\nxem xét một phiên bản tiếng Anh (300-dimensional “wiki.en”) có thể được\ntải xuống từ fastText website .\nĐể tải các Glove được đào tạo trước này và các embeddings fastText,\nchúng tôi xác định lớp TokenEmbedding sau.\nDưới đây chúng tôi tải các nhúng Glove 50 chiều (được đào tạo trước trên\nmột tập con Wikipedia). Khi tạo phiên bản TokenEmbedding , tệp nhúng\nđược chỉ định phải được tải xuống nếu chưa.\nXuất kích thước từ vựng. Từ vựng chứa 400000 từ (mã thông báo) và một mã\nthông báo không xác định đặc biệt.\nChúng ta có thể lấy chỉ mục của một từ trong từ vựng, và ngược lại.\n14.7.2. Áp dụng vectơ Word Pretrained\nSử dụng các vectơ Glove được tải, chúng tôi sẽ chứng minh ngữ nghĩa của\nchúng bằng cách áp dụng chúng trong các tác vụ tương tự và tương tự từ\nsau đây.\n14.7.2.1. Từ tương tự\nTương tự như Section 14.4.3 , để tìm các từ tương tự\nvề mặt ngữ nghĩa cho một từ đầu vào dựa trên sự tương đồng cosin giữa\ncác vectơ từ, chúng tôi thực hiện hàm knn ( \\(k\\) -láng giềng gần\nnhất) sau đây.\nSau đó, chúng ta tìm kiếm các từ tương tự bằng cách sử dụng vectơ từ\nđược đào tạo trước từ trường hợp TokenEmbedding embed .\nTừ vựng của các vectơ từ được đào tạo trước trong glove_6b50d chứa\n400000 từ và một mã thông báo không xác định đặc biệt. Không bao gồm từ\nđầu vào và mã thông báo không xác định, trong số từ vựng này cho phép\nchúng ta tìm thấy ba từ tương tự về mặt ngữ nghĩa nhất với từ “chip”.\nDưới đây xuất ra các từ tương tự như “em bé” và “đẹp”.\n14.7.2.2. Từ tương tự\nBên cạnh việc tìm các từ tương tự, chúng ta cũng có thể áp dụng vectơ từ\ncho các tác vụ tương tự từ. Ví dụ, “man”: “woman”:: “con trai”: “con\ngái” là hình thức của một từ tương tự: “người đàn ông” là “người phụ nữ”\nlà “con trai” là “con gái”. Cụ thể, nhiệm vụ hoàn thành từ tương tự có\nthể được định nghĩa là: đối với một từ tương tự \\(a : b :: c : d\\) ,\ncho ba từ đầu tiên \\(a\\) , \\(b\\) và \\(c\\) , tìm \\(d\\) .\nBiểu thị vector của từ \\(w\\) bởi \\(\\text{vec}(w)\\) . Để hoàn\nthành sự tương tự, chúng ta sẽ tìm thấy từ có vector tương tự nhất với\nkết quả của \\(\\text{vec}(c)+\\text{vec}(b)-\\text{vec}(a)\\) .\nHãy để chúng tôi xác minh sự tương tự “nam-nữ” bằng cách sử dụng các\nvectơ từ được tải.\nDưới đây hoàn thành một cách tương tự “thủ đô-quốc gia”: “beijing”:\n“china”:: “tokyo”: “japan”. Điều này thể hiện ngữ nghĩa trong vectơ từ\nđược đào tạo trước.\nĐối với tính từ tương tự “tính từ siêu” như “bad”: “worst”:: “big”:\n“big”: “biggest”, chúng ta có thể thấy rằng các vectơ từ được đào tạo\ntrước có thể nắm bắt thông tin cú pháp.\nĐể thể hiện khái niệm bị bắt về thì quá khứ trong vectơ từ được đào tạo\ntrước, chúng ta có thể kiểm tra cú pháp bằng cách sử dụng tương tự “thì\nquá khứ hiện tại”: “do”: “did”:: “go”: “went”.\n14.7.3. Tóm tắt\nTrong thực tế, các vectơ từ được đào tạo trước trên thể lớn có thể\nđược áp dụng cho các nhiệm vụ xử lý ngôn ngữ tự nhiên hạ nguồn.\nVectơ từ được đào tạo trước có thể được áp dụng cho các tác vụ tương\ntự và tương tự từ.\n14.7.4. Bài tập\nKiểm tra kết quả fastText bằng cách sử dụng TokenEmbedding('wiki.en') .\nKhi từ vựng cực kỳ lớn, làm thế nào chúng ta có thể tìm thấy các từ\ntương tự hoặc hoàn thành một từ tương tự nhanh hơn?\nDiscussions\nDiscussions"
+}

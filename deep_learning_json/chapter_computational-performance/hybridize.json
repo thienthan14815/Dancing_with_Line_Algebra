@@ -1,0 +1,582 @@
+{
+  "url": "https://vi.d2l.ai/chapter_computational-performance/hybridize.html",
+  "chapter": "chapter_computational-performance",
+  "title": "12.1. Trình biên dịch và phiên dịch",
+  "crawled_at": "2026-07-20T12:40:31.233051+00:00",
+  "headings": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "trinh-bien-dich-va-phien-dich",
+      "text": "12.1. Trình biên dịch và phiên dịch"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "lap-trinh-tuong-trung",
+      "text": "12.1.1. Lập trình tượng trưng"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "lap-trinh-lai",
+      "text": "12.1.2. Lập trình lai"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "lai-tao-lop-sequential",
+      "text": "12.1.3. Lai tạo lớp Sequential"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "tang-toc-bang-cach-lai",
+      "text": "12.1.3.1. Tăng tốc bằng cách lai"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "lap-so-se-ri",
+      "text": "12.1.3.2. Lập số sê-ri"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tom-tat",
+      "text": "12.1.4. Tóm tắt"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bai-tap",
+      "text": "12.1.5. Bài tập"
+    }
+  ],
+  "content": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "trinh-bien-dich-va-phien-dich",
+      "text": "12.1. Trình biên dịch và phiên dịch"
+    },
+    {
+      "type": "paragraph",
+      "text": "Cho đến nay, cuốn sách này đã tập trung vào lập trình bắt buộc, làm cho\nviệc sử dụng các tuyên bố như print , + , và if để thay đổi\ntrạng thái của một chương trình. Hãy xem xét ví dụ sau đây của một\nchương trình bắt buộc đơn giản."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def add(a, b):\n    return a + b\n\ndef fancy_func(a, b, c, d):\n    e = add(a, b)\n    f = add(c, d)\n    g = add(e, f)\n    return g\n\nprint(fancy_func(1, 2, 3, 4))"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "10"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def add(a, b):\n    return a + b\n\ndef fancy_func(a, b, c, d):\n    e = add(a, b)\n    f = add(c, d)\n    g = add(e, f)\n    return g\n\nprint(fancy_func(1, 2, 3, 4))"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "10"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def add(a, b):\n    return a + b\n\ndef fancy_func(a, b, c, d):\n    e = add(a, b)\n    f = add(c, d)\n    g = add(e, f)\n    return g\n\nprint(fancy_func(1, 2, 3, 4))"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "10"
+    },
+    {
+      "type": "paragraph",
+      "text": "Python là một ngôn ngữ được giải thị . Khi đánh giá hàm fancy_func trên, nó thực hiện các thao tác tạo nên cơ thể của hàm * theo trình tự\n*. Đó là, nó sẽ đánh giá e = add(a, b) và lưu trữ các kết quả dưới\ndạng biến e , do đó thay đổi trạng thái của chương trình. Hai câu\nlệnh tiếp theo f = add(c, d) và g = add(e, f) sẽ được thực thi\ntương tự, thực hiện bổ sung và lưu trữ các kết quả dưới dạng biến. Fig. 12.1.1 minh họa luồng dữ liệu."
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/computegraph.svg",
+      "local_path": "_images/computegraph.svg",
+      "alt": "../_images/computegraph.svg"
+    },
+    {
+      "type": "paragraph",
+      "text": "Fig. 12.1.1 Data flow in an imperative program. ¶"
+    },
+    {
+      "type": "paragraph",
+      "text": "Mặc dù lập trình bắt buộc là thuận tiện, nó có thể không hiệu quả. Một\nmặt, ngay cả khi hàm add được gọi nhiều lần trong suốt fancy_func , Python sẽ thực hiện ba cuộc gọi hàm riêng lẻ. Nếu chúng\nđược thực thi, giả sử, trên GPU (hoặc thậm chí trên nhiều GPU), chi phí\nphát sinh từ trình thông dịch Python có thể trở nên áp đảo. Hơn nữa, nó\nsẽ cần phải lưu các giá trị biến của e và f cho đến khi tất cả\ncác câu lệnh trong fancy_func đã được thực thi. Điều này là do chúng\nta không biết liệu các biến e và f sẽ được sử dụng bởi các phần\nkhác của chương trình sau khi các câu lệnh e = add(a, b) và f = add(c, d) được thực thi."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "lap-trinh-tuong-trung",
+      "text": "12.1.1. Lập trình tượng trưng"
+    },
+    {
+      "type": "paragraph",
+      "text": "Hãy xem xét phương pháp thay thế, *lập trình tượng trưng, trong đó tính\ntoán thường chỉ được thực hiện một khi quá trình đã được xác định đầy\nđủ. Chiến lược này được sử dụng bởi nhiều khuôn khổ học sâu, bao gồm\nTheano và TensorFlow (sau này đã có được các phần mở rộng bắt buộc). Nó\nthường bao gồm các bước sau:"
+    },
+    {
+      "type": "list",
+      "ordered": true,
+      "items": [
+        "Xác định các hoạt động sẽ được thực thi.",
+        "Biên dịch các hoạt động thành một chương trình thực thi.",
+        "Cung cấp các đầu vào cần thiết và gọi chương trình được biên dịch để\nthực hiện."
+      ]
+    },
+    {
+      "type": "paragraph",
+      "text": "Điều này cho phép tối ưu hóa một lượng đáng kể. Đầu tiên, chúng ta có\nthể bỏ qua trình thông dịch Python trong nhiều trường hợp, do đó loại bỏ\nmột nút cổ chai hiệu suất có thể trở nên đáng kể trên nhiều GPU nhanh\nđược ghép nối với một luồng Python duy nhất trên CPU. Thứ hai, một trình\nbiên dịch có thể tối ưu hóa và viết lại mã trên vào print((1 + 2) + (3 + 4)) hoặc thậm chí print(10) . Điều này là có\nthể kể từ khi một trình biên dịch được để xem mã đầy đủ trước khi biến\nnó thành hướng dẫn máy. Ví dụ, nó có thể giải phóng bộ nhớ (hoặc không\nbao giờ phân bổ nó) bất cứ khi nào một biến không còn cần thiết nữa.\nHoặc nó có thể biến đổi mã hoàn toàn thành một phần tương đương. Để có\nđược một ý tưởng tốt hơn, hãy xem xét mô phỏng sau đây của lập trình bắt\nbuộc (nó là Python sau tất cả) dưới đây."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def add_():\n    return '''\ndef add(a, b):\n    return a + b\n'''\n\ndef fancy_func_():\n    return '''\ndef fancy_func(a, b, c, d):\n    e = add(a, b)\n    f = add(c, d)\n    g = add(e, f)\n    return g\n'''\n\ndef evoke_():\n    return add_() + fancy_func_() + 'print(fancy_func(1, 2, 3, 4))'\n\nprog = evoke_()\nprint(prog)\ny = compile(prog, '', 'exec')\nexec(y)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "def add(a, b):\n    return a + b\n\ndef fancy_func(a, b, c, d):\n    e = add(a, b)\n    f = add(c, d)\n    g = add(e, f)\n    return g\nprint(fancy_func(1, 2, 3, 4))\n10"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def add_():\n    return '''\ndef add(a, b):\n    return a + b\n'''\n\ndef fancy_func_():\n    return '''\ndef fancy_func(a, b, c, d):\n    e = add(a, b)\n    f = add(c, d)\n    g = add(e, f)\n    return g\n'''\n\ndef evoke_():\n    return add_() + fancy_func_() + 'print(fancy_func(1, 2, 3, 4))'\n\nprog = evoke_()\nprint(prog)\ny = compile(prog, '', 'exec')\nexec(y)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "def add(a, b):\n    return a + b\n\ndef fancy_func(a, b, c, d):\n    e = add(a, b)\n    f = add(c, d)\n    g = add(e, f)\n    return g\nprint(fancy_func(1, 2, 3, 4))\n10"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def add_():\n    return '''\ndef add(a, b):\n    return a + b\n'''\n\ndef fancy_func_():\n    return '''\ndef fancy_func(a, b, c, d):\n    e = add(a, b)\n    f = add(c, d)\n    g = add(e, f)\n    return g\n'''\n\ndef evoke_():\n    return add_() + fancy_func_() + 'print(fancy_func(1, 2, 3, 4))'\n\nprog = evoke_()\nprint(prog)\ny = compile(prog, '', 'exec')\nexec(y)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "def add(a, b):\n    return a + b\n\ndef fancy_func(a, b, c, d):\n    e = add(a, b)\n    f = add(c, d)\n    g = add(e, f)\n    return g\nprint(fancy_func(1, 2, 3, 4))\n10"
+    },
+    {
+      "type": "paragraph",
+      "text": "Sự khác biệt giữa lập trình bắt buộc (giải thích) và lập trình tượng\ntrưng như sau:"
+    },
+    {
+      "type": "list",
+      "ordered": false,
+      "items": [
+        "Lập trình bắt buộc dễ dàng hơn. Khi lập trình bắt buộc được sử dụng\ntrong Python, phần lớn mã là đơn giản và dễ viết. Nó cũng dễ dàng hơn\nđể gỡ lỗi mã lập trình bắt buộc. Điều này là do dễ dàng hơn để có\nđược và in tất cả các giá trị biến trung gian có liên quan hoặc sử\ndụng các công cụ gỡ lỗi tích hợp sẵn của Python.",
+        "Lập trình tượng trưng hiệu quả hơn và dễ dàng hơn để cổng. Lập trình\ntượng trưng giúp tối ưu hóa mã trong quá trình biên dịch dễ dàng hơn,\nđồng thời có khả năng chuyển chương trình thành một định dạng độc lập\nvới Python. Điều này cho phép chương trình được chạy trong môi trường\nkhông phải Python, do đó tránh mọi vấn đề hiệu suất tiềm ẩn liên quan\nđến trình thông dịch Python."
+      ]
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "lap-trinh-lai",
+      "text": "12.1.2. Lập trình lai"
+    },
+    {
+      "type": "paragraph",
+      "text": "Trong lịch sử hầu hết các khuôn khổ học sâu lựa chọn giữa một cách tiếp\ncận bắt buộc hoặc mang tính biểu tượng. Ví dụ, Theano, TensorFlow (lấy\ncảm hứng từ trước đây), Keras và CNTK xây dựng các mô hình tượng trưng.\nNgược lại, Chainer và PyTorch có một cách tiếp cận bắt buộc. Một chế độ\nbắt buộc đã được thêm vào TensorFlow 2.0 và Keras trong các phiên bản\nsau này."
+    },
+    {
+      "type": "paragraph",
+      "text": "Khi thiết kế Gluon, các nhà phát triển đã xem xét liệu có thể kết hợp\nnhững lợi ích của cả hai mô hình lập trình hay không. Điều này dẫn đến\nmột mô hình lai cho phép người dùng phát triển và gỡ lỗi với lập trình\nbắt buộc thuần túy, trong khi có khả năng chuyển đổi hầu hết các chương\ntrình thành các chương trình tượng trưng để chạy khi hiệu suất tính toán\ncấp sản phẩm và triển khai được yêu cầu."
+    },
+    {
+      "type": "paragraph",
+      "text": "Trong thực tế, điều này có nghĩa là chúng tôi xây dựng các mô hình bằng\ncách sử dụng lớp HybridBlock hoặc HybridSequential . Theo mặc\nđịnh, một trong số chúng được thực thi theo cùng một cách lớp Block hoặc Sequential được thực thi trong lập trình bắt buộc. Lớp HybridSequential là một lớp con của HybridBlock (giống như Sequential lớp con Block ). Khi hàm hybridize được gọi, Gluon\nbiên dịch mô hình thành dạng được sử dụng trong lập trình tượng trưng.\nĐiều này cho phép người ta tối ưu hóa các thành phần chuyên sâu tính\ntoán mà không phải hy sinh theo cách thực hiện mô hình. Chúng tôi sẽ\nminh họa những lợi ích dưới đây, tập trung vào các mô hình và khối tuần\ntự."
+    },
+    {
+      "type": "paragraph",
+      "text": "Như đã đề cập ở trên, PyTorch dựa trên lập trình bắt buộc và sử dụng đồ\nthị tính toán động. Trong nỗ lực tận dụng tính di động và hiệu quả của\nlập trình tượng trưng, các nhà phát triển đã xem xét liệu có thể kết hợp\nlợi ích của cả hai mô hình lập trình hay không. Điều này dẫn đến một\ntorchscript cho phép người dùng phát triển và gỡ lỗi bằng cách sử dụng\nlập trình bắt buộc thuần túy, trong khi có khả năng chuyển đổi hầu hết\ncác chương trình thành các chương trình tượng trưng để chạy khi hiệu\nsuất và triển khai tính toán cấp sản phẩm được yêu cầu."
+    },
+    {
+      "type": "paragraph",
+      "text": "Mô hình lập trình bắt buộc bây giờ là mặc định trong Tensorflow 2, một\nthay đổi chào đón cho những người mới đến ngôn ngữ. Tuy nhiên, các kỹ\nthuật lập trình tượng trưng tương tự và đồ thị tính toán tiếp theo vẫn\ntồn tại trong TensorFlow, và có thể được truy cập bởi trình trang trí tf.function dễ sử dụng. Điều này đã mang lại mô hình lập trình bắt\nbuộc cho TensorFlow, cho phép người dùng xác định các hàm trực quan hơn,\nsau đó gói chúng và biên dịch chúng thành đồ thị tính toán tự động bằng\ncách sử dụng một tính năng mà nhóm TensorFlow đề cập đến là autograph ."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "lai-tao-lop-sequential",
+      "text": "12.1.3. Lai tạo lớp Sequential"
+    },
+    {
+      "type": "paragraph",
+      "text": "Cách dễ nhất để có được cảm nhận về cách thức hoạt động của lai là xem\nxét các mạng sâu với nhiều lớp. Thông thường, trình thông dịch Python sẽ\ncần thực thi mã cho tất cả các lớp để tạo ra một lệnh sau đó có thể được\nchuyển tiếp đến CPU hoặc GPU. Đối với một thiết bị điện toán (nhanh) duy\nnhất, điều này không gây ra bất kỳ vấn đề lớn nào. Mặt khác, nếu chúng\nta sử dụng một máy chủ 8 GPU tiên tiến như một phiên bản AWS\nP3dn.24xlarge Python sẽ phải vật lộn để giữ cho tất cả các GPU bận rộn.\nTrình thông dịch Python đơn luồng trở thành nút cổ chai ở đây. Hãy để\nchúng tôi xem cách chúng tôi có thể giải quyết vấn đề này cho các phần\nquan trọng của mã bằng cách thay thế Sequential bằng HybridSequential . Chúng tôi bắt đầu bằng cách xác định một MLP đơn\ngiản."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "from mxnet import np, npx\nfrom mxnet.gluon import nn\nfrom d2l import mxnet as d2l\n\nnpx.set_np()\n\n# Factory for networks\ndef get_net():\n    net = nn.HybridSequential()\n    net.add(nn.Dense(256, activation='relu'),\n            nn.Dense(128, activation='relu'),\n            nn.Dense(2))\n    net.initialize()\n    return net\n\nx = np.random.normal(size=(1, 512))\nnet = get_net()\nnet(x)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "array([[ 0.16526186, -0.14005628]])"
+    },
+    {
+      "type": "paragraph",
+      "text": "Bằng cách gọi hàm hybridize , chúng ta có thể biên dịch và tối ưu hóa\ntính toán trong MLP. Kết quả tính toán của mô hình vẫn không thay đổi."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "net.hybridize()\nnet(x)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "array([[ 0.16526186, -0.14005628]])"
+    },
+    {
+      "type": "paragraph",
+      "text": "Điều này có vẻ gần như quá tốt để đúng: chỉ cần chỉ định một khối là HybridSequential , viết cùng một mã như trước và gọi hybridize .\nKhi điều này xảy ra, mạng được tối ưu hóa (chúng tôi sẽ chuẩn hóa hiệu\nsuất bên dưới). Thật không may, điều này không hoạt động kỳ diệu cho mỗi\nlớp. Điều đó nói rằng, một layer sẽ không được tối ưu hóa nếu nó kế thừa\ntừ lớp Block thay vì lớp HybridBlock ."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "import torch\nfrom torch import nn\nfrom d2l import torch as d2l\n\n\n# Factory for networks\ndef get_net():\n    net = nn.Sequential(nn.Linear(512, 256),\n            nn.ReLU(),\n            nn.Linear(256, 128),\n            nn.ReLU(),\n            nn.Linear(128, 2))\n    return net\n\nx = torch.randn(size=(1, 512))\nnet = get_net()\nnet(x)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "tensor([[ 0.0854, -0.0074]], grad_fn=<AddmmBackward0>)"
+    },
+    {
+      "type": "paragraph",
+      "text": "Bằng cách chuyển đổi mô hình bằng hàm torch.jit.script , chúng ta có\nthể biên dịch và tối ưu hóa tính toán trong MLP. Kết quả tính toán của\nmô hình vẫn không thay đổi."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "net = torch.jit.script(net)\nnet(x)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "tensor([[ 0.0854, -0.0074]], grad_fn=<AddmmBackward0>)"
+    },
+    {
+      "type": "paragraph",
+      "text": "Điều này có vẻ gần như quá tốt là đúng: viết cùng một mã như trước và\nchỉ cần chuyển đổi mô hình bằng torch.jit.script . Khi điều này xảy\nra, mạng được tối ưu hóa (chúng tôi sẽ chuẩn hóa hiệu suất bên dưới)."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "import tensorflow as tf\nfrom tensorflow.keras.layers import Dense\nfrom d2l import tensorflow as d2l\n\n\n# Factory for networks\ndef get_net():\n    net = tf.keras.Sequential()\n    net.add(Dense(256, input_shape = (512,), activation = \"relu\"))\n    net.add(Dense(128, activation = \"relu\"))\n    net.add(Dense(2, activation = \"linear\"))\n    return net\n\nx = tf.random.normal([1,512])\nnet = get_net()\nnet(x)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "<tf.Tensor: shape=(1, 2), dtype=float32, numpy=array([[-1.2755444 ,  0.23634481]], dtype=float32)>"
+    },
+    {
+      "type": "paragraph",
+      "text": "Trước đây, tất cả các chức năng được xây dựng trong TensorFlow được xây\ndựng như một biểu đồ tính toán, và do đó JIT biên dịch theo mặc định.\nTuy nhiên, với việc phát hành TensorFlow 2.X và EagerTensor, đây không\ncòn là behavor mặc định. Chúng ta cen kích hoạt lại chức năng này với\ntf.function. tf.function thường được sử dụng như một trình trang trí\nhàm, tuy nhiên có thể gọi nó trực tiếp như một hàm python bình thường,\nđược hiển thị bên dưới. Kết quả tính toán của mô hình vẫn không thay\nđổi."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "net = tf.function(net)\nnet(x)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "<tf.Tensor: shape=(1, 2), dtype=float32, numpy=array([[-1.2755444 ,  0.23634481]], dtype=float32)>"
+    },
+    {
+      "type": "paragraph",
+      "text": "Điều này có vẻ gần như quá tốt để đúng: viết cùng một mã như trước và\nchỉ cần chuyển đổi mô hình bằng tf.function . Khi điều này xảy ra,\nmạng được xây dựng như một biểu đồ tính toán trong đại diện trung gian\nMLIR của TensorFlow và được tối ưu hóa rất nhiều ở cấp trình biên dịch\nđể thực hiện nhanh chóng (chúng tôi sẽ đánh dấu hiệu suất bên dưới).\nThêm cờ jit_compile = True một cách rõ ràng vào cuộc gọi tf.function() cho phép XLA (Accelerated Linear Algebra) chức năng\ntrong TensorFlow. XLA có thể tối ưu hóa hơn nữa mã được biên dịch JIT\ntrong một số trường hợp nhất định. Thực thi chế độ đồ thị được bật mà\nkhông có định nghĩa rõ ràng này, tuy nhiên XLA có thể thực hiện một số\nhoạt động đại số tuyến tính lớn nhất định (trong tĩnh mạch của những\nngười chúng ta thấy trong các ứng dụng học sâu) nhanh hơn nhiều, đặc\nbiệt là trong môi trường GPU."
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "tang-toc-bang-cach-lai",
+      "text": "12.1.3.1. Tăng tốc bằng cách lai"
+    },
+    {
+      "type": "paragraph",
+      "text": "Để chứng minh sự cải thiện hiệu suất đạt được bằng cách biên dịch, chúng\ntôi so sánh thời gian cần thiết để đánh giá net(x) trước và sau khi\nlai. Hãy để chúng tôi xác định một lớp để đo lần này đầu tiên. Nó sẽ có\ních trong suốt chương khi chúng tôi đặt ra để đo lường (và cải thiện)\nhiệu suất."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "#@save\nclass Benchmark:\n    \"\"\"For measuring running time.\"\"\"\n    def __init__(self, description='Done'):\n        self.description = description\n\n    def __enter__(self):\n        self.timer = d2l.Timer()\n        return self\n\n    def __exit__(self, *args):\n        print(f'{self.description}: {self.timer.stop():.4f} sec')"
+    },
+    {
+      "type": "paragraph",
+      "text": "Bây giờ chúng ta có thể gọi mạng hai lần, một lần với và một lần mà\nkhông cần lai tạo."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "net = get_net()\nwith Benchmark('Without hybridization'):\n    for i in range(1000): net(x)\n    npx.waitall()\n\nnet.hybridize()\nwith Benchmark('With hybridization'):\n    for i in range(1000): net(x)\n    npx.waitall()"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "Without hybridization: 0.7786 sec\nWith hybridization: 0.2446 sec"
+    },
+    {
+      "type": "paragraph",
+      "text": "Như đã quan sát thấy trong các kết quả trên, sau khi một phiên bản HybridSequential gọi hàm hybridize , hiệu suất tính toán được cải\nthiện thông qua việc sử dụng lập trình tượng trưng."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "#@save\nclass Benchmark:\n    \"\"\"For measuring running time.\"\"\"\n    def __init__(self, description='Done'):\n        self.description = description\n\n    def __enter__(self):\n        self.timer = d2l.Timer()\n        return self\n\n    def __exit__(self, *args):\n        print(f'{self.description}: {self.timer.stop():.4f} sec')"
+    },
+    {
+      "type": "paragraph",
+      "text": "Bây giờ chúng ta có thể gọi mạng hai lần, một lần với và một lần không\ncó torchscript."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "net = get_net()\nwith Benchmark('Without torchscript'):\n    for i in range(1000): net(x)\n\nnet = torch.jit.script(net)\nwith Benchmark('With torchscript'):\n    for i in range(1000): net(x)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "Without torchscript: 2.1717 sec\nWith torchscript: 2.1708 sec"
+    },
+    {
+      "type": "paragraph",
+      "text": "Như đã quan sát thấy trong các kết quả trên, sau khi một phiên bản nn.Sequential được viết kịch bản bằng hàm torch.jit.script , hiệu\nsuất tính toán được cải thiện thông qua việc sử dụng lập trình tượng\ntrưng."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "#@save\nclass Benchmark:\n    \"\"\"For measuring running time.\"\"\"\n    def __init__(self, description='Done'):\n        self.description = description\n\n    def __enter__(self):\n        self.timer = d2l.Timer()\n        return self\n\n    def __exit__(self, *args):\n        print(f'{self.description}: {self.timer.stop():.4f} sec')"
+    },
+    {
+      "type": "paragraph",
+      "text": "Bây giờ chúng ta có thể gọi mạng ba lần, một lần được thực hiện háo hức,\nmột lần với thực thi chế độ đồ thị, và một lần nữa sử dụng JIT biên dịch\nXLA."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "net = get_net()\nwith Benchmark('Eager Mode'):\n    for i in range(1000): net(x)\n\nnet = tf.function(net)\nwith Benchmark('Graph Mode'):\n    for i in range(1000): net(x)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "Eager Mode: 1.4461 sec\nGraph Mode: 0.4433 sec"
+    },
+    {
+      "type": "paragraph",
+      "text": "Như đã quan sát thấy trong các kết quả trên, sau khi một phiên bản tf.keras.Sequential được viết kịch bản bằng hàm tf.function ,\nhiệu suất tính toán được cải thiện thông qua việc sử dụng lập trình\ntượng trưng thông qua thực thi chế độ đồ thị trong tensorflow."
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "lap-so-se-ri",
+      "text": "12.1.3.2. Lập số sê-ri"
+    },
+    {
+      "type": "paragraph",
+      "text": "Một trong những lợi ích của việc biên dịch các mô hình là chúng ta có\nthể serialize (lưu) mô hình và các tham số của nó vào đĩa. Điều này cho\nphép chúng tôi lưu trữ một mô hình theo cách độc lập với ngôn ngữ\nfront-end của sự lựa chọn. Điều này cho phép chúng tôi triển khai các mô\nhình được đào tạo cho các thiết bị khác và dễ dàng sử dụng các ngôn ngữ\nlập trình front-end khác. Đồng thời mã thường nhanh hơn những gì có thể\nđạt được trong lập trình bắt buộc. Chúng ta hãy xem chức năng export đang hoạt động."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "net.export('my_mlp')\n!ls -lh my_mlp*"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "-rw-rw-r-- 1 d2l-worker d2l-worker 643K Apr 26 10:53 my_mlp-0000.params\n-rw-rw-r-- 1 d2l-worker d2l-worker 3.0K Apr 26 10:53 my_mlp-symbol.json"
+    },
+    {
+      "type": "paragraph",
+      "text": "Mô hình được phân hủy thành một tệp tham số (nhị phân lớn) và mô tả JSON\ncủa chương trình cần thiết để thực thi tính toán mô hình. Các tập tin có\nthể được đọc bởi các ngôn ngữ front-end khác được hỗ trợ bởi Python hoặc\nMXNet, chẳng hạn như C ++, R, Scala, và Perl. Chúng ta hãy xem xét một\nvài dòng đầu tiên trong mô tả mô hình."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "!head my_mlp-symbol.json"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "{\n  \"nodes\": [\n    {\n      \"op\": \"null\",\n      \"name\": \"data\",\n      \"inputs\": []\n    },\n    {\n      \"op\": \"null\",\n      \"name\": \"dense3_weight\","
+    },
+    {
+      "type": "paragraph",
+      "text": "Trước đó, chúng tôi đã chứng minh rằng, sau khi gọi hàm hybridize ,\nmô hình này có thể đạt được hiệu suất tính toán và tính di động vượt\ntrội. Lưu ý, mặc dù việc lai tạo có thể ảnh hưởng đến tính linh hoạt của\nmô hình, đặc biệt là về dòng chảy điều khiển."
+    },
+    {
+      "type": "paragraph",
+      "text": "Bên cạnh đó, trái với phiên bản Block , cần sử dụng hàm forward ,\nđối với một ví dụ HybridBlock chúng ta cần sử dụng hàm hybrid_forward ."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "class HybridNet(nn.HybridBlock):\n    def __init__(self, **kwargs):\n        super(HybridNet, self).__init__(**kwargs)\n        self.hidden = nn.Dense(4)\n        self.output = nn.Dense(2)\n\n    def hybrid_forward(self, F, x):\n        print('module F: ', F)\n        print('value  x: ', x)\n        x = F.npx.relu(self.hidden(x))\n        print('result  : ', x)\n        return self.output(x)"
+    },
+    {
+      "type": "paragraph",
+      "text": "Mã trên thực hiện một mạng đơn giản với 4 đơn vị ẩn và 2 đầu ra. Hàm hybrid_forward mất một đối số bổ sung F . Điều này là cần thiết\nvì, tùy thuộc vào việc mã đã được lai hay không, nó sẽ sử dụng một thư\nviện hơi khác ( ndarray hoặc symbol ) để xử lý. Cả hai lớp đều\nthực hiện các hàm rất giống nhau và MXNet tự động xác định đối số. Để\nhiểu những gì đang xảy ra, chúng ta in các đối số như một phần của lệnh\ngọi hàm."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "net = HybridNet()\nnet.initialize()\nx = np.random.normal(size=(1, 3))\nnet(x)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "module F:  <module 'mxnet.ndarray' from '/home/d2l-worker/miniconda3/envs/d2l-vi-release-1/lib/python3.8/site-packages/mxnet/ndarray/__init__.py'>\nvalue  x:  [[-0.6338663   0.40156594  0.46456942]]\nresult  :  [[0.01641375 0.         0.         0.        ]]"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "array([[0.00097611, 0.00019453]])"
+    },
+    {
+      "type": "paragraph",
+      "text": "Lặp lại tính toán chuyển tiếp sẽ dẫn đến cùng một đầu ra (chúng tôi bỏ\nqua chi tiết). Bây giờ chúng ta hãy xem những gì sẽ xảy ra nếu chúng ta\ngọi hàm hybridize ."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "net.hybridize()\nnet(x)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "module F:  <module 'mxnet.symbol' from '/home/d2l-worker/miniconda3/envs/d2l-vi-release-1/lib/python3.8/site-packages/mxnet/symbol/__init__.py'>\nvalue  x:  <_Symbol data>\nresult  :  <_Symbol hybridnet0_relu0>"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "array([[0.00097611, 0.00019453]])"
+    },
+    {
+      "type": "paragraph",
+      "text": "Thay vì sử dụng ndarray , bây giờ chúng tôi sử dụng mô-đun symbol cho F . Hơn nữa, mặc dù đầu vào là loại ndarray , dữ liệu chảy qua\nmạng hiện được chuyển đổi thành loại symbol như một phần của quá\ntrình biên dịch. Lặp lại cuộc gọi hàm dẫn đến một kết quả đáng ngạc\nnhiên:"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "net(x)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "array([[0.00097611, 0.00019453]])"
+    },
+    {
+      "type": "paragraph",
+      "text": "Điều này khá khác với những gì chúng ta đã thấy trước đây. Tất cả các\ncâu lệnh in, như được định nghĩa trong hybrid_forward , đều bị bỏ\nqua. Thật vậy, sau khi lai, việc thực hiện net(x) không liên quan\nđến thông dịch viên Python nữa. Điều này có nghĩa là bất kỳ mã Python\ngiả nào đều bị bỏ qua (chẳng hạn như các câu lệnh in) có lợi cho việc\nthực thi hợp lý hơn nhiều và hiệu suất tốt hơn. Thay vào đó, MXNet trực\ntiếp gọi phụ trợ C ++. Cũng lưu ý rằng một số chức năng không được hỗ\ntrợ trong mô-đun symbol (ví dụ, asnumpy ) và các hoạt động tại\nchỗ như a += b và a[:] = a + b phải được viết lại là a = a + b . Tuy nhiên, việc tổng hợp các mô hình đáng để nỗ lực bất\ncứ khi nào tốc độ quan trọng. Lợi ích có thể dao động từ các điểm phần\ntrăm nhỏ đến hơn gấp đôi tốc độ, tùy thuộc vào độ phức tạp của mô hình,\ntốc độ của CPU và tốc độ và số lượng GPU."
+    },
+    {
+      "type": "paragraph",
+      "text": "Một trong những lợi ích của việc biên dịch các mô hình là chúng ta có\nthể serialize (lưu) mô hình và các tham số của nó vào đĩa. Điều này cho\nphép chúng tôi lưu trữ một mô hình theo cách độc lập với ngôn ngữ\nfront-end của sự lựa chọn. Điều này cho phép chúng tôi triển khai các mô\nhình được đào tạo cho các thiết bị khác và dễ dàng sử dụng các ngôn ngữ\nlập trình front-end khác. Đồng thời mã thường nhanh hơn những gì có thể\nđạt được trong lập trình bắt buộc. Chúng ta hãy xem chức năng save đang hoạt động."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "net.save('my_mlp')\n!ls -lh my_mlp*"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "-rw-rw-r-- 1 d2l-worker d2l-worker 651K Apr 26 12:30 my_mlp"
+    },
+    {
+      "type": "paragraph",
+      "text": "Một trong những lợi ích của việc biên dịch các mô hình là chúng ta có\nthể serialize (lưu) mô hình và các tham số của nó vào đĩa. Điều này cho\nphép chúng tôi lưu trữ một mô hình theo cách độc lập với ngôn ngữ\nfront-end của sự lựa chọn. Điều này cho phép chúng tôi triển khai các mô\nhình được đào tạo cho các thiết bị khác và dễ dàng sử dụng các ngôn ngữ\nlập trình front-end khác hoặc thực hiện một mô hình được đào tạo trên\nmáy chủ. Đồng thời mã thường nhanh hơn những gì có thể đạt được trong\nlập trình bắt buộc. API cấp thấp cho phép chúng ta lưu trong tensorflow\nlà tf.saved_model . Hãy xem phiên bản saved_model đang hoạt động."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "net = get_net()\ntf.saved_model.save(net, 'my_mlp')\n!ls -lh my_mlp*"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "INFO:tensorflow:Assets written to: my_mlp/assets\ntotal 68K\ndrwxr-xr-x 2 d2l-worker d2l-worker 4.0K Apr 26 14:22 assets\n-rw-rw-r-- 1 d2l-worker d2l-worker  60K Apr 26 14:22 saved_model.pb\ndrwxr-xr-x 2 d2l-worker d2l-worker 4.0K Apr 26 14:22 variables"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tom-tat",
+      "text": "12.1.4. Tóm tắt"
+    },
+    {
+      "type": "list",
+      "ordered": false,
+      "items": [
+        "Lập trình bắt buộc giúp bạn dễ dàng thiết kế các mô hình mới vì có\nthể viết mã với luồng điều khiển và khả năng sử dụng một lượng lớn hệ\nsinh thái phần mềm Python.",
+        "Lập trình tượng trưng yêu cầu chúng ta chỉ định chương trình và biên\ndịch nó trước khi thực hiện nó. Lợi ích là cải thiện hiệu suất."
+      ]
+    },
+    {
+      "type": "list",
+      "ordered": false,
+      "items": [
+        "MXNet có thể kết hợp những lợi thế của cả hai cách tiếp cận khi cần\nthiết.",
+        "Các mô hình được xây dựng bởi các lớp HybridSequential và HybridBlock có thể chuyển đổi các chương trình bắt buộc thành các\nchương trình tượng trưng bằng cách gọi hàm hybridize ."
+      ]
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bai-tap",
+      "text": "12.1.5. Bài tập"
+    },
+    {
+      "type": "list",
+      "ordered": true,
+      "items": [
+        "Thêm x.asnumpy() vào dòng đầu tiên của hàm hybrid_forward của\nlớp HybridNet trong phần này. Thực hiện mã và quan sát các lỗi\nbạn gặp phải. Tại sao họ lại xảy ra?",
+        "Điều gì xảy ra nếu chúng ta thêm luồng điều khiển, tức là, các câu\nlệnh Python if và for trong hàm hybrid_forward ?",
+        "Xem lại các mô hình mà bạn quan tâm trong các chương trước. Bạn có\nthể cải thiện hiệu suất tính toán của họ bằng cách triển khai lại\nchúng không?"
+      ]
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    },
+    {
+      "type": "list",
+      "ordered": true,
+      "items": [
+        "Xem lại các mô hình mà bạn quan tâm trong các chương trước. Bạn có\nthể cải thiện hiệu suất tính toán của họ bằng cách triển khai lại\nchúng không?"
+      ]
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    },
+    {
+      "type": "list",
+      "ordered": true,
+      "items": [
+        "Xem lại các mô hình mà bạn quan tâm trong các chương trước. Bạn có\nthể cải thiện hiệu suất tính toán của họ bằng cách triển khai lại\nchúng không?"
+      ]
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    }
+  ],
+  "images": [
+    {
+      "original_url": "https://vi.d2l.ai/_images/computegraph.svg",
+      "local_path": "_images/computegraph.svg",
+      "alt": "../_images/computegraph.svg"
+    }
+  ],
+  "text": "12.1. Trình biên dịch và phiên dịch\nCho đến nay, cuốn sách này đã tập trung vào lập trình bắt buộc, làm cho\nviệc sử dụng các tuyên bố như print , + , và if để thay đổi\ntrạng thái của một chương trình. Hãy xem xét ví dụ sau đây của một\nchương trình bắt buộc đơn giản.\nPython là một ngôn ngữ được giải thị . Khi đánh giá hàm fancy_func trên, nó thực hiện các thao tác tạo nên cơ thể của hàm * theo trình tự\n*. Đó là, nó sẽ đánh giá e = add(a, b) và lưu trữ các kết quả dưới\ndạng biến e , do đó thay đổi trạng thái của chương trình. Hai câu\nlệnh tiếp theo f = add(c, d) và g = add(e, f) sẽ được thực thi\ntương tự, thực hiện bổ sung và lưu trữ các kết quả dưới dạng biến. Fig. 12.1.1 minh họa luồng dữ liệu.\nFig. 12.1.1 Data flow in an imperative program. ¶\nMặc dù lập trình bắt buộc là thuận tiện, nó có thể không hiệu quả. Một\nmặt, ngay cả khi hàm add được gọi nhiều lần trong suốt fancy_func , Python sẽ thực hiện ba cuộc gọi hàm riêng lẻ. Nếu chúng\nđược thực thi, giả sử, trên GPU (hoặc thậm chí trên nhiều GPU), chi phí\nphát sinh từ trình thông dịch Python có thể trở nên áp đảo. Hơn nữa, nó\nsẽ cần phải lưu các giá trị biến của e và f cho đến khi tất cả\ncác câu lệnh trong fancy_func đã được thực thi. Điều này là do chúng\nta không biết liệu các biến e và f sẽ được sử dụng bởi các phần\nkhác của chương trình sau khi các câu lệnh e = add(a, b) và f = add(c, d) được thực thi.\n12.1.1. Lập trình tượng trưng\nHãy xem xét phương pháp thay thế, *lập trình tượng trưng, trong đó tính\ntoán thường chỉ được thực hiện một khi quá trình đã được xác định đầy\nđủ. Chiến lược này được sử dụng bởi nhiều khuôn khổ học sâu, bao gồm\nTheano và TensorFlow (sau này đã có được các phần mở rộng bắt buộc). Nó\nthường bao gồm các bước sau:\nXác định các hoạt động sẽ được thực thi.\nBiên dịch các hoạt động thành một chương trình thực thi.\nCung cấp các đầu vào cần thiết và gọi chương trình được biên dịch để\nthực hiện.\nĐiều này cho phép tối ưu hóa một lượng đáng kể. Đầu tiên, chúng ta có\nthể bỏ qua trình thông dịch Python trong nhiều trường hợp, do đó loại bỏ\nmột nút cổ chai hiệu suất có thể trở nên đáng kể trên nhiều GPU nhanh\nđược ghép nối với một luồng Python duy nhất trên CPU. Thứ hai, một trình\nbiên dịch có thể tối ưu hóa và viết lại mã trên vào print((1 + 2) + (3 + 4)) hoặc thậm chí print(10) . Điều này là có\nthể kể từ khi một trình biên dịch được để xem mã đầy đủ trước khi biến\nnó thành hướng dẫn máy. Ví dụ, nó có thể giải phóng bộ nhớ (hoặc không\nbao giờ phân bổ nó) bất cứ khi nào một biến không còn cần thiết nữa.\nHoặc nó có thể biến đổi mã hoàn toàn thành một phần tương đương. Để có\nđược một ý tưởng tốt hơn, hãy xem xét mô phỏng sau đây của lập trình bắt\nbuộc (nó là Python sau tất cả) dưới đây.\nSự khác biệt giữa lập trình bắt buộc (giải thích) và lập trình tượng\ntrưng như sau:\nLập trình bắt buộc dễ dàng hơn. Khi lập trình bắt buộc được sử dụng\ntrong Python, phần lớn mã là đơn giản và dễ viết. Nó cũng dễ dàng hơn\nđể gỡ lỗi mã lập trình bắt buộc. Điều này là do dễ dàng hơn để có\nđược và in tất cả các giá trị biến trung gian có liên quan hoặc sử\ndụng các công cụ gỡ lỗi tích hợp sẵn của Python.\nLập trình tượng trưng hiệu quả hơn và dễ dàng hơn để cổng. Lập trình\ntượng trưng giúp tối ưu hóa mã trong quá trình biên dịch dễ dàng hơn,\nđồng thời có khả năng chuyển chương trình thành một định dạng độc lập\nvới Python. Điều này cho phép chương trình được chạy trong môi trường\nkhông phải Python, do đó tránh mọi vấn đề hiệu suất tiềm ẩn liên quan\nđến trình thông dịch Python.\n12.1.2. Lập trình lai\nTrong lịch sử hầu hết các khuôn khổ học sâu lựa chọn giữa một cách tiếp\ncận bắt buộc hoặc mang tính biểu tượng. Ví dụ, Theano, TensorFlow (lấy\ncảm hứng từ trước đây), Keras và CNTK xây dựng các mô hình tượng trưng.\nNgược lại, Chainer và PyTorch có một cách tiếp cận bắt buộc. Một chế độ\nbắt buộc đã được thêm vào TensorFlow 2.0 và Keras trong các phiên bản\nsau này.\nKhi thiết kế Gluon, các nhà phát triển đã xem xét liệu có thể kết hợp\nnhững lợi ích của cả hai mô hình lập trình hay không. Điều này dẫn đến\nmột mô hình lai cho phép người dùng phát triển và gỡ lỗi với lập trình\nbắt buộc thuần túy, trong khi có khả năng chuyển đổi hầu hết các chương\ntrình thành các chương trình tượng trưng để chạy khi hiệu suất tính toán\ncấp sản phẩm và triển khai được yêu cầu.\nTrong thực tế, điều này có nghĩa là chúng tôi xây dựng các mô hình bằng\ncách sử dụng lớp HybridBlock hoặc HybridSequential . Theo mặc\nđịnh, một trong số chúng được thực thi theo cùng một cách lớp Block hoặc Sequential được thực thi trong lập trình bắt buộc. Lớp HybridSequential là một lớp con của HybridBlock (giống như Sequential lớp con Block ). Khi hàm hybridize được gọi, Gluon\nbiên dịch mô hình thành dạng được sử dụng trong lập trình tượng trưng.\nĐiều này cho phép người ta tối ưu hóa các thành phần chuyên sâu tính\ntoán mà không phải hy sinh theo cách thực hiện mô hình. Chúng tôi sẽ\nminh họa những lợi ích dưới đây, tập trung vào các mô hình và khối tuần\ntự.\nNhư đã đề cập ở trên, PyTorch dựa trên lập trình bắt buộc và sử dụng đồ\nthị tính toán động. Trong nỗ lực tận dụng tính di động và hiệu quả của\nlập trình tượng trưng, các nhà phát triển đã xem xét liệu có thể kết hợp\nlợi ích của cả hai mô hình lập trình hay không. Điều này dẫn đến một\ntorchscript cho phép người dùng phát triển và gỡ lỗi bằng cách sử dụng\nlập trình bắt buộc thuần túy, trong khi có khả năng chuyển đổi hầu hết\ncác chương trình thành các chương trình tượng trưng để chạy khi hiệu\nsuất và triển khai tính toán cấp sản phẩm được yêu cầu.\nMô hình lập trình bắt buộc bây giờ là mặc định trong Tensorflow 2, một\nthay đổi chào đón cho những người mới đến ngôn ngữ. Tuy nhiên, các kỹ\nthuật lập trình tượng trưng tương tự và đồ thị tính toán tiếp theo vẫn\ntồn tại trong TensorFlow, và có thể được truy cập bởi trình trang trí tf.function dễ sử dụng. Điều này đã mang lại mô hình lập trình bắt\nbuộc cho TensorFlow, cho phép người dùng xác định các hàm trực quan hơn,\nsau đó gói chúng và biên dịch chúng thành đồ thị tính toán tự động bằng\ncách sử dụng một tính năng mà nhóm TensorFlow đề cập đến là autograph .\n12.1.3. Lai tạo lớp Sequential\nCách dễ nhất để có được cảm nhận về cách thức hoạt động của lai là xem\nxét các mạng sâu với nhiều lớp. Thông thường, trình thông dịch Python sẽ\ncần thực thi mã cho tất cả các lớp để tạo ra một lệnh sau đó có thể được\nchuyển tiếp đến CPU hoặc GPU. Đối với một thiết bị điện toán (nhanh) duy\nnhất, điều này không gây ra bất kỳ vấn đề lớn nào. Mặt khác, nếu chúng\nta sử dụng một máy chủ 8 GPU tiên tiến như một phiên bản AWS\nP3dn.24xlarge Python sẽ phải vật lộn để giữ cho tất cả các GPU bận rộn.\nTrình thông dịch Python đơn luồng trở thành nút cổ chai ở đây. Hãy để\nchúng tôi xem cách chúng tôi có thể giải quyết vấn đề này cho các phần\nquan trọng của mã bằng cách thay thế Sequential bằng HybridSequential . Chúng tôi bắt đầu bằng cách xác định một MLP đơn\ngiản.\nBằng cách gọi hàm hybridize , chúng ta có thể biên dịch và tối ưu hóa\ntính toán trong MLP. Kết quả tính toán của mô hình vẫn không thay đổi.\nĐiều này có vẻ gần như quá tốt để đúng: chỉ cần chỉ định một khối là HybridSequential , viết cùng một mã như trước và gọi hybridize .\nKhi điều này xảy ra, mạng được tối ưu hóa (chúng tôi sẽ chuẩn hóa hiệu\nsuất bên dưới). Thật không may, điều này không hoạt động kỳ diệu cho mỗi\nlớp. Điều đó nói rằng, một layer sẽ không được tối ưu hóa nếu nó kế thừa\ntừ lớp Block thay vì lớp HybridBlock .\nBằng cách chuyển đổi mô hình bằng hàm torch.jit.script , chúng ta có\nthể biên dịch và tối ưu hóa tính toán trong MLP. Kết quả tính toán của\nmô hình vẫn không thay đổi.\nĐiều này có vẻ gần như quá tốt là đúng: viết cùng một mã như trước và\nchỉ cần chuyển đổi mô hình bằng torch.jit.script . Khi điều này xảy\nra, mạng được tối ưu hóa (chúng tôi sẽ chuẩn hóa hiệu suất bên dưới).\nTrước đây, tất cả các chức năng được xây dựng trong TensorFlow được xây\ndựng như một biểu đồ tính toán, và do đó JIT biên dịch theo mặc định.\nTuy nhiên, với việc phát hành TensorFlow 2.X và EagerTensor, đây không\ncòn là behavor mặc định. Chúng ta cen kích hoạt lại chức năng này với\ntf.function. tf.function thường được sử dụng như một trình trang trí\nhàm, tuy nhiên có thể gọi nó trực tiếp như một hàm python bình thường,\nđược hiển thị bên dưới. Kết quả tính toán của mô hình vẫn không thay\nđổi.\nĐiều này có vẻ gần như quá tốt để đúng: viết cùng một mã như trước và\nchỉ cần chuyển đổi mô hình bằng tf.function . Khi điều này xảy ra,\nmạng được xây dựng như một biểu đồ tính toán trong đại diện trung gian\nMLIR của TensorFlow và được tối ưu hóa rất nhiều ở cấp trình biên dịch\nđể thực hiện nhanh chóng (chúng tôi sẽ đánh dấu hiệu suất bên dưới).\nThêm cờ jit_compile = True một cách rõ ràng vào cuộc gọi tf.function() cho phép XLA (Accelerated Linear Algebra) chức năng\ntrong TensorFlow. XLA có thể tối ưu hóa hơn nữa mã được biên dịch JIT\ntrong một số trường hợp nhất định. Thực thi chế độ đồ thị được bật mà\nkhông có định nghĩa rõ ràng này, tuy nhiên XLA có thể thực hiện một số\nhoạt động đại số tuyến tính lớn nhất định (trong tĩnh mạch của những\nngười chúng ta thấy trong các ứng dụng học sâu) nhanh hơn nhiều, đặc\nbiệt là trong môi trường GPU.\n12.1.3.1. Tăng tốc bằng cách lai\nĐể chứng minh sự cải thiện hiệu suất đạt được bằng cách biên dịch, chúng\ntôi so sánh thời gian cần thiết để đánh giá net(x) trước và sau khi\nlai. Hãy để chúng tôi xác định một lớp để đo lần này đầu tiên. Nó sẽ có\ních trong suốt chương khi chúng tôi đặt ra để đo lường (và cải thiện)\nhiệu suất.\nBây giờ chúng ta có thể gọi mạng hai lần, một lần với và một lần mà\nkhông cần lai tạo.\nNhư đã quan sát thấy trong các kết quả trên, sau khi một phiên bản HybridSequential gọi hàm hybridize , hiệu suất tính toán được cải\nthiện thông qua việc sử dụng lập trình tượng trưng.\nBây giờ chúng ta có thể gọi mạng hai lần, một lần với và một lần không\ncó torchscript.\nNhư đã quan sát thấy trong các kết quả trên, sau khi một phiên bản nn.Sequential được viết kịch bản bằng hàm torch.jit.script , hiệu\nsuất tính toán được cải thiện thông qua việc sử dụng lập trình tượng\ntrưng.\nBây giờ chúng ta có thể gọi mạng ba lần, một lần được thực hiện háo hức,\nmột lần với thực thi chế độ đồ thị, và một lần nữa sử dụng JIT biên dịch\nXLA.\nNhư đã quan sát thấy trong các kết quả trên, sau khi một phiên bản tf.keras.Sequential được viết kịch bản bằng hàm tf.function ,\nhiệu suất tính toán được cải thiện thông qua việc sử dụng lập trình\ntượng trưng thông qua thực thi chế độ đồ thị trong tensorflow.\n12.1.3.2. Lập số sê-ri\nMột trong những lợi ích của việc biên dịch các mô hình là chúng ta có\nthể serialize (lưu) mô hình và các tham số của nó vào đĩa. Điều này cho\nphép chúng tôi lưu trữ một mô hình theo cách độc lập với ngôn ngữ\nfront-end của sự lựa chọn. Điều này cho phép chúng tôi triển khai các mô\nhình được đào tạo cho các thiết bị khác và dễ dàng sử dụng các ngôn ngữ\nlập trình front-end khác. Đồng thời mã thường nhanh hơn những gì có thể\nđạt được trong lập trình bắt buộc. Chúng ta hãy xem chức năng export đang hoạt động.\nMô hình được phân hủy thành một tệp tham số (nhị phân lớn) và mô tả JSON\ncủa chương trình cần thiết để thực thi tính toán mô hình. Các tập tin có\nthể được đọc bởi các ngôn ngữ front-end khác được hỗ trợ bởi Python hoặc\nMXNet, chẳng hạn như C ++, R, Scala, và Perl. Chúng ta hãy xem xét một\nvài dòng đầu tiên trong mô tả mô hình.\nTrước đó, chúng tôi đã chứng minh rằng, sau khi gọi hàm hybridize ,\nmô hình này có thể đạt được hiệu suất tính toán và tính di động vượt\ntrội. Lưu ý, mặc dù việc lai tạo có thể ảnh hưởng đến tính linh hoạt của\nmô hình, đặc biệt là về dòng chảy điều khiển.\nBên cạnh đó, trái với phiên bản Block , cần sử dụng hàm forward ,\nđối với một ví dụ HybridBlock chúng ta cần sử dụng hàm hybrid_forward .\nMã trên thực hiện một mạng đơn giản với 4 đơn vị ẩn và 2 đầu ra. Hàm hybrid_forward mất một đối số bổ sung F . Điều này là cần thiết\nvì, tùy thuộc vào việc mã đã được lai hay không, nó sẽ sử dụng một thư\nviện hơi khác ( ndarray hoặc symbol ) để xử lý. Cả hai lớp đều\nthực hiện các hàm rất giống nhau và MXNet tự động xác định đối số. Để\nhiểu những gì đang xảy ra, chúng ta in các đối số như một phần của lệnh\ngọi hàm.\nLặp lại tính toán chuyển tiếp sẽ dẫn đến cùng một đầu ra (chúng tôi bỏ\nqua chi tiết). Bây giờ chúng ta hãy xem những gì sẽ xảy ra nếu chúng ta\ngọi hàm hybridize .\nThay vì sử dụng ndarray , bây giờ chúng tôi sử dụng mô-đun symbol cho F . Hơn nữa, mặc dù đầu vào là loại ndarray , dữ liệu chảy qua\nmạng hiện được chuyển đổi thành loại symbol như một phần của quá\ntrình biên dịch. Lặp lại cuộc gọi hàm dẫn đến một kết quả đáng ngạc\nnhiên:\nĐiều này khá khác với những gì chúng ta đã thấy trước đây. Tất cả các\ncâu lệnh in, như được định nghĩa trong hybrid_forward , đều bị bỏ\nqua. Thật vậy, sau khi lai, việc thực hiện net(x) không liên quan\nđến thông dịch viên Python nữa. Điều này có nghĩa là bất kỳ mã Python\ngiả nào đều bị bỏ qua (chẳng hạn như các câu lệnh in) có lợi cho việc\nthực thi hợp lý hơn nhiều và hiệu suất tốt hơn. Thay vào đó, MXNet trực\ntiếp gọi phụ trợ C ++. Cũng lưu ý rằng một số chức năng không được hỗ\ntrợ trong mô-đun symbol (ví dụ, asnumpy ) và các hoạt động tại\nchỗ như a += b và a[:] = a + b phải được viết lại là a = a + b . Tuy nhiên, việc tổng hợp các mô hình đáng để nỗ lực bất\ncứ khi nào tốc độ quan trọng. Lợi ích có thể dao động từ các điểm phần\ntrăm nhỏ đến hơn gấp đôi tốc độ, tùy thuộc vào độ phức tạp của mô hình,\ntốc độ của CPU và tốc độ và số lượng GPU.\nMột trong những lợi ích của việc biên dịch các mô hình là chúng ta có\nthể serialize (lưu) mô hình và các tham số của nó vào đĩa. Điều này cho\nphép chúng tôi lưu trữ một mô hình theo cách độc lập với ngôn ngữ\nfront-end của sự lựa chọn. Điều này cho phép chúng tôi triển khai các mô\nhình được đào tạo cho các thiết bị khác và dễ dàng sử dụng các ngôn ngữ\nlập trình front-end khác. Đồng thời mã thường nhanh hơn những gì có thể\nđạt được trong lập trình bắt buộc. Chúng ta hãy xem chức năng save đang hoạt động.\nMột trong những lợi ích của việc biên dịch các mô hình là chúng ta có\nthể serialize (lưu) mô hình và các tham số của nó vào đĩa. Điều này cho\nphép chúng tôi lưu trữ một mô hình theo cách độc lập với ngôn ngữ\nfront-end của sự lựa chọn. Điều này cho phép chúng tôi triển khai các mô\nhình được đào tạo cho các thiết bị khác và dễ dàng sử dụng các ngôn ngữ\nlập trình front-end khác hoặc thực hiện một mô hình được đào tạo trên\nmáy chủ. Đồng thời mã thường nhanh hơn những gì có thể đạt được trong\nlập trình bắt buộc. API cấp thấp cho phép chúng ta lưu trong tensorflow\nlà tf.saved_model . Hãy xem phiên bản saved_model đang hoạt động.\n12.1.4. Tóm tắt\nLập trình bắt buộc giúp bạn dễ dàng thiết kế các mô hình mới vì có\nthể viết mã với luồng điều khiển và khả năng sử dụng một lượng lớn hệ\nsinh thái phần mềm Python.\nLập trình tượng trưng yêu cầu chúng ta chỉ định chương trình và biên\ndịch nó trước khi thực hiện nó. Lợi ích là cải thiện hiệu suất.\nMXNet có thể kết hợp những lợi thế của cả hai cách tiếp cận khi cần\nthiết.\nCác mô hình được xây dựng bởi các lớp HybridSequential và HybridBlock có thể chuyển đổi các chương trình bắt buộc thành các\nchương trình tượng trưng bằng cách gọi hàm hybridize .\n12.1.5. Bài tập\nThêm x.asnumpy() vào dòng đầu tiên của hàm hybrid_forward của\nlớp HybridNet trong phần này. Thực hiện mã và quan sát các lỗi\nbạn gặp phải. Tại sao họ lại xảy ra?\nĐiều gì xảy ra nếu chúng ta thêm luồng điều khiển, tức là, các câu\nlệnh Python if và for trong hàm hybrid_forward ?\nXem lại các mô hình mà bạn quan tâm trong các chương trước. Bạn có\nthể cải thiện hiệu suất tính toán của họ bằng cách triển khai lại\nchúng không?\nDiscussions\nXem lại các mô hình mà bạn quan tâm trong các chương trước. Bạn có\nthể cải thiện hiệu suất tính toán của họ bằng cách triển khai lại\nchúng không?\nDiscussions\nXem lại các mô hình mà bạn quan tâm trong các chương trước. Bạn có\nthể cải thiện hiệu suất tính toán của họ bằng cách triển khai lại\nchúng không?\nDiscussions"
+}

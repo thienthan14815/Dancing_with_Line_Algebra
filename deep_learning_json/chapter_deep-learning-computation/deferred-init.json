@@ -1,0 +1,194 @@
+{
+  "url": "https://vi.d2l.ai/chapter_deep-learning-computation/deferred-init.html",
+  "chapter": "chapter_deep-learning-computation",
+  "title": "5.3. Khởi tạo hoãn lại",
+  "crawled_at": "2026-07-20T12:39:37.107800+00:00",
+  "headings": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "khoi-tao-hoan-lai",
+      "text": "5.3. Khởi tạo hoãn lại"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "khoi-tao-mot-mang",
+      "text": "5.3.1. Khởi tạo một mạng"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tom-tat",
+      "text": "5.3.2. Tóm tắt"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bai-tap",
+      "text": "5.3.3. Bài tập"
+    }
+  ],
+  "content": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "khoi-tao-hoan-lai",
+      "text": "5.3. Khởi tạo hoãn lại"
+    },
+    {
+      "type": "paragraph",
+      "text": "Cho đến nay, có vẻ như chúng ta đã thoát khỏi sự cẩu thả trong việc\nthiết lập mạng của mình. Cụ thể, chúng tôi đã làm những điều không trực\nquan sau đây, có vẻ như chúng không nên hoạt động:"
+    },
+    {
+      "type": "list",
+      "ordered": false,
+      "items": [
+        "Chúng tôi xác định các kiến trúc mạng mà không chỉ định kích thước\nđầu vào.",
+        "Chúng tôi đã thêm các lớp mà không chỉ định kích thước đầu ra của lớp\ntrước đó.",
+        "Chúng tôi thậm chí “khởi tạo” các tham số này trước khi cung cấp đủ\nthông tin để xác định có bao nhiêu tham số mô hình của chúng tôi nên\nchứa."
+      ]
+    },
+    {
+      "type": "paragraph",
+      "text": "Bạn có thể ngạc nhiên rằng mã của chúng tôi chạy ở tất cả. Rốt cuộc,\nkhông có cách nào khung học sâu có thể cho biết kích thước đầu vào của\nmạng sẽ là gì. Bí quyết ở đây là framework * defers khởi hóa*, chờ cho\nđến lần đầu tiên chúng ta truyền dữ liệu thông qua mô hình, để suy ra\nkích thước của mỗi lớp một cách nhanh chóng."
+    },
+    {
+      "type": "paragraph",
+      "text": "Sau đó, khi làm việc với các mạng thần kinh phức tạp, kỹ thuật này sẽ\ntrở nên thuận tiện hơn nữa vì kích thước đầu vào (tức là độ phân giải\ncủa một hình ảnh) sẽ ảnh hưởng đến kích thước của mỗi lớp tiếp theo. Do\nđó, khả năng thiết lập các tham số mà không cần biết, tại thời điểm viết\nmã, kích thước là gì có thể đơn giản hóa rất nhiều nhiệm vụ chỉ định và\nsau đó sửa đổi các mô hình của chúng tôi. Tiếp theo, chúng ta đi sâu hơn\nvào cơ chế khởi tạo."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "khoi-tao-mot-mang",
+      "text": "5.3.1. Khởi tạo một mạng"
+    },
+    {
+      "type": "paragraph",
+      "text": "Để bắt đầu, chúng ta hãy khởi tạo một MLP."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "from mxnet import np, npx\nfrom mxnet.gluon import nn\n\nnpx.set_np()\n\ndef get_net():\n    net = nn.Sequential()\n    net.add(nn.Dense(256, activation='relu'))\n    net.add(nn.Dense(10))\n    return net\n\nnet = get_net()"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "import tensorflow as tf\n\nnet = tf.keras.models.Sequential([\n    tf.keras.layers.Dense(256, activation=tf.nn.relu),\n    tf.keras.layers.Dense(10),\n])"
+    },
+    {
+      "type": "paragraph",
+      "text": "Tại thời điểm này, mạng không thể biết được kích thước của trọng lượng\ncủa lớp đầu vào vì kích thước đầu vào vẫn chưa được biết. Do đó, khung\nchưa khởi tạo bất kỳ tham số nào. Chúng tôi xác nhận bằng cách cố gắng\ntruy cập các tham số bên dưới."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "print(net.collect_params)\nprint(net.collect_params())"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "<bound method Block.collect_params of Sequential(\n  (0): Dense(-1 -> 256, Activation(relu))\n  (1): Dense(-1 -> 10, linear)\n)>\nsequential0_ (\n  Parameter dense0_weight (shape=(256, -1), dtype=float32)\n  Parameter dense0_bias (shape=(256,), dtype=float32)\n  Parameter dense1_weight (shape=(10, -1), dtype=float32)\n  Parameter dense1_bias (shape=(10,), dtype=float32)\n)"
+    },
+    {
+      "type": "paragraph",
+      "text": "Lưu ý rằng trong khi các đối tượng tham số tồn tại, kích thước đầu vào\ncho mỗi lớp được liệt kê là -1. MXNet sử dụng giá trị đặc biệt -1 để chỉ\nra rằng kích thước tham số vẫn chưa được biết. Tại thời điểm này, các nỗ\nlực truy cập net[0].weight.data() sẽ kích hoạt lỗi thời gian chạy\nnói rằng mạng phải được khởi tạo trước khi các tham số có thể được truy\ncập. Bây giờ chúng ta hãy xem những gì xảy ra khi chúng ta cố gắng khởi\ntạo các tham số thông qua chức năng initialize ."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "net.initialize()\nnet.collect_params()"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "sequential0_ (\n  Parameter dense0_weight (shape=(256, -1), dtype=float32)\n  Parameter dense0_bias (shape=(256,), dtype=float32)\n  Parameter dense1_weight (shape=(10, -1), dtype=float32)\n  Parameter dense1_bias (shape=(10,), dtype=float32)\n)"
+    },
+    {
+      "type": "paragraph",
+      "text": "Như chúng ta có thể thấy, không có gì thay đổi. Khi không xác định kích\nthước đầu vào, các cuộc gọi để khởi tạo không thực sự khởi tạo các tham\nsố. Thay vào đó, cuộc gọi này đăng ký vào MXNet mà chúng tôi muốn (và\ntùy chọn, theo phân phối nào) để khởi tạo các tham số."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "[net.layers[i].get_weights() for i in range(len(net.layers))]"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "[[], []]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Lưu ý rằng mỗi đối tượng lớp tồn tại nhưng trọng lượng trống. Sử dụng net.get_weights() sẽ gây ra lỗi vì trọng lượng chưa được khởi tạo."
+    },
+    {
+      "type": "paragraph",
+      "text": "Tiếp theo chúng ta hãy truyền dữ liệu qua mạng để làm cho framework cuối\ncùng khởi tạo các tham số."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "X = np.random.uniform(size=(2, 20))\nnet(X)\n\nnet.collect_params()"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "sequential0_ (\n  Parameter dense0_weight (shape=(256, 20), dtype=float32)\n  Parameter dense0_bias (shape=(256,), dtype=float32)\n  Parameter dense1_weight (shape=(10, 256), dtype=float32)\n  Parameter dense1_bias (shape=(10,), dtype=float32)\n)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "X = tf.random.uniform((2, 20))\nnet(X)\n[w.shape for w in net.get_weights()]"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "[(20, 256), (256,), (256, 10), (10,)]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Ngay khi chúng ta biết kích thước đầu vào, 20, khung có thể xác định\nhình dạng của ma trận trọng lượng của lớp đầu tiên bằng cách cắm giá trị\n20. Sau khi nhận ra hình dạng của lớp đầu tiên, khung tiến tới lớp thứ\nhai, v.v. Thông qua biểu đồ tính toán cho đến khi tất cả các hình dạng\nđược biết đến. Lưu ý rằng trong trường hợp này, chỉ có lớp đầu tiên yêu\ncầu khởi tạo hoãn lại, nhưng khung khởi tạo tuần tự. Khi tất cả các hình\ndạng tham số được biết, khung cuối cùng có thể khởi tạo các tham số."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tom-tat",
+      "text": "5.3.2. Tóm tắt"
+    },
+    {
+      "type": "list",
+      "ordered": false,
+      "items": [
+        "Khởi tạo hoãn lại có thể thuận tiện, cho phép khung tự động suy ra\ncác hình dạng tham số, giúp dễ dàng sửa đổi kiến trúc và loại bỏ một\nnguồn lỗi phổ biến.",
+        "Chúng ta có thể truyền dữ liệu thông qua mô hình để làm cho framework\ncuối cùng khởi tạo các tham số."
+      ]
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bai-tap",
+      "text": "5.3.3. Bài tập"
+    },
+    {
+      "type": "list",
+      "ordered": true,
+      "items": [
+        "Điều gì xảy ra nếu bạn chỉ định kích thước đầu vào cho lớp đầu tiên\nnhưng không cho các lớp tiếp theo? Bạn có được khởi tạo ngay lập tức\nkhông?",
+        "Điều gì sẽ xảy ra nếu bạn chỉ định kích thước không phù hợp?",
+        "Bạn sẽ cần làm gì nếu bạn có đầu vào của chiều chiều khác nhau? Gợi\ný: nhìn vào tham số buộc."
+      ]
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    }
+  ],
+  "images": [],
+  "text": "5.3. Khởi tạo hoãn lại\nCho đến nay, có vẻ như chúng ta đã thoát khỏi sự cẩu thả trong việc\nthiết lập mạng của mình. Cụ thể, chúng tôi đã làm những điều không trực\nquan sau đây, có vẻ như chúng không nên hoạt động:\nChúng tôi xác định các kiến trúc mạng mà không chỉ định kích thước\nđầu vào.\nChúng tôi đã thêm các lớp mà không chỉ định kích thước đầu ra của lớp\ntrước đó.\nChúng tôi thậm chí “khởi tạo” các tham số này trước khi cung cấp đủ\nthông tin để xác định có bao nhiêu tham số mô hình của chúng tôi nên\nchứa.\nBạn có thể ngạc nhiên rằng mã của chúng tôi chạy ở tất cả. Rốt cuộc,\nkhông có cách nào khung học sâu có thể cho biết kích thước đầu vào của\nmạng sẽ là gì. Bí quyết ở đây là framework * defers khởi hóa*, chờ cho\nđến lần đầu tiên chúng ta truyền dữ liệu thông qua mô hình, để suy ra\nkích thước của mỗi lớp một cách nhanh chóng.\nSau đó, khi làm việc với các mạng thần kinh phức tạp, kỹ thuật này sẽ\ntrở nên thuận tiện hơn nữa vì kích thước đầu vào (tức là độ phân giải\ncủa một hình ảnh) sẽ ảnh hưởng đến kích thước của mỗi lớp tiếp theo. Do\nđó, khả năng thiết lập các tham số mà không cần biết, tại thời điểm viết\nmã, kích thước là gì có thể đơn giản hóa rất nhiều nhiệm vụ chỉ định và\nsau đó sửa đổi các mô hình của chúng tôi. Tiếp theo, chúng ta đi sâu hơn\nvào cơ chế khởi tạo.\n5.3.1. Khởi tạo một mạng\nĐể bắt đầu, chúng ta hãy khởi tạo một MLP.\nTại thời điểm này, mạng không thể biết được kích thước của trọng lượng\ncủa lớp đầu vào vì kích thước đầu vào vẫn chưa được biết. Do đó, khung\nchưa khởi tạo bất kỳ tham số nào. Chúng tôi xác nhận bằng cách cố gắng\ntruy cập các tham số bên dưới.\nLưu ý rằng trong khi các đối tượng tham số tồn tại, kích thước đầu vào\ncho mỗi lớp được liệt kê là -1. MXNet sử dụng giá trị đặc biệt -1 để chỉ\nra rằng kích thước tham số vẫn chưa được biết. Tại thời điểm này, các nỗ\nlực truy cập net[0].weight.data() sẽ kích hoạt lỗi thời gian chạy\nnói rằng mạng phải được khởi tạo trước khi các tham số có thể được truy\ncập. Bây giờ chúng ta hãy xem những gì xảy ra khi chúng ta cố gắng khởi\ntạo các tham số thông qua chức năng initialize .\nNhư chúng ta có thể thấy, không có gì thay đổi. Khi không xác định kích\nthước đầu vào, các cuộc gọi để khởi tạo không thực sự khởi tạo các tham\nsố. Thay vào đó, cuộc gọi này đăng ký vào MXNet mà chúng tôi muốn (và\ntùy chọn, theo phân phối nào) để khởi tạo các tham số.\nLưu ý rằng mỗi đối tượng lớp tồn tại nhưng trọng lượng trống. Sử dụng net.get_weights() sẽ gây ra lỗi vì trọng lượng chưa được khởi tạo.\nTiếp theo chúng ta hãy truyền dữ liệu qua mạng để làm cho framework cuối\ncùng khởi tạo các tham số.\nNgay khi chúng ta biết kích thước đầu vào, 20, khung có thể xác định\nhình dạng của ma trận trọng lượng của lớp đầu tiên bằng cách cắm giá trị\n20. Sau khi nhận ra hình dạng của lớp đầu tiên, khung tiến tới lớp thứ\nhai, v.v. Thông qua biểu đồ tính toán cho đến khi tất cả các hình dạng\nđược biết đến. Lưu ý rằng trong trường hợp này, chỉ có lớp đầu tiên yêu\ncầu khởi tạo hoãn lại, nhưng khung khởi tạo tuần tự. Khi tất cả các hình\ndạng tham số được biết, khung cuối cùng có thể khởi tạo các tham số.\n5.3.2. Tóm tắt\nKhởi tạo hoãn lại có thể thuận tiện, cho phép khung tự động suy ra\ncác hình dạng tham số, giúp dễ dàng sửa đổi kiến trúc và loại bỏ một\nnguồn lỗi phổ biến.\nChúng ta có thể truyền dữ liệu thông qua mô hình để làm cho framework\ncuối cùng khởi tạo các tham số.\n5.3.3. Bài tập\nĐiều gì xảy ra nếu bạn chỉ định kích thước đầu vào cho lớp đầu tiên\nnhưng không cho các lớp tiếp theo? Bạn có được khởi tạo ngay lập tức\nkhông?\nĐiều gì sẽ xảy ra nếu bạn chỉ định kích thước không phù hợp?\nBạn sẽ cần làm gì nếu bạn có đầu vào của chiều chiều khác nhau? Gợi\ný: nhìn vào tham số buộc.\nDiscussions\nDiscussions"
+}

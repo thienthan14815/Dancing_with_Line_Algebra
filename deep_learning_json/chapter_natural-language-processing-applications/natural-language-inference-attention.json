@@ -1,0 +1,518 @@
+{
+  "url": "https://vi.d2l.ai/chapter_natural-language-processing-applications/natural-language-inference-attention.html",
+  "chapter": "chapter_natural-language-processing-applications",
+  "title": "15.5. Suy luận ngôn ngữ tự nhiên: Sử dụng sự chú ý",
+  "crawled_at": "2026-07-20T12:41:07.641187+00:00",
+  "headings": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "suy-luan-ngon-ngu-tu-nhien-su-dung-su-chu-y",
+      "text": "15.5. Suy luận ngôn ngữ tự nhiên: Sử dụng sự chú ý"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "mo-hinh",
+      "text": "15.5.1. Mô hình"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "tham-du",
+      "text": "15.5.1.1. Tham dự"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "so-sanh",
+      "text": "15.5.1.2. So sánh"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "tong-hop",
+      "text": "15.5.1.3. Tổng hợp"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "dat-tat-ca-moi-thu-lai-voi-nhau",
+      "text": "15.5.1.4. Đặt tất cả mọi thứ lại với nhau"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "dao-tao-va-danh-gia-mo-hinh",
+      "text": "15.5.2. Đào tạo và đánh giá mô hình"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "doc-tap-du-lieu",
+      "text": "15.5.2.1. Đọc tập dữ liệu"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "tao-mo-hinh",
+      "text": "15.5.2.2. Tạo mô hình"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "id2",
+      "text": "15.5.2.3. Đào tạo và đánh giá mô hình"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "su-dung-mo-hinh",
+      "text": "15.5.2.4. Sử dụng mô hình"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tom-tat",
+      "text": "15.5.3. Tóm tắt"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bai-tap",
+      "text": "15.5.4. Bài tập"
+    }
+  ],
+  "content": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "suy-luan-ngon-ngu-tu-nhien-su-dung-su-chu-y",
+      "text": "15.5. Suy luận ngôn ngữ tự nhiên: Sử dụng sự chú ý"
+    },
+    {
+      "type": "paragraph",
+      "text": "Chúng tôi đã giới thiệu nhiệm vụ suy luận ngôn ngữ tự nhiên và tập dữ\nliệu SNLI trong Section 15.4 .\nTheo quan điểm của nhiều mô hình dựa trên kiến trúc phức tạp và sâu sắc,\nParikh et al. đề xuất giải quyết suy luận ngôn ngữ tự nhiên với các cơ\nchế chú ý và gọi nó là một “mô hình chú ý có thể phân hủy” [Parikh et al., 2016] . Điều này dẫn đến một mô hình\nkhông có lớp lặp lại hoặc phức tạp, đạt được kết quả tốt nhất tại thời\nđiểm đó trên tập dữ liệu SNLI với ít tham số hơn nhiều. Trong phần này,\nchúng tôi sẽ mô tả và thực hiện phương pháp dựa trên sự chú ý này (với\nMLP s) cho suy luận ngôn ngữ tự nhiên, như được mô tả trong Fig. 15.5.1 ."
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/nlp-map-nli-attention.svg",
+      "local_path": "_images/nlp-map-nli-attention.svg",
+      "alt": "../_images/nlp-map-nli-attention.svg"
+    },
+    {
+      "type": "paragraph",
+      "text": "Fig. 15.5.1 This section feeds pretrained GloVe to an architecture based on\nattention and MLPs for natural language inference. ¶"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "mo-hinh",
+      "text": "15.5.1. Mô hình"
+    },
+    {
+      "type": "paragraph",
+      "text": "Đơn giản hơn là duy trì thứ tự của mã thông báo trong cơ sở và giả\nthuyết, chúng ta chỉ có thể sắp xếp các mã thông báo trong một chuỗi văn\nbản với mỗi mã thông báo khác, và ngược lại, sau đó so sánh và tổng hợp\nthông tin đó để dự đoán mối quan hệ logic giữa cơ sở và giả thuyết.\nTương tự như liên kết các mã thông báo giữa các câu nguồn và câu đích\ntrong dịch máy, sự liên kết của các mã thông báo giữa các cơ sở và giả\nthuyết có thể được thực hiện gọn gàng bởi các cơ chế chú ý."
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/nli-attention.svg",
+      "local_path": "_images/nli-attention.svg",
+      "alt": "../_images/nli-attention.svg"
+    },
+    {
+      "type": "paragraph",
+      "text": "Fig. 15.5.2 Natural language inference using attention mechanisms. ¶"
+    },
+    {
+      "type": "paragraph",
+      "text": "Fig. 15.5.2 mô tả phương pháp suy luận ngôn ngữ tự\nnhiên sử dụng các cơ chế chú ý. Ở cấp độ cao, nó bao gồm ba bước được\nđào tạo chung: tham dự, so sánh và tổng hợp. Chúng tôi sẽ minh họa cho\nhọ từng bước trong những điều sau đây."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "from mxnet import gluon, init, np, npx\nfrom mxnet.gluon import nn\nfrom d2l import mxnet as d2l\n\nnpx.set_np()"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "import torch\nfrom torch import nn\nfrom torch.nn import functional as F\nfrom d2l import torch as d2l"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "tham-du",
+      "text": "15.5.1.1. Tham dự"
+    },
+    {
+      "type": "paragraph",
+      "text": "Bước đầu tiên là căn chỉnh mã thông báo trong một chuỗi văn bản với mỗi\nmã thông báo trong chuỗi khác. Giả sử rằng tiền đề là “tôi cần ngủ” và\ngiả thuyết là “tôi mệt mỏi”. Do sự giống nhau về ngữ nghĩa, chúng ta có\nthể muốn căn chỉnh “i” trong giả thuyết với “i” trong tiền đề, và căn\nchỉnh “mệt mỏi” trong giả thuyết với “ngủ” trong tiền đề. Tương tự như\nvậy, chúng ta có thể muốn căn chỉnh “i” trong tiền đề với “i” trong giả\nthuyết, và căn chỉnh “cần” và “ngủ” trong tiền đề với “mệt mỏi” trong\ngiả thuyết. Lưu ý rằng căn chỉnh như vậy là * mềm* sử dụng trung bình\ncó trọng số, trong đó trọng lượng lớn lý tưởng được liên kết với các mã\nthông báo được căn chỉnh. Để dễ trình diễn, Fig. 15.5.2 cho thấy sự liên kết như vậy theo cách *\ncứng*."
+    },
+    {
+      "type": "paragraph",
+      "text": "Bây giờ chúng tôi mô tả sự liên kết mềm bằng cách sử dụng các cơ chế chú\ný chi tiết hơn. Biểu thị bằng \\(\\mathbf{A} = (\\mathbf{a}_1, \\ldots, \\mathbf{a}_m)\\) và \\(\\mathbf{B} = (\\mathbf{b}_1, \\ldots, \\mathbf{b}_n)\\) tiền đề và giả\nthuyết, có số lượng mã thông báo là \\(m\\) và \\(n\\) , tương ứng,\ntrong đó \\(\\mathbf{a}_i, \\mathbf{b}_j \\in \\mathbb{R}^{d}\\) ( \\(i = 1, \\ldots, m, j = 1, \\ldots, n\\) ) là một vector từ \\(d\\) chiều. Để liên kết mềm, chúng tôi tính toán trọng lượng chú ý \\(e_{ij} \\in \\mathbb{R}\\) như"
+    },
+    {
+      "type": "math",
+      "latex": "(15.5.1)¶\\[e_{ij} = f(\\mathbf{a}_i)^\\top f(\\mathbf{b}_j),\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "trong đó hàm \\(f\\) là một MLP được định nghĩa trong hàm mlp sau.\nKích thước đầu ra của \\(f\\) được chỉ định bởi đối số num_hiddens của mlp ."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def mlp(num_hiddens, flatten):\n    net = nn.Sequential()\n    net.add(nn.Dropout(0.2))\n    net.add(nn.Dense(num_hiddens, activation='relu', flatten=flatten))\n    net.add(nn.Dropout(0.2))\n    net.add(nn.Dense(num_hiddens, activation='relu', flatten=flatten))\n    return net"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def mlp(num_inputs, num_hiddens, flatten):\n    net = []\n    net.append(nn.Dropout(0.2))\n    net.append(nn.Linear(num_inputs, num_hiddens))\n    net.append(nn.ReLU())\n    if flatten:\n        net.append(nn.Flatten(start_dim=1))\n    net.append(nn.Dropout(0.2))\n    net.append(nn.Linear(num_hiddens, num_hiddens))\n    net.append(nn.ReLU())\n    if flatten:\n        net.append(nn.Flatten(start_dim=1))\n    return nn.Sequential(*net)"
+    },
+    {
+      "type": "paragraph",
+      "text": "Cần nhấn mạnh rằng, trong (15.5.1) \\(f\\) mất đầu vào \\(\\mathbf{a}_i\\) và \\(\\mathbf{b}_j\\) riêng biệt hơn là lấy một\ncặp chúng lại với nhau làm đầu vào. Thủ thuật * decomposition* này dẫn\nđến chỉ \\(m + n\\) ứng dụng (độ phức tạp tuyến tính) của \\(f\\) chứ không phải là \\(mn\\) ứng dụng (độ phức tạp bậc hai)."
+    },
+    {
+      "type": "paragraph",
+      "text": "Bình thường hóa trọng lượng chú ý trong (15.5.1) , chúng tôi\ntính toán trung bình trọng số của tất cả các vectơ mã thông báo trong\ngiả thuyết để có được đại diện của giả thuyết được liên kết nhẹ nhàng\nvới mã thông báo được lập chỉ mục bởi \\(i\\) trong tiền đề:"
+    },
+    {
+      "type": "math",
+      "latex": "(15.5.2)¶\\[\\boldsymbol{\\beta}_i = \\sum_{j=1}^{n}\\frac{\\exp(e_{ij})}{ \\sum_{k=1}^{n} \\exp(e_{ik})} \\mathbf{b}_j.\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Tương tự như vậy, chúng tôi tính toán sự liên kết mềm của các token tiền\nđề cho mỗi token được lập chỉ mục bởi \\(j\\) trong giả thuyết:"
+    },
+    {
+      "type": "math",
+      "latex": "(15.5.3)¶\\[\\boldsymbol{\\alpha}_j = \\sum_{i=1}^{m}\\frac{\\exp(e_{ij})}{ \\sum_{k=1}^{m} \\exp(e_{kj})} \\mathbf{a}_i.\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Dưới đây chúng tôi xác định lớp Attend để tính toán sự liên kết mềm\ncủa các giả thuyết ( beta ) với cơ sở đầu vào A và căn chỉnh mềm\ncủa cơ sở ( alpha ) với giả thuyết đầu vào B ."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "class Attend(nn.Block):\n    def __init__(self, num_hiddens, **kwargs):\n        super(Attend, self).__init__(**kwargs)\n        self.f = mlp(num_hiddens=num_hiddens, flatten=False)\n\n    def forward(self, A, B):\n        # Shape of `A`/`B`: (b`atch_size`, no. of tokens in sequence A/B,\n        # `embed_size`)\n        # Shape of `f_A`/`f_B`: (`batch_size`, no. of tokens in sequence A/B,\n        # `num_hiddens`)\n        f_A = self.f(A)\n        f_B = self.f(B)\n        # Shape of `e`: (`batch_size`, no. of tokens in sequence A,\n        # no. of tokens in sequence B)\n        e = npx.batch_dot(f_A, f_B, transpose_b=True)\n        # Shape of `beta`: (`batch_size`, no. of tokens in sequence A,\n        # `embed_size`), where sequence B is softly aligned with each token\n        # (axis 1 of `beta`) in sequence A\n        beta = npx.batch_dot(npx.softmax(e), B)\n        # Shape of `alpha`: (`batch_size`, no. of tokens in sequence B,\n        # `embed_size`), where sequence A is softly aligned with each token\n        # (axis 1 of `alpha`) in sequence B\n        alpha = npx.batch_dot(npx.softmax(e.transpose(0, 2, 1)), A)\n        return beta, alpha"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "class Attend(nn.Module):\n    def __init__(self, num_inputs, num_hiddens, **kwargs):\n        super(Attend, self).__init__(**kwargs)\n        self.f = mlp(num_inputs, num_hiddens, flatten=False)\n\n    def forward(self, A, B):\n        # Shape of `A`/`B`: (`batch_size`, no. of tokens in sequence A/B,\n        # `embed_size`)\n        # Shape of `f_A`/`f_B`: (`batch_size`, no. of tokens in sequence A/B,\n        # `num_hiddens`)\n        f_A = self.f(A)\n        f_B = self.f(B)\n        # Shape of `e`: (`batch_size`, no. of tokens in sequence A,\n        # no. of tokens in sequence B)\n        e = torch.bmm(f_A, f_B.permute(0, 2, 1))\n        # Shape of `beta`: (`batch_size`, no. of tokens in sequence A,\n        # `embed_size`), where sequence B is softly aligned with each token\n        # (axis 1 of `beta`) in sequence A\n        beta = torch.bmm(F.softmax(e, dim=-1), B)\n        # Shape of `alpha`: (`batch_size`, no. of tokens in sequence B,\n        # `embed_size`), where sequence A is softly aligned with each token\n        # (axis 1 of `alpha`) in sequence B\n        alpha = torch.bmm(F.softmax(e.permute(0, 2, 1), dim=-1), A)\n        return beta, alpha"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "so-sanh",
+      "text": "15.5.1.2. So sánh"
+    },
+    {
+      "type": "paragraph",
+      "text": "Trong bước tiếp theo, chúng ta so sánh một token trong một chuỗi với\nchuỗi khác được liên kết nhẹ nhàng với mã thông báo đó. Lưu ý rằng trong\nliên kết mềm, tất cả các mã thông báo từ một chuỗi, mặc dù với trọng\nlượng chú ý có thể khác nhau, sẽ được so sánh với một mã thông báo trong\nchuỗi khác. Để dễ dàng trình diễn, Fig. 15.5.2 cặp\ntoken với mã thông báo được liên kết theo cách * hard*. Ví dụ, giả sử\nrằng bước tham dự xác định rằng “nhu cầu” và “ngủ” trong tiền đề đều phù\nhợp với “mệt mỏi” trong giả thuyết, cặp “mệt mỏi — cần ngủ” sẽ được so\nsánh."
+    },
+    {
+      "type": "paragraph",
+      "text": "Trong bước so sánh, chúng ta cho phép nối (toán tử \\([\\cdot, \\cdot]\\) ) của mã thông báo từ một chuỗi và liên kết các\ntoken từ chuỗi khác vào một hàm \\(g\\) (một MLP):"
+    },
+    {
+      "type": "math",
+      "latex": "(15.5.4)¶\\[\\begin{split}\\mathbf{v}_{A,i} = g([\\mathbf{a}_i, \\boldsymbol{\\beta}_i]), i = 1, \\ldots, m\\\\ \\mathbf{v}_{B,j} = g([\\mathbf{b}_j, \\boldsymbol{\\alpha}_j]), j = 1, \\ldots, n.\\end{split}\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Năm (15.5.4) , \\(\\mathbf{v}_{A,i}\\) là sự so sánh giữa\ntoken \\(i\\) trong tiền đề và tất cả các token giả thuyết được liên\nkết nhẹ nhàng với mã thông báo \\(i\\) ; trong khi \\(\\mathbf{v}_{B,j}\\) là so sánh giữa token \\(j\\) trong giả\nthuyết và tất cả các token tiền đề được phù hợp nhẹ nhàng với token \\(j\\) . Lớp Compare sau đây định nghĩa như bước so sánh."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "class Compare(nn.Block):\n    def __init__(self, num_hiddens, **kwargs):\n        super(Compare, self).__init__(**kwargs)\n        self.g = mlp(num_hiddens=num_hiddens, flatten=False)\n\n    def forward(self, A, B, beta, alpha):\n        V_A = self.g(np.concatenate([A, beta], axis=2))\n        V_B = self.g(np.concatenate([B, alpha], axis=2))\n        return V_A, V_B"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "class Compare(nn.Module):\n    def __init__(self, num_inputs, num_hiddens, **kwargs):\n        super(Compare, self).__init__(**kwargs)\n        self.g = mlp(num_inputs, num_hiddens, flatten=False)\n\n    def forward(self, A, B, beta, alpha):\n        V_A = self.g(torch.cat([A, beta], dim=2))\n        V_B = self.g(torch.cat([B, alpha], dim=2))\n        return V_A, V_B"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "tong-hop",
+      "text": "15.5.1.3. Tổng hợp"
+    },
+    {
+      "type": "paragraph",
+      "text": "Với hai bộ vectơ so sánh \\(\\mathbf{v}_{A,i}\\) ( \\(i = 1, \\ldots, m\\) ) và \\(\\mathbf{v}_{B,j}\\) ( \\(j = 1, \\ldots, n\\) ) trên tay, trong bước cuối cùng chúng ta sẽ\ntổng hợp thông tin đó để suy ra mối quan hệ logic. Chúng tôi bắt đầu\nbằng cách tổng hợp cả hai bộ:"
+    },
+    {
+      "type": "math",
+      "latex": "(15.5.5)¶\\[\\mathbf{v}_A = \\sum_{i=1}^{m} \\mathbf{v}_{A,i}, \\quad \\mathbf{v}_B = \\sum_{j=1}^{n}\\mathbf{v}_{B,j}.\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Tiếp theo chúng ta cung cấp kết nối của cả hai kết quả tóm tắt thành hàm \\(h\\) (một MLP) để có được kết quả phân loại của mối quan hệ logic:"
+    },
+    {
+      "type": "math",
+      "latex": "(15.5.6)¶\\[\\hat{\\mathbf{y}} = h([\\mathbf{v}_A, \\mathbf{v}_B]).\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Bước tổng hợp được xác định trong lớp Aggregate sau."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "class Aggregate(nn.Block):\n    def __init__(self, num_hiddens, num_outputs, **kwargs):\n        super(Aggregate, self).__init__(**kwargs)\n        self.h = mlp(num_hiddens=num_hiddens, flatten=True)\n        self.h.add(nn.Dense(num_outputs))\n\n    def forward(self, V_A, V_B):\n        # Sum up both sets of comparison vectors\n        V_A = V_A.sum(axis=1)\n        V_B = V_B.sum(axis=1)\n        # Feed the concatenation of both summarization results into an MLP\n        Y_hat = self.h(np.concatenate([V_A, V_B], axis=1))\n        return Y_hat"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "class Aggregate(nn.Module):\n    def __init__(self, num_inputs, num_hiddens, num_outputs, **kwargs):\n        super(Aggregate, self).__init__(**kwargs)\n        self.h = mlp(num_inputs, num_hiddens, flatten=True)\n        self.linear = nn.Linear(num_hiddens, num_outputs)\n\n    def forward(self, V_A, V_B):\n        # Sum up both sets of comparison vectors\n        V_A = V_A.sum(dim=1)\n        V_B = V_B.sum(dim=1)\n        # Feed the concatenation of both summarization results into an MLP\n        Y_hat = self.linear(self.h(torch.cat([V_A, V_B], dim=1)))\n        return Y_hat"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "dat-tat-ca-moi-thu-lai-voi-nhau",
+      "text": "15.5.1.4. Đặt tất cả mọi thứ lại với nhau"
+    },
+    {
+      "type": "paragraph",
+      "text": "Bằng cách đặt các bước tham dự, so sánh và tổng hợp lại với nhau, chúng\ntôi xác định mô hình chú ý có thể phân hủy để cùng đào tạo ba bước này."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "class DecomposableAttention(nn.Block):\n    def __init__(self, vocab, embed_size, num_hiddens, **kwargs):\n        super(DecomposableAttention, self).__init__(**kwargs)\n        self.embedding = nn.Embedding(len(vocab), embed_size)\n        self.attend = Attend(num_hiddens)\n        self.compare = Compare(num_hiddens)\n        # There are 3 possible outputs: entailment, contradiction, and neutral\n        self.aggregate = Aggregate(num_hiddens, 3)\n\n    def forward(self, X):\n        premises, hypotheses = X\n        A = self.embedding(premises)\n        B = self.embedding(hypotheses)\n        beta, alpha = self.attend(A, B)\n        V_A, V_B = self.compare(A, B, beta, alpha)\n        Y_hat = self.aggregate(V_A, V_B)\n        return Y_hat"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "class DecomposableAttention(nn.Module):\n    def __init__(self, vocab, embed_size, num_hiddens, num_inputs_attend=100,\n                 num_inputs_compare=200, num_inputs_agg=400, **kwargs):\n        super(DecomposableAttention, self).__init__(**kwargs)\n        self.embedding = nn.Embedding(len(vocab), embed_size)\n        self.attend = Attend(num_inputs_attend, num_hiddens)\n        self.compare = Compare(num_inputs_compare, num_hiddens)\n        # There are 3 possible outputs: entailment, contradiction, and neutral\n        self.aggregate = Aggregate(num_inputs_agg, num_hiddens, num_outputs=3)\n\n    def forward(self, X):\n        premises, hypotheses = X\n        A = self.embedding(premises)\n        B = self.embedding(hypotheses)\n        beta, alpha = self.attend(A, B)\n        V_A, V_B = self.compare(A, B, beta, alpha)\n        Y_hat = self.aggregate(V_A, V_B)\n        return Y_hat"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "dao-tao-va-danh-gia-mo-hinh",
+      "text": "15.5.2. Đào tạo và đánh giá mô hình"
+    },
+    {
+      "type": "paragraph",
+      "text": "Bây giờ chúng ta sẽ đào tạo và đánh giá mô hình chú ý phân hủy được xác\nđịnh trên bộ dữ liệu SNLI. Chúng tôi bắt đầu bằng cách đọc tập dữ liệu."
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "doc-tap-du-lieu",
+      "text": "15.5.2.1. Đọc tập dữ liệu"
+    },
+    {
+      "type": "paragraph",
+      "text": "Chúng tôi tải xuống và đọc tập dữ liệu SNLI bằng chức năng được xác định\ntrong Section 15.4 . Kích thước\nlô và chiều dài chuỗi được đặt thành \\(256\\) và \\(50\\) , tương\nứng."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "batch_size, num_steps = 256, 50\ntrain_iter, test_iter, vocab = d2l.load_data_snli(batch_size, num_steps)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "Downloading ../data/snli_1.0.zip from https://nlp.stanford.edu/projects/snli/snli_1.0.zip...\nread 549367 examples\nread 9824 examples"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "batch_size, num_steps = 256, 50\ntrain_iter, test_iter, vocab = d2l.load_data_snli(batch_size, num_steps)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "read 549367 examples\nread 9824 examples"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "tao-mo-hinh",
+      "text": "15.5.2.2. Tạo mô hình"
+    },
+    {
+      "type": "paragraph",
+      "text": "Chúng tôi sử dụng nhúng Glove 100 chiều được đào tạo trước để đại diện\ncho các mã thông báo đầu vào. Do đó, chúng ta xác định trước kích thước\ncủa vectơ \\(\\mathbf{a}_i\\) và \\(\\mathbf{b}_j\\) trong (15.5.1) là 100. Kích thước đầu ra của các chức năng \\(f\\) trong (15.5.1) và \\(g\\) trong (15.5.4) được đặt thành 200. Sau đó, chúng ta tạo ra một\nví dụ mô hình, khởi tạo các tham số của nó và tải Glove nhúng để khởi\ntạo vectơ của mã thông báo đầu vào."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "embed_size, num_hiddens, devices = 100, 200, d2l.try_all_gpus()\nnet = DecomposableAttention(vocab, embed_size, num_hiddens)\nnet.initialize(init.Xavier(), ctx=devices)\nglove_embedding = d2l.TokenEmbedding('glove.6b.100d')\nembeds = glove_embedding[vocab.idx_to_token]\nnet.embedding.weight.set_data(embeds)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "Downloading ../data/glove.6B.100d.zip from http://d2l-data.s3-accelerate.amazonaws.com/glove.6B.100d.zip..."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "embed_size, num_hiddens, devices = 100, 200, d2l.try_all_gpus()\nnet = DecomposableAttention(vocab, embed_size, num_hiddens)\nglove_embedding = d2l.TokenEmbedding('glove.6b.100d')\nembeds = glove_embedding[vocab.idx_to_token]\nnet.embedding.weight.data.copy_(embeds);"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "id2",
+      "text": "15.5.2.3. Đào tạo và đánh giá mô hình"
+    },
+    {
+      "type": "paragraph",
+      "text": "Trái ngược với hàm split_batch trong Section 12.5 lấy\ncác đầu vào đơn như chuỗi văn bản (hoặc hình ảnh), chúng tôi định nghĩa\nmột hàm split_batch_multi_inputs để lấy nhiều đầu vào như cơ sở và\ngiả thuyết trong minibatches."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "#@save\ndef split_batch_multi_inputs(X, y, devices):\n    \"\"\"Split multi-input `X` and `y` into multiple devices.\"\"\"\n    X = list(zip(*[gluon.utils.split_and_load(\n        feature, devices, even_split=False) for feature in X]))\n    return (X, gluon.utils.split_and_load(y, devices, even_split=False))"
+    },
+    {
+      "type": "paragraph",
+      "text": "Bây giờ chúng ta có thể đào tạo và đánh giá mô hình trên tập dữ liệu\nSNLI."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "lr, num_epochs = 0.001, 4\ntrainer = gluon.Trainer(net.collect_params(), 'adam', {'learning_rate': lr})\nloss = gluon.loss.SoftmaxCrossEntropyLoss()\nd2l.train_ch13(net, train_iter, test_iter, loss, trainer, num_epochs, devices,\n               split_batch_multi_inputs)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "loss 0.516, train acc 0.796, test acc 0.813\n7507.7 examples/sec on [gpu(0), gpu(1)]"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_natural-language-inference-attention_b907c4_81_1.svg",
+      "local_path": "_images/output_natural-language-inference-attention_b907c4_81_1.svg",
+      "alt": "../_images/output_natural-language-inference-attention_b907c4_81_1.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "lr, num_epochs = 0.001, 4\ntrainer = torch.optim.Adam(net.parameters(), lr=lr)\nloss = nn.CrossEntropyLoss(reduction=\"none\")\nd2l.train_ch13(net, train_iter, test_iter, loss, trainer, num_epochs, devices)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "loss 0.497, train acc 0.805, test acc 0.826\n19939.0 examples/sec on [device(type='cuda', index=0), device(type='cuda', index=1)]"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_natural-language-inference-attention_b907c4_84_1.svg",
+      "local_path": "_images/output_natural-language-inference-attention_b907c4_84_1.svg",
+      "alt": "../_images/output_natural-language-inference-attention_b907c4_84_1.svg"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "su-dung-mo-hinh",
+      "text": "15.5.2.4. Sử dụng mô hình"
+    },
+    {
+      "type": "paragraph",
+      "text": "Cuối cùng, xác định hàm dự đoán để xuất ra mối quan hệ logic giữa một\ncặp tiền đề và giả thuyết."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "#@save\ndef predict_snli(net, vocab, premise, hypothesis):\n    \"\"\"Predict the logical relationship between the premise and hypothesis.\"\"\"\n    premise = np.array(vocab[premise], ctx=d2l.try_gpu())\n    hypothesis = np.array(vocab[hypothesis], ctx=d2l.try_gpu())\n    label = np.argmax(net([premise.reshape((1, -1)),\n                           hypothesis.reshape((1, -1))]), axis=1)\n    return 'entailment' if label == 0 else 'contradiction' if label == 1 \\\n            else 'neutral'"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "#@save\ndef predict_snli(net, vocab, premise, hypothesis):\n    \"\"\"Predict the logical relationship between the premise and hypothesis.\"\"\"\n    net.eval()\n    premise = torch.tensor(vocab[premise], device=d2l.try_gpu())\n    hypothesis = torch.tensor(vocab[hypothesis], device=d2l.try_gpu())\n    label = torch.argmax(net([premise.reshape((1, -1)),\n                           hypothesis.reshape((1, -1))]), dim=1)\n    return 'entailment' if label == 0 else 'contradiction' if label == 1 \\\n            else 'neutral'"
+    },
+    {
+      "type": "paragraph",
+      "text": "Chúng ta có thể sử dụng mô hình được đào tạo để có được kết quả suy luận\nngôn ngữ tự nhiên cho một cặp câu mẫu."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "predict_snli(net, vocab, ['he', 'is', 'good', '.'], ['he', 'is', 'bad', '.'])"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "'contradiction'"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "predict_snli(net, vocab, ['he', 'is', 'good', '.'], ['he', 'is', 'bad', '.'])"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "'contradiction'"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tom-tat",
+      "text": "15.5.3. Tóm tắt"
+    },
+    {
+      "type": "list",
+      "ordered": false,
+      "items": [
+        "Mô hình chú ý có thể phân hủy bao gồm ba bước để dự đoán mối quan hệ\nlogic giữa cơ sở và giả thuyết: tham dự, so sánh và tổng hợp.",
+        "Với các cơ chế chú ý, chúng ta có thể sắp xếp các mã thông báo theo\nmột chuỗi văn bản với mỗi mã thông báo khác và ngược lại. Sự liên kết\nnhư vậy là mềm bằng cách sử dụng trung bình trọng số, trong đó trọng\nlượng lớn lý tưởng được liên kết với các mã thông báo được căn chỉnh.",
+        "Thủ thuật phân hủy dẫn đến độ phức tạp tuyến tính mong muốn hơn so\nvới độ phức tạp bậc hai khi tính toán trọng lượng chú ý.",
+        "Chúng ta có thể sử dụng vectơ từ được đào tạo trước làm biểu diễn đầu\nvào cho nhiệm vụ xử lý ngôn ngữ tự nhiên hạ lưu như suy luận ngôn ngữ\ntự nhiên."
+      ]
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bai-tap",
+      "text": "15.5.4. Bài tập"
+    },
+    {
+      "type": "list",
+      "ordered": true,
+      "items": [
+        "Đào tạo mô hình với các kết hợp khác của các siêu tham số. Bạn có thể\ncó được độ chính xác tốt hơn trên bộ thử nghiệm?",
+        "Những hạn chế lớn của mô hình chú ý phân hủy đối với suy luận ngôn\nngữ tự nhiên là gì?",
+        "Giả sử rằng chúng ta muốn có được mức độ tương đồng ngữ nghĩa (ví dụ,\nmột giá trị liên tục giữa 0 và 1) cho bất kỳ cặp câu nào. Làm thế nào\nchúng ta sẽ thu thập và gắn nhãn cho tập dữ liệu? Bạn có thể thiết kế\nmột mô hình với các cơ chế chú ý?"
+      ]
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    }
+  ],
+  "images": [
+    {
+      "original_url": "https://vi.d2l.ai/_images/nlp-map-nli-attention.svg",
+      "local_path": "_images/nlp-map-nli-attention.svg",
+      "alt": "../_images/nlp-map-nli-attention.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/nli-attention.svg",
+      "local_path": "_images/nli-attention.svg",
+      "alt": "../_images/nli-attention.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_natural-language-inference-attention_b907c4_81_1.svg",
+      "local_path": "_images/output_natural-language-inference-attention_b907c4_81_1.svg",
+      "alt": "../_images/output_natural-language-inference-attention_b907c4_81_1.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_natural-language-inference-attention_b907c4_84_1.svg",
+      "local_path": "_images/output_natural-language-inference-attention_b907c4_84_1.svg",
+      "alt": "../_images/output_natural-language-inference-attention_b907c4_84_1.svg"
+    }
+  ],
+  "text": "15.5. Suy luận ngôn ngữ tự nhiên: Sử dụng sự chú ý\nChúng tôi đã giới thiệu nhiệm vụ suy luận ngôn ngữ tự nhiên và tập dữ\nliệu SNLI trong Section 15.4 .\nTheo quan điểm của nhiều mô hình dựa trên kiến trúc phức tạp và sâu sắc,\nParikh et al. đề xuất giải quyết suy luận ngôn ngữ tự nhiên với các cơ\nchế chú ý và gọi nó là một “mô hình chú ý có thể phân hủy” [Parikh et al., 2016] . Điều này dẫn đến một mô hình\nkhông có lớp lặp lại hoặc phức tạp, đạt được kết quả tốt nhất tại thời\nđiểm đó trên tập dữ liệu SNLI với ít tham số hơn nhiều. Trong phần này,\nchúng tôi sẽ mô tả và thực hiện phương pháp dựa trên sự chú ý này (với\nMLP s) cho suy luận ngôn ngữ tự nhiên, như được mô tả trong Fig. 15.5.1 .\nFig. 15.5.1 This section feeds pretrained GloVe to an architecture based on\nattention and MLPs for natural language inference. ¶\n15.5.1. Mô hình\nĐơn giản hơn là duy trì thứ tự của mã thông báo trong cơ sở và giả\nthuyết, chúng ta chỉ có thể sắp xếp các mã thông báo trong một chuỗi văn\nbản với mỗi mã thông báo khác, và ngược lại, sau đó so sánh và tổng hợp\nthông tin đó để dự đoán mối quan hệ logic giữa cơ sở và giả thuyết.\nTương tự như liên kết các mã thông báo giữa các câu nguồn và câu đích\ntrong dịch máy, sự liên kết của các mã thông báo giữa các cơ sở và giả\nthuyết có thể được thực hiện gọn gàng bởi các cơ chế chú ý.\nFig. 15.5.2 Natural language inference using attention mechanisms. ¶\nFig. 15.5.2 mô tả phương pháp suy luận ngôn ngữ tự\nnhiên sử dụng các cơ chế chú ý. Ở cấp độ cao, nó bao gồm ba bước được\nđào tạo chung: tham dự, so sánh và tổng hợp. Chúng tôi sẽ minh họa cho\nhọ từng bước trong những điều sau đây.\n15.5.1.1. Tham dự\nBước đầu tiên là căn chỉnh mã thông báo trong một chuỗi văn bản với mỗi\nmã thông báo trong chuỗi khác. Giả sử rằng tiền đề là “tôi cần ngủ” và\ngiả thuyết là “tôi mệt mỏi”. Do sự giống nhau về ngữ nghĩa, chúng ta có\nthể muốn căn chỉnh “i” trong giả thuyết với “i” trong tiền đề, và căn\nchỉnh “mệt mỏi” trong giả thuyết với “ngủ” trong tiền đề. Tương tự như\nvậy, chúng ta có thể muốn căn chỉnh “i” trong tiền đề với “i” trong giả\nthuyết, và căn chỉnh “cần” và “ngủ” trong tiền đề với “mệt mỏi” trong\ngiả thuyết. Lưu ý rằng căn chỉnh như vậy là * mềm* sử dụng trung bình\ncó trọng số, trong đó trọng lượng lớn lý tưởng được liên kết với các mã\nthông báo được căn chỉnh. Để dễ trình diễn, Fig. 15.5.2 cho thấy sự liên kết như vậy theo cách *\ncứng*.\nBây giờ chúng tôi mô tả sự liên kết mềm bằng cách sử dụng các cơ chế chú\ný chi tiết hơn. Biểu thị bằng \\(\\mathbf{A} = (\\mathbf{a}_1, \\ldots, \\mathbf{a}_m)\\) và \\(\\mathbf{B} = (\\mathbf{b}_1, \\ldots, \\mathbf{b}_n)\\) tiền đề và giả\nthuyết, có số lượng mã thông báo là \\(m\\) và \\(n\\) , tương ứng,\ntrong đó \\(\\mathbf{a}_i, \\mathbf{b}_j \\in \\mathbb{R}^{d}\\) ( \\(i = 1, \\ldots, m, j = 1, \\ldots, n\\) ) là một vector từ \\(d\\) chiều. Để liên kết mềm, chúng tôi tính toán trọng lượng chú ý \\(e_{ij} \\in \\mathbb{R}\\) như\ntrong đó hàm \\(f\\) là một MLP được định nghĩa trong hàm mlp sau.\nKích thước đầu ra của \\(f\\) được chỉ định bởi đối số num_hiddens của mlp .\nCần nhấn mạnh rằng, trong (15.5.1) \\(f\\) mất đầu vào \\(\\mathbf{a}_i\\) và \\(\\mathbf{b}_j\\) riêng biệt hơn là lấy một\ncặp chúng lại với nhau làm đầu vào. Thủ thuật * decomposition* này dẫn\nđến chỉ \\(m + n\\) ứng dụng (độ phức tạp tuyến tính) của \\(f\\) chứ không phải là \\(mn\\) ứng dụng (độ phức tạp bậc hai).\nBình thường hóa trọng lượng chú ý trong (15.5.1) , chúng tôi\ntính toán trung bình trọng số của tất cả các vectơ mã thông báo trong\ngiả thuyết để có được đại diện của giả thuyết được liên kết nhẹ nhàng\nvới mã thông báo được lập chỉ mục bởi \\(i\\) trong tiền đề:\nTương tự như vậy, chúng tôi tính toán sự liên kết mềm của các token tiền\nđề cho mỗi token được lập chỉ mục bởi \\(j\\) trong giả thuyết:\nDưới đây chúng tôi xác định lớp Attend để tính toán sự liên kết mềm\ncủa các giả thuyết ( beta ) với cơ sở đầu vào A và căn chỉnh mềm\ncủa cơ sở ( alpha ) với giả thuyết đầu vào B .\n15.5.1.2. So sánh\nTrong bước tiếp theo, chúng ta so sánh một token trong một chuỗi với\nchuỗi khác được liên kết nhẹ nhàng với mã thông báo đó. Lưu ý rằng trong\nliên kết mềm, tất cả các mã thông báo từ một chuỗi, mặc dù với trọng\nlượng chú ý có thể khác nhau, sẽ được so sánh với một mã thông báo trong\nchuỗi khác. Để dễ dàng trình diễn, Fig. 15.5.2 cặp\ntoken với mã thông báo được liên kết theo cách * hard*. Ví dụ, giả sử\nrằng bước tham dự xác định rằng “nhu cầu” và “ngủ” trong tiền đề đều phù\nhợp với “mệt mỏi” trong giả thuyết, cặp “mệt mỏi — cần ngủ” sẽ được so\nsánh.\nTrong bước so sánh, chúng ta cho phép nối (toán tử \\([\\cdot, \\cdot]\\) ) của mã thông báo từ một chuỗi và liên kết các\ntoken từ chuỗi khác vào một hàm \\(g\\) (một MLP):\nNăm (15.5.4) , \\(\\mathbf{v}_{A,i}\\) là sự so sánh giữa\ntoken \\(i\\) trong tiền đề và tất cả các token giả thuyết được liên\nkết nhẹ nhàng với mã thông báo \\(i\\) ; trong khi \\(\\mathbf{v}_{B,j}\\) là so sánh giữa token \\(j\\) trong giả\nthuyết và tất cả các token tiền đề được phù hợp nhẹ nhàng với token \\(j\\) . Lớp Compare sau đây định nghĩa như bước so sánh.\n15.5.1.3. Tổng hợp\nVới hai bộ vectơ so sánh \\(\\mathbf{v}_{A,i}\\) ( \\(i = 1, \\ldots, m\\) ) và \\(\\mathbf{v}_{B,j}\\) ( \\(j = 1, \\ldots, n\\) ) trên tay, trong bước cuối cùng chúng ta sẽ\ntổng hợp thông tin đó để suy ra mối quan hệ logic. Chúng tôi bắt đầu\nbằng cách tổng hợp cả hai bộ:\nTiếp theo chúng ta cung cấp kết nối của cả hai kết quả tóm tắt thành hàm \\(h\\) (một MLP) để có được kết quả phân loại của mối quan hệ logic:\nBước tổng hợp được xác định trong lớp Aggregate sau.\n15.5.1.4. Đặt tất cả mọi thứ lại với nhau\nBằng cách đặt các bước tham dự, so sánh và tổng hợp lại với nhau, chúng\ntôi xác định mô hình chú ý có thể phân hủy để cùng đào tạo ba bước này.\n15.5.2. Đào tạo và đánh giá mô hình\nBây giờ chúng ta sẽ đào tạo và đánh giá mô hình chú ý phân hủy được xác\nđịnh trên bộ dữ liệu SNLI. Chúng tôi bắt đầu bằng cách đọc tập dữ liệu.\n15.5.2.1. Đọc tập dữ liệu\nChúng tôi tải xuống và đọc tập dữ liệu SNLI bằng chức năng được xác định\ntrong Section 15.4 . Kích thước\nlô và chiều dài chuỗi được đặt thành \\(256\\) và \\(50\\) , tương\nứng.\n15.5.2.2. Tạo mô hình\nChúng tôi sử dụng nhúng Glove 100 chiều được đào tạo trước để đại diện\ncho các mã thông báo đầu vào. Do đó, chúng ta xác định trước kích thước\ncủa vectơ \\(\\mathbf{a}_i\\) và \\(\\mathbf{b}_j\\) trong (15.5.1) là 100. Kích thước đầu ra của các chức năng \\(f\\) trong (15.5.1) và \\(g\\) trong (15.5.4) được đặt thành 200. Sau đó, chúng ta tạo ra một\nví dụ mô hình, khởi tạo các tham số của nó và tải Glove nhúng để khởi\ntạo vectơ của mã thông báo đầu vào.\n15.5.2.3. Đào tạo và đánh giá mô hình\nTrái ngược với hàm split_batch trong Section 12.5 lấy\ncác đầu vào đơn như chuỗi văn bản (hoặc hình ảnh), chúng tôi định nghĩa\nmột hàm split_batch_multi_inputs để lấy nhiều đầu vào như cơ sở và\ngiả thuyết trong minibatches.\nBây giờ chúng ta có thể đào tạo và đánh giá mô hình trên tập dữ liệu\nSNLI.\n15.5.2.4. Sử dụng mô hình\nCuối cùng, xác định hàm dự đoán để xuất ra mối quan hệ logic giữa một\ncặp tiền đề và giả thuyết.\nChúng ta có thể sử dụng mô hình được đào tạo để có được kết quả suy luận\nngôn ngữ tự nhiên cho một cặp câu mẫu.\n15.5.3. Tóm tắt\nMô hình chú ý có thể phân hủy bao gồm ba bước để dự đoán mối quan hệ\nlogic giữa cơ sở và giả thuyết: tham dự, so sánh và tổng hợp.\nVới các cơ chế chú ý, chúng ta có thể sắp xếp các mã thông báo theo\nmột chuỗi văn bản với mỗi mã thông báo khác và ngược lại. Sự liên kết\nnhư vậy là mềm bằng cách sử dụng trung bình trọng số, trong đó trọng\nlượng lớn lý tưởng được liên kết với các mã thông báo được căn chỉnh.\nThủ thuật phân hủy dẫn đến độ phức tạp tuyến tính mong muốn hơn so\nvới độ phức tạp bậc hai khi tính toán trọng lượng chú ý.\nChúng ta có thể sử dụng vectơ từ được đào tạo trước làm biểu diễn đầu\nvào cho nhiệm vụ xử lý ngôn ngữ tự nhiên hạ lưu như suy luận ngôn ngữ\ntự nhiên.\n15.5.4. Bài tập\nĐào tạo mô hình với các kết hợp khác của các siêu tham số. Bạn có thể\ncó được độ chính xác tốt hơn trên bộ thử nghiệm?\nNhững hạn chế lớn của mô hình chú ý phân hủy đối với suy luận ngôn\nngữ tự nhiên là gì?\nGiả sử rằng chúng ta muốn có được mức độ tương đồng ngữ nghĩa (ví dụ,\nmột giá trị liên tục giữa 0 và 1) cho bất kỳ cặp câu nào. Làm thế nào\nchúng ta sẽ thu thập và gắn nhãn cho tập dữ liệu? Bạn có thể thiết kế\nmột mô hình với các cơ chế chú ý?\nDiscussions\nDiscussions"
+}

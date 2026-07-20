@@ -1,0 +1,720 @@
+{
+  "url": "https://vi.d2l.ai/chapter_attention-mechanisms/nadaraya-watson.html",
+  "chapter": "chapter_attention-mechanisms",
+  "title": "10.2. Chú ý Pooling: Hồi quy hạt nhân Nadaraya-Watson",
+  "crawled_at": "2026-07-20T12:40:12.038154+00:00",
+  "headings": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "chu-y-pooling-hoi-quy-hat-nhan-nadaraya-watson",
+      "text": "10.2. Chú ý Pooling: Hồi quy hạt nhân Nadaraya-Watson"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tao-ra-bo-du-lieu",
+      "text": "10.2.1. Tạo ra bộ dữ liệu"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "pooling-trung-binh",
+      "text": "10.2.2. Pooling trung bình"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "khong-tham-so-chu-y-pooling",
+      "text": "10.2.3. Không tham số Chú ý Pooling"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tham-so-chu-y-pooling",
+      "text": "10.2.4. ** Tham số chú ý Pooling**"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "phep-nhan-ma-tran-hang-loat",
+      "text": "10.2.4.1. Phép nhân ma trận hàng loạt"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "xac-dinh-mo-hinh",
+      "text": "10.2.4.2. Xác định mô hình"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "dao-tao",
+      "text": "10.2.4.3. Đào tạo"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tom-tat",
+      "text": "10.2.5. Tóm tắt"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bai-tap",
+      "text": "10.2.6. Bài tập"
+    }
+  ],
+  "content": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "chu-y-pooling-hoi-quy-hat-nhan-nadaraya-watson",
+      "text": "10.2. Chú ý Pooling: Hồi quy hạt nhân Nadaraya-Watson"
+    },
+    {
+      "type": "paragraph",
+      "text": "Bây giờ bạn đã biết các thành phần chính của các cơ chế chú ý theo khuôn\nkhổ trong Fig. 10.1.3 . Để tái lập lại, các tương tác giữa các\ntruy vấn (tín hiệu ý chí) và các phím (tín hiệu không có ý định) dẫn đến chú ý cùng . Sự chú ý tập hợp chọn lọc các giá trị (đầu vào cảm giác)\nđể tạo ra đầu ra. Trong phần này, chúng tôi sẽ mô tả chi tiết hơn để\ncung cấp cho bạn cái nhìn cấp cao về cách các cơ chế chú ý hoạt động\ntrong thực tế. Cụ thể, mô hình hồi quy hạt nhân Nadaraya-Watson đề xuất\nnăm 1964 là một ví dụ đơn giản nhưng đầy đủ để chứng minh máy học với\ncác cơ chế chú ý."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "from mxnet import autograd, gluon, np, npx\nfrom mxnet.gluon import nn\nfrom d2l import mxnet as d2l\n\nnpx.set_np()"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "import torch\nfrom torch import nn\nfrom d2l import torch as d2l"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "import tensorflow as tf\nfrom d2l import tensorflow as d2l\n\ntf.random.set_seed(seed=1322)"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tao-ra-bo-du-lieu",
+      "text": "10.2.1. Tạo ra bộ dữ liệu"
+    },
+    {
+      "type": "paragraph",
+      "text": "Để giữ cho mọi thứ đơn giản, chúng ta hãy xem xét vấn đề hồi quy sau:\nđưa ra một tập dữ liệu của cặp đầu vào-đầu ra \\(\\{(x_1, y_1), \\ldots, (x_n, y_n)\\}\\) , làm thế nào để tìm hiểu \\(f\\) để dự đoán đầu ra \\(\\hat{y} = f(x)\\) cho bất kỳ đầu vào\nmới \\(x\\) ?"
+    },
+    {
+      "type": "paragraph",
+      "text": "Ở đây chúng ta tạo ra một bộ dữ liệu nhân tạo theo hàm phi tuyến sau với\nthuật ngữ nhiễu \\(\\epsilon\\) :"
+    },
+    {
+      "type": "math",
+      "latex": "(10.2.1)¶\\[y_i = 2\\sin(x_i) + x_i^{0.8} + \\epsilon,\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "trong đó \\(\\epsilon\\) tuân theo một phân phối bình thường với 0\ntrung bình và độ lệch chuẩn 0,5. Cả 50 ví dụ đào tạo và 50 ví dụ thử\nnghiệm được tạo ra. Để hình dung rõ hơn mô hình chú ý sau này, các đầu\nvào đào tạo được sắp xếp."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "n_train = 50  # No. of training examples\nx_train = np.sort(np.random.rand(n_train) * 5)   # Training inputs\n\ndef f(x):\n    return 2 * np.sin(x) + x**0.8\n\ny_train = f(x_train) + np.random.normal(0.0, 0.5, (n_train,))  # Training outputs\nx_test = np.arange(0, 5, 0.1)  # Testing examples\ny_truth = f(x_test)  # Ground-truth outputs for the testing examples\nn_test = len(x_test)  # No. of testing examples\nn_test"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "50"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "n_train = 50  # No. of training examples\nx_train, _ = torch.sort(torch.rand(n_train) * 5)   # Training inputs\n\ndef f(x):\n    return 2 * torch.sin(x) + x**0.8\n\ny_train = f(x_train) + torch.normal(0.0, 0.5, (n_train,))  # Training outputs\nx_test = torch.arange(0, 5, 0.1)  # Testing examples\ny_truth = f(x_test)  # Ground-truth outputs for the testing examples\nn_test = len(x_test)  # No. of testing examples\nn_test"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "50"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "n_train = 50\nx_train = tf.sort(tf.random.uniform(shape=(n_train,), maxval=5))\n\ndef f(x):\n    return 2 * tf.sin(x) + x**0.8\n\ny_train = f(x_train) + tf.random.normal((n_train,), 0.0, 0.5)  # Training outputs\nx_test = tf.range(0, 5, 0.1)  # Testing examples\ny_truth = f(x_test)  # Ground-truth outputs for the testing examples\nn_test = len(x_test)  # No. of testing examples\nn_test"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "50"
+    },
+    {
+      "type": "paragraph",
+      "text": "Hàm sau vẽ tất cả các ví dụ đào tạo (được biểu diễn bằng các vòng tròn),\nhàm tạo dữ liệu đất-chân lý f không có thuật ngữ nhiễu (được dán\nnhãn bởi “Truth”), và hàm dự đoán đã học (được dán nhãn bởi “Pred”)."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def plot_kernel_reg(y_hat):\n    d2l.plot(x_test, [y_truth, y_hat], 'x', 'y', legend=['Truth', 'Pred'],\n             xlim=[0, 5], ylim=[-1, 5])\n    d2l.plt.plot(x_train, y_train, 'o', alpha=0.5);"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "pooling-trung-binh",
+      "text": "10.2.2. Pooling trung bình"
+    },
+    {
+      "type": "paragraph",
+      "text": "Chúng ta bắt đầu với sự ước tính “ngu ngốc nhất” của thế giới cho vấn đề\nhồi quy này: sử dụng tổng hợp trung bình đến trung bình trên tất cả các\nđầu ra đào tạo:"
+    },
+    {
+      "type": "math",
+      "latex": "(10.2.2)¶\\[f(x) = \\frac{1}{n}\\sum_{i=1}^n y_i,\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "được vẽ dưới đây. Như chúng ta có thể thấy, ước tính này thực sự không\nquá thông minh."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "y_hat = y_train.mean().repeat(n_test)\nplot_kernel_reg(y_hat)"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_nadaraya-watson_61a333_29_0.svg",
+      "local_path": "_images/output_nadaraya-watson_61a333_29_0.svg",
+      "alt": "../_images/output_nadaraya-watson_61a333_29_0.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "y_hat = torch.repeat_interleave(y_train.mean(), n_test)\nplot_kernel_reg(y_hat)"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_nadaraya-watson_61a333_32_0.svg",
+      "local_path": "_images/output_nadaraya-watson_61a333_32_0.svg",
+      "alt": "../_images/output_nadaraya-watson_61a333_32_0.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "y_hat = tf.repeat(tf.reduce_mean(y_train), repeats=n_test)\nplot_kernel_reg(y_hat)"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_nadaraya-watson_61a333_35_0.svg",
+      "local_path": "_images/output_nadaraya-watson_61a333_35_0.svg",
+      "alt": "../_images/output_nadaraya-watson_61a333_35_0.svg"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "khong-tham-so-chu-y-pooling",
+      "text": "10.2.3. Không tham số Chú ý Pooling"
+    },
+    {
+      "type": "paragraph",
+      "text": "Rõ ràng, tổng hợp trung bình bỏ qua các đầu vào \\(x_i\\) . Một ý tưởng\ntốt hơn đã được Nadaraya [Nadaraya.1964] và Watson [Watson.1964] đề xuất để cân nhắc các đầu ra \\(y_i\\) theo vị\ntrí đầu vào của chúng:"
+    },
+    {
+      "type": "math",
+      "latex": "(10.2.3)¶\\[f(x) = \\sum_{i=1}^n \\frac{K(x - x_i)}{\\sum_{j=1}^n K(x - x_j)} y_i,\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "trong đó \\(K\\) là một * kernel . Các ước tính trong\n:eq:`eq_nadaraya-watson` được gọi là * Nadaraya-Watson kernel\nregression*. Ở đây chúng tôi sẽ không đi sâu vào chi tiết của hạt\nnhân. Nhớ lại khuôn khổ của các cơ chế chú ý trong :numref:`fig_qkv`.\nTừ quan điểm của sự chú ý, chúng ta có thể viết lại\n:eq:`eq_nadaraya-watson` dưới dạng tổng quát hơn chú ý cùng*:"
+    },
+    {
+      "type": "math",
+      "latex": "(10.2.4)¶\\[f(x) = \\sum_{i=1}^n \\alpha(x, x_i) y_i,\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "trong đó \\(x\\) là truy vấn và \\((x_i, y_i)\\) là cặp giá trị\nkhóa-giá trị. So sánh (10.2.4) và (10.2.2) , sự chú ý tập hợp ở đây là trung bình có trọng\nsố của các giá trị \\(y_i\\) . Trọng lượng chú\ný* \\(\\alpha(x, x_i)\\) trong (10.2.4) được gán\ncho giá trị tương ứng \\(y_i\\) dựa trên sự tương tác giữa truy vấn \\(x\\) và khóa \\(x_i\\) được mô hình hóa bởi \\(\\alpha\\) . Đối\nvới bất kỳ truy vấn nào, trọng lượng chú ý của nó đối với tất cả các cặp\nkhóa-giá trị là một phân phối xác suất hợp lệ: chúng không âm và tổng\nhợp lên đến một."
+    },
+    {
+      "type": "paragraph",
+      "text": "Để đạt được trực giác của sự chú ý, chỉ cần xem xét một * Gaussian\nkernel* được định nghĩa là"
+    },
+    {
+      "type": "math",
+      "latex": "(10.2.5)¶\\[K(u) = \\frac{1}{\\sqrt{2\\pi}} \\exp(-\\frac{u^2}{2}).\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Cắm hạt nhân Gaussian vào (10.2.4) và (10.2.3) cho"
+    },
+    {
+      "type": "math",
+      "latex": "(10.2.6)¶\\[\\begin{split}\\begin{aligned} f(x) &=\\sum_{i=1}^n \\alpha(x, x_i) y_i\\\\ &= \\sum_{i=1}^n \\frac{\\exp\\left(-\\frac{1}{2}(x - x_i)^2\\right)}{\\sum_{j=1}^n \\exp\\left(-\\frac{1}{2}(x - x_j)^2\\right)} y_i \\\\&= \\sum_{i=1}^n \\mathrm{softmax}\\left(-\\frac{1}{2}(x - x_i)^2\\right) y_i. \\end{aligned}\\end{split}\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Trong (10.2.6) , một khóa \\(x_i\\) gần\nvới truy vấn đã cho \\(x\\) sẽ nhận được chú ý hơn thông qua trọng\nlượng chú ý * lớn hơn* được gán cho giá trị tương ứng của khóa \\(y_i\\) ."
+    },
+    {
+      "type": "paragraph",
+      "text": "Đáng chú ý, hồi quy hạt nhân Nadaraya-Watson là một mô hình không tham\nsố; do đó (10.2.6) là một ví dụ về không\ntham số attention pooling . Sau đây, chúng tôi vẽ dự đoán dựa trên mô\nhình chú ý không tham số này. Đường dự đoán là trơn tru và gần với sự\nthật mặt đất hơn so với sự thật được tạo ra bởi tổng hợp trung bình."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "# Shape of `X_repeat`: (`n_test`, `n_train`), where each row contains the\n# same testing inputs (i.e., same queries)\nX_repeat = x_test.repeat(n_train).reshape((-1, n_train))\n# Note that `x_train` contains the keys. Shape of `attention_weights`:\n# (`n_test`, `n_train`), where each row contains attention weights to be\n# assigned among the values (`y_train`) given each query\nattention_weights = npx.softmax(-(X_repeat - x_train)**2 / 2)\n# Each element of `y_hat` is weighted average of values, where weights are\n# attention weights\ny_hat = np.dot(attention_weights, y_train)\nplot_kernel_reg(y_hat)"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_nadaraya-watson_61a333_41_0.svg",
+      "local_path": "_images/output_nadaraya-watson_61a333_41_0.svg",
+      "alt": "../_images/output_nadaraya-watson_61a333_41_0.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "# Shape of `X_repeat`: (`n_test`, `n_train`), where each row contains the\n# same testing inputs (i.e., same queries)\nX_repeat = x_test.repeat_interleave(n_train).reshape((-1, n_train))\n# Note that `x_train` contains the keys. Shape of `attention_weights`:\n# (`n_test`, `n_train`), where each row contains attention weights to be\n# assigned among the values (`y_train`) given each query\nattention_weights = nn.functional.softmax(-(X_repeat - x_train)**2 / 2, dim=1)\n# Each element of `y_hat` is weighted average of values, where weights are\n# attention weights\ny_hat = torch.matmul(attention_weights, y_train)\nplot_kernel_reg(y_hat)"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_nadaraya-watson_61a333_44_0.svg",
+      "local_path": "_images/output_nadaraya-watson_61a333_44_0.svg",
+      "alt": "../_images/output_nadaraya-watson_61a333_44_0.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "# Shape of `X_repeat`: (`n_test`, `n_train`), where each row contains the\n# same testing inputs (i.e., same queries)\nX_repeat = tf.repeat(tf.expand_dims(x_train, axis=0), repeats=n_train, axis=0)\n# Note that `x_train` contains the keys. Shape of `attention_weights`:\n# (`n_test`, `n_train`), where each row contains attention weights to be\n# assigned among the values (`y_train`) given each query\nattention_weights = tf.nn.softmax(-(X_repeat - tf.expand_dims(x_train, axis=1))**2/2, axis=1)\n# Each element of `y_hat` is weighted average of values, where weights are attention weights\ny_hat = tf.matmul(attention_weights, tf.expand_dims(y_train, axis=1))\nplot_kernel_reg(y_hat)"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_nadaraya-watson_61a333_47_0.svg",
+      "local_path": "_images/output_nadaraya-watson_61a333_47_0.svg",
+      "alt": "../_images/output_nadaraya-watson_61a333_47_0.svg"
+    },
+    {
+      "type": "paragraph",
+      "text": "Bây giờ chúng ta hãy nhìn vào trọng lượng chú ý. Ở đây thử nghiệm đầu\nvào là các truy vấn trong khi đầu vào đào tạo là chìa khóa. Vì cả hai\nđầu vào được sắp xếp, chúng ta có thể thấy rằng cặp khóa truy vấn càng\ngần, trọng lượng chú ý cao hơn nằm trong sự chú ý."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "d2l.show_heatmaps(np.expand_dims(np.expand_dims(attention_weights, 0), 0),\n                  xlabel='Sorted training inputs',\n                  ylabel='Sorted testing inputs')"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_nadaraya-watson_61a333_53_0.svg",
+      "local_path": "_images/output_nadaraya-watson_61a333_53_0.svg",
+      "alt": "../_images/output_nadaraya-watson_61a333_53_0.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "d2l.show_heatmaps(attention_weights.unsqueeze(0).unsqueeze(0),\n                  xlabel='Sorted training inputs',\n                  ylabel='Sorted testing inputs')"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_nadaraya-watson_61a333_56_0.svg",
+      "local_path": "_images/output_nadaraya-watson_61a333_56_0.svg",
+      "alt": "../_images/output_nadaraya-watson_61a333_56_0.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "d2l.show_heatmaps(tf.expand_dims(tf.expand_dims(attention_weights, axis=0), axis=0),\n                  xlabel='Sorted training inputs',\n                  ylabel='Sorted testing inputs')"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_nadaraya-watson_61a333_59_0.svg",
+      "local_path": "_images/output_nadaraya-watson_61a333_59_0.svg",
+      "alt": "../_images/output_nadaraya-watson_61a333_59_0.svg"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tham-so-chu-y-pooling",
+      "text": "10.2.4. ** Tham số chú ý Pooling**"
+    },
+    {
+      "type": "paragraph",
+      "text": "Hồi quy hạt nhân Nadaraya-Watson không tham số được hưởng lợi ích * nhất\nquán * : cung cấp đủ dữ liệu mô hình này hội tụ với giải pháp tối ưu. Tuy\nnhiên, chúng ta có thể dễ dàng tích hợp các thông số có thể học được vào\ntập hợp sự chú ý."
+    },
+    {
+      "type": "paragraph",
+      "text": "Ví dụ, hơi khác so với (10.2.6) , trong\nkhoảng cách sau giữa truy vấn \\(x\\) và khóa \\(x_i\\) được nhân\nvới một tham số có thể học được \\(w\\) :"
+    },
+    {
+      "type": "math",
+      "latex": "(10.2.7)¶\\[\\begin{split}\\begin{aligned}f(x) &= \\sum_{i=1}^n \\alpha(x, x_i) y_i \\\\&= \\sum_{i=1}^n \\frac{\\exp\\left(-\\frac{1}{2}((x - x_i)w)^2\\right)}{\\sum_{j=1}^n \\exp\\left(-\\frac{1}{2}((x - x_j)w)^2\\right)} y_i \\\\&= \\sum_{i=1}^n \\mathrm{softmax}\\left(-\\frac{1}{2}((x - x_i)w)^2\\right) y_i.\\end{aligned}\\end{split}\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Trong phần còn lại của phần này, chúng tôi sẽ đào tạo mô hình này bằng\ncách học tham số của sự chú ý trong (10.2.7) ."
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "phep-nhan-ma-tran-hang-loat",
+      "text": "10.2.4.1. Phép nhân ma trận hàng loạt"
+    },
+    {
+      "type": "paragraph",
+      "text": "Để tính toán sự chú ý hiệu quả hơn cho các minibatches, chúng ta có thể\ntận dụng các tiện ích nhân ma trận hàng loạt được cung cấp bởi các\nframework deep learning."
+    },
+    {
+      "type": "paragraph",
+      "text": "Giả sử rằng minibatch đầu tiên chứa \\(n\\) ma trận \\(\\mathbf{X}_1, \\ldots, \\mathbf{X}_n\\) của hình dạng \\(a\\times b\\) , và minibatch thứ hai chứa \\(n\\) ma trận \\(\\mathbf{Y}_1, \\ldots, \\mathbf{Y}_n\\) hình dạng \\(b\\times c\\) .\nPhép nhân ma trận lô của chúng dẫn đến ma trận \\(n\\) \\(\\mathbf{X}_1\\mathbf{Y}_1, \\ldots, \\mathbf{X}_n\\mathbf{Y}_n\\) của\nhình dạng \\(a\\times c\\) . Do đó, cho hai hàng chục hình dạng\n( \\(n\\) , \\(a\\) , \\(b\\) ) và ( \\(n\\) , \\(b\\) , \\(c\\) ),\nhình dạng của sản lượng nhân ma trận lô của chúng là ( \\(n\\) , \\(a\\) , \\(c\\) ) ."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "X = np.ones((2, 1, 4))\nY = np.ones((2, 4, 6))\nnpx.batch_dot(X, Y).shape"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "(2, 1, 6)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "X = torch.ones((2, 1, 4))\nY = torch.ones((2, 4, 6))\ntorch.bmm(X, Y).shape"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "torch.Size([2, 1, 6])"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "X = tf.ones((2, 1, 4))\nY = tf.ones((2, 4, 6))\ntf.matmul(X, Y).shape"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "TensorShape([2, 1, 6])"
+    },
+    {
+      "type": "paragraph",
+      "text": "Trong bối cảnh của các cơ chế chú ý, chúng ta có thể sử dụng phép nhân\nma trận minibatch để tính toán trung bình có trọng số của các giá trị\ntrong một minibatch."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "weights = np.ones((2, 10)) * 0.1\nvalues = np.arange(20).reshape((2, 10))\nnpx.batch_dot(np.expand_dims(weights, 1), np.expand_dims(values, -1))"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "array([[[ 4.5]],\n\n       [[14.5]]])"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "weights = torch.ones((2, 10)) * 0.1\nvalues = torch.arange(20.0).reshape((2, 10))\ntorch.bmm(weights.unsqueeze(1), values.unsqueeze(-1))"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "tensor([[[ 4.5000]],\n\n        [[14.5000]]])"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "weights = tf.ones((2, 10)) * 0.1\nvalues = tf.reshape(tf.range(20.0), shape = (2, 10))\ntf.matmul(tf.expand_dims(weights, axis=1), tf.expand_dims(values, axis=-1)).numpy()"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "array([[[ 4.5]],\n\n       [[14.5]]], dtype=float32)"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "xac-dinh-mo-hinh",
+      "text": "10.2.4.2. Xác định mô hình"
+    },
+    {
+      "type": "paragraph",
+      "text": "Sử dụng phép nhân ma trận minibatch, bên dưới chúng ta xác định phiên\nbản tham số của hồi quy hạt nhân Nadaraya-Watson dựa trên parametric\nattention pooling trong (10.2.7) ."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "class NWKernelRegression(nn.Block):\n    def __init__(self, **kwargs):\n        super().__init__(**kwargs)\n        self.w = self.params.get('w', shape=(1,))\n\n    def forward(self, queries, keys, values):\n        # Shape of the output `queries` and `attention_weights`:\n        # (no. of queries, no. of key-value pairs)\n        queries = queries.repeat(keys.shape[1]).reshape((-1, keys.shape[1]))\n        self.attention_weights = npx.softmax(\n            -((queries - keys) * self.w.data())**2 / 2)\n        # Shape of `values`: (no. of queries, no. of key-value pairs)\n        return npx.batch_dot(np.expand_dims(self.attention_weights, 1),\n                             np.expand_dims(values, -1)).reshape(-1)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "class NWKernelRegression(nn.Module):\n    def __init__(self, **kwargs):\n        super().__init__(**kwargs)\n        self.w = nn.Parameter(torch.rand((1,), requires_grad=True))\n\n    def forward(self, queries, keys, values):\n        # Shape of the output `queries` and `attention_weights`:\n        # (no. of queries, no. of key-value pairs)\n        queries = queries.repeat_interleave(keys.shape[1]).reshape((-1, keys.shape[1]))\n        self.attention_weights = nn.functional.softmax(\n            -((queries - keys) * self.w)**2 / 2, dim=1)\n        # Shape of `values`: (no. of queries, no. of key-value pairs)\n        return torch.bmm(self.attention_weights.unsqueeze(1),\n                         values.unsqueeze(-1)).reshape(-1)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "class NWKernelRegression(tf.keras.layers.Layer):\n    def __init__(self, **kwargs):\n        super().__init__(**kwargs)\n        self.w = tf.Variable(initial_value=tf.random.uniform(shape=(1,)))\n\n    def call(self, queries, keys, values, **kwargs):\n        # For training queries are `x_train`. Keys are distance of taining data for each point. Values are `y_train`.\n        # Shape of the output `queries` and `attention_weights`: (no. of queries, no. of key-value pairs)\n        queries = tf.repeat(tf.expand_dims(queries, axis=1), repeats=keys.shape[1], axis=1)\n        self.attention_weights = tf.nn.softmax(-((queries - keys) * self.w)**2 /2, axis =1)\n        # Shape of `values`: (no. of queries, no. of key-value pairs)\n        return tf.squeeze(tf.matmul(tf.expand_dims(self.attention_weights, axis=1), tf.expand_dims(values, axis=-1)))"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "dao-tao",
+      "text": "10.2.4.3. Đào tạo"
+    },
+    {
+      "type": "paragraph",
+      "text": "Sau đây, chúng tôi chuyển đổi tập dữ liệu đào tạo thành các khóa và giá\ntrị để đào tạo mô hình chú ý. Trong tập hợp sự chú ý tham số, bất kỳ đầu\nvào đào tạo nào lấy các cặp giá trị khóa từ tất cả các ví dụ đào tạo\nngoại trừ chính nó để dự đoán đầu ra của nó."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "# Shape of `X_tile`: (`n_train`, `n_train`), where each column contains the\n# same training inputs\nX_tile = np.tile(x_train, (n_train, 1))\n# Shape of `Y_tile`: (`n_train`, `n_train`), where each column contains the\n# same training outputs\nY_tile = np.tile(y_train, (n_train, 1))\n# Shape of `keys`: ('n_train', 'n_train' - 1)\nkeys = X_tile[(1 - np.eye(n_train)).astype('bool')].reshape((n_train, -1))\n# Shape of `values`: ('n_train', 'n_train' - 1)\nvalues = Y_tile[(1 - np.eye(n_train)).astype('bool')].reshape((n_train, -1))"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "# Shape of `X_tile`: (`n_train`, `n_train`), where each column contains the\n# same training inputs\nX_tile = x_train.repeat((n_train, 1))\n# Shape of `Y_tile`: (`n_train`, `n_train`), where each column contains the\n# same training outputs\nY_tile = y_train.repeat((n_train, 1))\n# Shape of `keys`: ('n_train', 'n_train' - 1)\nkeys = X_tile[(1 - torch.eye(n_train)).type(torch.bool)].reshape((n_train, -1))\n# Shape of `values`: ('n_train', 'n_train' - 1)\nvalues = Y_tile[(1 - torch.eye(n_train)).type(torch.bool)].reshape((n_train, -1))"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "# Shape of `X_tile`: (`n_train`, `n_train`), where each column contains the\n# same training inputs\nX_tile = tf.repeat(tf.expand_dims(x_train, axis=0), repeats=n_train, axis=0)\n# Shape of `Y_tile`: (`n_train`, `n_train`), where each column contains the\n# same training outputs\nY_tile = tf.repeat(tf.expand_dims(y_train, axis=0), repeats=n_train, axis=0)\n# Shape of `keys`: ('n_train', 'n_train' - 1)\nkeys = tf.reshape(X_tile[tf.cast(1 - tf.eye(n_train), dtype=tf.bool)], shape=(n_train, -1))\n# Shape of `values`: ('n_train', 'n_train' - 1)\nvalues = tf.reshape(Y_tile[tf.cast(1 - tf.eye(n_train), dtype=tf.bool)], shape=(n_train, -1))"
+    },
+    {
+      "type": "paragraph",
+      "text": "Sử dụng sự mất mát bình phương và gốc gradient ngẫu nhiên, chúng tôi đào\ntạo mô hình chú ý tham số."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "net = NWKernelRegression()\nnet.initialize()\nloss = gluon.loss.L2Loss()\ntrainer = gluon.Trainer(net.collect_params(), 'sgd', {'learning_rate': 0.5})\nanimator = d2l.Animator(xlabel='epoch', ylabel='loss', xlim=[1, 5])\n\nfor epoch in range(5):\n    with autograd.record():\n        l = loss(net(x_train, keys, values), y_train)\n    l.backward()\n    trainer.step(1)\n    print(f'epoch {epoch + 1}, loss {float(l.sum()):.6f}')\n    animator.add(epoch + 1, float(l.sum()))"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_nadaraya-watson_61a333_113_0.svg",
+      "local_path": "_images/output_nadaraya-watson_61a333_113_0.svg",
+      "alt": "../_images/output_nadaraya-watson_61a333_113_0.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "net = NWKernelRegression()\nloss = nn.MSELoss(reduction='none')\ntrainer = torch.optim.SGD(net.parameters(), lr=0.5)\nanimator = d2l.Animator(xlabel='epoch', ylabel='loss', xlim=[1, 5])\n\nfor epoch in range(5):\n    trainer.zero_grad()\n    l = loss(net(x_train, keys, values), y_train)\n    l.sum().backward()\n    trainer.step()\n    print(f'epoch {epoch + 1}, loss {float(l.sum()):.6f}')\n    animator.add(epoch + 1, float(l.sum()))"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_nadaraya-watson_61a333_116_0.svg",
+      "local_path": "_images/output_nadaraya-watson_61a333_116_0.svg",
+      "alt": "../_images/output_nadaraya-watson_61a333_116_0.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "net = NWKernelRegression()\nloss_object = tf.keras.losses.MeanSquaredError()\noptimizer = tf.keras.optimizers.SGD(learning_rate=0.5)\nanimator = d2l.Animator(xlabel='epoch', ylabel='loss', xlim=[1, 5])\n\n\nfor epoch in range(5):\n    with tf.GradientTape() as t:\n        loss = loss_object(y_train, net(x_train, keys, values)) * len(y_train)\n    grads = t.gradient(loss, net.trainable_variables)\n    optimizer.apply_gradients(zip(grads, net.trainable_variables))\n    print(f'epoch {epoch + 1}, loss {float(loss):.6f}')\n    animator.add(epoch + 1, float(loss))"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_nadaraya-watson_61a333_119_0.svg",
+      "local_path": "_images/output_nadaraya-watson_61a333_119_0.svg",
+      "alt": "../_images/output_nadaraya-watson_61a333_119_0.svg"
+    },
+    {
+      "type": "paragraph",
+      "text": "Sau khi đào tạo mô hình chú ý tham số, chúng ta có thể vẽ giá của nó. Cố\ngắng để phù hợp với tập dữ liệu đào tạo với tiếng ồn, dòng dự đoán là ít\ntrơn tru hơn so với đối tác không tham số của nó đã được vẽ trước đó."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "# Shape of `keys`: (`n_test`, `n_train`), where each column contains the same\n# training inputs (i.e., same keys)\nkeys = np.tile(x_train, (n_test, 1))\n# Shape of `value`: (`n_test`, `n_train`)\nvalues = np.tile(y_train, (n_test, 1))\ny_hat = net(x_test, keys, values)\nplot_kernel_reg(y_hat)"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_nadaraya-watson_61a333_125_0.svg",
+      "local_path": "_images/output_nadaraya-watson_61a333_125_0.svg",
+      "alt": "../_images/output_nadaraya-watson_61a333_125_0.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "# Shape of `keys`: (`n_test`, `n_train`), where each column contains the same\n# training inputs (i.e., same keys)\nkeys = x_train.repeat((n_test, 1))\n# Shape of `value`: (`n_test`, `n_train`)\nvalues = y_train.repeat((n_test, 1))\ny_hat = net(x_test, keys, values).unsqueeze(1).detach()\nplot_kernel_reg(y_hat)"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_nadaraya-watson_61a333_128_0.svg",
+      "local_path": "_images/output_nadaraya-watson_61a333_128_0.svg",
+      "alt": "../_images/output_nadaraya-watson_61a333_128_0.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "# Shape of `keys`: (`n_test`, `n_train`), where each column contains the same\n# training inputs (i.e., same keys)\nkeys = tf.repeat(tf.expand_dims(x_train, axis=0), repeats=n_test, axis=0)\n# Shape of `value`: (`n_test`, `n_train`)\nvalues = tf.repeat(tf.expand_dims(y_train, axis=0), repeats=n_test, axis=0)\ny_hat = net(x_test, keys, values)\nplot_kernel_reg(y_hat)"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_nadaraya-watson_61a333_131_0.svg",
+      "local_path": "_images/output_nadaraya-watson_61a333_131_0.svg",
+      "alt": "../_images/output_nadaraya-watson_61a333_131_0.svg"
+    },
+    {
+      "type": "paragraph",
+      "text": "So sánh với sự chú ý không tham số, khu vực có trọng lượng chú ý lớn trở\nnên sắc bén hơn trong cài đặt có thể học được và tham số."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "d2l.show_heatmaps(np.expand_dims(np.expand_dims(net.attention_weights, 0), 0),\n                  xlabel='Sorted training inputs',\n                  ylabel='Sorted testing inputs')"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_nadaraya-watson_61a333_137_0.svg",
+      "local_path": "_images/output_nadaraya-watson_61a333_137_0.svg",
+      "alt": "../_images/output_nadaraya-watson_61a333_137_0.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "d2l.show_heatmaps(net.attention_weights.unsqueeze(0).unsqueeze(0),\n                  xlabel='Sorted training inputs',\n                  ylabel='Sorted testing inputs')"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_nadaraya-watson_61a333_140_0.svg",
+      "local_path": "_images/output_nadaraya-watson_61a333_140_0.svg",
+      "alt": "../_images/output_nadaraya-watson_61a333_140_0.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "d2l.show_heatmaps(tf.expand_dims(tf.expand_dims(net.attention_weights, axis=0), axis=0),\n                  xlabel='Sorted training inputs',\n                  ylabel='Sorted testing inputs')"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_nadaraya-watson_61a333_143_0.svg",
+      "local_path": "_images/output_nadaraya-watson_61a333_143_0.svg",
+      "alt": "../_images/output_nadaraya-watson_61a333_143_0.svg"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tom-tat",
+      "text": "10.2.5. Tóm tắt"
+    },
+    {
+      "type": "list",
+      "ordered": false,
+      "items": [
+        "Hồi quy hạt nhân Nadaraya-Watson là một ví dụ về máy học với các cơ\nchế chú ý.",
+        "Sự chú ý của hồi quy hạt nhân Nadaraya-Watson là một trung bình trọng\nsố của các đầu ra đào tạo. Từ góc độ chú ý, trọng lượng chú ý được\ngán cho một giá trị dựa trên một hàm của truy vấn và khóa được ghép\nnối với giá trị.",
+        "Chú ý pooling có thể là một trong hai không tham số hoặc tham số."
+      ]
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bai-tap",
+      "text": "10.2.6. Bài tập"
+    },
+    {
+      "type": "list",
+      "ordered": true,
+      "items": [
+        "Tăng số lượng các ví dụ đào tạo. Bạn có thể học hồi quy hạt nhân\nNadaraya-Watson không tham số tốt hơn?",
+        "Giá trị của \\(w\\) đã học được của chúng tôi trong thí nghiệm tập\nhợp chú ý tham số là gì? Tại sao nó làm cho vùng có trọng số sắc nét\nhơn khi hình dung trọng lượng chú ý?",
+        "Làm thế nào chúng ta có thể thêm các siêu tham số vào hồi quy hạt\nnhân Nadaraya-Watson không tham số để dự đoán tốt hơn?",
+        "Thiết kế một tập hợp chú ý tham số khác cho hồi quy hạt nhân của phần\nnày. Đào tạo mô hình mới này và hình dung trọng lượng chú ý của nó."
+      ]
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    }
+  ],
+  "images": [
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_nadaraya-watson_61a333_29_0.svg",
+      "local_path": "_images/output_nadaraya-watson_61a333_29_0.svg",
+      "alt": "../_images/output_nadaraya-watson_61a333_29_0.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_nadaraya-watson_61a333_32_0.svg",
+      "local_path": "_images/output_nadaraya-watson_61a333_32_0.svg",
+      "alt": "../_images/output_nadaraya-watson_61a333_32_0.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_nadaraya-watson_61a333_35_0.svg",
+      "local_path": "_images/output_nadaraya-watson_61a333_35_0.svg",
+      "alt": "../_images/output_nadaraya-watson_61a333_35_0.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_nadaraya-watson_61a333_41_0.svg",
+      "local_path": "_images/output_nadaraya-watson_61a333_41_0.svg",
+      "alt": "../_images/output_nadaraya-watson_61a333_41_0.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_nadaraya-watson_61a333_44_0.svg",
+      "local_path": "_images/output_nadaraya-watson_61a333_44_0.svg",
+      "alt": "../_images/output_nadaraya-watson_61a333_44_0.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_nadaraya-watson_61a333_47_0.svg",
+      "local_path": "_images/output_nadaraya-watson_61a333_47_0.svg",
+      "alt": "../_images/output_nadaraya-watson_61a333_47_0.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_nadaraya-watson_61a333_53_0.svg",
+      "local_path": "_images/output_nadaraya-watson_61a333_53_0.svg",
+      "alt": "../_images/output_nadaraya-watson_61a333_53_0.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_nadaraya-watson_61a333_56_0.svg",
+      "local_path": "_images/output_nadaraya-watson_61a333_56_0.svg",
+      "alt": "../_images/output_nadaraya-watson_61a333_56_0.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_nadaraya-watson_61a333_59_0.svg",
+      "local_path": "_images/output_nadaraya-watson_61a333_59_0.svg",
+      "alt": "../_images/output_nadaraya-watson_61a333_59_0.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_nadaraya-watson_61a333_113_0.svg",
+      "local_path": "_images/output_nadaraya-watson_61a333_113_0.svg",
+      "alt": "../_images/output_nadaraya-watson_61a333_113_0.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_nadaraya-watson_61a333_116_0.svg",
+      "local_path": "_images/output_nadaraya-watson_61a333_116_0.svg",
+      "alt": "../_images/output_nadaraya-watson_61a333_116_0.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_nadaraya-watson_61a333_119_0.svg",
+      "local_path": "_images/output_nadaraya-watson_61a333_119_0.svg",
+      "alt": "../_images/output_nadaraya-watson_61a333_119_0.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_nadaraya-watson_61a333_125_0.svg",
+      "local_path": "_images/output_nadaraya-watson_61a333_125_0.svg",
+      "alt": "../_images/output_nadaraya-watson_61a333_125_0.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_nadaraya-watson_61a333_128_0.svg",
+      "local_path": "_images/output_nadaraya-watson_61a333_128_0.svg",
+      "alt": "../_images/output_nadaraya-watson_61a333_128_0.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_nadaraya-watson_61a333_131_0.svg",
+      "local_path": "_images/output_nadaraya-watson_61a333_131_0.svg",
+      "alt": "../_images/output_nadaraya-watson_61a333_131_0.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_nadaraya-watson_61a333_137_0.svg",
+      "local_path": "_images/output_nadaraya-watson_61a333_137_0.svg",
+      "alt": "../_images/output_nadaraya-watson_61a333_137_0.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_nadaraya-watson_61a333_140_0.svg",
+      "local_path": "_images/output_nadaraya-watson_61a333_140_0.svg",
+      "alt": "../_images/output_nadaraya-watson_61a333_140_0.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_nadaraya-watson_61a333_143_0.svg",
+      "local_path": "_images/output_nadaraya-watson_61a333_143_0.svg",
+      "alt": "../_images/output_nadaraya-watson_61a333_143_0.svg"
+    }
+  ],
+  "text": "10.2. Chú ý Pooling: Hồi quy hạt nhân Nadaraya-Watson\nBây giờ bạn đã biết các thành phần chính của các cơ chế chú ý theo khuôn\nkhổ trong Fig. 10.1.3 . Để tái lập lại, các tương tác giữa các\ntruy vấn (tín hiệu ý chí) và các phím (tín hiệu không có ý định) dẫn đến chú ý cùng . Sự chú ý tập hợp chọn lọc các giá trị (đầu vào cảm giác)\nđể tạo ra đầu ra. Trong phần này, chúng tôi sẽ mô tả chi tiết hơn để\ncung cấp cho bạn cái nhìn cấp cao về cách các cơ chế chú ý hoạt động\ntrong thực tế. Cụ thể, mô hình hồi quy hạt nhân Nadaraya-Watson đề xuất\nnăm 1964 là một ví dụ đơn giản nhưng đầy đủ để chứng minh máy học với\ncác cơ chế chú ý.\n10.2.1. Tạo ra bộ dữ liệu\nĐể giữ cho mọi thứ đơn giản, chúng ta hãy xem xét vấn đề hồi quy sau:\nđưa ra một tập dữ liệu của cặp đầu vào-đầu ra \\(\\{(x_1, y_1), \\ldots, (x_n, y_n)\\}\\) , làm thế nào để tìm hiểu \\(f\\) để dự đoán đầu ra \\(\\hat{y} = f(x)\\) cho bất kỳ đầu vào\nmới \\(x\\) ?\nỞ đây chúng ta tạo ra một bộ dữ liệu nhân tạo theo hàm phi tuyến sau với\nthuật ngữ nhiễu \\(\\epsilon\\) :\ntrong đó \\(\\epsilon\\) tuân theo một phân phối bình thường với 0\ntrung bình và độ lệch chuẩn 0,5. Cả 50 ví dụ đào tạo và 50 ví dụ thử\nnghiệm được tạo ra. Để hình dung rõ hơn mô hình chú ý sau này, các đầu\nvào đào tạo được sắp xếp.\nHàm sau vẽ tất cả các ví dụ đào tạo (được biểu diễn bằng các vòng tròn),\nhàm tạo dữ liệu đất-chân lý f không có thuật ngữ nhiễu (được dán\nnhãn bởi “Truth”), và hàm dự đoán đã học (được dán nhãn bởi “Pred”).\n10.2.2. Pooling trung bình\nChúng ta bắt đầu với sự ước tính “ngu ngốc nhất” của thế giới cho vấn đề\nhồi quy này: sử dụng tổng hợp trung bình đến trung bình trên tất cả các\nđầu ra đào tạo:\nđược vẽ dưới đây. Như chúng ta có thể thấy, ước tính này thực sự không\nquá thông minh.\n10.2.3. Không tham số Chú ý Pooling\nRõ ràng, tổng hợp trung bình bỏ qua các đầu vào \\(x_i\\) . Một ý tưởng\ntốt hơn đã được Nadaraya [Nadaraya.1964] và Watson [Watson.1964] đề xuất để cân nhắc các đầu ra \\(y_i\\) theo vị\ntrí đầu vào của chúng:\ntrong đó \\(K\\) là một * kernel . Các ước tính trong\n:eq:`eq_nadaraya-watson` được gọi là * Nadaraya-Watson kernel\nregression*. Ở đây chúng tôi sẽ không đi sâu vào chi tiết của hạt\nnhân. Nhớ lại khuôn khổ của các cơ chế chú ý trong :numref:`fig_qkv`.\nTừ quan điểm của sự chú ý, chúng ta có thể viết lại\n:eq:`eq_nadaraya-watson` dưới dạng tổng quát hơn chú ý cùng*:\ntrong đó \\(x\\) là truy vấn và \\((x_i, y_i)\\) là cặp giá trị\nkhóa-giá trị. So sánh (10.2.4) và (10.2.2) , sự chú ý tập hợp ở đây là trung bình có trọng\nsố của các giá trị \\(y_i\\) . Trọng lượng chú\ný* \\(\\alpha(x, x_i)\\) trong (10.2.4) được gán\ncho giá trị tương ứng \\(y_i\\) dựa trên sự tương tác giữa truy vấn \\(x\\) và khóa \\(x_i\\) được mô hình hóa bởi \\(\\alpha\\) . Đối\nvới bất kỳ truy vấn nào, trọng lượng chú ý của nó đối với tất cả các cặp\nkhóa-giá trị là một phân phối xác suất hợp lệ: chúng không âm và tổng\nhợp lên đến một.\nĐể đạt được trực giác của sự chú ý, chỉ cần xem xét một * Gaussian\nkernel* được định nghĩa là\nCắm hạt nhân Gaussian vào (10.2.4) và (10.2.3) cho\nTrong (10.2.6) , một khóa \\(x_i\\) gần\nvới truy vấn đã cho \\(x\\) sẽ nhận được chú ý hơn thông qua trọng\nlượng chú ý * lớn hơn* được gán cho giá trị tương ứng của khóa \\(y_i\\) .\nĐáng chú ý, hồi quy hạt nhân Nadaraya-Watson là một mô hình không tham\nsố; do đó (10.2.6) là một ví dụ về không\ntham số attention pooling . Sau đây, chúng tôi vẽ dự đoán dựa trên mô\nhình chú ý không tham số này. Đường dự đoán là trơn tru và gần với sự\nthật mặt đất hơn so với sự thật được tạo ra bởi tổng hợp trung bình.\nBây giờ chúng ta hãy nhìn vào trọng lượng chú ý. Ở đây thử nghiệm đầu\nvào là các truy vấn trong khi đầu vào đào tạo là chìa khóa. Vì cả hai\nđầu vào được sắp xếp, chúng ta có thể thấy rằng cặp khóa truy vấn càng\ngần, trọng lượng chú ý cao hơn nằm trong sự chú ý.\n10.2.4. ** Tham số chú ý Pooling**\nHồi quy hạt nhân Nadaraya-Watson không tham số được hưởng lợi ích * nhất\nquán * : cung cấp đủ dữ liệu mô hình này hội tụ với giải pháp tối ưu. Tuy\nnhiên, chúng ta có thể dễ dàng tích hợp các thông số có thể học được vào\ntập hợp sự chú ý.\nVí dụ, hơi khác so với (10.2.6) , trong\nkhoảng cách sau giữa truy vấn \\(x\\) và khóa \\(x_i\\) được nhân\nvới một tham số có thể học được \\(w\\) :\nTrong phần còn lại của phần này, chúng tôi sẽ đào tạo mô hình này bằng\ncách học tham số của sự chú ý trong (10.2.7) .\n10.2.4.1. Phép nhân ma trận hàng loạt\nĐể tính toán sự chú ý hiệu quả hơn cho các minibatches, chúng ta có thể\ntận dụng các tiện ích nhân ma trận hàng loạt được cung cấp bởi các\nframework deep learning.\nGiả sử rằng minibatch đầu tiên chứa \\(n\\) ma trận \\(\\mathbf{X}_1, \\ldots, \\mathbf{X}_n\\) của hình dạng \\(a\\times b\\) , và minibatch thứ hai chứa \\(n\\) ma trận \\(\\mathbf{Y}_1, \\ldots, \\mathbf{Y}_n\\) hình dạng \\(b\\times c\\) .\nPhép nhân ma trận lô của chúng dẫn đến ma trận \\(n\\) \\(\\mathbf{X}_1\\mathbf{Y}_1, \\ldots, \\mathbf{X}_n\\mathbf{Y}_n\\) của\nhình dạng \\(a\\times c\\) . Do đó, cho hai hàng chục hình dạng\n( \\(n\\) , \\(a\\) , \\(b\\) ) và ( \\(n\\) , \\(b\\) , \\(c\\) ),\nhình dạng của sản lượng nhân ma trận lô của chúng là ( \\(n\\) , \\(a\\) , \\(c\\) ) .\nTrong bối cảnh của các cơ chế chú ý, chúng ta có thể sử dụng phép nhân\nma trận minibatch để tính toán trung bình có trọng số của các giá trị\ntrong một minibatch.\n10.2.4.2. Xác định mô hình\nSử dụng phép nhân ma trận minibatch, bên dưới chúng ta xác định phiên\nbản tham số của hồi quy hạt nhân Nadaraya-Watson dựa trên parametric\nattention pooling trong (10.2.7) .\n10.2.4.3. Đào tạo\nSau đây, chúng tôi chuyển đổi tập dữ liệu đào tạo thành các khóa và giá\ntrị để đào tạo mô hình chú ý. Trong tập hợp sự chú ý tham số, bất kỳ đầu\nvào đào tạo nào lấy các cặp giá trị khóa từ tất cả các ví dụ đào tạo\nngoại trừ chính nó để dự đoán đầu ra của nó.\nSử dụng sự mất mát bình phương và gốc gradient ngẫu nhiên, chúng tôi đào\ntạo mô hình chú ý tham số.\nSau khi đào tạo mô hình chú ý tham số, chúng ta có thể vẽ giá của nó. Cố\ngắng để phù hợp với tập dữ liệu đào tạo với tiếng ồn, dòng dự đoán là ít\ntrơn tru hơn so với đối tác không tham số của nó đã được vẽ trước đó.\nSo sánh với sự chú ý không tham số, khu vực có trọng lượng chú ý lớn trở\nnên sắc bén hơn trong cài đặt có thể học được và tham số.\n10.2.5. Tóm tắt\nHồi quy hạt nhân Nadaraya-Watson là một ví dụ về máy học với các cơ\nchế chú ý.\nSự chú ý của hồi quy hạt nhân Nadaraya-Watson là một trung bình trọng\nsố của các đầu ra đào tạo. Từ góc độ chú ý, trọng lượng chú ý được\ngán cho một giá trị dựa trên một hàm của truy vấn và khóa được ghép\nnối với giá trị.\nChú ý pooling có thể là một trong hai không tham số hoặc tham số.\n10.2.6. Bài tập\nTăng số lượng các ví dụ đào tạo. Bạn có thể học hồi quy hạt nhân\nNadaraya-Watson không tham số tốt hơn?\nGiá trị của \\(w\\) đã học được của chúng tôi trong thí nghiệm tập\nhợp chú ý tham số là gì? Tại sao nó làm cho vùng có trọng số sắc nét\nhơn khi hình dung trọng lượng chú ý?\nLàm thế nào chúng ta có thể thêm các siêu tham số vào hồi quy hạt\nnhân Nadaraya-Watson không tham số để dự đoán tốt hơn?\nThiết kế một tập hợp chú ý tham số khác cho hồi quy hạt nhân của phần\nnày. Đào tạo mô hình mới này và hình dung trọng lượng chú ý của nó.\nDiscussions\nDiscussions"
+}

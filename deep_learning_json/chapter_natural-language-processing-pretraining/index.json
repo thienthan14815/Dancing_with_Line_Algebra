@@ -1,0 +1,128 @@
+{
+  "url": "https://vi.d2l.ai/chapter_natural-language-processing-pretraining/index.html",
+  "chapter": "chapter_natural-language-processing-pretraining",
+  "title": "14. Chế biến ngôn ngữ tự nhiên: Pretraining",
+  "crawled_at": "2026-07-20T12:40:52.559159+00:00",
+  "headings": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "che-bien-ngon-ngu-tu-nhien-pretraining",
+      "text": "14. Chế biến ngôn ngữ tự nhiên: Pretraining"
+    }
+  ],
+  "content": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "che-bien-ngon-ngu-tu-nhien-pretraining",
+      "text": "14. Chế biến ngôn ngữ tự nhiên: Pretraining"
+    },
+    {
+      "type": "paragraph",
+      "text": "Con người cần giao tiếp. Trong nhu cầu cơ bản này của tình trạng con\nngười, một lượng lớn văn bản bằng văn bản đã được tạo ra trên cơ sở hàng\nngày. Với văn bản phong phú trên phương tiện truyền thông xã hội, ứng\ndụng trò chuyện, email, đánh giá sản phẩm, bài báo tin tức, bài báo\nnghiên cứu và sách, điều quan trọng là cho phép máy tính hiểu chúng để\ncung cấp hỗ trợ hoặc đưa ra quyết định dựa trên ngôn ngữ của con người."
+    },
+    {
+      "type": "paragraph",
+      "text": "Xử lý ngôn ngữ tự nhiên nghiên cứu tương tác giữa máy tính và con\nngười sử dụng ngôn ngữ tự nhiên. Trong thực tế, rất phổ biến khi sử dụng\ncác kỹ thuật xử lý ngôn ngữ tự nhiên để xử lý và phân tích dữ liệu văn\nbản (ngôn ngữ tự nhiên của con người), chẳng hạn như các mô hình ngôn\nngữ trong Section 8.3 và các mô hình dịch máy trong Section 9.5 ."
+    },
+    {
+      "type": "paragraph",
+      "text": "Để hiểu văn bản, chúng ta có thể bắt đầu bằng cách học các đại diện của\nnó. Tận dụng các chuỗi văn bản hiện có từ corpora lớn, tự giám sát đã\nđược sử dụng rộng rãi để chuẩn bị các biểu diễn văn bản, chẳng hạn như\nbằng cách dự đoán một số phần ẩn của văn bản bằng cách sử dụng một số\nphần khác của văn bản xung quanh của chúng. Bằng cách này, các mô hình\nhọc thông qua giám sát từ dữ liệu văn bản * massive* mà không có nỗ\nlực ghi nhãn * chi phí*!"
+    },
+    {
+      "type": "paragraph",
+      "text": "Như chúng ta sẽ thấy trong chương này, khi coi từng từ hoặc từ con như\nmột mã thông báo riêng lẻ, biểu diễn của mỗi mã thông báo có thể được\nđào tạo trước bằng cách sử dụng các mô hình nhúng word2vec, Glove hoặc\ntừ con trên corpora lớn. Sau khi đào tạo trước, biểu diễn của mỗi mã\nthông báo có thể là một vectơ, tuy nhiên, nó vẫn giữ nguyên bất kể bối\ncảnh là gì. Ví dụ, đại diện vector của “ngân hàng” là như nhau trong cả\nhai “đi đến ngân hàng để gửi một số tiền” và “đi đến ngân hàng để ngồi\nxuống”. Do đó, nhiều mô hình pretraining gần đây hơn thích ứng đại diện\ncủa cùng một mã thông báo với các bối cảnh khác nhau. Trong số đó có\nBERT, một mô hình tự giám sát sâu hơn nhiều dựa trên bộ mã hóa biến áp.\nTrong chương này, chúng tôi sẽ tập trung vào cách chuẩn bị các đại diện\nnhư vậy cho văn bản, như được tô sáng trong Fig. 14.1 ."
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/nlp-map-pretrain.svg",
+      "local_path": "_images/nlp-map-pretrain.svg",
+      "alt": "../_images/nlp-map-pretrain.svg"
+    },
+    {
+      "type": "paragraph",
+      "text": "Fig. 14.1 Pretrained text representations can be fed to various deep learning\narchitectures for different downstream natural language processing\napplications. This chapter focuses on the upstream text\nrepresentation pretraining. ¶"
+    },
+    {
+      "type": "paragraph",
+      "text": "Để nhìn thấy bức tranh lớn, Fig. 14.1 cho thấy\nrằng các đại diện văn bản được đào tạo sẵn có thể được cung cấp cho một\nloạt các kiến trúc học sâu cho các ứng dụng xử lý ngôn ngữ tự nhiên hạ\nnguồn khác nhau. Chúng tôi sẽ bao gồm chúng trong Section 15 ."
+    },
+    {
+      "type": "list",
+      "ordered": false,
+      "items": [
+        "14.1. Từ nhúng (word2vec) 14.1.1. Vectơ một nóng là một lựa chọn tồi 14.1.2. Word2vec tự giám sát 14.1.3. Mô hình Skip-Gram 14.1.4. Mô hình túi từ liên tục (CBOW) 14.1.5. Tóm tắt 14.1.6. Bài tập",
+        "14.1.1. Vectơ một nóng là một lựa chọn tồi",
+        "14.1.2. Word2vec tự giám sát",
+        "14.1.3. Mô hình Skip-Gram",
+        "14.1.4. Mô hình túi từ liên tục (CBOW)",
+        "14.1.5. Tóm tắt",
+        "14.1.6. Bài tập",
+        "14.2. Đào tạo gần đúng 14.2.1. Lấy mẫu âm 14.2.2. Phân cấp Softmax 14.2.3. Tóm tắt 14.2.4. Bài tập",
+        "14.2.1. Lấy mẫu âm",
+        "14.2.2. Phân cấp Softmax",
+        "14.2.3. Tóm tắt",
+        "14.2.4. Bài tập",
+        "14.3. Các Dataset cho Pretraining Word Embeddings 14.3.1. Đọc tập dữ liệu 14.3.2. Lấy mẫu phụ 14.3.3. Trích xuất từ trung tâm và từ ngữ cảnh 14.3.4. Lấy mẫu âm 14.3.5. Tải ví dụ đào tạo trong Minibatches 14.3.6. Đặt tất cả mọi thứ lại với nhau 14.3.7. Tóm tắt 14.3.8. Bài tập",
+        "14.3.1. Đọc tập dữ liệu",
+        "14.3.2. Lấy mẫu phụ",
+        "14.3.3. Trích xuất từ trung tâm và từ ngữ cảnh",
+        "14.3.4. Lấy mẫu âm",
+        "14.3.5. Tải ví dụ đào tạo trong Minibatches",
+        "14.3.6. Đặt tất cả mọi thứ lại với nhau",
+        "14.3.7. Tóm tắt",
+        "14.3.8. Bài tập",
+        "14.4. Pretraining word2vec 14.4.1. Mô hình Skip-Gram 14.4.2. Đào tạo 14.4.3. Áp dụng Word Embeddings 14.4.4. Tóm tắt 14.4.5. Bài tập",
+        "14.4.1. Mô hình Skip-Gram",
+        "14.4.2. Đào tạo",
+        "14.4.3. Áp dụng Word Embeddings",
+        "14.4.4. Tóm tắt",
+        "14.4.5. Bài tập",
+        "14.5. Word Nhúng với Vectơ toàn cầu (Glove) 14.5.1. Skip-Gram với Thống kê Corpus toàn cầu 14.5.2. Mô hình Glove 14.5.3. Giải thích găng tay từ Tỷ lệ xác suất đồng xuất hiện 14.5.4. Tóm tắt 14.5.5. Bài tập",
+        "14.5.1. Skip-Gram với Thống kê Corpus toàn cầu",
+        "14.5.2. Mô hình Glove",
+        "14.5.3. Giải thích găng tay từ Tỷ lệ xác suất đồng xuất hiện",
+        "14.5.4. Tóm tắt",
+        "14.5.5. Bài tập",
+        "14.6. Subword Nhúng 14.6.1. Mô hình fastText 14.6.2. Mã hóa cặp byte 14.6.3. Tóm tắt 14.6.4. Bài tập",
+        "14.6.1. Mô hình fastText",
+        "14.6.2. Mã hóa cặp byte",
+        "14.6.3. Tóm tắt",
+        "14.6.4. Bài tập",
+        "14.7. Từ tương tự và tương tự 14.7.1. Đang tải Pretrained Word Vectơ 14.7.2. Áp dụng vectơ Word Pretrained 14.7.3. Tóm tắt 14.7.4. Bài tập",
+        "14.7.1. Đang tải Pretrained Word Vectơ",
+        "14.7.2. Áp dụng vectơ Word Pretrained",
+        "14.7.3. Tóm tắt",
+        "14.7.4. Bài tập",
+        "14.8. Đại diện bộ mã hóa hai chiều từ Transformers (BERT) 14.8.1. Từ bối cảnh độc lập đến bối cảnh nhạy cảm 14.8.2. Từ nhiệm vụ cụ thể đến nhiệm vụ Agnostic 14.8.3. BERT: Kết hợp tốt nhất của cả hai thế giới 14.8.4. Đại diện đầu vào 14.8.5. Nhiệm vụ Pretraining 14.8.6. Đặt tất cả mọi thứ lại với nhau 14.8.7. Tóm tắt 14.8.8. Bài tập",
+        "14.8.1. Từ bối cảnh độc lập đến bối cảnh nhạy cảm",
+        "14.8.2. Từ nhiệm vụ cụ thể đến nhiệm vụ Agnostic",
+        "14.8.3. BERT: Kết hợp tốt nhất của cả hai thế giới",
+        "14.8.4. Đại diện đầu vào",
+        "14.8.5. Nhiệm vụ Pretraining",
+        "14.8.6. Đặt tất cả mọi thứ lại với nhau",
+        "14.8.7. Tóm tắt",
+        "14.8.8. Bài tập",
+        "14.9. Tập dữ liệu cho Pretraining BERT 14.9.1. Xác định hàm trợ giúp cho các nhiệm vụ Pretraining 14.9.2. Chuyển văn bản thành tập dữ liệu Pretraining 14.9.3. Tóm tắt 14.9.4. Bài tập",
+        "14.9.1. Xác định hàm trợ giúp cho các nhiệm vụ Pretraining",
+        "14.9.2. Chuyển văn bản thành tập dữ liệu Pretraining",
+        "14.9.3. Tóm tắt",
+        "14.9.4. Bài tập",
+        "14.10. Pretraining BERT 14.10.1. Pretraining BERT 14.10.2. Đại diện cho văn bản với BERT 14.10.3. Tóm tắt 14.10.4. Bài tập",
+        "14.10.1. Pretraining BERT",
+        "14.10.2. Đại diện cho văn bản với BERT",
+        "14.10.3. Tóm tắt",
+        "14.10.4. Bài tập"
+      ]
+    }
+  ],
+  "images": [
+    {
+      "original_url": "https://vi.d2l.ai/_images/nlp-map-pretrain.svg",
+      "local_path": "_images/nlp-map-pretrain.svg",
+      "alt": "../_images/nlp-map-pretrain.svg"
+    }
+  ],
+  "text": "14. Chế biến ngôn ngữ tự nhiên: Pretraining\nCon người cần giao tiếp. Trong nhu cầu cơ bản này của tình trạng con\nngười, một lượng lớn văn bản bằng văn bản đã được tạo ra trên cơ sở hàng\nngày. Với văn bản phong phú trên phương tiện truyền thông xã hội, ứng\ndụng trò chuyện, email, đánh giá sản phẩm, bài báo tin tức, bài báo\nnghiên cứu và sách, điều quan trọng là cho phép máy tính hiểu chúng để\ncung cấp hỗ trợ hoặc đưa ra quyết định dựa trên ngôn ngữ của con người.\nXử lý ngôn ngữ tự nhiên nghiên cứu tương tác giữa máy tính và con\nngười sử dụng ngôn ngữ tự nhiên. Trong thực tế, rất phổ biến khi sử dụng\ncác kỹ thuật xử lý ngôn ngữ tự nhiên để xử lý và phân tích dữ liệu văn\nbản (ngôn ngữ tự nhiên của con người), chẳng hạn như các mô hình ngôn\nngữ trong Section 8.3 và các mô hình dịch máy trong Section 9.5 .\nĐể hiểu văn bản, chúng ta có thể bắt đầu bằng cách học các đại diện của\nnó. Tận dụng các chuỗi văn bản hiện có từ corpora lớn, tự giám sát đã\nđược sử dụng rộng rãi để chuẩn bị các biểu diễn văn bản, chẳng hạn như\nbằng cách dự đoán một số phần ẩn của văn bản bằng cách sử dụng một số\nphần khác của văn bản xung quanh của chúng. Bằng cách này, các mô hình\nhọc thông qua giám sát từ dữ liệu văn bản * massive* mà không có nỗ\nlực ghi nhãn * chi phí*!\nNhư chúng ta sẽ thấy trong chương này, khi coi từng từ hoặc từ con như\nmột mã thông báo riêng lẻ, biểu diễn của mỗi mã thông báo có thể được\nđào tạo trước bằng cách sử dụng các mô hình nhúng word2vec, Glove hoặc\ntừ con trên corpora lớn. Sau khi đào tạo trước, biểu diễn của mỗi mã\nthông báo có thể là một vectơ, tuy nhiên, nó vẫn giữ nguyên bất kể bối\ncảnh là gì. Ví dụ, đại diện vector của “ngân hàng” là như nhau trong cả\nhai “đi đến ngân hàng để gửi một số tiền” và “đi đến ngân hàng để ngồi\nxuống”. Do đó, nhiều mô hình pretraining gần đây hơn thích ứng đại diện\ncủa cùng một mã thông báo với các bối cảnh khác nhau. Trong số đó có\nBERT, một mô hình tự giám sát sâu hơn nhiều dựa trên bộ mã hóa biến áp.\nTrong chương này, chúng tôi sẽ tập trung vào cách chuẩn bị các đại diện\nnhư vậy cho văn bản, như được tô sáng trong Fig. 14.1 .\nFig. 14.1 Pretrained text representations can be fed to various deep learning\narchitectures for different downstream natural language processing\napplications. This chapter focuses on the upstream text\nrepresentation pretraining. ¶\nĐể nhìn thấy bức tranh lớn, Fig. 14.1 cho thấy\nrằng các đại diện văn bản được đào tạo sẵn có thể được cung cấp cho một\nloạt các kiến trúc học sâu cho các ứng dụng xử lý ngôn ngữ tự nhiên hạ\nnguồn khác nhau. Chúng tôi sẽ bao gồm chúng trong Section 15 .\n14.1. Từ nhúng (word2vec) 14.1.1. Vectơ một nóng là một lựa chọn tồi 14.1.2. Word2vec tự giám sát 14.1.3. Mô hình Skip-Gram 14.1.4. Mô hình túi từ liên tục (CBOW) 14.1.5. Tóm tắt 14.1.6. Bài tập\n14.1.1. Vectơ một nóng là một lựa chọn tồi\n14.1.2. Word2vec tự giám sát\n14.1.3. Mô hình Skip-Gram\n14.1.4. Mô hình túi từ liên tục (CBOW)\n14.1.5. Tóm tắt\n14.1.6. Bài tập\n14.2. Đào tạo gần đúng 14.2.1. Lấy mẫu âm 14.2.2. Phân cấp Softmax 14.2.3. Tóm tắt 14.2.4. Bài tập\n14.2.1. Lấy mẫu âm\n14.2.2. Phân cấp Softmax\n14.2.3. Tóm tắt\n14.2.4. Bài tập\n14.3. Các Dataset cho Pretraining Word Embeddings 14.3.1. Đọc tập dữ liệu 14.3.2. Lấy mẫu phụ 14.3.3. Trích xuất từ trung tâm và từ ngữ cảnh 14.3.4. Lấy mẫu âm 14.3.5. Tải ví dụ đào tạo trong Minibatches 14.3.6. Đặt tất cả mọi thứ lại với nhau 14.3.7. Tóm tắt 14.3.8. Bài tập\n14.3.1. Đọc tập dữ liệu\n14.3.2. Lấy mẫu phụ\n14.3.3. Trích xuất từ trung tâm và từ ngữ cảnh\n14.3.4. Lấy mẫu âm\n14.3.5. Tải ví dụ đào tạo trong Minibatches\n14.3.6. Đặt tất cả mọi thứ lại với nhau\n14.3.7. Tóm tắt\n14.3.8. Bài tập\n14.4. Pretraining word2vec 14.4.1. Mô hình Skip-Gram 14.4.2. Đào tạo 14.4.3. Áp dụng Word Embeddings 14.4.4. Tóm tắt 14.4.5. Bài tập\n14.4.1. Mô hình Skip-Gram\n14.4.2. Đào tạo\n14.4.3. Áp dụng Word Embeddings\n14.4.4. Tóm tắt\n14.4.5. Bài tập\n14.5. Word Nhúng với Vectơ toàn cầu (Glove) 14.5.1. Skip-Gram với Thống kê Corpus toàn cầu 14.5.2. Mô hình Glove 14.5.3. Giải thích găng tay từ Tỷ lệ xác suất đồng xuất hiện 14.5.4. Tóm tắt 14.5.5. Bài tập\n14.5.1. Skip-Gram với Thống kê Corpus toàn cầu\n14.5.2. Mô hình Glove\n14.5.3. Giải thích găng tay từ Tỷ lệ xác suất đồng xuất hiện\n14.5.4. Tóm tắt\n14.5.5. Bài tập\n14.6. Subword Nhúng 14.6.1. Mô hình fastText 14.6.2. Mã hóa cặp byte 14.6.3. Tóm tắt 14.6.4. Bài tập\n14.6.1. Mô hình fastText\n14.6.2. Mã hóa cặp byte\n14.6.3. Tóm tắt\n14.6.4. Bài tập\n14.7. Từ tương tự và tương tự 14.7.1. Đang tải Pretrained Word Vectơ 14.7.2. Áp dụng vectơ Word Pretrained 14.7.3. Tóm tắt 14.7.4. Bài tập\n14.7.1. Đang tải Pretrained Word Vectơ\n14.7.2. Áp dụng vectơ Word Pretrained\n14.7.3. Tóm tắt\n14.7.4. Bài tập\n14.8. Đại diện bộ mã hóa hai chiều từ Transformers (BERT) 14.8.1. Từ bối cảnh độc lập đến bối cảnh nhạy cảm 14.8.2. Từ nhiệm vụ cụ thể đến nhiệm vụ Agnostic 14.8.3. BERT: Kết hợp tốt nhất của cả hai thế giới 14.8.4. Đại diện đầu vào 14.8.5. Nhiệm vụ Pretraining 14.8.6. Đặt tất cả mọi thứ lại với nhau 14.8.7. Tóm tắt 14.8.8. Bài tập\n14.8.1. Từ bối cảnh độc lập đến bối cảnh nhạy cảm\n14.8.2. Từ nhiệm vụ cụ thể đến nhiệm vụ Agnostic\n14.8.3. BERT: Kết hợp tốt nhất của cả hai thế giới\n14.8.4. Đại diện đầu vào\n14.8.5. Nhiệm vụ Pretraining\n14.8.6. Đặt tất cả mọi thứ lại với nhau\n14.8.7. Tóm tắt\n14.8.8. Bài tập\n14.9. Tập dữ liệu cho Pretraining BERT 14.9.1. Xác định hàm trợ giúp cho các nhiệm vụ Pretraining 14.9.2. Chuyển văn bản thành tập dữ liệu Pretraining 14.9.3. Tóm tắt 14.9.4. Bài tập\n14.9.1. Xác định hàm trợ giúp cho các nhiệm vụ Pretraining\n14.9.2. Chuyển văn bản thành tập dữ liệu Pretraining\n14.9.3. Tóm tắt\n14.9.4. Bài tập\n14.10. Pretraining BERT 14.10.1. Pretraining BERT 14.10.2. Đại diện cho văn bản với BERT 14.10.3. Tóm tắt 14.10.4. Bài tập\n14.10.1. Pretraining BERT\n14.10.2. Đại diện cho văn bản với BERT\n14.10.3. Tóm tắt\n14.10.4. Bài tập"
+}

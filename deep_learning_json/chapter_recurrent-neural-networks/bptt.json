@@ -1,0 +1,377 @@
+{
+  "url": "https://vi.d2l.ai/chapter_recurrent-neural-networks/bptt.html",
+  "chapter": "chapter_recurrent-neural-networks",
+  "title": "8.7. Backpropagation qua thời gian",
+  "crawled_at": "2026-07-20T12:40:01.772342+00:00",
+  "headings": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "backpropagation-qua-thoi-gian",
+      "text": "8.7. Backpropagation qua thời gian"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "phan-tich-gradient-trong-rnns",
+      "text": "8.7.1. Phân tích Gradient trong RNNs"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "full-tinh-toan",
+      "text": "8.7.1.1. Full tính toán"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "cat-ngan-thoi-gian-buoc",
+      "text": "8.7.1.2. Cắt ngắn thời gian bước"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "ngau-nhien-cat-ngan",
+      "text": "8.7.1.3. Ngẫu nhiên Cắt ngắn"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "so-sanh-chien-luoc",
+      "text": "8.7.1.4. So sánh chiến lược"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "backpropagation-qua-thoi-gian-chi-tiet",
+      "text": "8.7.2. Backpropagation qua thời gian chi tiết"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tom-tat",
+      "text": "8.7.3. Tóm tắt"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bai-tap",
+      "text": "8.7.4. Bài tập"
+    }
+  ],
+  "content": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "backpropagation-qua-thoi-gian",
+      "text": "8.7. Backpropagation qua thời gian"
+    },
+    {
+      "type": "paragraph",
+      "text": "Cho đến nay chúng tôi đã nhiều lần ám chỉ những thứ như bùng nổ độ\ndạng , biến mất độ dạng , và sự cần thiết phải tách gradient cho\nRNNs. Ví dụ, trong Section 8.5 , chúng tôi đã gọi hàm detach trên trình tự. Không ai trong số này thực sự được giải thích\nđầy đủ, vì lợi ích của việc có thể xây dựng một mô hình một cách nhanh\nchóng và xem nó hoạt động như thế nào. Trong phần này, chúng ta sẽ\nnghiên cứu sâu hơn một chút về các chi tiết về truyền ngược cho các mô\nhình trình tự và tại sao (và cách thức) toán học hoạt động."
+    },
+    {
+      "type": "paragraph",
+      "text": "Chúng tôi gặp phải một số hiệu ứng của vụ nổ gradient khi lần đầu tiên\nchúng tôi triển khai RNN s ( Section 8.5 ). Đặc biệt, nếu\nbạn giải quyết các bài tập, bạn sẽ thấy rằng cắt gradient là rất quan\ntrọng để đảm bảo sự hội tụ thích hợp. Để hiểu rõ hơn về vấn đề này, phần\nnày sẽ xem xét cách tính toán độ dốc cho các mô hình trình tự. Lưu ý\nrằng không có gì về mặt khái niệm mới trong cách thức hoạt động của nó.\nRốt cuộc, chúng ta vẫn chỉ đơn thuần áp dụng quy tắc chuỗi để tính toán\nđộ dốc. Tuy nhiên, nó là giá trị trong khi xem xét backpropagation\n( Section 4.7 ) một lần nữa."
+    },
+    {
+      "type": "paragraph",
+      "text": "Chúng tôi đã mô tả về phía trước và lạc hậu tuyên truyền và đồ thị tính\ntoán trong MLP s trong Section 4.7 . Chuyển tiếp tuyên\ntruyền trong một RNN là tương đối đơn giản. Backpropagation thông qua\nthời giới thực sự là một cụ thể ứng dụng của backpropagation trong RNNs [Werbos, 1990] . Nó đòi hỏi chúng ta phải mở rộng biểu đồ tính\ntoán của một RNN một bước một lần tại một thời điểm để có được các phụ\nthuộc giữa các biến mô hình và tham số. Sau đó, dựa trên quy tắc chuỗi,\nchúng tôi áp dụng backpropagation để tính toán và lưu trữ gradient. Vì\ncác trình tự có thể khá dài, sự phụ thuộc có thể khá dài. Ví dụ, đối với\nmột chuỗi 1000 ký tự, token đầu tiên có khả năng có thể có ảnh hưởng\nđáng kể đến mã thông báo ở vị trí cuối cùng. Điều này không thực sự khả\nthi về mặt tính toán (mất quá nhiều thời gian và đòi hỏi quá nhiều bộ\nnhớ) và nó đòi hỏi hơn 1000 sản phẩm ma trận trước khi chúng tôi sẽ đến\ngradient rất khó nắm bắt đó. Đây là một quá trình đầy sự không chắc chắn\ntính toán và thống kê. Trong phần sau đây, chúng tôi sẽ làm sáng tỏ\nnhững gì xảy ra và cách giải quyết vấn đề này trong thực tế."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "phan-tich-gradient-trong-rnns",
+      "text": "8.7.1. Phân tích Gradient trong RNNs"
+    },
+    {
+      "type": "paragraph",
+      "text": "Chúng tôi bắt đầu với một mô hình đơn giản hóa về cách thức hoạt động\ncủa một RNN. Mô hình này bỏ qua chi tiết về các chi tiết cụ thể của\ntrạng thái ẩn và cách nó được cập nhật. Ký hiệu toán học ở đây không\nphân biệt rõ ràng vô hướng, vectơ, và ma trận như trước đây. Những chi\ntiết này không quan trọng đối với phân tích và sẽ chỉ phục vụ để làm lộn\nxộn ký hiệu trong tiểu mục này."
+    },
+    {
+      "type": "paragraph",
+      "text": "Trong mô hình đơn giản hóa này, chúng tôi biểu thị \\(h_t\\) là trạng\nthái ẩn, \\(x_t\\) làm đầu vào và \\(o_t\\) là đầu ra tại bước thời\ngian \\(t\\) . Nhớ lại các cuộc thảo luận của chúng tôi trong Section 8.4.2 rằng đầu vào và trạng thái ẩn có\nthể được nối để được nhân với một biến trọng lượng trong lớp ẩn. Do đó,\nchúng tôi sử dụng \\(w_h\\) và \\(w_o\\) để chỉ ra trọng lượng của\nlớp ẩn và lớp đầu ra, tương ứng. Kết quả là, các trạng thái ẩn và đầu ra\ntại mỗi thời điểm các bước có thể được giải thích là"
+    },
+    {
+      "type": "math",
+      "latex": "(8.7.1)¶\\[\\begin{split}\\begin{aligned}h_t &= f(x_t, h_{t-1}, w_h),\\\\o_t &= g(h_t, w_o),\\end{aligned}\\end{split}\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "trong đó \\(f\\) và \\(g\\) là sự biến đổi của lớp ẩn và lớp đầu ra,\ntương ứng. Do đó, chúng ta có một chuỗi các giá trị \\(\\{\\ldots, (x_{t-1}, h_{t-1}, o_{t-1}), (x_{t}, h_{t}, o_t), \\ldots\\}\\) phụ thuộc vào nhau thông qua tính toán lặp lại. Việc tuyên truyền về\nphía trước là khá đơn giản. Tất cả những gì chúng ta cần là vòng lặp qua \\((x_t, h_t, o_t)\\) ba lần một bước tại một thời điểm. Sự khác biệt\ngiữa đầu ra \\(o_t\\) và nhãn mong muốn \\(y_t\\) sau đó được đánh\ngiá bởi một chức năng khách quan trên tất cả các bước thời gian \\(T\\) như"
+    },
+    {
+      "type": "math",
+      "latex": "(8.7.2)¶\\[L(x_1, \\ldots, x_T, y_1, \\ldots, y_T, w_h, w_o) = \\frac{1}{T}\\sum_{t=1}^T l(y_t, o_t).\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Đối với truyền ngược, các vấn đề phức tạp hơn một chút, đặc biệt là khi\nchúng ta tính toán các gradient liên quan đến các tham số \\(w_h\\) của hàm khách quan \\(L\\) . Để được cụ thể, theo quy tắc chuỗi,"
+    },
+    {
+      "type": "math",
+      "latex": "(8.7.3)¶\\[\\begin{split}\\begin{aligned}\\frac{\\partial L}{\\partial w_h}  & = \\frac{1}{T}\\sum_{t=1}^T \\frac{\\partial l(y_t, o_t)}{\\partial w_h}  \\\\& = \\frac{1}{T}\\sum_{t=1}^T \\frac{\\partial l(y_t, o_t)}{\\partial o_t} \\frac{\\partial g(h_t, w_o)}{\\partial h_t}  \\frac{\\partial h_t}{\\partial w_h}.\\end{aligned}\\end{split}\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Yếu tố thứ nhất và thứ hai của sản phẩm trong (8.7.3) rất dễ tính toán. Yếu tố thứ ba \\(\\partial h_t/\\partial w_h\\) là nơi mọi thứ trở nên khó khăn, vì\nchúng ta cần tính toán lại hiệu ứng của tham số \\(w_h\\) trên \\(h_t\\) . Theo tính toán tái phát vào năm (8.7.1) , \\(h_t\\) phụ thuộc vào cả \\(h_{t-1}\\) và \\(w_h\\) , trong đó\ntính toán \\(h_{t-1}\\) cũng phụ thuộc vào \\(w_h\\) . Do đó, sử dụng\nsản lượng quy tắc chuỗi"
+    },
+    {
+      "type": "math",
+      "latex": "(8.7.4)¶\\[\\frac{\\partial h_t}{\\partial w_h}= \\frac{\\partial f(x_{t},h_{t-1},w_h)}{\\partial w_h} +\\frac{\\partial f(x_{t},h_{t-1},w_h)}{\\partial h_{t-1}} \\frac{\\partial h_{t-1}}{\\partial w_h}.\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Để lấy được gradient trên, giả sử rằng chúng ta có ba chuỗi \\(\\{a_{t}\\},\\{b_{t}\\},\\{c_{t}\\}\\) đáp ứng \\(a_{0}=0\\) và \\(a_{t}=b_{t}+c_{t}a_{t-1}\\) cho \\(t=1, 2,\\ldots\\) . Sau đó, đối\nvới \\(t\\geq 1\\) , thật dễ dàng để hiển thị"
+    },
+    {
+      "type": "math",
+      "latex": "(8.7.5)¶\\[a_{t}=b_{t}+\\sum_{i=1}^{t-1}\\left(\\prod_{j=i+1}^{t}c_{j}\\right)b_{i}.\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Bằng cách thay thế \\(a_t\\) , \\(b_t\\) , và \\(c_t\\) theo"
+    },
+    {
+      "type": "math",
+      "latex": "(8.7.6)¶\\[\\begin{split}\\begin{aligned}a_t &= \\frac{\\partial h_t}{\\partial w_h},\\\\\nb_t &= \\frac{\\partial f(x_{t},h_{t-1},w_h)}{\\partial w_h}, \\\\\nc_t &= \\frac{\\partial f(x_{t},h_{t-1},w_h)}{\\partial h_{t-1}},\\end{aligned}\\end{split}\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "tính toán gradient trong (8.7.4) thỏa mãn \\(a_{t}=b_{t}+c_{t}a_{t-1}\\) . Do đó, mỗi (8.7.5) ,\nchúng ta có thể loại bỏ tính toán tái phát trong (8.7.4) với"
+    },
+    {
+      "type": "math",
+      "latex": "(8.7.7)¶\\[\\frac{\\partial h_t}{\\partial w_h}=\\frac{\\partial f(x_{t},h_{t-1},w_h)}{\\partial w_h}+\\sum_{i=1}^{t-1}\\left(\\prod_{j=i+1}^{t} \\frac{\\partial f(x_{j},h_{j-1},w_h)}{\\partial h_{j-1}} \\right) \\frac{\\partial f(x_{i},h_{i-1},w_h)}{\\partial w_h}.\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Mặc dù chúng ta có thể sử dụng quy tắc chuỗi để tính toán \\(\\partial h_t/\\partial w_h\\) đệ quy, chuỗi này có thể nhận được rất\ndài bất cứ khi nào \\(t\\) lớn. Hãy để chúng tôi thảo luận về một số\nchiến lược để đối phó với vấn đề này."
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "full-tinh-toan",
+      "text": "8.7.1.1. Full tính toán"
+    },
+    {
+      "type": "paragraph",
+      "text": "Rõ ràng, chúng ta chỉ có thể tính toán toàn bộ tổng trong (8.7.7) . Tuy nhiên, điều này rất chậm và độ\ndốc có thể nổ tung, vì những thay đổi tinh tế trong điều kiện ban đầu có\nkhả năng ảnh hưởng đến kết quả rất nhiều. Đó là, chúng ta có thể thấy\nnhững thứ tương tự như hiệu ứng butterfly trong đó những thay đổi tối\nthiểu trong điều kiện ban đầu dẫn đến những thay đổi không cân xứng\ntrong kết quả. Điều này thực sự là khá không mong muốn về mô hình mà\nchúng tôi muốn ước tính. Rốt cuộc, chúng tôi đang tìm kiếm những người\ndự đoán mạnh mẽ mà khái quát hóa tốt. Do đó chiến lược này hầu như không\nbao giờ được sử dụng trong thực tế."
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "cat-ngan-thoi-gian-buoc",
+      "text": "8.7.1.2. Cắt ngắn thời gian bước"
+    },
+    {
+      "type": "paragraph",
+      "text": "Ngoài ra, chúng ta có thể cắt ngắn tổng trong (8.7.7) sau \\(\\tau\\) bước. Đây là những\ngì chúng ta đã thảo luận cho đến nay, chẳng hạn như khi chúng ta tách\ncác gradient trong Section 8.5 . Điều này dẫn đến một * xấp xỉ * của gradient thật, đơn giản bằng cách chấm dứt tổng tại \\(\\partial h_{t-\\tau}/\\partial w_h\\) . Trong thực tế, điều này hoạt\nđộng khá tốt. Nó là những gì thường được gọi là backpropgation cắt ngắn\nqua thời gian [Jaeger, 2002] . Một trong những hậu quả của việc\nnày là mô hình tập trung chủ yếu vào ảnh hưởng ngắn hạn chứ không phải\nlà hậu quả lâu dài. Điều này thực sự là * mong muốn*, vì nó thiên vị\nước tính đối với các mô hình đơn giản và ổn định hơn."
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "ngau-nhien-cat-ngan",
+      "text": "8.7.1.3. Ngẫu nhiên Cắt ngắn"
+    },
+    {
+      "type": "paragraph",
+      "text": "Cuối cùng, chúng ta có thể thay thế \\(\\partial h_t/\\partial w_h\\) bằng một biến ngẫu nhiên đó là chính xác trong kỳ vọng nhưng cắt ngắn\nchuỗi. Điều này đạt được bằng cách sử dụng một chuỗi \\(\\xi_t\\) với \\(0 \\leq \\pi_t \\leq 1\\) được xác định trước, trong đó \\(P(\\xi_t = 0) = 1-\\pi_t\\) và \\(P(\\xi_t = \\pi_t^{-1}) = \\pi_t\\) ,\ndo đó \\(E[\\xi_t] = 1\\) . Chúng tôi sử dụng điều này để thay thế\ngradient \\(\\partial h_t/\\partial w_h\\) trong (8.7.4) bằng"
+    },
+    {
+      "type": "math",
+      "latex": "(8.7.8)¶\\[z_t= \\frac{\\partial f(x_{t},h_{t-1},w_h)}{\\partial w_h} +\\xi_t \\frac{\\partial f(x_{t},h_{t-1},w_h)}{\\partial h_{t-1}} \\frac{\\partial h_{t-1}}{\\partial w_h}.\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Nó theo định nghĩa của \\(\\xi_t\\) rằng \\(E[z_t] = \\partial h_t/\\partial w_h\\) . Bất cứ khi nào \\(\\xi_t = 0\\) tính toán tái phát chấm dứt tại thời điểm đó bước \\(t\\) . Điều này dẫn đến một tổng trọng số của các chuỗi có độ dài\nkhác nhau trong đó các chuỗi dài rất hiếm nhưng quá nặng một cách thích\nhợp. Ý tưởng này được đề xuất bởi Tallec và Ollivier [Tallec & Ollivier, 2017] ."
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "so-sanh-chien-luoc",
+      "text": "8.7.1.4. So sánh chiến lược"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/truncated-bptt.svg",
+      "local_path": "_images/truncated-bptt.svg",
+      "alt": "../_images/truncated-bptt.svg"
+    },
+    {
+      "type": "paragraph",
+      "text": "Fig. 8.7.1 Comparing strategies for computing gradients in RNNs. From top to\nbottom: randomized truncation, regular truncation, and full\ncomputation. ¶"
+    },
+    {
+      "type": "paragraph",
+      "text": "Fig. 8.7.1 minh họa ba chiến lược khi phân tích vài\nký tự đầu tiên của The Time Machine cuốn sách sử dụng backpropagation\nqua thời gian cho RNNs:"
+    },
+    {
+      "type": "list",
+      "ordered": false,
+      "items": [
+        "Hàng đầu tiên là sự cắt ngắn ngẫu nhiên phân vùng văn bản thành các\nphân đoạn có độ dài khác nhau.",
+        "Hàng thứ hai là sự cắt ngắn thông thường phá vỡ văn bản thành các dãy\ncon có cùng độ dài. Đây là những gì chúng tôi đã làm trong các thí\nnghiệm RNN.",
+        "Hàng thứ ba là sự lan truyền ngược đầy đủ thông qua thời gian dẫn đến\nmột biểu thức không khả thi về mặt tính toán."
+      ]
+    },
+    {
+      "type": "paragraph",
+      "text": "Thật không may, trong khi hấp dẫn về lý thuyết, cắt ngắn ngẫu nhiên\nkhông hoạt động tốt hơn nhiều so với cắt ngắn thông thường, rất có thể\nlà do một số yếu tố. Đầu tiên, hiệu quả của một quan sát sau một số bước\nlan truyền ngược vào quá khứ là khá đủ để nắm bắt các phụ thuộc trong\nthực tế. Thứ hai, phương sai tăng chống lại thực tế là gradient chính\nxác hơn với nhiều bước hơn. Thứ ba, chúng tôi thực sự * muốn* mô hình\nchỉ có một phạm vi tương tác ngắn. Do đó, thường xuyên cắt ngắn\nbackpropagation thông qua thời gian có một hiệu ứng thường xuyên nhẹ có\nthể được mong muốn."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "backpropagation-qua-thoi-gian-chi-tiet",
+      "text": "8.7.2. Backpropagation qua thời gian chi tiết"
+    },
+    {
+      "type": "paragraph",
+      "text": "Sau khi thảo luận về nguyên tắc chung, chúng ta hãy thảo luận về tuyên\ntruyền ngược qua thời gian một cách chi tiết. Khác với phân tích trong Section 8.7.1 , sau đây chúng ta sẽ chỉ ra cách tính\nđộ dốc của hàm mục tiêu đối với tất cả các tham số mô hình bị phân hủy.\nĐể giữ cho mọi thứ đơn giản, chúng ta xem xét một RNN không có tham số\nthiên vị, có chức năng kích hoạt trong lớp ẩn sử dụng ánh xạ danh tính\n( \\(\\phi(x)=x\\) ). Đối với bước thời gian \\(t\\) , hãy để đầu vào ví\ndụ duy nhất và nhãn lần lượt là \\(\\mathbf{x}_t \\in \\mathbb{R}^d\\) và \\(y_t\\) . Trạng thái ẩn \\(\\mathbf{h}_t \\in \\mathbb{R}^h\\) và đầu\nra \\(\\mathbf{o}_t \\in \\mathbb{R}^q\\) được tính là"
+    },
+    {
+      "type": "math",
+      "latex": "(8.7.9)¶\\[\\begin{split}\\begin{aligned}\\mathbf{h}_t &= \\mathbf{W}_{hx} \\mathbf{x}_t + \\mathbf{W}_{hh} \\mathbf{h}_{t-1},\\\\\n\\mathbf{o}_t &= \\mathbf{W}_{qh} \\mathbf{h}_{t},\\end{aligned}\\end{split}\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "trong đó \\(\\mathbf{W}_{hx} \\in \\mathbb{R}^{h \\times d}\\) , \\(\\mathbf{W}_{hh} \\in \\mathbb{R}^{h \\times h}\\) , và \\(\\mathbf{W}_{qh} \\in \\mathbb{R}^{q \\times h}\\) là các thông số\ntrọng lượng. Biểu thị bởi \\(l(\\mathbf{o}_t, y_t)\\) sự mất mát tại\nbước thời gian \\(t\\) . Chức năng mục tiêu của chúng tôi, sự mất mát\ntrên \\(T\\) bước thời gian từ đầu chuỗi là do đó"
+    },
+    {
+      "type": "math",
+      "latex": "(8.7.10)¶\\[L = \\frac{1}{T} \\sum_{t=1}^T l(\\mathbf{o}_t, y_t).\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Để hình dung các phụ thuộc giữa các biến mô hình và tham số trong quá\ntrình tính toán RNN, chúng ta có thể vẽ một biểu đồ tính toán cho mô\nhình, như thể hiện trong Fig. 8.7.2 . Ví dụ, tính toán các\ntrạng thái ẩn của bước thời gian 3, \\(\\mathbf{h}_3\\) , phụ thuộc vào\ncác thông số mô hình \\(\\mathbf{W}_{hx}\\) và \\(\\mathbf{W}_{hh}\\) ,\ntrạng thái ẩn của bước thời gian cuối cùng \\(\\mathbf{h}_2\\) và đầu\nvào của bước thời gian hiện tại \\(\\mathbf{x}_3\\) ."
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/rnn-bptt.svg",
+      "local_path": "_images/rnn-bptt.svg",
+      "alt": "../_images/rnn-bptt.svg"
+    },
+    {
+      "type": "paragraph",
+      "text": "Fig. 8.7.2 Computational graph showing dependencies for an RNN model with three\ntime steps. Boxes represent variables (not shaded) or parameters\n(shaded) and circles represent operators. ¶"
+    },
+    {
+      "type": "paragraph",
+      "text": "Như vừa đề cập, các thông số mô hình trong Fig. 8.7.2 là \\(\\mathbf{W}_{hx}\\) , \\(\\mathbf{W}_{hh}\\) và \\(\\mathbf{W}_{qh}\\) . Nói chung, đào tạo mô hình này yêu cầu tính\ntoán gradient đối với các thông số này \\(\\partial L/\\partial \\mathbf{W}_{hx}\\) , \\(\\partial L/\\partial \\mathbf{W}_{hh}\\) và \\(\\partial L/\\partial \\mathbf{W}_{qh}\\) . Theo các phụ thuộc trong Fig. 8.7.2 , chúng ta có thể đi qua theo hướng ngược lại\ncủa các mũi tên để tính toán và lưu trữ các gradient lần lượt. Để thể\nhiện linh hoạt phép nhân của ma trận, vectơ và vô hướng của các hình\ndạng khác nhau trong quy tắc chuỗi, chúng ta tiếp tục sử dụng toán tử \\(\\text{prod}\\) như được mô tả trong Section 4.7 ."
+    },
+    {
+      "type": "paragraph",
+      "text": "Trước hết, việc phân biệt chức năng khách quan đối với đầu ra mô hình\nbất cứ lúc nào \\(t\\) là khá đơn giản:"
+    },
+    {
+      "type": "math",
+      "latex": "(8.7.11)¶\\[\\frac{\\partial L}{\\partial \\mathbf{o}_t} =  \\frac{\\partial l (\\mathbf{o}_t, y_t)}{T \\cdot \\partial \\mathbf{o}_t} \\in \\mathbb{R}^q.\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Bây giờ, chúng ta có thể tính toán gradient của hàm mục tiêu đối với\ntham số \\(\\mathbf{W}_{qh}\\) trong lớp đầu ra: \\(\\partial L/\\partial \\mathbf{W}_{qh} \\in \\mathbb{R}^{q \\times h}\\) .\nDựa trên Fig. 8.7.2 , hàm khách quan \\(L\\) phụ thuộc\nvào \\(\\mathbf{W}_{qh}\\) qua \\(\\mathbf{o}_1, \\ldots, \\mathbf{o}_T\\) . Sử dụng sản lượng quy tắc\nchuỗi"
+    },
+    {
+      "type": "math",
+      "latex": "(8.7.12)¶\\[\\frac{\\partial L}{\\partial \\mathbf{W}_{qh}}\n= \\sum_{t=1}^T \\text{prod}\\left(\\frac{\\partial L}{\\partial \\mathbf{o}_t}, \\frac{\\partial \\mathbf{o}_t}{\\partial \\mathbf{W}_{qh}}\\right)\n= \\sum_{t=1}^T \\frac{\\partial L}{\\partial \\mathbf{o}_t} \\mathbf{h}_t^\\top,\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "trong đó \\(\\partial L/\\partial \\mathbf{o}_t\\) được đưa ra bởi (8.7.11) ."
+    },
+    {
+      "type": "paragraph",
+      "text": "Tiếp theo, như thể hiện trong Fig. 8.7.2 , tại bước thời\ngian cuối cùng \\(T\\) các chức năng khách quan \\(L\\) phụ thuộc\nvào trạng thái ẩn \\(\\mathbf{h}_T\\) chỉ qua \\(\\mathbf{o}_T\\) . Do\nđó, chúng ta có thể dễ dàng tìm thấy gradient \\(\\partial L/\\partial \\mathbf{h}_T \\in \\mathbb{R}^h\\) bằng quy tắc\nchuỗi:"
+    },
+    {
+      "type": "math",
+      "latex": "(8.7.13)¶\\[\\frac{\\partial L}{\\partial \\mathbf{h}_T} = \\text{prod}\\left(\\frac{\\partial L}{\\partial \\mathbf{o}_T}, \\frac{\\partial \\mathbf{o}_T}{\\partial \\mathbf{h}_T} \\right) = \\mathbf{W}_{qh}^\\top \\frac{\\partial L}{\\partial \\mathbf{o}_T}.\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Nó trở nên phức tạp hơn cho bất kỳ bước thời gian \\(t < T\\) , nơi\nchức năng khách quan \\(L\\) phụ thuộc vào \\(\\mathbf{h}_t\\) qua \\(\\mathbf{h}_{t+1}\\) và \\(\\mathbf{o}_t\\) . Theo quy tắc chuỗi,\ngradient của trạng thái ẩn \\(\\partial L/\\partial \\mathbf{h}_t \\in \\mathbb{R}^h\\) bất cứ lúc nào\nbước \\(t < T\\) có thể được tính toán một cách lặp lại như:"
+    },
+    {
+      "type": "math",
+      "latex": "(8.7.14)¶\\[\\frac{\\partial L}{\\partial \\mathbf{h}_t} = \\text{prod}\\left(\\frac{\\partial L}{\\partial \\mathbf{h}_{t+1}}, \\frac{\\partial \\mathbf{h}_{t+1}}{\\partial \\mathbf{h}_t} \\right) + \\text{prod}\\left(\\frac{\\partial L}{\\partial \\mathbf{o}_t}, \\frac{\\partial \\mathbf{o}_t}{\\partial \\mathbf{h}_t} \\right) = \\mathbf{W}_{hh}^\\top \\frac{\\partial L}{\\partial \\mathbf{h}_{t+1}} + \\mathbf{W}_{qh}^\\top \\frac{\\partial L}{\\partial \\mathbf{o}_t}.\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Để phân tích, mở rộng tính toán định kỳ cho bất kỳ bước thời gian \\(1 \\leq t \\leq T\\) cho"
+    },
+    {
+      "type": "math",
+      "latex": "(8.7.15)¶\\[\\frac{\\partial L}{\\partial \\mathbf{h}_t}= \\sum_{i=t}^T {\\left(\\mathbf{W}_{hh}^\\top\\right)}^{T-i} \\mathbf{W}_{qh}^\\top \\frac{\\partial L}{\\partial \\mathbf{o}_{T+t-i}}.\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Chúng ta có thể thấy từ (8.7.15) rằng ví dụ tuyến\ntính đơn giản này đã thể hiện một số vấn đề chính của các mô hình chuỗi\ndài: nó liên quan đến sức mạnh có khả năng rất lớn của \\(\\mathbf{W}_{hh}^\\top\\) . Trong đó, eigenvalues nhỏ hơn 1 biến mất\nvà eigenvalues lớn hơn 1 phân kỳ. Điều này không ổn định về số lượng,\nbiểu hiện dưới dạng biến mất và bùng nổ gradient. Một cách để giải quyết\nvấn đề này là cắt ngắn các bước thời gian ở kích thước thuận tiện về mặt\ntính toán như đã thảo luận trong Section 8.7.1 . Trong\nthực tế, sự cắt ngắn này được thực hiện bằng cách tách gradient sau một\nsố bước thời gian nhất định. Sau đó, chúng ta sẽ thấy các mô hình trình\ntự phức tạp hơn như bộ nhớ ngắn hạn dài có thể làm giảm bớt điều này hơn\nnữa."
+    },
+    {
+      "type": "paragraph",
+      "text": "Cuối cùng, Fig. 8.7.2 cho thấy hàm khách quan \\(L\\) phụ thuộc vào các tham số mô hình \\(\\mathbf{W}_{hx}\\) và \\(\\mathbf{W}_{hh}\\) trong lớp ẩn thông qua các trạng thái ẩn \\(\\mathbf{h}_1, \\ldots, \\mathbf{h}_T\\) . Để tính toán gradient liên\nquan đến các tham số như vậy \\(\\partial L / \\partial \\mathbf{W}_{hx} \\in \\mathbb{R}^{h \\times d}\\) và \\(\\partial L / \\partial \\mathbf{W}_{hh} \\in \\mathbb{R}^{h \\times h}\\) ,\nchúng tôi áp dụng quy tắc chuỗi cung cấp"
+    },
+    {
+      "type": "math",
+      "latex": "(8.7.16)¶\\[\\begin{split}\\begin{aligned}\n\\frac{\\partial L}{\\partial \\mathbf{W}_{hx}}\n&= \\sum_{t=1}^T \\text{prod}\\left(\\frac{\\partial L}{\\partial \\mathbf{h}_t}, \\frac{\\partial \\mathbf{h}_t}{\\partial \\mathbf{W}_{hx}}\\right)\n= \\sum_{t=1}^T \\frac{\\partial L}{\\partial \\mathbf{h}_t} \\mathbf{x}_t^\\top,\\\\\n\\frac{\\partial L}{\\partial \\mathbf{W}_{hh}}\n&= \\sum_{t=1}^T \\text{prod}\\left(\\frac{\\partial L}{\\partial \\mathbf{h}_t}, \\frac{\\partial \\mathbf{h}_t}{\\partial \\mathbf{W}_{hh}}\\right)\n= \\sum_{t=1}^T \\frac{\\partial L}{\\partial \\mathbf{h}_t} \\mathbf{h}_{t-1}^\\top,\n\\end{aligned}\\end{split}\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "trong đó \\(\\partial L/\\partial \\mathbf{h}_t\\) được tính toán lặp đi\nlặp lại bởi (8.7.13) và (8.7.14) là đại lượng chính ảnh hưởng đến\nsự ổn định số."
+    },
+    {
+      "type": "paragraph",
+      "text": "Kể từ khi tuyên truyền ngược qua thời gian là việc áp dụng tuyên truyền\nngược trong RNN s, như chúng tôi đã giải thích trong Section 4.7 , đào tạo RNN s xen kẽ tuyên truyền về phía\ntrước với truyền ngược qua thời gian. Bên cạnh đó, backpropagation thông\nqua thời gian tính toán và lưu trữ các gradient trên lần lượt. Cụ thể,\ncác giá trị trung gian được lưu trữ được tái sử dụng để tránh tính toán\ntrùng lặp, chẳng hạn như lưu trữ \\(\\partial L/\\partial \\mathbf{h}_t\\) được sử dụng trong tính toán cả \\(\\partial L / \\partial \\mathbf{W}_{hx}\\) và \\(\\partial L / \\partial \\mathbf{W}_{hh}\\) ."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tom-tat",
+      "text": "8.7.3. Tóm tắt"
+    },
+    {
+      "type": "list",
+      "ordered": false,
+      "items": [
+        "Backpropagation qua thời gian chỉ đơn thuần là một ứng dụng của\nbackpropagation cho các mô hình trình tự với một trạng thái ẩn.",
+        "Cắt ngắn là cần thiết để thuận tiện tính toán và ổn định số, chẳng\nhạn như cắt ngắn thường xuyên và cắt ngắn ngẫu nhiên.",
+        "Sức mạnh cao của ma trận có thể dẫn đến sự khác biệt hoặc biến mất\neigenvalues. Điều này thể hiện chính nó dưới dạng bùng nổ hoặc biến\nmất gradient.",
+        "Để tính toán hiệu quả, các giá trị trung gian được lưu trữ trong quá\ntrình truyền ngược qua thời gian."
+      ]
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bai-tap",
+      "text": "8.7.4. Bài tập"
+    },
+    {
+      "type": "list",
+      "ordered": true,
+      "items": [
+        "Giả sử rằng chúng ta có một ma trận đối xứng \\(\\mathbf{M} \\in \\mathbb{R}^{n \\times n}\\) với eigenvalues \\(\\lambda_i\\) có eigenvectors tương ứng là \\(\\mathbf{v}_i\\) ( \\(i = 1, \\ldots, n\\) ). Không mất tính tổng quát, giả định rằng\nchúng được đặt hàng theo thứ tự \\(|\\lambda_i| \\geq |\\lambda_{i+1}|\\) .",
+        "Cho thấy \\(\\mathbf{M}^k\\) có eigenvalues \\(\\lambda_i^k\\) .",
+        "Chứng minh rằng đối với một vector ngẫu nhiên \\(\\mathbf{x} \\in \\mathbb{R}^n\\) , với xác suất cao \\(\\mathbf{M}^k \\mathbf{x}\\) sẽ rất phù hợp với eigenvector \\(\\mathbf{v}_1\\) của \\(\\mathbf{M}\\) . Chính thức hóa tuyên bố\nnày.",
+        "Kết quả trên có ý nghĩa gì đối với gradient trong RNNs?",
+        "Bên cạnh việc cắt gradient, bạn có thể nghĩ về bất kỳ phương pháp nào\nkhác để đối phó với sự bùng nổ gradient trong các mạng thần kinh tái\nphát không?"
+      ]
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    }
+  ],
+  "images": [
+    {
+      "original_url": "https://vi.d2l.ai/_images/truncated-bptt.svg",
+      "local_path": "_images/truncated-bptt.svg",
+      "alt": "../_images/truncated-bptt.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/rnn-bptt.svg",
+      "local_path": "_images/rnn-bptt.svg",
+      "alt": "../_images/rnn-bptt.svg"
+    }
+  ],
+  "text": "8.7. Backpropagation qua thời gian\nCho đến nay chúng tôi đã nhiều lần ám chỉ những thứ như bùng nổ độ\ndạng , biến mất độ dạng , và sự cần thiết phải tách gradient cho\nRNNs. Ví dụ, trong Section 8.5 , chúng tôi đã gọi hàm detach trên trình tự. Không ai trong số này thực sự được giải thích\nđầy đủ, vì lợi ích của việc có thể xây dựng một mô hình một cách nhanh\nchóng và xem nó hoạt động như thế nào. Trong phần này, chúng ta sẽ\nnghiên cứu sâu hơn một chút về các chi tiết về truyền ngược cho các mô\nhình trình tự và tại sao (và cách thức) toán học hoạt động.\nChúng tôi gặp phải một số hiệu ứng của vụ nổ gradient khi lần đầu tiên\nchúng tôi triển khai RNN s ( Section 8.5 ). Đặc biệt, nếu\nbạn giải quyết các bài tập, bạn sẽ thấy rằng cắt gradient là rất quan\ntrọng để đảm bảo sự hội tụ thích hợp. Để hiểu rõ hơn về vấn đề này, phần\nnày sẽ xem xét cách tính toán độ dốc cho các mô hình trình tự. Lưu ý\nrằng không có gì về mặt khái niệm mới trong cách thức hoạt động của nó.\nRốt cuộc, chúng ta vẫn chỉ đơn thuần áp dụng quy tắc chuỗi để tính toán\nđộ dốc. Tuy nhiên, nó là giá trị trong khi xem xét backpropagation\n( Section 4.7 ) một lần nữa.\nChúng tôi đã mô tả về phía trước và lạc hậu tuyên truyền và đồ thị tính\ntoán trong MLP s trong Section 4.7 . Chuyển tiếp tuyên\ntruyền trong một RNN là tương đối đơn giản. Backpropagation thông qua\nthời giới thực sự là một cụ thể ứng dụng của backpropagation trong RNNs [Werbos, 1990] . Nó đòi hỏi chúng ta phải mở rộng biểu đồ tính\ntoán của một RNN một bước một lần tại một thời điểm để có được các phụ\nthuộc giữa các biến mô hình và tham số. Sau đó, dựa trên quy tắc chuỗi,\nchúng tôi áp dụng backpropagation để tính toán và lưu trữ gradient. Vì\ncác trình tự có thể khá dài, sự phụ thuộc có thể khá dài. Ví dụ, đối với\nmột chuỗi 1000 ký tự, token đầu tiên có khả năng có thể có ảnh hưởng\nđáng kể đến mã thông báo ở vị trí cuối cùng. Điều này không thực sự khả\nthi về mặt tính toán (mất quá nhiều thời gian và đòi hỏi quá nhiều bộ\nnhớ) và nó đòi hỏi hơn 1000 sản phẩm ma trận trước khi chúng tôi sẽ đến\ngradient rất khó nắm bắt đó. Đây là một quá trình đầy sự không chắc chắn\ntính toán và thống kê. Trong phần sau đây, chúng tôi sẽ làm sáng tỏ\nnhững gì xảy ra và cách giải quyết vấn đề này trong thực tế.\n8.7.1. Phân tích Gradient trong RNNs\nChúng tôi bắt đầu với một mô hình đơn giản hóa về cách thức hoạt động\ncủa một RNN. Mô hình này bỏ qua chi tiết về các chi tiết cụ thể của\ntrạng thái ẩn và cách nó được cập nhật. Ký hiệu toán học ở đây không\nphân biệt rõ ràng vô hướng, vectơ, và ma trận như trước đây. Những chi\ntiết này không quan trọng đối với phân tích và sẽ chỉ phục vụ để làm lộn\nxộn ký hiệu trong tiểu mục này.\nTrong mô hình đơn giản hóa này, chúng tôi biểu thị \\(h_t\\) là trạng\nthái ẩn, \\(x_t\\) làm đầu vào và \\(o_t\\) là đầu ra tại bước thời\ngian \\(t\\) . Nhớ lại các cuộc thảo luận của chúng tôi trong Section 8.4.2 rằng đầu vào và trạng thái ẩn có\nthể được nối để được nhân với một biến trọng lượng trong lớp ẩn. Do đó,\nchúng tôi sử dụng \\(w_h\\) và \\(w_o\\) để chỉ ra trọng lượng của\nlớp ẩn và lớp đầu ra, tương ứng. Kết quả là, các trạng thái ẩn và đầu ra\ntại mỗi thời điểm các bước có thể được giải thích là\ntrong đó \\(f\\) và \\(g\\) là sự biến đổi của lớp ẩn và lớp đầu ra,\ntương ứng. Do đó, chúng ta có một chuỗi các giá trị \\(\\{\\ldots, (x_{t-1}, h_{t-1}, o_{t-1}), (x_{t}, h_{t}, o_t), \\ldots\\}\\) phụ thuộc vào nhau thông qua tính toán lặp lại. Việc tuyên truyền về\nphía trước là khá đơn giản. Tất cả những gì chúng ta cần là vòng lặp qua \\((x_t, h_t, o_t)\\) ba lần một bước tại một thời điểm. Sự khác biệt\ngiữa đầu ra \\(o_t\\) và nhãn mong muốn \\(y_t\\) sau đó được đánh\ngiá bởi một chức năng khách quan trên tất cả các bước thời gian \\(T\\) như\nĐối với truyền ngược, các vấn đề phức tạp hơn một chút, đặc biệt là khi\nchúng ta tính toán các gradient liên quan đến các tham số \\(w_h\\) của hàm khách quan \\(L\\) . Để được cụ thể, theo quy tắc chuỗi,\nYếu tố thứ nhất và thứ hai của sản phẩm trong (8.7.3) rất dễ tính toán. Yếu tố thứ ba \\(\\partial h_t/\\partial w_h\\) là nơi mọi thứ trở nên khó khăn, vì\nchúng ta cần tính toán lại hiệu ứng của tham số \\(w_h\\) trên \\(h_t\\) . Theo tính toán tái phát vào năm (8.7.1) , \\(h_t\\) phụ thuộc vào cả \\(h_{t-1}\\) và \\(w_h\\) , trong đó\ntính toán \\(h_{t-1}\\) cũng phụ thuộc vào \\(w_h\\) . Do đó, sử dụng\nsản lượng quy tắc chuỗi\nĐể lấy được gradient trên, giả sử rằng chúng ta có ba chuỗi \\(\\{a_{t}\\},\\{b_{t}\\},\\{c_{t}\\}\\) đáp ứng \\(a_{0}=0\\) và \\(a_{t}=b_{t}+c_{t}a_{t-1}\\) cho \\(t=1, 2,\\ldots\\) . Sau đó, đối\nvới \\(t\\geq 1\\) , thật dễ dàng để hiển thị\nBằng cách thay thế \\(a_t\\) , \\(b_t\\) , và \\(c_t\\) theo\ntính toán gradient trong (8.7.4) thỏa mãn \\(a_{t}=b_{t}+c_{t}a_{t-1}\\) . Do đó, mỗi (8.7.5) ,\nchúng ta có thể loại bỏ tính toán tái phát trong (8.7.4) với\nMặc dù chúng ta có thể sử dụng quy tắc chuỗi để tính toán \\(\\partial h_t/\\partial w_h\\) đệ quy, chuỗi này có thể nhận được rất\ndài bất cứ khi nào \\(t\\) lớn. Hãy để chúng tôi thảo luận về một số\nchiến lược để đối phó với vấn đề này.\n8.7.1.1. Full tính toán\nRõ ràng, chúng ta chỉ có thể tính toán toàn bộ tổng trong (8.7.7) . Tuy nhiên, điều này rất chậm và độ\ndốc có thể nổ tung, vì những thay đổi tinh tế trong điều kiện ban đầu có\nkhả năng ảnh hưởng đến kết quả rất nhiều. Đó là, chúng ta có thể thấy\nnhững thứ tương tự như hiệu ứng butterfly trong đó những thay đổi tối\nthiểu trong điều kiện ban đầu dẫn đến những thay đổi không cân xứng\ntrong kết quả. Điều này thực sự là khá không mong muốn về mô hình mà\nchúng tôi muốn ước tính. Rốt cuộc, chúng tôi đang tìm kiếm những người\ndự đoán mạnh mẽ mà khái quát hóa tốt. Do đó chiến lược này hầu như không\nbao giờ được sử dụng trong thực tế.\n8.7.1.2. Cắt ngắn thời gian bước\nNgoài ra, chúng ta có thể cắt ngắn tổng trong (8.7.7) sau \\(\\tau\\) bước. Đây là những\ngì chúng ta đã thảo luận cho đến nay, chẳng hạn như khi chúng ta tách\ncác gradient trong Section 8.5 . Điều này dẫn đến một * xấp xỉ * của gradient thật, đơn giản bằng cách chấm dứt tổng tại \\(\\partial h_{t-\\tau}/\\partial w_h\\) . Trong thực tế, điều này hoạt\nđộng khá tốt. Nó là những gì thường được gọi là backpropgation cắt ngắn\nqua thời gian [Jaeger, 2002] . Một trong những hậu quả của việc\nnày là mô hình tập trung chủ yếu vào ảnh hưởng ngắn hạn chứ không phải\nlà hậu quả lâu dài. Điều này thực sự là * mong muốn*, vì nó thiên vị\nước tính đối với các mô hình đơn giản và ổn định hơn.\n8.7.1.3. Ngẫu nhiên Cắt ngắn\nCuối cùng, chúng ta có thể thay thế \\(\\partial h_t/\\partial w_h\\) bằng một biến ngẫu nhiên đó là chính xác trong kỳ vọng nhưng cắt ngắn\nchuỗi. Điều này đạt được bằng cách sử dụng một chuỗi \\(\\xi_t\\) với \\(0 \\leq \\pi_t \\leq 1\\) được xác định trước, trong đó \\(P(\\xi_t = 0) = 1-\\pi_t\\) và \\(P(\\xi_t = \\pi_t^{-1}) = \\pi_t\\) ,\ndo đó \\(E[\\xi_t] = 1\\) . Chúng tôi sử dụng điều này để thay thế\ngradient \\(\\partial h_t/\\partial w_h\\) trong (8.7.4) bằng\nNó theo định nghĩa của \\(\\xi_t\\) rằng \\(E[z_t] = \\partial h_t/\\partial w_h\\) . Bất cứ khi nào \\(\\xi_t = 0\\) tính toán tái phát chấm dứt tại thời điểm đó bước \\(t\\) . Điều này dẫn đến một tổng trọng số của các chuỗi có độ dài\nkhác nhau trong đó các chuỗi dài rất hiếm nhưng quá nặng một cách thích\nhợp. Ý tưởng này được đề xuất bởi Tallec và Ollivier [Tallec & Ollivier, 2017] .\n8.7.1.4. So sánh chiến lược\nFig. 8.7.1 Comparing strategies for computing gradients in RNNs. From top to\nbottom: randomized truncation, regular truncation, and full\ncomputation. ¶\nFig. 8.7.1 minh họa ba chiến lược khi phân tích vài\nký tự đầu tiên của The Time Machine cuốn sách sử dụng backpropagation\nqua thời gian cho RNNs:\nHàng đầu tiên là sự cắt ngắn ngẫu nhiên phân vùng văn bản thành các\nphân đoạn có độ dài khác nhau.\nHàng thứ hai là sự cắt ngắn thông thường phá vỡ văn bản thành các dãy\ncon có cùng độ dài. Đây là những gì chúng tôi đã làm trong các thí\nnghiệm RNN.\nHàng thứ ba là sự lan truyền ngược đầy đủ thông qua thời gian dẫn đến\nmột biểu thức không khả thi về mặt tính toán.\nThật không may, trong khi hấp dẫn về lý thuyết, cắt ngắn ngẫu nhiên\nkhông hoạt động tốt hơn nhiều so với cắt ngắn thông thường, rất có thể\nlà do một số yếu tố. Đầu tiên, hiệu quả của một quan sát sau một số bước\nlan truyền ngược vào quá khứ là khá đủ để nắm bắt các phụ thuộc trong\nthực tế. Thứ hai, phương sai tăng chống lại thực tế là gradient chính\nxác hơn với nhiều bước hơn. Thứ ba, chúng tôi thực sự * muốn* mô hình\nchỉ có một phạm vi tương tác ngắn. Do đó, thường xuyên cắt ngắn\nbackpropagation thông qua thời gian có một hiệu ứng thường xuyên nhẹ có\nthể được mong muốn.\n8.7.2. Backpropagation qua thời gian chi tiết\nSau khi thảo luận về nguyên tắc chung, chúng ta hãy thảo luận về tuyên\ntruyền ngược qua thời gian một cách chi tiết. Khác với phân tích trong Section 8.7.1 , sau đây chúng ta sẽ chỉ ra cách tính\nđộ dốc của hàm mục tiêu đối với tất cả các tham số mô hình bị phân hủy.\nĐể giữ cho mọi thứ đơn giản, chúng ta xem xét một RNN không có tham số\nthiên vị, có chức năng kích hoạt trong lớp ẩn sử dụng ánh xạ danh tính\n( \\(\\phi(x)=x\\) ). Đối với bước thời gian \\(t\\) , hãy để đầu vào ví\ndụ duy nhất và nhãn lần lượt là \\(\\mathbf{x}_t \\in \\mathbb{R}^d\\) và \\(y_t\\) . Trạng thái ẩn \\(\\mathbf{h}_t \\in \\mathbb{R}^h\\) và đầu\nra \\(\\mathbf{o}_t \\in \\mathbb{R}^q\\) được tính là\ntrong đó \\(\\mathbf{W}_{hx} \\in \\mathbb{R}^{h \\times d}\\) , \\(\\mathbf{W}_{hh} \\in \\mathbb{R}^{h \\times h}\\) , và \\(\\mathbf{W}_{qh} \\in \\mathbb{R}^{q \\times h}\\) là các thông số\ntrọng lượng. Biểu thị bởi \\(l(\\mathbf{o}_t, y_t)\\) sự mất mát tại\nbước thời gian \\(t\\) . Chức năng mục tiêu của chúng tôi, sự mất mát\ntrên \\(T\\) bước thời gian từ đầu chuỗi là do đó\nĐể hình dung các phụ thuộc giữa các biến mô hình và tham số trong quá\ntrình tính toán RNN, chúng ta có thể vẽ một biểu đồ tính toán cho mô\nhình, như thể hiện trong Fig. 8.7.2 . Ví dụ, tính toán các\ntrạng thái ẩn của bước thời gian 3, \\(\\mathbf{h}_3\\) , phụ thuộc vào\ncác thông số mô hình \\(\\mathbf{W}_{hx}\\) và \\(\\mathbf{W}_{hh}\\) ,\ntrạng thái ẩn của bước thời gian cuối cùng \\(\\mathbf{h}_2\\) và đầu\nvào của bước thời gian hiện tại \\(\\mathbf{x}_3\\) .\nFig. 8.7.2 Computational graph showing dependencies for an RNN model with three\ntime steps. Boxes represent variables (not shaded) or parameters\n(shaded) and circles represent operators. ¶\nNhư vừa đề cập, các thông số mô hình trong Fig. 8.7.2 là \\(\\mathbf{W}_{hx}\\) , \\(\\mathbf{W}_{hh}\\) và \\(\\mathbf{W}_{qh}\\) . Nói chung, đào tạo mô hình này yêu cầu tính\ntoán gradient đối với các thông số này \\(\\partial L/\\partial \\mathbf{W}_{hx}\\) , \\(\\partial L/\\partial \\mathbf{W}_{hh}\\) và \\(\\partial L/\\partial \\mathbf{W}_{qh}\\) . Theo các phụ thuộc trong Fig. 8.7.2 , chúng ta có thể đi qua theo hướng ngược lại\ncủa các mũi tên để tính toán và lưu trữ các gradient lần lượt. Để thể\nhiện linh hoạt phép nhân của ma trận, vectơ và vô hướng của các hình\ndạng khác nhau trong quy tắc chuỗi, chúng ta tiếp tục sử dụng toán tử \\(\\text{prod}\\) như được mô tả trong Section 4.7 .\nTrước hết, việc phân biệt chức năng khách quan đối với đầu ra mô hình\nbất cứ lúc nào \\(t\\) là khá đơn giản:\nBây giờ, chúng ta có thể tính toán gradient của hàm mục tiêu đối với\ntham số \\(\\mathbf{W}_{qh}\\) trong lớp đầu ra: \\(\\partial L/\\partial \\mathbf{W}_{qh} \\in \\mathbb{R}^{q \\times h}\\) .\nDựa trên Fig. 8.7.2 , hàm khách quan \\(L\\) phụ thuộc\nvào \\(\\mathbf{W}_{qh}\\) qua \\(\\mathbf{o}_1, \\ldots, \\mathbf{o}_T\\) . Sử dụng sản lượng quy tắc\nchuỗi\ntrong đó \\(\\partial L/\\partial \\mathbf{o}_t\\) được đưa ra bởi (8.7.11) .\nTiếp theo, như thể hiện trong Fig. 8.7.2 , tại bước thời\ngian cuối cùng \\(T\\) các chức năng khách quan \\(L\\) phụ thuộc\nvào trạng thái ẩn \\(\\mathbf{h}_T\\) chỉ qua \\(\\mathbf{o}_T\\) . Do\nđó, chúng ta có thể dễ dàng tìm thấy gradient \\(\\partial L/\\partial \\mathbf{h}_T \\in \\mathbb{R}^h\\) bằng quy tắc\nchuỗi:\nNó trở nên phức tạp hơn cho bất kỳ bước thời gian \\(t < T\\) , nơi\nchức năng khách quan \\(L\\) phụ thuộc vào \\(\\mathbf{h}_t\\) qua \\(\\mathbf{h}_{t+1}\\) và \\(\\mathbf{o}_t\\) . Theo quy tắc chuỗi,\ngradient của trạng thái ẩn \\(\\partial L/\\partial \\mathbf{h}_t \\in \\mathbb{R}^h\\) bất cứ lúc nào\nbước \\(t < T\\) có thể được tính toán một cách lặp lại như:\nĐể phân tích, mở rộng tính toán định kỳ cho bất kỳ bước thời gian \\(1 \\leq t \\leq T\\) cho\nChúng ta có thể thấy từ (8.7.15) rằng ví dụ tuyến\ntính đơn giản này đã thể hiện một số vấn đề chính của các mô hình chuỗi\ndài: nó liên quan đến sức mạnh có khả năng rất lớn của \\(\\mathbf{W}_{hh}^\\top\\) . Trong đó, eigenvalues nhỏ hơn 1 biến mất\nvà eigenvalues lớn hơn 1 phân kỳ. Điều này không ổn định về số lượng,\nbiểu hiện dưới dạng biến mất và bùng nổ gradient. Một cách để giải quyết\nvấn đề này là cắt ngắn các bước thời gian ở kích thước thuận tiện về mặt\ntính toán như đã thảo luận trong Section 8.7.1 . Trong\nthực tế, sự cắt ngắn này được thực hiện bằng cách tách gradient sau một\nsố bước thời gian nhất định. Sau đó, chúng ta sẽ thấy các mô hình trình\ntự phức tạp hơn như bộ nhớ ngắn hạn dài có thể làm giảm bớt điều này hơn\nnữa.\nCuối cùng, Fig. 8.7.2 cho thấy hàm khách quan \\(L\\) phụ thuộc vào các tham số mô hình \\(\\mathbf{W}_{hx}\\) và \\(\\mathbf{W}_{hh}\\) trong lớp ẩn thông qua các trạng thái ẩn \\(\\mathbf{h}_1, \\ldots, \\mathbf{h}_T\\) . Để tính toán gradient liên\nquan đến các tham số như vậy \\(\\partial L / \\partial \\mathbf{W}_{hx} \\in \\mathbb{R}^{h \\times d}\\) và \\(\\partial L / \\partial \\mathbf{W}_{hh} \\in \\mathbb{R}^{h \\times h}\\) ,\nchúng tôi áp dụng quy tắc chuỗi cung cấp\ntrong đó \\(\\partial L/\\partial \\mathbf{h}_t\\) được tính toán lặp đi\nlặp lại bởi (8.7.13) và (8.7.14) là đại lượng chính ảnh hưởng đến\nsự ổn định số.\nKể từ khi tuyên truyền ngược qua thời gian là việc áp dụng tuyên truyền\nngược trong RNN s, như chúng tôi đã giải thích trong Section 4.7 , đào tạo RNN s xen kẽ tuyên truyền về phía\ntrước với truyền ngược qua thời gian. Bên cạnh đó, backpropagation thông\nqua thời gian tính toán và lưu trữ các gradient trên lần lượt. Cụ thể,\ncác giá trị trung gian được lưu trữ được tái sử dụng để tránh tính toán\ntrùng lặp, chẳng hạn như lưu trữ \\(\\partial L/\\partial \\mathbf{h}_t\\) được sử dụng trong tính toán cả \\(\\partial L / \\partial \\mathbf{W}_{hx}\\) và \\(\\partial L / \\partial \\mathbf{W}_{hh}\\) .\n8.7.3. Tóm tắt\nBackpropagation qua thời gian chỉ đơn thuần là một ứng dụng của\nbackpropagation cho các mô hình trình tự với một trạng thái ẩn.\nCắt ngắn là cần thiết để thuận tiện tính toán và ổn định số, chẳng\nhạn như cắt ngắn thường xuyên và cắt ngắn ngẫu nhiên.\nSức mạnh cao của ma trận có thể dẫn đến sự khác biệt hoặc biến mất\neigenvalues. Điều này thể hiện chính nó dưới dạng bùng nổ hoặc biến\nmất gradient.\nĐể tính toán hiệu quả, các giá trị trung gian được lưu trữ trong quá\ntrình truyền ngược qua thời gian.\n8.7.4. Bài tập\nGiả sử rằng chúng ta có một ma trận đối xứng \\(\\mathbf{M} \\in \\mathbb{R}^{n \\times n}\\) với eigenvalues \\(\\lambda_i\\) có eigenvectors tương ứng là \\(\\mathbf{v}_i\\) ( \\(i = 1, \\ldots, n\\) ). Không mất tính tổng quát, giả định rằng\nchúng được đặt hàng theo thứ tự \\(|\\lambda_i| \\geq |\\lambda_{i+1}|\\) .\nCho thấy \\(\\mathbf{M}^k\\) có eigenvalues \\(\\lambda_i^k\\) .\nChứng minh rằng đối với một vector ngẫu nhiên \\(\\mathbf{x} \\in \\mathbb{R}^n\\) , với xác suất cao \\(\\mathbf{M}^k \\mathbf{x}\\) sẽ rất phù hợp với eigenvector \\(\\mathbf{v}_1\\) của \\(\\mathbf{M}\\) . Chính thức hóa tuyên bố\nnày.\nKết quả trên có ý nghĩa gì đối với gradient trong RNNs?\nBên cạnh việc cắt gradient, bạn có thể nghĩ về bất kỳ phương pháp nào\nkhác để đối phó với sự bùng nổ gradient trong các mạng thần kinh tái\nphát không?\nDiscussions"
+}

@@ -1,0 +1,1504 @@
+{
+  "url": "https://vi.d2l.ai/chapter_preliminaries/linear-algebra.html",
+  "chapter": "chapter_preliminaries",
+  "title": "2.3. Đại số tuyến tính",
+  "crawled_at": "2026-07-20T12:39:13.854668+00:00",
+  "headings": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "dai-so-tuyen-tinh",
+      "text": "2.3. Đại số tuyến tính"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "vo-huong",
+      "text": "2.3.1. Vô hướng"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "vecto",
+      "text": "2.3.2. Vectơ"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "chieu-dai-kich-thuoc-va-hinh-dang",
+      "text": "2.3.2.1. Chiều dài, kích thước và hình dạng"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "ma-tran",
+      "text": "2.3.3. Ma trận"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tensors",
+      "text": "2.3.4. Tensors"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tinh-chat-co-ban-cua-tensor-arithmetic",
+      "text": "2.3.5. Tính chất cơ bản của Tensor Arithmetic"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "giam",
+      "text": "2.3.6. Giảm"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "tong-khong-giam",
+      "text": "2.3.6.1. Tổng không giảm"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "san-pham-dot",
+      "text": "2.3.7. Sản phẩm Dot"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "matrix-vector-san-pham",
+      "text": "2.3.8. Matrix-Vector Sản phẩm"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "phep-nhan-ma-tran-ma-tran",
+      "text": "2.3.9. Phép nhân ma trận ma trận"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "dinh-muc",
+      "text": "2.3.10. Định mức"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "dinh-muc-va-muc-tieu",
+      "text": "2.3.10.1. Định mức và mục tiêu"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tim-hieu-them-ve-linear-algebra",
+      "text": "2.3.11. Tìm hiểu thêm về Linear Algebra"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tom-tat",
+      "text": "2.3.12. Tóm tắt"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bai-tap",
+      "text": "2.3.13. Bài tập"
+    }
+  ],
+  "content": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "dai-so-tuyen-tinh",
+      "text": "2.3. Đại số tuyến tính"
+    },
+    {
+      "type": "paragraph",
+      "text": "Bây giờ bạn có thể lưu trữ và thao tác dữ liệu, chúng ta hãy xem xét\nngắn gọn tập hợp con của đại số tuyến tính cơ bản mà bạn sẽ cần hiểu và\nthực hiện hầu hết các mô hình được đề cập trong cuốn sách này. Dưới đây,\nchúng tôi giới thiệu các đối tượng toán học cơ bản, số học, và phép toán\ntrong đại số tuyến tính, thể hiện từng đối tượng trong số chúng thông\nqua ký hiệu toán học và việc thực hiện tương ứng trong mã."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "vo-huong",
+      "text": "2.3.1. Vô hướng"
+    },
+    {
+      "type": "paragraph",
+      "text": "Nếu bạn chưa bao giờ học đại số tuyến tính hoặc học máy, thì kinh nghiệm\ntrong quá khứ của bạn với toán học có thể bao gồm suy nghĩ về một số tại\nmột thời điểm. Và, nếu bạn đã bao giờ cân bằng một sổ séc hoặc thậm chí\ntrả tiền cho bữa tối tại một nhà hàng thì bạn đã biết làm thế nào để làm\nnhững việc cơ bản như thêm và nhân các cặp số. Ví dụ, nhiệt độ ở Palo\nAlto là \\(52\\) độ F. Chính thức, chúng ta gọi các giá trị chỉ bao\ngồm một số lượng * vô số * . Nếu bạn muốn chuyển đổi giá trị này sang\nCelsius (thang nhiệt độ hợp lý hơn của hệ mét), bạn sẽ đánh giá biểu\nthức \\(c = \\frac{5}{9}(f - 32)\\) , đặt \\(f\\) thành \\(52\\) .\nTrong phương trình này, mỗi thuật ngữ — \\(5\\) , \\(9\\) , và \\(32\\) —là những giá trị vô hướng. Các giữ chỗ \\(c\\) và \\(f\\) được gọi là * variables* và chúng đại diện cho các giá trị vô hướng\nkhông xác định."
+    },
+    {
+      "type": "paragraph",
+      "text": "Trong cuốn sách này, chúng ta áp dụng ký hiệu toán học trong đó các biến\nvô hướng được biểu thị bằng các chữ cái thường thấp hơn (ví dụ: \\(x\\) , \\(y\\) và \\(z\\) ). Chúng tôi biểu thị không gian của\ntất cả (liên tục) * có giá trị thực* vô hướng bởi \\(\\mathbb{R}\\) .\nĐối với sự nhanh chóng, chúng ta sẽ xem xét các định nghĩa nghiêm ngặt\nvề chính xác không gian là gì, nhưng chỉ cần nhớ rằng biểu thức \\(x \\in \\mathbb{R}\\) là một cách chính thức để nói rằng \\(x\\) là\nmột vô hướng có giá trị thực. Ký hiệu \\(\\in\\) có thể được phát âm\n“trong” và chỉ đơn giản là biểu thị thành viên trong một bộ. Tương tự,\nchúng ta có thể viết \\(x, y \\in \\{0, 1\\}\\) để nói rằng \\(x\\) và \\(y\\) là những con số có giá trị chỉ có thể là \\(0\\) hoặc \\(1\\) ."
+    },
+    {
+      "type": "paragraph",
+      "text": "Một vô hướng được biểu diễn bằng một tensor chỉ với một yếu tố. Trong\nđoạn tiếp theo, chúng ta khởi tạo hai vô hướng và thực hiện một số phép\ntoán số học quen thuộc với chúng, cụ thể là cộng, nhân, chia và hàm mũ."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "from mxnet import np, npx\n\nnpx.set_np()\n\nx = np.array(3.0)\ny = np.array(2.0)\n\nx + y, x * y, x / y, x ** y"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "(array(5.), array(6.), array(1.5), array(9.))"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "import torch\n\nx = torch.tensor(3.0)\ny = torch.tensor(2.0)\n\nx + y, x * y, x / y, x**y"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "(tensor(5.), tensor(6.), tensor(1.5000), tensor(9.))"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "import tensorflow as tf\n\nx = tf.constant(3.0)\ny = tf.constant(2.0)\n\nx + y, x * y, x / y, x**y"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "(<tf.Tensor: shape=(), dtype=float32, numpy=5.0>,\n <tf.Tensor: shape=(), dtype=float32, numpy=6.0>,\n <tf.Tensor: shape=(), dtype=float32, numpy=1.5>,\n <tf.Tensor: shape=(), dtype=float32, numpy=9.0>)"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "vecto",
+      "text": "2.3.2. Vectơ"
+    },
+    {
+      "type": "paragraph",
+      "text": "Bạn có thể nghĩ một vector chỉ đơn giản là một danh sách các giá trị vô\nhướng. Chúng ta gọi các giá trị này là * element* ( entries hoặc components ) của vector. Khi vectơ của chúng ta đại diện cho các ví dụ\ntừ tập dữ liệu của chúng ta, các giá trị của chúng giữ một số ý nghĩa\ntrong thế giới thực. Ví dụ: nếu chúng ta đang đào tạo một mô hình để dự\nđoán rủi ro mà một khoản vay mặc định, chúng ta có thể liên kết mỗi ứng\nviên với một vectơ có thành phần tương ứng với thu nhập, thời gian làm\nviệc, số lượng mặc định trước đó và các yếu tố khác. Nếu chúng ta đang\nnghiên cứu nguy cơ đau tim bệnh nhân bệnh viện có khả năng phải đối mặt,\nchúng ta có thể đại diện cho mỗi bệnh nhân bằng một vectơ có thành phần\nnắm bắt các dấu hiệu quan trọng gần đây nhất của họ, mức cholesterol,\nphút tập thể dục mỗi ngày, vv Trong ký hiệu toán học, chúng ta thường sẽ\nbiểu thị vectơ là mặt đậm, thấp hơn cased các chữ cái (ví dụ: \\(\\mathbf{x}\\) , \\(\\mathbf{y}\\) và \\(\\mathbf{z})\\) ."
+    },
+    {
+      "type": "paragraph",
+      "text": "Chúng tôi làm việc với các vectơ thông qua các hàng chục một chiều.\nTrong hàng chục nói chung có thể có độ dài tùy ý, tùy thuộc vào giới hạn\nbộ nhớ của máy của bạn."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "x = np.arange(4)\nx"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "array([0., 1., 2., 3.])"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "x = torch.arange(4)\nx"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "tensor([0, 1, 2, 3])"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "x = tf.range(4)\nx"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "<tf.Tensor: shape=(4,), dtype=int32, numpy=array([0, 1, 2, 3], dtype=int32)>"
+    },
+    {
+      "type": "paragraph",
+      "text": "Chúng ta có thể tham khảo bất kỳ phần tử nào của vectơ bằng cách sử dụng\nchỉ số dưới. Ví dụ: chúng ta có thể tham khảo phần tử \\(i^\\mathrm{th}\\) của \\(\\mathbf{x}\\) bởi \\(x_i\\) . Lưu ý rằng\nphần tử \\(x_i\\) là vô hướng, vì vậy chúng ta không phải đối mặt với\nphông chữ khi đề cập đến nó. Văn học mở rộng coi vectơ cột là định hướng\nmặc định của vectơ, cuốn sách này cũng vậy. Trong toán học, một vector \\(\\mathbf{x}\\) có thể được viết là"
+    },
+    {
+      "type": "math",
+      "latex": "(2.3.1)¶\\[\\begin{split}\\mathbf{x} =\\begin{bmatrix}x_{1}  \\\\x_{2}  \\\\ \\vdots  \\\\x_{n}\\end{bmatrix},\\end{split}\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "trong đó \\(x_1, \\ldots, x_n\\) là các yếu tố của vectơ. Trong code,\nchúng ta truy cập bất kỳ phần tử nào bằng cách lập chỉ mục vào tensor."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "x[3]"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "array(3.)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "x[3]"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "tensor(3)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "x[3]"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "<tf.Tensor: shape=(), dtype=int32, numpy=3>"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "chieu-dai-kich-thuoc-va-hinh-dang",
+      "text": "2.3.2.1. Chiều dài, kích thước và hình dạng"
+    },
+    {
+      "type": "paragraph",
+      "text": "Chúng ta hãy xem lại một số khái niệm từ Section 2.1 . Một\nvectơ chỉ là một mảng các số. Và cũng giống như mỗi mảng có một chiều\ndài, vì vậy không mỗi vector. Trong ký hiệu toán học, nếu chúng ta muốn\nnói rằng một vector \\(\\mathbf{x}\\) bao gồm \\(n\\) vô hướng có giá\ntrị thực, chúng ta có thể thể hiện điều này là \\(\\mathbf{x} \\in \\mathbb{R}^n\\) . Độ dài của một vectơ thường được\ngọi là dimension của vectơ."
+    },
+    {
+      "type": "paragraph",
+      "text": "Như với một mảng Python thông thường, chúng ta có thể truy cập độ dài\ncủa một tensor bằng cách gọi hàm len() tích hợp của Python."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "len(x)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "4"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "len(x)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "4"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "len(x)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "4"
+    },
+    {
+      "type": "paragraph",
+      "text": "Khi một tensor đại diện cho một vectơ (với chính xác một trục), chúng ta\ncũng có thể truy cập độ dài của nó thông qua thuộc tính .shape . Hình\ndạng là một tuple liệt kê chiều dài (chiều) dọc theo mỗi trục của\ntensor. Đối với hàng chục chỉ với một trục, hình dạng chỉ có một yếu tố."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "x.shape"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "(4,)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "x.shape"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "torch.Size([4])"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "x.shape"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "TensorShape([4])"
+    },
+    {
+      "type": "paragraph",
+      "text": "Lưu ý rằng từ “chiều” có xu hướng bị quá tải trong các bối cảnh này và\nđiều này có xu hướng gây nhầm lẫn cho mọi người. Để làm rõ, chúng ta sử\ndụng chiều của một * vector* hoặc một * axis* để chỉ chiều dài của\nnó, tức là số phần tử của một vectơ hoặc một trục. Tuy nhiên, chúng ta\nsử dụng chiều của một tensor để chỉ số trục mà một tensor có. Theo nghĩa\nnày, chiều của một số trục của một tensor sẽ là chiều dài của trục đó."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "ma-tran",
+      "text": "2.3.3. Ma trận"
+    },
+    {
+      "type": "paragraph",
+      "text": "Cũng giống như các vectơ tổng quát hóa vô hướng từ thứ tự số 0 để đặt\nhàng một, ma trận khái quát hóa vectơ từ thứ tự một đến thứ tự hai. Ma\ntrận, mà chúng ta thường sẽ biểu thị bằng chữ in hoa, có mặt đậm (ví dụ: \\(\\mathbf{X}\\) , \\(\\mathbf{Y}\\) và \\(\\mathbf{Z}\\) ), được biểu\ndiễn bằng mã dưới dạng hàng chục với hai trục."
+    },
+    {
+      "type": "paragraph",
+      "text": "Trong ký hiệu toán, ta sử dụng \\(\\mathbf{A} \\in \\mathbb{R}^{m \\times n}\\) để thể hiện rằng ma trận \\(\\mathbf{A}\\) bao gồm \\(m\\) hàng và \\(n\\) cột vô hướng có\ngiá trị thực. Trực quan, chúng ta có thể minh họa bất kỳ ma trận \\(\\mathbf{A} \\in \\mathbb{R}^{m \\times n}\\) như một bảng, trong đó\nmỗi phần tử \\(a_{ij}\\) thuộc về hàng \\(i^{\\mathrm{th}}\\) và cột \\(j^{\\mathrm{th}}\\) :"
+    },
+    {
+      "type": "math",
+      "latex": "(2.3.2)¶\\[\\begin{split}\\mathbf{A}=\\begin{bmatrix} a_{11} & a_{12} & \\cdots & a_{1n} \\\\ a_{21} & a_{22} & \\cdots & a_{2n} \\\\ \\vdots & \\vdots & \\ddots & \\vdots \\\\ a_{m1} & a_{m2} & \\cdots & a_{mn} \\\\ \\end{bmatrix}.\\end{split}\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Đối với bất kỳ \\(\\mathbf{A} \\in \\mathbb{R}^{m \\times n}\\) , hình dạng\ncủa \\(\\mathbf{A}\\) là ( \\(m\\) , \\(n\\) ) hoặc \\(m \\times n\\) . Cụ thể, khi một ma trận có cùng số hàng và cột, hình\ndạng của nó trở thành một hình vuông; do đó, nó được gọi là matrận vuông ."
+    },
+    {
+      "type": "paragraph",
+      "text": "Chúng ta có thể tạo một ma trận \\(m \\times n\\) bằng cách chỉ định\nmột hình dạng với hai thành phần \\(m\\) và \\(n\\) khi gọi bất kỳ\nchức năng yêu thích nào của chúng tôi để khởi tạo một tensor."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "A = np.arange(20).reshape(5, 4)\nA"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "array([[ 0.,  1.,  2.,  3.],\n       [ 4.,  5.,  6.,  7.],\n       [ 8.,  9., 10., 11.],\n       [12., 13., 14., 15.],\n       [16., 17., 18., 19.]])"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "A = torch.arange(20).reshape(5, 4)\nA"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "tensor([[ 0,  1,  2,  3],\n        [ 4,  5,  6,  7],\n        [ 8,  9, 10, 11],\n        [12, 13, 14, 15],\n        [16, 17, 18, 19]])"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "A = tf.reshape(tf.range(20), (5, 4))\nA"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "<tf.Tensor: shape=(5, 4), dtype=int32, numpy=\narray([[ 0,  1,  2,  3],\n       [ 4,  5,  6,  7],\n       [ 8,  9, 10, 11],\n       [12, 13, 14, 15],\n       [16, 17, 18, 19]], dtype=int32)>"
+    },
+    {
+      "type": "paragraph",
+      "text": "Chúng ta có thể truy cập phần tử vô hướng \\(a_{ij}\\) của ma trận \\(\\mathbf{A}\\) trong (2.3.2) bằng cách chỉ định các\nchỉ số cho hàng ( \\(i\\) ) và cột ( \\(j\\) ), chẳng hạn như \\([\\mathbf{A}]_{ij}\\) . Khi các yếu tố vô hướng của ma trận \\(\\mathbf{A}\\) , chẳng hạn như trong (2.3.2) , không\nđược đưa ra, chúng ta có thể chỉ đơn giản sử dụng chữ thường của ma trận \\(\\mathbf{A}\\) với chỉ số dưới, \\(a_{ij}\\) , để tham khảo \\([\\mathbf{A}]_{ij}\\) . Để giữ ký hiệu đơn giản, dấu phẩy chỉ được\nchèn vào các chỉ số riêng biệt khi cần thiết, chẳng hạn như \\(a_{2, 3j}\\) và \\([\\mathbf{A}]_{2i-1, 3}\\) ."
+    },
+    {
+      "type": "paragraph",
+      "text": "Đôi khi, chúng tôi muốn lật các trục. Khi chúng ta trao đổi các hàng và\ncột của ma trận, kết quả được gọi là transpose của ma trận. Chính\nthức, chúng tôi biểu thị một ma trận \\(\\mathbf{A}\\) của transpose\nbởi \\(\\mathbf{A}^\\top\\) và nếu \\(\\mathbf{B} = \\mathbf{A}^\\top\\) ,\nsau đó \\(b_{ij} = a_{ji}\\) cho bất kỳ \\(i\\) và \\(j\\) . Như\nvậy, transpose của \\(\\mathbf{A}\\) trong (2.3.2) là\nmột ma trận \\(n \\times m\\) :"
+    },
+    {
+      "type": "math",
+      "latex": "(2.3.3)¶\\[\\begin{split}\\mathbf{A}^\\top =\n\\begin{bmatrix}\n    a_{11} & a_{21} & \\dots  & a_{m1} \\\\\n    a_{12} & a_{22} & \\dots  & a_{m2} \\\\\n    \\vdots & \\vdots & \\ddots  & \\vdots \\\\\n    a_{1n} & a_{2n} & \\dots  & a_{mn}\n\\end{bmatrix}.\\end{split}\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Bây giờ chúng ta truy cập vào một matrix của transpose trong mã."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "A.T"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "array([[ 0.,  4.,  8., 12., 16.],\n       [ 1.,  5.,  9., 13., 17.],\n       [ 2.,  6., 10., 14., 18.],\n       [ 3.,  7., 11., 15., 19.]])"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "A.T"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "tensor([[ 0,  4,  8, 12, 16],\n        [ 1,  5,  9, 13, 17],\n        [ 2,  6, 10, 14, 18],\n        [ 3,  7, 11, 15, 19]])"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "tf.transpose(A)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "<tf.Tensor: shape=(4, 5), dtype=int32, numpy=\narray([[ 0,  4,  8, 12, 16],\n       [ 1,  5,  9, 13, 17],\n       [ 2,  6, 10, 14, 18],\n       [ 3,  7, 11, 15, 19]], dtype=int32)>"
+    },
+    {
+      "type": "paragraph",
+      "text": "Là một loại đặc biệt của ma trận vuông, a * matrix đối xứng * \\(\\mathbf{A}\\) bằng chuyển vị của nó: \\(\\mathbf{A} = \\mathbf{A}^\\top\\) . Ở đây chúng ta xác định ma trận\nđối xứng B ."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "B = np.array([[1, 2, 3], [2, 0, 4], [3, 4, 5]])\nB"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "array([[1., 2., 3.],\n       [2., 0., 4.],\n       [3., 4., 5.]])"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "B = torch.tensor([[1, 2, 3], [2, 0, 4], [3, 4, 5]])\nB"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "tensor([[1, 2, 3],\n        [2, 0, 4],\n        [3, 4, 5]])"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "B = tf.constant([[1, 2, 3], [2, 0, 4], [3, 4, 5]])\nB"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "<tf.Tensor: shape=(3, 3), dtype=int32, numpy=\narray([[1, 2, 3],\n       [2, 0, 4],\n       [3, 4, 5]], dtype=int32)>"
+    },
+    {
+      "type": "paragraph",
+      "text": "Bây giờ chúng tôi so sánh B với transpose của nó."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "B == B.T"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "array([[ True,  True,  True],\n       [ True,  True,  True],\n       [ True,  True,  True]])"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "B == B.T"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "tensor([[True, True, True],\n        [True, True, True],\n        [True, True, True]])"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "B == tf.transpose(B)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "<tf.Tensor: shape=(3, 3), dtype=bool, numpy=\narray([[ True,  True,  True],\n       [ True,  True,  True],\n       [ True,  True,  True]])>"
+    },
+    {
+      "type": "paragraph",
+      "text": "Ma trận là cấu trúc dữ liệu hữu ích: chúng cho phép chúng ta tổ chức dữ\nliệu có các phương thức biến thể khác nhau. Ví dụ: các hàng trong ma\ntrận của chúng ta có thể tương ứng với các ngôi nhà khác nhau (ví dụ dữ\nliệu), trong khi các cột có thể tương ứng với các thuộc tính khác nhau.\nĐiều này nghe có vẻ quen thuộc nếu bạn đã từng sử dụng phần mềm bảng\ntính hoặc đã đọc Section 2.2 . Do đó, mặc dù định hướng mặc\nđịnh của một vectơ duy nhất là một vectơ cột, trong một ma trận đại diện\ncho một tập dữ liệu dạng bảng, nó là thông thường hơn để coi mỗi ví dụ\ndữ liệu như một vectơ hàng trong ma trận. Và, như chúng ta sẽ thấy trong\ncác chương sau, quy ước này sẽ cho phép các thực hành học sâu phổ biến.\nVí dụ, dọc theo trục ngoài cùng của một tensor, chúng ta có thể truy cập\nhoặc liệt kê minibatches ví dụ dữ liệu, hoặc chỉ các ví dụ dữ liệu nếu\nkhông có minibatch tồn tại."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tensors",
+      "text": "2.3.4. Tensors"
+    },
+    {
+      "type": "paragraph",
+      "text": "Cũng giống như vectơ tổng quát hóa vô hướng, và ma trận tổng quát hóa\nvectơ, chúng ta có thể xây dựng cấu trúc dữ liệu với nhiều trục hơn nữa. **Tensors** cung cấp cho chúng ta một cách chung để mô tả các mảng \\(n\\) chiều\nvới một số trục tùy ý. Vectơ, ví dụ, là các hàng chục bậc nhất, và ma\ntrận là hàng chục bậc hai. Tensors được ký hiệu bằng chữ in hoa của một\nkhuôn mặt phông chữ đặc biệt (ví dụ, \\(\\mathsf{X}\\) , \\(\\mathsf{Y}\\) , và \\(\\mathsf{Z}\\) ) và cơ chế lập chỉ mục của\nchúng (ví dụ, \\(x_{ijk}\\) và \\([\\mathsf{X}]_{1, 2i-1, 3}\\) )\ntương tự như của ma trận."
+    },
+    {
+      "type": "paragraph",
+      "text": "Tensors sẽ trở nên quan trọng hơn khi chúng ta bắt đầu làm việc với hình\nảnh, đến các mảng \\(n\\) chiều với 3 trục tương ứng với chiều cao,\nchiều rộng và trục * kênh* để xếp các kênh màu (đỏ, xanh lá cây và\nxanh dương). Hiện tại, chúng ta sẽ bỏ qua hàng chục bậc cao hơn và tập\ntrung vào những điều cơ bản."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "X = np.arange(24).reshape(2, 3, 4)\nX"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "array([[[ 0.,  1.,  2.,  3.],\n        [ 4.,  5.,  6.,  7.],\n        [ 8.,  9., 10., 11.]],\n\n       [[12., 13., 14., 15.],\n        [16., 17., 18., 19.],\n        [20., 21., 22., 23.]]])"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "X = torch.arange(24).reshape(2, 3, 4)\nX"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "tensor([[[ 0,  1,  2,  3],\n         [ 4,  5,  6,  7],\n         [ 8,  9, 10, 11]],\n\n        [[12, 13, 14, 15],\n         [16, 17, 18, 19],\n         [20, 21, 22, 23]]])"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "X = tf.reshape(tf.range(24), (2, 3, 4))\nX"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "<tf.Tensor: shape=(2, 3, 4), dtype=int32, numpy=\narray([[[ 0,  1,  2,  3],\n        [ 4,  5,  6,  7],\n        [ 8,  9, 10, 11]],\n\n       [[12, 13, 14, 15],\n        [16, 17, 18, 19],\n        [20, 21, 22, 23]]], dtype=int32)>"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tinh-chat-co-ban-cua-tensor-arithmetic",
+      "text": "2.3.5. Tính chất cơ bản của Tensor Arithmetic"
+    },
+    {
+      "type": "paragraph",
+      "text": "Vô hướng, vectơ, ma trận, và hàng chục (“tensors” trong tiểu mục này đề\ncập đến các đối tượng đại số) của một số trục tùy ý có một số tính chất\ntốt đẹp thường có ích. Ví dụ, bạn có thể nhận thấy từ định nghĩa của một\nphép toán elementwise rằng bất kỳ hoạt động đơn nguyên tố nào không thay\nđổi hình dạng của toán hạng của nó. Tương tự như vậy, với bất kỳ hai\nhàng chục có cùng hình dạng, kết quả của bất kỳ phép toán phần tử nhị\nphân nào sẽ là một tensor của cùng một hình dạng đó Ví dụ, thêm hai ma\ntrận có cùng hình dạng thực hiện phép cộng elementwise trên hai ma trận\nnày."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "A = np.arange(20).reshape(5, 4)\nB = A.copy()  # Assign a copy of `A` to `B` by allocating new memory\nA, A + B"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "(array([[ 0.,  1.,  2.,  3.],\n        [ 4.,  5.,  6.,  7.],\n        [ 8.,  9., 10., 11.],\n        [12., 13., 14., 15.],\n        [16., 17., 18., 19.]]),\n array([[ 0.,  2.,  4.,  6.],\n        [ 8., 10., 12., 14.],\n        [16., 18., 20., 22.],\n        [24., 26., 28., 30.],\n        [32., 34., 36., 38.]]))"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "A = torch.arange(20, dtype=torch.float32).reshape(5, 4)\nB = A.clone()  # Assign a copy of `A` to `B` by allocating new memory\nA, A + B"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "(tensor([[ 0.,  1.,  2.,  3.],\n         [ 4.,  5.,  6.,  7.],\n         [ 8.,  9., 10., 11.],\n         [12., 13., 14., 15.],\n         [16., 17., 18., 19.]]),\n tensor([[ 0.,  2.,  4.,  6.],\n         [ 8., 10., 12., 14.],\n         [16., 18., 20., 22.],\n         [24., 26., 28., 30.],\n         [32., 34., 36., 38.]]))"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "A = tf.reshape(tf.range(20, dtype=tf.float32), (5, 4))\nB = A  # No cloning of `A` to `B` by allocating new memory\nA, A + B"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "(<tf.Tensor: shape=(5, 4), dtype=float32, numpy=\n array([[ 0.,  1.,  2.,  3.],\n        [ 4.,  5.,  6.,  7.],\n        [ 8.,  9., 10., 11.],\n        [12., 13., 14., 15.],\n        [16., 17., 18., 19.]], dtype=float32)>,\n <tf.Tensor: shape=(5, 4), dtype=float32, numpy=\n array([[ 0.,  2.,  4.,  6.],\n        [ 8., 10., 12., 14.],\n        [16., 18., 20., 22.],\n        [24., 26., 28., 30.],\n        [32., 34., 36., 38.]], dtype=float32)>)"
+    },
+    {
+      "type": "paragraph",
+      "text": "Cụ thể, elementwise phép nhân của hai ma trận được gọi là sản phẩm *\nHadamard* của họ (ký hiệu toán \\(\\odot\\) ). Xem xét ma trận \\(\\mathbf{B} \\in \\mathbb{R}^{m \\times n}\\) có phần tử của hàng \\(i\\) và cột \\(j\\) là \\(b_{ij}\\) . Sản phẩm Hadamard của ma\ntrận \\(\\mathbf{A}\\) (được định nghĩa trong (2.3.2) )\nvà \\(\\mathbf{B}\\)"
+    },
+    {
+      "type": "math",
+      "latex": "(2.3.4)¶\\[\\begin{split}\\mathbf{A} \\odot \\mathbf{B} =\n\\begin{bmatrix}\n    a_{11}  b_{11} & a_{12}  b_{12} & \\dots  & a_{1n}  b_{1n} \\\\\n    a_{21}  b_{21} & a_{22}  b_{22} & \\dots  & a_{2n}  b_{2n} \\\\\n    \\vdots & \\vdots & \\ddots & \\vdots \\\\\n    a_{m1}  b_{m1} & a_{m2}  b_{m2} & \\dots  & a_{mn}  b_{mn}\n\\end{bmatrix}.\\end{split}\\]"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "A * B"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "array([[  0.,   1.,   4.,   9.],\n       [ 16.,  25.,  36.,  49.],\n       [ 64.,  81., 100., 121.],\n       [144., 169., 196., 225.],\n       [256., 289., 324., 361.]])"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "A * B"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "tensor([[  0.,   1.,   4.,   9.],\n        [ 16.,  25.,  36.,  49.],\n        [ 64.,  81., 100., 121.],\n        [144., 169., 196., 225.],\n        [256., 289., 324., 361.]])"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "A * B"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "<tf.Tensor: shape=(5, 4), dtype=float32, numpy=\narray([[  0.,   1.,   4.,   9.],\n       [ 16.,  25.,  36.,  49.],\n       [ 64.,  81., 100., 121.],\n       [144., 169., 196., 225.],\n       [256., 289., 324., 361.]], dtype=float32)>"
+    },
+    {
+      "type": "paragraph",
+      "text": "Nhân hoặc thêm một tensor với vô hướng cũng không thay đổi hình dạng của\ntensor, trong đó mỗi phần tử của tensor toán hạng sẽ được thêm hoặc nhân\nvới vô hướng."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "a = 2\nX = np.arange(24).reshape(2, 3, 4)\na + X, (a * X).shape"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "(array([[[ 2.,  3.,  4.,  5.],\n         [ 6.,  7.,  8.,  9.],\n         [10., 11., 12., 13.]],\n\n        [[14., 15., 16., 17.],\n         [18., 19., 20., 21.],\n         [22., 23., 24., 25.]]]),\n (2, 3, 4))"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "a = 2\nX = torch.arange(24).reshape(2, 3, 4)\na + X, (a * X).shape"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "(tensor([[[ 2,  3,  4,  5],\n          [ 6,  7,  8,  9],\n          [10, 11, 12, 13]],\n\n         [[14, 15, 16, 17],\n          [18, 19, 20, 21],\n          [22, 23, 24, 25]]]),\n torch.Size([2, 3, 4]))"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "a = 2\nX = tf.reshape(tf.range(24), (2, 3, 4))\na + X, (a * X).shape"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "(<tf.Tensor: shape=(2, 3, 4), dtype=int32, numpy=\n array([[[ 2,  3,  4,  5],\n         [ 6,  7,  8,  9],\n         [10, 11, 12, 13]],\n\n        [[14, 15, 16, 17],\n         [18, 19, 20, 21],\n         [22, 23, 24, 25]]], dtype=int32)>,\n TensorShape([2, 3, 4]))"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "giam",
+      "text": "2.3.6. Giảm"
+    },
+    {
+      "type": "paragraph",
+      "text": "Một thao tác hữu ích mà chúng ta có thể thực hiện với các hàng chục tùy\ný là tính toán tổng các phần tử của chúng. Trong ký hiệu toán học, chúng\nta thể hiện các khoản tiền bằng ký hiệu \\(\\sum\\) . Để thể hiện tổng\ncủa các phần tử trong một vector \\(\\mathbf{x}\\) chiều dài \\(d\\) ,\nchúng tôi viết \\(\\sum_{i=1}^d x_i\\) . Trong code, chúng ta chỉ có thể\ngọi hàm để tính tổng."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "x = np.arange(4)\nx, x.sum()"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "(array([0., 1., 2., 3.]), array(6.))"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "x = torch.arange(4, dtype=torch.float32)\nx, x.sum()"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "(tensor([0., 1., 2., 3.]), tensor(6.))"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "x = tf.range(4, dtype=tf.float32)\nx, tf.reduce_sum(x)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "(<tf.Tensor: shape=(4,), dtype=float32, numpy=array([0., 1., 2., 3.], dtype=float32)>,\n <tf.Tensor: shape=(), dtype=float32, numpy=6.0>)"
+    },
+    {
+      "type": "paragraph",
+      "text": "Chúng ta có thể diễn đạt tổng trên các phần tử của hàng chục hình dạng\ntùy ý. Ví dụ, tổng các phần tử của ma trận \\(m \\times n\\) \\(\\mathbf{A}\\) có thể được viết \\(\\sum_{i=1}^{m} \\sum_{j=1}^{n} a_{ij}\\) ."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "A.shape, A.sum()"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "((5, 4), array(190.))"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "A.shape, A.sum()"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "(torch.Size([5, 4]), tensor(190.))"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "A.shape, tf.reduce_sum(A)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "(TensorShape([5, 4]), <tf.Tensor: shape=(), dtype=float32, numpy=190.0>)"
+    },
+    {
+      "type": "paragraph",
+      "text": "Theo mặc định, gọi hàm để tính tổng giảm một tensor dọc theo tất cả\ncác trục của nó đến một vô hướng. Chúng ta cũng có thể chỉ định các trục\ndọc theo đó tensor được giảm thông qua tổng hợp. Lấy ma trận làm ví dụ.\nĐể giảm kích thước hàng (trục 0) bằng cách tổng hợp các phần tử của tất\ncả các hàng, chúng tôi chỉ định axis=0 khi gọi hàm. Vì ma trận đầu\nvào giảm dọc theo trục 0 để tạo ra vectơ đầu ra, kích thước của trục 0\ncủa đầu vào bị mất trong hình dạng đầu ra."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "A_sum_axis0 = A.sum(axis=0)\nA_sum_axis0, A_sum_axis0.shape"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "(array([40., 45., 50., 55.]), (4,))"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "A_sum_axis0 = A.sum(axis=0)\nA_sum_axis0, A_sum_axis0.shape"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "(tensor([40., 45., 50., 55.]), torch.Size([4]))"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "A_sum_axis0 = tf.reduce_sum(A, axis=0)\nA_sum_axis0, A_sum_axis0.shape"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "(<tf.Tensor: shape=(4,), dtype=float32, numpy=array([40., 45., 50., 55.], dtype=float32)>,\n TensorShape([4]))"
+    },
+    {
+      "type": "paragraph",
+      "text": "Chỉ định axis=1 sẽ giảm kích thước cột (trục 1) bằng cách tổng hợp\ncác phần tử của tất cả các cột. Do đó, kích thước của trục 1 của đầu vào\nbị mất trong hình dạng đầu ra."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "A_sum_axis1 = A.sum(axis=1)\nA_sum_axis1, A_sum_axis1.shape"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "(array([ 6., 22., 38., 54., 70.]), (5,))"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "A_sum_axis1 = A.sum(axis=1)\nA_sum_axis1, A_sum_axis1.shape"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "(tensor([ 6., 22., 38., 54., 70.]), torch.Size([5]))"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "A_sum_axis1 = tf.reduce_sum(A, axis=1)\nA_sum_axis1, A_sum_axis1.shape"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "(<tf.Tensor: shape=(5,), dtype=float32, numpy=array([ 6., 22., 38., 54., 70.], dtype=float32)>,\n TensorShape([5]))"
+    },
+    {
+      "type": "paragraph",
+      "text": "Giảm một ma trận dọc theo cả hàng và cột thông qua tổng tương đương với\nviệc tổng hợp tất cả các phần tử của ma trận."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "A.sum(axis=[0, 1])  # Same as `A.sum()`"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "array(190.)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "A.sum(axis=[0, 1])  # Same as `A.sum()`"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "tensor(190.)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "tf.reduce_sum(A, axis=[0, 1])  # Same as `tf.reduce_sum(A)`"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "<tf.Tensor: shape=(), dtype=float32, numpy=190.0>"
+    },
+    {
+      "type": "paragraph",
+      "text": "Một số lượng liên quan là mean , còn được gọi là trung bình . Chúng\ntôi tính trung bình bằng cách chia tổng cho tổng số phần tử. Trong mã,\nchúng ta chỉ có thể gọi hàm để tính toán trung bình trên hàng chục hình\ndạng tùy ý."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "A.mean(), A.sum() / A.size"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "(array(9.5), array(9.5))"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "A.mean(), A.sum() / A.numel()"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "(tensor(9.5000), tensor(9.5000))"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "tf.reduce_mean(A), tf.reduce_sum(A) / tf.size(A).numpy()"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "(<tf.Tensor: shape=(), dtype=float32, numpy=9.5>,\n <tf.Tensor: shape=(), dtype=float32, numpy=9.5>)"
+    },
+    {
+      "type": "paragraph",
+      "text": "Tương tự như vậy, chức năng tính trung bình cũng có thể làm giảm tensor\ndọc theo các trục được chỉ định."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "A.mean(axis=0), A.sum(axis=0) / A.shape[0]"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "(array([ 8.,  9., 10., 11.]), array([ 8.,  9., 10., 11.]))"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "A.mean(axis=0), A.sum(axis=0) / A.shape[0]"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "(tensor([ 8.,  9., 10., 11.]), tensor([ 8.,  9., 10., 11.]))"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "tf.reduce_mean(A, axis=0), tf.reduce_sum(A, axis=0) / A.shape[0]"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "(<tf.Tensor: shape=(4,), dtype=float32, numpy=array([ 8.,  9., 10., 11.], dtype=float32)>,\n <tf.Tensor: shape=(4,), dtype=float32, numpy=array([ 8.,  9., 10., 11.], dtype=float32)>)"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "tong-khong-giam",
+      "text": "2.3.6.1. Tổng không giảm"
+    },
+    {
+      "type": "paragraph",
+      "text": "Tuy nhiên, đôi khi có thể hữu ích khi giữ số trục không thay đổi khi gọi\nhàm tính tổng hoặc trung bình."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "sum_A = A.sum(axis=1, keepdims=True)\nsum_A"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "array([[ 6.],\n       [22.],\n       [38.],\n       [54.],\n       [70.]])"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "sum_A = A.sum(axis=1, keepdims=True)\nsum_A"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "tensor([[ 6.],\n        [22.],\n        [38.],\n        [54.],\n        [70.]])"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "sum_A = tf.reduce_sum(A, axis=1, keepdims=True)\nsum_A"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "<tf.Tensor: shape=(5, 1), dtype=float32, numpy=\narray([[ 6.],\n       [22.],\n       [38.],\n       [54.],\n       [70.]], dtype=float32)>"
+    },
+    {
+      "type": "paragraph",
+      "text": "Ví dụ, vì sum_A vẫn giữ hai trục của nó sau khi tổng hợp mỗi hàng,\nchúng ta có thể chia A cho sum_A với phát sóng."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "A / sum_A"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "array([[0.        , 0.16666667, 0.33333334, 0.5       ],\n       [0.18181819, 0.22727273, 0.27272728, 0.3181818 ],\n       [0.21052632, 0.23684211, 0.2631579 , 0.28947368],\n       [0.22222222, 0.24074075, 0.25925925, 0.2777778 ],\n       [0.22857143, 0.24285714, 0.25714287, 0.27142859]])"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "A / sum_A"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "tensor([[0.0000, 0.1667, 0.3333, 0.5000],\n        [0.1818, 0.2273, 0.2727, 0.3182],\n        [0.2105, 0.2368, 0.2632, 0.2895],\n        [0.2222, 0.2407, 0.2593, 0.2778],\n        [0.2286, 0.2429, 0.2571, 0.2714]])"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "A / sum_A"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "<tf.Tensor: shape=(5, 4), dtype=float32, numpy=\narray([[0.        , 0.16666667, 0.33333334, 0.5       ],\n       [0.18181819, 0.22727273, 0.27272728, 0.3181818 ],\n       [0.21052632, 0.23684211, 0.2631579 , 0.28947368],\n       [0.22222222, 0.24074075, 0.25925925, 0.2777778 ],\n       [0.22857143, 0.24285714, 0.25714287, 0.27142859]], dtype=float32)>"
+    },
+    {
+      "type": "paragraph",
+      "text": "Nếu chúng ta muốn tính toán tổng tích lũy của các phần tử của A dọc\ntheo một số trục , giả sử axis=0 (từng hàng), chúng ta có thể gọi\nhàm cumsum . Chức năng này sẽ không làm giảm tensor đầu vào dọc theo\nbất kỳ trục nào."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "A.cumsum(axis=0)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "array([[ 0.,  1.,  2.,  3.],\n       [ 4.,  6.,  8., 10.],\n       [12., 15., 18., 21.],\n       [24., 28., 32., 36.],\n       [40., 45., 50., 55.]])"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "A.cumsum(axis=0)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "tensor([[ 0.,  1.,  2.,  3.],\n        [ 4.,  6.,  8., 10.],\n        [12., 15., 18., 21.],\n        [24., 28., 32., 36.],\n        [40., 45., 50., 55.]])"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "tf.cumsum(A, axis=0)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "<tf.Tensor: shape=(5, 4), dtype=float32, numpy=\narray([[ 0.,  1.,  2.,  3.],\n       [ 4.,  6.,  8., 10.],\n       [12., 15., 18., 21.],\n       [24., 28., 32., 36.],\n       [40., 45., 50., 55.]], dtype=float32)>"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "san-pham-dot",
+      "text": "2.3.7. Sản phẩm Dot"
+    },
+    {
+      "type": "paragraph",
+      "text": "Cho đến nay, chúng tôi chỉ thực hiện các hoạt động elementwise, tổng và\ntrung bình. Và nếu đây là tất cả những gì chúng ta có thể làm, đại số\ntuyến tính có lẽ sẽ không xứng đáng với phần riêng của nó. Tuy nhiên,\nmột trong những hoạt động cơ bản nhất là sản phẩm chấm. Với hai vectơ \\(\\mathbf{x}, \\mathbf{y} \\in \\mathbb{R}^d\\) , sản phẩm dot của họ \\(\\mathbf{x}^\\top \\mathbf{y}\\) (hoặc \\(\\langle \\mathbf{x}, \\mathbf{y} \\rangle\\) ) là một tổng so với các\nsản phẩm của các phần tử ở cùng một vị trí: \\(\\mathbf{x}^\\top \\mathbf{y} = \\sum_{i=1}^{d} x_i y_i\\) ."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "y = np.ones(4)\nx, y, np.dot(x, y)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "(array([0., 1., 2., 3.]), array([1., 1., 1., 1.]), array(6.))"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "y = torch.ones(4, dtype = torch.float32)\nx, y, torch.dot(x, y)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "(tensor([0., 1., 2., 3.]), tensor([1., 1., 1., 1.]), tensor(6.))"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "y = tf.ones(4, dtype=tf.float32)\nx, y, tf.tensordot(x, y, axes=1)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "(<tf.Tensor: shape=(4,), dtype=float32, numpy=array([0., 1., 2., 3.], dtype=float32)>,\n <tf.Tensor: shape=(4,), dtype=float32, numpy=array([1., 1., 1., 1.], dtype=float32)>,\n <tf.Tensor: shape=(), dtype=float32, numpy=6.0>)"
+    },
+    {
+      "type": "paragraph",
+      "text": "Lưu ý rằng chúng ta có thể diễn đạt tích chấm của hai vectơ tương đương\nbằng cách thực hiện phép nhân elementwise và sau đó là tổng:"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "np.sum(x * y)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "array(6.)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "torch.sum(x * y)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "tensor(6.)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "tf.reduce_sum(x * y)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "<tf.Tensor: shape=(), dtype=float32, numpy=6.0>"
+    },
+    {
+      "type": "paragraph",
+      "text": "Các sản phẩm Dot rất hữu ích trong một loạt các bối cảnh. Ví dụ, cho một\nsố tập hợp các giá trị, được biểu thị bằng một vectơ \\(\\mathbf{x} \\in \\mathbb{R}^d\\) và một tập hợp trọng số được ký hiệu\nbởi \\(\\mathbf{w} \\in \\mathbb{R}^d\\) , tổng trọng số của các giá trị\ntrong \\(\\mathbf{x}\\) theo trọng lượng \\(\\mathbf{w}\\) có thể được\nbiểu thị dưới dạng sản phẩm chấm \\(\\mathbf{x}^\\top \\mathbf{w}\\) . Khi\ntrọng lượng không âm và tổng thành một (tức là \\(\\left(\\sum_{i=1}^{d} {w_i} = 1\\right)\\) ), sản phẩm chấm biểu thị\ntrung bình * có trọng lự * . Sau khi bình thường hóa hai vectơ để có\nchiều dài đơn vị, các sản phẩm chấm thể hiện cosin của góc giữa chúng.\nChúng tôi sẽ chính thức giới thiệu khái niệm này là * chiều dài* sau\ntrong phần này."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "matrix-vector-san-pham",
+      "text": "2.3.8. Matrix-Vector Sản phẩm"
+    },
+    {
+      "type": "paragraph",
+      "text": "Bây giờ chúng ta đã biết cách tính toán các sản phẩm chấm, chúng ta có\nthể bắt đầu hiểu các sản phẩm * ma thuật-vectơ * . Nhớ lại ma trận \\(\\mathbf{A} \\in \\mathbb{R}^{m \\times n}\\) và vector \\(\\mathbf{x} \\in \\mathbb{R}^n\\) được xác định và hình dung trong (2.3.2) và (2.3.1) tương ứng. Hãy để\nchúng tôi bắt đầu bằng cách hình dung ma trận \\(\\mathbf{A}\\) về\nvectơ hàng của nó"
+    },
+    {
+      "type": "math",
+      "latex": "(2.3.5)¶\\[\\begin{split}\\mathbf{A}=\n\\begin{bmatrix}\n\\mathbf{a}^\\top_{1} \\\\\n\\mathbf{a}^\\top_{2} \\\\\n\\vdots \\\\\n\\mathbf{a}^\\top_m \\\\\n\\end{bmatrix},\\end{split}\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "trong đó mỗi \\(\\mathbf{a}^\\top_{i} \\in \\mathbb{R}^n\\) là một vectơ\nhàng đại diện cho hàng \\(i^\\mathrm{th}\\) của ma trận \\(\\mathbf{A}\\) ."
+    },
+    {
+      "type": "paragraph",
+      "text": "Sản phẩm ma trận-vector \\(\\mathbf{A}\\mathbf{x}\\) chỉ đơn giản là một\nvector cột có chiều dài \\(m\\) , có \\(i^\\mathrm{th}\\) phần tử là\nsản phẩm chấm \\(\\mathbf{a}^\\top_i \\mathbf{x}\\) :"
+    },
+    {
+      "type": "math",
+      "latex": "(2.3.6)¶\\[\\begin{split}\\mathbf{A}\\mathbf{x}\n= \\begin{bmatrix}\n\\mathbf{a}^\\top_{1} \\\\\n\\mathbf{a}^\\top_{2} \\\\\n\\vdots \\\\\n\\mathbf{a}^\\top_m \\\\\n\\end{bmatrix}\\mathbf{x}\n= \\begin{bmatrix}\n \\mathbf{a}^\\top_{1} \\mathbf{x}  \\\\\n \\mathbf{a}^\\top_{2} \\mathbf{x} \\\\\n\\vdots\\\\\n \\mathbf{a}^\\top_{m} \\mathbf{x}\\\\\n\\end{bmatrix}.\\end{split}\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Chúng ta có thể nghĩ đến phép nhân của một ma trận \\(\\mathbf{A}\\in \\mathbb{R}^{m \\times n}\\) như một biến đổi dự án\nvectơ từ \\(\\mathbb{R}^{n}\\) đến \\(\\mathbb{R}^{m}\\) . Những biến\nđổi này trở nên hữu ích đáng kể. Ví dụ, chúng ta có thể biểu diễn các\nvòng quay dưới dạng phép nhân bằng một ma trận vuông. Như chúng ta sẽ\nthấy trong các chương tiếp theo, chúng ta cũng có thể sử dụng các sản\nphẩm ma thuật-vector để mô tả các phép tính chuyên sâu nhất cần thiết\nkhi tính toán từng lớp trong mạng thần kinh với các giá trị của lớp\ntrước đó."
+    },
+    {
+      "type": "paragraph",
+      "text": "Thể hiện các sản phẩm ma thuật-vector trong mã với hàng chục, chúng tôi\nsử dụng chức năng dot tương tự như đối với các sản phẩm chấm. Khi\nchúng ta gọi np.dot(A, x) với ma trận A và một vector x , sản\nphẩm ma thuật-vector được thực hiện. Lưu ý rằng kích thước cột A (chiều dài của nó dọc theo trục 1) phải giống với kích thước x (chiều dài của nó)."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "A.shape, x.shape, np.dot(A, x)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "((5, 4), (4,), array([ 14.,  38.,  62.,  86., 110.]))"
+    },
+    {
+      "type": "paragraph",
+      "text": "Thể hiện các sản phẩm ma thuật-vector trong mã với hàng chục, chúng tôi\nsử dụng hàm mv . Khi chúng ta gọi torch.mv(A, x) với ma trận A và một vector x , sản phẩm ma thuật-vector được thực hiện. Lưu\ný rằng kích thước cột của A (chiều dài của nó dọc theo trục 1) phải\ngiống với kích thước x (chiều dài của nó)."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "A.shape, x.shape, torch.mv(A, x)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "(torch.Size([5, 4]), torch.Size([4]), tensor([ 14.,  38.,  62.,  86., 110.]))"
+    },
+    {
+      "type": "paragraph",
+      "text": "Thể hiện các sản phẩm ma thuật-vector trong mã với hàng chục, chúng tôi\nsử dụng hàm matvec . Khi chúng ta gọi tf.linalg.matvec(A, x) với\nma trận A và một vector x , sản phẩm ma thuật-vector được thực\nhiện. Lưu ý rằng kích thước cột A (chiều dài của nó dọc theo trục 1)\nphải giống với kích thước x (chiều dài của nó)."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "A.shape, x.shape, tf.linalg.matvec(A, x)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "(TensorShape([5, 4]),\n TensorShape([4]),\n <tf.Tensor: shape=(5,), dtype=float32, numpy=array([ 14.,  38.,  62.,  86., 110.], dtype=float32)>)"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "phep-nhan-ma-tran-ma-tran",
+      "text": "2.3.9. Phép nhân ma trận ma trận"
+    },
+    {
+      "type": "paragraph",
+      "text": "Nếu bạn đã nhận được sự treo của các sản phẩm chấm và các sản phẩm ma\nthuật-vector, thì nhân * ma trận ma trận * phải đơn giản."
+    },
+    {
+      "type": "paragraph",
+      "text": "Nói rằng chúng ta có hai ma trận \\(\\mathbf{A} \\in \\mathbb{R}^{n \\times k}\\) và \\(\\mathbf{B} \\in \\mathbb{R}^{k \\times m}\\) :"
+    },
+    {
+      "type": "math",
+      "latex": "(2.3.7)¶\\[\\begin{split}\\mathbf{A}=\\begin{bmatrix}\n a_{11} & a_{12} & \\cdots & a_{1k} \\\\\n a_{21} & a_{22} & \\cdots & a_{2k} \\\\\n\\vdots & \\vdots & \\ddots & \\vdots \\\\\n a_{n1} & a_{n2} & \\cdots & a_{nk} \\\\\n\\end{bmatrix},\\quad\n\\mathbf{B}=\\begin{bmatrix}\n b_{11} & b_{12} & \\cdots & b_{1m} \\\\\n b_{21} & b_{22} & \\cdots & b_{2m} \\\\\n\\vdots & \\vdots & \\ddots & \\vdots \\\\\n b_{k1} & b_{k2} & \\cdots & b_{km} \\\\\n\\end{bmatrix}.\\end{split}\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Biểu thị bằng \\(\\mathbf{a}^\\top_{i} \\in \\mathbb{R}^k\\) vector hàng\nđại diện cho hàng \\(i^\\mathrm{th}\\) của ma trận \\(\\mathbf{A}\\) ,\nvà để cho \\(\\mathbf{b}_{j} \\in \\mathbb{R}^k\\) là vectơ cột từ cột \\(j^\\mathrm{th}\\) của ma trận \\(\\mathbf{B}\\) . Để sản xuất sản\nphẩm ma trận \\(\\mathbf{C} = \\mathbf{A}\\mathbf{B}\\) , dễ nhất là nghĩ\nđến \\(\\mathbf{A}\\) về vectơ hàng và \\(\\mathbf{B}\\) về vectơ cột\ncủa nó:"
+    },
+    {
+      "type": "math",
+      "latex": "(2.3.8)¶\\[\\begin{split}\\mathbf{A}=\n\\begin{bmatrix}\n\\mathbf{a}^\\top_{1} \\\\\n\\mathbf{a}^\\top_{2} \\\\\n\\vdots \\\\\n\\mathbf{a}^\\top_n \\\\\n\\end{bmatrix},\n\\quad \\mathbf{B}=\\begin{bmatrix}\n \\mathbf{b}_{1} & \\mathbf{b}_{2} & \\cdots & \\mathbf{b}_{m} \\\\\n\\end{bmatrix}.\\end{split}\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Sau đó, sản phẩm ma trận \\(\\mathbf{C} \\in \\mathbb{R}^{n \\times m}\\) được sản xuất như chúng ta chỉ đơn giản là tính toán từng phần tử \\(c_{ij}\\) như là sản phẩm chấm \\(\\mathbf{a}^\\top_i \\mathbf{b}_j\\) :"
+    },
+    {
+      "type": "math",
+      "latex": "(2.3.9)¶\\[\\begin{split}\\mathbf{C} = \\mathbf{AB} = \\begin{bmatrix}\n\\mathbf{a}^\\top_{1} \\\\\n\\mathbf{a}^\\top_{2} \\\\\n\\vdots \\\\\n\\mathbf{a}^\\top_n \\\\\n\\end{bmatrix}\n\\begin{bmatrix}\n \\mathbf{b}_{1} & \\mathbf{b}_{2} & \\cdots & \\mathbf{b}_{m} \\\\\n\\end{bmatrix}\n= \\begin{bmatrix}\n\\mathbf{a}^\\top_{1} \\mathbf{b}_1 & \\mathbf{a}^\\top_{1}\\mathbf{b}_2& \\cdots & \\mathbf{a}^\\top_{1} \\mathbf{b}_m \\\\\n \\mathbf{a}^\\top_{2}\\mathbf{b}_1 & \\mathbf{a}^\\top_{2} \\mathbf{b}_2 & \\cdots & \\mathbf{a}^\\top_{2} \\mathbf{b}_m \\\\\n \\vdots & \\vdots & \\ddots &\\vdots\\\\\n\\mathbf{a}^\\top_{n} \\mathbf{b}_1 & \\mathbf{a}^\\top_{n}\\mathbf{b}_2& \\cdots& \\mathbf{a}^\\top_{n} \\mathbf{b}_m\n\\end{bmatrix}.\\end{split}\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Chúng ta có thể nghĩ đến phép nhân ma trận ma trận \\(\\mathbf{AB}\\) chỉ đơn giản là thực hiện \\(m\\) các sản phẩm ma trận vector và khâu\nkết quả lại với nhau để tạo thành ma trận \\(n \\times m\\) Trong đoạn\nmã sau, chúng tôi thực hiện phép nhân ma trận trên A và B . Ở\nđây, A là một ma trận với 5 hàng và 4 cột, và B là một ma trận\nvới 4 hàng và 3 cột. Sau khi nhân, chúng ta có được một ma trận với 5\nhàng và 3 cột."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "B = np.ones(shape=(4, 3))\nnp.dot(A, B)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "array([[ 6.,  6.,  6.],\n       [22., 22., 22.],\n       [38., 38., 38.],\n       [54., 54., 54.],\n       [70., 70., 70.]])"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "B = torch.ones(4, 3)\ntorch.mm(A, B)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "tensor([[ 6.,  6.,  6.],\n        [22., 22., 22.],\n        [38., 38., 38.],\n        [54., 54., 54.],\n        [70., 70., 70.]])"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "B = tf.ones((4, 3), tf.float32)\ntf.matmul(A, B)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "<tf.Tensor: shape=(5, 3), dtype=float32, numpy=\narray([[ 6.,  6.,  6.],\n       [22., 22., 22.],\n       [38., 38., 38.],\n       [54., 54., 54.],\n       [70., 70., 70.]], dtype=float32)>"
+    },
+    {
+      "type": "paragraph",
+      "text": "Phép nhân ma trận ma trận có thể được gọi đơn giản là nhân * ma trận * ,\nvà không nên nhầm lẫn với sản phẩm Hadamard."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "dinh-muc",
+      "text": "2.3.10. Định mức"
+    },
+    {
+      "type": "paragraph",
+      "text": "Một số toán tử hữu ích nhất trong đại số tuyến tính là * chỉ tiêu * .\nMột cách không chính thức, định mức của một vector cho chúng ta biết\ncách * lớn* một vectơ là. Khái niệm về kích thước* đang được xem xét ở\nđây không liên quan đến chiều mà là độ lớn của các thành phần."
+    },
+    {
+      "type": "paragraph",
+      "text": "Trong đại số tuyến tính, một định mức vectơ là một hàm \\(f\\) ánh xạ\nmột vectơ đến vô hướng, thỏa mãn một số ít các thuộc tính. Với bất kỳ\nvector \\(\\mathbf{x}\\) nào, thuộc tính đầu tiên nói rằng nếu chúng ta\nquy mô tất cả các phần tử của một vectơ bằng một hệ số không đổi \\(\\alpha\\) , định mức của nó cũng quy mô theo giá trị * tuyệt đối *\ncủa cùng một yếu tố không đổi:"
+    },
+    {
+      "type": "math",
+      "latex": "(2.3.10)¶\\[f(\\alpha \\mathbf{x}) = |\\alpha| f(\\mathbf{x}).\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Tính chất thứ hai là bất đẳng thức tam giác quen thuộc:"
+    },
+    {
+      "type": "math",
+      "latex": "(2.3.11)¶\\[f(\\mathbf{x} + \\mathbf{y}) \\leq f(\\mathbf{x}) + f(\\mathbf{y}).\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Tài sản thứ ba chỉ đơn giản nói rằng định mức phải không tiêu cực:"
+    },
+    {
+      "type": "math",
+      "latex": "(2.3.12)¶\\[f(\\mathbf{x}) \\geq 0.\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Điều đó có ý nghĩa, như trong hầu hết các bối cảnh, * kích thước* nhỏ\nnhất cho bất cứ điều gì là 0. Thuộc tính cuối cùng yêu cầu định mức nhỏ\nnhất đạt được và chỉ đạt được bằng một vectơ bao gồm tất cả các số\nkhông."
+    },
+    {
+      "type": "math",
+      "latex": "(2.3.13)¶\\[\\forall i, [\\mathbf{x}]_i = 0 \\Leftrightarrow f(\\mathbf{x})=0.\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Bạn có thể nhận thấy rằng các định mức âm thanh rất giống với các biện\npháp khoảng cách. Và nếu bạn nhớ khoảng cách Euclide (nghĩ rằng định lý\nPythagoras) từ trường lớp, thì các khái niệm về không tiêu cực và bất\nbình đẳng tam giác có thể rung chuông. Trên thực tế, khoảng cách Euclide\nlà một tiêu chuẩn: cụ thể nó là định mức \\(L_2\\) . Giả sử rằng các\nyếu tố trong vector \\(n\\) chiều \\(\\mathbf{x}\\) là \\(x_1, \\ldots, x_n\\) ."
+    },
+    {
+      "type": "paragraph",
+      "text": "\\(L_2\\) norm của \\(\\mathbf{x}\\) là căn bậc hai của tổng các ô\nvuông của các phần tử vectơ:"
+    },
+    {
+      "type": "math",
+      "latex": "(2.3.14)¶\\[\\|\\mathbf{x}\\|_2 = \\sqrt{\\sum_{i=1}^n x_i^2},\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "trong đó chỉ số dưới \\(2\\) thường bị bỏ qua trong \\(L_2\\) chỉ\ntiêu, tức là \\(\\|\\mathbf{x}\\|\\) tương đương với \\(\\|\\mathbf{x}\\|_2\\) . Trong mã, chúng ta có thể tính định mức \\(L_2\\) của một vectơ như sau."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "u = np.array([3, -4])\nnp.linalg.norm(u)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "array(5.)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "u = torch.tensor([3.0, -4.0])\ntorch.norm(u)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "tensor(5.)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "u = tf.constant([3.0, -4.0])\ntf.norm(u)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "<tf.Tensor: shape=(), dtype=float32, numpy=5.0>"
+    },
+    {
+      "type": "paragraph",
+      "text": "Trong học sâu, chúng tôi làm việc thường xuyên hơn với định mức \\(L_2\\) bình phương."
+    },
+    {
+      "type": "paragraph",
+      "text": "Bạn cũng sẽ thường xuyên gặp phải the \\(L_1\\) norm , được biểu thị\ndưới dạng tổng các giá trị tuyệt đối của các phần tử vectơ:"
+    },
+    {
+      "type": "math",
+      "latex": "(2.3.15)¶\\[\\|\\mathbf{x}\\|_1 = \\sum_{i=1}^n \\left|x_i \\right|.\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "So với định mức \\(L_2\\) , nó ít bị ảnh hưởng bởi outliers. Để tính\nđịnh mức \\(L_1\\) , ta soạn hàm giá trị tuyệt đối với một tổng trên\ncác phần tử."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "np.abs(u).sum()"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "array(7.)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "torch.abs(u).sum()"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "tensor(7.)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "tf.reduce_sum(tf.abs(u))"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "<tf.Tensor: shape=(), dtype=float32, numpy=7.0>"
+    },
+    {
+      "type": "paragraph",
+      "text": "Cả định mức \\(L_2\\) và định mức \\(L_1\\) đều là những trường hợp\nđặc biệt của \\(L_p\\) * tiêu chuẩn* chung hơn:"
+    },
+    {
+      "type": "math",
+      "latex": "(2.3.16)¶\\[\\|\\mathbf{x}\\|_p = \\left(\\sum_{i=1}^n \\left|x_i \\right|^p \\right)^{1/p}.\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Tương tự như định mức \\(L_2\\) của vectơ, chuẩn Frobenius của ma\ntrận \\(\\mathbf{X} \\in \\mathbb{R}^{m \\times n}\\) là căn bậc hai của\ntổng bình phương của các phần tử ma trận:"
+    },
+    {
+      "type": "math",
+      "latex": "(2.3.17)¶\\[\\|\\mathbf{X}\\|_F = \\sqrt{\\sum_{i=1}^m \\sum_{j=1}^n x_{ij}^2}.\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Định mức Frobenius thỏa mãn tất cả các thuộc tính của các chỉ tiêu\nvector. Nó hoạt động như thể nó là một định mức \\(L_2\\) của một\nvectơ hình ma trận. Gọi hàm sau sẽ tính định mức Frobenius của một ma\ntrận."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "np.linalg.norm(np.ones((4, 9)))"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "array(6.)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "torch.norm(torch.ones((4, 9)))"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "tensor(6.)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "tf.norm(tf.ones((4, 9)))"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "<tf.Tensor: shape=(), dtype=float32, numpy=6.0>"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "dinh-muc-va-muc-tieu",
+      "text": "2.3.10.1. Định mức và mục tiêu"
+    },
+    {
+      "type": "paragraph",
+      "text": "Mặc dù chúng ta không muốn vượt quá xa bản thân, chúng ta có thể trồng\nmột số trực giác về lý do tại sao những khái niệm này hữu ích. Trong học\nsâu, chúng ta thường cố gắng giải quyết các vấn đề tối ưu hóa: tối đa\nhóa xác suất được gán cho dữ liệu quan sát; giảm xuống khoảng cách\ngiữa các dự đoán and the ground-truth đất sự thật observations quan sát.\nGán biểu diễn vector cho các mục (như từ, sản phẩm hoặc bài báo tin tức)\nsao cho khoảng cách giữa các mục tương tự được giảm thiểu và khoảng cách\ngiữa các mục khác nhau được tối đa hóa. Thông thường, các mục tiêu, có\nlẽ là các thành phần quan trọng nhất của các thuật toán học sâu (bên\ncạnh dữ liệu), được thể hiện dưới dạng định mức."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tim-hieu-them-ve-linear-algebra",
+      "text": "2.3.11. Tìm hiểu thêm về Linear Algebra"
+    },
+    {
+      "type": "paragraph",
+      "text": "Chỉ trong phần này, chúng tôi đã dạy bạn tất cả các đại số tuyến tính mà\nbạn sẽ cần phải hiểu một phần đáng chú ý của học sâu hiện đại. Có rất\nnhiều hơn để đại số tuyến tính và rất nhiều toán học đó rất hữu ích cho\nviệc học máy. Ví dụ, ma trận có thể bị phân hủy thành các yếu tố, và\nnhững phân hủy này có thể tiết lộ cấu trúc chiều thấp trong các bộ dữ\nliệu thế giới thực. Có toàn bộ trường con của machine learning tập trung\nvào việc sử dụng các phân hủy ma trận và khái quát hóa của chúng cho các\nhàng chục bậc cao để khám phá cấu trúc trong bộ dữ liệu và giải quyết\ncác vấn đề dự đoán. Nhưng cuốn sách này tập trung vào việc học sâu. Và\nchúng tôi tin rằng bạn sẽ có xu hướng tìm hiểu thêm toán học hơn một khi\nbạn đã nhận được bàn tay của bạn bẩn triển khai các mô hình máy học hữu\ních trên các bộ dữ liệu thực. Vì vậy, trong khi chúng tôi có quyền giới\nthiệu nhiều toán học hơn nhiều sau này, chúng tôi sẽ kết thúc phần này ở\nđây."
+    },
+    {
+      "type": "paragraph",
+      "text": "Nếu bạn muốn tìm hiểu thêm về đại số tuyến tính, bạn có thể tham khảo online appendix on linear algebraic\noperations hoặc các tài nguyên tuyệt vời khác [Strang, 1993] [Kolter, 2008] [Petersen et al., 2008] ."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tom-tat",
+      "text": "2.3.12. Tóm tắt"
+    },
+    {
+      "type": "list",
+      "ordered": false,
+      "items": [
+        "Vô hướng, vectơ, ma trận, và hàng chục là các đối tượng toán học cơ\nbản trong đại số tuyến tính.",
+        "Vectơ tổng quát hóa vô hướng, và ma trận tổng quát hóa vectơ.",
+        "Vô hướng, vectơ, ma trận và hàng chục có số không, một, hai và một số\ntrục tùy ý, tương ứng.",
+        "Một tensor có thể được giảm dọc theo các trục được chỉ định bởi sum và mean .",
+        "Nhân Elementwise của hai ma trận được gọi là sản phẩm Hadamard của\nhọ. Nó khác với phép nhân ma trận.",
+        "Trong học sâu, chúng ta thường làm việc với các tiêu chuẩn như định\nmức \\(L_1\\) , định mức \\(L_2\\) và định mức Frobenius.",
+        "Chúng ta có thể thực hiện một loạt các hoạt động trên vô hướng,\nvectơ, ma trận và hàng chục."
+      ]
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bai-tap",
+      "text": "2.3.13. Bài tập"
+    },
+    {
+      "type": "list",
+      "ordered": true,
+      "items": [
+        "Chứng minh rằng sự chuyển vị của một ma trận \\(\\mathbf{A}\\) transpose là \\(\\mathbf{A}\\) : \\((\\mathbf{A}^\\top)^\\top = \\mathbf{A}\\) .",
+        "Cho hai ma trận \\(\\mathbf{A}\\) và \\(\\mathbf{B}\\) , cho thấy\ntổng các transposes bằng chuyển vị của một tổng: \\(\\mathbf{A}^\\top + \\mathbf{B}^\\top = (\\mathbf{A} + \\mathbf{B})^\\top\\) .",
+        "Cho bất kỳ ma trận vuông \\(\\mathbf{A}\\) , là \\(\\mathbf{A} + \\mathbf{A}^\\top\\) luôn đối xứng? Tại sao?",
+        "Chúng tôi xác định tensor X của hình dạng (2, 3, 4) trong phần\nnày. Sản lượng của len(X) là gì?",
+        "Đối với một tensor X có hình dạng tùy ý, liệu len(X) luôn\ntương ứng với chiều dài của một trục nhất định là X không? Trục\nđó là gì?",
+        "Chạy A / A.sum(axis=1) và xem những gì sẽ xảy ra. Bạn có thể phân\ntích lý do?",
+        "Khi đi du lịch giữa hai điểm ở Manhattan, khoảng cách mà bạn cần bao\ngồm về tọa độ, tức là về con đường và đường phố là bao nhiêu? Bạn có\nthể đi du lịch theo đường chéo?",
+        "Xem xét một tensor với hình dạng (2, 3, 4). Các hình dạng của đầu ra\ntổng kết dọc theo trục 0, 1 và 2 là gì?",
+        "Nạp một tensor với 3 trục trở lên đến chức năng linalg.norm và\nquan sát đầu ra của nó. Chức năng này tính toán gì cho hàng chục hình\ndạng tùy ý?"
+      ]
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    }
+  ],
+  "images": [],
+  "text": "2.3. Đại số tuyến tính\nBây giờ bạn có thể lưu trữ và thao tác dữ liệu, chúng ta hãy xem xét\nngắn gọn tập hợp con của đại số tuyến tính cơ bản mà bạn sẽ cần hiểu và\nthực hiện hầu hết các mô hình được đề cập trong cuốn sách này. Dưới đây,\nchúng tôi giới thiệu các đối tượng toán học cơ bản, số học, và phép toán\ntrong đại số tuyến tính, thể hiện từng đối tượng trong số chúng thông\nqua ký hiệu toán học và việc thực hiện tương ứng trong mã.\n2.3.1. Vô hướng\nNếu bạn chưa bao giờ học đại số tuyến tính hoặc học máy, thì kinh nghiệm\ntrong quá khứ của bạn với toán học có thể bao gồm suy nghĩ về một số tại\nmột thời điểm. Và, nếu bạn đã bao giờ cân bằng một sổ séc hoặc thậm chí\ntrả tiền cho bữa tối tại một nhà hàng thì bạn đã biết làm thế nào để làm\nnhững việc cơ bản như thêm và nhân các cặp số. Ví dụ, nhiệt độ ở Palo\nAlto là \\(52\\) độ F. Chính thức, chúng ta gọi các giá trị chỉ bao\ngồm một số lượng * vô số * . Nếu bạn muốn chuyển đổi giá trị này sang\nCelsius (thang nhiệt độ hợp lý hơn của hệ mét), bạn sẽ đánh giá biểu\nthức \\(c = \\frac{5}{9}(f - 32)\\) , đặt \\(f\\) thành \\(52\\) .\nTrong phương trình này, mỗi thuật ngữ — \\(5\\) , \\(9\\) , và \\(32\\) —là những giá trị vô hướng. Các giữ chỗ \\(c\\) và \\(f\\) được gọi là * variables* và chúng đại diện cho các giá trị vô hướng\nkhông xác định.\nTrong cuốn sách này, chúng ta áp dụng ký hiệu toán học trong đó các biến\nvô hướng được biểu thị bằng các chữ cái thường thấp hơn (ví dụ: \\(x\\) , \\(y\\) và \\(z\\) ). Chúng tôi biểu thị không gian của\ntất cả (liên tục) * có giá trị thực* vô hướng bởi \\(\\mathbb{R}\\) .\nĐối với sự nhanh chóng, chúng ta sẽ xem xét các định nghĩa nghiêm ngặt\nvề chính xác không gian là gì, nhưng chỉ cần nhớ rằng biểu thức \\(x \\in \\mathbb{R}\\) là một cách chính thức để nói rằng \\(x\\) là\nmột vô hướng có giá trị thực. Ký hiệu \\(\\in\\) có thể được phát âm\n“trong” và chỉ đơn giản là biểu thị thành viên trong một bộ. Tương tự,\nchúng ta có thể viết \\(x, y \\in \\{0, 1\\}\\) để nói rằng \\(x\\) và \\(y\\) là những con số có giá trị chỉ có thể là \\(0\\) hoặc \\(1\\) .\nMột vô hướng được biểu diễn bằng một tensor chỉ với một yếu tố. Trong\nđoạn tiếp theo, chúng ta khởi tạo hai vô hướng và thực hiện một số phép\ntoán số học quen thuộc với chúng, cụ thể là cộng, nhân, chia và hàm mũ.\n2.3.2. Vectơ\nBạn có thể nghĩ một vector chỉ đơn giản là một danh sách các giá trị vô\nhướng. Chúng ta gọi các giá trị này là * element* ( entries hoặc components ) của vector. Khi vectơ của chúng ta đại diện cho các ví dụ\ntừ tập dữ liệu của chúng ta, các giá trị của chúng giữ một số ý nghĩa\ntrong thế giới thực. Ví dụ: nếu chúng ta đang đào tạo một mô hình để dự\nđoán rủi ro mà một khoản vay mặc định, chúng ta có thể liên kết mỗi ứng\nviên với một vectơ có thành phần tương ứng với thu nhập, thời gian làm\nviệc, số lượng mặc định trước đó và các yếu tố khác. Nếu chúng ta đang\nnghiên cứu nguy cơ đau tim bệnh nhân bệnh viện có khả năng phải đối mặt,\nchúng ta có thể đại diện cho mỗi bệnh nhân bằng một vectơ có thành phần\nnắm bắt các dấu hiệu quan trọng gần đây nhất của họ, mức cholesterol,\nphút tập thể dục mỗi ngày, vv Trong ký hiệu toán học, chúng ta thường sẽ\nbiểu thị vectơ là mặt đậm, thấp hơn cased các chữ cái (ví dụ: \\(\\mathbf{x}\\) , \\(\\mathbf{y}\\) và \\(\\mathbf{z})\\) .\nChúng tôi làm việc với các vectơ thông qua các hàng chục một chiều.\nTrong hàng chục nói chung có thể có độ dài tùy ý, tùy thuộc vào giới hạn\nbộ nhớ của máy của bạn.\nChúng ta có thể tham khảo bất kỳ phần tử nào của vectơ bằng cách sử dụng\nchỉ số dưới. Ví dụ: chúng ta có thể tham khảo phần tử \\(i^\\mathrm{th}\\) của \\(\\mathbf{x}\\) bởi \\(x_i\\) . Lưu ý rằng\nphần tử \\(x_i\\) là vô hướng, vì vậy chúng ta không phải đối mặt với\nphông chữ khi đề cập đến nó. Văn học mở rộng coi vectơ cột là định hướng\nmặc định của vectơ, cuốn sách này cũng vậy. Trong toán học, một vector \\(\\mathbf{x}\\) có thể được viết là\ntrong đó \\(x_1, \\ldots, x_n\\) là các yếu tố của vectơ. Trong code,\nchúng ta truy cập bất kỳ phần tử nào bằng cách lập chỉ mục vào tensor.\n2.3.2.1. Chiều dài, kích thước và hình dạng\nChúng ta hãy xem lại một số khái niệm từ Section 2.1 . Một\nvectơ chỉ là một mảng các số. Và cũng giống như mỗi mảng có một chiều\ndài, vì vậy không mỗi vector. Trong ký hiệu toán học, nếu chúng ta muốn\nnói rằng một vector \\(\\mathbf{x}\\) bao gồm \\(n\\) vô hướng có giá\ntrị thực, chúng ta có thể thể hiện điều này là \\(\\mathbf{x} \\in \\mathbb{R}^n\\) . Độ dài của một vectơ thường được\ngọi là dimension của vectơ.\nNhư với một mảng Python thông thường, chúng ta có thể truy cập độ dài\ncủa một tensor bằng cách gọi hàm len() tích hợp của Python.\nKhi một tensor đại diện cho một vectơ (với chính xác một trục), chúng ta\ncũng có thể truy cập độ dài của nó thông qua thuộc tính .shape . Hình\ndạng là một tuple liệt kê chiều dài (chiều) dọc theo mỗi trục của\ntensor. Đối với hàng chục chỉ với một trục, hình dạng chỉ có một yếu tố.\nLưu ý rằng từ “chiều” có xu hướng bị quá tải trong các bối cảnh này và\nđiều này có xu hướng gây nhầm lẫn cho mọi người. Để làm rõ, chúng ta sử\ndụng chiều của một * vector* hoặc một * axis* để chỉ chiều dài của\nnó, tức là số phần tử của một vectơ hoặc một trục. Tuy nhiên, chúng ta\nsử dụng chiều của một tensor để chỉ số trục mà một tensor có. Theo nghĩa\nnày, chiều của một số trục của một tensor sẽ là chiều dài của trục đó.\n2.3.3. Ma trận\nCũng giống như các vectơ tổng quát hóa vô hướng từ thứ tự số 0 để đặt\nhàng một, ma trận khái quát hóa vectơ từ thứ tự một đến thứ tự hai. Ma\ntrận, mà chúng ta thường sẽ biểu thị bằng chữ in hoa, có mặt đậm (ví dụ: \\(\\mathbf{X}\\) , \\(\\mathbf{Y}\\) và \\(\\mathbf{Z}\\) ), được biểu\ndiễn bằng mã dưới dạng hàng chục với hai trục.\nTrong ký hiệu toán, ta sử dụng \\(\\mathbf{A} \\in \\mathbb{R}^{m \\times n}\\) để thể hiện rằng ma trận \\(\\mathbf{A}\\) bao gồm \\(m\\) hàng và \\(n\\) cột vô hướng có\ngiá trị thực. Trực quan, chúng ta có thể minh họa bất kỳ ma trận \\(\\mathbf{A} \\in \\mathbb{R}^{m \\times n}\\) như một bảng, trong đó\nmỗi phần tử \\(a_{ij}\\) thuộc về hàng \\(i^{\\mathrm{th}}\\) và cột \\(j^{\\mathrm{th}}\\) :\nĐối với bất kỳ \\(\\mathbf{A} \\in \\mathbb{R}^{m \\times n}\\) , hình dạng\ncủa \\(\\mathbf{A}\\) là ( \\(m\\) , \\(n\\) ) hoặc \\(m \\times n\\) . Cụ thể, khi một ma trận có cùng số hàng và cột, hình\ndạng của nó trở thành một hình vuông; do đó, nó được gọi là matrận vuông .\nChúng ta có thể tạo một ma trận \\(m \\times n\\) bằng cách chỉ định\nmột hình dạng với hai thành phần \\(m\\) và \\(n\\) khi gọi bất kỳ\nchức năng yêu thích nào của chúng tôi để khởi tạo một tensor.\nChúng ta có thể truy cập phần tử vô hướng \\(a_{ij}\\) của ma trận \\(\\mathbf{A}\\) trong (2.3.2) bằng cách chỉ định các\nchỉ số cho hàng ( \\(i\\) ) và cột ( \\(j\\) ), chẳng hạn như \\([\\mathbf{A}]_{ij}\\) . Khi các yếu tố vô hướng của ma trận \\(\\mathbf{A}\\) , chẳng hạn như trong (2.3.2) , không\nđược đưa ra, chúng ta có thể chỉ đơn giản sử dụng chữ thường của ma trận \\(\\mathbf{A}\\) với chỉ số dưới, \\(a_{ij}\\) , để tham khảo \\([\\mathbf{A}]_{ij}\\) . Để giữ ký hiệu đơn giản, dấu phẩy chỉ được\nchèn vào các chỉ số riêng biệt khi cần thiết, chẳng hạn như \\(a_{2, 3j}\\) và \\([\\mathbf{A}]_{2i-1, 3}\\) .\nĐôi khi, chúng tôi muốn lật các trục. Khi chúng ta trao đổi các hàng và\ncột của ma trận, kết quả được gọi là transpose của ma trận. Chính\nthức, chúng tôi biểu thị một ma trận \\(\\mathbf{A}\\) của transpose\nbởi \\(\\mathbf{A}^\\top\\) và nếu \\(\\mathbf{B} = \\mathbf{A}^\\top\\) ,\nsau đó \\(b_{ij} = a_{ji}\\) cho bất kỳ \\(i\\) và \\(j\\) . Như\nvậy, transpose của \\(\\mathbf{A}\\) trong (2.3.2) là\nmột ma trận \\(n \\times m\\) :\nBây giờ chúng ta truy cập vào một matrix của transpose trong mã.\nLà một loại đặc biệt của ma trận vuông, a * matrix đối xứng * \\(\\mathbf{A}\\) bằng chuyển vị của nó: \\(\\mathbf{A} = \\mathbf{A}^\\top\\) . Ở đây chúng ta xác định ma trận\nđối xứng B .\nBây giờ chúng tôi so sánh B với transpose của nó.\nMa trận là cấu trúc dữ liệu hữu ích: chúng cho phép chúng ta tổ chức dữ\nliệu có các phương thức biến thể khác nhau. Ví dụ: các hàng trong ma\ntrận của chúng ta có thể tương ứng với các ngôi nhà khác nhau (ví dụ dữ\nliệu), trong khi các cột có thể tương ứng với các thuộc tính khác nhau.\nĐiều này nghe có vẻ quen thuộc nếu bạn đã từng sử dụng phần mềm bảng\ntính hoặc đã đọc Section 2.2 . Do đó, mặc dù định hướng mặc\nđịnh của một vectơ duy nhất là một vectơ cột, trong một ma trận đại diện\ncho một tập dữ liệu dạng bảng, nó là thông thường hơn để coi mỗi ví dụ\ndữ liệu như một vectơ hàng trong ma trận. Và, như chúng ta sẽ thấy trong\ncác chương sau, quy ước này sẽ cho phép các thực hành học sâu phổ biến.\nVí dụ, dọc theo trục ngoài cùng của một tensor, chúng ta có thể truy cập\nhoặc liệt kê minibatches ví dụ dữ liệu, hoặc chỉ các ví dụ dữ liệu nếu\nkhông có minibatch tồn tại.\n2.3.4. Tensors\nCũng giống như vectơ tổng quát hóa vô hướng, và ma trận tổng quát hóa\nvectơ, chúng ta có thể xây dựng cấu trúc dữ liệu với nhiều trục hơn nữa. **Tensors** cung cấp cho chúng ta một cách chung để mô tả các mảng \\(n\\) chiều\nvới một số trục tùy ý. Vectơ, ví dụ, là các hàng chục bậc nhất, và ma\ntrận là hàng chục bậc hai. Tensors được ký hiệu bằng chữ in hoa của một\nkhuôn mặt phông chữ đặc biệt (ví dụ, \\(\\mathsf{X}\\) , \\(\\mathsf{Y}\\) , và \\(\\mathsf{Z}\\) ) và cơ chế lập chỉ mục của\nchúng (ví dụ, \\(x_{ijk}\\) và \\([\\mathsf{X}]_{1, 2i-1, 3}\\) )\ntương tự như của ma trận.\nTensors sẽ trở nên quan trọng hơn khi chúng ta bắt đầu làm việc với hình\nảnh, đến các mảng \\(n\\) chiều với 3 trục tương ứng với chiều cao,\nchiều rộng và trục * kênh* để xếp các kênh màu (đỏ, xanh lá cây và\nxanh dương). Hiện tại, chúng ta sẽ bỏ qua hàng chục bậc cao hơn và tập\ntrung vào những điều cơ bản.\n2.3.5. Tính chất cơ bản của Tensor Arithmetic\nVô hướng, vectơ, ma trận, và hàng chục (“tensors” trong tiểu mục này đề\ncập đến các đối tượng đại số) của một số trục tùy ý có một số tính chất\ntốt đẹp thường có ích. Ví dụ, bạn có thể nhận thấy từ định nghĩa của một\nphép toán elementwise rằng bất kỳ hoạt động đơn nguyên tố nào không thay\nđổi hình dạng của toán hạng của nó. Tương tự như vậy, với bất kỳ hai\nhàng chục có cùng hình dạng, kết quả của bất kỳ phép toán phần tử nhị\nphân nào sẽ là một tensor của cùng một hình dạng đó Ví dụ, thêm hai ma\ntrận có cùng hình dạng thực hiện phép cộng elementwise trên hai ma trận\nnày.\nCụ thể, elementwise phép nhân của hai ma trận được gọi là sản phẩm *\nHadamard* của họ (ký hiệu toán \\(\\odot\\) ). Xem xét ma trận \\(\\mathbf{B} \\in \\mathbb{R}^{m \\times n}\\) có phần tử của hàng \\(i\\) và cột \\(j\\) là \\(b_{ij}\\) . Sản phẩm Hadamard của ma\ntrận \\(\\mathbf{A}\\) (được định nghĩa trong (2.3.2) )\nvà \\(\\mathbf{B}\\)\nNhân hoặc thêm một tensor với vô hướng cũng không thay đổi hình dạng của\ntensor, trong đó mỗi phần tử của tensor toán hạng sẽ được thêm hoặc nhân\nvới vô hướng.\n2.3.6. Giảm\nMột thao tác hữu ích mà chúng ta có thể thực hiện với các hàng chục tùy\ný là tính toán tổng các phần tử của chúng. Trong ký hiệu toán học, chúng\nta thể hiện các khoản tiền bằng ký hiệu \\(\\sum\\) . Để thể hiện tổng\ncủa các phần tử trong một vector \\(\\mathbf{x}\\) chiều dài \\(d\\) ,\nchúng tôi viết \\(\\sum_{i=1}^d x_i\\) . Trong code, chúng ta chỉ có thể\ngọi hàm để tính tổng.\nChúng ta có thể diễn đạt tổng trên các phần tử của hàng chục hình dạng\ntùy ý. Ví dụ, tổng các phần tử của ma trận \\(m \\times n\\) \\(\\mathbf{A}\\) có thể được viết \\(\\sum_{i=1}^{m} \\sum_{j=1}^{n} a_{ij}\\) .\nTheo mặc định, gọi hàm để tính tổng giảm một tensor dọc theo tất cả\ncác trục của nó đến một vô hướng. Chúng ta cũng có thể chỉ định các trục\ndọc theo đó tensor được giảm thông qua tổng hợp. Lấy ma trận làm ví dụ.\nĐể giảm kích thước hàng (trục 0) bằng cách tổng hợp các phần tử của tất\ncả các hàng, chúng tôi chỉ định axis=0 khi gọi hàm. Vì ma trận đầu\nvào giảm dọc theo trục 0 để tạo ra vectơ đầu ra, kích thước của trục 0\ncủa đầu vào bị mất trong hình dạng đầu ra.\nChỉ định axis=1 sẽ giảm kích thước cột (trục 1) bằng cách tổng hợp\ncác phần tử của tất cả các cột. Do đó, kích thước của trục 1 của đầu vào\nbị mất trong hình dạng đầu ra.\nGiảm một ma trận dọc theo cả hàng và cột thông qua tổng tương đương với\nviệc tổng hợp tất cả các phần tử của ma trận.\nMột số lượng liên quan là mean , còn được gọi là trung bình . Chúng\ntôi tính trung bình bằng cách chia tổng cho tổng số phần tử. Trong mã,\nchúng ta chỉ có thể gọi hàm để tính toán trung bình trên hàng chục hình\ndạng tùy ý.\nTương tự như vậy, chức năng tính trung bình cũng có thể làm giảm tensor\ndọc theo các trục được chỉ định.\n2.3.6.1. Tổng không giảm\nTuy nhiên, đôi khi có thể hữu ích khi giữ số trục không thay đổi khi gọi\nhàm tính tổng hoặc trung bình.\nVí dụ, vì sum_A vẫn giữ hai trục của nó sau khi tổng hợp mỗi hàng,\nchúng ta có thể chia A cho sum_A với phát sóng.\nNếu chúng ta muốn tính toán tổng tích lũy của các phần tử của A dọc\ntheo một số trục , giả sử axis=0 (từng hàng), chúng ta có thể gọi\nhàm cumsum . Chức năng này sẽ không làm giảm tensor đầu vào dọc theo\nbất kỳ trục nào.\n2.3.7. Sản phẩm Dot\nCho đến nay, chúng tôi chỉ thực hiện các hoạt động elementwise, tổng và\ntrung bình. Và nếu đây là tất cả những gì chúng ta có thể làm, đại số\ntuyến tính có lẽ sẽ không xứng đáng với phần riêng của nó. Tuy nhiên,\nmột trong những hoạt động cơ bản nhất là sản phẩm chấm. Với hai vectơ \\(\\mathbf{x}, \\mathbf{y} \\in \\mathbb{R}^d\\) , sản phẩm dot của họ \\(\\mathbf{x}^\\top \\mathbf{y}\\) (hoặc \\(\\langle \\mathbf{x}, \\mathbf{y} \\rangle\\) ) là một tổng so với các\nsản phẩm của các phần tử ở cùng một vị trí: \\(\\mathbf{x}^\\top \\mathbf{y} = \\sum_{i=1}^{d} x_i y_i\\) .\nLưu ý rằng chúng ta có thể diễn đạt tích chấm của hai vectơ tương đương\nbằng cách thực hiện phép nhân elementwise và sau đó là tổng:\nCác sản phẩm Dot rất hữu ích trong một loạt các bối cảnh. Ví dụ, cho một\nsố tập hợp các giá trị, được biểu thị bằng một vectơ \\(\\mathbf{x} \\in \\mathbb{R}^d\\) và một tập hợp trọng số được ký hiệu\nbởi \\(\\mathbf{w} \\in \\mathbb{R}^d\\) , tổng trọng số của các giá trị\ntrong \\(\\mathbf{x}\\) theo trọng lượng \\(\\mathbf{w}\\) có thể được\nbiểu thị dưới dạng sản phẩm chấm \\(\\mathbf{x}^\\top \\mathbf{w}\\) . Khi\ntrọng lượng không âm và tổng thành một (tức là \\(\\left(\\sum_{i=1}^{d} {w_i} = 1\\right)\\) ), sản phẩm chấm biểu thị\ntrung bình * có trọng lự * . Sau khi bình thường hóa hai vectơ để có\nchiều dài đơn vị, các sản phẩm chấm thể hiện cosin của góc giữa chúng.\nChúng tôi sẽ chính thức giới thiệu khái niệm này là * chiều dài* sau\ntrong phần này.\n2.3.8. Matrix-Vector Sản phẩm\nBây giờ chúng ta đã biết cách tính toán các sản phẩm chấm, chúng ta có\nthể bắt đầu hiểu các sản phẩm * ma thuật-vectơ * . Nhớ lại ma trận \\(\\mathbf{A} \\in \\mathbb{R}^{m \\times n}\\) và vector \\(\\mathbf{x} \\in \\mathbb{R}^n\\) được xác định và hình dung trong (2.3.2) và (2.3.1) tương ứng. Hãy để\nchúng tôi bắt đầu bằng cách hình dung ma trận \\(\\mathbf{A}\\) về\nvectơ hàng của nó\ntrong đó mỗi \\(\\mathbf{a}^\\top_{i} \\in \\mathbb{R}^n\\) là một vectơ\nhàng đại diện cho hàng \\(i^\\mathrm{th}\\) của ma trận \\(\\mathbf{A}\\) .\nSản phẩm ma trận-vector \\(\\mathbf{A}\\mathbf{x}\\) chỉ đơn giản là một\nvector cột có chiều dài \\(m\\) , có \\(i^\\mathrm{th}\\) phần tử là\nsản phẩm chấm \\(\\mathbf{a}^\\top_i \\mathbf{x}\\) :\nChúng ta có thể nghĩ đến phép nhân của một ma trận \\(\\mathbf{A}\\in \\mathbb{R}^{m \\times n}\\) như một biến đổi dự án\nvectơ từ \\(\\mathbb{R}^{n}\\) đến \\(\\mathbb{R}^{m}\\) . Những biến\nđổi này trở nên hữu ích đáng kể. Ví dụ, chúng ta có thể biểu diễn các\nvòng quay dưới dạng phép nhân bằng một ma trận vuông. Như chúng ta sẽ\nthấy trong các chương tiếp theo, chúng ta cũng có thể sử dụng các sản\nphẩm ma thuật-vector để mô tả các phép tính chuyên sâu nhất cần thiết\nkhi tính toán từng lớp trong mạng thần kinh với các giá trị của lớp\ntrước đó.\nThể hiện các sản phẩm ma thuật-vector trong mã với hàng chục, chúng tôi\nsử dụng chức năng dot tương tự như đối với các sản phẩm chấm. Khi\nchúng ta gọi np.dot(A, x) với ma trận A và một vector x , sản\nphẩm ma thuật-vector được thực hiện. Lưu ý rằng kích thước cột A (chiều dài của nó dọc theo trục 1) phải giống với kích thước x (chiều dài của nó).\nThể hiện các sản phẩm ma thuật-vector trong mã với hàng chục, chúng tôi\nsử dụng hàm mv . Khi chúng ta gọi torch.mv(A, x) với ma trận A và một vector x , sản phẩm ma thuật-vector được thực hiện. Lưu\ný rằng kích thước cột của A (chiều dài của nó dọc theo trục 1) phải\ngiống với kích thước x (chiều dài của nó).\nThể hiện các sản phẩm ma thuật-vector trong mã với hàng chục, chúng tôi\nsử dụng hàm matvec . Khi chúng ta gọi tf.linalg.matvec(A, x) với\nma trận A và một vector x , sản phẩm ma thuật-vector được thực\nhiện. Lưu ý rằng kích thước cột A (chiều dài của nó dọc theo trục 1)\nphải giống với kích thước x (chiều dài của nó).\n2.3.9. Phép nhân ma trận ma trận\nNếu bạn đã nhận được sự treo của các sản phẩm chấm và các sản phẩm ma\nthuật-vector, thì nhân * ma trận ma trận * phải đơn giản.\nNói rằng chúng ta có hai ma trận \\(\\mathbf{A} \\in \\mathbb{R}^{n \\times k}\\) và \\(\\mathbf{B} \\in \\mathbb{R}^{k \\times m}\\) :\nBiểu thị bằng \\(\\mathbf{a}^\\top_{i} \\in \\mathbb{R}^k\\) vector hàng\nđại diện cho hàng \\(i^\\mathrm{th}\\) của ma trận \\(\\mathbf{A}\\) ,\nvà để cho \\(\\mathbf{b}_{j} \\in \\mathbb{R}^k\\) là vectơ cột từ cột \\(j^\\mathrm{th}\\) của ma trận \\(\\mathbf{B}\\) . Để sản xuất sản\nphẩm ma trận \\(\\mathbf{C} = \\mathbf{A}\\mathbf{B}\\) , dễ nhất là nghĩ\nđến \\(\\mathbf{A}\\) về vectơ hàng và \\(\\mathbf{B}\\) về vectơ cột\ncủa nó:\nSau đó, sản phẩm ma trận \\(\\mathbf{C} \\in \\mathbb{R}^{n \\times m}\\) được sản xuất như chúng ta chỉ đơn giản là tính toán từng phần tử \\(c_{ij}\\) như là sản phẩm chấm \\(\\mathbf{a}^\\top_i \\mathbf{b}_j\\) :\nChúng ta có thể nghĩ đến phép nhân ma trận ma trận \\(\\mathbf{AB}\\) chỉ đơn giản là thực hiện \\(m\\) các sản phẩm ma trận vector và khâu\nkết quả lại với nhau để tạo thành ma trận \\(n \\times m\\) Trong đoạn\nmã sau, chúng tôi thực hiện phép nhân ma trận trên A và B . Ở\nđây, A là một ma trận với 5 hàng và 4 cột, và B là một ma trận\nvới 4 hàng và 3 cột. Sau khi nhân, chúng ta có được một ma trận với 5\nhàng và 3 cột.\nPhép nhân ma trận ma trận có thể được gọi đơn giản là nhân * ma trận * ,\nvà không nên nhầm lẫn với sản phẩm Hadamard.\n2.3.10. Định mức\nMột số toán tử hữu ích nhất trong đại số tuyến tính là * chỉ tiêu * .\nMột cách không chính thức, định mức của một vector cho chúng ta biết\ncách * lớn* một vectơ là. Khái niệm về kích thước* đang được xem xét ở\nđây không liên quan đến chiều mà là độ lớn của các thành phần.\nTrong đại số tuyến tính, một định mức vectơ là một hàm \\(f\\) ánh xạ\nmột vectơ đến vô hướng, thỏa mãn một số ít các thuộc tính. Với bất kỳ\nvector \\(\\mathbf{x}\\) nào, thuộc tính đầu tiên nói rằng nếu chúng ta\nquy mô tất cả các phần tử của một vectơ bằng một hệ số không đổi \\(\\alpha\\) , định mức của nó cũng quy mô theo giá trị * tuyệt đối *\ncủa cùng một yếu tố không đổi:\nTính chất thứ hai là bất đẳng thức tam giác quen thuộc:\nTài sản thứ ba chỉ đơn giản nói rằng định mức phải không tiêu cực:\nĐiều đó có ý nghĩa, như trong hầu hết các bối cảnh, * kích thước* nhỏ\nnhất cho bất cứ điều gì là 0. Thuộc tính cuối cùng yêu cầu định mức nhỏ\nnhất đạt được và chỉ đạt được bằng một vectơ bao gồm tất cả các số\nkhông.\nBạn có thể nhận thấy rằng các định mức âm thanh rất giống với các biện\npháp khoảng cách. Và nếu bạn nhớ khoảng cách Euclide (nghĩ rằng định lý\nPythagoras) từ trường lớp, thì các khái niệm về không tiêu cực và bất\nbình đẳng tam giác có thể rung chuông. Trên thực tế, khoảng cách Euclide\nlà một tiêu chuẩn: cụ thể nó là định mức \\(L_2\\) . Giả sử rằng các\nyếu tố trong vector \\(n\\) chiều \\(\\mathbf{x}\\) là \\(x_1, \\ldots, x_n\\) .\n\\(L_2\\) norm của \\(\\mathbf{x}\\) là căn bậc hai của tổng các ô\nvuông của các phần tử vectơ:\ntrong đó chỉ số dưới \\(2\\) thường bị bỏ qua trong \\(L_2\\) chỉ\ntiêu, tức là \\(\\|\\mathbf{x}\\|\\) tương đương với \\(\\|\\mathbf{x}\\|_2\\) . Trong mã, chúng ta có thể tính định mức \\(L_2\\) của một vectơ như sau.\nTrong học sâu, chúng tôi làm việc thường xuyên hơn với định mức \\(L_2\\) bình phương.\nBạn cũng sẽ thường xuyên gặp phải the \\(L_1\\) norm , được biểu thị\ndưới dạng tổng các giá trị tuyệt đối của các phần tử vectơ:\nSo với định mức \\(L_2\\) , nó ít bị ảnh hưởng bởi outliers. Để tính\nđịnh mức \\(L_1\\) , ta soạn hàm giá trị tuyệt đối với một tổng trên\ncác phần tử.\nCả định mức \\(L_2\\) và định mức \\(L_1\\) đều là những trường hợp\nđặc biệt của \\(L_p\\) * tiêu chuẩn* chung hơn:\nTương tự như định mức \\(L_2\\) của vectơ, chuẩn Frobenius của ma\ntrận \\(\\mathbf{X} \\in \\mathbb{R}^{m \\times n}\\) là căn bậc hai của\ntổng bình phương của các phần tử ma trận:\nĐịnh mức Frobenius thỏa mãn tất cả các thuộc tính của các chỉ tiêu\nvector. Nó hoạt động như thể nó là một định mức \\(L_2\\) của một\nvectơ hình ma trận. Gọi hàm sau sẽ tính định mức Frobenius của một ma\ntrận.\n2.3.10.1. Định mức và mục tiêu\nMặc dù chúng ta không muốn vượt quá xa bản thân, chúng ta có thể trồng\nmột số trực giác về lý do tại sao những khái niệm này hữu ích. Trong học\nsâu, chúng ta thường cố gắng giải quyết các vấn đề tối ưu hóa: tối đa\nhóa xác suất được gán cho dữ liệu quan sát; giảm xuống khoảng cách\ngiữa các dự đoán and the ground-truth đất sự thật observations quan sát.\nGán biểu diễn vector cho các mục (như từ, sản phẩm hoặc bài báo tin tức)\nsao cho khoảng cách giữa các mục tương tự được giảm thiểu và khoảng cách\ngiữa các mục khác nhau được tối đa hóa. Thông thường, các mục tiêu, có\nlẽ là các thành phần quan trọng nhất của các thuật toán học sâu (bên\ncạnh dữ liệu), được thể hiện dưới dạng định mức.\n2.3.11. Tìm hiểu thêm về Linear Algebra\nChỉ trong phần này, chúng tôi đã dạy bạn tất cả các đại số tuyến tính mà\nbạn sẽ cần phải hiểu một phần đáng chú ý của học sâu hiện đại. Có rất\nnhiều hơn để đại số tuyến tính và rất nhiều toán học đó rất hữu ích cho\nviệc học máy. Ví dụ, ma trận có thể bị phân hủy thành các yếu tố, và\nnhững phân hủy này có thể tiết lộ cấu trúc chiều thấp trong các bộ dữ\nliệu thế giới thực. Có toàn bộ trường con của machine learning tập trung\nvào việc sử dụng các phân hủy ma trận và khái quát hóa của chúng cho các\nhàng chục bậc cao để khám phá cấu trúc trong bộ dữ liệu và giải quyết\ncác vấn đề dự đoán. Nhưng cuốn sách này tập trung vào việc học sâu. Và\nchúng tôi tin rằng bạn sẽ có xu hướng tìm hiểu thêm toán học hơn một khi\nbạn đã nhận được bàn tay của bạn bẩn triển khai các mô hình máy học hữu\ních trên các bộ dữ liệu thực. Vì vậy, trong khi chúng tôi có quyền giới\nthiệu nhiều toán học hơn nhiều sau này, chúng tôi sẽ kết thúc phần này ở\nđây.\nNếu bạn muốn tìm hiểu thêm về đại số tuyến tính, bạn có thể tham khảo online appendix on linear algebraic\noperations hoặc các tài nguyên tuyệt vời khác [Strang, 1993] [Kolter, 2008] [Petersen et al., 2008] .\n2.3.12. Tóm tắt\nVô hướng, vectơ, ma trận, và hàng chục là các đối tượng toán học cơ\nbản trong đại số tuyến tính.\nVectơ tổng quát hóa vô hướng, và ma trận tổng quát hóa vectơ.\nVô hướng, vectơ, ma trận và hàng chục có số không, một, hai và một số\ntrục tùy ý, tương ứng.\nMột tensor có thể được giảm dọc theo các trục được chỉ định bởi sum và mean .\nNhân Elementwise của hai ma trận được gọi là sản phẩm Hadamard của\nhọ. Nó khác với phép nhân ma trận.\nTrong học sâu, chúng ta thường làm việc với các tiêu chuẩn như định\nmức \\(L_1\\) , định mức \\(L_2\\) và định mức Frobenius.\nChúng ta có thể thực hiện một loạt các hoạt động trên vô hướng,\nvectơ, ma trận và hàng chục.\n2.3.13. Bài tập\nChứng minh rằng sự chuyển vị của một ma trận \\(\\mathbf{A}\\) transpose là \\(\\mathbf{A}\\) : \\((\\mathbf{A}^\\top)^\\top = \\mathbf{A}\\) .\nCho hai ma trận \\(\\mathbf{A}\\) và \\(\\mathbf{B}\\) , cho thấy\ntổng các transposes bằng chuyển vị của một tổng: \\(\\mathbf{A}^\\top + \\mathbf{B}^\\top = (\\mathbf{A} + \\mathbf{B})^\\top\\) .\nCho bất kỳ ma trận vuông \\(\\mathbf{A}\\) , là \\(\\mathbf{A} + \\mathbf{A}^\\top\\) luôn đối xứng? Tại sao?\nChúng tôi xác định tensor X của hình dạng (2, 3, 4) trong phần\nnày. Sản lượng của len(X) là gì?\nĐối với một tensor X có hình dạng tùy ý, liệu len(X) luôn\ntương ứng với chiều dài của một trục nhất định là X không? Trục\nđó là gì?\nChạy A / A.sum(axis=1) và xem những gì sẽ xảy ra. Bạn có thể phân\ntích lý do?\nKhi đi du lịch giữa hai điểm ở Manhattan, khoảng cách mà bạn cần bao\ngồm về tọa độ, tức là về con đường và đường phố là bao nhiêu? Bạn có\nthể đi du lịch theo đường chéo?\nXem xét một tensor với hình dạng (2, 3, 4). Các hình dạng của đầu ra\ntổng kết dọc theo trục 0, 1 và 2 là gì?\nNạp một tensor với 3 trục trở lên đến chức năng linalg.norm và\nquan sát đầu ra của nó. Chức năng này tính toán gì cho hàng chục hình\ndạng tùy ý?\nDiscussions\nDiscussions\nDiscussions"
+}

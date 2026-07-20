@@ -1,0 +1,301 @@
+{
+  "url": "https://vi.d2l.ai/chapter_optimization/adadelta.html",
+  "chapter": "chapter_optimization",
+  "title": "11.9. Adadelta",
+  "crawled_at": "2026-07-20T12:40:27.481255+00:00",
+  "headings": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "adadelta",
+      "text": "11.9. Adadelta"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "cac-thuat-toan",
+      "text": "11.9.1. Các thuật toán"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "thuc-hien",
+      "text": "11.9.2. Thực hiện"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tom-tat",
+      "text": "11.9.3. Tóm tắt"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bai-tap",
+      "text": "11.9.4. Bài tập"
+    }
+  ],
+  "content": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "adadelta",
+      "text": "11.9. Adadelta"
+    },
+    {
+      "type": "paragraph",
+      "text": "Adadelta là một biến thể khác của AdaGrad ( Section 11.7 ). Sự\nkhác biệt chính nằm ở thực tế là nó làm giảm số tiền mà tốc độ học tập\nthích ứng với tọa độ. Hơn nữa, theo truyền thống, nó được gọi là không\ncó tỷ lệ học tập vì nó sử dụng số lượng thay đổi chính nó làm hiệu chuẩn\ncho sự thay đổi trong tương lai. Thuật toán được đề xuất vào năm [Zeiler, 2012] . Nó khá đơn giản, được thảo luận về các thuật toán\ntrước đó cho đến nay."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "cac-thuat-toan",
+      "text": "11.9.1. Các thuật toán"
+    },
+    {
+      "type": "paragraph",
+      "text": "Tóm lại, Adadelta sử dụng hai biến trạng thái, \\(\\mathbf{s}_t\\) để\nlưu trữ trung bình bị rò rỉ của khoảnh khắc thứ hai của gradient và \\(\\Delta\\mathbf{x}_t\\) để lưu trữ trung bình bị rò rỉ của khoảnh\nkhắc thứ hai của sự thay đổi các tham số trong chính mô hình. Lưu ý rằng\nchúng tôi sử dụng ký hiệu ban đầu và đặt tên của các tác giả để tương\nthích với các ấn phẩm và triển khai khác (không có lý do thực sự nào\nkhác tại sao người ta nên sử dụng các biến Hy Lạp khác nhau để chỉ ra\nmột tham số phục vụ cùng một mục đích trong đà, Adagrad, RMSProp và\nAdadelta)."
+    },
+    {
+      "type": "paragraph",
+      "text": "Dưới đây là các chi tiết kỹ thuật của Adadelta. Với tham số du jour là \\(\\rho\\) , chúng tôi có được các bản cập nhật rò rỉ sau tương tự như Section 11.8 :"
+    },
+    {
+      "type": "math",
+      "latex": "(11.9.1)¶\\[\\begin{aligned}\n    \\mathbf{s}_t & = \\rho \\mathbf{s}_{t-1} + (1 - \\rho) \\mathbf{g}_t^2.\n\\end{aligned}\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Sự khác biệt đối với Section 11.8 là chúng tôi thực hiện các\nbản cập nhật với gradient \\(\\mathbf{g}_t'\\) được thay đổi lại, tức\nlà,"
+    },
+    {
+      "type": "math",
+      "latex": "(11.9.2)¶\\[\\begin{split}\\begin{aligned}\n    \\mathbf{x}_t  & = \\mathbf{x}_{t-1} - \\mathbf{g}_t'. \\\\\n\\end{aligned}\\end{split}\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Vậy gradient được rescaled \\(\\mathbf{g}_t'\\) là gì? Chúng ta có thể\ntính toán nó như sau:"
+    },
+    {
+      "type": "math",
+      "latex": "(11.9.3)¶\\[\\begin{split}\\begin{aligned}\n    \\mathbf{g}_t' & = \\frac{\\sqrt{\\Delta\\mathbf{x}_{t-1} + \\epsilon}}{\\sqrt{{\\mathbf{s}_t + \\epsilon}}} \\odot \\mathbf{g}_t, \\\\\n\\end{aligned}\\end{split}\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "trong đó \\(\\Delta \\mathbf{x}_{t-1}\\) là mức trung bình bị rò rỉ của\ngradient được định lại bình phương \\(\\mathbf{g}_t'\\) . Chúng tôi khởi\ntạo \\(\\Delta \\mathbf{x}_{0}\\) là \\(0\\) và cập nhật nó ở mỗi bước\nvới \\(\\mathbf{g}_t'\\) , tức là,"
+    },
+    {
+      "type": "math",
+      "latex": "(11.9.4)¶\\[\\begin{aligned}\n    \\Delta \\mathbf{x}_t & = \\rho \\Delta\\mathbf{x}_{t-1} + (1 - \\rho) {\\mathbf{g}_t'}^2,\n\\end{aligned}\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "và \\(\\epsilon\\) (một giá trị nhỏ như \\(10^{-5}\\) ) được thêm vào\nđể duy trì sự ổn định số."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "thuc-hien",
+      "text": "11.9.2. Thực hiện"
+    },
+    {
+      "type": "paragraph",
+      "text": "Adadelta cần duy trì hai biến trạng thái cho mỗi biến, \\(\\mathbf{s}_t\\) và \\(\\Delta\\mathbf{x}_t\\) . Điều này mang lại\nviệc thực hiện sau đây."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "%matplotlib inline\nfrom mxnet import np, npx\nfrom d2l import mxnet as d2l\n\nnpx.set_np()\n\ndef init_adadelta_states(feature_dim):\n    s_w, s_b = np.zeros((feature_dim, 1)), np.zeros(1)\n    delta_w, delta_b = np.zeros((feature_dim, 1)), np.zeros(1)\n    return ((s_w, delta_w), (s_b, delta_b))\n\ndef adadelta(params, states, hyperparams):\n    rho, eps = hyperparams['rho'], 1e-5\n    for p, (s, delta) in zip(params, states):\n        # In-place updates via [:]\n        s[:] = rho * s + (1 - rho) * np.square(p.grad)\n        g = (np.sqrt(delta + eps) / np.sqrt(s + eps)) * p.grad\n        p[:] -= g\n        delta[:] = rho * delta + (1 - rho) * g * g"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "%matplotlib inline\nimport torch\nfrom d2l import torch as d2l\n\n\ndef init_adadelta_states(feature_dim):\n    s_w, s_b = torch.zeros((feature_dim, 1)), torch.zeros(1)\n    delta_w, delta_b = torch.zeros((feature_dim, 1)), torch.zeros(1)\n    return ((s_w, delta_w), (s_b, delta_b))\n\ndef adadelta(params, states, hyperparams):\n    rho, eps = hyperparams['rho'], 1e-5\n    for p, (s, delta) in zip(params, states):\n        with torch.no_grad():\n            # In-place updates via [:]\n            s[:] = rho * s + (1 - rho) * torch.square(p.grad)\n            g = (torch.sqrt(delta + eps) / torch.sqrt(s + eps)) * p.grad\n            p[:] -= g\n            delta[:] = rho * delta + (1 - rho) * g * g\n        p.grad.data.zero_()"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "%matplotlib inline\nimport tensorflow as tf\nfrom d2l import tensorflow as d2l\n\n\ndef init_adadelta_states(feature_dim):\n    s_w = tf.Variable(tf.zeros((feature_dim, 1)))\n    s_b = tf.Variable(tf.zeros(1))\n    delta_w = tf.Variable(tf.zeros((feature_dim, 1)))\n    delta_b = tf.Variable(tf.zeros(1))\n    return ((s_w, delta_w), (s_b, delta_b))\n\ndef adadelta(params, grads, states, hyperparams):\n    rho, eps = hyperparams['rho'], 1e-5\n    for p, (s, delta), grad in zip(params, states, grads):\n        s[:].assign(rho * s + (1 - rho) * tf.math.square(grad))\n        g = (tf.math.sqrt(delta + eps) / tf.math.sqrt(s + eps)) * grad\n        p[:].assign(p - g)\n        delta[:].assign(rho * delta + (1 - rho) * g * g)"
+    },
+    {
+      "type": "paragraph",
+      "text": "Chọn \\(\\rho = 0.9\\) lên tới thời gian bán hủy là 10 cho mỗi bản cập\nnhật tham số. Điều này có xu hướng hoạt động khá tốt. Chúng tôi nhận\nđược hành vi sau đây."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "data_iter, feature_dim = d2l.get_data_ch11(batch_size=10)\nd2l.train_ch11(adadelta, init_adadelta_states(feature_dim),\n               {'rho': 0.9}, data_iter, feature_dim);"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "loss: 0.244, 0.120 sec/epoch"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_adadelta_0b41cb_15_1.svg",
+      "local_path": "_images/output_adadelta_0b41cb_15_1.svg",
+      "alt": "../_images/output_adadelta_0b41cb_15_1.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "data_iter, feature_dim = d2l.get_data_ch11(batch_size=10)\nd2l.train_ch11(adadelta, init_adadelta_states(feature_dim),\n               {'rho': 0.9}, data_iter, feature_dim);"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "loss: 0.244, 0.016 sec/epoch"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_adadelta_0b41cb_18_1.svg",
+      "local_path": "_images/output_adadelta_0b41cb_18_1.svg",
+      "alt": "../_images/output_adadelta_0b41cb_18_1.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "data_iter, feature_dim = d2l.get_data_ch11(batch_size=10)\nd2l.train_ch11(adadelta, init_adadelta_states(feature_dim),\n               {'rho': 0.9}, data_iter, feature_dim);"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "loss: 0.243, 0.151 sec/epoch"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_adadelta_0b41cb_21_1.svg",
+      "local_path": "_images/output_adadelta_0b41cb_21_1.svg",
+      "alt": "../_images/output_adadelta_0b41cb_21_1.svg"
+    },
+    {
+      "type": "paragraph",
+      "text": "Để thực hiện ngắn gọn, chúng tôi chỉ cần sử dụng thuật toán adadelta từ lớp Trainer . Điều này mang lại một lớp lót sau đây cho một lời\ngọi nhỏ gọn hơn nhiều."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "d2l.train_concise_ch11('adadelta', {'rho': 0.9}, data_iter)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "loss: 0.245, 0.120 sec/epoch"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_adadelta_0b41cb_27_1.svg",
+      "local_path": "_images/output_adadelta_0b41cb_27_1.svg",
+      "alt": "../_images/output_adadelta_0b41cb_27_1.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "trainer = torch.optim.Adadelta\nd2l.train_concise_ch11(trainer, {'rho': 0.9}, data_iter)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "loss: 0.244, 0.015 sec/epoch"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_adadelta_0b41cb_30_1.svg",
+      "local_path": "_images/output_adadelta_0b41cb_30_1.svg",
+      "alt": "../_images/output_adadelta_0b41cb_30_1.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "# adadelta is not converging at default learning rate\n# but it's converging at lr = 5.0\ntrainer = tf.keras.optimizers.Adadelta\nd2l.train_concise_ch11(trainer, {'learning_rate':5.0, 'rho': 0.9}, data_iter)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "loss: 0.244, 0.105 sec/epoch"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_adadelta_0b41cb_33_1.svg",
+      "local_path": "_images/output_adadelta_0b41cb_33_1.svg",
+      "alt": "../_images/output_adadelta_0b41cb_33_1.svg"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tom-tat",
+      "text": "11.9.3. Tóm tắt"
+    },
+    {
+      "type": "list",
+      "ordered": false,
+      "items": [
+        "Adadelta không có tham số tỷ lệ học tập. Thay vào đó, nó sử dụng tốc\nđộ thay đổi trong chính các thông số để điều chỉnh tốc độ học tập.",
+        "Adadelta yêu cầu hai biến trạng thái để lưu trữ những khoảnh khắc thứ\nhai của gradient và sự thay đổi trong các tham số.",
+        "Adadelta sử dụng trung bình rò rỉ để giữ ước tính chạy của các số\nliệu thống kê thích hợp."
+      ]
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bai-tap",
+      "text": "11.9.4. Bài tập"
+    },
+    {
+      "type": "list",
+      "ordered": true,
+      "items": [
+        "Điều chỉnh giá trị của \\(\\rho\\) . Điều gì xảy ra?",
+        "Hiển thị cách thực hiện thuật toán mà không cần sử dụng \\(\\mathbf{g}_t'\\) . Tại sao đây có thể là một ý tưởng tốt?",
+        "Adadelta có thực sự học tỷ lệ miễn phí không? Bạn có thể tìm thấy các\nvấn đề tối ưu hóa phá vỡ Adadelta?",
+        "So sánh Adadelta với Adagrad và RMS prop để thảo luận về hành vi hội\ntụ của họ."
+      ]
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    }
+  ],
+  "images": [
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_adadelta_0b41cb_15_1.svg",
+      "local_path": "_images/output_adadelta_0b41cb_15_1.svg",
+      "alt": "../_images/output_adadelta_0b41cb_15_1.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_adadelta_0b41cb_18_1.svg",
+      "local_path": "_images/output_adadelta_0b41cb_18_1.svg",
+      "alt": "../_images/output_adadelta_0b41cb_18_1.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_adadelta_0b41cb_21_1.svg",
+      "local_path": "_images/output_adadelta_0b41cb_21_1.svg",
+      "alt": "../_images/output_adadelta_0b41cb_21_1.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_adadelta_0b41cb_27_1.svg",
+      "local_path": "_images/output_adadelta_0b41cb_27_1.svg",
+      "alt": "../_images/output_adadelta_0b41cb_27_1.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_adadelta_0b41cb_30_1.svg",
+      "local_path": "_images/output_adadelta_0b41cb_30_1.svg",
+      "alt": "../_images/output_adadelta_0b41cb_30_1.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_adadelta_0b41cb_33_1.svg",
+      "local_path": "_images/output_adadelta_0b41cb_33_1.svg",
+      "alt": "../_images/output_adadelta_0b41cb_33_1.svg"
+    }
+  ],
+  "text": "11.9. Adadelta\nAdadelta là một biến thể khác của AdaGrad ( Section 11.7 ). Sự\nkhác biệt chính nằm ở thực tế là nó làm giảm số tiền mà tốc độ học tập\nthích ứng với tọa độ. Hơn nữa, theo truyền thống, nó được gọi là không\ncó tỷ lệ học tập vì nó sử dụng số lượng thay đổi chính nó làm hiệu chuẩn\ncho sự thay đổi trong tương lai. Thuật toán được đề xuất vào năm [Zeiler, 2012] . Nó khá đơn giản, được thảo luận về các thuật toán\ntrước đó cho đến nay.\n11.9.1. Các thuật toán\nTóm lại, Adadelta sử dụng hai biến trạng thái, \\(\\mathbf{s}_t\\) để\nlưu trữ trung bình bị rò rỉ của khoảnh khắc thứ hai của gradient và \\(\\Delta\\mathbf{x}_t\\) để lưu trữ trung bình bị rò rỉ của khoảnh\nkhắc thứ hai của sự thay đổi các tham số trong chính mô hình. Lưu ý rằng\nchúng tôi sử dụng ký hiệu ban đầu và đặt tên của các tác giả để tương\nthích với các ấn phẩm và triển khai khác (không có lý do thực sự nào\nkhác tại sao người ta nên sử dụng các biến Hy Lạp khác nhau để chỉ ra\nmột tham số phục vụ cùng một mục đích trong đà, Adagrad, RMSProp và\nAdadelta).\nDưới đây là các chi tiết kỹ thuật của Adadelta. Với tham số du jour là \\(\\rho\\) , chúng tôi có được các bản cập nhật rò rỉ sau tương tự như Section 11.8 :\nSự khác biệt đối với Section 11.8 là chúng tôi thực hiện các\nbản cập nhật với gradient \\(\\mathbf{g}_t'\\) được thay đổi lại, tức\nlà,\nVậy gradient được rescaled \\(\\mathbf{g}_t'\\) là gì? Chúng ta có thể\ntính toán nó như sau:\ntrong đó \\(\\Delta \\mathbf{x}_{t-1}\\) là mức trung bình bị rò rỉ của\ngradient được định lại bình phương \\(\\mathbf{g}_t'\\) . Chúng tôi khởi\ntạo \\(\\Delta \\mathbf{x}_{0}\\) là \\(0\\) và cập nhật nó ở mỗi bước\nvới \\(\\mathbf{g}_t'\\) , tức là,\nvà \\(\\epsilon\\) (một giá trị nhỏ như \\(10^{-5}\\) ) được thêm vào\nđể duy trì sự ổn định số.\n11.9.2. Thực hiện\nAdadelta cần duy trì hai biến trạng thái cho mỗi biến, \\(\\mathbf{s}_t\\) và \\(\\Delta\\mathbf{x}_t\\) . Điều này mang lại\nviệc thực hiện sau đây.\nChọn \\(\\rho = 0.9\\) lên tới thời gian bán hủy là 10 cho mỗi bản cập\nnhật tham số. Điều này có xu hướng hoạt động khá tốt. Chúng tôi nhận\nđược hành vi sau đây.\nĐể thực hiện ngắn gọn, chúng tôi chỉ cần sử dụng thuật toán adadelta từ lớp Trainer . Điều này mang lại một lớp lót sau đây cho một lời\ngọi nhỏ gọn hơn nhiều.\n11.9.3. Tóm tắt\nAdadelta không có tham số tỷ lệ học tập. Thay vào đó, nó sử dụng tốc\nđộ thay đổi trong chính các thông số để điều chỉnh tốc độ học tập.\nAdadelta yêu cầu hai biến trạng thái để lưu trữ những khoảnh khắc thứ\nhai của gradient và sự thay đổi trong các tham số.\nAdadelta sử dụng trung bình rò rỉ để giữ ước tính chạy của các số\nliệu thống kê thích hợp.\n11.9.4. Bài tập\nĐiều chỉnh giá trị của \\(\\rho\\) . Điều gì xảy ra?\nHiển thị cách thực hiện thuật toán mà không cần sử dụng \\(\\mathbf{g}_t'\\) . Tại sao đây có thể là một ý tưởng tốt?\nAdadelta có thực sự học tỷ lệ miễn phí không? Bạn có thể tìm thấy các\nvấn đề tối ưu hóa phá vỡ Adadelta?\nSo sánh Adadelta với Adagrad và RMS prop để thảo luận về hành vi hội\ntụ của họ.\nDiscussions\nDiscussions\nDiscussions"
+}

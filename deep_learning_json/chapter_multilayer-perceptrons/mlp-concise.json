@@ -1,0 +1,180 @@
+{
+  "url": "https://vi.d2l.ai/chapter_multilayer-perceptrons/mlp-concise.html",
+  "chapter": "chapter_multilayer-perceptrons",
+  "title": "4.3. Thực hiện ngắn gọn của Multilayer Perceptrons",
+  "crawled_at": "2026-07-20T12:39:26.817705+00:00",
+  "headings": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "thuc-hien-ngan-gon-cua-multilayer-perceptrons",
+      "text": "4.3. Thực hiện ngắn gọn của Multilayer Perceptrons"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "mo-hinh",
+      "text": "4.3.1. Mô hình"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tom-tat",
+      "text": "4.3.2. Tóm tắt"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bai-tap",
+      "text": "4.3.3. Bài tập"
+    }
+  ],
+  "content": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "thuc-hien-ngan-gon-cua-multilayer-perceptrons",
+      "text": "4.3. Thực hiện ngắn gọn của Multilayer Perceptrons"
+    },
+    {
+      "type": "paragraph",
+      "text": "Như bạn có thể mong đợi, bằng cách dựa vào các API cấp cao, chúng tôi có\nthể triển khai MLP thậm chí còn ngắn gọn hơn."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "from mxnet import gluon, init, npx\nfrom mxnet.gluon import nn\nfrom d2l import mxnet as d2l\n\nnpx.set_np()"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "import torch\nfrom torch import nn\nfrom d2l import torch as d2l"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "import tensorflow as tf\nfrom d2l import tensorflow as d2l"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "mo-hinh",
+      "text": "4.3.1. Mô hình"
+    },
+    {
+      "type": "paragraph",
+      "text": "So với việc thực hiện súc tích của chúng tôi về triển khai hồi quy\nsoftmax ( Section 3.7 ), sự khác biệt duy nhất là\nchúng tôi thêm hai lớp được kết nối hoàn toàn (trước đây, chúng tôi đã\nthêm * một*). Đầu tiên là lớp ẩn của chúng tôi, chứa 256 đơn vị ẩn và\náp dụng chức năng kích hoạt ReLU. Thứ hai là lớp đầu ra của chúng tôi."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "net = nn.Sequential()\nnet.add(nn.Dense(256, activation='relu'),\n        nn.Dense(10))\nnet.initialize(init.Normal(sigma=0.01))"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "net = nn.Sequential(nn.Flatten(),\n                    nn.Linear(784, 256),\n                    nn.ReLU(),\n                    nn.Linear(256, 10))\n\ndef init_weights(m):\n    if type(m) == nn.Linear:\n        nn.init.normal_(m.weight, std=0.01)\n\nnet.apply(init_weights);"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "net = tf.keras.models.Sequential([\n    tf.keras.layers.Flatten(),\n    tf.keras.layers.Dense(256, activation='relu'),\n    tf.keras.layers.Dense(10)])"
+    },
+    {
+      "type": "paragraph",
+      "text": "Vòng đào tạo chính xác giống như khi chúng tôi thực hiện hồi quy\nsoftmax. Mô đun này cho phép chúng ta tách các vấn đề liên quan đến kiến\ntrúc mô hình khỏi các cân nhắc trực giao."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "batch_size, lr, num_epochs = 256, 0.1, 10\nloss = gluon.loss.SoftmaxCrossEntropyLoss()\ntrainer = gluon.Trainer(net.collect_params(), 'sgd', {'learning_rate': lr})\n\ntrain_iter, test_iter = d2l.load_data_fashion_mnist(batch_size)\nd2l.train_ch3(net, train_iter, test_iter, loss, num_epochs, trainer)"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_mlp-concise_f87756_27_0.svg",
+      "local_path": "_images/output_mlp-concise_f87756_27_0.svg",
+      "alt": "../_images/output_mlp-concise_f87756_27_0.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "batch_size, lr, num_epochs = 256, 0.1, 10\nloss = nn.CrossEntropyLoss(reduction='none')\ntrainer = torch.optim.SGD(net.parameters(), lr=lr)\n\ntrain_iter, test_iter = d2l.load_data_fashion_mnist(batch_size)\nd2l.train_ch3(net, train_iter, test_iter, loss, num_epochs, trainer)"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_mlp-concise_f87756_30_0.svg",
+      "local_path": "_images/output_mlp-concise_f87756_30_0.svg",
+      "alt": "../_images/output_mlp-concise_f87756_30_0.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "batch_size, lr, num_epochs = 256, 0.1, 10\nloss = tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True)\ntrainer = tf.keras.optimizers.SGD(learning_rate=lr)\n\ntrain_iter, test_iter = d2l.load_data_fashion_mnist(batch_size)\nd2l.train_ch3(net, train_iter, test_iter, loss, num_epochs, trainer)"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_mlp-concise_f87756_33_0.svg",
+      "local_path": "_images/output_mlp-concise_f87756_33_0.svg",
+      "alt": "../_images/output_mlp-concise_f87756_33_0.svg"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tom-tat",
+      "text": "4.3.2. Tóm tắt"
+    },
+    {
+      "type": "list",
+      "ordered": false,
+      "items": [
+        "Sử dụng API cấp cao, chúng ta có thể triển khai MLP chính xác hơn\nnhiều.",
+        "Đối với bài toán phân loại tương tự, việc thực hiện một MLP giống như\ncủa hồi quy softmax ngoại trừ các lớp ẩn bổ sung có hàm kích hoạt."
+      ]
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bai-tap",
+      "text": "4.3.3. Bài tập"
+    },
+    {
+      "type": "list",
+      "ordered": true,
+      "items": [
+        "Hãy thử thêm các số lớp ẩn khác nhau (bạn cũng có thể sửa đổi tốc độ\nhọc tập). Cài đặt nào hoạt động tốt nhất?",
+        "Hãy thử các chức năng kích hoạt khác nhau. Cái nào hoạt động tốt\nnhất?",
+        "Hãy thử các sơ đồ khác nhau để khởi tạo các trọng lượng. Phương pháp\nnào hoạt động tốt nhất?"
+      ]
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    }
+  ],
+  "images": [
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_mlp-concise_f87756_27_0.svg",
+      "local_path": "_images/output_mlp-concise_f87756_27_0.svg",
+      "alt": "../_images/output_mlp-concise_f87756_27_0.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_mlp-concise_f87756_30_0.svg",
+      "local_path": "_images/output_mlp-concise_f87756_30_0.svg",
+      "alt": "../_images/output_mlp-concise_f87756_30_0.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_mlp-concise_f87756_33_0.svg",
+      "local_path": "_images/output_mlp-concise_f87756_33_0.svg",
+      "alt": "../_images/output_mlp-concise_f87756_33_0.svg"
+    }
+  ],
+  "text": "4.3. Thực hiện ngắn gọn của Multilayer Perceptrons\nNhư bạn có thể mong đợi, bằng cách dựa vào các API cấp cao, chúng tôi có\nthể triển khai MLP thậm chí còn ngắn gọn hơn.\n4.3.1. Mô hình\nSo với việc thực hiện súc tích của chúng tôi về triển khai hồi quy\nsoftmax ( Section 3.7 ), sự khác biệt duy nhất là\nchúng tôi thêm hai lớp được kết nối hoàn toàn (trước đây, chúng tôi đã\nthêm * một*). Đầu tiên là lớp ẩn của chúng tôi, chứa 256 đơn vị ẩn và\náp dụng chức năng kích hoạt ReLU. Thứ hai là lớp đầu ra của chúng tôi.\nVòng đào tạo chính xác giống như khi chúng tôi thực hiện hồi quy\nsoftmax. Mô đun này cho phép chúng ta tách các vấn đề liên quan đến kiến\ntrúc mô hình khỏi các cân nhắc trực giao.\n4.3.2. Tóm tắt\nSử dụng API cấp cao, chúng ta có thể triển khai MLP chính xác hơn\nnhiều.\nĐối với bài toán phân loại tương tự, việc thực hiện một MLP giống như\ncủa hồi quy softmax ngoại trừ các lớp ẩn bổ sung có hàm kích hoạt.\n4.3.3. Bài tập\nHãy thử thêm các số lớp ẩn khác nhau (bạn cũng có thể sửa đổi tốc độ\nhọc tập). Cài đặt nào hoạt động tốt nhất?\nHãy thử các chức năng kích hoạt khác nhau. Cái nào hoạt động tốt\nnhất?\nHãy thử các sơ đồ khác nhau để khởi tạo các trọng lượng. Phương pháp\nnào hoạt động tốt nhất?\nDiscussions\nDiscussions\nDiscussions"
+}

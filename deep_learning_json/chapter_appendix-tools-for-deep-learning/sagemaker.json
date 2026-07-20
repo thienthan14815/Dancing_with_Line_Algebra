@@ -1,0 +1,312 @@
+{
+  "url": "https://vi.d2l.ai/chapter_appendix-tools-for-deep-learning/sagemaker.html",
+  "chapter": "chapter_appendix-tools-for-deep-learning",
+  "title": "19.2. Sử dụng Amazon SageMaker",
+  "crawled_at": "2026-07-20T12:41:34.268802+00:00",
+  "headings": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "su-dung-amazon-sagemaker",
+      "text": "19.2. Sử dụng Amazon SageMaker"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "dang-ky-va-dang-nhap",
+      "text": "19.2.1. Đăng ký và đăng nhập"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tao-mot-phien-ban-sagemaker",
+      "text": "19.2.2. Tạo một phiên bản SageMaker"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "chay-va-dung-phien-ban",
+      "text": "19.2.3. Chạy và dừng phiên bản"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "cap-nhat-may-tinh-xach-tay",
+      "text": "19.2.4. Cập nhật máy tính xách tay"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tom-tat",
+      "text": "19.2.5. Tóm tắt"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bai-tap",
+      "text": "19.2.6. Bài tập"
+    }
+  ],
+  "content": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "su-dung-amazon-sagemaker",
+      "text": "19.2. Sử dụng Amazon SageMaker"
+    },
+    {
+      "type": "paragraph",
+      "text": "Nhiều ứng dụng học sâu đòi hỏi một lượng tính toán đáng kể. Máy cục bộ\ncủa bạn có thể quá chậm để giải quyết những vấn đề này trong một khoảng\nthời gian hợp lý. Dịch vụ điện toán đám mây cung cấp cho bạn quyền truy\ncập vào các máy tính mạnh mẽ hơn để chạy các phần chuyên sâu GPU của\ncuốn sách này. Hướng dẫn này sẽ hướng dẫn bạn thông qua Amazon\nSageMaker: một dịch vụ cho phép bạn chạy cuốn sách này một cách dễ dàng."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "dang-ky-va-dang-nhap",
+      "text": "19.2.1. Đăng ký và đăng nhập"
+    },
+    {
+      "type": "paragraph",
+      "text": "Đầu tiên, chúng ta cần đăng ký một tài khoản tại https://aws.amazon.com/ . Chúng tôi khuyến khích bạn sử dụng xác thực hai\nyếu tố để bảo mật bổ sung. Nó cũng là một ý tưởng tốt để thiết lập thanh\ntoán chi tiết và thông báo chi tiêu để tránh bất kỳ bất ngờ bất ngờ\ntrong trường hợp bạn quên dừng bất kỳ phiên bản đang chạy. Lưu ý rằng\nbạn sẽ cần một thẻ tín dụng. Sau khi đăng nhập vào tài khoản AWS của\nbạn, hãy truy cập console và tìm\nkiếm “SageMaker” (xem Fig. 19.2.1 ) sau đó nhấp để mở bảng\nSageMaker."
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/sagemaker.png",
+      "local_path": "_images/sagemaker.png",
+      "alt": "../_images/sagemaker.png"
+    },
+    {
+      "type": "paragraph",
+      "text": "Fig. 19.2.1 Open the SageMaker panel. ¶"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tao-mot-phien-ban-sagemaker",
+      "text": "19.2.2. Tạo một phiên bản SageMaker"
+    },
+    {
+      "type": "paragraph",
+      "text": "Tiếp theo, chúng ta hãy tạo một ví dụ máy tính xách tay như được mô tả\ntrong Fig. 19.2.2 ."
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/sagemaker-create.png",
+      "local_path": "_images/sagemaker-create.png",
+      "alt": "../_images/sagemaker-create.png"
+    },
+    {
+      "type": "paragraph",
+      "text": "Fig. 19.2.2 Create a SageMaker instance. ¶"
+    },
+    {
+      "type": "paragraph",
+      "text": "SageMaker cung cấp nhiều instance\ntypes sức\nmạnh tính toán khác nhau và giá cả. Khi tạo một phiên bản, chúng ta có\nthể chỉ định tên phiên bản và chọn kiểu của nó. Năm Fig. 19.2.3 , chúng tôi chọn ml.p3.2xlarge .\nVới một GPU Tesla V100 và CPU 8 nhân, phiên bản này đủ mạnh cho hầu hết\ncác chương."
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/sagemaker-create-2.png",
+      "local_path": "_images/sagemaker-create-2.png",
+      "alt": "../_images/sagemaker-create-2.png"
+    },
+    {
+      "type": "paragraph",
+      "text": "Fig. 19.2.3 Choose the instance type. ¶"
+    },
+    {
+      "type": "paragraph",
+      "text": "Một phiên bản máy tính xách tay Jupyter của cuốn sách này để phù hợp\nSageMaker có sẵn tại https://github.com/d2l-ai/d2l-en-sagemaker . We can\nspecify this GitHub repository URL to let SageMaker clone this\nrepository during instance creation, as shown in Fig. 19.2.4 ."
+    },
+    {
+      "type": "paragraph",
+      "text": "Một phiên bản máy tính xách tay Jupyter của cuốn sách này để phù hợp\nSageMaker có sẵn tại https://github.com/d2l-ai/d2l-pytorch-sagemaker . We\ncan specify this GitHub repository URL to let SageMaker clone this\nrepository during instance creation, as shown in Fig. 19.2.4 ."
+    },
+    {
+      "type": "paragraph",
+      "text": "Một phiên bản máy tính xách tay Jupyter của cuốn sách này để phù hợp\nSageMaker có sẵn tại https://github.com/d2l-ai/d2l-tensorflow-sagemaker .\nWe can specify this GitHub repository URL to let SageMaker clone this\nrepository during instance creation, as shown in Fig. 19.2.4 ."
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/sagemaker-create-3.png",
+      "local_path": "_images/sagemaker-create-3.png",
+      "alt": "../_images/sagemaker-create-3.png"
+    },
+    {
+      "type": "paragraph",
+      "text": "Fig. 19.2.4 Specify the GitHub repository. ¶"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "chay-va-dung-phien-ban",
+      "text": "19.2.3. Chạy và dừng phiên bản"
+    },
+    {
+      "type": "paragraph",
+      "text": "Có thể mất vài phút trước khi phiên bản đã sẵn sàng. Khi nó đã sẵn sàng,\nbạn có thể nhấp vào liên kết “Mở Jupyter” như thể hiện trong Fig. 19.2.5 ."
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/sagemaker-open.png",
+      "local_path": "_images/sagemaker-open.png",
+      "alt": "../_images/sagemaker-open.png"
+    },
+    {
+      "type": "paragraph",
+      "text": "Fig. 19.2.5 Open Jupyter on the created SageMaker instance. ¶"
+    },
+    {
+      "type": "paragraph",
+      "text": "Sau đó, như thể hiện trong Fig. 19.2.6 , bạn có thể\nđiều hướng qua máy chủ Jupyter chạy trên phiên bản này."
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/sagemaker-jupyter.png",
+      "local_path": "_images/sagemaker-jupyter.png",
+      "alt": "../_images/sagemaker-jupyter.png"
+    },
+    {
+      "type": "paragraph",
+      "text": "Fig. 19.2.6 The Jupyter server running on the SageMaker instance. ¶"
+    },
+    {
+      "type": "paragraph",
+      "text": "Chạy và chỉnh sửa máy tính xách tay Jupyter trên phiên bản SageMaker\ntương tự như những gì chúng ta đã thảo luận trong Section 19.1 . Sau khi hoàn thành công việc của bạn, đừng quên\ndừng phiên bản để tránh sạc thêm, như thể hiện trong Fig. 19.2.7 ."
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/sagemaker-stop.png",
+      "local_path": "_images/sagemaker-stop.png",
+      "alt": "../_images/sagemaker-stop.png"
+    },
+    {
+      "type": "paragraph",
+      "text": "Fig. 19.2.7 Stop a SageMaker instance. ¶"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "cap-nhat-may-tinh-xach-tay",
+      "text": "19.2.4. Cập nhật máy tính xách tay"
+    },
+    {
+      "type": "paragraph",
+      "text": "Chúng tôi sẽ thường xuyên cập nhật các máy tính xách tay trong kho lưu\ntrữ GitHub d2l-ai/d2l-en-sagemaker .\nBạn chỉ cần sử dụng lệnh git pull để cập nhật lên phiên bản mới\nnhất."
+    },
+    {
+      "type": "paragraph",
+      "text": "Chúng tôi sẽ thường xuyên cập nhật các máy tính xách tay trong kho lưu\ntrữ GitHub d2l-ai/d2l-pytorch-sagemaker .\nBạn chỉ cần sử dụng lệnh git pull để cập nhật lên phiên bản mới\nnhất."
+    },
+    {
+      "type": "paragraph",
+      "text": "Chúng tôi sẽ thường xuyên cập nhật các máy tính xách tay trong kho lưu\ntrữ GitHub d2l-ai/d2l-tensorflow-sagemaker .\nBạn chỉ cần sử dụng lệnh git pull để cập nhật lên phiên bản mới\nnhất."
+    },
+    {
+      "type": "paragraph",
+      "text": "Trước tiên, bạn cần mở một thiết bị đầu cuối như thể hiện trong Fig. 19.2.8 ."
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/sagemaker-terminal.png",
+      "local_path": "_images/sagemaker-terminal.png",
+      "alt": "../_images/sagemaker-terminal.png"
+    },
+    {
+      "type": "paragraph",
+      "text": "Fig. 19.2.8 Open a terminal on the SageMaker instance. ¶"
+    },
+    {
+      "type": "paragraph",
+      "text": "Bạn có thể muốn thực hiện các thay đổi cục bộ của mình trước khi kéo các\nbản cập nhật. Ngoài ra, bạn chỉ cần bỏ qua tất cả các thay đổi cục bộ\ncủa mình bằng các lệnh sau trong thiết bị đầu cuối."
+    },
+    {
+      "type": "code",
+      "language": "bash",
+      "text": "cd SageMaker/d2l-en-sagemaker/\ngit reset --hard\ngit pull"
+    },
+    {
+      "type": "code",
+      "language": "bash",
+      "text": "cd SageMaker/d2l-pytorch-sagemaker/\ngit reset --hard\ngit pull"
+    },
+    {
+      "type": "code",
+      "language": "bash",
+      "text": "cd SageMaker/d2l-tensorflow-sagemaker/\ngit reset --hard\ngit pull"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tom-tat",
+      "text": "19.2.5. Tóm tắt"
+    },
+    {
+      "type": "list",
+      "ordered": false,
+      "items": [
+        "Chúng tôi có thể khởi chạy và dừng máy chủ Jupyter thông qua Amazon\nSageMaker để chạy cuốn sách này.",
+        "Chúng tôi có thể cập nhật máy tính xách tay thông qua thiết bị đầu\ncuối trên phiên bản Amazon SageMaker."
+      ]
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bai-tap",
+      "text": "19.2.6. Bài tập"
+    },
+    {
+      "type": "list",
+      "ordered": true,
+      "items": [
+        "Hãy thử chỉnh sửa và chạy mã trong cuốn sách này bằng Amazon\nSageMaker.",
+        "Truy cập thư mục mã nguồn thông qua thiết bị đầu cuối."
+      ]
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    }
+  ],
+  "images": [
+    {
+      "original_url": "https://vi.d2l.ai/_images/sagemaker.png",
+      "local_path": "_images/sagemaker.png",
+      "alt": "../_images/sagemaker.png"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/sagemaker-create.png",
+      "local_path": "_images/sagemaker-create.png",
+      "alt": "../_images/sagemaker-create.png"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/sagemaker-create-2.png",
+      "local_path": "_images/sagemaker-create-2.png",
+      "alt": "../_images/sagemaker-create-2.png"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/sagemaker-create-3.png",
+      "local_path": "_images/sagemaker-create-3.png",
+      "alt": "../_images/sagemaker-create-3.png"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/sagemaker-open.png",
+      "local_path": "_images/sagemaker-open.png",
+      "alt": "../_images/sagemaker-open.png"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/sagemaker-jupyter.png",
+      "local_path": "_images/sagemaker-jupyter.png",
+      "alt": "../_images/sagemaker-jupyter.png"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/sagemaker-stop.png",
+      "local_path": "_images/sagemaker-stop.png",
+      "alt": "../_images/sagemaker-stop.png"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/sagemaker-terminal.png",
+      "local_path": "_images/sagemaker-terminal.png",
+      "alt": "../_images/sagemaker-terminal.png"
+    }
+  ],
+  "text": "19.2. Sử dụng Amazon SageMaker\nNhiều ứng dụng học sâu đòi hỏi một lượng tính toán đáng kể. Máy cục bộ\ncủa bạn có thể quá chậm để giải quyết những vấn đề này trong một khoảng\nthời gian hợp lý. Dịch vụ điện toán đám mây cung cấp cho bạn quyền truy\ncập vào các máy tính mạnh mẽ hơn để chạy các phần chuyên sâu GPU của\ncuốn sách này. Hướng dẫn này sẽ hướng dẫn bạn thông qua Amazon\nSageMaker: một dịch vụ cho phép bạn chạy cuốn sách này một cách dễ dàng.\n19.2.1. Đăng ký và đăng nhập\nĐầu tiên, chúng ta cần đăng ký một tài khoản tại https://aws.amazon.com/ . Chúng tôi khuyến khích bạn sử dụng xác thực hai\nyếu tố để bảo mật bổ sung. Nó cũng là một ý tưởng tốt để thiết lập thanh\ntoán chi tiết và thông báo chi tiêu để tránh bất kỳ bất ngờ bất ngờ\ntrong trường hợp bạn quên dừng bất kỳ phiên bản đang chạy. Lưu ý rằng\nbạn sẽ cần một thẻ tín dụng. Sau khi đăng nhập vào tài khoản AWS của\nbạn, hãy truy cập console và tìm\nkiếm “SageMaker” (xem Fig. 19.2.1 ) sau đó nhấp để mở bảng\nSageMaker.\nFig. 19.2.1 Open the SageMaker panel. ¶\n19.2.2. Tạo một phiên bản SageMaker\nTiếp theo, chúng ta hãy tạo một ví dụ máy tính xách tay như được mô tả\ntrong Fig. 19.2.2 .\nFig. 19.2.2 Create a SageMaker instance. ¶\nSageMaker cung cấp nhiều instance\ntypes sức\nmạnh tính toán khác nhau và giá cả. Khi tạo một phiên bản, chúng ta có\nthể chỉ định tên phiên bản và chọn kiểu của nó. Năm Fig. 19.2.3 , chúng tôi chọn ml.p3.2xlarge .\nVới một GPU Tesla V100 và CPU 8 nhân, phiên bản này đủ mạnh cho hầu hết\ncác chương.\nFig. 19.2.3 Choose the instance type. ¶\nMột phiên bản máy tính xách tay Jupyter của cuốn sách này để phù hợp\nSageMaker có sẵn tại https://github.com/d2l-ai/d2l-en-sagemaker . We can\nspecify this GitHub repository URL to let SageMaker clone this\nrepository during instance creation, as shown in Fig. 19.2.4 .\nMột phiên bản máy tính xách tay Jupyter của cuốn sách này để phù hợp\nSageMaker có sẵn tại https://github.com/d2l-ai/d2l-pytorch-sagemaker . We\ncan specify this GitHub repository URL to let SageMaker clone this\nrepository during instance creation, as shown in Fig. 19.2.4 .\nMột phiên bản máy tính xách tay Jupyter của cuốn sách này để phù hợp\nSageMaker có sẵn tại https://github.com/d2l-ai/d2l-tensorflow-sagemaker .\nWe can specify this GitHub repository URL to let SageMaker clone this\nrepository during instance creation, as shown in Fig. 19.2.4 .\nFig. 19.2.4 Specify the GitHub repository. ¶\n19.2.3. Chạy và dừng phiên bản\nCó thể mất vài phút trước khi phiên bản đã sẵn sàng. Khi nó đã sẵn sàng,\nbạn có thể nhấp vào liên kết “Mở Jupyter” như thể hiện trong Fig. 19.2.5 .\nFig. 19.2.5 Open Jupyter on the created SageMaker instance. ¶\nSau đó, như thể hiện trong Fig. 19.2.6 , bạn có thể\nđiều hướng qua máy chủ Jupyter chạy trên phiên bản này.\nFig. 19.2.6 The Jupyter server running on the SageMaker instance. ¶\nChạy và chỉnh sửa máy tính xách tay Jupyter trên phiên bản SageMaker\ntương tự như những gì chúng ta đã thảo luận trong Section 19.1 . Sau khi hoàn thành công việc của bạn, đừng quên\ndừng phiên bản để tránh sạc thêm, như thể hiện trong Fig. 19.2.7 .\nFig. 19.2.7 Stop a SageMaker instance. ¶\n19.2.4. Cập nhật máy tính xách tay\nChúng tôi sẽ thường xuyên cập nhật các máy tính xách tay trong kho lưu\ntrữ GitHub d2l-ai/d2l-en-sagemaker .\nBạn chỉ cần sử dụng lệnh git pull để cập nhật lên phiên bản mới\nnhất.\nChúng tôi sẽ thường xuyên cập nhật các máy tính xách tay trong kho lưu\ntrữ GitHub d2l-ai/d2l-pytorch-sagemaker .\nBạn chỉ cần sử dụng lệnh git pull để cập nhật lên phiên bản mới\nnhất.\nChúng tôi sẽ thường xuyên cập nhật các máy tính xách tay trong kho lưu\ntrữ GitHub d2l-ai/d2l-tensorflow-sagemaker .\nBạn chỉ cần sử dụng lệnh git pull để cập nhật lên phiên bản mới\nnhất.\nTrước tiên, bạn cần mở một thiết bị đầu cuối như thể hiện trong Fig. 19.2.8 .\nFig. 19.2.8 Open a terminal on the SageMaker instance. ¶\nBạn có thể muốn thực hiện các thay đổi cục bộ của mình trước khi kéo các\nbản cập nhật. Ngoài ra, bạn chỉ cần bỏ qua tất cả các thay đổi cục bộ\ncủa mình bằng các lệnh sau trong thiết bị đầu cuối.\n19.2.5. Tóm tắt\nChúng tôi có thể khởi chạy và dừng máy chủ Jupyter thông qua Amazon\nSageMaker để chạy cuốn sách này.\nChúng tôi có thể cập nhật máy tính xách tay thông qua thiết bị đầu\ncuối trên phiên bản Amazon SageMaker.\n19.2.6. Bài tập\nHãy thử chỉnh sửa và chạy mã trong cuốn sách này bằng Amazon\nSageMaker.\nTruy cập thư mục mã nguồn thông qua thiết bị đầu cuối.\nDiscussions"
+}

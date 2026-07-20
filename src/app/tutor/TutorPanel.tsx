@@ -4,6 +4,8 @@ import type { BadgeTone } from '../ui';
 import type { Exercise, CheckResult } from '../../core/exercises/types';
 import { HeuristicTutor } from './provider';
 import type { TutorProvider, HintLevel } from './provider';
+import { hasDiagram } from './diagramSpec';
+import TutorDiagram from './TutorDiagram';
 import './tutor.css';
 
 // ===========================================================================
@@ -45,17 +47,26 @@ export default function TutorPanel({ exercise, lastResult, provider }: TutorPane
 
   const [revealed, setRevealed] = useState<RevealedHint[]>([]);
   const [loading, setLoading] = useState(false);
+  const [showDiagram, setShowDiagram] = useState(false);
 
-  // Đổi bài → xóa hết gợi ý đã mở.
+  const canDraw = hasDiagram(exercise);
+
+  // Đổi bài → xóa hết gợi ý đã mở và ẩn hình minh họa.
   useEffect(() => {
     setRevealed([]);
     setLoading(false);
+    setShowDiagram(false);
   }, [exercise.id]);
 
   const maxShown = revealed.reduce<HintLevel | 0>((m, r) => (r.level > m ? r.level : m), 0);
   const nextLevel = Math.min(4, maxShown + 1) as HintLevel;
   const hasLevel4 = revealed.some((r) => r.level === 4);
   const wrong = !!lastResult && !lastResult.correct;
+
+  // Đã xem "Giải thích đầy đủ" (cấp 4) thì tự mở hình minh họa (nếu có).
+  useEffect(() => {
+    if (hasLevel4 && canDraw) setShowDiagram(true);
+  }, [hasLevel4, canDraw]);
 
   const revealLevel = async (level: HintLevel) => {
     if (loading || revealed.some((r) => r.level === level)) return;
@@ -139,6 +150,22 @@ export default function TutorPanel({ exercise, lastResult, provider }: TutorPane
           📖 Giải thích đầy đủ
         </Button>
       </div>
+
+      {/* Hình minh họa — chỉ hiện với các câu có thể vẽ hình học. */}
+      {canDraw && (
+        <div className="tt-diagram">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setShowDiagram((s) => !s)}
+            aria-expanded={showDiagram}
+            title="Xem đồ thị minh họa ý nghĩa hình học của câu hỏi"
+          >
+            📈 {showDiagram ? 'Ẩn hình minh họa' : 'Xem hình minh họa'}
+          </Button>
+          {showDiagram && <TutorDiagram exercise={exercise} />}
+        </div>
+      )}
     </Card>
   );
 }

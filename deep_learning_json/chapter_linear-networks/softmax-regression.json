@@ -1,0 +1,465 @@
+{
+  "url": "https://vi.d2l.ai/chapter_linear-networks/softmax-regression.html",
+  "chapter": "chapter_linear-networks",
+  "title": "3.4. Hồi quy Softmax",
+  "crawled_at": "2026-07-20T12:39:20.890275+00:00",
+  "headings": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "hoi-quy-softmax",
+      "text": "3.4. Hồi quy Softmax"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "phan-loai-van-de",
+      "text": "3.4.1. Phân loại vấn đề"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "kien-truc-mang",
+      "text": "3.4.2. Kiến trúc mạng"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "chi-phi-tham-so-cua-cac-lop-duoc-ket-noi-hoan-toan",
+      "text": "3.4.3. Chi phí tham số của các lớp được kết nối hoàn toàn"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "softmax-hoat-dong",
+      "text": "3.4.4. Softmax hoạt động"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "vectorization-cho-minibatches",
+      "text": "3.4.5. Vectorization cho Minibatches"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "chuc-nang-mat",
+      "text": "3.4.6. Chức năng mất"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "log-likelihood",
+      "text": "3.4.6.1. Log-Likelihood"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "softmax-va-cac-dan-xuat",
+      "text": "3.4.6.2. Softmax và các dẫn xuất"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "mat-cross-entropy",
+      "text": "3.4.6.3. Mất Cross-Entropy"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "thong-tin-co-ban-ve-ly-thuyet",
+      "text": "3.4.7. Thông tin cơ bản về lý thuyết"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "entropy",
+      "text": "3.4.7.1. Entropy"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "surprisal",
+      "text": "3.4.7.2. Surprisal"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "cross-entropy-revisited",
+      "text": "3.4.7.3. Cross-Entropy Revisited"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "du-doan-va-danh-gia-mo-hinh",
+      "text": "3.4.8. Dự đoán và đánh giá mô hình"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tom-tat",
+      "text": "3.4.9. Tóm tắt"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bai-tap",
+      "text": "3.4.10. Bài tập"
+    }
+  ],
+  "content": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "hoi-quy-softmax",
+      "text": "3.4. Hồi quy Softmax"
+    },
+    {
+      "type": "paragraph",
+      "text": "Trong Section 3.1 , chúng tôi giới thiệu hồi quy\ntuyến tính, làm việc thông qua việc triển khai từ đầu vào năm Section 3.2 và một lần nữa sử dụng API cấp cao của\nmột khung học sâu trong Section 3.3 để thực hiện nâng\nnặng."
+    },
+    {
+      "type": "paragraph",
+      "text": "Hồi quy là cái búa chúng ta đạt được khi chúng ta muốn trả lời * bao\nnhiêu? * hoặc * bao nhiêu? * câu hỏi. Nếu bạn muốn dự đoán số đô la (giá\ncả) mà tại đó một ngôi nhà sẽ được bán, hoặc số chiến thắng một đội bóng\nchày có thể có, hoặc số ngày mà một bệnh nhân sẽ vẫn nhập viện trước khi\nđược xuất viện, sau đó bạn có thể đang tìm kiếm một mô hình hồi quy."
+    },
+    {
+      "type": "paragraph",
+      "text": "Trong thực tế, chúng tôi thường quan tâm đến * phân loại * : hỏi không\nphải “bao nhiêu” mà là “cái nào”:"
+    },
+    {
+      "type": "list",
+      "ordered": false,
+      "items": [
+        "Email này có thuộc về thư mục spam hay hộp thư đến không?",
+        "Khách hàng này có nhiều khả năng * để đăng ký* hoặc * không đăng\nký* cho một dịch vụ đăng ký?",
+        "Hình ảnh này mô tả một con lừa, chó, một con mèo, hoặc một con gà\ntrống?",
+        "Aston có thể xem bộ phim nào nhất tiếp theo?"
+      ]
+    },
+    {
+      "type": "paragraph",
+      "text": "Thông thường, các học viên học máy làm quá tải từ * phân loại * để mô\ntả hai vấn đề tinh tế khác nhau: (i) những vấn đề mà chúng tôi chỉ quan\ntâm đến các bài tập cứng của các ví dụ cho các loại (lớp); và (ii) những\nvấn đề mà chúng tôi muốn thực hiện các bài tập mềm, tức là, để đánh giá\nxác suất mà mỗi loại áp dụng. Sự khác biệt có xu hướng bị mờ, một phần,\nbởi vì thường xuyên, ngay cả khi chúng ta chỉ quan tâm đến các bài tập\ncứng, chúng ta vẫn sử dụng các mô hình tạo ra các bài tập mềm."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "phan-loai-van-de",
+      "text": "3.4.1. Phân loại vấn đề"
+    },
+    {
+      "type": "paragraph",
+      "text": "Để có được bàn chân của chúng tôi ướt, chúng ta hãy bắt đầu với một vấn\nđề phân loại hình ảnh đơn giản. Ở đây, mỗi đầu vào bao gồm một hình ảnh\nthang màu xám \\(2\\times2\\) . Chúng ta có thể đại diện cho mỗi giá trị\npixel với một vô hướng duy nhất, cho chúng ta bốn tính năng \\(x_1, x_2, x_3, x_4\\) . Hơn nữa, chúng ta hãy giả định rằng mỗi hình\nảnh thuộc về một trong số các loại “mèo”, “gà” và “chó”."
+    },
+    {
+      "type": "paragraph",
+      "text": "Tiếp theo, chúng ta phải chọn cách đại diện cho các nhãn. Chúng tôi có\nhai lựa chọn rõ ràng. Có lẽ xung tự nhiên nhất sẽ là chọn \\(y \\in \\{1, 2, 3\\}\\) , trong đó các số nguyên đại diện cho \\(\\{\\text{dog}, \\text{cat}, \\text{chicken}\\}\\) tương ứng. Đây là một\ncách tuyệt vời để * lưu trữ* thông tin như vậy trên máy tính. Nếu các\ndanh mục có một số thứ tự nhiên trong số đó, hãy nói nếu chúng ta đang\ncố gắng dự đoán \\(\\{\\text{baby}, \\text{toddler}, \\text{adolescent}, \\text{young adult}, \\text{adult}, \\text{geriatric}\\}\\) ,\nthì thậm chí có thể khiến vấn đề này làm hồi quy và giữ nhãn ở định dạng\nnày."
+    },
+    {
+      "type": "paragraph",
+      "text": "Nhưng các vấn đề phân loại chung không đi kèm với trật tự tự nhiên giữa\ncác lớp học. May mắn thay, các nhà thống kê từ lâu đã phát minh ra một\ncách đơn giản để đại diện cho dữ liệu phân loại: mã hóa* một*. Mã hóa\nmột nóng là một vector với nhiều thành phần như chúng ta có các loại.\nThành phần tương ứng với thể loại của phiên bản cụ thể được đặt thành 1\nvà tất cả các thành phần khác được đặt thành 0. Trong trường hợp của\nchúng tôi, một nhãn \\(y\\) sẽ là một vector ba chiều, với \\((1, 0, 0)\\) tương ứng với “mèo”, \\((0, 1, 0)\\) đến “gà” và \\((0, 0, 1)\\) thành “chó”:"
+    },
+    {
+      "type": "math",
+      "latex": "(3.4.1)¶\\[y \\in \\{(1, 0, 0), (0, 1, 0), (0, 0, 1)\\}.\\]"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "kien-truc-mang",
+      "text": "3.4.2. Kiến trúc mạng"
+    },
+    {
+      "type": "paragraph",
+      "text": "Để ước tính xác suất có điều kiện liên quan đến tất cả các lớp có thể,\nchúng ta cần một mô hình với nhiều đầu ra, một cho mỗi lớp. Để giải\nquyết phân loại với các mô hình tuyến tính, chúng ta sẽ cần nhiều hàm\naffine như chúng ta có đầu ra. Mỗi đầu ra sẽ tương ứng với chức năng\naffine riêng của nó. Trong trường hợp của chúng tôi, vì chúng tôi có 4\ntính năng và 3 danh mục đầu ra có thể, chúng tôi sẽ cần 12 vô hướng để\nđại diện cho trọng lượng ( \\(w\\) với các chỉ mục) và 3 vô hướng để\nđại diện cho các thành kiến ( \\(b\\) với chỉ mục). Chúng tôi tính toán\nba logits này, \\(o_1, o_2\\) , và \\(o_3\\) , cho mỗi đầu vào:"
+    },
+    {
+      "type": "math",
+      "latex": "(3.4.2)¶\\[\\begin{split}\\begin{aligned}\no_1 &= x_1 w_{11} + x_2 w_{12} + x_3 w_{13} + x_4 w_{14} + b_1,\\\\\no_2 &= x_1 w_{21} + x_2 w_{22} + x_3 w_{23} + x_4 w_{24} + b_2,\\\\\no_3 &= x_1 w_{31} + x_2 w_{32} + x_3 w_{33} + x_4 w_{34} + b_3.\n\\end{aligned}\\end{split}\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Chúng ta có thể mô tả tính toán này với sơ đồ mạng thần kinh được hiển\nthị trong Fig. 3.4.1 . Cũng giống như trong hồi quy tuyến\ntính, hồi quy softmax cũng là một mạng thần kinh một lớp. Và kể từ khi\ntính toán của mỗi đầu ra, \\(o_1, o_2\\) và \\(o_3\\) , phụ thuộc vào\ntất cả các đầu vào, \\(x_1\\) , \\(x_2\\) , \\(x_3\\) và \\(x_4\\) , lớp đầu ra của hồi quy softmax cũng có thể được mô tả là\nlớp kết nối hoàn toàn."
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/softmaxreg.svg",
+      "local_path": "_images/softmaxreg.svg",
+      "alt": "../_images/softmaxreg.svg"
+    },
+    {
+      "type": "paragraph",
+      "text": "Fig. 3.4.1 Softmax regression is a single-layer neural network. ¶"
+    },
+    {
+      "type": "paragraph",
+      "text": "Để thể hiện mô hình nhỏ gọn hơn, chúng ta có thể sử dụng ký hiệu đại số\ntuyến tính. Ở dạng vector, chúng tôi đến \\(\\mathbf{o} = \\mathbf{W} \\mathbf{x} + \\mathbf{b}\\) , một hình thức\nphù hợp hơn cho cả toán học và viết mã. Lưu ý rằng chúng tôi đã thu thập\ntất cả các trọng lượng của chúng tôi thành ma trận \\(3 \\times 4\\) và\nđối với các tính năng của một ví dụ dữ liệu nhất định \\(\\mathbf{x}\\) , đầu ra của chúng tôi được đưa ra bởi một sản phẩm ma\nthuật-vector có trọng lượng của chúng tôi bởi các tính năng đầu vào của\nchúng tôi cộng với thiên vị của chúng tôi \\(\\mathbf{b}\\) ."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "chi-phi-tham-so-cua-cac-lop-duoc-ket-noi-hoan-toan",
+      "text": "3.4.3. Chi phí tham số của các lớp được kết nối hoàn toàn"
+    },
+    {
+      "type": "paragraph",
+      "text": "Như chúng ta sẽ thấy trong các chương tiếp theo, các lớp được kết nối\nhoàn toàn có mặt khắp nơi trong học sâu. Tuy nhiên, như tên cho thấy,\ncác lớp được kết nối hoàn toàn là * đầy đủ* kết nối với nhiều tham số\ncó khả năng học được. Cụ thể, đối với bất kỳ lớp kết nối hoàn toàn nào\nvới đầu vào \\(d\\) và đầu ra \\(q\\) , chi phí tham số hóa là \\(\\mathcal{O}(dq)\\) , có thể rất cao trong thực tế. May mắn thay, chi\nphí chuyển đổi đầu vào \\(d\\) này thành đầu ra \\(q\\) có thể được\ngiảm xuống còn \\(\\mathcal{O}(\\frac{dq}{n})\\) , trong đó siêu tham số \\(n\\) có thể được chúng tôi xác định linh hoạt để cân bằng giữa tiết\nkiệm thông số và hiệu quả mô hình trong các ứng dụng thế giới thực [Zhang.Tay.Zhang.ea.2021] ."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "softmax-hoat-dong",
+      "text": "3.4.4. Softmax hoạt động"
+    },
+    {
+      "type": "paragraph",
+      "text": "Cách tiếp cận chính mà chúng ta sẽ thực hiện ở đây là giải thích các kết\nquả đầu ra của mô hình của chúng tôi là xác suất. Chúng tôi sẽ tối ưu\nhóa các thông số của mình để tạo ra xác suất tối đa hóa khả năng của dữ\nliệu quan sát. Sau đó, để tạo ra dự đoán, chúng tôi sẽ đặt một ngưỡng,\nví dụ, chọn nhãn với xác suất dự đoán tối đa."
+    },
+    {
+      "type": "paragraph",
+      "text": "Đặt chính thức, chúng tôi muốn bất kỳ đầu ra \\(\\hat{y}_j\\) được hiểu\nlà xác suất mà một mục nhất định thuộc về lớp \\(j\\) . Sau đó, chúng\nta có thể chọn lớp có giá trị đầu ra lớn nhất như dự đoán của chúng ta \\(\\operatorname*{argmax}_j y_j\\) . Ví dụ: nếu \\(\\hat{y}_1\\) , \\(\\hat{y}_2\\) và \\(\\hat{y}_3\\) lần lượt là 0,1, 0,8 và 0,1, thì\nchúng tôi dự đoán loại 2, trong đó (trong ví dụ của chúng tôi) đại diện\ncho “gà”."
+    },
+    {
+      "type": "paragraph",
+      "text": "Bạn có thể bị cám dỗ để đề nghị rằng chúng tôi giải thích các bản ghi \\(o\\) trực tiếp như đầu ra của chúng tôi quan tâm. Tuy nhiên, có một\nsố vấn đề với việc giải thích trực tiếp đầu ra của lớp tuyến tính là một\nxác suất. Một mặt, không có gì hạn chế những con số này để tổng cộng với\n1. Mặt khác, tùy thuộc vào đầu vào, chúng có thể lấy giá trị âm. Những\nvi phạm tiên đề cơ bản của xác suất được trình bày trong Section 2.6"
+    },
+    {
+      "type": "paragraph",
+      "text": "Để hiểu kết quả đầu ra của chúng tôi là xác suất, chúng tôi phải đảm bảo\nrằng (ngay cả trên dữ liệu mới), chúng sẽ không âm và tổng hợp lên đến\n1. Hơn nữa, chúng ta cần một mục tiêu đào tạo khuyến khích mô hình ước\ntính xác suất trung thực. Trong tất cả các trường hợp khi một phân loại\nđầu ra 0.5, chúng tôi hy vọng rằng một nửa trong số các ví dụ đó sẽ thực\nsự thuộc về lớp dự đoán. Đây là một thuộc tính gọi là calibration ."
+    },
+    {
+      "type": "paragraph",
+      "text": "Chức năng softmax , được phát minh vào năm 1959 bởi nhà khoa học xã hội\nR.Duncan Luce trong bối cảnh mô hình lựa chọn , thực hiện chính xác\nđiều này. Để chuyển đổi nhật ký của chúng tôi sao cho chúng trở nên\nkhông âm và tổng thành 1, trong khi yêu cầu mô hình vẫn có thể khác\nbiệt, trước tiên chúng ta cấp mũ mỗi logit (đảm bảo không tiêu cực) và\nsau đó chia cho tổng của chúng (đảm bảo rằng chúng tổng thành 1):"
+    },
+    {
+      "type": "math",
+      "latex": "(3.4.3)¶\\[\\hat{\\mathbf{y}} = \\mathrm{softmax}(\\mathbf{o})\\quad \\text{where}\\quad \\hat{y}_j = \\frac{\\exp(o_j)}{\\sum_k \\exp(o_k)}.\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Thật dễ dàng để xem \\(\\hat{y}_1 + \\hat{y}_2 + \\hat{y}_3 = 1\\) với \\(0 \\leq \\hat{y}_j \\leq 1\\) cho tất cả \\(j\\) . Do đó, \\(\\hat{\\mathbf{y}}\\) là một phân phối xác suất thích hợp mà các giá\ntrị phần tử có thể được diễn giải cho phù hợp. Lưu ý rằng thao tác\nsoftmax không thay đổi thứ tự trong số các bản ghi \\(\\mathbf{o}\\) ,\nđơn giản là các giá trị pre-softmax xác định xác suất được gán cho mỗi\nlớp. Do đó, trong quá trình dự đoán, chúng ta vẫn có thể chọn ra lớp có\nkhả năng nhất bằng"
+    },
+    {
+      "type": "math",
+      "latex": "(3.4.4)¶\\[\\operatorname*{argmax}_j \\hat y_j = \\operatorname*{argmax}_j o_j.\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Mặc dù softmax là một hàm phi tuyến, các đầu ra của hồi quy softmax vẫn\nlà * quyết định* bởi một biến đổi affine của các tính năng đầu vào; do\nđó, hồi quy softmax là một mô hình tuyến tính."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "vectorization-cho-minibatches",
+      "text": "3.4.5. Vectorization cho Minibatches"
+    },
+    {
+      "type": "paragraph",
+      "text": "Để cải thiện hiệu quả tính toán và tận dụng lợi thế của GPU, chúng tôi\nthường thực hiện các phép tính vector cho các minibatches dữ liệu. Giả\nsử rằng chúng ta được đưa ra một minibatch \\(\\mathbf{X}\\) ví dụ với\nkích thước tính năng (số lượng đầu vào) \\(d\\) và kích thước lô \\(n\\) . Hơn nữa, giả sử rằng chúng tôi có \\(q\\) danh mục trong\nđầu ra. Sau đó, các tính năng minibatch \\(\\mathbf{X}\\) là trong \\(\\mathbb{R}^{n \\times d}\\) , trọng lượng \\(\\mathbf{W} \\in \\mathbb{R}^{d \\times q}\\) và sự thiên vị đáp ứng \\(\\mathbf{b} \\in \\mathbb{R}^{1\\times q}\\) ."
+    },
+    {
+      "type": "math",
+      "latex": "(3.4.5)¶\\[\\begin{split}\\begin{aligned} \\mathbf{O} &= \\mathbf{X} \\mathbf{W} + \\mathbf{b}, \\\\ \\hat{\\mathbf{Y}} & = \\mathrm{softmax}(\\mathbf{O}). \\end{aligned}\\end{split}\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Điều này tăng tốc hoạt động thống trị thành một sản phẩm ma trận ma trận \\(\\mathbf{X} \\mathbf{W}\\) so với các sản phẩm ma trận vector mà\nchúng tôi sẽ thực hiện nếu chúng tôi xử lý một ví dụ tại một thời điểm.\nVì mỗi hàng trong \\(\\mathbf{X}\\) đại diện cho một ví dụ dữ liệu, nên\nbản thân thao tác softmax có thể được tính toán * rowwise*: cho mỗi\nhàng \\(\\mathbf{O}\\) , cấp số mũ tất cả các mục nhập và sau đó bình\nthường hóa chúng bằng tổng. Kích hoạt phát sóng trong tổng kết \\(\\mathbf{X} \\mathbf{W} + \\mathbf{b}\\) trong (3.4.5) , cả hai minibatch đăng nhập \\(\\mathbf{O}\\) và xác suất đầu ra \\(\\hat{\\mathbf{Y}}\\) là \\(n \\times q\\) ma trận."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "chuc-nang-mat",
+      "text": "3.4.6. Chức năng mất"
+    },
+    {
+      "type": "paragraph",
+      "text": "Tiếp theo, chúng ta cần một chức năng mất mát để đo lường chất lượng xác\nsuất dự đoán của chúng tôi. Chúng ta sẽ dựa vào ước tính khả năng tối\nđa, khái niệm rất giống nhau mà chúng ta gặp phải khi cung cấp một biện\nminh xác suất cho mục tiêu sai số bình phương trung bình trong hồi quy\ntuyến tính ( Section 3.1.3 )."
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "log-likelihood",
+      "text": "3.4.6.1. Log-Likelihood"
+    },
+    {
+      "type": "paragraph",
+      "text": "Hàm softmax cung cấp cho chúng ta một vector \\(\\hat{\\mathbf{y}}\\) ,\nmà chúng ta có thể giải thích như xác suất có điều kiện ước tính của mỗi\nlớp cho bất kỳ đầu vào \\(\\mathbf{x}\\) , ví dụ, \\(\\hat{y}_1\\) = \\(P(y=\\text{cat} \\mid \\mathbf{x})\\) . Giả sử rằng toàn bộ dữ liệu \\(\\{\\mathbf{X}, \\mathbf{Y}\\}\\) có \\(n\\) ví dụ, trong đó ví dụ\nđược lập chỉ mục bởi \\(i\\) bao gồm một vector tính năng \\(\\mathbf{x}^{(i)}\\) và một vector nhãn một nóng \\(\\mathbf{y}^{(i)}\\) . Chúng ta có thể so sánh các ước tính với thực\ntế bằng cách kiểm tra xem các lớp thực tế có thể xảy ra như thế nào theo\nmô hình của chúng tôi, với các tính năng:"
+    },
+    {
+      "type": "math",
+      "latex": "(3.4.6)¶\\[P(\\mathbf{Y} \\mid \\mathbf{X}) = \\prod_{i=1}^n P(\\mathbf{y}^{(i)} \\mid \\mathbf{x}^{(i)}).\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Theo ước tính khả năng tối đa, chúng tôi tối đa hóa \\(P(\\mathbf{Y} \\mid \\mathbf{X})\\) , tương đương với việc giảm thiểu\nkhả năng log âm:"
+    },
+    {
+      "type": "math",
+      "latex": "(3.4.7)¶\\[-\\log P(\\mathbf{Y} \\mid \\mathbf{X}) = \\sum_{i=1}^n -\\log P(\\mathbf{y}^{(i)} \\mid \\mathbf{x}^{(i)})\n= \\sum_{i=1}^n l(\\mathbf{y}^{(i)}, \\hat{\\mathbf{y}}^{(i)}),\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "nơi đối với bất kỳ cặp nhãn \\(\\mathbf{y}\\) và dự đoán mô hình \\(\\hat{\\mathbf{y}}\\) trên các lớp \\(q\\) , hàm mất \\(l\\) là"
+    },
+    {
+      "type": "math",
+      "latex": "(3.4.8)¶\\[l(\\mathbf{y}, \\hat{\\mathbf{y}}) = - \\sum_{j=1}^q y_j \\log \\hat{y}_j.\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Vì lý do được giải thích sau này, hàm mất trong (3.4.8) thường được gọi là mất cross-entropy . Kể\ntừ \\(\\mathbf{y}\\) là một vectơ một nóng có chiều dài \\(q\\) , tổng\ntrên tất cả các tọa độ của nó \\(j\\) biến mất cho tất cả trừ một\nthuật ngữ. Vì tất cả \\(\\hat{y}_j\\) được dự đoán xác suất, logarit\ncủa chúng không bao giờ lớn hơn \\(0\\) . Do đó, hàm mất không thể được\ngiảm thiểu thêm nữa nếu chúng ta dự đoán chính xác nhãn thực tế với chắc chắn , tức là, nếu xác suất dự đoán \\(P(\\mathbf{y} \\mid \\mathbf{x}) = 1\\) cho nhãn thực tế \\(\\mathbf{y}\\) . Lưu ý rằng điều này thường là không thể. Ví dụ: có\nthể có nhiễu nhãn trong tập dữ liệu (một số ví dụ có thể bị dán nhãn\nsai). Cũng có thể không thể thực hiện được khi các tính năng đầu vào\nkhông đủ thông tin để phân loại mọi ví dụ một cách hoàn hảo."
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "softmax-va-cac-dan-xuat",
+      "text": "3.4.6.2. Softmax và các dẫn xuất"
+    },
+    {
+      "type": "paragraph",
+      "text": "Vì softmax và tổn thất tương ứng rất phổ biến, nên hiểu rõ hơn một chút\nvề cách nó được tính toán. Cắm (3.4.3) vào định\nnghĩa về sự mất mát trong (3.4.8) và sử dụng định\nnghĩa của softmax chúng ta có được:"
+    },
+    {
+      "type": "math",
+      "latex": "(3.4.9)¶\\[\\begin{split}\\begin{aligned}\nl(\\mathbf{y}, \\hat{\\mathbf{y}}) &=  - \\sum_{j=1}^q y_j \\log \\frac{\\exp(o_j)}{\\sum_{k=1}^q \\exp(o_k)} \\\\\n&= \\sum_{j=1}^q y_j \\log \\sum_{k=1}^q \\exp(o_k) - \\sum_{j=1}^q y_j o_j\\\\\n&= \\log \\sum_{k=1}^q \\exp(o_k) - \\sum_{j=1}^q y_j o_j.\n\\end{aligned}\\end{split}\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Để hiểu rõ hơn một chút những gì đang xảy ra, hãy xem xét phái sinh liên\nquan đến bất kỳ logit \\(o_j\\) nào. Chúng tôi nhận được"
+    },
+    {
+      "type": "math",
+      "latex": "(3.4.10)¶\\[\\partial_{o_j} l(\\mathbf{y}, \\hat{\\mathbf{y}}) = \\frac{\\exp(o_j)}{\\sum_{k=1}^q \\exp(o_k)} - y_j = \\mathrm{softmax}(\\mathbf{o})_j - y_j.\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Nói cách khác, đạo hàm là sự khác biệt giữa xác suất được gán bởi mô\nhình của chúng ta, như thể hiện bằng phép toán softmax, và những gì thực\nsự đã xảy ra, như thể hiện bằng các phần tử trong vectơ nhãn một nóng.\nTheo nghĩa này, nó rất giống với những gì chúng ta đã thấy trong hồi\nquy, trong đó gradient là sự khác biệt giữa quan sát \\(y\\) và ước\ntính \\(\\hat{y}\\) . Đây không phải là sự trùng hợp ngẫu nhiên. Trong\nbất kỳ họ cấp số nhân nào (xem mô hình online appendix on\ndistributions ),\nđộ dốc của khả năng log được đưa ra bởi chính xác thuật ngữ này. Thực tế\nnày làm cho gradient tính toán dễ dàng trong thực tế."
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "mat-cross-entropy",
+      "text": "3.4.6.3. Mất Cross-Entropy"
+    },
+    {
+      "type": "paragraph",
+      "text": "Bây giờ hãy xem xét trường hợp mà chúng ta quan sát không chỉ là một kết\nquả duy nhất mà còn là toàn bộ phân phối trên kết quả. Chúng ta có thể\nsử dụng đại diện tương tự như trước cho nhãn \\(\\mathbf{y}\\) . Sự khác\nbiệt duy nhất là thay vì một vector chỉ chứa các mục nhị phân, giả sử \\((0, 0, 1)\\) , bây giờ chúng ta có một vector xác suất chung, nói \\((0.1, 0.2, 0.7)\\) . Toán học mà chúng tôi đã sử dụng trước đây để\nxác định mất \\(l\\) trong (3.4.8) vẫn hoạt động\ntốt, chỉ là việc giải thích là tổng quát hơn một chút. Đó là giá trị dự\nkiến của sự mất mát cho một phân phối trên nhãn. Tổn thất này được gọi\nlà mất cross-entropy và nó là một trong những tổn thất được sử dụng\nphổ biến nhất cho các vấn đề phân loại. Chúng ta có thể demystify tên\nbằng cách giới thiệu chỉ những điều cơ bản của lý thuyết thông tin. Nếu\nbạn muốn hiểu thêm chi tiết về lý thuyết thông tin, bạn có thể tham khảo\nthêm online appendix on information\ntheory ."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "thong-tin-co-ban-ve-ly-thuyet",
+      "text": "3.4.7. Thông tin cơ bản về lý thuyết"
+    },
+    {
+      "type": "paragraph",
+      "text": "Lý lịch thông tin đề cập đến vấn đề mã hóa, giải mã, truyền tải, và\nthao tác thông tin (còn được gọi là dữ liệu) ở dạng ngắn gọn nhất có\nthể."
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "entropy",
+      "text": "3.4.7.1. Entropy"
+    },
+    {
+      "type": "paragraph",
+      "text": "Ý tưởng trung tâm trong lý thuyết thông tin là định lượng nội dung thông\ntin trong dữ liệu. Số lượng này đặt một giới hạn cứng về khả năng nén dữ\nliệu của chúng tôi. Trong lý thuyết thông tin, đại lượng này được gọi là entropy của một phân phối \\(P\\) , và nó được bắt bởi phương trình\nsau:"
+    },
+    {
+      "type": "math",
+      "latex": "(3.4.11)¶\\[H[P] = \\sum_j - P(j) \\log P(j).\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Một trong những định lý cơ bản của lý thuyết thông tin nói rằng để mã\nhóa dữ liệu được rút ra ngẫu nhiên từ phân phối \\(P\\) , chúng ta cần\nít nhất \\(H[P]\\) “net” để mã hóa nó. Nếu bạn tự hỏi một “nat” là gì,\nnó tương đương với bit nhưng khi sử dụng một mã với base \\(e\\) chứ\nkhông phải là một với base 2. Như vậy, một nat là \\(\\frac{1}{\\log(2)} \\approx 1.44\\) bit."
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "surprisal",
+      "text": "3.4.7.2. Surprisal"
+    },
+    {
+      "type": "paragraph",
+      "text": "Bạn có thể tự hỏi nén có liên quan gì đến dự đoán. Hãy tưởng tượng rằng\nchúng ta có một luồng dữ liệu mà chúng ta muốn nén. Nếu chúng ta luôn dễ\ndàng dự đoán token tiếp theo, thì dữ liệu này rất dễ nén! Lấy ví dụ cực\nđoan trong đó mọi token trong luồng luôn có cùng giá trị. Đó là một\nluồng dữ liệu rất nhàm chán! Và không chỉ nó là nhàm chán, nhưng nó cũng\ndễ dàng để dự đoán. Bởi vì chúng luôn giống nhau, chúng tôi không phải\ntruyền tải bất kỳ thông tin nào để truyền đạt nội dung của luồng. Dễ dự\nđoán, dễ nén."
+    },
+    {
+      "type": "paragraph",
+      "text": "Tuy nhiên, nếu chúng ta không thể dự đoán hoàn hảo mọi sự kiện, thì đôi\nkhi chúng ta có thể ngạc nhiên. Sự ngạc nhiên của chúng tôi là lớn hơn\nkhi chúng tôi chỉ định một sự kiện xác suất thấp hơn. Claude Shannon\nđịnh cư vào \\(\\log \\frac{1}{P(j)} = -\\log P(j)\\) để định lượng của\nmột người ngạc nhiên khi quan sát một sự kiện \\(j\\) đã gán cho nó\nmột xác suất (chủ quan) \\(P(j)\\) . Entropy được định nghĩa trong (3.4.11) sau đó là sự ngạc nhiên dự kiến * khi\nngười ta gán xác suất chính xác thực sự phù hợp với quá trình tạo dữ\nliệu."
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "cross-entropy-revisited",
+      "text": "3.4.7.3. Cross-Entropy Revisited"
+    },
+    {
+      "type": "paragraph",
+      "text": "Vì vậy, nếu entropy là mức độ bất ngờ trải qua bởi một người biết xác\nsuất thực sự, thì bạn có thể tự hỏi, cross-entropy là gì? Các\ncross-entropy* từ* \\(P\\) * đến* \\(Q\\) , được ký hiệu là \\(H(P, Q)\\) , là sự ngạc nhiên dự kiến của một người quan sát với xác\nsuất chủ quan \\(Q\\) khi nhìn thấy dữ liệu thực sự được tạo ra theo\nxác suất \\(P\\) . Entropy chéo thấp nhất có thể đạt được khi \\(P=Q\\) . Trong trường hợp này, entropy chéo từ \\(P\\) đến \\(Q\\) là \\(H(P, P)= H(P)\\) ."
+    },
+    {
+      "type": "paragraph",
+      "text": "Nói tóm lại, chúng ta có thể nghĩ đến mục tiêu phân loại chéo entropy\ntheo hai cách: (i) là tối đa hóa khả năng của dữ liệu quan sát; và (ii)\nlà giảm thiểu sự ngạc nhiên của chúng ta (và do đó số lượng bit) cần\nthiết để truyền đạt các nhãn."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "du-doan-va-danh-gia-mo-hinh",
+      "text": "3.4.8. Dự đoán và đánh giá mô hình"
+    },
+    {
+      "type": "paragraph",
+      "text": "Sau khi đào tạo mô hình hồi quy softmax, cho bất kỳ tính năng ví dụ nào,\nchúng ta có thể dự đoán xác suất của mỗi lớp đầu ra. Thông thường, chúng\nta sử dụng class có xác suất dự đoán cao nhất làm class output. Dự đoán\nlà chính xác nếu nó phù hợp với lớp thực tế (label). Trong phần tiếp\ntheo của thử nghiệm, chúng tôi sẽ sử dụng accuracy để đánh giá hiệu\nsuất của mô hình. Điều này bằng tỷ lệ giữa số dự đoán chính xác và tổng\nsố dự đoán."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tom-tat",
+      "text": "3.4.9. Tóm tắt"
+    },
+    {
+      "type": "list",
+      "ordered": false,
+      "items": [
+        "Thao tác softmax lấy một vector và ánh xạ nó thành xác suất.",
+        "Hồi quy Softmax áp dụng cho các bài toán phân loại. Nó sử dụng phân\nphối xác suất của lớp đầu ra trong hoạt động softmax.",
+        "Cross-entropy là một thước đo tốt về sự khác biệt giữa hai phân phối\nxác suất. Nó đo số lượng bit cần thiết để mã hóa dữ liệu cho mô hình\ncủa chúng tôi."
+      ]
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bai-tap",
+      "text": "3.4.10. Bài tập"
+    },
+    {
+      "type": "list",
+      "ordered": true,
+      "items": [
+        "Chúng ta có thể khám phá mối liên hệ giữa các gia đình cấp số nhân và\nsoftmax ở một số chiều sâu hơn. Tính toán đạo hàm thứ hai của tổn thất chéo entropy \\(l(\\mathbf{y},\\hat{\\mathbf{y}})\\) cho softmax. Tính toán phương sai của phân phối được đưa ra bởi \\(\\mathrm{softmax}(\\mathbf{o})\\) và cho thấy nó khớp với đạo\nhàm thứ hai được tính toán ở trên.",
+        "Tính toán đạo hàm thứ hai của tổn thất chéo entropy \\(l(\\mathbf{y},\\hat{\\mathbf{y}})\\) cho softmax.",
+        "Tính toán phương sai của phân phối được đưa ra bởi \\(\\mathrm{softmax}(\\mathbf{o})\\) và cho thấy nó khớp với đạo\nhàm thứ hai được tính toán ở trên.",
+        "Giả sử rằng chúng ta có ba lớp xảy ra với xác suất bằng nhau, tức là\nvector xác suất là \\((\\frac{1}{3}, \\frac{1}{3}, \\frac{1}{3})\\) . Vấn đề là gì nếu chúng ta cố gắng thiết kế một mã nhị phân cho nó? Bạn có thể thiết kế một mã tốt hơn? Gợi ý: điều gì sẽ xảy ra nếu\nchúng ta cố gắng mã hóa hai quan sát độc lập? Điều gì sẽ xảy ra\nnếu chúng ta mã hóa \\(n\\) quan sát cùng nhau?",
+        "Vấn đề là gì nếu chúng ta cố gắng thiết kế một mã nhị phân cho nó?",
+        "Bạn có thể thiết kế một mã tốt hơn? Gợi ý: điều gì sẽ xảy ra nếu\nchúng ta cố gắng mã hóa hai quan sát độc lập? Điều gì sẽ xảy ra\nnếu chúng ta mã hóa \\(n\\) quan sát cùng nhau?",
+        "Softmax là một sai lầm cho bản đồ được giới thiệu ở trên (nhưng tất\ncả mọi người trong deep learning đều sử dụng nó). Softmax thực được\nđịnh nghĩa là \\(\\mathrm{RealSoftMax}(a, b) = \\log (\\exp(a) + \\exp(b))\\) . Chứng minh rằng \\(\\mathrm{RealSoftMax}(a, b) > \\mathrm{max}(a, b)\\) . Chứng minh rằng điều này giữ cho \\(\\lambda^{-1} \\mathrm{RealSoftMax}(\\lambda a, \\lambda b)\\) ,\nvới điều kiện là \\(\\lambda > 0\\) . Cho thấy rằng đối với \\(\\lambda \\to \\infty\\) chúng tôi có \\(\\lambda^{-1} \\mathrm{RealSoftMax}(\\lambda a, \\lambda b) \\to \\mathrm{max}(a, b)\\) . Soft-min trông như thế nào? Mở rộng điều này đến hơn hai số.",
+        "Chứng minh rằng \\(\\mathrm{RealSoftMax}(a, b) > \\mathrm{max}(a, b)\\) .",
+        "Chứng minh rằng điều này giữ cho \\(\\lambda^{-1} \\mathrm{RealSoftMax}(\\lambda a, \\lambda b)\\) ,\nvới điều kiện là \\(\\lambda > 0\\) .",
+        "Cho thấy rằng đối với \\(\\lambda \\to \\infty\\) chúng tôi có \\(\\lambda^{-1} \\mathrm{RealSoftMax}(\\lambda a, \\lambda b) \\to \\mathrm{max}(a, b)\\) .",
+        "Soft-min trông như thế nào?",
+        "Mở rộng điều này đến hơn hai số."
+      ]
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    }
+  ],
+  "images": [
+    {
+      "original_url": "https://vi.d2l.ai/_images/softmaxreg.svg",
+      "local_path": "_images/softmaxreg.svg",
+      "alt": "../_images/softmaxreg.svg"
+    }
+  ],
+  "text": "3.4. Hồi quy Softmax\nTrong Section 3.1 , chúng tôi giới thiệu hồi quy\ntuyến tính, làm việc thông qua việc triển khai từ đầu vào năm Section 3.2 và một lần nữa sử dụng API cấp cao của\nmột khung học sâu trong Section 3.3 để thực hiện nâng\nnặng.\nHồi quy là cái búa chúng ta đạt được khi chúng ta muốn trả lời * bao\nnhiêu? * hoặc * bao nhiêu? * câu hỏi. Nếu bạn muốn dự đoán số đô la (giá\ncả) mà tại đó một ngôi nhà sẽ được bán, hoặc số chiến thắng một đội bóng\nchày có thể có, hoặc số ngày mà một bệnh nhân sẽ vẫn nhập viện trước khi\nđược xuất viện, sau đó bạn có thể đang tìm kiếm một mô hình hồi quy.\nTrong thực tế, chúng tôi thường quan tâm đến * phân loại * : hỏi không\nphải “bao nhiêu” mà là “cái nào”:\nEmail này có thuộc về thư mục spam hay hộp thư đến không?\nKhách hàng này có nhiều khả năng * để đăng ký* hoặc * không đăng\nký* cho một dịch vụ đăng ký?\nHình ảnh này mô tả một con lừa, chó, một con mèo, hoặc một con gà\ntrống?\nAston có thể xem bộ phim nào nhất tiếp theo?\nThông thường, các học viên học máy làm quá tải từ * phân loại * để mô\ntả hai vấn đề tinh tế khác nhau: (i) những vấn đề mà chúng tôi chỉ quan\ntâm đến các bài tập cứng của các ví dụ cho các loại (lớp); và (ii) những\nvấn đề mà chúng tôi muốn thực hiện các bài tập mềm, tức là, để đánh giá\nxác suất mà mỗi loại áp dụng. Sự khác biệt có xu hướng bị mờ, một phần,\nbởi vì thường xuyên, ngay cả khi chúng ta chỉ quan tâm đến các bài tập\ncứng, chúng ta vẫn sử dụng các mô hình tạo ra các bài tập mềm.\n3.4.1. Phân loại vấn đề\nĐể có được bàn chân của chúng tôi ướt, chúng ta hãy bắt đầu với một vấn\nđề phân loại hình ảnh đơn giản. Ở đây, mỗi đầu vào bao gồm một hình ảnh\nthang màu xám \\(2\\times2\\) . Chúng ta có thể đại diện cho mỗi giá trị\npixel với một vô hướng duy nhất, cho chúng ta bốn tính năng \\(x_1, x_2, x_3, x_4\\) . Hơn nữa, chúng ta hãy giả định rằng mỗi hình\nảnh thuộc về một trong số các loại “mèo”, “gà” và “chó”.\nTiếp theo, chúng ta phải chọn cách đại diện cho các nhãn. Chúng tôi có\nhai lựa chọn rõ ràng. Có lẽ xung tự nhiên nhất sẽ là chọn \\(y \\in \\{1, 2, 3\\}\\) , trong đó các số nguyên đại diện cho \\(\\{\\text{dog}, \\text{cat}, \\text{chicken}\\}\\) tương ứng. Đây là một\ncách tuyệt vời để * lưu trữ* thông tin như vậy trên máy tính. Nếu các\ndanh mục có một số thứ tự nhiên trong số đó, hãy nói nếu chúng ta đang\ncố gắng dự đoán \\(\\{\\text{baby}, \\text{toddler}, \\text{adolescent}, \\text{young adult}, \\text{adult}, \\text{geriatric}\\}\\) ,\nthì thậm chí có thể khiến vấn đề này làm hồi quy và giữ nhãn ở định dạng\nnày.\nNhưng các vấn đề phân loại chung không đi kèm với trật tự tự nhiên giữa\ncác lớp học. May mắn thay, các nhà thống kê từ lâu đã phát minh ra một\ncách đơn giản để đại diện cho dữ liệu phân loại: mã hóa* một*. Mã hóa\nmột nóng là một vector với nhiều thành phần như chúng ta có các loại.\nThành phần tương ứng với thể loại của phiên bản cụ thể được đặt thành 1\nvà tất cả các thành phần khác được đặt thành 0. Trong trường hợp của\nchúng tôi, một nhãn \\(y\\) sẽ là một vector ba chiều, với \\((1, 0, 0)\\) tương ứng với “mèo”, \\((0, 1, 0)\\) đến “gà” và \\((0, 0, 1)\\) thành “chó”:\n3.4.2. Kiến trúc mạng\nĐể ước tính xác suất có điều kiện liên quan đến tất cả các lớp có thể,\nchúng ta cần một mô hình với nhiều đầu ra, một cho mỗi lớp. Để giải\nquyết phân loại với các mô hình tuyến tính, chúng ta sẽ cần nhiều hàm\naffine như chúng ta có đầu ra. Mỗi đầu ra sẽ tương ứng với chức năng\naffine riêng của nó. Trong trường hợp của chúng tôi, vì chúng tôi có 4\ntính năng và 3 danh mục đầu ra có thể, chúng tôi sẽ cần 12 vô hướng để\nđại diện cho trọng lượng ( \\(w\\) với các chỉ mục) và 3 vô hướng để\nđại diện cho các thành kiến ( \\(b\\) với chỉ mục). Chúng tôi tính toán\nba logits này, \\(o_1, o_2\\) , và \\(o_3\\) , cho mỗi đầu vào:\nChúng ta có thể mô tả tính toán này với sơ đồ mạng thần kinh được hiển\nthị trong Fig. 3.4.1 . Cũng giống như trong hồi quy tuyến\ntính, hồi quy softmax cũng là một mạng thần kinh một lớp. Và kể từ khi\ntính toán của mỗi đầu ra, \\(o_1, o_2\\) và \\(o_3\\) , phụ thuộc vào\ntất cả các đầu vào, \\(x_1\\) , \\(x_2\\) , \\(x_3\\) và \\(x_4\\) , lớp đầu ra của hồi quy softmax cũng có thể được mô tả là\nlớp kết nối hoàn toàn.\nFig. 3.4.1 Softmax regression is a single-layer neural network. ¶\nĐể thể hiện mô hình nhỏ gọn hơn, chúng ta có thể sử dụng ký hiệu đại số\ntuyến tính. Ở dạng vector, chúng tôi đến \\(\\mathbf{o} = \\mathbf{W} \\mathbf{x} + \\mathbf{b}\\) , một hình thức\nphù hợp hơn cho cả toán học và viết mã. Lưu ý rằng chúng tôi đã thu thập\ntất cả các trọng lượng của chúng tôi thành ma trận \\(3 \\times 4\\) và\nđối với các tính năng của một ví dụ dữ liệu nhất định \\(\\mathbf{x}\\) , đầu ra của chúng tôi được đưa ra bởi một sản phẩm ma\nthuật-vector có trọng lượng của chúng tôi bởi các tính năng đầu vào của\nchúng tôi cộng với thiên vị của chúng tôi \\(\\mathbf{b}\\) .\n3.4.3. Chi phí tham số của các lớp được kết nối hoàn toàn\nNhư chúng ta sẽ thấy trong các chương tiếp theo, các lớp được kết nối\nhoàn toàn có mặt khắp nơi trong học sâu. Tuy nhiên, như tên cho thấy,\ncác lớp được kết nối hoàn toàn là * đầy đủ* kết nối với nhiều tham số\ncó khả năng học được. Cụ thể, đối với bất kỳ lớp kết nối hoàn toàn nào\nvới đầu vào \\(d\\) và đầu ra \\(q\\) , chi phí tham số hóa là \\(\\mathcal{O}(dq)\\) , có thể rất cao trong thực tế. May mắn thay, chi\nphí chuyển đổi đầu vào \\(d\\) này thành đầu ra \\(q\\) có thể được\ngiảm xuống còn \\(\\mathcal{O}(\\frac{dq}{n})\\) , trong đó siêu tham số \\(n\\) có thể được chúng tôi xác định linh hoạt để cân bằng giữa tiết\nkiệm thông số và hiệu quả mô hình trong các ứng dụng thế giới thực [Zhang.Tay.Zhang.ea.2021] .\n3.4.4. Softmax hoạt động\nCách tiếp cận chính mà chúng ta sẽ thực hiện ở đây là giải thích các kết\nquả đầu ra của mô hình của chúng tôi là xác suất. Chúng tôi sẽ tối ưu\nhóa các thông số của mình để tạo ra xác suất tối đa hóa khả năng của dữ\nliệu quan sát. Sau đó, để tạo ra dự đoán, chúng tôi sẽ đặt một ngưỡng,\nví dụ, chọn nhãn với xác suất dự đoán tối đa.\nĐặt chính thức, chúng tôi muốn bất kỳ đầu ra \\(\\hat{y}_j\\) được hiểu\nlà xác suất mà một mục nhất định thuộc về lớp \\(j\\) . Sau đó, chúng\nta có thể chọn lớp có giá trị đầu ra lớn nhất như dự đoán của chúng ta \\(\\operatorname*{argmax}_j y_j\\) . Ví dụ: nếu \\(\\hat{y}_1\\) , \\(\\hat{y}_2\\) và \\(\\hat{y}_3\\) lần lượt là 0,1, 0,8 và 0,1, thì\nchúng tôi dự đoán loại 2, trong đó (trong ví dụ của chúng tôi) đại diện\ncho “gà”.\nBạn có thể bị cám dỗ để đề nghị rằng chúng tôi giải thích các bản ghi \\(o\\) trực tiếp như đầu ra của chúng tôi quan tâm. Tuy nhiên, có một\nsố vấn đề với việc giải thích trực tiếp đầu ra của lớp tuyến tính là một\nxác suất. Một mặt, không có gì hạn chế những con số này để tổng cộng với\n1. Mặt khác, tùy thuộc vào đầu vào, chúng có thể lấy giá trị âm. Những\nvi phạm tiên đề cơ bản của xác suất được trình bày trong Section 2.6\nĐể hiểu kết quả đầu ra của chúng tôi là xác suất, chúng tôi phải đảm bảo\nrằng (ngay cả trên dữ liệu mới), chúng sẽ không âm và tổng hợp lên đến\n1. Hơn nữa, chúng ta cần một mục tiêu đào tạo khuyến khích mô hình ước\ntính xác suất trung thực. Trong tất cả các trường hợp khi một phân loại\nđầu ra 0.5, chúng tôi hy vọng rằng một nửa trong số các ví dụ đó sẽ thực\nsự thuộc về lớp dự đoán. Đây là một thuộc tính gọi là calibration .\nChức năng softmax , được phát minh vào năm 1959 bởi nhà khoa học xã hội\nR.Duncan Luce trong bối cảnh mô hình lựa chọn , thực hiện chính xác\nđiều này. Để chuyển đổi nhật ký của chúng tôi sao cho chúng trở nên\nkhông âm và tổng thành 1, trong khi yêu cầu mô hình vẫn có thể khác\nbiệt, trước tiên chúng ta cấp mũ mỗi logit (đảm bảo không tiêu cực) và\nsau đó chia cho tổng của chúng (đảm bảo rằng chúng tổng thành 1):\nThật dễ dàng để xem \\(\\hat{y}_1 + \\hat{y}_2 + \\hat{y}_3 = 1\\) với \\(0 \\leq \\hat{y}_j \\leq 1\\) cho tất cả \\(j\\) . Do đó, \\(\\hat{\\mathbf{y}}\\) là một phân phối xác suất thích hợp mà các giá\ntrị phần tử có thể được diễn giải cho phù hợp. Lưu ý rằng thao tác\nsoftmax không thay đổi thứ tự trong số các bản ghi \\(\\mathbf{o}\\) ,\nđơn giản là các giá trị pre-softmax xác định xác suất được gán cho mỗi\nlớp. Do đó, trong quá trình dự đoán, chúng ta vẫn có thể chọn ra lớp có\nkhả năng nhất bằng\nMặc dù softmax là một hàm phi tuyến, các đầu ra của hồi quy softmax vẫn\nlà * quyết định* bởi một biến đổi affine của các tính năng đầu vào; do\nđó, hồi quy softmax là một mô hình tuyến tính.\n3.4.5. Vectorization cho Minibatches\nĐể cải thiện hiệu quả tính toán và tận dụng lợi thế của GPU, chúng tôi\nthường thực hiện các phép tính vector cho các minibatches dữ liệu. Giả\nsử rằng chúng ta được đưa ra một minibatch \\(\\mathbf{X}\\) ví dụ với\nkích thước tính năng (số lượng đầu vào) \\(d\\) và kích thước lô \\(n\\) . Hơn nữa, giả sử rằng chúng tôi có \\(q\\) danh mục trong\nđầu ra. Sau đó, các tính năng minibatch \\(\\mathbf{X}\\) là trong \\(\\mathbb{R}^{n \\times d}\\) , trọng lượng \\(\\mathbf{W} \\in \\mathbb{R}^{d \\times q}\\) và sự thiên vị đáp ứng \\(\\mathbf{b} \\in \\mathbb{R}^{1\\times q}\\) .\nĐiều này tăng tốc hoạt động thống trị thành một sản phẩm ma trận ma trận \\(\\mathbf{X} \\mathbf{W}\\) so với các sản phẩm ma trận vector mà\nchúng tôi sẽ thực hiện nếu chúng tôi xử lý một ví dụ tại một thời điểm.\nVì mỗi hàng trong \\(\\mathbf{X}\\) đại diện cho một ví dụ dữ liệu, nên\nbản thân thao tác softmax có thể được tính toán * rowwise*: cho mỗi\nhàng \\(\\mathbf{O}\\) , cấp số mũ tất cả các mục nhập và sau đó bình\nthường hóa chúng bằng tổng. Kích hoạt phát sóng trong tổng kết \\(\\mathbf{X} \\mathbf{W} + \\mathbf{b}\\) trong (3.4.5) , cả hai minibatch đăng nhập \\(\\mathbf{O}\\) và xác suất đầu ra \\(\\hat{\\mathbf{Y}}\\) là \\(n \\times q\\) ma trận.\n3.4.6. Chức năng mất\nTiếp theo, chúng ta cần một chức năng mất mát để đo lường chất lượng xác\nsuất dự đoán của chúng tôi. Chúng ta sẽ dựa vào ước tính khả năng tối\nđa, khái niệm rất giống nhau mà chúng ta gặp phải khi cung cấp một biện\nminh xác suất cho mục tiêu sai số bình phương trung bình trong hồi quy\ntuyến tính ( Section 3.1.3 ).\n3.4.6.1. Log-Likelihood\nHàm softmax cung cấp cho chúng ta một vector \\(\\hat{\\mathbf{y}}\\) ,\nmà chúng ta có thể giải thích như xác suất có điều kiện ước tính của mỗi\nlớp cho bất kỳ đầu vào \\(\\mathbf{x}\\) , ví dụ, \\(\\hat{y}_1\\) = \\(P(y=\\text{cat} \\mid \\mathbf{x})\\) . Giả sử rằng toàn bộ dữ liệu \\(\\{\\mathbf{X}, \\mathbf{Y}\\}\\) có \\(n\\) ví dụ, trong đó ví dụ\nđược lập chỉ mục bởi \\(i\\) bao gồm một vector tính năng \\(\\mathbf{x}^{(i)}\\) và một vector nhãn một nóng \\(\\mathbf{y}^{(i)}\\) . Chúng ta có thể so sánh các ước tính với thực\ntế bằng cách kiểm tra xem các lớp thực tế có thể xảy ra như thế nào theo\nmô hình của chúng tôi, với các tính năng:\nTheo ước tính khả năng tối đa, chúng tôi tối đa hóa \\(P(\\mathbf{Y} \\mid \\mathbf{X})\\) , tương đương với việc giảm thiểu\nkhả năng log âm:\nnơi đối với bất kỳ cặp nhãn \\(\\mathbf{y}\\) và dự đoán mô hình \\(\\hat{\\mathbf{y}}\\) trên các lớp \\(q\\) , hàm mất \\(l\\) là\nVì lý do được giải thích sau này, hàm mất trong (3.4.8) thường được gọi là mất cross-entropy . Kể\ntừ \\(\\mathbf{y}\\) là một vectơ một nóng có chiều dài \\(q\\) , tổng\ntrên tất cả các tọa độ của nó \\(j\\) biến mất cho tất cả trừ một\nthuật ngữ. Vì tất cả \\(\\hat{y}_j\\) được dự đoán xác suất, logarit\ncủa chúng không bao giờ lớn hơn \\(0\\) . Do đó, hàm mất không thể được\ngiảm thiểu thêm nữa nếu chúng ta dự đoán chính xác nhãn thực tế với chắc chắn , tức là, nếu xác suất dự đoán \\(P(\\mathbf{y} \\mid \\mathbf{x}) = 1\\) cho nhãn thực tế \\(\\mathbf{y}\\) . Lưu ý rằng điều này thường là không thể. Ví dụ: có\nthể có nhiễu nhãn trong tập dữ liệu (một số ví dụ có thể bị dán nhãn\nsai). Cũng có thể không thể thực hiện được khi các tính năng đầu vào\nkhông đủ thông tin để phân loại mọi ví dụ một cách hoàn hảo.\n3.4.6.2. Softmax và các dẫn xuất\nVì softmax và tổn thất tương ứng rất phổ biến, nên hiểu rõ hơn một chút\nvề cách nó được tính toán. Cắm (3.4.3) vào định\nnghĩa về sự mất mát trong (3.4.8) và sử dụng định\nnghĩa của softmax chúng ta có được:\nĐể hiểu rõ hơn một chút những gì đang xảy ra, hãy xem xét phái sinh liên\nquan đến bất kỳ logit \\(o_j\\) nào. Chúng tôi nhận được\nNói cách khác, đạo hàm là sự khác biệt giữa xác suất được gán bởi mô\nhình của chúng ta, như thể hiện bằng phép toán softmax, và những gì thực\nsự đã xảy ra, như thể hiện bằng các phần tử trong vectơ nhãn một nóng.\nTheo nghĩa này, nó rất giống với những gì chúng ta đã thấy trong hồi\nquy, trong đó gradient là sự khác biệt giữa quan sát \\(y\\) và ước\ntính \\(\\hat{y}\\) . Đây không phải là sự trùng hợp ngẫu nhiên. Trong\nbất kỳ họ cấp số nhân nào (xem mô hình online appendix on\ndistributions ),\nđộ dốc của khả năng log được đưa ra bởi chính xác thuật ngữ này. Thực tế\nnày làm cho gradient tính toán dễ dàng trong thực tế.\n3.4.6.3. Mất Cross-Entropy\nBây giờ hãy xem xét trường hợp mà chúng ta quan sát không chỉ là một kết\nquả duy nhất mà còn là toàn bộ phân phối trên kết quả. Chúng ta có thể\nsử dụng đại diện tương tự như trước cho nhãn \\(\\mathbf{y}\\) . Sự khác\nbiệt duy nhất là thay vì một vector chỉ chứa các mục nhị phân, giả sử \\((0, 0, 1)\\) , bây giờ chúng ta có một vector xác suất chung, nói \\((0.1, 0.2, 0.7)\\) . Toán học mà chúng tôi đã sử dụng trước đây để\nxác định mất \\(l\\) trong (3.4.8) vẫn hoạt động\ntốt, chỉ là việc giải thích là tổng quát hơn một chút. Đó là giá trị dự\nkiến của sự mất mát cho một phân phối trên nhãn. Tổn thất này được gọi\nlà mất cross-entropy và nó là một trong những tổn thất được sử dụng\nphổ biến nhất cho các vấn đề phân loại. Chúng ta có thể demystify tên\nbằng cách giới thiệu chỉ những điều cơ bản của lý thuyết thông tin. Nếu\nbạn muốn hiểu thêm chi tiết về lý thuyết thông tin, bạn có thể tham khảo\nthêm online appendix on information\ntheory .\n3.4.7. Thông tin cơ bản về lý thuyết\nLý lịch thông tin đề cập đến vấn đề mã hóa, giải mã, truyền tải, và\nthao tác thông tin (còn được gọi là dữ liệu) ở dạng ngắn gọn nhất có\nthể.\n3.4.7.1. Entropy\nÝ tưởng trung tâm trong lý thuyết thông tin là định lượng nội dung thông\ntin trong dữ liệu. Số lượng này đặt một giới hạn cứng về khả năng nén dữ\nliệu của chúng tôi. Trong lý thuyết thông tin, đại lượng này được gọi là entropy của một phân phối \\(P\\) , và nó được bắt bởi phương trình\nsau:\nMột trong những định lý cơ bản của lý thuyết thông tin nói rằng để mã\nhóa dữ liệu được rút ra ngẫu nhiên từ phân phối \\(P\\) , chúng ta cần\nít nhất \\(H[P]\\) “net” để mã hóa nó. Nếu bạn tự hỏi một “nat” là gì,\nnó tương đương với bit nhưng khi sử dụng một mã với base \\(e\\) chứ\nkhông phải là một với base 2. Như vậy, một nat là \\(\\frac{1}{\\log(2)} \\approx 1.44\\) bit.\n3.4.7.2. Surprisal\nBạn có thể tự hỏi nén có liên quan gì đến dự đoán. Hãy tưởng tượng rằng\nchúng ta có một luồng dữ liệu mà chúng ta muốn nén. Nếu chúng ta luôn dễ\ndàng dự đoán token tiếp theo, thì dữ liệu này rất dễ nén! Lấy ví dụ cực\nđoan trong đó mọi token trong luồng luôn có cùng giá trị. Đó là một\nluồng dữ liệu rất nhàm chán! Và không chỉ nó là nhàm chán, nhưng nó cũng\ndễ dàng để dự đoán. Bởi vì chúng luôn giống nhau, chúng tôi không phải\ntruyền tải bất kỳ thông tin nào để truyền đạt nội dung của luồng. Dễ dự\nđoán, dễ nén.\nTuy nhiên, nếu chúng ta không thể dự đoán hoàn hảo mọi sự kiện, thì đôi\nkhi chúng ta có thể ngạc nhiên. Sự ngạc nhiên của chúng tôi là lớn hơn\nkhi chúng tôi chỉ định một sự kiện xác suất thấp hơn. Claude Shannon\nđịnh cư vào \\(\\log \\frac{1}{P(j)} = -\\log P(j)\\) để định lượng của\nmột người ngạc nhiên khi quan sát một sự kiện \\(j\\) đã gán cho nó\nmột xác suất (chủ quan) \\(P(j)\\) . Entropy được định nghĩa trong (3.4.11) sau đó là sự ngạc nhiên dự kiến * khi\nngười ta gán xác suất chính xác thực sự phù hợp với quá trình tạo dữ\nliệu.\n3.4.7.3. Cross-Entropy Revisited\nVì vậy, nếu entropy là mức độ bất ngờ trải qua bởi một người biết xác\nsuất thực sự, thì bạn có thể tự hỏi, cross-entropy là gì? Các\ncross-entropy* từ* \\(P\\) * đến* \\(Q\\) , được ký hiệu là \\(H(P, Q)\\) , là sự ngạc nhiên dự kiến của một người quan sát với xác\nsuất chủ quan \\(Q\\) khi nhìn thấy dữ liệu thực sự được tạo ra theo\nxác suất \\(P\\) . Entropy chéo thấp nhất có thể đạt được khi \\(P=Q\\) . Trong trường hợp này, entropy chéo từ \\(P\\) đến \\(Q\\) là \\(H(P, P)= H(P)\\) .\nNói tóm lại, chúng ta có thể nghĩ đến mục tiêu phân loại chéo entropy\ntheo hai cách: (i) là tối đa hóa khả năng của dữ liệu quan sát; và (ii)\nlà giảm thiểu sự ngạc nhiên của chúng ta (và do đó số lượng bit) cần\nthiết để truyền đạt các nhãn.\n3.4.8. Dự đoán và đánh giá mô hình\nSau khi đào tạo mô hình hồi quy softmax, cho bất kỳ tính năng ví dụ nào,\nchúng ta có thể dự đoán xác suất của mỗi lớp đầu ra. Thông thường, chúng\nta sử dụng class có xác suất dự đoán cao nhất làm class output. Dự đoán\nlà chính xác nếu nó phù hợp với lớp thực tế (label). Trong phần tiếp\ntheo của thử nghiệm, chúng tôi sẽ sử dụng accuracy để đánh giá hiệu\nsuất của mô hình. Điều này bằng tỷ lệ giữa số dự đoán chính xác và tổng\nsố dự đoán.\n3.4.9. Tóm tắt\nThao tác softmax lấy một vector và ánh xạ nó thành xác suất.\nHồi quy Softmax áp dụng cho các bài toán phân loại. Nó sử dụng phân\nphối xác suất của lớp đầu ra trong hoạt động softmax.\nCross-entropy là một thước đo tốt về sự khác biệt giữa hai phân phối\nxác suất. Nó đo số lượng bit cần thiết để mã hóa dữ liệu cho mô hình\ncủa chúng tôi.\n3.4.10. Bài tập\nChúng ta có thể khám phá mối liên hệ giữa các gia đình cấp số nhân và\nsoftmax ở một số chiều sâu hơn. Tính toán đạo hàm thứ hai của tổn thất chéo entropy \\(l(\\mathbf{y},\\hat{\\mathbf{y}})\\) cho softmax. Tính toán phương sai của phân phối được đưa ra bởi \\(\\mathrm{softmax}(\\mathbf{o})\\) và cho thấy nó khớp với đạo\nhàm thứ hai được tính toán ở trên.\nTính toán đạo hàm thứ hai của tổn thất chéo entropy \\(l(\\mathbf{y},\\hat{\\mathbf{y}})\\) cho softmax.\nTính toán phương sai của phân phối được đưa ra bởi \\(\\mathrm{softmax}(\\mathbf{o})\\) và cho thấy nó khớp với đạo\nhàm thứ hai được tính toán ở trên.\nGiả sử rằng chúng ta có ba lớp xảy ra với xác suất bằng nhau, tức là\nvector xác suất là \\((\\frac{1}{3}, \\frac{1}{3}, \\frac{1}{3})\\) . Vấn đề là gì nếu chúng ta cố gắng thiết kế một mã nhị phân cho nó? Bạn có thể thiết kế một mã tốt hơn? Gợi ý: điều gì sẽ xảy ra nếu\nchúng ta cố gắng mã hóa hai quan sát độc lập? Điều gì sẽ xảy ra\nnếu chúng ta mã hóa \\(n\\) quan sát cùng nhau?\nVấn đề là gì nếu chúng ta cố gắng thiết kế một mã nhị phân cho nó?\nBạn có thể thiết kế một mã tốt hơn? Gợi ý: điều gì sẽ xảy ra nếu\nchúng ta cố gắng mã hóa hai quan sát độc lập? Điều gì sẽ xảy ra\nnếu chúng ta mã hóa \\(n\\) quan sát cùng nhau?\nSoftmax là một sai lầm cho bản đồ được giới thiệu ở trên (nhưng tất\ncả mọi người trong deep learning đều sử dụng nó). Softmax thực được\nđịnh nghĩa là \\(\\mathrm{RealSoftMax}(a, b) = \\log (\\exp(a) + \\exp(b))\\) . Chứng minh rằng \\(\\mathrm{RealSoftMax}(a, b) > \\mathrm{max}(a, b)\\) . Chứng minh rằng điều này giữ cho \\(\\lambda^{-1} \\mathrm{RealSoftMax}(\\lambda a, \\lambda b)\\) ,\nvới điều kiện là \\(\\lambda > 0\\) . Cho thấy rằng đối với \\(\\lambda \\to \\infty\\) chúng tôi có \\(\\lambda^{-1} \\mathrm{RealSoftMax}(\\lambda a, \\lambda b) \\to \\mathrm{max}(a, b)\\) . Soft-min trông như thế nào? Mở rộng điều này đến hơn hai số.\nChứng minh rằng \\(\\mathrm{RealSoftMax}(a, b) > \\mathrm{max}(a, b)\\) .\nChứng minh rằng điều này giữ cho \\(\\lambda^{-1} \\mathrm{RealSoftMax}(\\lambda a, \\lambda b)\\) ,\nvới điều kiện là \\(\\lambda > 0\\) .\nCho thấy rằng đối với \\(\\lambda \\to \\infty\\) chúng tôi có \\(\\lambda^{-1} \\mathrm{RealSoftMax}(\\lambda a, \\lambda b) \\to \\mathrm{max}(a, b)\\) .\nSoft-min trông như thế nào?\nMở rộng điều này đến hơn hai số.\nDiscussions"
+}

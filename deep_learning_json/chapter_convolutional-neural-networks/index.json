@@ -1,0 +1,84 @@
+{
+  "url": "https://vi.d2l.ai/chapter_convolutional-neural-networks/index.html",
+  "chapter": "chapter_convolutional-neural-networks",
+  "title": "6. Mạng thần kinh phức tạp",
+  "crawled_at": "2026-07-20T12:39:40.336333+00:00",
+  "headings": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "mang-than-kinh-phuc-tap",
+      "text": "6. Mạng thần kinh phức tạp"
+    }
+  ],
+  "content": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "mang-than-kinh-phuc-tap",
+      "text": "6. Mạng thần kinh phức tạp"
+    },
+    {
+      "type": "paragraph",
+      "text": "Trong các chương trước đó, chúng tôi đã đưa ra dữ liệu hình ảnh, trong\nđó mỗi ví dụ bao gồm một lưới pixel hai chiều. Tùy thuộc vào việc chúng\nta đang xử lý hình ảnh đen trắng hay màu, mỗi vị trí pixel có thể được\nliên kết với một hoặc nhiều giá trị số, tương ứng. Cho đến bây giờ, cách\nđối phó với cấu trúc phong phú này là vô cùng không thỏa mãn. Chúng tôi\nchỉ đơn giản là loại bỏ cấu trúc không gian của mỗi hình ảnh bằng cách\nlàm phẳng chúng thành các vectơ một chiều, cho chúng ăn thông qua một\nMLP được kết nối hoàn toàn. Bởi vì các mạng này không thay đổi theo thứ\ntự của các tính năng, chúng ta có thể nhận được kết quả tương tự bất kể\nchúng ta giữ nguyên một thứ tự tương ứng với cấu trúc không gian của\npixel hay nếu chúng ta hoán vị các cột của ma trận thiết kế trước khi\nlắp các tham số của MLP. Tốt nhất, chúng tôi sẽ tận dụng kiến thức trước\nđây của chúng tôi rằng các pixel gần đó thường liên quan đến nhau, để\nxây dựng các mô hình hiệu quả để học từ dữ liệu hình ảnh."
+    },
+    {
+      "type": "paragraph",
+      "text": "Chương này giới thiệu mạng thần kinh phức lượng (CNN), một họ mạng\nthần kinh mạnh mẽ được thiết kế cho mục đích chính xác này. Các kiến\ntrúc dựa trên CNN hiện đang phổ biến trong lĩnh vực thị giác máy tính,\nvà đã trở nên chiếm ưu thế đến mức hầu như không ai ngày nay sẽ phát\ntriển một ứng dụng thương mại hoặc tham gia một cuộc thi liên quan đến\nnhận dạng hình ảnh, phát hiện đối tượng hoặc phân khúc ngữ nghĩa, mà\nkhông cần xây dựng cách tiếp cận này."
+    },
+    {
+      "type": "paragraph",
+      "text": "CNN hiện đại, vì chúng được gọi là thông tục nợ thiết kế của họ để\ntruyền cảm hứng từ sinh học, lý thuyết nhóm và một liều lượng lành mạnh\ncủa mày mò thử nghiệm. Ngoài hiệu quả mẫu của chúng trong việc đạt được\ncác mô hình chính xác, CNN có xu hướng hiệu quả về mặt tính toán, cả vì\nchúng yêu cầu ít tham số hơn các kiến trúc được kết nối hoàn toàn và vì\ncác phức tạp dễ song song trên các lõi GPU. Do đó, các học viên thường\náp dụng CNN bất cứ khi nào có thể, và ngày càng họ nổi lên như đối thủ\ncạnh tranh đáng tin cậy ngay cả trên các nhiệm vụ có cấu trúc trình tự\nmột chiều, chẳng hạn như phân tích chuỗi âm thanh, văn bản và chuỗi thời\ngian, nơi các mạng thần kinh tái phát được sử dụng thông thường. Một số\nsự thích nghi thông minh của CNN cũng đã đưa chúng chịu đựng dữ liệu có\ncấu trúc đồ thị và trong các hệ thống giới thiệu."
+    },
+    {
+      "type": "paragraph",
+      "text": "Đầu tiên, chúng ta sẽ đi qua các hoạt động cơ bản bao gồm xương sống của\ntất cả các mạng phức tạp. Chúng bao gồm các lớp phức tạp, chi tiết\nnitty-gritty bao gồm đệm và sải chân, các lớp tổng hợp được sử dụng để\ntổng hợp thông tin trên các vùng không gian liền kề, sử dụng nhiều kênh\nở mỗi lớp, và một cuộc thảo luận cẩn thận về cấu trúc của kiến trúc hiện\nđại. Chúng tôi sẽ kết thúc chương với một ví dụ làm việc đầy đủ về\nLeNet, mạng phức tạp đầu tiên được triển khai thành công, rất lâu trước\nkhi sự gia tăng của học sâu hiện đại. Trong chương tiếp theo, chúng ta\nsẽ đi sâu vào triển khai đầy đủ một số kiến trúc CNN phổ biến và tương\nđối gần đây có thiết kế đại diện cho hầu hết các kỹ thuật thường được sử\ndụng bởi các học viên hiện đại."
+    },
+    {
+      "type": "list",
+      "ordered": false,
+      "items": [
+        "6.1. Từ các lớp được kết nối hoàn toàn đến sự phức tạp 6.1.1. Bất biến 6.1.2. Hạn chế MLP 6.1.3. Sự phức tạp 6.1.4. “Where’s Waldo” Revisited 6.1.5. Tóm tắt 6.1.6. Bài tập",
+        "6.1.1. Bất biến",
+        "6.1.2. Hạn chế MLP",
+        "6.1.3. Sự phức tạp",
+        "6.1.4. “Where’s Waldo” Revisited",
+        "6.1.5. Tóm tắt",
+        "6.1.6. Bài tập",
+        "6.2. Sự phức tạp cho hình ảnh 6.2.1. Hoạt động tương quan chéo 6.2.2. Layers phức tạp 6.2.3. Phát hiện cạnh đối tượng trong hình ảnh 6.2.4. Học một hạt nhân 6.2.5. Tương quan chéo và phức tạp 6.2.6. Bản đồ tính năng và trường tiếp nhận 6.2.7. Tóm tắt 6.2.8. Bài tập",
+        "6.2.1. Hoạt động tương quan chéo",
+        "6.2.2. Layers phức tạp",
+        "6.2.3. Phát hiện cạnh đối tượng trong hình ảnh",
+        "6.2.4. Học một hạt nhân",
+        "6.2.5. Tương quan chéo và phức tạp",
+        "6.2.6. Bản đồ tính năng và trường tiếp nhận",
+        "6.2.7. Tóm tắt",
+        "6.2.8. Bài tập",
+        "6.3. Đệm và sải chân 6.3.1. Đệm 6.3.2. Sải chân 6.3.3. Tóm tắt 6.3.4. Bài tập",
+        "6.3.1. Đệm",
+        "6.3.2. Sải chân",
+        "6.3.3. Tóm tắt",
+        "6.3.4. Bài tập",
+        "6.4. Nhiều kênh đầu vào và nhiều đầu ra 6.4.1. Nhiều kênh đầu vào 6.4.2. Nhiều kênh đầu ra 6.4.3. \\(1\\times 1\\) Lớp phức tạp 6.4.4. Tóm tắt 6.4.5. Bài tập",
+        "6.4.1. Nhiều kênh đầu vào",
+        "6.4.2. Nhiều kênh đầu ra",
+        "6.4.3. \\(1\\times 1\\) Lớp phức tạp",
+        "6.4.4. Tóm tắt",
+        "6.4.5. Bài tập",
+        "6.5. Pooling 6.5.1. Pooling tối đa và Pooling trung bình 6.5.2. Padding và Stride 6.5.3. Nhiều kênh 6.5.4. Tóm tắt 6.5.5. Bài tập",
+        "6.5.1. Pooling tối đa và Pooling trung bình",
+        "6.5.2. Padding và Stride",
+        "6.5.3. Nhiều kênh",
+        "6.5.4. Tóm tắt",
+        "6.5.5. Bài tập",
+        "6.6. Mạng thần kinh phức tạp (LeNet) 6.6.1. LeNet 6.6.2. Đào tạo 6.6.3. Tóm tắt 6.6.4. Bài tập",
+        "6.6.1. LeNet",
+        "6.6.2. Đào tạo",
+        "6.6.3. Tóm tắt",
+        "6.6.4. Bài tập"
+      ]
+    }
+  ],
+  "images": [],
+  "text": "6. Mạng thần kinh phức tạp\nTrong các chương trước đó, chúng tôi đã đưa ra dữ liệu hình ảnh, trong\nđó mỗi ví dụ bao gồm một lưới pixel hai chiều. Tùy thuộc vào việc chúng\nta đang xử lý hình ảnh đen trắng hay màu, mỗi vị trí pixel có thể được\nliên kết với một hoặc nhiều giá trị số, tương ứng. Cho đến bây giờ, cách\nđối phó với cấu trúc phong phú này là vô cùng không thỏa mãn. Chúng tôi\nchỉ đơn giản là loại bỏ cấu trúc không gian của mỗi hình ảnh bằng cách\nlàm phẳng chúng thành các vectơ một chiều, cho chúng ăn thông qua một\nMLP được kết nối hoàn toàn. Bởi vì các mạng này không thay đổi theo thứ\ntự của các tính năng, chúng ta có thể nhận được kết quả tương tự bất kể\nchúng ta giữ nguyên một thứ tự tương ứng với cấu trúc không gian của\npixel hay nếu chúng ta hoán vị các cột của ma trận thiết kế trước khi\nlắp các tham số của MLP. Tốt nhất, chúng tôi sẽ tận dụng kiến thức trước\nđây của chúng tôi rằng các pixel gần đó thường liên quan đến nhau, để\nxây dựng các mô hình hiệu quả để học từ dữ liệu hình ảnh.\nChương này giới thiệu mạng thần kinh phức lượng (CNN), một họ mạng\nthần kinh mạnh mẽ được thiết kế cho mục đích chính xác này. Các kiến\ntrúc dựa trên CNN hiện đang phổ biến trong lĩnh vực thị giác máy tính,\nvà đã trở nên chiếm ưu thế đến mức hầu như không ai ngày nay sẽ phát\ntriển một ứng dụng thương mại hoặc tham gia một cuộc thi liên quan đến\nnhận dạng hình ảnh, phát hiện đối tượng hoặc phân khúc ngữ nghĩa, mà\nkhông cần xây dựng cách tiếp cận này.\nCNN hiện đại, vì chúng được gọi là thông tục nợ thiết kế của họ để\ntruyền cảm hứng từ sinh học, lý thuyết nhóm và một liều lượng lành mạnh\ncủa mày mò thử nghiệm. Ngoài hiệu quả mẫu của chúng trong việc đạt được\ncác mô hình chính xác, CNN có xu hướng hiệu quả về mặt tính toán, cả vì\nchúng yêu cầu ít tham số hơn các kiến trúc được kết nối hoàn toàn và vì\ncác phức tạp dễ song song trên các lõi GPU. Do đó, các học viên thường\náp dụng CNN bất cứ khi nào có thể, và ngày càng họ nổi lên như đối thủ\ncạnh tranh đáng tin cậy ngay cả trên các nhiệm vụ có cấu trúc trình tự\nmột chiều, chẳng hạn như phân tích chuỗi âm thanh, văn bản và chuỗi thời\ngian, nơi các mạng thần kinh tái phát được sử dụng thông thường. Một số\nsự thích nghi thông minh của CNN cũng đã đưa chúng chịu đựng dữ liệu có\ncấu trúc đồ thị và trong các hệ thống giới thiệu.\nĐầu tiên, chúng ta sẽ đi qua các hoạt động cơ bản bao gồm xương sống của\ntất cả các mạng phức tạp. Chúng bao gồm các lớp phức tạp, chi tiết\nnitty-gritty bao gồm đệm và sải chân, các lớp tổng hợp được sử dụng để\ntổng hợp thông tin trên các vùng không gian liền kề, sử dụng nhiều kênh\nở mỗi lớp, và một cuộc thảo luận cẩn thận về cấu trúc của kiến trúc hiện\nđại. Chúng tôi sẽ kết thúc chương với một ví dụ làm việc đầy đủ về\nLeNet, mạng phức tạp đầu tiên được triển khai thành công, rất lâu trước\nkhi sự gia tăng của học sâu hiện đại. Trong chương tiếp theo, chúng ta\nsẽ đi sâu vào triển khai đầy đủ một số kiến trúc CNN phổ biến và tương\nđối gần đây có thiết kế đại diện cho hầu hết các kỹ thuật thường được sử\ndụng bởi các học viên hiện đại.\n6.1. Từ các lớp được kết nối hoàn toàn đến sự phức tạp 6.1.1. Bất biến 6.1.2. Hạn chế MLP 6.1.3. Sự phức tạp 6.1.4. “Where’s Waldo” Revisited 6.1.5. Tóm tắt 6.1.6. Bài tập\n6.1.1. Bất biến\n6.1.2. Hạn chế MLP\n6.1.3. Sự phức tạp\n6.1.4. “Where’s Waldo” Revisited\n6.1.5. Tóm tắt\n6.1.6. Bài tập\n6.2. Sự phức tạp cho hình ảnh 6.2.1. Hoạt động tương quan chéo 6.2.2. Layers phức tạp 6.2.3. Phát hiện cạnh đối tượng trong hình ảnh 6.2.4. Học một hạt nhân 6.2.5. Tương quan chéo và phức tạp 6.2.6. Bản đồ tính năng và trường tiếp nhận 6.2.7. Tóm tắt 6.2.8. Bài tập\n6.2.1. Hoạt động tương quan chéo\n6.2.2. Layers phức tạp\n6.2.3. Phát hiện cạnh đối tượng trong hình ảnh\n6.2.4. Học một hạt nhân\n6.2.5. Tương quan chéo và phức tạp\n6.2.6. Bản đồ tính năng và trường tiếp nhận\n6.2.7. Tóm tắt\n6.2.8. Bài tập\n6.3. Đệm và sải chân 6.3.1. Đệm 6.3.2. Sải chân 6.3.3. Tóm tắt 6.3.4. Bài tập\n6.3.1. Đệm\n6.3.2. Sải chân\n6.3.3. Tóm tắt\n6.3.4. Bài tập\n6.4. Nhiều kênh đầu vào và nhiều đầu ra 6.4.1. Nhiều kênh đầu vào 6.4.2. Nhiều kênh đầu ra 6.4.3. \\(1\\times 1\\) Lớp phức tạp 6.4.4. Tóm tắt 6.4.5. Bài tập\n6.4.1. Nhiều kênh đầu vào\n6.4.2. Nhiều kênh đầu ra\n6.4.3. \\(1\\times 1\\) Lớp phức tạp\n6.4.4. Tóm tắt\n6.4.5. Bài tập\n6.5. Pooling 6.5.1. Pooling tối đa và Pooling trung bình 6.5.2. Padding và Stride 6.5.3. Nhiều kênh 6.5.4. Tóm tắt 6.5.5. Bài tập\n6.5.1. Pooling tối đa và Pooling trung bình\n6.5.2. Padding và Stride\n6.5.3. Nhiều kênh\n6.5.4. Tóm tắt\n6.5.5. Bài tập\n6.6. Mạng thần kinh phức tạp (LeNet) 6.6.1. LeNet 6.6.2. Đào tạo 6.6.3. Tóm tắt 6.6.4. Bài tập\n6.6.1. LeNet\n6.6.2. Đào tạo\n6.6.3. Tóm tắt\n6.6.4. Bài tập"
+}

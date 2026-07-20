@@ -1,0 +1,273 @@
+{
+  "url": "https://vi.d2l.ai/chapter_preliminaries/pandas.html",
+  "chapter": "chapter_preliminaries",
+  "title": "2.2. Xử lý sơ bộ dữ liệu",
+  "crawled_at": "2026-07-20T12:39:12.355168+00:00",
+  "headings": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "xu-ly-so-bo-du-lieu",
+      "text": "2.2. Xử lý sơ bộ dữ liệu"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "doc-tap-du-lieu",
+      "text": "2.2.1. Đọc tập dữ liệu"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "xu-ly-du-lieu-bi-thieu",
+      "text": "2.2.2. Xử lý dữ liệu bị thiếu"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "chuyen-doi-sang-dinh-dang-tensor",
+      "text": "2.2.3. Chuyển đổi sang định dạng Tensor"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tom-tat",
+      "text": "2.2.4. Tóm tắt"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bai-tap",
+      "text": "2.2.5. Bài tập"
+    }
+  ],
+  "content": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "xu-ly-so-bo-du-lieu",
+      "text": "2.2. Xử lý sơ bộ dữ liệu"
+    },
+    {
+      "type": "paragraph",
+      "text": "Cho đến nay chúng tôi đã giới thiệu một loạt các kỹ thuật để thao tác dữ\nliệu đã được lưu trữ trong hàng chục. Để áp dụng deep learning để giải\nquyết các vấn đề trong thế giới thực, chúng ta thường bắt đầu với tiền\nxử lý dữ liệu thô, thay vì những dữ liệu được chuẩn bị độc đáo ở định\ndạng tensor. Trong số các công cụ phân tích dữ liệu phổ biến trong\nPython, gói pandas thường được sử dụng. Giống như nhiều gói mở rộng\nkhác trong hệ sinh thái rộng lớn của Python, pandas có thể làm việc\ncùng với hàng chục. Vì vậy, chúng tôi sẽ đi qua một thời gian ngắn các\nbước để xử lý trước dữ liệu thô với pandas và chuyển đổi chúng sang\nđịnh dạng tensor. Chúng tôi sẽ đề cập đến nhiều kỹ thuật tiền xử lý dữ\nliệu hơn trong các chương sau."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "doc-tap-du-lieu",
+      "text": "2.2.1. Đọc tập dữ liệu"
+    },
+    {
+      "type": "paragraph",
+      "text": "Ví dụ, chúng ta bắt đầu bằng cách tạo một tập dữ liệu nhân tạo được lưu\ntrữ trong tệp csv (giá trị phân cách bằng dấu phẩy) ../data/house_tiny.csv . Dữ liệu được lưu trữ ở các định dạng khác có\nthể được xử lý theo những cách tương tự."
+    },
+    {
+      "type": "paragraph",
+      "text": "Dưới đây chúng tôi viết từng hàng tập dữ liệu vào một tệp csv."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "import os\n\nos.makedirs(os.path.join('..', 'data'), exist_ok=True)\ndata_file = os.path.join('..', 'data', 'house_tiny.csv')\nwith open(data_file, 'w') as f:\n    f.write('NumRooms,Alley,Price\\n')  # Column names\n    f.write('NA,Pave,127500\\n')  # Each row represents a data example\n    f.write('2,NA,106000\\n')\n    f.write('4,NA,178100\\n')\n    f.write('NA,NA,140000\\n')"
+    },
+    {
+      "type": "paragraph",
+      "text": "Để tải tập dữ liệu thô từ tệp csv đã tạo , chúng tôi nhập gói pandas và gọi hàm read_csv . Tập dữ liệu này có bốn hàng và ba cột, trong đó\nmỗi hàng mô tả số phòng (“NumRooms”), kiểu hẻm (“Alley”), và giá\n(“Price”) của một ngôi nhà."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "# If pandas is not installed, just uncomment the following line:\n# !pip install pandas\nimport pandas as pd\n\ndata = pd.read_csv(data_file)\nprint(data)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "   NumRooms Alley   Price\n0       NaN  Pave  127500\n1       2.0   NaN  106000\n2       4.0   NaN  178100\n3       NaN   NaN  140000"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "# If pandas is not installed, just uncomment the following line:\n# !pip install pandas\nimport pandas as pd\n\ndata = pd.read_csv(data_file)\nprint(data)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "   NumRooms Alley   Price\n0       NaN  Pave  127500\n1       2.0   NaN  106000\n2       4.0   NaN  178100\n3       NaN   NaN  140000"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "# If pandas is not installed, just uncomment the following line:\n# !pip install pandas\nimport pandas as pd\n\ndata = pd.read_csv(data_file)\nprint(data)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "   NumRooms Alley   Price\n0       NaN  Pave  127500\n1       2.0   NaN  106000\n2       4.0   NaN  178100\n3       NaN   NaN  140000"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "xu-ly-du-lieu-bi-thieu",
+      "text": "2.2.2. Xử lý dữ liệu bị thiếu"
+    },
+    {
+      "type": "paragraph",
+      "text": "Lưu ý rằng các mục “nan” bị thiếu giá trị. Để xử lý dữ liệu bị thiếu,\ncác phương pháp điển hình bao gồm imputation và xoá , trong đó\nimputation thay thế các giá trị bị thiếu bằng các giá trị thay thế,\ntrong khi xóa bỏ qua các giá trị bị thiếu. Ở đây chúng tôi sẽ xem xét\nimputation."
+    },
+    {
+      "type": "paragraph",
+      "text": "Bằng cách lập chỉ mục dựa trên vị trí số nguyên ( iloc ), chúng tôi\nchia data thành inputs và outputs , trong đó cái trước lấy\nhai cột đầu tiên trong khi cột sau chỉ giữ cột cuối cùng. Đối với các\ngiá trị số trong inputs bị thiếu, chúng ta thay thế các mục “nan”\nbằng giá trị trung bình của cùng một cột."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "inputs, outputs = data.iloc[:, 0:2], data.iloc[:, 2]\ninputs = inputs.fillna(inputs.mean())\nprint(inputs)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "   NumRooms Alley\n0       3.0  Pave\n1       2.0   NaN\n2       4.0   NaN\n3       3.0   NaN"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "inputs, outputs = data.iloc[:, 0:2], data.iloc[:, 2]\ninputs = inputs.fillna(inputs.mean())\nprint(inputs)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "   NumRooms Alley\n0       3.0  Pave\n1       2.0   NaN\n2       4.0   NaN\n3       3.0   NaN"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "inputs, outputs = data.iloc[:, 0:2], data.iloc[:, 2]\ninputs = inputs.fillna(inputs.mean())\nprint(inputs)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "   NumRooms Alley\n0       3.0  Pave\n1       2.0   NaN\n2       4.0   NaN\n3       3.0   NaN"
+    },
+    {
+      "type": "paragraph",
+      "text": "Đối với các giá trị phân loại hoặc rời rạc trong inputs , chúng tôi\ncoi “nan” là một thể loại. Vì cột “Alley” chỉ lấy hai loại giá trị phân\nloại “Pave” và “nan”, pandas có thể tự động chuyển đổi cột này thành\nhai cột “Alley_Pave” và “Alley_nan”. Một hàng có kiểu hẻm là “Pave” sẽ\nđặt giá trị của “Alley_Pave” và “Alley_nan” thành 1 và 0. Một hàng có\nkiểu hẻm bị thiếu sẽ đặt giá trị của chúng thành 0 và 1."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "inputs = pd.get_dummies(inputs, dummy_na=True)\nprint(inputs)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "   NumRooms  Alley_Pave  Alley_nan\n0       3.0           1          0\n1       2.0           0          1\n2       4.0           0          1\n3       3.0           0          1"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "inputs = pd.get_dummies(inputs, dummy_na=True)\nprint(inputs)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "   NumRooms  Alley_Pave  Alley_nan\n0       3.0           1          0\n1       2.0           0          1\n2       4.0           0          1\n3       3.0           0          1"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "inputs = pd.get_dummies(inputs, dummy_na=True)\nprint(inputs)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "   NumRooms  Alley_Pave  Alley_nan\n0       3.0           1          0\n1       2.0           0          1\n2       4.0           0          1\n3       3.0           0          1"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "chuyen-doi-sang-dinh-dang-tensor",
+      "text": "2.2.3. Chuyển đổi sang định dạng Tensor"
+    },
+    {
+      "type": "paragraph",
+      "text": "Bây giờ tất cả các mục trong inputs và outputs đều là số, chúng\ncó thể được chuyển đổi sang định dạng tensor. Khi dữ liệu ở định dạng\nnày, chúng có thể được thao tác thêm với các chức năng tensor mà chúng\ntôi đã giới thiệu trong Section 2.1 ."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "from mxnet import np\n\nX, y = np.array(inputs.values), np.array(outputs.values)\nX, y"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "(array([[3., 1., 0.],\n        [2., 0., 1.],\n        [4., 0., 1.],\n        [3., 0., 1.]], dtype=float64),\n array([127500, 106000, 178100, 140000], dtype=int64))"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "import torch\n\nX, y = torch.tensor(inputs.values), torch.tensor(outputs.values)\nX, y"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "(tensor([[3., 1., 0.],\n         [2., 0., 1.],\n         [4., 0., 1.],\n         [3., 0., 1.]], dtype=torch.float64),\n tensor([127500, 106000, 178100, 140000]))"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "import tensorflow as tf\n\nX, y = tf.constant(inputs.values), tf.constant(outputs.values)\nX, y"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "(<tf.Tensor: shape=(4, 3), dtype=float64, numpy=\n array([[3., 1., 0.],\n        [2., 0., 1.],\n        [4., 0., 1.],\n        [3., 0., 1.]])>,\n <tf.Tensor: shape=(4,), dtype=int64, numpy=array([127500, 106000, 178100, 140000])>)"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tom-tat",
+      "text": "2.2.4. Tóm tắt"
+    },
+    {
+      "type": "list",
+      "ordered": false,
+      "items": [
+        "Giống như nhiều gói mở rộng khác trong hệ sinh thái rộng lớn của\nPython, pandas có thể làm việc cùng với hàng chục.",
+        "Imputation và xóa có thể được sử dụng để xử lý dữ liệu bị thiếu."
+      ]
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bai-tap",
+      "text": "2.2.5. Bài tập"
+    },
+    {
+      "type": "paragraph",
+      "text": "Tạo một tập dữ liệu thô với nhiều hàng và cột hơn."
+    },
+    {
+      "type": "list",
+      "ordered": true,
+      "items": [
+        "Xóa cột với các giá trị còn thiếu nhiều nhất.",
+        "Chuyển đổi tập dữ liệu được xử lý trước sang định dạng tensor."
+      ]
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    }
+  ],
+  "images": [],
+  "text": "2.2. Xử lý sơ bộ dữ liệu\nCho đến nay chúng tôi đã giới thiệu một loạt các kỹ thuật để thao tác dữ\nliệu đã được lưu trữ trong hàng chục. Để áp dụng deep learning để giải\nquyết các vấn đề trong thế giới thực, chúng ta thường bắt đầu với tiền\nxử lý dữ liệu thô, thay vì những dữ liệu được chuẩn bị độc đáo ở định\ndạng tensor. Trong số các công cụ phân tích dữ liệu phổ biến trong\nPython, gói pandas thường được sử dụng. Giống như nhiều gói mở rộng\nkhác trong hệ sinh thái rộng lớn của Python, pandas có thể làm việc\ncùng với hàng chục. Vì vậy, chúng tôi sẽ đi qua một thời gian ngắn các\nbước để xử lý trước dữ liệu thô với pandas và chuyển đổi chúng sang\nđịnh dạng tensor. Chúng tôi sẽ đề cập đến nhiều kỹ thuật tiền xử lý dữ\nliệu hơn trong các chương sau.\n2.2.1. Đọc tập dữ liệu\nVí dụ, chúng ta bắt đầu bằng cách tạo một tập dữ liệu nhân tạo được lưu\ntrữ trong tệp csv (giá trị phân cách bằng dấu phẩy) ../data/house_tiny.csv . Dữ liệu được lưu trữ ở các định dạng khác có\nthể được xử lý theo những cách tương tự.\nDưới đây chúng tôi viết từng hàng tập dữ liệu vào một tệp csv.\nĐể tải tập dữ liệu thô từ tệp csv đã tạo , chúng tôi nhập gói pandas và gọi hàm read_csv . Tập dữ liệu này có bốn hàng và ba cột, trong đó\nmỗi hàng mô tả số phòng (“NumRooms”), kiểu hẻm (“Alley”), và giá\n(“Price”) của một ngôi nhà.\n2.2.2. Xử lý dữ liệu bị thiếu\nLưu ý rằng các mục “nan” bị thiếu giá trị. Để xử lý dữ liệu bị thiếu,\ncác phương pháp điển hình bao gồm imputation và xoá , trong đó\nimputation thay thế các giá trị bị thiếu bằng các giá trị thay thế,\ntrong khi xóa bỏ qua các giá trị bị thiếu. Ở đây chúng tôi sẽ xem xét\nimputation.\nBằng cách lập chỉ mục dựa trên vị trí số nguyên ( iloc ), chúng tôi\nchia data thành inputs và outputs , trong đó cái trước lấy\nhai cột đầu tiên trong khi cột sau chỉ giữ cột cuối cùng. Đối với các\ngiá trị số trong inputs bị thiếu, chúng ta thay thế các mục “nan”\nbằng giá trị trung bình của cùng một cột.\nĐối với các giá trị phân loại hoặc rời rạc trong inputs , chúng tôi\ncoi “nan” là một thể loại. Vì cột “Alley” chỉ lấy hai loại giá trị phân\nloại “Pave” và “nan”, pandas có thể tự động chuyển đổi cột này thành\nhai cột “Alley_Pave” và “Alley_nan”. Một hàng có kiểu hẻm là “Pave” sẽ\nđặt giá trị của “Alley_Pave” và “Alley_nan” thành 1 và 0. Một hàng có\nkiểu hẻm bị thiếu sẽ đặt giá trị của chúng thành 0 và 1.\n2.2.3. Chuyển đổi sang định dạng Tensor\nBây giờ tất cả các mục trong inputs và outputs đều là số, chúng\ncó thể được chuyển đổi sang định dạng tensor. Khi dữ liệu ở định dạng\nnày, chúng có thể được thao tác thêm với các chức năng tensor mà chúng\ntôi đã giới thiệu trong Section 2.1 .\n2.2.4. Tóm tắt\nGiống như nhiều gói mở rộng khác trong hệ sinh thái rộng lớn của\nPython, pandas có thể làm việc cùng với hàng chục.\nImputation và xóa có thể được sử dụng để xử lý dữ liệu bị thiếu.\n2.2.5. Bài tập\nTạo một tập dữ liệu thô với nhiều hàng và cột hơn.\nXóa cột với các giá trị còn thiếu nhiều nhất.\nChuyển đổi tập dữ liệu được xử lý trước sang định dạng tensor.\nDiscussions\nDiscussions\nDiscussions"
+}

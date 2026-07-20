@@ -1,0 +1,336 @@
+{
+  "url": "https://vi.d2l.ai/chapter_recurrent-neural-networks/rnn-concise.html",
+  "chapter": "chapter_recurrent-neural-networks",
+  "title": "8.6. Thực hiện ngắn gọn các mạng nơ-ron tái phát",
+  "crawled_at": "2026-07-20T12:40:00.785713+00:00",
+  "headings": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "thuc-hien-ngan-gon-cac-mang-no-ron-tai-phat",
+      "text": "8.6. Thực hiện ngắn gọn các mạng nơ-ron tái phát"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "dinh-nghia-mau",
+      "text": "8.6.1. Định nghĩa mẫu"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "dao-tao-va-du-doan",
+      "text": "8.6.2. Đào tạo và dự đoán"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tom-tat",
+      "text": "8.6.3. Tóm tắt"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bai-tap",
+      "text": "8.6.4. Bài tập"
+    }
+  ],
+  "content": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "thuc-hien-ngan-gon-cac-mang-no-ron-tai-phat",
+      "text": "8.6. Thực hiện ngắn gọn các mạng nơ-ron tái phát"
+    },
+    {
+      "type": "paragraph",
+      "text": "Trong khi Section 8.5 được hướng dẫn để xem RNN được\nthực hiện như thế nào, điều này không thuận tiện hay nhanh chóng. Phần\nnày sẽ chỉ ra cách triển khai cùng một mô hình ngôn ngữ hiệu quả hơn\nbằng cách sử dụng các hàm được cung cấp bởi các API cấp cao của một\nkhuôn khổ học sâu. Chúng tôi bắt đầu như trước bằng cách đọc tập dữ liệu\nmáy thời gian."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "from mxnet import np, npx\nfrom mxnet.gluon import nn, rnn\nfrom d2l import mxnet as d2l\n\nnpx.set_np()\n\nbatch_size, num_steps = 32, 35\ntrain_iter, vocab = d2l.load_data_time_machine(batch_size, num_steps)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "import torch\nfrom torch import nn\nfrom torch.nn import functional as F\nfrom d2l import torch as d2l\n\nbatch_size, num_steps = 32, 35\ntrain_iter, vocab = d2l.load_data_time_machine(batch_size, num_steps)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "import tensorflow as tf\nfrom d2l import tensorflow as d2l\n\nbatch_size, num_steps = 32, 35\ntrain_iter, vocab = d2l.load_data_time_machine(batch_size, num_steps)"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "dinh-nghia-mau",
+      "text": "8.6.1. Định nghĩa mẫu"
+    },
+    {
+      "type": "paragraph",
+      "text": "API cấp cao cung cấp triển khai các mạng thần kinh định kỳ. Chúng tôi\nxây dựng lớp mạng thần kinh tái phát rnn_layer với một lớp ẩn duy\nnhất và 256 đơn vị ẩn. Trên thực tế, chúng tôi thậm chí còn chưa thảo\nluận về ý nghĩa của việc có nhiều lớp — điều này sẽ xảy ra trong Section 9.3 . Hiện tại, đủ để nói rằng nhiều lớp chỉ đơn\ngiản là lên đến đầu ra của một lớp RNN được sử dụng làm đầu vào cho lớp\ntiếp theo của RNN."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "num_hiddens = 256\nrnn_layer = rnn.RNN(num_hiddens)\nrnn_layer.initialize()"
+    },
+    {
+      "type": "paragraph",
+      "text": "Khởi tạo trạng thái ẩn là đơn giản. Chúng tôi gọi hàm thành viên begin_state . Điều này trả về một danh sách ( state ) chứa một\ntrạng thái ẩn ban đầu cho mỗi ví dụ trong minibatch, có hình dạng là (số\nlớp ẩn, kích thước lô, số đơn vị ẩn). Đối với một số mô hình được giới\nthiệu sau (ví dụ: bộ nhớ ngắn hạn dài), một danh sách như vậy cũng chứa\ncác thông tin khác."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "state = rnn_layer.begin_state(batch_size=batch_size)\nlen(state), state[0].shape"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "(1, (1, 32, 256))"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "num_hiddens = 256\nrnn_layer = nn.RNN(len(vocab), num_hiddens)"
+    },
+    {
+      "type": "paragraph",
+      "text": "Chúng tôi sử dụng một tensor để khởi tạo trạng thái ẩn, có hình dạng là\n(số lớp ẩn, kích thước lô, số đơn vị ẩn)."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "state = torch.zeros((1, batch_size, num_hiddens))\nstate.shape"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "torch.Size([1, 32, 256])"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "num_hiddens = 256\nrnn_cell = tf.keras.layers.SimpleRNNCell(num_hiddens,\n    kernel_initializer='glorot_uniform')\nrnn_layer = tf.keras.layers.RNN(rnn_cell, time_major=True,\n    return_sequences=True, return_state=True)\n\nstate = rnn_cell.get_initial_state(batch_size=batch_size, dtype=tf.float32)\nstate.shape"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "TensorShape([32, 256])"
+    },
+    {
+      "type": "paragraph",
+      "text": "Với trạng thái ẩn và đầu vào, chúng ta có thể tính toán đầu ra với trạng\nthái ẩn cập nhật. Cần nhấn mạnh rằng “đầu ra” ( Y ) của rnn_layer không * không* liên quan đến tính toán các lớp đầu ra: nó đề cập đến\ntrạng thái ẩn ở bước thời gian * mỗi* và chúng có thể được sử dụng làm\nđầu vào cho lớp đầu ra tiếp theo."
+    },
+    {
+      "type": "paragraph",
+      "text": "Bên cạnh đó, trạng thái ẩn được cập nhật ( state_new ) trả về bởi rnn_layer đề cập đến trạng thái ẩn ở bước thời gian last của\nminibatch. Nó có thể được sử dụng để khởi tạo trạng thái ẩn cho\nminibatch tiếp theo trong một kỷ nguyên trong phân vùng tuần tự. Đối với\nnhiều lớp ẩn, trạng thái ẩn của mỗi lớp sẽ được lưu trữ trong biến này\n( state_new ). Đối với một số mô hình được giới thiệu sau (ví dụ: bộ\nnhớ ngắn hạn dài), biến này cũng chứa các thông tin khác."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "X = np.random.uniform(size=(num_steps, batch_size, len(vocab)))\nY, state_new = rnn_layer(X, state)\nY.shape, len(state_new), state_new[0].shape"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "((35, 32, 256), 1, (1, 32, 256))"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "X = torch.rand(size=(num_steps, batch_size, len(vocab)))\nY, state_new = rnn_layer(X, state)\nY.shape, state_new.shape"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "(torch.Size([35, 32, 256]), torch.Size([1, 32, 256]))"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "X = tf.random.uniform((num_steps, batch_size, len(vocab)))\nY, state_new = rnn_layer(X, state)\nY.shape, len(state_new), state_new[0].shape"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "(TensorShape([35, 32, 256]), 32, TensorShape([256]))"
+    },
+    {
+      "type": "paragraph",
+      "text": "Tương tự như Section 8.5 , chúng tôi định nghĩa một lớp RNNModel cho một mô hình RNN hoàn chỉnh Lưu ý rằng rnn_layer chỉ\nchứa các lớp tái phát ẩn, chúng ta cần tạo một lớp đầu ra riêng biệt."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "#@save\nclass RNNModel(nn.Block):\n    \"\"\"The RNN model.\"\"\"\n    def __init__(self, rnn_layer, vocab_size, **kwargs):\n        super(RNNModel, self).__init__(**kwargs)\n        self.rnn = rnn_layer\n        self.vocab_size = vocab_size\n        self.dense = nn.Dense(vocab_size)\n\n    def forward(self, inputs, state):\n        X = npx.one_hot(inputs.T, self.vocab_size)\n        Y, state = self.rnn(X, state)\n        # The fully-connected layer will first change the shape of `Y` to\n        # (`num_steps` * `batch_size`, `num_hiddens`). Its output shape is\n        # (`num_steps` * `batch_size`, `vocab_size`).\n        output = self.dense(Y.reshape(-1, Y.shape[-1]))\n        return output, state\n\n    def begin_state(self, *args, **kwargs):\n        return self.rnn.begin_state(*args, **kwargs)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "#@save\nclass RNNModel(nn.Module):\n    \"\"\"The RNN model.\"\"\"\n    def __init__(self, rnn_layer, vocab_size, **kwargs):\n        super(RNNModel, self).__init__(**kwargs)\n        self.rnn = rnn_layer\n        self.vocab_size = vocab_size\n        self.num_hiddens = self.rnn.hidden_size\n        # If the RNN is bidirectional (to be introduced later),\n        # `num_directions` should be 2, else it should be 1.\n        if not self.rnn.bidirectional:\n            self.num_directions = 1\n            self.linear = nn.Linear(self.num_hiddens, self.vocab_size)\n        else:\n            self.num_directions = 2\n            self.linear = nn.Linear(self.num_hiddens * 2, self.vocab_size)\n\n    def forward(self, inputs, state):\n        X = F.one_hot(inputs.T.long(), self.vocab_size)\n        X = X.to(torch.float32)\n        Y, state = self.rnn(X, state)\n        # The fully connected layer will first change the shape of `Y` to\n        # (`num_steps` * `batch_size`, `num_hiddens`). Its output shape is\n        # (`num_steps` * `batch_size`, `vocab_size`).\n        output = self.linear(Y.reshape((-1, Y.shape[-1])))\n        return output, state\n\n    def begin_state(self, device, batch_size=1):\n        if not isinstance(self.rnn, nn.LSTM):\n            # `nn.GRU` takes a tensor as hidden state\n            return  torch.zeros((self.num_directions * self.rnn.num_layers,\n                                 batch_size, self.num_hiddens),\n                                device=device)\n        else:\n            # `nn.LSTM` takes a tuple of hidden states\n            return (torch.zeros((\n                self.num_directions * self.rnn.num_layers,\n                batch_size, self.num_hiddens), device=device),\n                    torch.zeros((\n                        self.num_directions * self.rnn.num_layers,\n                        batch_size, self.num_hiddens), device=device))"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "#@save\nclass RNNModel(tf.keras.layers.Layer):\n    def __init__(self, rnn_layer, vocab_size, **kwargs):\n        super(RNNModel, self).__init__(**kwargs)\n        self.rnn = rnn_layer\n        self.vocab_size = vocab_size\n        self.dense = tf.keras.layers.Dense(vocab_size)\n\n    def call(self, inputs, state):\n        X = tf.one_hot(tf.transpose(inputs), self.vocab_size)\n        # Later RNN like `tf.keras.layers.LSTMCell` return more than two values\n        Y, *state = self.rnn(X, state)\n        output = self.dense(tf.reshape(Y, (-1, Y.shape[-1])))\n        return output, state\n\n    def begin_state(self, *args, **kwargs):\n        return self.rnn.cell.get_initial_state(*args, **kwargs)"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "dao-tao-va-du-doan",
+      "text": "8.6.2. Đào tạo và dự đoán"
+    },
+    {
+      "type": "paragraph",
+      "text": "Trước khi đào tạo mô hình, chúng ta hãy đưa ra dự đoán với một mô hình\ncó trọng lượng ngẫu nhiên."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "device = d2l.try_gpu()\nnet = RNNModel(rnn_layer, len(vocab))\nnet.initialize(force_reinit=True, ctx=device)\nd2l.predict_ch8('time traveller', 10, net, vocab, device)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "'time travellervmoopwrrrr'"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "device = d2l.try_gpu()\nnet = RNNModel(rnn_layer, vocab_size=len(vocab))\nnet = net.to(device)\nd2l.predict_ch8('time traveller', 10, net, vocab, device)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "'time travellerxxxxxxxxxx'"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "device_name = d2l.try_gpu()._device_name\nstrategy = tf.distribute.OneDeviceStrategy(device_name)\nwith strategy.scope():\n    net = RNNModel(rnn_layer, vocab_size=len(vocab))\n\nd2l.predict_ch8('time traveller', 10, net, vocab)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "'time travellerjlclggqtfr'"
+    },
+    {
+      "type": "paragraph",
+      "text": "Như là khá rõ ràng, mô hình này hoàn toàn không hoạt động. Tiếp theo,\nchúng tôi gọi train_ch8 với các siêu tham số tương tự được xác định\ntrong Section 8.5 và đào tạo mô hình của chúng tôi với\nAPIs** cấp cao."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "num_epochs, lr = 500, 1\nd2l.train_ch8(net, train_iter, vocab, lr, num_epochs, device)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "perplexity 1.2, 131898.2 tokens/sec on gpu(0)\ntime traveller held the time dimension with a uniformvelocity fr\ntraveller for so it well they couldmmst an the mather the p"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_rnn-concise_eff2f4_68_1.svg",
+      "local_path": "_images/output_rnn-concise_eff2f4_68_1.svg",
+      "alt": "../_images/output_rnn-concise_eff2f4_68_1.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "num_epochs, lr = 500, 1\nd2l.train_ch8(net, train_iter, vocab, lr, num_epochs, device)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "perplexity 1.3, 286577.9 tokens/sec on cuda:0\ntime traveller proceeded anyong the eread must uply helo bree th\ntravelleryou can show black is white by argumed thave back"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_rnn-concise_eff2f4_71_1.svg",
+      "local_path": "_images/output_rnn-concise_eff2f4_71_1.svg",
+      "alt": "../_images/output_rnn-concise_eff2f4_71_1.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "num_epochs, lr = 500, 1\nd2l.train_ch8(net, train_iter, vocab, lr, num_epochs, strategy)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "perplexity 1.3, 15412.8 tokens/sec on /GPU:0\ntime traveller after the pauserequired for the proper assimilati\ntraveller of co urealy abmeding wion anof thed than ansmith"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_rnn-concise_eff2f4_74_1.svg",
+      "local_path": "_images/output_rnn-concise_eff2f4_74_1.svg",
+      "alt": "../_images/output_rnn-concise_eff2f4_74_1.svg"
+    },
+    {
+      "type": "paragraph",
+      "text": "So với phần cuối, mô hình này đạt được sự bối rối tương đương, mặc dù\ntrong một khoảng thời gian ngắn hơn, do mã được tối ưu hóa hơn bởi các\nAPI cấp cao của khung học sâu."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tom-tat",
+      "text": "8.6.3. Tóm tắt"
+    },
+    {
+      "type": "list",
+      "ordered": false,
+      "items": [
+        "API cấp cao của khung học sâu cung cấp một triển khai của lớp RNN.",
+        "Lớp RNN của API cấp cao trả về một đầu ra và trạng thái ẩn cập nhật,\ntrong đó đầu ra không liên quan đến tính toán lớp đầu ra.",
+        "Sử dụng API cấp cao dẫn đến đào tạo RNN nhanh hơn so với sử dụng\ntriển khai từ đầu."
+      ]
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bai-tap",
+      "text": "8.6.4. Bài tập"
+    },
+    {
+      "type": "list",
+      "ordered": true,
+      "items": [
+        "Bạn có thể làm cho mô hình RNN overfit bằng cách sử dụng các API cấp\ncao không?",
+        "Điều gì sẽ xảy ra nếu bạn tăng số lượng các lớp ẩn trong mô hình RNN?\nBạn có thể làm cho mô hình hoạt động?",
+        "Thực hiện mô hình autoregressive của Section 8.1 bằng\ncách sử dụng một RNN."
+      ]
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    }
+  ],
+  "images": [
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_rnn-concise_eff2f4_68_1.svg",
+      "local_path": "_images/output_rnn-concise_eff2f4_68_1.svg",
+      "alt": "../_images/output_rnn-concise_eff2f4_68_1.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_rnn-concise_eff2f4_71_1.svg",
+      "local_path": "_images/output_rnn-concise_eff2f4_71_1.svg",
+      "alt": "../_images/output_rnn-concise_eff2f4_71_1.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_rnn-concise_eff2f4_74_1.svg",
+      "local_path": "_images/output_rnn-concise_eff2f4_74_1.svg",
+      "alt": "../_images/output_rnn-concise_eff2f4_74_1.svg"
+    }
+  ],
+  "text": "8.6. Thực hiện ngắn gọn các mạng nơ-ron tái phát\nTrong khi Section 8.5 được hướng dẫn để xem RNN được\nthực hiện như thế nào, điều này không thuận tiện hay nhanh chóng. Phần\nnày sẽ chỉ ra cách triển khai cùng một mô hình ngôn ngữ hiệu quả hơn\nbằng cách sử dụng các hàm được cung cấp bởi các API cấp cao của một\nkhuôn khổ học sâu. Chúng tôi bắt đầu như trước bằng cách đọc tập dữ liệu\nmáy thời gian.\n8.6.1. Định nghĩa mẫu\nAPI cấp cao cung cấp triển khai các mạng thần kinh định kỳ. Chúng tôi\nxây dựng lớp mạng thần kinh tái phát rnn_layer với một lớp ẩn duy\nnhất và 256 đơn vị ẩn. Trên thực tế, chúng tôi thậm chí còn chưa thảo\nluận về ý nghĩa của việc có nhiều lớp — điều này sẽ xảy ra trong Section 9.3 . Hiện tại, đủ để nói rằng nhiều lớp chỉ đơn\ngiản là lên đến đầu ra của một lớp RNN được sử dụng làm đầu vào cho lớp\ntiếp theo của RNN.\nKhởi tạo trạng thái ẩn là đơn giản. Chúng tôi gọi hàm thành viên begin_state . Điều này trả về một danh sách ( state ) chứa một\ntrạng thái ẩn ban đầu cho mỗi ví dụ trong minibatch, có hình dạng là (số\nlớp ẩn, kích thước lô, số đơn vị ẩn). Đối với một số mô hình được giới\nthiệu sau (ví dụ: bộ nhớ ngắn hạn dài), một danh sách như vậy cũng chứa\ncác thông tin khác.\nChúng tôi sử dụng một tensor để khởi tạo trạng thái ẩn, có hình dạng là\n(số lớp ẩn, kích thước lô, số đơn vị ẩn).\nVới trạng thái ẩn và đầu vào, chúng ta có thể tính toán đầu ra với trạng\nthái ẩn cập nhật. Cần nhấn mạnh rằng “đầu ra” ( Y ) của rnn_layer không * không* liên quan đến tính toán các lớp đầu ra: nó đề cập đến\ntrạng thái ẩn ở bước thời gian * mỗi* và chúng có thể được sử dụng làm\nđầu vào cho lớp đầu ra tiếp theo.\nBên cạnh đó, trạng thái ẩn được cập nhật ( state_new ) trả về bởi rnn_layer đề cập đến trạng thái ẩn ở bước thời gian last của\nminibatch. Nó có thể được sử dụng để khởi tạo trạng thái ẩn cho\nminibatch tiếp theo trong một kỷ nguyên trong phân vùng tuần tự. Đối với\nnhiều lớp ẩn, trạng thái ẩn của mỗi lớp sẽ được lưu trữ trong biến này\n( state_new ). Đối với một số mô hình được giới thiệu sau (ví dụ: bộ\nnhớ ngắn hạn dài), biến này cũng chứa các thông tin khác.\nTương tự như Section 8.5 , chúng tôi định nghĩa một lớp RNNModel cho một mô hình RNN hoàn chỉnh Lưu ý rằng rnn_layer chỉ\nchứa các lớp tái phát ẩn, chúng ta cần tạo một lớp đầu ra riêng biệt.\n8.6.2. Đào tạo và dự đoán\nTrước khi đào tạo mô hình, chúng ta hãy đưa ra dự đoán với một mô hình\ncó trọng lượng ngẫu nhiên.\nNhư là khá rõ ràng, mô hình này hoàn toàn không hoạt động. Tiếp theo,\nchúng tôi gọi train_ch8 với các siêu tham số tương tự được xác định\ntrong Section 8.5 và đào tạo mô hình của chúng tôi với\nAPIs** cấp cao.\nSo với phần cuối, mô hình này đạt được sự bối rối tương đương, mặc dù\ntrong một khoảng thời gian ngắn hơn, do mã được tối ưu hóa hơn bởi các\nAPI cấp cao của khung học sâu.\n8.6.3. Tóm tắt\nAPI cấp cao của khung học sâu cung cấp một triển khai của lớp RNN.\nLớp RNN của API cấp cao trả về một đầu ra và trạng thái ẩn cập nhật,\ntrong đó đầu ra không liên quan đến tính toán lớp đầu ra.\nSử dụng API cấp cao dẫn đến đào tạo RNN nhanh hơn so với sử dụng\ntriển khai từ đầu.\n8.6.4. Bài tập\nBạn có thể làm cho mô hình RNN overfit bằng cách sử dụng các API cấp\ncao không?\nĐiều gì sẽ xảy ra nếu bạn tăng số lượng các lớp ẩn trong mô hình RNN?\nBạn có thể làm cho mô hình hoạt động?\nThực hiện mô hình autoregressive của Section 8.1 bằng\ncách sử dụng một RNN.\nDiscussions\nDiscussions\nDiscussions"
+}

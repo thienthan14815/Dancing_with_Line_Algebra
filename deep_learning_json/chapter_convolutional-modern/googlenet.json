@@ -1,0 +1,385 @@
+{
+  "url": "https://vi.d2l.ai/chapter_convolutional-modern/googlenet.html",
+  "chapter": "chapter_convolutional-modern",
+  "title": "7.4. Mạng có kết nối song song (GoogLeNet)",
+  "crawled_at": "2026-07-20T12:39:50.844177+00:00",
+  "headings": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "mang-co-ket-noi-song-song-googlenet",
+      "text": "7.4. Mạng có kết nối song song (GoogLeNet)"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "chong-bat-noi",
+      "text": "7.4.1. Chống** Bắt nối"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "mo-hinh-googlenet",
+      "text": "7.4.2. Mô hình GoogLeNet"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "dao-tao",
+      "text": "7.4.3. Đào tạo"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tom-tat",
+      "text": "7.4.4. Tóm tắt"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bai-tap",
+      "text": "7.4.5. Bài tập"
+    }
+  ],
+  "content": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "mang-co-ket-noi-song-song-googlenet",
+      "text": "7.4. Mạng có kết nối song song (GoogLeNet)"
+    },
+    {
+      "type": "paragraph",
+      "text": "Năm 2014, GoogLeNet giành chiến thắng trong ImageNet Challenge, đề\nxuất một cấu trúc kết hợp các thế mạnh của Nin và mô hình của các khối\nlặp lại [Szegedy et al., 2015] . Một trọng tâm của bài báo là\ngiải quyết câu hỏi về hạt nhân có kích thước nào là tốt nhất. Rốt cuộc,\ncác mạng phổ biến trước đây sử dụng các lựa chọn nhỏ tới \\(1 \\times 1\\) và lớn tới \\(11 \\times 11\\) . Một cái nhìn sâu sắc\ntrong bài báo này là đôi khi nó có thể thuận lợi để sử dụng một sự kết\nhợp của các hạt nhân có kích thước đa dạng. Trong phần này, chúng tôi sẽ\ngiới thiệu GoogLeNet, trình bày một phiên bản đơn giản hóa một chút của\nmô hình gốc: chúng tôi bỏ qua một vài tính năng đặc biệt đã được thêm\nvào để ổn định đào tạo nhưng bây giờ không cần thiết với các thuật toán\nđào tạo tốt hơn có sẵn."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "chong-bat-noi",
+      "text": "7.4.1. Chống** Bắt nối"
+    },
+    {
+      "type": "paragraph",
+      "text": "Khối phức tạp cơ bản trong GoogLeNet được gọi là khối Inception *, có\nthể được đặt tên do một trích dẫn từ bộ phim *Inception (“Chúng ta cần\nphải đi sâu hơn”), đã đưa ra một meme virus."
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/inception.svg",
+      "local_path": "_images/inception.svg",
+      "alt": "../_images/inception.svg"
+    },
+    {
+      "type": "paragraph",
+      "text": "Fig. 7.4.1 Structure of the Inception block. ¶"
+    },
+    {
+      "type": "paragraph",
+      "text": "Như được mô tả trong Fig. 7.4.1 , khối khởi đầu bao gồm\nbốn con đường song song. Ba đường dẫn đầu tiên sử dụng các lớp phức tạp\nvới kích thước cửa sổ \\(1\\times 1\\) , \\(3\\times 3\\) và \\(5\\times 5\\) để trích xuất thông tin từ các kích thước không gian\nkhác nhau. Hai đường dẫn giữa thực hiện sự phức tạp \\(1\\times 1\\) trên đầu vào để giảm số lượng kênh, giảm độ phức tạp của mô hình. Đường\ndẫn thứ tư sử dụng một lớp tổng hợp tối đa \\(3\\times 3\\) , tiếp theo\nlà một lớp ghép \\(1\\times 1\\) để thay đổi số kênh. Bốn đường dẫn đều\nsử dụng đệm thích hợp để cung cấp cho đầu vào và đầu ra cùng chiều cao\nvà chiều rộng. Cuối cùng, các đầu ra dọc theo mỗi đường dẫn được nối dọc\ntheo kích thước kênh và bao gồm đầu ra của khối. Các siêu tham số được\nđiều chỉnh chung của khối Inception là số kênh đầu ra trên mỗi lớp."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "from mxnet import np, npx\nfrom mxnet.gluon import nn\nfrom d2l import mxnet as d2l\n\nnpx.set_np()\n\nclass Inception(nn.Block):\n    # `c1`--`c4` are the number of output channels for each path\n    def __init__(self, c1, c2, c3, c4, **kwargs):\n        super(Inception, self).__init__(**kwargs)\n        # Path 1 is a single 1 x 1 convolutional layer\n        self.p1_1 = nn.Conv2D(c1, kernel_size=1, activation='relu')\n        # Path 2 is a 1 x 1 convolutional layer followed by a 3 x 3\n        # convolutional layer\n        self.p2_1 = nn.Conv2D(c2[0], kernel_size=1, activation='relu')\n        self.p2_2 = nn.Conv2D(c2[1], kernel_size=3, padding=1,\n                              activation='relu')\n        # Path 3 is a 1 x 1 convolutional layer followed by a 5 x 5\n        # convolutional layer\n        self.p3_1 = nn.Conv2D(c3[0], kernel_size=1, activation='relu')\n        self.p3_2 = nn.Conv2D(c3[1], kernel_size=5, padding=2,\n                              activation='relu')\n        # Path 4 is a 3 x 3 maximum pooling layer followed by a 1 x 1\n        # convolutional layer\n        self.p4_1 = nn.MaxPool2D(pool_size=3, strides=1, padding=1)\n        self.p4_2 = nn.Conv2D(c4, kernel_size=1, activation='relu')\n\n    def forward(self, x):\n        p1 = self.p1_1(x)\n        p2 = self.p2_2(self.p2_1(x))\n        p3 = self.p3_2(self.p3_1(x))\n        p4 = self.p4_2(self.p4_1(x))\n        # Concatenate the outputs on the channel dimension\n        return np.concatenate((p1, p2, p3, p4), axis=1)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "import torch\nfrom torch import nn\nfrom torch.nn import functional as F\nfrom d2l import torch as d2l\n\n\nclass Inception(nn.Module):\n    # `c1`--`c4` are the number of output channels for each path\n    def __init__(self, in_channels, c1, c2, c3, c4, **kwargs):\n        super(Inception, self).__init__(**kwargs)\n        # Path 1 is a single 1 x 1 convolutional layer\n        self.p1_1 = nn.Conv2d(in_channels, c1, kernel_size=1)\n        # Path 2 is a 1 x 1 convolutional layer followed by a 3 x 3\n        # convolutional layer\n        self.p2_1 = nn.Conv2d(in_channels, c2[0], kernel_size=1)\n        self.p2_2 = nn.Conv2d(c2[0], c2[1], kernel_size=3, padding=1)\n        # Path 3 is a 1 x 1 convolutional layer followed by a 5 x 5\n        # convolutional layer\n        self.p3_1 = nn.Conv2d(in_channels, c3[0], kernel_size=1)\n        self.p3_2 = nn.Conv2d(c3[0], c3[1], kernel_size=5, padding=2)\n        # Path 4 is a 3 x 3 maximum pooling layer followed by a 1 x 1\n        # convolutional layer\n        self.p4_1 = nn.MaxPool2d(kernel_size=3, stride=1, padding=1)\n        self.p4_2 = nn.Conv2d(in_channels, c4, kernel_size=1)\n\n    def forward(self, x):\n        p1 = F.relu(self.p1_1(x))\n        p2 = F.relu(self.p2_2(F.relu(self.p2_1(x))))\n        p3 = F.relu(self.p3_2(F.relu(self.p3_1(x))))\n        p4 = F.relu(self.p4_2(self.p4_1(x)))\n        # Concatenate the outputs on the channel dimension\n        return torch.cat((p1, p2, p3, p4), dim=1)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "import tensorflow as tf\nfrom d2l import tensorflow as d2l\n\n\nclass Inception(tf.keras.Model):\n    # `c1`--`c4` are the number of output channels for each path\n    def __init__(self, c1, c2, c3, c4):\n        super().__init__()\n        # Path 1 is a single 1 x 1 convolutional layer\n        self.p1_1 = tf.keras.layers.Conv2D(c1, 1, activation='relu')\n        # Path 2 is a 1 x 1 convolutional layer followed by a 3 x 3\n        # convolutional layer\n        self.p2_1 = tf.keras.layers.Conv2D(c2[0], 1, activation='relu')\n        self.p2_2 = tf.keras.layers.Conv2D(c2[1], 3, padding='same',\n                                           activation='relu')\n        # Path 3 is a 1 x 1 convolutional layer followed by a 5 x 5\n        # convolutional layer\n        self.p3_1 = tf.keras.layers.Conv2D(c3[0], 1, activation='relu')\n        self.p3_2 = tf.keras.layers.Conv2D(c3[1], 5, padding='same',\n                                           activation='relu')\n        # Path 4 is a 3 x 3 maximum pooling layer followed by a 1 x 1\n        # convolutional layer\n        self.p4_1 = tf.keras.layers.MaxPool2D(3, 1, padding='same')\n        self.p4_2 = tf.keras.layers.Conv2D(c4, 1, activation='relu')\n\n\n    def call(self, x):\n        p1 = self.p1_1(x)\n        p2 = self.p2_2(self.p2_1(x))\n        p3 = self.p3_2(self.p3_1(x))\n        p4 = self.p4_2(self.p4_1(x))\n        # Concatenate the outputs on the channel dimension\n        return tf.keras.layers.Concatenate()([p1, p2, p3, p4])"
+    },
+    {
+      "type": "paragraph",
+      "text": "Để đạt được một số trực giác về lý do tại sao mạng này hoạt động rất\ntốt, hãy xem xét sự kết hợp của các bộ lọc. Họ khám phá hình ảnh trong\nmột loạt các kích cỡ bộ lọc. Điều này có nghĩa là các chi tiết ở các\nphạm vi khác nhau có thể được nhận dạng hiệu quả bởi các bộ lọc có kích\nthước khác nhau. Đồng thời, chúng ta có thể phân bổ lượng tham số khác\nnhau cho các bộ lọc khác nhau."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "mo-hinh-googlenet",
+      "text": "7.4.2. Mô hình GoogLeNet"
+    },
+    {
+      "type": "paragraph",
+      "text": "Như thể hiện trong Fig. 7.4.2 , GoogLeNet sử dụng một\nchồng tổng cộng 9 khối khởi đầu và tổng hợp trung bình toàn cầu để tạo\nra ước tính của nó. Tổng hợp tối đa giữa các khối khởi đầu làm giảm kích\nthước. mô-đun đầu tiên tương tự như AlexNet và LeNet. Ngăn xếp các khối\nđược kế thừa từ VGG và tổng hợp trung bình toàn cầu tránh được một chồng\ncác lớp được kết nối hoàn toàn ở cuối."
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/inception-full.svg",
+      "local_path": "_images/inception-full.svg",
+      "alt": "../_images/inception-full.svg"
+    },
+    {
+      "type": "paragraph",
+      "text": "Fig. 7.4.2 The GoogLeNet architecture. ¶"
+    },
+    {
+      "type": "paragraph",
+      "text": "Bây giờ chúng ta có thể thực hiện GoogLeNet từng mảnh. mô-đun đầu tiên\nsử dụng lớp ghép \\(7\\times 7\\) 64 kênh."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "b1 = nn.Sequential()\nb1.add(nn.Conv2D(64, kernel_size=7, strides=2, padding=3, activation='relu'),\n       nn.MaxPool2D(pool_size=3, strides=2, padding=1))"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "b1 = nn.Sequential(nn.Conv2d(1, 64, kernel_size=7, stride=2, padding=3),\n                   nn.ReLU(),\n                   nn.MaxPool2d(kernel_size=3, stride=2, padding=1))"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def b1():\n    return tf.keras.models.Sequential([\n        tf.keras.layers.Conv2D(64, 7, strides=2, padding='same',\n                               activation='relu'),\n        tf.keras.layers.MaxPool2D(pool_size=3, strides=2, padding='same')])"
+    },
+    {
+      "type": "paragraph",
+      "text": "mô-đun thứ hai sử dụng hai lớp phức tạp: thứ nhất, một lớp ghép \\(1\\times 1\\) 64 kênh, sau đó là một lớp ghép \\(3\\times 3\\) tăng\ngấp ba lần số kênh. Điều này tương ứng với đường dẫn thứ hai trong khối\nInception."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "b2 = nn.Sequential()\nb2.add(nn.Conv2D(64, kernel_size=1, activation='relu'),\n       nn.Conv2D(192, kernel_size=3, padding=1, activation='relu'),\n       nn.MaxPool2D(pool_size=3, strides=2, padding=1))"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "b2 = nn.Sequential(nn.Conv2d(64, 64, kernel_size=1),\n                   nn.ReLU(),\n                   nn.Conv2d(64, 192, kernel_size=3, padding=1),\n                   nn.ReLU(),\n                   nn.MaxPool2d(kernel_size=3, stride=2, padding=1))"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def b2():\n    return tf.keras.Sequential([\n        tf.keras.layers.Conv2D(64, 1, activation='relu'),\n        tf.keras.layers.Conv2D(192, 3, padding='same', activation='relu'),\n        tf.keras.layers.MaxPool2D(pool_size=3, strides=2, padding='same')])"
+    },
+    {
+      "type": "paragraph",
+      "text": "mô-đun thứ ba kết nối hai khối Inception hoàn chỉnh trong chuỗi. Số kênh\nđầu ra của khối Inception đầu tiên là \\(64+128+32+32=256\\) và tỷ lệ\nsố kênh đầu ra giữa bốn đường dẫn là \\(64:128:32:32=2:4:1:1\\) . Các\nđường dẫn thứ hai và thứ ba đầu tiên làm giảm số lượng kênh đầu vào\nxuống \\(96/192=1/2\\) và \\(16/192=1/12\\) , và sau đó kết nối lớp\nphức tạp thứ hai. Số lượng kênh đầu ra của khối Inception thứ hai được\ntăng lên \\(128+192+96+64=480\\) và tỷ lệ số kênh đầu ra trong bốn\nđường dẫn là \\(128:192:96:64 = 4:6:3:2\\) . Các đường dẫn thứ hai và\nthứ ba đầu tiên làm giảm số lượng kênh đầu vào xuống \\(128/256=1/2\\) và \\(32/256=1/8\\) , tương ứng."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "b3 = nn.Sequential()\nb3.add(Inception(64, (96, 128), (16, 32), 32),\n       Inception(128, (128, 192), (32, 96), 64),\n       nn.MaxPool2D(pool_size=3, strides=2, padding=1))"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "b3 = nn.Sequential(Inception(192, 64, (96, 128), (16, 32), 32),\n                   Inception(256, 128, (128, 192), (32, 96), 64),\n                   nn.MaxPool2d(kernel_size=3, stride=2, padding=1))"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def b3():\n    return tf.keras.models.Sequential([\n        Inception(64, (96, 128), (16, 32), 32),\n        Inception(128, (128, 192), (32, 96), 64),\n        tf.keras.layers.MaxPool2D(pool_size=3, strides=2, padding='same')])"
+    },
+    {
+      "type": "paragraph",
+      "text": "mô-đun thứ tư phức tạp hơn. Nó kết nối năm khối Inception trong loạt, và\nhọ có \\(192+208+48+64=512\\) , \\(160+224+64+64=512\\) , \\(128+256+64+64=512\\) , \\(112+288+64+64=528\\) , và \\(256+320+128+128=832\\) kênh đầu ra, tương ứng. Số lượng kênh được\ngán cho các đường dẫn này tương tự như trong mô-đun thứ ba: đường dẫn\nthứ hai với lớp cuộn \\(3\\times 3\\) xuất ra số lượng kênh lớn nhất,\ntiếp theo là đường dẫn đầu tiên chỉ có lớp ghép \\(1\\times 1\\) , đường\ndẫn thứ ba với lớp biên độ \\(5\\times 5\\) và con đường thứ tư với lớp\ntổng hợp tối đa \\(3\\times 3\\) . Các đường dẫn thứ hai và thứ ba trước\ntiên sẽ giảm số lượng kênh theo tỷ lệ. Các tỷ lệ này hơi khác nhau trong\ncác khối Inception khác nhau."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "b4 = nn.Sequential()\nb4.add(Inception(192, (96, 208), (16, 48), 64),\n       Inception(160, (112, 224), (24, 64), 64),\n       Inception(128, (128, 256), (24, 64), 64),\n       Inception(112, (144, 288), (32, 64), 64),\n       Inception(256, (160, 320), (32, 128), 128),\n       nn.MaxPool2D(pool_size=3, strides=2, padding=1))"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "b4 = nn.Sequential(Inception(480, 192, (96, 208), (16, 48), 64),\n                   Inception(512, 160, (112, 224), (24, 64), 64),\n                   Inception(512, 128, (128, 256), (24, 64), 64),\n                   Inception(512, 112, (144, 288), (32, 64), 64),\n                   Inception(528, 256, (160, 320), (32, 128), 128),\n                   nn.MaxPool2d(kernel_size=3, stride=2, padding=1))"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def b4():\n    return tf.keras.Sequential([\n        Inception(192, (96, 208), (16, 48), 64),\n        Inception(160, (112, 224), (24, 64), 64),\n        Inception(128, (128, 256), (24, 64), 64),\n        Inception(112, (144, 288), (32, 64), 64),\n        Inception(256, (160, 320), (32, 128), 128),\n        tf.keras.layers.MaxPool2D(pool_size=3, strides=2, padding='same')])"
+    },
+    {
+      "type": "paragraph",
+      "text": "mô-đun thứ năm có hai khối Inception với các kênh đầu ra \\(256+320+128+128=832\\) và \\(384+384+128+128=1024\\) . Số lượng\nkênh được gán cho mỗi đường dẫn giống như trong các mô-đun thứ ba và thứ\ntư, nhưng khác nhau về các giá trị cụ thể. Cần lưu ý rằng khối thứ năm\nđược theo sau bởi lớp đầu ra. Khối này sử dụng lớp tổng hợp trung bình\ntoàn cầu để thay đổi chiều cao và chiều rộng của mỗi kênh thành 1, giống\nnhư trong Nin. Cuối cùng, chúng ta biến đầu ra thành một mảng hai chiều\ntheo sau là một lớp kết nối hoàn toàn có số lượng đầu ra là số lớp nhãn."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "b5 = nn.Sequential()\nb5.add(Inception(256, (160, 320), (32, 128), 128),\n       Inception(384, (192, 384), (48, 128), 128),\n       nn.GlobalAvgPool2D())\n\nnet = nn.Sequential()\nnet.add(b1, b2, b3, b4, b5, nn.Dense(10))"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "b5 = nn.Sequential(Inception(832, 256, (160, 320), (32, 128), 128),\n                   Inception(832, 384, (192, 384), (48, 128), 128),\n                   nn.AdaptiveAvgPool2d((1,1)),\n                   nn.Flatten())\n\nnet = nn.Sequential(b1, b2, b3, b4, b5, nn.Linear(1024, 10))"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def b5():\n    return tf.keras.Sequential([\n        Inception(256, (160, 320), (32, 128), 128),\n        Inception(384, (192, 384), (48, 128), 128),\n        tf.keras.layers.GlobalAvgPool2D(),\n        tf.keras.layers.Flatten()\n    ])\n# Recall that this has to be a function that will be passed to\n# `d2l.train_ch6()` so that model building/compiling need to be within\n# `strategy.scope()` in order to utilize the CPU/GPU devices that we have\ndef net():\n    return tf.keras.Sequential([b1(), b2(), b3(), b4(), b5(),\n                                tf.keras.layers.Dense(10)])"
+    },
+    {
+      "type": "paragraph",
+      "text": "Mô hình GoogLeNet phức tạp về mặt tính toán, vì vậy không dễ dàng để sửa\nđổi số lượng kênh như trong VGG. Để có thời gian đào tạo hợp lý về\nFashion-MNIST, chúng tôi giảm chiều cao và chiều rộng đầu vào từ 224\nxuống 96. Điều này đơn giản hóa việc tính toán. Những thay đổi về hình\ndạng của đầu ra giữa các mô-đun khác nhau được thể hiện dưới đây."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "X = np.random.uniform(size=(1, 1, 96, 96))\nnet.initialize()\nfor layer in net:\n    X = layer(X)\n    print(layer.name, 'output shape:\\t', X.shape)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "sequential0 output shape:    (1, 64, 24, 24)\nsequential1 output shape:    (1, 192, 12, 12)\nsequential2 output shape:    (1, 480, 6, 6)\nsequential3 output shape:    (1, 832, 3, 3)\nsequential4 output shape:    (1, 1024, 1, 1)\ndense0 output shape:         (1, 10)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "X = torch.rand(size=(1, 1, 96, 96))\nfor layer in net:\n    X = layer(X)\n    print(layer.__class__.__name__,'output shape:\\t', X.shape)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "Sequential output shape:     torch.Size([1, 64, 24, 24])\nSequential output shape:     torch.Size([1, 192, 12, 12])\nSequential output shape:     torch.Size([1, 480, 6, 6])\nSequential output shape:     torch.Size([1, 832, 3, 3])\nSequential output shape:     torch.Size([1, 1024])\nLinear output shape:         torch.Size([1, 10])"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "X = tf.random.uniform(shape=(1, 96, 96, 1))\nfor layer in net().layers:\n    X = layer(X)\n    print(layer.__class__.__name__, 'output shape:\\t', X.shape)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "Sequential output shape:     (1, 24, 24, 64)\nSequential output shape:     (1, 12, 12, 192)\nSequential output shape:     (1, 6, 6, 480)\nSequential output shape:     (1, 3, 3, 832)\nSequential output shape:     (1, 1024)\nDense output shape:  (1, 10)"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "dao-tao",
+      "text": "7.4.3. Đào tạo"
+    },
+    {
+      "type": "paragraph",
+      "text": "Như trước đây, chúng tôi đào tạo mô hình của mình bằng cách sử dụng bộ\ndữ liệu Fashion-MNIST. Chúng tôi chuyển đổi nó thành độ phân giải \\(96 \\times 96\\) pixel trước khi gọi quy trình đào tạo."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "lr, num_epochs, batch_size = 0.1, 10, 128\ntrain_iter, test_iter = d2l.load_data_fashion_mnist(batch_size, resize=96)\nd2l.train_ch6(net, train_iter, test_iter, num_epochs, lr, d2l.try_gpu())"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "loss 0.242, train acc 0.908, test acc 0.900\n2251.6 examples/sec on gpu(0)"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_googlenet_83a8b4_87_1.svg",
+      "local_path": "_images/output_googlenet_83a8b4_87_1.svg",
+      "alt": "../_images/output_googlenet_83a8b4_87_1.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "lr, num_epochs, batch_size = 0.1, 10, 128\ntrain_iter, test_iter = d2l.load_data_fashion_mnist(batch_size, resize=96)\nd2l.train_ch6(net, train_iter, test_iter, num_epochs, lr, d2l.try_gpu())"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "loss 0.260, train acc 0.900, test acc 0.891\n3459.1 examples/sec on cuda:0"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_googlenet_83a8b4_90_1.svg",
+      "local_path": "_images/output_googlenet_83a8b4_90_1.svg",
+      "alt": "../_images/output_googlenet_83a8b4_90_1.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "lr, num_epochs, batch_size = 0.1, 10, 128\ntrain_iter, test_iter = d2l.load_data_fashion_mnist(batch_size, resize=96)\nd2l.train_ch6(net, train_iter, test_iter, num_epochs, lr, d2l.try_gpu())"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "loss 0.234, train acc 0.912, test acc 0.900\n3525.3 examples/sec on /GPU:0"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "<keras.engine.sequential.Sequential at 0x7efb1855c040>"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_googlenet_83a8b4_93_2.svg",
+      "local_path": "_images/output_googlenet_83a8b4_93_2.svg",
+      "alt": "../_images/output_googlenet_83a8b4_93_2.svg"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tom-tat",
+      "text": "7.4.4. Tóm tắt"
+    },
+    {
+      "type": "list",
+      "ordered": false,
+      "items": [
+        "Khối Inception tương đương với một mạng con với bốn đường dẫn. Nó\ntrích xuất thông tin song song thông qua các lớp phức tạp của các\nhình dạng cửa sổ khác nhau và các lớp tổng hợp tối đa. \\(1 \\times 1\\) sự covolutions làm giảm kích thước kênh ở mức mỗi\npixel. Tổng hợp tối đa làm giảm độ phân giải.",
+        "GoogLeNet kết nối nhiều khối Inception được thiết kế tốt với các lớp\nkhác trong loạt. Tỷ lệ số kênh được gán trong khối Inception thu được\nthông qua một số lượng lớn các thí nghiệm trên tập dữ liệu ImageNet.",
+        "GoogLeNet, cũng như các phiên bản thành công của nó, là một trong\nnhững mô hình hiệu quả nhất trên ImageNet, cung cấp độ chính xác thử\nnghiệm tương tự với độ phức tạp tính toán thấp hơn."
+      ]
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bai-tap",
+      "text": "7.4.5. Bài tập"
+    },
+    {
+      "type": "list",
+      "ordered": true,
+      "items": [
+        "Có một số lần lặp lại của GoogLeNet. Cố gắng thực hiện và chạy chúng.\nMột số trong số họ bao gồm những điều sau đây: Thêm một lớp chuẩn hóa hàng loạt [Ioffe & Szegedy, 2015] , như\nđược mô tả sau trong Section 7.5 . Thực hiện các điều chỉnh đối với khối Inception [Szegedy et al., 2016] . Sử dụng làm mịn nhãn cho mô hình regarization [Szegedy et al., 2016] . Bao gồm nó trong kết nối còn lại [Szegedy et al., 2017] , như được mô tả sau\ntrong Section 7.6 .",
+        "Thêm một lớp chuẩn hóa hàng loạt [Ioffe & Szegedy, 2015] , như\nđược mô tả sau trong Section 7.5 .",
+        "Thực hiện các điều chỉnh đối với khối Inception [Szegedy et al., 2016] .",
+        "Sử dụng làm mịn nhãn cho mô hình regarization [Szegedy et al., 2016] .",
+        "Bao gồm nó trong kết nối còn lại [Szegedy et al., 2017] , như được mô tả sau\ntrong Section 7.6 .",
+        "Kích thước hình ảnh tối thiểu để GoogLeNet hoạt động là bao nhiêu?",
+        "So sánh kích thước tham số mô hình của AlexNet, VGG và Nin với\nGoogLeNet. Làm thế nào để hai kiến trúc mạng sau làm giảm đáng kể\nkích thước tham số mô hình?"
+      ]
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    }
+  ],
+  "images": [
+    {
+      "original_url": "https://vi.d2l.ai/_images/inception.svg",
+      "local_path": "_images/inception.svg",
+      "alt": "../_images/inception.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/inception-full.svg",
+      "local_path": "_images/inception-full.svg",
+      "alt": "../_images/inception-full.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_googlenet_83a8b4_87_1.svg",
+      "local_path": "_images/output_googlenet_83a8b4_87_1.svg",
+      "alt": "../_images/output_googlenet_83a8b4_87_1.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_googlenet_83a8b4_90_1.svg",
+      "local_path": "_images/output_googlenet_83a8b4_90_1.svg",
+      "alt": "../_images/output_googlenet_83a8b4_90_1.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_googlenet_83a8b4_93_2.svg",
+      "local_path": "_images/output_googlenet_83a8b4_93_2.svg",
+      "alt": "../_images/output_googlenet_83a8b4_93_2.svg"
+    }
+  ],
+  "text": "7.4. Mạng có kết nối song song (GoogLeNet)\nNăm 2014, GoogLeNet giành chiến thắng trong ImageNet Challenge, đề\nxuất một cấu trúc kết hợp các thế mạnh của Nin và mô hình của các khối\nlặp lại [Szegedy et al., 2015] . Một trọng tâm của bài báo là\ngiải quyết câu hỏi về hạt nhân có kích thước nào là tốt nhất. Rốt cuộc,\ncác mạng phổ biến trước đây sử dụng các lựa chọn nhỏ tới \\(1 \\times 1\\) và lớn tới \\(11 \\times 11\\) . Một cái nhìn sâu sắc\ntrong bài báo này là đôi khi nó có thể thuận lợi để sử dụng một sự kết\nhợp của các hạt nhân có kích thước đa dạng. Trong phần này, chúng tôi sẽ\ngiới thiệu GoogLeNet, trình bày một phiên bản đơn giản hóa một chút của\nmô hình gốc: chúng tôi bỏ qua một vài tính năng đặc biệt đã được thêm\nvào để ổn định đào tạo nhưng bây giờ không cần thiết với các thuật toán\nđào tạo tốt hơn có sẵn.\n7.4.1. Chống** Bắt nối\nKhối phức tạp cơ bản trong GoogLeNet được gọi là khối Inception *, có\nthể được đặt tên do một trích dẫn từ bộ phim *Inception (“Chúng ta cần\nphải đi sâu hơn”), đã đưa ra một meme virus.\nFig. 7.4.1 Structure of the Inception block. ¶\nNhư được mô tả trong Fig. 7.4.1 , khối khởi đầu bao gồm\nbốn con đường song song. Ba đường dẫn đầu tiên sử dụng các lớp phức tạp\nvới kích thước cửa sổ \\(1\\times 1\\) , \\(3\\times 3\\) và \\(5\\times 5\\) để trích xuất thông tin từ các kích thước không gian\nkhác nhau. Hai đường dẫn giữa thực hiện sự phức tạp \\(1\\times 1\\) trên đầu vào để giảm số lượng kênh, giảm độ phức tạp của mô hình. Đường\ndẫn thứ tư sử dụng một lớp tổng hợp tối đa \\(3\\times 3\\) , tiếp theo\nlà một lớp ghép \\(1\\times 1\\) để thay đổi số kênh. Bốn đường dẫn đều\nsử dụng đệm thích hợp để cung cấp cho đầu vào và đầu ra cùng chiều cao\nvà chiều rộng. Cuối cùng, các đầu ra dọc theo mỗi đường dẫn được nối dọc\ntheo kích thước kênh và bao gồm đầu ra của khối. Các siêu tham số được\nđiều chỉnh chung của khối Inception là số kênh đầu ra trên mỗi lớp.\nĐể đạt được một số trực giác về lý do tại sao mạng này hoạt động rất\ntốt, hãy xem xét sự kết hợp của các bộ lọc. Họ khám phá hình ảnh trong\nmột loạt các kích cỡ bộ lọc. Điều này có nghĩa là các chi tiết ở các\nphạm vi khác nhau có thể được nhận dạng hiệu quả bởi các bộ lọc có kích\nthước khác nhau. Đồng thời, chúng ta có thể phân bổ lượng tham số khác\nnhau cho các bộ lọc khác nhau.\n7.4.2. Mô hình GoogLeNet\nNhư thể hiện trong Fig. 7.4.2 , GoogLeNet sử dụng một\nchồng tổng cộng 9 khối khởi đầu và tổng hợp trung bình toàn cầu để tạo\nra ước tính của nó. Tổng hợp tối đa giữa các khối khởi đầu làm giảm kích\nthước. mô-đun đầu tiên tương tự như AlexNet và LeNet. Ngăn xếp các khối\nđược kế thừa từ VGG và tổng hợp trung bình toàn cầu tránh được một chồng\ncác lớp được kết nối hoàn toàn ở cuối.\nFig. 7.4.2 The GoogLeNet architecture. ¶\nBây giờ chúng ta có thể thực hiện GoogLeNet từng mảnh. mô-đun đầu tiên\nsử dụng lớp ghép \\(7\\times 7\\) 64 kênh.\nmô-đun thứ hai sử dụng hai lớp phức tạp: thứ nhất, một lớp ghép \\(1\\times 1\\) 64 kênh, sau đó là một lớp ghép \\(3\\times 3\\) tăng\ngấp ba lần số kênh. Điều này tương ứng với đường dẫn thứ hai trong khối\nInception.\nmô-đun thứ ba kết nối hai khối Inception hoàn chỉnh trong chuỗi. Số kênh\nđầu ra của khối Inception đầu tiên là \\(64+128+32+32=256\\) và tỷ lệ\nsố kênh đầu ra giữa bốn đường dẫn là \\(64:128:32:32=2:4:1:1\\) . Các\nđường dẫn thứ hai và thứ ba đầu tiên làm giảm số lượng kênh đầu vào\nxuống \\(96/192=1/2\\) và \\(16/192=1/12\\) , và sau đó kết nối lớp\nphức tạp thứ hai. Số lượng kênh đầu ra của khối Inception thứ hai được\ntăng lên \\(128+192+96+64=480\\) và tỷ lệ số kênh đầu ra trong bốn\nđường dẫn là \\(128:192:96:64 = 4:6:3:2\\) . Các đường dẫn thứ hai và\nthứ ba đầu tiên làm giảm số lượng kênh đầu vào xuống \\(128/256=1/2\\) và \\(32/256=1/8\\) , tương ứng.\nmô-đun thứ tư phức tạp hơn. Nó kết nối năm khối Inception trong loạt, và\nhọ có \\(192+208+48+64=512\\) , \\(160+224+64+64=512\\) , \\(128+256+64+64=512\\) , \\(112+288+64+64=528\\) , và \\(256+320+128+128=832\\) kênh đầu ra, tương ứng. Số lượng kênh được\ngán cho các đường dẫn này tương tự như trong mô-đun thứ ba: đường dẫn\nthứ hai với lớp cuộn \\(3\\times 3\\) xuất ra số lượng kênh lớn nhất,\ntiếp theo là đường dẫn đầu tiên chỉ có lớp ghép \\(1\\times 1\\) , đường\ndẫn thứ ba với lớp biên độ \\(5\\times 5\\) và con đường thứ tư với lớp\ntổng hợp tối đa \\(3\\times 3\\) . Các đường dẫn thứ hai và thứ ba trước\ntiên sẽ giảm số lượng kênh theo tỷ lệ. Các tỷ lệ này hơi khác nhau trong\ncác khối Inception khác nhau.\nmô-đun thứ năm có hai khối Inception với các kênh đầu ra \\(256+320+128+128=832\\) và \\(384+384+128+128=1024\\) . Số lượng\nkênh được gán cho mỗi đường dẫn giống như trong các mô-đun thứ ba và thứ\ntư, nhưng khác nhau về các giá trị cụ thể. Cần lưu ý rằng khối thứ năm\nđược theo sau bởi lớp đầu ra. Khối này sử dụng lớp tổng hợp trung bình\ntoàn cầu để thay đổi chiều cao và chiều rộng của mỗi kênh thành 1, giống\nnhư trong Nin. Cuối cùng, chúng ta biến đầu ra thành một mảng hai chiều\ntheo sau là một lớp kết nối hoàn toàn có số lượng đầu ra là số lớp nhãn.\nMô hình GoogLeNet phức tạp về mặt tính toán, vì vậy không dễ dàng để sửa\nđổi số lượng kênh như trong VGG. Để có thời gian đào tạo hợp lý về\nFashion-MNIST, chúng tôi giảm chiều cao và chiều rộng đầu vào từ 224\nxuống 96. Điều này đơn giản hóa việc tính toán. Những thay đổi về hình\ndạng của đầu ra giữa các mô-đun khác nhau được thể hiện dưới đây.\n7.4.3. Đào tạo\nNhư trước đây, chúng tôi đào tạo mô hình của mình bằng cách sử dụng bộ\ndữ liệu Fashion-MNIST. Chúng tôi chuyển đổi nó thành độ phân giải \\(96 \\times 96\\) pixel trước khi gọi quy trình đào tạo.\n7.4.4. Tóm tắt\nKhối Inception tương đương với một mạng con với bốn đường dẫn. Nó\ntrích xuất thông tin song song thông qua các lớp phức tạp của các\nhình dạng cửa sổ khác nhau và các lớp tổng hợp tối đa. \\(1 \\times 1\\) sự covolutions làm giảm kích thước kênh ở mức mỗi\npixel. Tổng hợp tối đa làm giảm độ phân giải.\nGoogLeNet kết nối nhiều khối Inception được thiết kế tốt với các lớp\nkhác trong loạt. Tỷ lệ số kênh được gán trong khối Inception thu được\nthông qua một số lượng lớn các thí nghiệm trên tập dữ liệu ImageNet.\nGoogLeNet, cũng như các phiên bản thành công của nó, là một trong\nnhững mô hình hiệu quả nhất trên ImageNet, cung cấp độ chính xác thử\nnghiệm tương tự với độ phức tạp tính toán thấp hơn.\n7.4.5. Bài tập\nCó một số lần lặp lại của GoogLeNet. Cố gắng thực hiện và chạy chúng.\nMột số trong số họ bao gồm những điều sau đây: Thêm một lớp chuẩn hóa hàng loạt [Ioffe & Szegedy, 2015] , như\nđược mô tả sau trong Section 7.5 . Thực hiện các điều chỉnh đối với khối Inception [Szegedy et al., 2016] . Sử dụng làm mịn nhãn cho mô hình regarization [Szegedy et al., 2016] . Bao gồm nó trong kết nối còn lại [Szegedy et al., 2017] , như được mô tả sau\ntrong Section 7.6 .\nThêm một lớp chuẩn hóa hàng loạt [Ioffe & Szegedy, 2015] , như\nđược mô tả sau trong Section 7.5 .\nThực hiện các điều chỉnh đối với khối Inception [Szegedy et al., 2016] .\nSử dụng làm mịn nhãn cho mô hình regarization [Szegedy et al., 2016] .\nBao gồm nó trong kết nối còn lại [Szegedy et al., 2017] , như được mô tả sau\ntrong Section 7.6 .\nKích thước hình ảnh tối thiểu để GoogLeNet hoạt động là bao nhiêu?\nSo sánh kích thước tham số mô hình của AlexNet, VGG và Nin với\nGoogLeNet. Làm thế nào để hai kiến trúc mạng sau làm giảm đáng kể\nkích thước tham số mô hình?\nDiscussions\nDiscussions\nDiscussions"
+}

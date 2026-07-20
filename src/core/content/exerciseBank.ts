@@ -23,6 +23,10 @@ import { exercises as SECTION6 } from './bank/ch6';
 import { exercises as SECTION7 } from './bank/ch7';
 import { exercises as SECTION8 } from './bank/ch8';
 import { exercises as SECTION9 } from './bank/ch9';
+import { exercises as SECTION10 } from './bank/ch10';
+import { exercises as SECTION11 } from './bank/ch11';
+import { exercises as SECTION12 } from './bank/ch12';
+import { exercises as SECTION13 } from './bank/ch13';
 
 // ---------------------------------------------------------------------------
 // SECTION 0 — KIẾN THỨC NỀN (Foundations)
@@ -870,6 +874,10 @@ export const EXERCISES: Exercise[] = [
   ...SECTION7,
   ...SECTION8,
   ...SECTION9,
+  ...SECTION10,
+  ...SECTION11,
+  ...SECTION12,
+  ...SECTION13,
 ];
 
 /** Gom bài tập theo skillId (ổn định theo thứ tự khai báo trong EXERCISES). */

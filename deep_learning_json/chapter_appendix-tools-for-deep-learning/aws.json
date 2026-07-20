@@ -1,0 +1,589 @@
+{
+  "url": "https://vi.d2l.ai/chapter_appendix-tools-for-deep-learning/aws.html",
+  "chapter": "chapter_appendix-tools-for-deep-learning",
+  "title": "19.3. Sử dụng phiên bản AWS EC2",
+  "crawled_at": "2026-07-20T12:41:35.081362+00:00",
+  "headings": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "su-dung-phien-ban-aws-ec2",
+      "text": "19.3. Sử dụng phiên bản AWS EC2"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tao-va-chay-phien-ban-ec2",
+      "text": "19.3.1. Tạo và chạy Phiên bản EC2"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "vi-tri-dat-truoc-chon-mot-trung-tam-du-lieu-gan-do-de-giam-do-tre-vi-du-oregon-duoc-danh-dau-bang-hop-mau-do-o-phia-tren-ben-phai-cua-fig-ec2-neu-ban-dang-o-trung-quoc-ban-co-the-chon-mot-khu-vuc-chau-a-thai-binh-duong-gan-do-chang-han-nhu-seoul-hoac-tokyo-xin-luu-y-rang-mot-so-trung-tam-du-lieu-co-the-khong-co-phien-ban-gpu",
+      "text": "19.3.1.1. Vị trí đặt trước Chọn một trung tâm dữ liệu gần đó để giảm độ trễ, ví dụ: “Oregon” (được đánh dấu bằng hộp màu đỏ ở phía trên bên phải của Fig. 19.3.2 ). Nếu bạn đang ở Trung Quốc, bạn có thể chọn một khu vực Châu Á Thái Bình Dương gần đó, chẳng hạn như Seoul hoặc Tokyo. Xin lưu ý rằng một số trung tâm dữ liệu có thể không có phiên bản GPU."
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "tang-gioi-han-truoc-khi-chon-mot-phien-ban-hay-kiem-tra-xem-co-gioi-han-so-luong-bang-cach-nhap-vao-nhan-gioi-han-o-thanh-ben-trai-nhu-trong-fig-ec2-fig-limits-hien-thi-mot-vi-du-ve-gioi-han-nhu-vay-tai-khoan-hien-khong-the-mo-phien-ban-p2-xlarge-tren-moi-vung-neu-ban-can-mo-mot-hoac-nhieu-phien-ban-hay-nhap-vao-lien-ket-tang-gioi-han-yeu-cau-de-ap-dung-han-ngach-phien-ban-cao-hon-noi-chung-phai-mat-mot-ngay-lam-viec-de-xu-ly-don-dang-ky",
+      "text": "19.3.1.2. Tăng giới hạn Trước khi chọn một phiên bản, hãy kiểm tra xem có giới hạn số lượng bằng cách nhấp vào nhãn “Giới hạn” ở thanh bên trái như trong Fig. 19.3.2 . Fig. 19.3.3 hiển thị một ví dụ về giới hạn như vậy. Tài khoản hiện không thể mở phiên bản “p2.xlarge” trên mỗi vùng. Nếu bạn cần mở một hoặc nhiều phiên bản, hãy nhấp vào liên kết “Tăng giới hạn yêu cầu” để áp dụng hạn ngạch phiên bản cao hơn. Nói chung, phải mất một ngày làm việc để xử lý đơn đăng ký."
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "khoi-chay-phien-ban-tiep-theo-nhap-vao-nut-khoi-chay-phien-ban-duoc-danh-dau-bang-hop-mau-do-trong-fig-ec2-de-khoi-chay-phien-ban-cua-ban",
+      "text": "19.3.1.3. Khởi chạy Phiên bản Tiếp theo, nhấp vào nút “Khởi chạy phiên bản” được đánh dấu bằng hộp màu đỏ trong Fig. 19.3.2 để khởi chạy phiên bản của bạn."
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "ket-noi-voi-phien-ban",
+      "text": "19.3.1.4. Kết nối với Phiên bản"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "cai-dat-cda",
+      "text": "19.3.2. Cài đặt CDA"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "cai-dat-mxnet-va-tai-xuong-may-tinh-xach-tay-d2l",
+      "text": "19.3.3. Cài đặt MXNet và Tải xuống máy tính xách tay D2L"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "chay-jupyter",
+      "text": "19.3.4. Chạy Jupyter"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "dong-phien-ban-chua-su-dung",
+      "text": "19.3.5. Đóng phiên bản chưa sử dụng"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tom-tat",
+      "text": "19.3.6. Tóm tắt"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bai-tap",
+      "text": "19.3.7. Bài tập"
+    }
+  ],
+  "content": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "su-dung-phien-ban-aws-ec2",
+      "text": "19.3. Sử dụng phiên bản AWS EC2"
+    },
+    {
+      "type": "paragraph",
+      "text": "Trong phần này, chúng tôi sẽ chỉ cho bạn cách cài đặt tất cả các thư\nviện trên một máy Linux thô. Hãy nhớ rằng trong Section 19.2 , chúng tôi đã thảo luận về cách sử dụng Amazon\nSageMaker, trong khi tự mình xây dựng một phiên bản ít tốn kém hơn trên\nAWS. Các hướng dẫn bao gồm một số bước:"
+    },
+    {
+      "type": "list",
+      "ordered": true,
+      "items": [
+        "Yêu cầu phiên bản GPU Linux từ AWS EC2.",
+        "Tùy chọn: cài đặt CIDA hoặc sử dụng AMI với CIDA được cài đặt sẵn.",
+        "Thiết lập phiên bản GPU MXNet tương ứng."
+      ]
+    },
+    {
+      "type": "paragraph",
+      "text": "Quá trình này cũng áp dụng cho các trường hợp khác (và các đám mây\nkhác), mặc dù với một số sửa đổi nhỏ. Trước khi tiếp tục, bạn cần tạo\ntài khoản AWS, xem Section 19.2 để biết thêm chi tiết."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tao-va-chay-phien-ban-ec2",
+      "text": "19.3.1. Tạo và chạy Phiên bản EC2"
+    },
+    {
+      "type": "paragraph",
+      "text": "Sau khi đăng nhập vào tài khoản AWS của bạn, nhấp vào “EC2” (được đánh\ndấu bằng hộp màu đỏ trong Fig. 19.3.1 ) để chuyển đến bảng EC2."
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/aws.png",
+      "local_path": "_images/aws.png",
+      "alt": "../_images/aws.png"
+    },
+    {
+      "type": "paragraph",
+      "text": "Fig. 19.3.1 Open the EC2 console. ¶"
+    },
+    {
+      "type": "paragraph",
+      "text": "Fig. 19.3.2 hiển thị bảng điều khiển EC2 với thông tin tài khoản\nnhạy cảm bị mờ."
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/ec2.png",
+      "local_path": "_images/ec2.png",
+      "alt": "../_images/ec2.png"
+    },
+    {
+      "type": "paragraph",
+      "text": "Fig. 19.3.2 EC2 panel. ¶"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "vi-tri-dat-truoc-chon-mot-trung-tam-du-lieu-gan-do-de-giam-do-tre-vi-du-oregon-duoc-danh-dau-bang-hop-mau-do-o-phia-tren-ben-phai-cua-fig-ec2-neu-ban-dang-o-trung-quoc-ban-co-the-chon-mot-khu-vuc-chau-a-thai-binh-duong-gan-do-chang-han-nhu-seoul-hoac-tokyo-xin-luu-y-rang-mot-so-trung-tam-du-lieu-co-the-khong-co-phien-ban-gpu",
+      "text": "19.3.1.1. Vị trí đặt trước Chọn một trung tâm dữ liệu gần đó để giảm độ trễ, ví dụ: “Oregon” (được đánh dấu bằng hộp màu đỏ ở phía trên bên phải của Fig. 19.3.2 ). Nếu bạn đang ở Trung Quốc, bạn có thể chọn một khu vực Châu Á Thái Bình Dương gần đó, chẳng hạn như Seoul hoặc Tokyo. Xin lưu ý rằng một số trung tâm dữ liệu có thể không có phiên bản GPU."
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "tang-gioi-han-truoc-khi-chon-mot-phien-ban-hay-kiem-tra-xem-co-gioi-han-so-luong-bang-cach-nhap-vao-nhan-gioi-han-o-thanh-ben-trai-nhu-trong-fig-ec2-fig-limits-hien-thi-mot-vi-du-ve-gioi-han-nhu-vay-tai-khoan-hien-khong-the-mo-phien-ban-p2-xlarge-tren-moi-vung-neu-ban-can-mo-mot-hoac-nhieu-phien-ban-hay-nhap-vao-lien-ket-tang-gioi-han-yeu-cau-de-ap-dung-han-ngach-phien-ban-cao-hon-noi-chung-phai-mat-mot-ngay-lam-viec-de-xu-ly-don-dang-ky",
+      "text": "19.3.1.2. Tăng giới hạn Trước khi chọn một phiên bản, hãy kiểm tra xem có giới hạn số lượng bằng cách nhấp vào nhãn “Giới hạn” ở thanh bên trái như trong Fig. 19.3.2 . Fig. 19.3.3 hiển thị một ví dụ về giới hạn như vậy. Tài khoản hiện không thể mở phiên bản “p2.xlarge” trên mỗi vùng. Nếu bạn cần mở một hoặc nhiều phiên bản, hãy nhấp vào liên kết “Tăng giới hạn yêu cầu” để áp dụng hạn ngạch phiên bản cao hơn. Nói chung, phải mất một ngày làm việc để xử lý đơn đăng ký."
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/limits.png",
+      "local_path": "_images/limits.png",
+      "alt": "../_images/limits.png"
+    },
+    {
+      "type": "paragraph",
+      "text": "Fig. 19.3.3 Instance quantity restrictions. ¶"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "khoi-chay-phien-ban-tiep-theo-nhap-vao-nut-khoi-chay-phien-ban-duoc-danh-dau-bang-hop-mau-do-trong-fig-ec2-de-khoi-chay-phien-ban-cua-ban",
+      "text": "19.3.1.3. Khởi chạy Phiên bản Tiếp theo, nhấp vào nút “Khởi chạy phiên bản” được đánh dấu bằng hộp màu đỏ trong Fig. 19.3.2 để khởi chạy phiên bản của bạn."
+    },
+    {
+      "type": "paragraph",
+      "text": "Chúng tôi bắt đầu bằng cách chọn một AMI phù hợp (AWS Machine Image).\nNhập “Ubuntu” vào hộp tìm kiếm (được đánh dấu bằng hộp màu đỏ trong Fig. 19.3.4 )."
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/ubuntu-new.png",
+      "local_path": "_images/ubuntu-new.png",
+      "alt": "../_images/ubuntu-new.png"
+    },
+    {
+      "type": "paragraph",
+      "text": "Fig. 19.3.4 Choose an operating system. ¶"
+    },
+    {
+      "type": "paragraph",
+      "text": "EC2 cung cấp nhiều cấu hình phiên bản khác nhau để lựa chọn. Điều này\nđôi khi có thể cảm thấy áp đảo đối với người mới bắt đầu. Dưới đây là\nmột bảng các máy phù hợp:"
+    },
+    {
+      "type": "table",
+      "html": "<table class=\"docutils align-default\">\n<colgroup>\n<col style=\"width: 14%\"/>\n<col style=\"width: 27%\"/>\n<col style=\"width: 59%\"/>\n</colgroup>\n<thead>\n<tr class=\"row-odd\"><th class=\"head\"><p>Name</p></th>\n<th class=\"head\"><p>GPU</p></th>\n<th class=\"head\"><p>Notes</p></th>\n</tr>\n</thead>\n<tbody>\n<tr class=\"row-even\"><td><p>g2</p></td>\n<td><p>Grid K520</p></td>\n<td><p>ancient</p></td>\n</tr>\n<tr class=\"row-odd\"><td><p>p2</p></td>\n<td><p>Kepler K80</p></td>\n<td><p>old but often cheap as spot</p></td>\n</tr>\n<tr class=\"row-even\"><td><p>g3</p></td>\n<td><p>Maxwell M60</p></td>\n<td><p>good trade-off</p></td>\n</tr>\n<tr class=\"row-odd\"><td><p>p3</p></td>\n<td><p>Volta V100</p></td>\n<td><p>high performance for FP16</p></td>\n</tr>\n<tr class=\"row-even\"><td><p>g4</p></td>\n<td><p>Turing T4</p></td>\n<td><p>inference optimized FP16/INT8</p></td>\n</tr>\n</tbody>\n</table>",
+      "text": "Name GPU Notes g2 Grid K520 ancient p2 Kepler K80 old but often cheap as spot g3 Maxwell M60 good trade-off p3 Volta V100 high performance for FP16 g4 Turing T4 inference optimized FP16/INT8"
+    },
+    {
+      "type": "paragraph",
+      "text": "Tất cả các máy chủ trên đều có nhiều hương vị cho biết số lượng GPU được\nsử dụng. Ví dụ: p2.xlarge có 1 GPU và p2.16xlarge có 16 GPU và nhiều bộ\nnhớ hơn. Để biết thêm chi tiết, hãy xem AWS EC2\ndocumentation ."
+    },
+    {
+      "type": "paragraph",
+      "text": "** Lưu ý: ** bạn phải sử dụng phiên bản hỗ trợ GPU với trình điều khiển\nphù hợp và phiên bản MXNet được kích hoạt GPU. Nếu không, bạn sẽ không\nthấy bất kỳ lợi ích nào từ việc sử dụng GPU."
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/p2x.png",
+      "local_path": "_images/p2x.png",
+      "alt": "../_images/p2x.png"
+    },
+    {
+      "type": "paragraph",
+      "text": "Fig. 19.3.5 Choose an instance. ¶"
+    },
+    {
+      "type": "paragraph",
+      "text": "Cho đến nay, chúng tôi đã hoàn thành hai trong bảy bước đầu tiên để khởi\nchạy một phiên bản EC2, như được hiển thị trên đầu Fig. 19.3.6 .\nTrong ví dụ này, chúng tôi giữ các cấu hình mặc định cho các bước “3.\nCấu hình phiên bản”, “5. Thêm Thẻ”, và “6. Cấu hình nhóm bảo mật”. Nhấn\nvào “4. Thêm lưu trữ” và tăng kích thước đĩa cứng mặc định lên 64 GB\n(được đánh dấu trong hộp màu đỏ của Fig. 19.3.6 ). Lưu ý rằng\nCIDA của chính nó đã chiếm 4 GB."
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/disk.png",
+      "local_path": "_images/disk.png",
+      "alt": "../_images/disk.png"
+    },
+    {
+      "type": "paragraph",
+      "text": "Fig. 19.3.6 Modify instance hard disk size. ¶"
+    },
+    {
+      "type": "paragraph",
+      "text": "Cuối cùng, đi đến “7. Xem lại” và nhấp vào “Khởi chạy” để khởi chạy\nphiên bản được cấu hình. Bây giờ hệ thống sẽ nhắc bạn chọn cặp khóa được\nsử dụng để truy cập phiên bản. Nếu bạn không có cặp khóa, hãy chọn “Tạo\ncặp khóa mới” trong menu thả xuống đầu tiên trong Fig. 19.3.7 để tạo một cặp khóa. Sau đó, bạn có thể chọn\n“Chọn một cặp khóa hiện có” cho menu này và sau đó chọn cặp khóa được\ntạo trước đó. Nhấp vào “Khởi chạy phiên bản” để khởi chạy phiên bản đã\ntạo."
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/keypair.png",
+      "local_path": "_images/keypair.png",
+      "alt": "../_images/keypair.png"
+    },
+    {
+      "type": "paragraph",
+      "text": "Fig. 19.3.7 Select a key pair. ¶"
+    },
+    {
+      "type": "paragraph",
+      "text": "Đảm bảo rằng bạn tải xuống cặp khóa và lưu trữ nó ở một vị trí an toàn\nnếu bạn tạo một cặp khóa mới. Đây là cách duy nhất của bạn để SSH vào\nmáy chủ. Nhấp vào ID phiên bản được hiển thị trong Fig. 19.3.8 để xem trạng thái của phiên bản này."
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/launching.png",
+      "local_path": "_images/launching.png",
+      "alt": "../_images/launching.png"
+    },
+    {
+      "type": "paragraph",
+      "text": "Fig. 19.3.8 Click the instance ID. ¶"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "ket-noi-voi-phien-ban",
+      "text": "19.3.1.4. Kết nối với Phiên bản"
+    },
+    {
+      "type": "paragraph",
+      "text": "Như được hiển thị trong Fig. 19.3.9 , sau khi trạng thái\nphiên bản chuyển sang màu xanh lá cây, nhấp chuột phải vào phiên bản và\nchọn Connect để xem phương thức truy cập phiên bản."
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/connect.png",
+      "local_path": "_images/connect.png",
+      "alt": "../_images/connect.png"
+    },
+    {
+      "type": "paragraph",
+      "text": "Fig. 19.3.9 View instance access and startup method. ¶"
+    },
+    {
+      "type": "paragraph",
+      "text": "Nếu đây là khóa mới, SSH không được xem công khai để SSH hoạt động.\nChuyển đến thư mục nơi bạn lưu trữ D2L_key.pem (ví dụ: thư mục\nDownloads) và đảm bảo rằng khóa không thể xem công khai."
+    },
+    {
+      "type": "code",
+      "language": "bash",
+      "text": "cd /Downloads  ## if D2L_key.pem is stored in Downloads folder\nchmod 400 D2L_key.pem"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/chmod.png",
+      "local_path": "_images/chmod.png",
+      "alt": "../_images/chmod.png"
+    },
+    {
+      "type": "paragraph",
+      "text": "Fig. 19.3.10 View instance access and startup method. ¶"
+    },
+    {
+      "type": "paragraph",
+      "text": "Bây giờ, sao chép lệnh ssh trong hộp màu đỏ thấp hơn của Fig. 19.3.10 và dán vào dòng lệnh:"
+    },
+    {
+      "type": "code",
+      "language": "bash",
+      "text": "ssh -i \"D2L_key.pem\" ubuntu@ec2-xx-xxx-xxx-xxx.y.compute.amazonaws.com"
+    },
+    {
+      "type": "paragraph",
+      "text": "Khi dòng lệnh nhắc “Bạn có chắc muốn tiếp tục kết nối (có/không)”, nhập\n“yes” và nhấn Enter để đăng nhập vào phiên bản."
+    },
+    {
+      "type": "paragraph",
+      "text": "Máy chủ của bạn đã sẵn sàng ngay bây giờ."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "cai-dat-cda",
+      "text": "19.3.2. Cài đặt CDA"
+    },
+    {
+      "type": "paragraph",
+      "text": "Trước khi cài đặt CIDA, hãy chắc chắn cập nhật phiên bản với các trình\nđiều khiển mới nhất."
+    },
+    {
+      "type": "code",
+      "language": "bash",
+      "text": "sudo apt-get update && sudo apt-get install -y build-essential git libgfortran3"
+    },
+    {
+      "type": "paragraph",
+      "text": "Ở đây chúng tôi tải về CDA 10.1. Truy cập [kho chính thức] của NVIDIA\n( https://developer.nvidia.com/cuda-downloads ) to find the download link\nof CUDA 10.1 as shown in Fig. 19.3.11 ."
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/cuda101.png",
+      "local_path": "_images/cuda101.png",
+      "alt": "../_images/cuda101.png"
+    },
+    {
+      "type": "paragraph",
+      "text": "Fig. 19.3.11 Find the CUDA 10.1 download address. ¶"
+    },
+    {
+      "type": "paragraph",
+      "text": "Sao chép các hướng dẫn và dán chúng vào thiết bị đầu cuối để cài đặt\nCUTA 10.1."
+    },
+    {
+      "type": "code",
+      "language": "bash",
+      "text": "## Paste the copied link from CUDA website\nwget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu1804/x86_64/cuda-ubuntu1804.pin\nsudo mv cuda-ubuntu1804.pin /etc/apt/preferences.d/cuda-repository-pin-600\nwget http://developer.download.nvidia.com/compute/cuda/10.1/Prod/local_installers/cuda-repo-ubuntu1804-10-1-local-10.1.243-418.87.00_1.0-1_amd64.deb\nsudo dpkg -i cuda-repo-ubuntu1804-10-1-local-10.1.243-418.87.00_1.0-1_amd64.deb\nsudo apt-key add /var/cuda-repo-10-1-local-10.1.243-418.87.00/7fa2af80.pub\nsudo apt-get update\nsudo apt-get -y install cuda"
+    },
+    {
+      "type": "paragraph",
+      "text": "Sau khi cài đặt chương trình, hãy chạy lệnh sau để xem GPU."
+    },
+    {
+      "type": "code",
+      "language": "bash",
+      "text": "nvidia-smi"
+    },
+    {
+      "type": "paragraph",
+      "text": "Cuối cùng, thêm CIDA vào đường dẫn thư viện để giúp các thư viện khác\ntìm thấy nó."
+    },
+    {
+      "type": "code",
+      "language": "bash",
+      "text": "echo \"export LD_LIBRARY_PATH=\\${LD_LIBRARY_PATH}:/usr/local/cuda/lib64\" >> ~/.bashrc"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "cai-dat-mxnet-va-tai-xuong-may-tinh-xach-tay-d2l",
+      "text": "19.3.3. Cài đặt MXNet và Tải xuống máy tính xách tay D2L"
+    },
+    {
+      "type": "paragraph",
+      "text": "Đầu tiên, để đơn giản hóa quá trình cài đặt, bạn cần cài đặt Miniconda cho Linux.\nLiên kết tải xuống và tên tệp có thể thay đổi, vì vậy vui lòng truy cập\ntrang web Miniconda và nhấp vào “Sao chép địa chỉ liên kết” như thể hiện\ntrong Fig. 19.3.12 ."
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/miniconda.png",
+      "local_path": "_images/miniconda.png",
+      "alt": "../_images/miniconda.png"
+    },
+    {
+      "type": "paragraph",
+      "text": "Fig. 19.3.12 Download Miniconda. ¶"
+    },
+    {
+      "type": "code",
+      "language": "bash",
+      "text": "# The link and file name are subject to changes\nwget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh\nsh Miniconda3-latest-Linux-x86_64.sh -b"
+    },
+    {
+      "type": "paragraph",
+      "text": "Sau khi cài đặt Miniconda, chạy lệnh sau để kích hoạt CIDA và conda."
+    },
+    {
+      "type": "code",
+      "language": "bash",
+      "text": "~/miniconda3/bin/conda init\nsource ~/.bashrc"
+    },
+    {
+      "type": "paragraph",
+      "text": "Tiếp theo, tải xuống mã cho cuốn sách này."
+    },
+    {
+      "type": "code",
+      "language": "bash",
+      "text": "sudo apt-get install unzip\nmkdir d2l-en && cd d2l-en\ncurl https://d2l.ai/d2l-en.zip -o d2l-en.zip\nunzip d2l-en.zip && rm d2l-en.zip"
+    },
+    {
+      "type": "paragraph",
+      "text": "Sau đó tạo môi trường conda d2l và nhập y để tiến hành cài đặt."
+    },
+    {
+      "type": "code",
+      "language": "bash",
+      "text": "conda create --name d2l -y"
+    },
+    {
+      "type": "paragraph",
+      "text": "Sau khi tạo môi trường d2l , hãy kích hoạt nó và cài đặt pip ."
+    },
+    {
+      "type": "code",
+      "language": "bash",
+      "text": "conda activate d2l\nconda install python=3.7 pip -y"
+    },
+    {
+      "type": "paragraph",
+      "text": "Cuối cùng, cài đặt MXNet và gói d2l . Postfix cu101 có nghĩa là\nđây là biến thể CIDA 10.1. Đối với các phiên bản khác nhau, chỉ nói CUCA\n10.0, bạn sẽ muốn chọn cu100 thay thế."
+    },
+    {
+      "type": "code",
+      "language": "bash",
+      "text": "pip install mxnet-cu101==1.7.0\npip install git+https://github.com/d2l-ai/d2l-en"
+    },
+    {
+      "type": "paragraph",
+      "text": "Bạn có thể nhanh chóng kiểm tra xem mọi thứ có diễn ra tốt đẹp như sau:"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "$ python\n>>> from mxnet import np, npx\n>>> np.zeros((1024, 1024), ctx=npx.gpu())"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "chay-jupyter",
+      "text": "19.3.4. Chạy Jupyter"
+    },
+    {
+      "type": "paragraph",
+      "text": "Để chạy Jupyter từ xa, bạn cần sử dụng chuyển tiếp cổng SSH. Rốt cuộc,\nmáy chủ trong đám mây không có màn hình hoặc bàn phím. Đối với điều này,\nđăng nhập vào máy chủ của bạn từ máy tính để bàn (hoặc máy tính xách\ntay) như sau."
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "# This command must be run in the local command line\nssh -i \"/path/to/key.pem\" ubuntu@ec2-xx-xxx-xxx-xxx.y.compute.amazonaws.com -L 8889:localhost:8888\nconda activate d2l\njupyter notebook"
+    },
+    {
+      "type": "paragraph",
+      "text": "Fig. 19.3.13 hiển thị đầu ra có thể sau khi bạn chạy Jupyter\nNotebook. Hàng cuối cùng là URL cho cổng 8888."
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/jupyter.png",
+      "local_path": "_images/jupyter.png",
+      "alt": "../_images/jupyter.png"
+    },
+    {
+      "type": "paragraph",
+      "text": "Fig. 19.3.13 Output after running Jupyter Notebook. The last row is the URL for\nport 8888. ¶"
+    },
+    {
+      "type": "paragraph",
+      "text": "Vì bạn đã sử dụng chuyển tiếp cổng đến cổng 8889, bạn sẽ cần thay thế số\ncổng và sử dụng bí mật do Jupyter đưa ra khi mở URL trong trình duyệt\ncục bộ của bạn."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "dong-phien-ban-chua-su-dung",
+      "text": "19.3.5. Đóng phiên bản chưa sử dụng"
+    },
+    {
+      "type": "paragraph",
+      "text": "Vì dịch vụ đám mây được lập hóa đơn theo thời gian sử dụng, bạn nên đóng\ncác phiên bản không được sử dụng. Lưu ý rằng có những lựa chọn thay thế:\n“dừng” một phiên bản có nghĩa là bạn sẽ có thể khởi động lại nó. Điều\nnày giống như tắt nguồn cho máy chủ thông thường của bạn. Tuy nhiên, các\nphiên bản dừng vẫn sẽ được lập hóa đơn một lượng nhỏ cho dung lượng đĩa\ncứng được giữ lại. “Chấm dứt” xóa tất cả dữ liệu được liên kết với nó.\nĐiều này bao gồm đĩa, do đó bạn không thể khởi động lại. Chỉ làm điều\nnày nếu bạn biết rằng bạn sẽ không cần nó trong tương lai."
+    },
+    {
+      "type": "paragraph",
+      "text": "Nếu bạn muốn sử dụng phiên bản như một mẫu cho nhiều trường hợp khác,\nnhấp chuột phải vào ví dụ trong Fig. 19.3.9 và chọn “Image” \\(\\rightarrow\\) “Create” để tạo một hình ảnh của phiên bản. Sau khi\nhoàn tất, hãy chọn “Trạng thái phiên bản” \\(\\rightarrow\\) “Terminate” để chấm dứt phiên bản. Lần sau khi bạn muốn sử dụng phiên\nbản này, bạn có thể làm theo các bước để tạo và chạy phiên bản EC2 được\nmô tả trong phần này để tạo một phiên bản dựa trên hình ảnh đã lưu. Sự\nkhác biệt duy nhất là, trong “1. Chọn AMI” được hiển thị trong Fig. 19.3.4 , bạn phải sử dụng tùy chọn “AMI của tôi” ở bên\ntrái để chọn hình ảnh đã lưu của bạn. Phiên bản được tạo sẽ giữ lại\nthông tin được lưu trữ trên đĩa cứng hình ảnh. Ví dụ: bạn sẽ không phải\ncài đặt lại CIDA và các môi trường thời gian chạy khác."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tom-tat",
+      "text": "19.3.6. Tóm tắt"
+    },
+    {
+      "type": "list",
+      "ordered": false,
+      "items": [
+        "Bạn có thể khởi chạy và dừng các phiên bản theo yêu cầu mà không cần\nphải mua và xây dựng máy tính của riêng bạn.",
+        "Bạn cần cài đặt trình điều khiển GPU phù hợp trước khi bạn có thể sử\ndụng chúng."
+      ]
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bai-tap",
+      "text": "19.3.7. Bài tập"
+    },
+    {
+      "type": "list",
+      "ordered": true,
+      "items": [
+        "Đám mây cung cấp sự tiện lợi, nhưng nó không rẻ. Tìm hiểu cách khởi\nchạy spot instances để xem\ncách giảm giá.",
+        "Thử nghiệm với các máy chủ GPU khác nhau. Họ nhanh như thế nào?",
+        "Thử nghiệm với các máy chủ đa GPU. Làm thế nào tốt bạn có thể mở rộng\nmọi thứ lên?"
+      ]
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    }
+  ],
+  "images": [
+    {
+      "original_url": "https://vi.d2l.ai/_images/aws.png",
+      "local_path": "_images/aws.png",
+      "alt": "../_images/aws.png"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/ec2.png",
+      "local_path": "_images/ec2.png",
+      "alt": "../_images/ec2.png"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/limits.png",
+      "local_path": "_images/limits.png",
+      "alt": "../_images/limits.png"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/ubuntu-new.png",
+      "local_path": "_images/ubuntu-new.png",
+      "alt": "../_images/ubuntu-new.png"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/p2x.png",
+      "local_path": "_images/p2x.png",
+      "alt": "../_images/p2x.png"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/disk.png",
+      "local_path": "_images/disk.png",
+      "alt": "../_images/disk.png"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/keypair.png",
+      "local_path": "_images/keypair.png",
+      "alt": "../_images/keypair.png"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/launching.png",
+      "local_path": "_images/launching.png",
+      "alt": "../_images/launching.png"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/connect.png",
+      "local_path": "_images/connect.png",
+      "alt": "../_images/connect.png"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/chmod.png",
+      "local_path": "_images/chmod.png",
+      "alt": "../_images/chmod.png"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/cuda101.png",
+      "local_path": "_images/cuda101.png",
+      "alt": "../_images/cuda101.png"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/miniconda.png",
+      "local_path": "_images/miniconda.png",
+      "alt": "../_images/miniconda.png"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/jupyter.png",
+      "local_path": "_images/jupyter.png",
+      "alt": "../_images/jupyter.png"
+    }
+  ],
+  "text": "19.3. Sử dụng phiên bản AWS EC2\nTrong phần này, chúng tôi sẽ chỉ cho bạn cách cài đặt tất cả các thư\nviện trên một máy Linux thô. Hãy nhớ rằng trong Section 19.2 , chúng tôi đã thảo luận về cách sử dụng Amazon\nSageMaker, trong khi tự mình xây dựng một phiên bản ít tốn kém hơn trên\nAWS. Các hướng dẫn bao gồm một số bước:\nYêu cầu phiên bản GPU Linux từ AWS EC2.\nTùy chọn: cài đặt CIDA hoặc sử dụng AMI với CIDA được cài đặt sẵn.\nThiết lập phiên bản GPU MXNet tương ứng.\nQuá trình này cũng áp dụng cho các trường hợp khác (và các đám mây\nkhác), mặc dù với một số sửa đổi nhỏ. Trước khi tiếp tục, bạn cần tạo\ntài khoản AWS, xem Section 19.2 để biết thêm chi tiết.\n19.3.1. Tạo và chạy Phiên bản EC2\nSau khi đăng nhập vào tài khoản AWS của bạn, nhấp vào “EC2” (được đánh\ndấu bằng hộp màu đỏ trong Fig. 19.3.1 ) để chuyển đến bảng EC2.\nFig. 19.3.1 Open the EC2 console. ¶\nFig. 19.3.2 hiển thị bảng điều khiển EC2 với thông tin tài khoản\nnhạy cảm bị mờ.\nFig. 19.3.2 EC2 panel. ¶\n19.3.1.1. Vị trí đặt trước Chọn một trung tâm dữ liệu gần đó để giảm độ trễ, ví dụ: “Oregon” (được đánh dấu bằng hộp màu đỏ ở phía trên bên phải của Fig. 19.3.2 ). Nếu bạn đang ở Trung Quốc, bạn có thể chọn một khu vực Châu Á Thái Bình Dương gần đó, chẳng hạn như Seoul hoặc Tokyo. Xin lưu ý rằng một số trung tâm dữ liệu có thể không có phiên bản GPU.\n19.3.1.2. Tăng giới hạn Trước khi chọn một phiên bản, hãy kiểm tra xem có giới hạn số lượng bằng cách nhấp vào nhãn “Giới hạn” ở thanh bên trái như trong Fig. 19.3.2 . Fig. 19.3.3 hiển thị một ví dụ về giới hạn như vậy. Tài khoản hiện không thể mở phiên bản “p2.xlarge” trên mỗi vùng. Nếu bạn cần mở một hoặc nhiều phiên bản, hãy nhấp vào liên kết “Tăng giới hạn yêu cầu” để áp dụng hạn ngạch phiên bản cao hơn. Nói chung, phải mất một ngày làm việc để xử lý đơn đăng ký.\nFig. 19.3.3 Instance quantity restrictions. ¶\n19.3.1.3. Khởi chạy Phiên bản Tiếp theo, nhấp vào nút “Khởi chạy phiên bản” được đánh dấu bằng hộp màu đỏ trong Fig. 19.3.2 để khởi chạy phiên bản của bạn.\nChúng tôi bắt đầu bằng cách chọn một AMI phù hợp (AWS Machine Image).\nNhập “Ubuntu” vào hộp tìm kiếm (được đánh dấu bằng hộp màu đỏ trong Fig. 19.3.4 ).\nFig. 19.3.4 Choose an operating system. ¶\nEC2 cung cấp nhiều cấu hình phiên bản khác nhau để lựa chọn. Điều này\nđôi khi có thể cảm thấy áp đảo đối với người mới bắt đầu. Dưới đây là\nmột bảng các máy phù hợp:\nTất cả các máy chủ trên đều có nhiều hương vị cho biết số lượng GPU được\nsử dụng. Ví dụ: p2.xlarge có 1 GPU và p2.16xlarge có 16 GPU và nhiều bộ\nnhớ hơn. Để biết thêm chi tiết, hãy xem AWS EC2\ndocumentation .\n** Lưu ý: ** bạn phải sử dụng phiên bản hỗ trợ GPU với trình điều khiển\nphù hợp và phiên bản MXNet được kích hoạt GPU. Nếu không, bạn sẽ không\nthấy bất kỳ lợi ích nào từ việc sử dụng GPU.\nFig. 19.3.5 Choose an instance. ¶\nCho đến nay, chúng tôi đã hoàn thành hai trong bảy bước đầu tiên để khởi\nchạy một phiên bản EC2, như được hiển thị trên đầu Fig. 19.3.6 .\nTrong ví dụ này, chúng tôi giữ các cấu hình mặc định cho các bước “3.\nCấu hình phiên bản”, “5. Thêm Thẻ”, và “6. Cấu hình nhóm bảo mật”. Nhấn\nvào “4. Thêm lưu trữ” và tăng kích thước đĩa cứng mặc định lên 64 GB\n(được đánh dấu trong hộp màu đỏ của Fig. 19.3.6 ). Lưu ý rằng\nCIDA của chính nó đã chiếm 4 GB.\nFig. 19.3.6 Modify instance hard disk size. ¶\nCuối cùng, đi đến “7. Xem lại” và nhấp vào “Khởi chạy” để khởi chạy\nphiên bản được cấu hình. Bây giờ hệ thống sẽ nhắc bạn chọn cặp khóa được\nsử dụng để truy cập phiên bản. Nếu bạn không có cặp khóa, hãy chọn “Tạo\ncặp khóa mới” trong menu thả xuống đầu tiên trong Fig. 19.3.7 để tạo một cặp khóa. Sau đó, bạn có thể chọn\n“Chọn một cặp khóa hiện có” cho menu này và sau đó chọn cặp khóa được\ntạo trước đó. Nhấp vào “Khởi chạy phiên bản” để khởi chạy phiên bản đã\ntạo.\nFig. 19.3.7 Select a key pair. ¶\nĐảm bảo rằng bạn tải xuống cặp khóa và lưu trữ nó ở một vị trí an toàn\nnếu bạn tạo một cặp khóa mới. Đây là cách duy nhất của bạn để SSH vào\nmáy chủ. Nhấp vào ID phiên bản được hiển thị trong Fig. 19.3.8 để xem trạng thái của phiên bản này.\nFig. 19.3.8 Click the instance ID. ¶\n19.3.1.4. Kết nối với Phiên bản\nNhư được hiển thị trong Fig. 19.3.9 , sau khi trạng thái\nphiên bản chuyển sang màu xanh lá cây, nhấp chuột phải vào phiên bản và\nchọn Connect để xem phương thức truy cập phiên bản.\nFig. 19.3.9 View instance access and startup method. ¶\nNếu đây là khóa mới, SSH không được xem công khai để SSH hoạt động.\nChuyển đến thư mục nơi bạn lưu trữ D2L_key.pem (ví dụ: thư mục\nDownloads) và đảm bảo rằng khóa không thể xem công khai.\nFig. 19.3.10 View instance access and startup method. ¶\nBây giờ, sao chép lệnh ssh trong hộp màu đỏ thấp hơn của Fig. 19.3.10 và dán vào dòng lệnh:\nKhi dòng lệnh nhắc “Bạn có chắc muốn tiếp tục kết nối (có/không)”, nhập\n“yes” và nhấn Enter để đăng nhập vào phiên bản.\nMáy chủ của bạn đã sẵn sàng ngay bây giờ.\n19.3.2. Cài đặt CDA\nTrước khi cài đặt CIDA, hãy chắc chắn cập nhật phiên bản với các trình\nđiều khiển mới nhất.\nỞ đây chúng tôi tải về CDA 10.1. Truy cập [kho chính thức] của NVIDIA\n( https://developer.nvidia.com/cuda-downloads ) to find the download link\nof CUDA 10.1 as shown in Fig. 19.3.11 .\nFig. 19.3.11 Find the CUDA 10.1 download address. ¶\nSao chép các hướng dẫn và dán chúng vào thiết bị đầu cuối để cài đặt\nCUTA 10.1.\nSau khi cài đặt chương trình, hãy chạy lệnh sau để xem GPU.\nCuối cùng, thêm CIDA vào đường dẫn thư viện để giúp các thư viện khác\ntìm thấy nó.\n19.3.3. Cài đặt MXNet và Tải xuống máy tính xách tay D2L\nĐầu tiên, để đơn giản hóa quá trình cài đặt, bạn cần cài đặt Miniconda cho Linux.\nLiên kết tải xuống và tên tệp có thể thay đổi, vì vậy vui lòng truy cập\ntrang web Miniconda và nhấp vào “Sao chép địa chỉ liên kết” như thể hiện\ntrong Fig. 19.3.12 .\nFig. 19.3.12 Download Miniconda. ¶\nSau khi cài đặt Miniconda, chạy lệnh sau để kích hoạt CIDA và conda.\nTiếp theo, tải xuống mã cho cuốn sách này.\nSau đó tạo môi trường conda d2l và nhập y để tiến hành cài đặt.\nSau khi tạo môi trường d2l , hãy kích hoạt nó và cài đặt pip .\nCuối cùng, cài đặt MXNet và gói d2l . Postfix cu101 có nghĩa là\nđây là biến thể CIDA 10.1. Đối với các phiên bản khác nhau, chỉ nói CUCA\n10.0, bạn sẽ muốn chọn cu100 thay thế.\nBạn có thể nhanh chóng kiểm tra xem mọi thứ có diễn ra tốt đẹp như sau:\n19.3.4. Chạy Jupyter\nĐể chạy Jupyter từ xa, bạn cần sử dụng chuyển tiếp cổng SSH. Rốt cuộc,\nmáy chủ trong đám mây không có màn hình hoặc bàn phím. Đối với điều này,\nđăng nhập vào máy chủ của bạn từ máy tính để bàn (hoặc máy tính xách\ntay) như sau.\nFig. 19.3.13 hiển thị đầu ra có thể sau khi bạn chạy Jupyter\nNotebook. Hàng cuối cùng là URL cho cổng 8888.\nFig. 19.3.13 Output after running Jupyter Notebook. The last row is the URL for\nport 8888. ¶\nVì bạn đã sử dụng chuyển tiếp cổng đến cổng 8889, bạn sẽ cần thay thế số\ncổng và sử dụng bí mật do Jupyter đưa ra khi mở URL trong trình duyệt\ncục bộ của bạn.\n19.3.5. Đóng phiên bản chưa sử dụng\nVì dịch vụ đám mây được lập hóa đơn theo thời gian sử dụng, bạn nên đóng\ncác phiên bản không được sử dụng. Lưu ý rằng có những lựa chọn thay thế:\n“dừng” một phiên bản có nghĩa là bạn sẽ có thể khởi động lại nó. Điều\nnày giống như tắt nguồn cho máy chủ thông thường của bạn. Tuy nhiên, các\nphiên bản dừng vẫn sẽ được lập hóa đơn một lượng nhỏ cho dung lượng đĩa\ncứng được giữ lại. “Chấm dứt” xóa tất cả dữ liệu được liên kết với nó.\nĐiều này bao gồm đĩa, do đó bạn không thể khởi động lại. Chỉ làm điều\nnày nếu bạn biết rằng bạn sẽ không cần nó trong tương lai.\nNếu bạn muốn sử dụng phiên bản như một mẫu cho nhiều trường hợp khác,\nnhấp chuột phải vào ví dụ trong Fig. 19.3.9 và chọn “Image” \\(\\rightarrow\\) “Create” để tạo một hình ảnh của phiên bản. Sau khi\nhoàn tất, hãy chọn “Trạng thái phiên bản” \\(\\rightarrow\\) “Terminate” để chấm dứt phiên bản. Lần sau khi bạn muốn sử dụng phiên\nbản này, bạn có thể làm theo các bước để tạo và chạy phiên bản EC2 được\nmô tả trong phần này để tạo một phiên bản dựa trên hình ảnh đã lưu. Sự\nkhác biệt duy nhất là, trong “1. Chọn AMI” được hiển thị trong Fig. 19.3.4 , bạn phải sử dụng tùy chọn “AMI của tôi” ở bên\ntrái để chọn hình ảnh đã lưu của bạn. Phiên bản được tạo sẽ giữ lại\nthông tin được lưu trữ trên đĩa cứng hình ảnh. Ví dụ: bạn sẽ không phải\ncài đặt lại CIDA và các môi trường thời gian chạy khác.\n19.3.6. Tóm tắt\nBạn có thể khởi chạy và dừng các phiên bản theo yêu cầu mà không cần\nphải mua và xây dựng máy tính của riêng bạn.\nBạn cần cài đặt trình điều khiển GPU phù hợp trước khi bạn có thể sử\ndụng chúng.\n19.3.7. Bài tập\nĐám mây cung cấp sự tiện lợi, nhưng nó không rẻ. Tìm hiểu cách khởi\nchạy spot instances để xem\ncách giảm giá.\nThử nghiệm với các máy chủ GPU khác nhau. Họ nhanh như thế nào?\nThử nghiệm với các máy chủ đa GPU. Làm thế nào tốt bạn có thể mở rộng\nmọi thứ lên?\nDiscussions"
+}

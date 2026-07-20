@@ -1,0 +1,256 @@
+{
+  "url": "https://vi.d2l.ai/chapter_recommender-systems/mf.html",
+  "chapter": "chapter_recommender-systems",
+  "title": "16.3. Matrận Factorization",
+  "crawled_at": "2026-07-20T12:41:11.699056+00:00",
+  "headings": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "matran-factorization",
+      "text": "16.3. Matrận Factorization"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "mo-hinh-factorization-matrix",
+      "text": "16.3.1. Mô hình Factorization Matrix"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "thuc-hien-mo-hinh",
+      "text": "16.3.2. Thực hiện mô hình"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "cac-bien-phap-danh-gia",
+      "text": "16.3.3. Các biện pháp đánh giá"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "dao-tao-va-danh-gia-mo-hinh",
+      "text": "16.3.4. Đào tạo và đánh giá mô hình"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tom-tat",
+      "text": "16.3.5. Tóm tắt"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bai-tap",
+      "text": "16.3.6. Bài tập"
+    }
+  ],
+  "content": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "matran-factorization",
+      "text": "16.3. Matrận Factorization"
+    },
+    {
+      "type": "paragraph",
+      "text": "Matrix Factorization [Koren et al., 2009] là một thuật\ntoán được thiết lập tốt trong tài liệu hệ thống giới thiệu. Phiên bản\nđầu tiên của mô hình bao thanh toán ma trận được đề xuất bởi Simon Funk\ntrong một [bài đăng blog] nổi tiếng\n( https://sifter.org/~simon/journal/20061211.html ) trong đó ông mô tả ý\ntưởng bao thanh toán ma trận tương tác. Sau đó nó trở nên nổi tiếng rộng\nrãi do cuộc thi Netflix được tổ chức vào năm 2006. Vào thời điểm đó,\nNetflix, một công ty phát trực tuyến truyền thông và cho thuê video, đã\ncông bố một cuộc thi để cải thiện hiệu suất hệ thống giới thiệu của\nmình. Đội ngũ tốt nhất có thể cải thiện trên đường cơ sở Netflix, tức là\nCinematch), 10 phần trăm sẽ giành được giải thưởng một triệu USD. Như\nvậy, cuộc thi này đã thu hút rất nhiều sự chú ý đến lĩnh vực nghiên cứu\nhệ thống giới thiệu. Sau đó, giải thưởng lớn đã giành được bởi đội\nPragmatic Chaos của BellKor, một nhóm kết hợp của BellKor, Lý thuyết\nthực dụng và BigChaos (bạn không cần phải lo lắng về các thuật toán này\nbây giờ). Mặc dù điểm cuối cùng là kết quả của một giải pháp ensemble\n(tức là sự kết hợp của nhiều thuật toán), thuật toán factorization ma\ntrận đóng một vai trò quan trọng trong sự pha trộn cuối cùng. Báo cáo kỹ\nthuật của giải pháp Netflix Grand Prize [Toscher et al., 2009] cung cấp một giới thiệu chi tiết về\nmô hình được thông qua. Trong phần này, chúng ta sẽ đi sâu vào các chi\ntiết của mô hình factorization ma trận và việc thực hiện nó."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "mo-hinh-factorization-matrix",
+      "text": "16.3.1. Mô hình Factorization Matrix"
+    },
+    {
+      "type": "paragraph",
+      "text": "Matrận factorization là một lớp các mô hình lọc hợp tác. Cụ thể, mô hình\nfactorizes ma trận tương tác mục người dùng (ví dụ, ma trận đánh giá)\nvào tích của hai ma trận cấp thấp hơn, nắm bắt cấu trúc cấp thấp của các\ntương tác mục người dùng."
+    },
+    {
+      "type": "paragraph",
+      "text": "Hãy để \\(\\mathbf{R} \\in \\mathbb{R}^{m \\times n}\\) biểu thị ma trận\ntương tác với \\(m\\) người dùng và \\(n\\) mục, và các giá trị của \\(\\mathbf{R}\\) đại diện cho xếp hạng rõ ràng. Tương tác mục người\ndùng sẽ được bao thanh toán thành ma trận tiềm ẩn người dùng \\(\\mathbf{P} \\in \\mathbb{R}^{m \\times k}\\) và một ma trận tiềm ẩn\nmục \\(\\mathbf{Q} \\in \\mathbb{R}^{n \\times k}\\) , trong đó \\(k \\ll m, n\\) , là kích thước yếu tố tiềm ẩn. Hãy để \\(\\mathbf{p}_u\\) biểu thị hàng \\(u^\\mathrm{th}\\) của \\(\\mathbf{P}\\) và \\(\\mathbf{q}_i\\) biểu thị hàng \\(i^\\mathrm{th}\\) của \\(\\mathbf{Q}\\) . Đối với một mục nhất định \\(i\\) , các yếu tố của \\(\\mathbf{q}_i\\) đo mức độ mà vật phẩm sở\nhữu những đặc điểm đó như thể loại và ngôn ngữ của một bộ phim. Đối với\nmột người dùng nhất định \\(u\\) , các yếu tố của \\(\\mathbf{p}_u\\) đo mức độ quan tâm mà người dùng có trong các đặc điểm tương ứng của các\nmặt hàng. Những yếu tố tiềm ẩn này có thể đo lường các kích thước rõ\nràng như đã đề cập trong các ví dụ đó hoặc hoàn toàn không thể hiểu\nđược. Các xếp hạng dự đoán có thể được ước tính bởi"
+    },
+    {
+      "type": "math",
+      "latex": "(16.3.1)¶\\[\\hat{\\mathbf{R}} = \\mathbf{PQ}^\\top\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "trong đó \\(\\hat{\\mathbf{R}}\\in \\mathbb{R}^{m \\times n}\\) là ma trận\nđánh giá dự đoán có hình dạng giống như \\(\\mathbf{R}\\) . Một vấn đề\nlớn của quy tắc dự đoán này là thành kiến của người dùng/mục không thể\nđược mô hình hóa. Ví dụ, một số người dùng có xu hướng đưa ra xếp hạng\ncao hơn hoặc một số mặt hàng luôn nhận được xếp hạng thấp hơn do chất\nlượng kém hơn. Những thành kiến này là phổ biến trong các ứng dụng trong\nthế giới thực. Để nắm bắt những thành kiến này, các thuật ngữ thiên vị\ncụ thể và mục cụ thể của người dùng được giới thiệu. Cụ thể, người dùng\nđánh giá dự đoán \\(u\\) cung cấp cho mục \\(i\\) được tính bằng"
+    },
+    {
+      "type": "math",
+      "latex": "(16.3.2)¶\\[\\hat{\\mathbf{R}}_{ui} = \\mathbf{p}_u\\mathbf{q}^\\top_i + b_u + b_i\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Sau đó, chúng tôi đào tạo mô hình factorization ma trận bằng cách giảm\nthiểu sai số bình phương trung bình giữa điểm đánh giá dự đoán và điểm\nđánh giá thực. Hàm mục tiêu được định nghĩa như sau:"
+    },
+    {
+      "type": "math",
+      "latex": "(16.3.3)¶\\[\\underset{\\mathbf{P}, \\mathbf{Q}, b}{\\mathrm{argmin}} \\sum_{(u, i) \\in \\mathcal{K}} \\| \\mathbf{R}_{ui} -\n\\hat{\\mathbf{R}}_{ui} \\|^2 + \\lambda (\\| \\mathbf{P} \\|^2_F + \\| \\mathbf{Q}\n\\|^2_F + b_u^2 + b_i^2 )\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "trong đó \\(\\lambda\\) biểu thị tỷ lệ đều đặn. Thuật ngữ chính quy hóa\n$ lambda ( | mathbf {P} |^2_F + | mathbf {Q} |^2_F + b_u^2 +\nb_i^2) $ is used to avoid over-fitting by penalizing the magnitude of\nthe parameters. The $ (u, i) $ pairs for which $ mathbf {R} _ {ui} $\nđược biết đến được lưu trữ trong bộ 732 293616. Các tham số mô hình có\nthể được học với một thuật toán tối ưu hóa, chẳng hạn như Stochastic\nGradient Descent và Adam."
+    },
+    {
+      "type": "paragraph",
+      "text": "Một minh họa trực quan của mô hình factorization ma trận được hiển thị\ndưới đây:"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/rec-mf.svg",
+      "local_path": "_images/rec-mf.svg",
+      "alt": "../_images/rec-mf.svg"
+    },
+    {
+      "type": "paragraph",
+      "text": "Fig. 16.3.1 Illustration of matrix factorization model ¶"
+    },
+    {
+      "type": "paragraph",
+      "text": "Trong phần còn lại của phần này, chúng tôi sẽ giải thích việc triển khai\ntính toán ma trận và đào tạo mô hình trên bộ dữ liệu MovieLens."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "import mxnet as mx\nfrom mxnet import autograd, gluon, np, npx\nfrom mxnet.gluon import nn\nfrom d2l import mxnet as d2l\n\nnpx.set_np()"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "thuc-hien-mo-hinh",
+      "text": "16.3.2. Thực hiện mô hình"
+    },
+    {
+      "type": "paragraph",
+      "text": "Đầu tiên, chúng tôi thực hiện mô hình factorization ma trận được mô tả ở\ntrên. Các yếu tố tiềm ẩn của người dùng và mục có thể được tạo ra với nn.Embedding . input_dim là số mục/người dùng và ( output_dim )\nlà kích thước của các yếu tố tiềm ẩn ( \\(k\\) ). Chúng tôi cũng có thể\nsử dụng nn.Embedding để tạo thành kiến người dùng/mục bằng cách đặt output_dim thành một. Trong chức năng forward , id người dùng và\nmục được sử dụng để tra cứu các embeddings."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "class MF(nn.Block):\n    def __init__(self, num_factors, num_users, num_items, **kwargs):\n        super(MF, self).__init__(**kwargs)\n        self.P = nn.Embedding(input_dim=num_users, output_dim=num_factors)\n        self.Q = nn.Embedding(input_dim=num_items, output_dim=num_factors)\n        self.user_bias = nn.Embedding(num_users, 1)\n        self.item_bias = nn.Embedding(num_items, 1)\n\n    def forward(self, user_id, item_id):\n        P_u = self.P(user_id)\n        Q_i = self.Q(item_id)\n        b_u = self.user_bias(user_id)\n        b_i = self.item_bias(item_id)\n        outputs = (P_u * Q_i).sum(axis=1) + np.squeeze(b_u) + np.squeeze(b_i)\n        return outputs.flatten()"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "cac-bien-phap-danh-gia",
+      "text": "16.3.3. Các biện pháp đánh giá"
+    },
+    {
+      "type": "paragraph",
+      "text": "Sau đó, chúng tôi thực hiện đo RMSE (lỗi gốc có nghĩa là vuông), thường\nđược sử dụng để đo lường sự khác biệt giữa điểm xếp hạng được dự đoán\nbởi mô hình và xếp hạng thực sự quan sát (sự thật mặt đất) [Gunawardana & Shani, 2015] . RMSE được định nghĩa là:"
+    },
+    {
+      "type": "math",
+      "latex": "(16.3.4)¶\\[\\mathrm{RMSE} = \\sqrt{\\frac{1}{|\\mathcal{T}|}\\sum_{(u, i) \\in \\mathcal{T}}(\\mathbf{R}_{ui} -\\hat{\\mathbf{R}}_{ui})^2}\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "trong đó \\(\\mathcal{T}\\) là bộ bao gồm các cặp người dùng và các mặt\nhàng mà bạn muốn đánh giá. \\(|\\mathcal{T}|\\) là kích thước của bộ\nnày. Chúng ta có thể sử dụng hàm RMSE được cung cấp bởi mx.metric ."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def evaluator(net, test_iter, devices):\n    rmse = mx.metric.RMSE()  # Get the RMSE\n    rmse_list = []\n    for idx, (users, items, ratings) in enumerate(test_iter):\n        u = gluon.utils.split_and_load(users, devices, even_split=False)\n        i = gluon.utils.split_and_load(items, devices, even_split=False)\n        r_ui = gluon.utils.split_and_load(ratings, devices, even_split=False)\n        r_hat = [net(u, i) for u, i in zip(u, i)]\n        rmse.update(labels=r_ui, preds=r_hat)\n        rmse_list.append(rmse.get()[1])\n    return float(np.mean(np.array(rmse_list)))"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "dao-tao-va-danh-gia-mo-hinh",
+      "text": "16.3.4. Đào tạo và đánh giá mô hình"
+    },
+    {
+      "type": "paragraph",
+      "text": "Trong chức năng đào tạo, chúng tôi áp dụng giảm \\(L_2\\) với giảm\ncân. Cơ chế phân rã trọng lượng có tác dụng tương tự như quy định hóa \\(L_2\\) ."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "#@save\ndef train_recsys_rating(net, train_iter, test_iter, loss, trainer, num_epochs,\n                        devices=d2l.try_all_gpus(), evaluator=None,\n                        **kwargs):\n    timer = d2l.Timer()\n    animator = d2l.Animator(xlabel='epoch', xlim=[1, num_epochs], ylim=[0, 2],\n                            legend=['train loss', 'test RMSE'])\n    for epoch in range(num_epochs):\n        metric, l = d2l.Accumulator(3), 0.\n        for i, values in enumerate(train_iter):\n            timer.start()\n            input_data = []\n            values = values if isinstance(values, list) else [values]\n            for v in values:\n                input_data.append(gluon.utils.split_and_load(v, devices))\n            train_feat = input_data[0:-1] if len(values) > 1 else input_data\n            train_label = input_data[-1]\n            with autograd.record():\n                preds = [net(*t) for t in zip(*train_feat)]\n                ls = [loss(p, s) for p, s in zip(preds, train_label)]\n            [l.backward() for l in ls]\n            l += sum([l.asnumpy() for l in ls]).mean() / len(devices)\n            trainer.step(values[0].shape[0])\n            metric.add(l, values[0].shape[0], values[0].size)\n            timer.stop()\n        if len(kwargs) > 0:  # It will be used in section AutoRec\n            test_rmse = evaluator(net, test_iter, kwargs['inter_mat'],\n                                  devices)\n        else:\n            test_rmse = evaluator(net, test_iter, devices)\n        train_l = l / (i + 1)\n        animator.add(epoch + 1, (train_l, test_rmse))\n    print(f'train loss {metric[0] / metric[1]:.3f}, '\n          f'test RMSE {test_rmse:.3f}')\n    print(f'{metric[2] * num_epochs / timer.sum():.1f} examples/sec '\n          f'on {str(devices)}')"
+    },
+    {
+      "type": "paragraph",
+      "text": "Cuối cùng, chúng ta hãy đặt tất cả mọi thứ lại với nhau và đào tạo mô\nhình. Ở đây, chúng ta đặt kích thước yếu tố tiềm ẩn là 30."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "devices = d2l.try_all_gpus()\nnum_users, num_items, train_iter, test_iter = d2l.split_and_load_ml100k(\n    test_ratio=0.1, batch_size=512)\nnet = MF(30, num_users, num_items)\nnet.initialize(ctx=devices, force_reinit=True, init=mx.init.Normal(0.01))\nlr, num_epochs, wd, optimizer = 0.002, 20, 1e-5, 'adam'\nloss = gluon.loss.L2Loss()\ntrainer = gluon.Trainer(net.collect_params(), optimizer,\n                        {\"learning_rate\": lr, 'wd': wd})\ntrain_recsys_rating(net, train_iter, test_iter, loss, trainer, num_epochs,\n                    devices, evaluator)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "train loss 0.064, test RMSE 1.059\n37412.3 examples/sec on [gpu(0), gpu(1)]"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_mf_922250_9_1.svg",
+      "local_path": "_images/output_mf_922250_9_1.svg",
+      "alt": "../_images/output_mf_922250_9_1.svg"
+    },
+    {
+      "type": "paragraph",
+      "text": "Dưới đây, chúng tôi sử dụng mô hình được đào tạo để dự đoán xếp hạng mà\nngười dùng (ID 20) có thể cung cấp cho một mục (ID 30)."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "scores = net(np.array([20], dtype='int', ctx=devices[0]),\n             np.array([30], dtype='int', ctx=devices[0]))\nscores"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "array([3.2455618], ctx=gpu(0))"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tom-tat",
+      "text": "16.3.5. Tóm tắt"
+    },
+    {
+      "type": "list",
+      "ordered": false,
+      "items": [
+        "Mô hình factorization ma trận được sử dụng rộng rãi trong các hệ\nthống recommender. Nó có thể được sử dụng để dự đoán xếp hạng mà\nngười dùng có thể cung cấp cho một mục.",
+        "Chúng tôi có thể thực hiện và đào tạo ma trận factorization cho các\nhệ thống recommender."
+      ]
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bai-tap",
+      "text": "16.3.6. Bài tập"
+    },
+    {
+      "type": "list",
+      "ordered": false,
+      "items": [
+        "Thay đổi kích thước của các yếu tố tiềm ẩn. Làm thế nào để kích thước\ncủa các yếu tố tiềm ẩn ảnh hưởng đến hiệu suất mô hình?",
+        "Hãy thử các trình tối ưu hóa khác nhau, tỷ lệ học tập và tỷ lệ phân\nrã cân nặng.",
+        "Kiểm tra điểm xếp hạng dự đoán của những người dùng khác cho một bộ\nphim cụ thể."
+      ]
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    }
+  ],
+  "images": [
+    {
+      "original_url": "https://vi.d2l.ai/_images/rec-mf.svg",
+      "local_path": "_images/rec-mf.svg",
+      "alt": "../_images/rec-mf.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_mf_922250_9_1.svg",
+      "local_path": "_images/output_mf_922250_9_1.svg",
+      "alt": "../_images/output_mf_922250_9_1.svg"
+    }
+  ],
+  "text": "16.3. Matrận Factorization\nMatrix Factorization [Koren et al., 2009] là một thuật\ntoán được thiết lập tốt trong tài liệu hệ thống giới thiệu. Phiên bản\nđầu tiên của mô hình bao thanh toán ma trận được đề xuất bởi Simon Funk\ntrong một [bài đăng blog] nổi tiếng\n( https://sifter.org/~simon/journal/20061211.html ) trong đó ông mô tả ý\ntưởng bao thanh toán ma trận tương tác. Sau đó nó trở nên nổi tiếng rộng\nrãi do cuộc thi Netflix được tổ chức vào năm 2006. Vào thời điểm đó,\nNetflix, một công ty phát trực tuyến truyền thông và cho thuê video, đã\ncông bố một cuộc thi để cải thiện hiệu suất hệ thống giới thiệu của\nmình. Đội ngũ tốt nhất có thể cải thiện trên đường cơ sở Netflix, tức là\nCinematch), 10 phần trăm sẽ giành được giải thưởng một triệu USD. Như\nvậy, cuộc thi này đã thu hút rất nhiều sự chú ý đến lĩnh vực nghiên cứu\nhệ thống giới thiệu. Sau đó, giải thưởng lớn đã giành được bởi đội\nPragmatic Chaos của BellKor, một nhóm kết hợp của BellKor, Lý thuyết\nthực dụng và BigChaos (bạn không cần phải lo lắng về các thuật toán này\nbây giờ). Mặc dù điểm cuối cùng là kết quả của một giải pháp ensemble\n(tức là sự kết hợp của nhiều thuật toán), thuật toán factorization ma\ntrận đóng một vai trò quan trọng trong sự pha trộn cuối cùng. Báo cáo kỹ\nthuật của giải pháp Netflix Grand Prize [Toscher et al., 2009] cung cấp một giới thiệu chi tiết về\nmô hình được thông qua. Trong phần này, chúng ta sẽ đi sâu vào các chi\ntiết của mô hình factorization ma trận và việc thực hiện nó.\n16.3.1. Mô hình Factorization Matrix\nMatrận factorization là một lớp các mô hình lọc hợp tác. Cụ thể, mô hình\nfactorizes ma trận tương tác mục người dùng (ví dụ, ma trận đánh giá)\nvào tích của hai ma trận cấp thấp hơn, nắm bắt cấu trúc cấp thấp của các\ntương tác mục người dùng.\nHãy để \\(\\mathbf{R} \\in \\mathbb{R}^{m \\times n}\\) biểu thị ma trận\ntương tác với \\(m\\) người dùng và \\(n\\) mục, và các giá trị của \\(\\mathbf{R}\\) đại diện cho xếp hạng rõ ràng. Tương tác mục người\ndùng sẽ được bao thanh toán thành ma trận tiềm ẩn người dùng \\(\\mathbf{P} \\in \\mathbb{R}^{m \\times k}\\) và một ma trận tiềm ẩn\nmục \\(\\mathbf{Q} \\in \\mathbb{R}^{n \\times k}\\) , trong đó \\(k \\ll m, n\\) , là kích thước yếu tố tiềm ẩn. Hãy để \\(\\mathbf{p}_u\\) biểu thị hàng \\(u^\\mathrm{th}\\) của \\(\\mathbf{P}\\) và \\(\\mathbf{q}_i\\) biểu thị hàng \\(i^\\mathrm{th}\\) của \\(\\mathbf{Q}\\) . Đối với một mục nhất định \\(i\\) , các yếu tố của \\(\\mathbf{q}_i\\) đo mức độ mà vật phẩm sở\nhữu những đặc điểm đó như thể loại và ngôn ngữ của một bộ phim. Đối với\nmột người dùng nhất định \\(u\\) , các yếu tố của \\(\\mathbf{p}_u\\) đo mức độ quan tâm mà người dùng có trong các đặc điểm tương ứng của các\nmặt hàng. Những yếu tố tiềm ẩn này có thể đo lường các kích thước rõ\nràng như đã đề cập trong các ví dụ đó hoặc hoàn toàn không thể hiểu\nđược. Các xếp hạng dự đoán có thể được ước tính bởi\ntrong đó \\(\\hat{\\mathbf{R}}\\in \\mathbb{R}^{m \\times n}\\) là ma trận\nđánh giá dự đoán có hình dạng giống như \\(\\mathbf{R}\\) . Một vấn đề\nlớn của quy tắc dự đoán này là thành kiến của người dùng/mục không thể\nđược mô hình hóa. Ví dụ, một số người dùng có xu hướng đưa ra xếp hạng\ncao hơn hoặc một số mặt hàng luôn nhận được xếp hạng thấp hơn do chất\nlượng kém hơn. Những thành kiến này là phổ biến trong các ứng dụng trong\nthế giới thực. Để nắm bắt những thành kiến này, các thuật ngữ thiên vị\ncụ thể và mục cụ thể của người dùng được giới thiệu. Cụ thể, người dùng\nđánh giá dự đoán \\(u\\) cung cấp cho mục \\(i\\) được tính bằng\nSau đó, chúng tôi đào tạo mô hình factorization ma trận bằng cách giảm\nthiểu sai số bình phương trung bình giữa điểm đánh giá dự đoán và điểm\nđánh giá thực. Hàm mục tiêu được định nghĩa như sau:\ntrong đó \\(\\lambda\\) biểu thị tỷ lệ đều đặn. Thuật ngữ chính quy hóa\n$ lambda ( | mathbf {P} |^2_F + | mathbf {Q} |^2_F + b_u^2 +\nb_i^2) $ is used to avoid over-fitting by penalizing the magnitude of\nthe parameters. The $ (u, i) $ pairs for which $ mathbf {R} _ {ui} $\nđược biết đến được lưu trữ trong bộ 732 293616. Các tham số mô hình có\nthể được học với một thuật toán tối ưu hóa, chẳng hạn như Stochastic\nGradient Descent và Adam.\nMột minh họa trực quan của mô hình factorization ma trận được hiển thị\ndưới đây:\nFig. 16.3.1 Illustration of matrix factorization model ¶\nTrong phần còn lại của phần này, chúng tôi sẽ giải thích việc triển khai\ntính toán ma trận và đào tạo mô hình trên bộ dữ liệu MovieLens.\n16.3.2. Thực hiện mô hình\nĐầu tiên, chúng tôi thực hiện mô hình factorization ma trận được mô tả ở\ntrên. Các yếu tố tiềm ẩn của người dùng và mục có thể được tạo ra với nn.Embedding . input_dim là số mục/người dùng và ( output_dim )\nlà kích thước của các yếu tố tiềm ẩn ( \\(k\\) ). Chúng tôi cũng có thể\nsử dụng nn.Embedding để tạo thành kiến người dùng/mục bằng cách đặt output_dim thành một. Trong chức năng forward , id người dùng và\nmục được sử dụng để tra cứu các embeddings.\n16.3.3. Các biện pháp đánh giá\nSau đó, chúng tôi thực hiện đo RMSE (lỗi gốc có nghĩa là vuông), thường\nđược sử dụng để đo lường sự khác biệt giữa điểm xếp hạng được dự đoán\nbởi mô hình và xếp hạng thực sự quan sát (sự thật mặt đất) [Gunawardana & Shani, 2015] . RMSE được định nghĩa là:\ntrong đó \\(\\mathcal{T}\\) là bộ bao gồm các cặp người dùng và các mặt\nhàng mà bạn muốn đánh giá. \\(|\\mathcal{T}|\\) là kích thước của bộ\nnày. Chúng ta có thể sử dụng hàm RMSE được cung cấp bởi mx.metric .\n16.3.4. Đào tạo và đánh giá mô hình\nTrong chức năng đào tạo, chúng tôi áp dụng giảm \\(L_2\\) với giảm\ncân. Cơ chế phân rã trọng lượng có tác dụng tương tự như quy định hóa \\(L_2\\) .\nCuối cùng, chúng ta hãy đặt tất cả mọi thứ lại với nhau và đào tạo mô\nhình. Ở đây, chúng ta đặt kích thước yếu tố tiềm ẩn là 30.\nDưới đây, chúng tôi sử dụng mô hình được đào tạo để dự đoán xếp hạng mà\nngười dùng (ID 20) có thể cung cấp cho một mục (ID 30).\n16.3.5. Tóm tắt\nMô hình factorization ma trận được sử dụng rộng rãi trong các hệ\nthống recommender. Nó có thể được sử dụng để dự đoán xếp hạng mà\nngười dùng có thể cung cấp cho một mục.\nChúng tôi có thể thực hiện và đào tạo ma trận factorization cho các\nhệ thống recommender.\n16.3.6. Bài tập\nThay đổi kích thước của các yếu tố tiềm ẩn. Làm thế nào để kích thước\ncủa các yếu tố tiềm ẩn ảnh hưởng đến hiệu suất mô hình?\nHãy thử các trình tối ưu hóa khác nhau, tỷ lệ học tập và tỷ lệ phân\nrã cân nặng.\nKiểm tra điểm xếp hạng dự đoán của những người dùng khác cho một bộ\nphim cụ thể.\nDiscussions"
+}

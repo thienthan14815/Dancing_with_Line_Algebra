@@ -1,0 +1,1222 @@
+{
+  "url": "https://vi.d2l.ai/chapter_appendix-mathematics-for-deep-learning/geometry-linear-algebraic-ops.html",
+  "chapter": "chapter_appendix-mathematics-for-deep-learning",
+  "title": "18.1. Hình học và các hoạt động đại số tuyến tính",
+  "crawled_at": "2026-07-20T12:41:22.177140+00:00",
+  "headings": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "hinh-hoc-va-cac-hoat-dong-dai-so-tuyen-tinh",
+      "text": "18.1. Hình học và các hoạt động đại số tuyến tính"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "hinh-hoc-cua-vecto-truoc-tien-chung-ta-can-thao-luan-ve-hai-cach-giai-thich-hinh-hoc-pho-bien-cua-vecto-nhu-mot-trong-hai-diem-hoac-huong-trong-khong-gian-ve-co-ban-mot-vecto-la-danh-sach-cac-so-nhu-danh-sach-python-ben-duoi",
+      "text": "18.1.1. Hình học của Vectơ Trước tiên, chúng ta cần thảo luận về hai cách giải thích hình học phổ biến của vectơ, như một trong hai điểm hoặc hướng trong không gian. Về cơ bản, một vectơ là danh sách các số như danh sách Python bên dưới."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "dot-san-pham-va-angles-nhu-chung-ta-da-thay-trong-sec-linear-algebra-neu-chung-ta-lay-hai-vecto-cot-mathbf-u-va-mathbf-v-chung-ta-co-the-tao-thanh-san-pham-cham-cua-chung-bang-cach-tinh-toan",
+      "text": "18.1.2. Dot Sản phẩm và Angles Như chúng ta đã thấy trong Section 2.3 , nếu chúng ta lấy hai vectơ cột \\(\\mathbf{u}\\) và \\(\\mathbf{v}\\) , chúng ta có thể tạo thành sản phẩm chấm của chúng bằng cách tính toán:"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "cosine-similarity",
+      "text": "18.1.2.1. Cosine Similarity"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "sieu-may-bay",
+      "text": "18.1.3. Siêu máy bay"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "hinh-hoc-cua-bien-doi-tuyen-tinh",
+      "text": "18.1.4. Hình học của biến đổi tuyến tính"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "su-phu-thuoc-tuyen-tinh",
+      "text": "18.1.5. Sự phụ thuộc tuyến tính"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "thu-hang",
+      "text": "18.1.6. thứ hạng"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "kha-nang-dao-nguoc",
+      "text": "18.1.7. Khả năng đảo ngược"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "cac-van-de-so-trong-khi-nghich-dao-cua-ma-tran-rat-huu-ich-ve-ly-thuyet-chung-ta-phai-noi-rang-hau-het-thoi-gian-chung-ta-khong-muon-su-dung-ma-tran-nghich-dao-de-giai-quyet-mot-van-de-trong-thuc-te-noi-chung-co-nhieu-thuat-toan-on-dinh-so-hon-de-giai-cac-phuong-trinh-tuyen-tinh-nhu",
+      "text": "18.1.7.1. Các vấn đề số Trong khi nghịch đảo của ma trận rất hữu ích về lý thuyết, chúng ta phải nói rằng hầu hết thời gian chúng ta không muốn sử dụng ma trận nghịch đảo để giải quyết một vấn đề trong thực tế. Nói chung, có nhiều thuật toán ổn định số hơn để giải các phương trình tuyến tính như"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "xac-dinh-quan-diem-hinh-hoc-cua-dai-so-tuyen-tinh-dua-ra-mot-cach-truc-quan-de-dien-giai-mot-dai-luong-co-ban-duoc-goi-la-quyet-dinh-hay-xem-xet-hinh-anh-luoi-tu-truoc-nhung-bay-gio-voi-mot-khu-vuc-duoc-to-sang-fig-grid-filled",
+      "text": "18.1.8. Xác định Quan điểm hình học của đại số tuyến tính đưa ra một cách trực quan để diễn giải một đại lượng cơ bản được gọi là quyết định . Hãy xem xét hình ảnh lưới từ trước, nhưng bây giờ với một khu vực được tô sáng ( Fig. 18.1.9 )."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tensors-va-hoat-dong-dai-so-tuyen-tinh-pho-bien",
+      "text": "18.1.9. Tensors và hoạt động đại số tuyến tính phổ biến"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "vi-du-pho-bien-tu-dai-so-tuyen-tinh",
+      "text": "18.1.9.1. Ví dụ phổ biến từ đại số tuyến tính"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "expressing-in-code-tensors-cung-co-the-duoc-van-hanh-linh-hoat-trong-ma-nhu-da-thay-trong-sec-linear-algebra-chung-ta-co-the-tao-ra-hang-chuc-nhu-duoc-hien-thi-duoi-day",
+      "text": "18.1.9.2. Expressing in Code Tensors cũng có thể được vận hành linh hoạt trong mã. Như đã thấy trong Section 2.3 , chúng ta có thể tạo ra hàng chục như được hiển thị dưới đây."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tom-tat-vecto-co-the-duoc-giai-thich-ve-mat-hinh-hoc-nhu-mot-trong-hai-diem-hoac-huong-trong-khong-gian-cac-san-pham-cham-xac-dinh-khai-niem-goc-den-khong-gian-chieu-cao-tuy-y-chung-co-the-duoc-su-dung-de-xac-dinh-cac-mat-phang-quyet-dinh-thuong-duoc-su-dung-nhu-la-buoc-cuoi-cung-trong-mot-nhiem-vu-phan-loai-phep-nhan-ma-tran-co-the-duoc-giai-thich-ve-mat-hinh-hoc-la-bien-dang-thong-nhat-cua-toa-do-ben-duoi-chung-dai-dien-cho-mot-cach-rat-han-che-nhung-ve-mat-toan-hoc-sach-de-bien-doi-vecto-phu-thuoc-tuyen-tinh-la-mot-cach-de-biet-khi-mot-tap-hop-cac-vecto-nam-trong-mot-khong-gian-chieu-thap-hon-chung-ta-mong-doi-gia-su-ban-co-3-vecto-song-trong-mot-khong-gian-2-chieu-thu-hang-cua-ma-tran-la-kich-thuoc-cua-tap-hop-con-lon-nhat-cua-cac-cot-cua-no-doc-lap-tuyen-tinh-khi-nghich-dao-cua-ma-tran-duoc-xac-dinh-dao-nguoc-ma-tran-cho-phep-chung-ta-tim-mot-ma-tran-khac-hoan-tac-hanh-dong-cua-dau-tien-ma-tran-dao-nguoc-la-huu-ich-trong-ly-thuyet-nhung-doi-hoi-su-cham-soc-trong-thuc-te-do-su-bat-on-so-yeu-to-quyet-dinh-cho-phep-chung-ta-do-luong-bao-nhieu-ma-tran-mo-rong-hoac-ky-hop-dong-mot-khong-gian-mot-yeu-to-quyet-dinh-nonzero-ngu-y-mot-ma-tran-dao-nguoc-khong-so-it-va-mot-yeu-to-xac-dinh-co-gia-tri-khong-co-nghia-la-ma-tran-khong-the-dao-nguoc-so-it-co-that-tensor-va-tong-ket-einstein-cung-cap-cho-mot-ky-hieu-gon-gang-va-sach-se-de-the-hien-nhieu-tinh-toan-duoc-nhin-thay-trong-hoc-may",
+      "text": "18.1.10. Tóm tắt * Vectơ có thể được giải thích về mặt hình học như một trong hai điểm hoặc hướng trong không gian * Các sản phẩm chấm xác định khái niệm góc đến không gian chiều cao tùy ý. Chúng có thể được sử dụng để xác định các mặt phẳng quyết định thường được sử dụng như là bước cuối cùng trong một nhiệm vụ phân loại. * Phép nhân ma trận có thể được giải thích về mặt hình học là biến dạng thống nhất của tọa độ bên dưới. Chúng đại diện cho một cách rất hạn chế, nhưng về mặt toán học sạch, để biến đổi vectơ. * Phụ thuộc tuyến tính là một cách để biết khi một tập hợp các vectơ nằm trong một không gian chiều thấp hơn chúng ta mong đợi (giả sử bạn có \\(3\\) vectơ sống trong một không gian \\(2\\) chiều). Thứ hạng của ma trận là kích thước của tập hợp con lớn nhất của các cột của nó độc lập tuyến tính * Khi nghịch đảo của ma trận được xác định, đảo ngược ma trận cho phép chúng ta tìm một ma trận khác hoàn tác hành động của đầu tiên. Ma trận đảo ngược là hữu ích trong lý thuyết, nhưng đòi hỏi sự chăm sóc trong thực tế do sự bất ổn số.* yếu tố quyết định cho phép chúng ta đo lường bao nhiêu ma trận mở rộng hoặc ký hợp đồng một không gian. Một yếu tố quyết định nonzero ngụ ý một ma trận đảo ngược (không số ít) và một yếu tố xác định có giá trị không có nghĩa là ma trận không thể đảo ngược (số ít). * co thắt tensor và tổng kết Einstein cung cấp cho một ký hiệu gọn gàng và sạch sẽ để thể hiện nhiều tính toán được nhìn thấy trong học máy."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "exercises",
+      "text": "18.1.11. Exercises"
+    }
+  ],
+  "content": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "hinh-hoc-va-cac-hoat-dong-dai-so-tuyen-tinh",
+      "text": "18.1. Hình học và các hoạt động đại số tuyến tính"
+    },
+    {
+      "type": "paragraph",
+      "text": "Trong Section 2.3 , chúng tôi gặp phải những điều cơ\nbản về đại số tuyến tính và thấy nó có thể được sử dụng như thế nào để\nthể hiện các hoạt động phổ biến để chuyển đổi dữ liệu của chúng tôi. Đại\nsố tuyến tính là một trong những trụ cột toán học quan trọng dựa trên\nphần lớn công việc mà chúng ta làm trong học sâu và trong học máy rộng\nhơn. Trong khi Section 2.3 chứa đủ máy móc để truyền\nđạt cơ học của các mô hình học sâu hiện đại, có rất nhiều hơn cho chủ đề\nnày. Trong phần này, chúng ta sẽ đi sâu hơn, làm nổi bật một số diễn\ngiải hình học của các phép toán đại số tuyến tính, và giới thiệu một vài\nkhái niệm cơ bản, bao gồm eigenvalues và eigenvectors."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "hinh-hoc-cua-vecto-truoc-tien-chung-ta-can-thao-luan-ve-hai-cach-giai-thich-hinh-hoc-pho-bien-cua-vecto-nhu-mot-trong-hai-diem-hoac-huong-trong-khong-gian-ve-co-ban-mot-vecto-la-danh-sach-cac-so-nhu-danh-sach-python-ben-duoi",
+      "text": "18.1.1. Hình học của Vectơ Trước tiên, chúng ta cần thảo luận về hai cách giải thích hình học phổ biến của vectơ, như một trong hai điểm hoặc hướng trong không gian. Về cơ bản, một vectơ là danh sách các số như danh sách Python bên dưới."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "v = [1, 7, 0, 1]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Các nhà toán học thường viết điều này dưới dạng vectơ * cột* hoặc *\nhàng*, đó là để nói là"
+    },
+    {
+      "type": "math",
+      "latex": "(18.1.1)¶\\[\\begin{split}\\mathbf{x} = \\begin{bmatrix}1\\\\7\\\\0\\\\1\\end{bmatrix},\\end{split}\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "hoặc là"
+    },
+    {
+      "type": "math",
+      "latex": "(18.1.2)¶\\[\\mathbf{x}^\\top = \\begin{bmatrix}1 & 7 & 0 & 1\\end{bmatrix}.\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Chúng thường có các diễn giải khác nhau, trong đó các ví dụ dữ liệu là\nvectơ cột và trọng lượng được sử dụng để tạo thành các tổng trọng số là\nvectơ hàng. Tuy nhiên, nó có thể có lợi để linh hoạt. Như chúng ta đã mô\ntả trong Section 2.3 , mặc dù định hướng mặc định của\nmột vectơ duy nhất là một vectơ cột, đối với bất kỳ ma trận nào đại diện\ncho một tập dữ liệu dạng bảng, coi mỗi ví dụ dữ liệu như một vectơ hàng\ntrong ma trận là thông thường hơn."
+    },
+    {
+      "type": "paragraph",
+      "text": "Với một vector, cách giải thích đầu tiên mà chúng ta nên đưa ra nó là\nmột điểm trong không gian. Trong hai hoặc ba chiều, ta có thể hình dung\ncác điểm này bằng cách sử dụng các thành phần của các vectơ để xác định\nvị trí của các điểm trong không gian so với một tham chiếu cố định gọi\nlà origin . Điều này có thể được nhìn thấy trong Fig. 18.1.1 ."
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/grid-points.svg",
+      "local_path": "_images/grid-points.svg",
+      "alt": "../_images/grid-points.svg"
+    },
+    {
+      "type": "paragraph",
+      "text": "Fig. 18.1.1 An illustration of visualizing vectors as points in the plane. The\nfirst component of the vector gives the \\(x\\) -coordinate, the\nsecond component gives the \\(y\\) -coordinate. Higher dimensions\nare analogous, although much harder to visualize. ¶"
+    },
+    {
+      "type": "paragraph",
+      "text": "Quan điểm hình học này cho phép chúng ta xem xét vấn đề ở mức độ trừu\ntượng hơn. Không còn phải đối mặt với một số vấn đề dường như không thể\nvượt qua như phân loại hình ảnh là mèo hoặc chó, chúng ta có thể bắt đầu\nxem xét các nhiệm vụ trừu tượng như tập hợp các điểm trong không gian và\nhình dung nhiệm vụ khám phá cách tách hai cụm điểm riêng biệt."
+    },
+    {
+      "type": "paragraph",
+      "text": "Song song, có quan điểm thứ hai mà mọi người thường lấy vectơ: như hướng\ntrong không gian. Chúng ta không chỉ có thể nghĩ về vector \\(\\mathbf{v} = [3,2]^\\top\\) là vị trí \\(3\\) đơn vị ở bên phải và \\(2\\) các đơn vị lên từ nguồn gốc, chúng ta cũng có thể nghĩ về nó\nnhư là hướng để thực hiện \\(3\\) bước sang phải và \\(2\\) bước\nlên. Bằng cách này, chúng tôi xem xét tất cả các vectơ trong hình Fig. 18.1.2 giống nhau."
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/par-vec.svg",
+      "local_path": "_images/par-vec.svg",
+      "alt": "../_images/par-vec.svg"
+    },
+    {
+      "type": "paragraph",
+      "text": "Fig. 18.1.2 Any vector can be visualized as an arrow in the plane. In this case,\nevery vector drawn is a representation of the vector \\((3,2)^\\top\\) . ¶"
+    },
+    {
+      "type": "paragraph",
+      "text": "Một trong những lợi ích của sự thay đổi này là chúng ta có thể hiểu rõ\nvề hành động bổ sung vector. Đặc biệt, chúng ta làm theo các hướng dẫn\nđược đưa ra bởi một vectơ, và sau đó làm theo các hướng dẫn được đưa ra\nbởi người kia, như được thấy trong Fig. 18.1.3 ."
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/vec-add.svg",
+      "local_path": "_images/vec-add.svg",
+      "alt": "../_images/vec-add.svg"
+    },
+    {
+      "type": "paragraph",
+      "text": "Fig. 18.1.3 We can visualize vector addition by first following one vector, and\nthen another. ¶"
+    },
+    {
+      "type": "paragraph",
+      "text": "Phép trừ vector có cách giải thích tương tự. Bằng cách xem xét danh tính\nmà \\(\\mathbf{u} = \\mathbf{v} + (\\mathbf{u}-\\mathbf{v})\\) , chúng ta\nthấy rằng vector \\(\\mathbf{u}-\\mathbf{v}\\) là hướng đưa chúng ta từ\nđiểm \\(\\mathbf{v}\\) đến điểm \\(\\mathbf{u}\\) ."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "dot-san-pham-va-angles-nhu-chung-ta-da-thay-trong-sec-linear-algebra-neu-chung-ta-lay-hai-vecto-cot-mathbf-u-va-mathbf-v-chung-ta-co-the-tao-thanh-san-pham-cham-cua-chung-bang-cach-tinh-toan",
+      "text": "18.1.2. Dot Sản phẩm và Angles Như chúng ta đã thấy trong Section 2.3 , nếu chúng ta lấy hai vectơ cột \\(\\mathbf{u}\\) và \\(\\mathbf{v}\\) , chúng ta có thể tạo thành sản phẩm chấm của chúng bằng cách tính toán:"
+    },
+    {
+      "type": "math",
+      "latex": "(18.1.3)¶\\[\\mathbf{u}^\\top\\mathbf{v} = \\sum_i u_i\\cdot v_i.\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Bởi vì (18.1.3) là đối xứng, chúng ta sẽ phản ánh ký hiệu\ncủa phép nhân cổ điển và viết"
+    },
+    {
+      "type": "math",
+      "latex": "(18.1.4)¶\\[\\mathbf{u}\\cdot\\mathbf{v} = \\mathbf{u}^\\top\\mathbf{v} = \\mathbf{v}^\\top\\mathbf{u},\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "để làm nổi bật thực tế là trao đổi thứ tự của các vectơ sẽ mang lại câu\ntrả lời tương tự."
+    },
+    {
+      "type": "paragraph",
+      "text": "Sản phẩm dot (18.1.3) cũng thừa nhận một giải thích hình\nhọc: it is closely related to the angle between two vectors. Consider\nthe angle shown in Fig. 18.1.4 ."
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/vec-angle.svg",
+      "local_path": "_images/vec-angle.svg",
+      "alt": "../_images/vec-angle.svg"
+    },
+    {
+      "type": "paragraph",
+      "text": "Fig. 18.1.4 Between any two vectors in the plane there is a well defined angle \\(\\theta\\) . We will see this angle is intimately tied to the dot\nproduct. ¶"
+    },
+    {
+      "type": "paragraph",
+      "text": "Để bắt đầu, chúng ta hãy xem xét hai vectơ cụ thể:"
+    },
+    {
+      "type": "math",
+      "latex": "(18.1.5)¶\\[\\mathbf{v} = (r,0) \\; \\text{and} \\; \\mathbf{w} = (s\\cos(\\theta), s \\sin(\\theta)).\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Vector \\(\\mathbf{v}\\) có chiều dài \\(r\\) và chạy song song với\ntrục \\(x\\) , và vector \\(\\mathbf{w}\\) có chiều dài \\(s\\) và ở\ngóc \\(\\theta\\) với trục \\(x\\) . Nếu chúng ta tính toán sản phẩm\nchấm của hai vectơ này, chúng ta thấy rằng"
+    },
+    {
+      "type": "math",
+      "latex": "(18.1.6)¶\\[\\mathbf{v}\\cdot\\mathbf{w} = rs\\cos(\\theta) = \\|\\mathbf{v}\\|\\|\\mathbf{w}\\|\\cos(\\theta).\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Với một số thao tác đại số đơn giản, chúng ta có thể sắp xếp lại các\nthuật ngữ để có được"
+    },
+    {
+      "type": "math",
+      "latex": "(18.1.7)¶\\[\\theta = \\arccos\\left(\\frac{\\mathbf{v}\\cdot\\mathbf{w}}{\\|\\mathbf{v}\\|\\|\\mathbf{w}\\|}\\right).\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Nói tóm lại, đối với hai vectơ cụ thể này, tích chấm kết hợp với các\nđịnh mức cho chúng ta biết góc giữa hai vectơ. Thực tế tương tự này là\nđúng nói chung. Tuy nhiên, chúng tôi sẽ không lấy được biểu thức ở đây,\nnếu chúng ta xem xét viết \\(\\|\\mathbf{v} - \\mathbf{w}\\|^2\\) theo hai\ncách: một với sản phẩm chấm và một hình học khác sử dụng định luật\ncosin, chúng ta có thể có được mối quan hệ đầy đủ. Thật vậy, đối với bất\nkỳ hai vectơ \\(\\mathbf{v}\\) và \\(\\mathbf{w}\\) , góc giữa hai\nvectơ là"
+    },
+    {
+      "type": "math",
+      "latex": "(18.1.8)¶\\[\\theta = \\arccos\\left(\\frac{\\mathbf{v}\\cdot\\mathbf{w}}{\\|\\mathbf{v}\\|\\|\\mathbf{w}\\|}\\right).\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Đây là một kết quả tốt đẹp vì không có gì trong các tài liệu tham khảo\ntính toán hai chiều. Thật vậy, chúng ta có thể sử dụng điều này trong ba\nhoặc ba triệu chiều mà không gặp vấn đề gì."
+    },
+    {
+      "type": "paragraph",
+      "text": "Như một ví dụ đơn giản, chúng ta hãy xem làm thế nào để tính toán góc\ngiữa một cặp vectơ:"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "%matplotlib inline\nfrom IPython import display\nfrom mxnet import gluon, np, npx\nfrom d2l import mxnet as d2l\n\nnpx.set_np()\n\ndef angle(v, w):\n    return np.arccos(v.dot(w) / (np.linalg.norm(v) * np.linalg.norm(w)))\n\nangle(np.array([0, 1, 2]), np.array([2, 3, 4]))"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "array(0.41899002)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "%matplotlib inline\nimport torch\nimport torchvision\nfrom IPython import display\nfrom torchvision import transforms\nfrom d2l import torch as d2l\n\n\ndef angle(v, w):\n    return torch.acos(v.dot(w) / (torch.norm(v) * torch.norm(w)))\n\nangle(torch.tensor([0, 1, 2], dtype=torch.float32), torch.tensor([2.0, 3, 4]))"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "tensor(0.4190)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "%matplotlib inline\nimport tensorflow as tf\nfrom IPython import display\nfrom d2l import tensorflow as d2l\n\n\ndef angle(v, w):\n    return tf.acos(tf.tensordot(v, w, axes=1) / (tf.norm(v) * tf.norm(w)))\n\nangle(tf.constant([0, 1, 2], dtype=tf.float32), tf.constant([2.0, 3, 4]))"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "<tf.Tensor: shape=(), dtype=float32, numpy=0.41899002>"
+    },
+    {
+      "type": "paragraph",
+      "text": "Chúng tôi sẽ không sử dụng nó ngay bây giờ, nhưng rất hữu ích khi biết\nrằng chúng ta sẽ đề cập đến các vectơ mà góc là \\(\\pi/2\\) (hoặc\ntương đương \\(90^{\\circ}\\) ) là * trực tho*. Bằng cách kiểm tra\nphương trình trên, chúng ta thấy rằng điều này xảy ra khi \\(\\theta = \\pi/2\\) , đó là điều tương tự như \\(\\cos(\\theta) = 0\\) . Cách duy nhất điều này có thể xảy ra là nếu\nbản thân sản phẩm chấm bằng 0, và hai vectơ là trực giao nếu và chỉ khi \\(\\mathbf{v}\\cdot\\mathbf{w} = 0\\) . Điều này sẽ chứng minh là một\ncông thức hữu ích khi hiểu các đối tượng về mặt hình học."
+    },
+    {
+      "type": "paragraph",
+      "text": "It is reasonable to ask: why is computing the angle useful? The answer\ncomes in the kind of invariance we expect data to have. Consider an\nimage, and a duplicate image, where every pixel value is the same but \\(10\\%\\) the brightness. The values of the individual pixels are in\ngeneral far from the original values. Thus, if one computed the distance\nbetween the original image and the darker one, the distance can be\nlarge. However, for most ML applications, the content is the same—it\nis still an image of a cat as far as a cat/dog classifier is concerned.\nHowever, if we consider the angle, it is not hard to see that for any\nvector \\(\\mathbf{v}\\) , the angle between \\(\\mathbf{v}\\) and \\(0.1\\cdot\\mathbf{v}\\) is zero. This corresponds to the fact that\nscaling vectors keeps the same direction and just changes the length.\nThe angle considers the darker image identical."
+    },
+    {
+      "type": "paragraph",
+      "text": "Ví dụ như thế này ở khắp mọi nơi. Trong văn bản, chúng ta có thể muốn\nchủ đề được thảo luận không thay đổi nếu chúng ta viết dài gấp đôi tài\nliệu nói cùng một điều. Đối với một số mã hóa (chẳng hạn như đếm số lần\nxuất hiện của các từ trong một số từ vựng), điều này tương ứng với việc\ntăng gấp đôi vector mã hóa tài liệu, vì vậy một lần nữa chúng ta có thể\nsử dụng góc."
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "cosine-similarity",
+      "text": "18.1.2.1. Cosine Similarity"
+    },
+    {
+      "type": "paragraph",
+      "text": "In ML contexts where the angle is employed to measure the closeness of\ntwo vectors, practitioners adopt the term cosine similarity to refer\nto the portion"
+    },
+    {
+      "type": "math",
+      "latex": "(18.1.9)¶\\[\\cos(\\theta) = \\frac{\\mathbf{v}\\cdot\\mathbf{w}}{\\|\\mathbf{v}\\|\\|\\mathbf{w}\\|}.\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Cosin có giá trị lớn nhất là \\(1\\) khi hai vectơ trỏ theo cùng một\nhướng, giá trị tối thiểu là \\(-1\\) khi chúng chỉ theo hướng ngược\nlại, và giá trị \\(0\\) khi hai vectơ là trực giao. Lưu ý rằng nếu các\nthành phần của vectơ chiều cao được lấy mẫu ngẫu nhiên với trung bình \\(0\\) , cosin của chúng gần như sẽ luôn gần với \\(0\\) ."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "sieu-may-bay",
+      "text": "18.1.3. Siêu máy bay"
+    },
+    {
+      "type": "paragraph",
+      "text": "Ngoài việc làm việc với các vectơ, một đối tượng chính khác mà bạn phải\nhiểu để đi xa trong đại số tuyến tính là * hyperplane*, một khái quát\nhóa cho các kích thước cao hơn của một đường thẳng (hai chiều) hoặc của\nmột mặt phẳng (ba chiều). Trong một không gian vectơ \\(d\\) chiều,\nmột siêu phẳng có \\(d-1\\) kích thước và chia không gian thành hai\nnửa không gian."
+    },
+    {
+      "type": "paragraph",
+      "text": "Hãy để chúng tôi bắt đầu với một ví dụ. Giả sử rằng chúng ta có một\nvector cột \\(\\mathbf{w}=[2,1]^\\top\\) . Chúng tôi muốn biết, “những\nđiểm \\(\\mathbf{v}\\) với \\(\\mathbf{w}\\cdot\\mathbf{v} = 1\\) là\ngì?” Bằng cách nhớ lại kết nối giữa các sản phẩm chấm và góc trên (18.1.8) , chúng ta có thể thấy rằng điều này tương\nđương với"
+    },
+    {
+      "type": "math",
+      "latex": "(18.1.10)¶\\[\\|\\mathbf{v}\\|\\|\\mathbf{w}\\|\\cos(\\theta) = 1 \\; \\iff \\; \\|\\mathbf{v}\\|\\cos(\\theta) = \\frac{1}{\\|\\mathbf{w}\\|} = \\frac{1}{\\sqrt{5}}.\\]"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/proj-vec.svg",
+      "local_path": "_images/proj-vec.svg",
+      "alt": "../_images/proj-vec.svg"
+    },
+    {
+      "type": "paragraph",
+      "text": "Fig. 18.1.5 Recalling trigonometry, we see the formula \\(\\|\\mathbf{v}\\|\\cos(\\theta)\\) is the length of the projection of\nthe vector \\(\\mathbf{v}\\) onto the direction of \\(\\mathbf{w}\\) ¶"
+    },
+    {
+      "type": "paragraph",
+      "text": "Nếu chúng ta xem xét ý nghĩa hình học của biểu thức này, chúng ta thấy\nrằng điều này tương đương với việc nói rằng độ dài của phép chiếu \\(\\mathbf{v}\\) theo hướng \\(\\mathbf{w}\\) chính xác là \\(1/\\|\\mathbf{w}\\|\\) , như được thể hiện trong Fig. 18.1.5 . Tập hợp tất cả các điểm mà điều này là\nđúng là một đường thẳng ở góc phải với vector \\(\\mathbf{w}\\) . Nếu\nchúng ta muốn, chúng ta có thể tìm thấy phương trình cho dòng này và\nthấy rằng nó là \\(2x + y = 1\\) hoặc tương đương \\(y = 1 - 2x\\) ."
+    },
+    {
+      "type": "paragraph",
+      "text": "Nếu bây giờ chúng ta nhìn vào những gì xảy ra khi chúng ta hỏi về tập\nhợp các điểm với \\(\\mathbf{w}\\cdot\\mathbf{v} > 1\\) hoặc \\(\\mathbf{w}\\cdot\\mathbf{v} < 1\\) , chúng ta có thể thấy rằng đây là\nnhững trường hợp các dự báo dài hơn hoặc ngắn hơn \\(1/\\|\\mathbf{w}\\|\\) , tương ứng. Do đó, hai bất bình đẳng đó xác\nđịnh hai bên của dòng. Bằng cách này, chúng tôi đã tìm ra cách cắt không\ngian của chúng tôi thành hai nửa, trong đó tất cả các điểm ở một bên đều\ncó sản phẩm chấm dưới ngưỡng và phía bên kia ở trên như chúng ta thấy\ntrong Fig. 18.1.6 ."
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/space-division.svg",
+      "local_path": "_images/space-division.svg",
+      "alt": "../_images/space-division.svg"
+    },
+    {
+      "type": "paragraph",
+      "text": "Fig. 18.1.6 If we now consider the inequality version of the expression, we see\nthat our hyperplane (in this case: just a line) separates the space\ninto two halves. ¶"
+    },
+    {
+      "type": "paragraph",
+      "text": "Câu chuyện trong chiều cao hơn là nhiều như nhau. Nếu bây giờ chúng ta\nlấy \\(\\mathbf{w} = [1,2,3]^\\top\\) và hỏi về các điểm trong ba chiều\nvới \\(\\mathbf{w}\\cdot\\mathbf{v} = 1\\) , chúng ta có được một mặt\nphẳng ở góc phải với vector \\(\\mathbf{w}\\) đã cho. Hai bất đẳng thức\nlại xác định hai mặt của mặt phẳng như được thể hiện trong Fig. 18.1.7 ."
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/space-division-3d.svg",
+      "local_path": "_images/space-division-3d.svg",
+      "alt": "../_images/space-division-3d.svg"
+    },
+    {
+      "type": "paragraph",
+      "text": "Fig. 18.1.7 Hyperplanes in any dimension separate the space into two halves. ¶"
+    },
+    {
+      "type": "paragraph",
+      "text": "Trong khi khả năng hình dung của chúng ta hết vào thời điểm này, không\ncó gì ngăn cản chúng ta làm điều này trong hàng chục, hàng trăm hoặc\nhàng tỷ chiều. Điều này xảy ra thường xuyên khi nghĩ về các mô hình học\nmáy. Ví dụ, chúng ta có thể hiểu các mô hình phân loại tuyến tính như\ncác mô hình từ Section 3.4 , như các phương pháp để tìm các\nsiêu phẳng tách biệt các lớp mục tiêu khác nhau. Trong bối cảnh này, các\nsiêu máy bay như vậy thường được gọi là kế hoạch quyết định . Phần lớn\ncác mô hình phân loại học sâu kết thúc bằng một lớp tuyến tính được đưa\nvào một softmax, do đó người ta có thể diễn giải vai trò của mạng nơ-ron\nsâu là tìm một nhúng phi tuyến tính sao cho các lớp mục tiêu có thể được\ntách sạch bằng các siêu phẳng."
+    },
+    {
+      "type": "paragraph",
+      "text": "Để đưa ra một ví dụ được xây dựng bằng tay, hãy chú ý rằng chúng ta có\nthể tạo ra một mô hình hợp lý để phân loại hình ảnh nhỏ của áo phông và\nquần dài từ tập dữ liệu thời trang MNIST (thấy trong Section 3.5 ) bằng cách chỉ lấy vectơ giữa phương tiện\ncủa chúng để xác định mặt phẳng quyết định và nhãn cầu một ngưỡng thô.\nĐầu tiên chúng ta sẽ tải dữ liệu và tính toán trung bình."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "# Load in the dataset\ntrain = gluon.data.vision.FashionMNIST(train=True)\ntest = gluon.data.vision.FashionMNIST(train=False)\n\nX_train_0 = np.stack([x[0] for x in train if x[1] == 0]).astype(float)\nX_train_1 = np.stack([x[0] for x in train if x[1] == 1]).astype(float)\nX_test = np.stack(\n    [x[0] for x in test if x[1] == 0 or x[1] == 1]).astype(float)\ny_test = np.stack(\n    [x[1] for x in test if x[1] == 0 or x[1] == 1]).astype(float)\n\n# Compute averages\nave_0 = np.mean(X_train_0, axis=0)\nave_1 = np.mean(X_train_1, axis=0)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "# Load in the dataset\ntrans = []\ntrans.append(transforms.ToTensor())\ntrans = transforms.Compose(trans)\ntrain = torchvision.datasets.FashionMNIST(root=\"../data\", transform=trans,\n                                          train=True, download=True)\ntest = torchvision.datasets.FashionMNIST(root=\"../data\", transform=trans,\n                                         train=False, download=True)\n\nX_train_0 = torch.stack(\n    [x[0] * 256 for x in train if x[1] == 0]).type(torch.float32)\nX_train_1 = torch.stack(\n    [x[0] * 256 for x in train if x[1] == 1]).type(torch.float32)\nX_test = torch.stack(\n    [x[0] * 256 for x in test if x[1] == 0 or x[1] == 1]).type(torch.float32)\ny_test = torch.stack([torch.tensor(x[1]) for x in test\n                      if x[1] == 0 or x[1] == 1]).type(torch.float32)\n\n# Compute averages\nave_0 = torch.mean(X_train_0, axis=0)\nave_1 = torch.mean(X_train_1, axis=0)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "# Load in the dataset\n((train_images, train_labels), (\n    test_images, test_labels)) = tf.keras.datasets.fashion_mnist.load_data()\n\n\nX_train_0 = tf.cast(tf.stack(train_images[[i for i, label in enumerate(\n    train_labels) if label == 0]] * 256), dtype=tf.float32)\nX_train_1 = tf.cast(tf.stack(train_images[[i for i, label in enumerate(\n    train_labels) if label == 1]] * 256), dtype=tf.float32)\nX_test = tf.cast(tf.stack(test_images[[i for i, label in enumerate(\n    test_labels) if label == 0]] * 256), dtype=tf.float32)\ny_test = tf.cast(tf.stack(test_images[[i for i, label in enumerate(\n    test_labels) if label == 1]] * 256), dtype=tf.float32)\n\n# Compute averages\nave_0 = tf.reduce_mean(X_train_0, axis=0)\nave_1 = tf.reduce_mean(X_train_1, axis=0)"
+    },
+    {
+      "type": "paragraph",
+      "text": "Nó có thể là thông tin để kiểm tra các trung bình này một cách chi tiết,\nvì vậy hãy để chúng tôi vẽ những gì họ trông như thế nào. Trong trường\nhợp này, chúng ta thấy rằng trung bình thực sự giống như một hình ảnh mờ\ncủa một chiếc áo phông."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "# Plot average t-shirt\nd2l.set_figsize()\nd2l.plt.imshow(ave_0.reshape(28, 28).tolist(), cmap='Greys')\nd2l.plt.show()"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_geometry-linear-algebraic-ops_80b1c3_29_0.svg",
+      "local_path": "_images/output_geometry-linear-algebraic-ops_80b1c3_29_0.svg",
+      "alt": "../_images/output_geometry-linear-algebraic-ops_80b1c3_29_0.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "# Plot average t-shirt\nd2l.set_figsize()\nd2l.plt.imshow(ave_0.reshape(28, 28).tolist(), cmap='Greys')\nd2l.plt.show()"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_geometry-linear-algebraic-ops_80b1c3_32_0.svg",
+      "local_path": "_images/output_geometry-linear-algebraic-ops_80b1c3_32_0.svg",
+      "alt": "../_images/output_geometry-linear-algebraic-ops_80b1c3_32_0.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "# Plot average t-shirt\nd2l.set_figsize()\nd2l.plt.imshow(tf.reshape(ave_0, (28, 28)), cmap='Greys')\nd2l.plt.show()"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_geometry-linear-algebraic-ops_80b1c3_35_0.svg",
+      "local_path": "_images/output_geometry-linear-algebraic-ops_80b1c3_35_0.svg",
+      "alt": "../_images/output_geometry-linear-algebraic-ops_80b1c3_35_0.svg"
+    },
+    {
+      "type": "paragraph",
+      "text": "Trong trường hợp thứ hai, chúng ta lại thấy rằng trung bình giống như\nmột hình ảnh mờ của quần."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "# Plot average trousers\nd2l.plt.imshow(ave_1.reshape(28, 28).tolist(), cmap='Greys')\nd2l.plt.show()"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_geometry-linear-algebraic-ops_80b1c3_41_0.svg",
+      "local_path": "_images/output_geometry-linear-algebraic-ops_80b1c3_41_0.svg",
+      "alt": "../_images/output_geometry-linear-algebraic-ops_80b1c3_41_0.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "# Plot average trousers\nd2l.plt.imshow(ave_1.reshape(28, 28).tolist(), cmap='Greys')\nd2l.plt.show()"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_geometry-linear-algebraic-ops_80b1c3_44_0.svg",
+      "local_path": "_images/output_geometry-linear-algebraic-ops_80b1c3_44_0.svg",
+      "alt": "../_images/output_geometry-linear-algebraic-ops_80b1c3_44_0.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "# Plot average trousers\nd2l.plt.imshow(tf.reshape(ave_1, (28, 28)), cmap='Greys')\nd2l.plt.show()"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_geometry-linear-algebraic-ops_80b1c3_47_0.svg",
+      "local_path": "_images/output_geometry-linear-algebraic-ops_80b1c3_47_0.svg",
+      "alt": "../_images/output_geometry-linear-algebraic-ops_80b1c3_47_0.svg"
+    },
+    {
+      "type": "paragraph",
+      "text": "Trong một giải pháp hoàn toàn máy học, chúng ta sẽ tìm hiểu ngưỡng từ\ntập dữ liệu. Trong trường hợp này, tôi chỉ đơn giản là mắt một ngưỡng\ntrông tốt trên dữ liệu đào tạo bằng tay."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "# Print test set accuracy with eyeballed threshold\nw = (ave_1 - ave_0).T\npredictions = X_test.reshape(2000, -1).dot(w.flatten()) > -1500000\n\n# Accuracy\nnp.mean(predictions.astype(y_test.dtype) == y_test, dtype=np.float64)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "array(0.801, dtype=float64)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "# Print test set accuracy with eyeballed threshold\nw = (ave_1 - ave_0).T\n# '@' is Matrix Multiplication operator in pytorch.\npredictions = X_test.reshape(2000, -1) @ (w.flatten()) > -1500000\n\n# Accuracy\ntorch.mean((predictions.type(y_test.dtype) == y_test).float(), dtype=torch.float64)"
+    },
+    {
+      "type": "code",
+      "language": null,
+      "text": "/tmp/ipykernel_118305/3819644537.py:2: UserWarning: The use of x.T on tensors of dimension other than 2 to reverse their shape is deprecated and it will throw an error in a future release. Consider x.mT to transpose batches of matricesor x.permute(*torch.arange(x.ndim - 1, -1, -1)) to reverse the dimensions of a tensor. (Triggered internally at  ../aten/src/ATen/native/TensorShape.cpp:2318.)\n  w = (ave_1 - ave_0).T"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "tensor(0.7870, dtype=torch.float64)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "# Print test set accuracy with eyeballed threshold\nw = tf.transpose(ave_1 - ave_0)\npredictions = tf.reduce_sum(X_test * tf.nest.flatten(w), axis=0) > -1500000\n\n# Accuracy\ntf.reduce_mean(\n    tf.cast(tf.cast(predictions, y_test.dtype) == y_test, tf.float32))"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "<tf.Tensor: shape=(), dtype=float32, numpy=0.4602704>"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "hinh-hoc-cua-bien-doi-tuyen-tinh",
+      "text": "18.1.4. Hình học của biến đổi tuyến tính"
+    },
+    {
+      "type": "paragraph",
+      "text": "Thông qua Section 2.3 và các cuộc thảo luận trên,\nchúng ta có một sự hiểu biết vững chắc về hình học của vectơ, độ dài và\ngóc. Tuy nhiên, có một đối tượng quan trọng mà chúng ta đã bỏ qua thảo\nluận, và đó là một sự hiểu biết hình học về các biến đổi tuyến tính được\nthể hiện bằng ma trận. Nội bộ hoàn toàn những gì ma trận có thể làm để\nchuyển đổi dữ liệu giữa hai không gian chiều cao có khả năng khác nhau\ncần thực hành đáng kể, và vượt quá phạm vi của phụ lục này. Tuy nhiên,\nchúng ta có thể bắt đầu xây dựng trực giác theo hai chiều."
+    },
+    {
+      "type": "paragraph",
+      "text": "Giả sử rằng chúng ta có một số ma trận:"
+    },
+    {
+      "type": "math",
+      "latex": "(18.1.11)¶\\[\\begin{split}\\mathbf{A} = \\begin{bmatrix}\na & b \\\\ c & d\n\\end{bmatrix}.\\end{split}\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "If we want to apply this to an arbitrary vector \\(\\mathbf{v} = [x, y]^\\top\\) , we multiply and see that"
+    },
+    {
+      "type": "math",
+      "latex": "(18.1.12)¶\\[\\begin{split}\\begin{aligned}\n\\mathbf{A}\\mathbf{v} & = \\begin{bmatrix}a & b \\\\ c & d\\end{bmatrix}\\begin{bmatrix}x \\\\ y\\end{bmatrix} \\\\\n& = \\begin{bmatrix}ax+by\\\\ cx+dy\\end{bmatrix} \\\\\n& = x\\begin{bmatrix}a \\\\ c\\end{bmatrix} + y\\begin{bmatrix}b \\\\d\\end{bmatrix} \\\\\n& = x\\left\\{\\mathbf{A}\\begin{bmatrix}1\\\\0\\end{bmatrix}\\right\\} + y\\left\\{\\mathbf{A}\\begin{bmatrix}0\\\\1\\end{bmatrix}\\right\\}.\n\\end{aligned}\\end{split}\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Điều này có vẻ giống như một tính toán kỳ lạ, nơi một cái gì đó rõ ràng\ntrở nên hơi bất khả xâm phạm. Tuy nhiên, nó cho chúng ta biết rằng chúng\nta có thể viết cách mà ma trận biến đổi vectơ any về cách nó biến đổi\n* hai vectơ cụ thể : :math:`[1,0]^top` và :math:`[0,1]^top`. Điều\nnày đáng để xem xét trong một khoảnh khắc. Về cơ bản chúng ta đã giảm\nmột bài toán vô hạn (những gì xảy ra với bất kỳ cặp số thực nào) thành\nmột vấn đề hữu hạn (những gì xảy ra với các vectơ cụ thể này). Các vectơ\nnày là một ví dụ a *basis*, nơi chúng ta có thể viết bất kỳ vectơ\nnào trong không gian của chúng ta dưới dạng tổng trọng số của các vectơ\ncơ bản này*."
+    },
+    {
+      "type": "paragraph",
+      "text": "Hãy để chúng tôi vẽ những gì xảy ra khi chúng ta sử dụng ma trận cụ thể"
+    },
+    {
+      "type": "math",
+      "latex": "(18.1.13)¶\\[\\begin{split}\\mathbf{A} = \\begin{bmatrix}\n1 & 2 \\\\\n-1 & 3\n\\end{bmatrix}.\\end{split}\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Nếu chúng ta nhìn vào vector cụ thể \\(\\mathbf{v} = [2, -1]^\\top\\) ,\nchúng ta thấy đây là \\(2\\cdot[1,0]^\\top + -1\\cdot[0,1]^\\top\\) và do\nđó chúng ta biết rằng ma trận \\(A\\) sẽ gửi điều này đến \\(2(\\mathbf{A}[1,0]^\\top) + -1(\\mathbf{A}[0,1])^\\top = 2[1, -1]^\\top - [2,3]^\\top = [0, -5]^\\top\\) .\nNếu chúng ta làm theo logic này thông qua một cách cẩn thận, nói bằng\ncách xem xét lưới của tất cả các cặp số nguyên của điểm, chúng ta thấy\nrằng những gì xảy ra là phép nhân ma trận có thể nghiêng, xoay, và quy\nmô lưới điện, nhưng cấu trúc lưới phải vẫn như bạn thấy trong Fig. 18.1.8 ."
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/grid-transform.svg",
+      "local_path": "_images/grid-transform.svg",
+      "alt": "../_images/grid-transform.svg"
+    },
+    {
+      "type": "paragraph",
+      "text": "Fig. 18.1.8 The matrix \\(\\mathbf{A}\\) acting on the given basis vectors.\nNotice how the entire grid is transported along with it. ¶"
+    },
+    {
+      "type": "paragraph",
+      "text": "Đây là điểm trực quan quan trọng nhất để nội tâm hóa về các biến đổi\ntuyến tính được thể hiện bằng ma trận. Ma trận không có khả năng làm\nbiến dạng một số phần của không gian khác với những phần khác. Tất cả\nnhững gì họ có thể làm là lấy tọa độ ban đầu trên không gian của chúng\nta và nghiêng, xoay và quy mô chúng."
+    },
+    {
+      "type": "paragraph",
+      "text": "Một số biến dạng có thể nghiêm trọng. For instance ví dụ the matrix ma\ntrận"
+    },
+    {
+      "type": "math",
+      "latex": "(18.1.14)¶\\[\\begin{split}\\mathbf{B} = \\begin{bmatrix}\n2 & -1 \\\\ 4 & -2\n\\end{bmatrix},\\end{split}\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "nén toàn bộ mặt phẳng hai chiều xuống một dòng duy nhất. Xác định và làm\nviệc với các biến đổi như vậy là chủ đề của một phần sau, nhưng về mặt\nhình học chúng ta có thể thấy rằng điều này về cơ bản khác với các loại\nbiến đổi mà chúng ta đã thấy ở trên. Ví dụ, kết quả từ ma trận \\(\\mathbf{A}\\) có thể là “uốn cong trở lại” vào lưới gốc. Kết quả từ\nma trận \\(\\mathbf{B}\\) không thể vì chúng ta sẽ không bao giờ biết\nvector \\([1,2]^\\top\\) đến từ đâu - nó là \\([1,1]^\\top\\) hay \\([0, -1]^\\top\\) ?"
+    },
+    {
+      "type": "paragraph",
+      "text": "Trong khi bức ảnh này dành cho ma trận \\(2\\times2\\) , không có gì\nngăn cản chúng ta tham gia các bài học đã học vào các chiều cao hơn. Nếu\nchúng ta lấy vectơ cơ bản tương tự như \\([1,0, \\ldots,0]\\) và xem ma\ntrận của chúng ta gửi chúng ở đâu, chúng ta có thể bắt đầu có cảm giác\nvề cách nhân ma trận biến dạng toàn bộ không gian trong bất kỳ không\ngian chiều nào chúng ta đang xử lý."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "su-phu-thuoc-tuyen-tinh",
+      "text": "18.1.5. Sự phụ thuộc tuyến tính"
+    },
+    {
+      "type": "paragraph",
+      "text": "Xem xét lại ma trận"
+    },
+    {
+      "type": "math",
+      "latex": "(18.1.15)¶\\[\\begin{split}\\mathbf{B} = \\begin{bmatrix}\n2 & -1 \\\\ 4 & -2\n\\end{bmatrix}.\\end{split}\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Điều này nén toàn bộ mặt phẳng xuống để sống trên dòng đơn \\(y = 2x\\) . Câu hỏi bây giờ đặt ra: có cách nào đó chúng ta có thể\nphát hiện ra điều này chỉ nhìn vào chính ma trận? Câu trả lời là thực sự\nchúng ta có thể. Chúng ta hãy lấy \\(\\mathbf{b}_1 = [2,4]^\\top\\) và \\(\\mathbf{b}_2 = [-1, -2]^\\top\\) là hai cột của \\(\\mathbf{B}\\) .\nHãy nhớ rằng chúng ta có thể viết mọi thứ được chuyển đổi bởi ma trận \\(\\mathbf{B}\\) như một tổng trọng số của các cột của ma trận: như \\(a_1\\mathbf{b}_1 + a_2\\mathbf{b}_2\\) . Chúng tôi gọi đây là một kết\nhợp tuyến tính*. Thực tế là \\(\\mathbf{b}_1 = -2\\cdot\\mathbf{b}_2\\) có nghĩa là chúng ta có thể viết bất kỳ sự kết hợp tuyến tính nào của\nhai cột đó hoàn toàn về nói \\(\\mathbf{b}_2\\) kể từ"
+    },
+    {
+      "type": "math",
+      "latex": "(18.1.16)¶\\[a_1\\mathbf{b}_1 + a_2\\mathbf{b}_2 = -2a_1\\mathbf{b}_2 + a_2\\mathbf{b}_2 = (a_2-2a_1)\\mathbf{b}_2.\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Điều này có nghĩa là một trong các cột, theo một nghĩa nào đó, dư thừa\nvì nó không xác định một hướng duy nhất trong không gian. Điều này không\nnên làm chúng ta ngạc nhiên quá nhiều vì chúng ta đã thấy rằng ma trận\nnày sụp đổ toàn bộ mặt phẳng xuống thành một dòng duy nhất. Hơn nữa,\nchúng ta thấy rằng sự phụ thuộc tuyến tính \\(\\mathbf{b}_1 = -2\\cdot\\mathbf{b}_2\\) nắm bắt điều này. Để làm cho\nđiều này đối xứng hơn giữa hai vectơ, chúng ta sẽ viết cái này là"
+    },
+    {
+      "type": "math",
+      "latex": "(18.1.17)¶\\[\\mathbf{b}_1  + 2\\cdot\\mathbf{b}_2 = 0.\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Nói chung, chúng ta sẽ nói rằng một tập hợp các vectơ \\(\\mathbf{v}_1, \\ldots, \\mathbf{v}_k\\) là * phụ thuộc tuyến tính*\nnếu có hệ số tồn tại \\(a_1, \\ldots, a_k\\) * không bằng 0* để"
+    },
+    {
+      "type": "math",
+      "latex": "(18.1.18)¶\\[\\sum_{i=1}^k a_i\\mathbf{v_i} = 0.\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Trong trường hợp này, chúng ta có thể giải quyết cho một trong các vectơ\nvề một số sự kết hợp của những người khác, và hiệu quả làm cho nó dư\nthừa. Do đó, sự phụ thuộc tuyến tính trong các cột của ma trận là một\nnhân chứng cho thực tế là ma trận của chúng ta đang nén không gian xuống\nmột số chiều thấp hơn. Nếu không có sự phụ thuộc tuyến tính, chúng tôi\nnói rằng các vectơ là * độc lập tuyến tính*. Nếu các cột của ma trận\nđộc lập tuyến tính, không xảy ra nén và thao tác có thể được hoàn tác."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "thu-hang",
+      "text": "18.1.6. thứ hạng"
+    },
+    {
+      "type": "paragraph",
+      "text": "Nếu chúng ta có một ma trận \\(n\\times m\\) chung, nó là hợp lý để hỏi\nkhông gian kích thước mà ma trận ánh xạ vào. Một khái niệm được gọi là rank sẽ là câu trả lời của chúng tôi. Trong phần trước, chúng tôi lưu\ný rằng một sự phụ thuộc tuyến tính làm chứng cho việc nén không gian vào\nmột chiều thấp hơn và vì vậy chúng tôi sẽ có thể sử dụng điều này để xác\nđịnh khái niệm về cấp bậc. Đặc biệt, cấp bậc của một ma trận \\(\\mathbf{A}\\) là số lượng lớn nhất các cột độc lập tuyến tính giữa\ntất cả các tập con của cột. Ví dụ, ma trận"
+    },
+    {
+      "type": "math",
+      "latex": "(18.1.19)¶\\[\\begin{split}\\mathbf{B} = \\begin{bmatrix}\n2 & 4 \\\\ -1 & -2\n\\end{bmatrix},\\end{split}\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "có \\(\\mathrm{rank}(B)=1\\) , vì hai cột phụ thuộc tuyến tính, nhưng\nbản thân một trong hai cột không phụ thuộc tuyến tính. Đối với một ví dụ\nkhó khăn hơn, chúng ta có thể xem xét"
+    },
+    {
+      "type": "math",
+      "latex": "(18.1.20)¶\\[\\begin{split}\\mathbf{C} = \\begin{bmatrix}\n1& 3 & 0 & -1 & 0 \\\\\n-1 & 0 & 1 & 1 & -1 \\\\\n0 & 3 & 1 & 0 & -1 \\\\\n2 & 3 & -1 & -2 & 1\n\\end{bmatrix},\\end{split}\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "và cho thấy \\(\\mathbf{C}\\) đã xếp hạng hai vì, ví dụ, hai cột đầu\ntiên độc lập tuyến tính, tuy nhiên bất kỳ bộ sưu tập nào trong bốn cột\nphụ thuộc."
+    },
+    {
+      "type": "paragraph",
+      "text": "Thủ tục này, như mô tả, rất không hiệu quả. Nó đòi hỏi phải xem xét mọi\ntập hợp con của các cột của ma trận nhất định của chúng ta, và do đó có\nkhả năng hàm mũ trong số cột. Sau đó chúng ta sẽ thấy một cách hiệu quả\nhơn về tính toán để tính toán thứ hạng của ma trận, nhưng hiện tại, điều\nnày là đủ để thấy rằng khái niệm này được xác định rõ và hiểu ý nghĩa."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "kha-nang-dao-nguoc",
+      "text": "18.1.7. Khả năng đảo ngược"
+    },
+    {
+      "type": "paragraph",
+      "text": "Chúng ta đã thấy ở trên rằng phép nhân của một ma trận với các cột phụ\nthuộc tuyến tính không thể hoàn tác, tức là, không có hoạt động nghịch\nđảo nào luôn có thể khôi phục đầu vào. Tuy nhiên, nhân với ma trận cấp\nbậc đầy đủ (tức là, một số \\(\\mathbf{A}\\) là ma trận \\(n \\times n\\) với thứ hạng \\(n\\) ), chúng ta nên luôn luôn có\nthể hoàn tác nó. Xem xét ma trận"
+    },
+    {
+      "type": "math",
+      "latex": "(18.1.21)¶\\[\\begin{split}\\mathbf{I} = \\begin{bmatrix}\n1 & 0 & \\cdots & 0 \\\\\n0 & 1 & \\cdots & 0 \\\\\n\\vdots & \\vdots & \\ddots & \\vdots \\\\\n0 & 0 & \\cdots & 1\n\\end{bmatrix}.\\end{split}\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "mà là ma trận với những người dọc theo đường chéo, và số không ở nơi\nkhác. Chúng tôi gọi đây là ma trận identity . Đó là ma trận khiến dữ\nliệu của chúng tôi không thay đổi khi áp dụng. Để tìm một ma trận hoàn\ntác những gì ma trận của chúng tôi \\(\\mathbf{A}\\) đã làm, chúng tôi\nmuốn tìm một ma trận \\(\\mathbf{A}^{-1}\\) sao cho"
+    },
+    {
+      "type": "math",
+      "latex": "(18.1.22)¶\\[\\mathbf{A}^{-1}\\mathbf{A} = \\mathbf{A}\\mathbf{A}^{-1} =  \\mathbf{I}.\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Nếu chúng ta xem xét điều này như một hệ thống, chúng ta có \\(n \\times n\\) ẩn số (các mục của \\(\\mathbf{A}^{-1}\\) ) và \\(n \\times n\\) phương trình (bình đẳng cần giữ giữa mọi mục nhập của\nsản phẩm \\(\\mathbf{A}^{-1}\\mathbf{A}\\) và mọi mục nhập của \\(\\mathbf{I}\\) ) vì vậy chúng ta nên khái quát mong đợi một giải pháp\ntồn tại. Thật vậy, trong phần tiếp theo chúng ta sẽ thấy một đại lượng\nđược gọi là determinant , có thuộc tính miễn là yếu tố quyết định không\nphải bằng 0, chúng ta có thể tìm ra giải pháp. Chúng tôi gọi ma trận \\(\\mathbf{A}^{-1}\\) như ma trận inverse . Ví dụ, nếu \\(\\mathbf{A}\\) là ma trận \\(2 \\times 2\\) chung"
+    },
+    {
+      "type": "math",
+      "latex": "(18.1.23)¶\\[\\begin{split}\\mathbf{A} = \\begin{bmatrix}\na & b \\\\\nc & d\n\\end{bmatrix},\\end{split}\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "sau đó chúng ta có thể thấy rằng nghịch đảo là"
+    },
+    {
+      "type": "math",
+      "latex": "(18.1.24)¶\\[\\begin{split} \\frac{1}{ad-bc}  \\begin{bmatrix}\nd & -b \\\\\n-c & a\n\\end{bmatrix}.\\end{split}\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Chúng ta có thể kiểm tra để xem điều này bằng cách thấy rằng nhân với\nnghịch đảo được đưa ra bởi công thức trên hoạt động trong thực tế."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "M = np.array([[1, 2], [1, 4]])\nM_inv = np.array([[2, -1], [-0.5, 0.5]])\nM_inv.dot(M)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "array([[1., 0.],\n       [0., 1.]])"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "M = torch.tensor([[1, 2], [1, 4]], dtype=torch.float32)\nM_inv = torch.tensor([[2, -1], [-0.5, 0.5]])\nM_inv @ M"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "tensor([[1., 0.],\n        [0., 1.]])"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "M = tf.constant([[1, 2], [1, 4]], dtype=tf.float32)\nM_inv = tf.constant([[2, -1], [-0.5, 0.5]])\ntf.matmul(M_inv, M)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "<tf.Tensor: shape=(2, 2), dtype=float32, numpy=\narray([[1., 0.],\n       [0., 1.]], dtype=float32)>"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "cac-van-de-so-trong-khi-nghich-dao-cua-ma-tran-rat-huu-ich-ve-ly-thuyet-chung-ta-phai-noi-rang-hau-het-thoi-gian-chung-ta-khong-muon-su-dung-ma-tran-nghich-dao-de-giai-quyet-mot-van-de-trong-thuc-te-noi-chung-co-nhieu-thuat-toan-on-dinh-so-hon-de-giai-cac-phuong-trinh-tuyen-tinh-nhu",
+      "text": "18.1.7.1. Các vấn đề số Trong khi nghịch đảo của ma trận rất hữu ích về lý thuyết, chúng ta phải nói rằng hầu hết thời gian chúng ta không muốn sử dụng ma trận nghịch đảo để giải quyết một vấn đề trong thực tế. Nói chung, có nhiều thuật toán ổn định số hơn để giải các phương trình tuyến tính như"
+    },
+    {
+      "type": "math",
+      "latex": "(18.1.25)¶\\[\\mathbf{A}\\mathbf{x} = \\mathbf{b},\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "hơn là tính toán nghịch đảo và nhân lên để có được"
+    },
+    {
+      "type": "math",
+      "latex": "(18.1.26)¶\\[\\mathbf{x} = \\mathbf{A}^{-1}\\mathbf{b}.\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Cũng giống như phân chia bởi một số nhỏ có thể dẫn đến sự bất ổn số, vì\nvậy có thể đảo ngược của một ma trận gần với có thứ hạng thấp."
+    },
+    {
+      "type": "paragraph",
+      "text": "Hơn nữa, thông thường ma trận \\(\\mathbf{A}\\) là * thưa thớt *, có\nnghĩa là nó chỉ chứa một số lượng nhỏ các giá trị không phải bằng không.\nNếu chúng ta khám phá các ví dụ, chúng ta sẽ thấy rằng điều này không có\nnghĩa là nghịch đảo thưa thớt. Ngay cả khi \\(\\mathbf{A}\\) là một \\(1\\) triệu bởi \\(1\\) triệu ma trận với chỉ \\(5\\) triệu mục\nkhông phải bằng không (và do đó chúng tôi chỉ cần lưu trữ những \\(5\\) triệu), nghịch đảo thường sẽ có hầu hết mọi mục không âm, yêu\ncầu chúng tôi lưu trữ tất cả \\(1\\text{M}^2\\) mục đó là \\(1\\) nghìn tỷ mục!"
+    },
+    {
+      "type": "paragraph",
+      "text": "Mặc dù chúng ta không có thời gian để lặn tất cả các cách vào các vấn đề\nsố gai góc thường gặp khi làm việc với đại số tuyến tính, chúng tôi muốn\ncung cấp cho bạn một số trực giác về khi nào cần tiến hành thận trọng,\nvà nói chung tránh đảo ngược trong thực tế là một nguyên tắc tốt."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "xac-dinh-quan-diem-hinh-hoc-cua-dai-so-tuyen-tinh-dua-ra-mot-cach-truc-quan-de-dien-giai-mot-dai-luong-co-ban-duoc-goi-la-quyet-dinh-hay-xem-xet-hinh-anh-luoi-tu-truoc-nhung-bay-gio-voi-mot-khu-vuc-duoc-to-sang-fig-grid-filled",
+      "text": "18.1.8. Xác định Quan điểm hình học của đại số tuyến tính đưa ra một cách trực quan để diễn giải một đại lượng cơ bản được gọi là quyết định . Hãy xem xét hình ảnh lưới từ trước, nhưng bây giờ với một khu vực được tô sáng ( Fig. 18.1.9 )."
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/grid-transform-filled.svg",
+      "local_path": "_images/grid-transform-filled.svg",
+      "alt": "../_images/grid-transform-filled.svg"
+    },
+    {
+      "type": "paragraph",
+      "text": "Fig. 18.1.9 The matrix \\(\\mathbf{A}\\) again distorting the grid. This time, I\nwant to draw particular attention to what happens to the highlighted\nsquare. ¶"
+    },
+    {
+      "type": "paragraph",
+      "text": "Nhìn vào hình vuông được tô sáng. Đây là một hình vuông với các cạnh\nđược đưa ra bởi \\((0, 1)\\) và \\((1, 0)\\) và do đó nó có diện\ntích một. Sau \\(\\mathbf{A}\\) biến hình vuông này, chúng ta thấy rằng\nnó trở thành một hình bình hành. Không có lý do gì hình bình hành này\nnên có cùng một khu vực mà chúng ta bắt đầu, và thực sự trong trường hợp\ncụ thể được hiển thị ở đây"
+    },
+    {
+      "type": "math",
+      "latex": "(18.1.27)¶\\[\\begin{split}\\mathbf{A} = \\begin{bmatrix}\n1 & 2 \\\\\n-1 & 3\n\\end{bmatrix},\\end{split}\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "nó là một bài tập trong hình học tọa độ để tính toán diện tích của hình\nbình hành này và có được rằng khu vực này là \\(5\\) ."
+    },
+    {
+      "type": "paragraph",
+      "text": "Nói chung, nếu chúng ta có một ma trận"
+    },
+    {
+      "type": "math",
+      "latex": "(18.1.28)¶\\[\\begin{split}\\mathbf{A} = \\begin{bmatrix}\na & b \\\\\nc & d\n\\end{bmatrix},\\end{split}\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "chúng ta có thể thấy với một số tính toán rằng diện tích của hình bình\nhành kết quả là \\(ad-bc\\) . Khu vực này được gọi là quyết định ."
+    },
+    {
+      "type": "paragraph",
+      "text": "Hãy để chúng tôi kiểm tra điều này một cách nhanh chóng với một số mã ví\ndụ."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "import numpy as np\n\nnp.linalg.det(np.array([[1, -1], [2, 3]]))"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "5.000000000000001"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "torch.det(torch.tensor([[1, -1], [2, 3]], dtype=torch.float32))"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "tensor(5.)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "tf.linalg.det(tf.constant([[1, -1], [2, 3]], dtype=tf.float32))"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "<tf.Tensor: shape=(), dtype=float32, numpy=5.0>"
+    },
+    {
+      "type": "paragraph",
+      "text": "Mắt đại bàng giữa chúng ta sẽ nhận thấy rằng biểu thức này có thể bằng 0\nhoặc thậm chí tiêu cực. Đối với thuật ngữ tiêu cực, đây là vấn đề quy\nước được thực hiện chung trong toán học: nếu ma trận lật hình, chúng ta\nnói khu vực này bị phủ định. Chúng ta hãy xem bây giờ rằng khi yếu tố\nquyết định bằng không, chúng ta tìm hiểu thêm."
+    },
+    {
+      "type": "paragraph",
+      "text": "Hãy để chúng tôi xem xét"
+    },
+    {
+      "type": "math",
+      "latex": "(18.1.29)¶\\[\\begin{split}\\mathbf{B} = \\begin{bmatrix}\n2 & 4 \\\\ -1 & -2\n\\end{bmatrix}.\\end{split}\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Nếu chúng ta tính toán yếu tố quyết định của ma trận này, chúng ta nhận\nđược \\(2\\cdot(-2 ) - 4\\cdot(-1) = 0\\) . Với sự hiểu biết của chúng\ntôi ở trên, điều này có ý nghĩa. \\(\\mathbf{B}\\) nén hình vuông từ\nhình ảnh gốc xuống một đoạn đường, có diện tích bằng không. Và quả thực,\nbị nén thành một không gian chiều thấp hơn là cách duy nhất để có diện\ntích bằng 0 sau khi biến đổi. Như vậy chúng ta thấy kết quả sau là đúng:\nmột ma trận \\(A\\) có thể đảo ngược nếu và chỉ khi yếu tố quyết định\nkhông bằng 0."
+    },
+    {
+      "type": "paragraph",
+      "text": "Như một nhận xét cuối cùng, hãy tưởng tượng rằng chúng ta có bất kỳ con\nsố nào được vẽ trên mặt phẳng. Suy nghĩ giống như các nhà khoa học máy\ntính, chúng ta có thể phân hủy con số đó thành một tập hợp các ô vuông\nnhỏ để diện tích của hình là về bản chất chỉ là số lượng hình vuông\ntrong phân hủy. Nếu bây giờ chúng ta biến đổi con số đó bằng một ma\ntrận, chúng ta sẽ gửi từng ô vuông này thành hình bình hành, mỗi ô có\ndiện tích được đưa ra bởi yếu tố quyết định. Chúng ta thấy rằng đối với\nbất kỳ con số nào, yếu tố quyết định cho số (ký) mà ma trận quy mô diện\ntích của bất kỳ hình nào."
+    },
+    {
+      "type": "paragraph",
+      "text": "Các yếu tố quyết định tính toán cho ma trận lớn hơn có thể tốn nhiều\ncông sức, nhưng trực giác là như nhau. Yếu tố quyết định vẫn là yếu tố\nmà \\(n\\times n\\) ma trận quy mô \\(n\\) -khối lượng chiều."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tensors-va-hoat-dong-dai-so-tuyen-tinh-pho-bien",
+      "text": "18.1.9. Tensors và hoạt động đại số tuyến tính phổ biến"
+    },
+    {
+      "type": "paragraph",
+      "text": "Năm Section 2.3 khái niệm về hàng chục đã được giới\nthiệu. Trong phần này, chúng ta sẽ đi sâu hơn vào các cơn co thắt tensor\n(tensor tương đương với phép nhân ma trận), và xem làm thế nào nó có thể\ncung cấp một cái nhìn thống nhất về một số hoạt động ma trận và vector."
+    },
+    {
+      "type": "paragraph",
+      "text": "Với ma trận và vectơ, chúng ta biết cách nhân chúng để chuyển đổi dữ\nliệu. Chúng ta cần phải có một định nghĩa tương tự cho hàng chục nếu\nchúng hữu ích cho chúng ta. Hãy suy nghĩ về phép nhân ma trận:"
+    },
+    {
+      "type": "math",
+      "latex": "(18.1.30)¶\\[\\mathbf{C} = \\mathbf{A}\\mathbf{B},\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "hoặc tương đương"
+    },
+    {
+      "type": "math",
+      "latex": "(18.1.31)¶\\[c_{i, j} = \\sum_{k} a_{i, k}b_{k, j}.\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Mô hình này là một trong những chúng ta có thể lặp lại cho hàng chục.\nĐối với hàng chục, không có một trường hợp nào để tổng hợp những gì có\nthể được lựa chọn phổ biến, vì vậy chúng ta cần xác định chính xác những\nchỉ số chúng ta muốn tổng hợp lại. For instance ví dụ we could consider\nxem xét"
+    },
+    {
+      "type": "math",
+      "latex": "(18.1.32)¶\\[y_{il} = \\sum_{jk} x_{ijkl}a_{jk}.\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Một sự chuyển đổi như vậy được gọi là co lại tensor . Nó có thể đại\ndiện cho một gia đình biến đổi linh hoạt hơn nhiều mà phép nhân ma trận\nmột mình."
+    },
+    {
+      "type": "paragraph",
+      "text": "Là một đơn giản hóa ký hiệu thường được sử dụng, chúng ta có thể nhận\nthấy rằng tổng là trên chính xác những chỉ số xảy ra nhiều hơn một lần\ntrong biểu thức, do đó mọi người thường làm việc với ký hiệu *\nEinstein*, trong đó tổng kết được thực hiện trong tất cả các chỉ số lặp\nđi lặp lại. Điều này cho phép biểu thức nhỏ gọn:"
+    },
+    {
+      "type": "math",
+      "latex": "(18.1.33)¶\\[y_{il} = x_{ijkl}a_{jk}.\\]"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "vi-du-pho-bien-tu-dai-so-tuyen-tinh",
+      "text": "18.1.9.1. Ví dụ phổ biến từ đại số tuyến tính"
+    },
+    {
+      "type": "paragraph",
+      "text": "Chúng ta hãy xem có bao nhiêu định nghĩa đại số tuyến tính mà chúng ta\nđã thấy trước đây có thể được thể hiện trong ký hiệu tensor nén này:"
+    },
+    {
+      "type": "list",
+      "ordered": false,
+      "items": [
+        "\\(\\mathbf{v} \\cdot \\mathbf{w} = \\sum_i v_iw_i\\)",
+        "\\(\\|\\mathbf{v}\\|_2^{2} = \\sum_i v_iv_i\\)",
+        "\\((\\mathbf{A}\\mathbf{v})_i = \\sum_j a_{ij}v_j\\)",
+        "\\((\\mathbf{A}\\mathbf{B})_{ik} = \\sum_j a_{ij}b_{jk}\\)",
+        "\\(\\mathrm{tr}(\\mathbf{A}) = \\sum_i a_{ii}\\)"
+      ]
+    },
+    {
+      "type": "paragraph",
+      "text": "Bằng cách này, chúng ta có thể thay thế vô số ký hiệu chuyên biệt bằng\ncác biểu thức tensor ngắn."
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "expressing-in-code-tensors-cung-co-the-duoc-van-hanh-linh-hoat-trong-ma-nhu-da-thay-trong-sec-linear-algebra-chung-ta-co-the-tao-ra-hang-chuc-nhu-duoc-hien-thi-duoi-day",
+      "text": "18.1.9.2. Expressing in Code Tensors cũng có thể được vận hành linh hoạt trong mã. Như đã thấy trong Section 2.3 , chúng ta có thể tạo ra hàng chục như được hiển thị dưới đây."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "# Define tensors\nB = np.array([[[1, 2, 3], [4, 5, 6]], [[7, 8, 9], [10, 11, 12]]])\nA = np.array([[1, 2], [3, 4]])\nv = np.array([1, 2])\n\n# Print out the shapes\nA.shape, B.shape, v.shape"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "((2, 2), (2, 2, 3), (2,))"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "# Define tensors\nB = torch.tensor([[[1, 2, 3], [4, 5, 6]], [[7, 8, 9], [10, 11, 12]]])\nA = torch.tensor([[1, 2], [3, 4]])\nv = torch.tensor([1, 2])\n\n# Print out the shapes\nA.shape, B.shape, v.shape"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "(torch.Size([2, 2]), torch.Size([2, 2, 3]), torch.Size([2]))"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "# Define tensors\nB = tf.constant([[[1, 2, 3], [4, 5, 6]], [[7, 8, 9], [10, 11, 12]]])\nA = tf.constant([[1, 2], [3, 4]])\nv = tf.constant([1, 2])\n\n# Print out the shapes\nA.shape, B.shape, v.shape"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "(TensorShape([2, 2]), TensorShape([2, 2, 3]), TensorShape([2]))"
+    },
+    {
+      "type": "paragraph",
+      "text": "Tổng kết Einstein đã được thực hiện trực tiếp. Các chỉ số xảy ra trong\ntổng kết Einstein có thể được truyền như một chuỗi, tiếp theo là các\nhàng chục đang được hành động. Ví dụ, để thực hiện phép nhân ma trận,\nchúng ta có thể xem xét tổng kết Einstein thấy ở trên\n( \\(\\mathbf{A}\\mathbf{v} = a_{ij}v_j\\) ) và tự loại bỏ các chỉ số để\nthực hiện:"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "# Reimplement matrix multiplication\nnp.einsum(\"ij, j -> i\", A, v), A.dot(v)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "(array([ 5, 11]), array([ 5, 11]))"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "# Reimplement matrix multiplication\ntorch.einsum(\"ij, j -> i\", A, v), A@v"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "(tensor([ 5, 11]), tensor([ 5, 11]))"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "# Reimplement matrix multiplication\ntf.einsum(\"ij, j -> i\", A, v), tf.matmul(A, tf.reshape(v, (2, 1)))"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "(<tf.Tensor: shape=(2,), dtype=int32, numpy=array([ 5, 11], dtype=int32)>,\n <tf.Tensor: shape=(2, 1), dtype=int32, numpy=\n array([[ 5],\n        [11]], dtype=int32)>)"
+    },
+    {
+      "type": "paragraph",
+      "text": "Đây là một ký hiệu rất linh hoạt. Ví dụ nếu chúng ta muốn tính toán\nnhững gì sẽ được viết theo truyền thống như"
+    },
+    {
+      "type": "math",
+      "latex": "(18.1.34)¶\\[c_{kl} = \\sum_{ij} \\mathbf{b}_{ijk}\\mathbf{a}_{il}v_j.\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "nó có thể được thực hiện thông qua tổng kết Einstein như:"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "np.einsum(\"ijk, il, j -> kl\", B, A, v)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "array([[ 90, 126],\n       [102, 144],\n       [114, 162]])"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "torch.einsum(\"ijk, il, j -> kl\", B, A, v)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "tensor([[ 90, 126],\n        [102, 144],\n        [114, 162]])"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "tf.einsum(\"ijk, il, j -> kl\", B, A, v)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "<tf.Tensor: shape=(3, 2), dtype=int32, numpy=\narray([[ 90, 126],\n       [102, 144],\n       [114, 162]], dtype=int32)>"
+    },
+    {
+      "type": "paragraph",
+      "text": "Ký hiệu này có thể đọc được và hiệu quả đối với con người, tuy nhiên\ncồng kềnh nếu vì bất kỳ lý do gì chúng ta cần tạo ra sự co lại căng\nthẳng theo chương trình. Vì lý do này, einsum cung cấp một ký hiệu\nthay thế bằng cách cung cấp các chỉ số nguyên cho mỗi tensor. Ví dụ,\ncùng một sự co lại tensor cũng có thể được viết là:"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "np.einsum(B, [0, 1, 2], A, [0, 3], v, [1], [2, 3])"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "array([[ 90, 126],\n       [102, 144],\n       [114, 162]])"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "# PyTorch doesn't support this type of notation."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "# TensorFlow doesn't support this type of notation."
+    },
+    {
+      "type": "paragraph",
+      "text": "Một trong hai ký hiệu cho phép đại diện ngắn gọn và hiệu quả các cơn co\nthắt tensor trong mã."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tom-tat-vecto-co-the-duoc-giai-thich-ve-mat-hinh-hoc-nhu-mot-trong-hai-diem-hoac-huong-trong-khong-gian-cac-san-pham-cham-xac-dinh-khai-niem-goc-den-khong-gian-chieu-cao-tuy-y-chung-co-the-duoc-su-dung-de-xac-dinh-cac-mat-phang-quyet-dinh-thuong-duoc-su-dung-nhu-la-buoc-cuoi-cung-trong-mot-nhiem-vu-phan-loai-phep-nhan-ma-tran-co-the-duoc-giai-thich-ve-mat-hinh-hoc-la-bien-dang-thong-nhat-cua-toa-do-ben-duoi-chung-dai-dien-cho-mot-cach-rat-han-che-nhung-ve-mat-toan-hoc-sach-de-bien-doi-vecto-phu-thuoc-tuyen-tinh-la-mot-cach-de-biet-khi-mot-tap-hop-cac-vecto-nam-trong-mot-khong-gian-chieu-thap-hon-chung-ta-mong-doi-gia-su-ban-co-3-vecto-song-trong-mot-khong-gian-2-chieu-thu-hang-cua-ma-tran-la-kich-thuoc-cua-tap-hop-con-lon-nhat-cua-cac-cot-cua-no-doc-lap-tuyen-tinh-khi-nghich-dao-cua-ma-tran-duoc-xac-dinh-dao-nguoc-ma-tran-cho-phep-chung-ta-tim-mot-ma-tran-khac-hoan-tac-hanh-dong-cua-dau-tien-ma-tran-dao-nguoc-la-huu-ich-trong-ly-thuyet-nhung-doi-hoi-su-cham-soc-trong-thuc-te-do-su-bat-on-so-yeu-to-quyet-dinh-cho-phep-chung-ta-do-luong-bao-nhieu-ma-tran-mo-rong-hoac-ky-hop-dong-mot-khong-gian-mot-yeu-to-quyet-dinh-nonzero-ngu-y-mot-ma-tran-dao-nguoc-khong-so-it-va-mot-yeu-to-xac-dinh-co-gia-tri-khong-co-nghia-la-ma-tran-khong-the-dao-nguoc-so-it-co-that-tensor-va-tong-ket-einstein-cung-cap-cho-mot-ky-hieu-gon-gang-va-sach-se-de-the-hien-nhieu-tinh-toan-duoc-nhin-thay-trong-hoc-may",
+      "text": "18.1.10. Tóm tắt * Vectơ có thể được giải thích về mặt hình học như một trong hai điểm hoặc hướng trong không gian * Các sản phẩm chấm xác định khái niệm góc đến không gian chiều cao tùy ý. Chúng có thể được sử dụng để xác định các mặt phẳng quyết định thường được sử dụng như là bước cuối cùng trong một nhiệm vụ phân loại. * Phép nhân ma trận có thể được giải thích về mặt hình học là biến dạng thống nhất của tọa độ bên dưới. Chúng đại diện cho một cách rất hạn chế, nhưng về mặt toán học sạch, để biến đổi vectơ. * Phụ thuộc tuyến tính là một cách để biết khi một tập hợp các vectơ nằm trong một không gian chiều thấp hơn chúng ta mong đợi (giả sử bạn có \\(3\\) vectơ sống trong một không gian \\(2\\) chiều). Thứ hạng của ma trận là kích thước của tập hợp con lớn nhất của các cột của nó độc lập tuyến tính * Khi nghịch đảo của ma trận được xác định, đảo ngược ma trận cho phép chúng ta tìm một ma trận khác hoàn tác hành động của đầu tiên. Ma trận đảo ngược là hữu ích trong lý thuyết, nhưng đòi hỏi sự chăm sóc trong thực tế do sự bất ổn số.* yếu tố quyết định cho phép chúng ta đo lường bao nhiêu ma trận mở rộng hoặc ký hợp đồng một không gian. Một yếu tố quyết định nonzero ngụ ý một ma trận đảo ngược (không số ít) và một yếu tố xác định có giá trị không có nghĩa là ma trận không thể đảo ngược (số ít). * co thắt tensor và tổng kết Einstein cung cấp cho một ký hiệu gọn gàng và sạch sẽ để thể hiện nhiều tính toán được nhìn thấy trong học máy."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "exercises",
+      "text": "18.1.11. Exercises"
+    },
+    {
+      "type": "list",
+      "ordered": true,
+      "items": [
+        "What is the angle between (18.1.35) ¶ \\[\\begin{split}\\vec v_1 = \\begin{bmatrix}\n1 \\\\ 0 \\\\ -1 \\\\ 2\n\\end{bmatrix}, \\qquad \\vec v_2 = \\begin{bmatrix}\n3 \\\\ 1 \\\\ 0 \\\\ 1\n\\end{bmatrix}?\\end{split}\\]",
+        "True or false: \\(\\begin{bmatrix}1 & 2\\\\0&1\\end{bmatrix}\\) and \\(\\begin{bmatrix}1 & -2\\\\0&1\\end{bmatrix}\\) are inverses of one\nanother?",
+        "Suppose that we draw a shape in the plane with area \\(100\\mathrm{m}^2\\) . What is the area after transforming the\nfigure by the matrix (18.1.36) ¶ \\[\\begin{split}\\begin{bmatrix}\n2 & 3\\\\\n1 & 2\n\\end{bmatrix}.\\end{split}\\]",
+        "Which of the following sets of vectors are linearly independent?"
+      ]
+    },
+    {
+      "type": "math",
+      "latex": "(18.1.35)¶\\[\\begin{split}\\vec v_1 = \\begin{bmatrix}\n1 \\\\ 0 \\\\ -1 \\\\ 2\n\\end{bmatrix}, \\qquad \\vec v_2 = \\begin{bmatrix}\n3 \\\\ 1 \\\\ 0 \\\\ 1\n\\end{bmatrix}?\\end{split}\\]"
+    },
+    {
+      "type": "math",
+      "latex": "(18.1.36)¶\\[\\begin{split}\\begin{bmatrix}\n2 & 3\\\\\n1 & 2\n\\end{bmatrix}.\\end{split}\\]"
+    },
+    {
+      "type": "list",
+      "ordered": false,
+      "items": [
+        "\\(\\left\\{\\begin{pmatrix}1\\\\0\\\\-1\\end{pmatrix}, \\begin{pmatrix}2\\\\1\\\\-1\\end{pmatrix}, \\begin{pmatrix}3\\\\1\\\\1\\end{pmatrix}\\right\\}\\)",
+        "\\(\\left\\{\\begin{pmatrix}3\\\\1\\\\1\\end{pmatrix}, \\begin{pmatrix}1\\\\1\\\\1\\end{pmatrix}, \\begin{pmatrix}0\\\\0\\\\0\\end{pmatrix}\\right\\}\\)",
+        "\\(\\left\\{\\begin{pmatrix}1\\\\1\\\\0\\end{pmatrix}, \\begin{pmatrix}0\\\\1\\\\-1\\end{pmatrix}, \\begin{pmatrix}1\\\\0\\\\1\\end{pmatrix}\\right\\}\\)"
+      ]
+    },
+    {
+      "type": "list",
+      "ordered": true,
+      "items": [
+        "Suppose that you have a matrix written as \\(A = \\begin{bmatrix}c\\\\d\\end{bmatrix}\\cdot\\begin{bmatrix}a & b\\end{bmatrix}\\) for some choice of values \\(a, b, c\\) , and \\(d\\) . True or\nfalse: the determinant of such a matrix is always \\(0\\) ?",
+        "The vectors \\(e_1 = \\begin{bmatrix}1\\\\0\\end{bmatrix}\\) and \\(e_2 = \\begin{bmatrix}0\\\\1\\end{bmatrix}\\) are orthogonal. What\nis the condition on a matrix \\(A\\) so that \\(Ae_1\\) and \\(Ae_2\\) are orthogonal?",
+        "How can you write \\(\\mathrm{tr}(\\mathbf{A}^4)\\) in Einstein\nnotation for an arbitrary matrix \\(A\\) ?"
+      ]
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    }
+  ],
+  "images": [
+    {
+      "original_url": "https://vi.d2l.ai/_images/grid-points.svg",
+      "local_path": "_images/grid-points.svg",
+      "alt": "../_images/grid-points.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/par-vec.svg",
+      "local_path": "_images/par-vec.svg",
+      "alt": "../_images/par-vec.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/vec-add.svg",
+      "local_path": "_images/vec-add.svg",
+      "alt": "../_images/vec-add.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/vec-angle.svg",
+      "local_path": "_images/vec-angle.svg",
+      "alt": "../_images/vec-angle.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/proj-vec.svg",
+      "local_path": "_images/proj-vec.svg",
+      "alt": "../_images/proj-vec.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/space-division.svg",
+      "local_path": "_images/space-division.svg",
+      "alt": "../_images/space-division.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/space-division-3d.svg",
+      "local_path": "_images/space-division-3d.svg",
+      "alt": "../_images/space-division-3d.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_geometry-linear-algebraic-ops_80b1c3_29_0.svg",
+      "local_path": "_images/output_geometry-linear-algebraic-ops_80b1c3_29_0.svg",
+      "alt": "../_images/output_geometry-linear-algebraic-ops_80b1c3_29_0.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_geometry-linear-algebraic-ops_80b1c3_32_0.svg",
+      "local_path": "_images/output_geometry-linear-algebraic-ops_80b1c3_32_0.svg",
+      "alt": "../_images/output_geometry-linear-algebraic-ops_80b1c3_32_0.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_geometry-linear-algebraic-ops_80b1c3_35_0.svg",
+      "local_path": "_images/output_geometry-linear-algebraic-ops_80b1c3_35_0.svg",
+      "alt": "../_images/output_geometry-linear-algebraic-ops_80b1c3_35_0.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_geometry-linear-algebraic-ops_80b1c3_41_0.svg",
+      "local_path": "_images/output_geometry-linear-algebraic-ops_80b1c3_41_0.svg",
+      "alt": "../_images/output_geometry-linear-algebraic-ops_80b1c3_41_0.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_geometry-linear-algebraic-ops_80b1c3_44_0.svg",
+      "local_path": "_images/output_geometry-linear-algebraic-ops_80b1c3_44_0.svg",
+      "alt": "../_images/output_geometry-linear-algebraic-ops_80b1c3_44_0.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_geometry-linear-algebraic-ops_80b1c3_47_0.svg",
+      "local_path": "_images/output_geometry-linear-algebraic-ops_80b1c3_47_0.svg",
+      "alt": "../_images/output_geometry-linear-algebraic-ops_80b1c3_47_0.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/grid-transform.svg",
+      "local_path": "_images/grid-transform.svg",
+      "alt": "../_images/grid-transform.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/grid-transform-filled.svg",
+      "local_path": "_images/grid-transform-filled.svg",
+      "alt": "../_images/grid-transform-filled.svg"
+    }
+  ],
+  "text": "18.1. Hình học và các hoạt động đại số tuyến tính\nTrong Section 2.3 , chúng tôi gặp phải những điều cơ\nbản về đại số tuyến tính và thấy nó có thể được sử dụng như thế nào để\nthể hiện các hoạt động phổ biến để chuyển đổi dữ liệu của chúng tôi. Đại\nsố tuyến tính là một trong những trụ cột toán học quan trọng dựa trên\nphần lớn công việc mà chúng ta làm trong học sâu và trong học máy rộng\nhơn. Trong khi Section 2.3 chứa đủ máy móc để truyền\nđạt cơ học của các mô hình học sâu hiện đại, có rất nhiều hơn cho chủ đề\nnày. Trong phần này, chúng ta sẽ đi sâu hơn, làm nổi bật một số diễn\ngiải hình học của các phép toán đại số tuyến tính, và giới thiệu một vài\nkhái niệm cơ bản, bao gồm eigenvalues và eigenvectors.\n18.1.1. Hình học của Vectơ Trước tiên, chúng ta cần thảo luận về hai cách giải thích hình học phổ biến của vectơ, như một trong hai điểm hoặc hướng trong không gian. Về cơ bản, một vectơ là danh sách các số như danh sách Python bên dưới.\nCác nhà toán học thường viết điều này dưới dạng vectơ * cột* hoặc *\nhàng*, đó là để nói là\nhoặc là\nChúng thường có các diễn giải khác nhau, trong đó các ví dụ dữ liệu là\nvectơ cột và trọng lượng được sử dụng để tạo thành các tổng trọng số là\nvectơ hàng. Tuy nhiên, nó có thể có lợi để linh hoạt. Như chúng ta đã mô\ntả trong Section 2.3 , mặc dù định hướng mặc định của\nmột vectơ duy nhất là một vectơ cột, đối với bất kỳ ma trận nào đại diện\ncho một tập dữ liệu dạng bảng, coi mỗi ví dụ dữ liệu như một vectơ hàng\ntrong ma trận là thông thường hơn.\nVới một vector, cách giải thích đầu tiên mà chúng ta nên đưa ra nó là\nmột điểm trong không gian. Trong hai hoặc ba chiều, ta có thể hình dung\ncác điểm này bằng cách sử dụng các thành phần của các vectơ để xác định\nvị trí của các điểm trong không gian so với một tham chiếu cố định gọi\nlà origin . Điều này có thể được nhìn thấy trong Fig. 18.1.1 .\nFig. 18.1.1 An illustration of visualizing vectors as points in the plane. The\nfirst component of the vector gives the \\(x\\) -coordinate, the\nsecond component gives the \\(y\\) -coordinate. Higher dimensions\nare analogous, although much harder to visualize. ¶\nQuan điểm hình học này cho phép chúng ta xem xét vấn đề ở mức độ trừu\ntượng hơn. Không còn phải đối mặt với một số vấn đề dường như không thể\nvượt qua như phân loại hình ảnh là mèo hoặc chó, chúng ta có thể bắt đầu\nxem xét các nhiệm vụ trừu tượng như tập hợp các điểm trong không gian và\nhình dung nhiệm vụ khám phá cách tách hai cụm điểm riêng biệt.\nSong song, có quan điểm thứ hai mà mọi người thường lấy vectơ: như hướng\ntrong không gian. Chúng ta không chỉ có thể nghĩ về vector \\(\\mathbf{v} = [3,2]^\\top\\) là vị trí \\(3\\) đơn vị ở bên phải và \\(2\\) các đơn vị lên từ nguồn gốc, chúng ta cũng có thể nghĩ về nó\nnhư là hướng để thực hiện \\(3\\) bước sang phải và \\(2\\) bước\nlên. Bằng cách này, chúng tôi xem xét tất cả các vectơ trong hình Fig. 18.1.2 giống nhau.\nFig. 18.1.2 Any vector can be visualized as an arrow in the plane. In this case,\nevery vector drawn is a representation of the vector \\((3,2)^\\top\\) . ¶\nMột trong những lợi ích của sự thay đổi này là chúng ta có thể hiểu rõ\nvề hành động bổ sung vector. Đặc biệt, chúng ta làm theo các hướng dẫn\nđược đưa ra bởi một vectơ, và sau đó làm theo các hướng dẫn được đưa ra\nbởi người kia, như được thấy trong Fig. 18.1.3 .\nFig. 18.1.3 We can visualize vector addition by first following one vector, and\nthen another. ¶\nPhép trừ vector có cách giải thích tương tự. Bằng cách xem xét danh tính\nmà \\(\\mathbf{u} = \\mathbf{v} + (\\mathbf{u}-\\mathbf{v})\\) , chúng ta\nthấy rằng vector \\(\\mathbf{u}-\\mathbf{v}\\) là hướng đưa chúng ta từ\nđiểm \\(\\mathbf{v}\\) đến điểm \\(\\mathbf{u}\\) .\n18.1.2. Dot Sản phẩm và Angles Như chúng ta đã thấy trong Section 2.3 , nếu chúng ta lấy hai vectơ cột \\(\\mathbf{u}\\) và \\(\\mathbf{v}\\) , chúng ta có thể tạo thành sản phẩm chấm của chúng bằng cách tính toán:\nBởi vì (18.1.3) là đối xứng, chúng ta sẽ phản ánh ký hiệu\ncủa phép nhân cổ điển và viết\nđể làm nổi bật thực tế là trao đổi thứ tự của các vectơ sẽ mang lại câu\ntrả lời tương tự.\nSản phẩm dot (18.1.3) cũng thừa nhận một giải thích hình\nhọc: it is closely related to the angle between two vectors. Consider\nthe angle shown in Fig. 18.1.4 .\nFig. 18.1.4 Between any two vectors in the plane there is a well defined angle \\(\\theta\\) . We will see this angle is intimately tied to the dot\nproduct. ¶\nĐể bắt đầu, chúng ta hãy xem xét hai vectơ cụ thể:\nVector \\(\\mathbf{v}\\) có chiều dài \\(r\\) và chạy song song với\ntrục \\(x\\) , và vector \\(\\mathbf{w}\\) có chiều dài \\(s\\) và ở\ngóc \\(\\theta\\) với trục \\(x\\) . Nếu chúng ta tính toán sản phẩm\nchấm của hai vectơ này, chúng ta thấy rằng\nVới một số thao tác đại số đơn giản, chúng ta có thể sắp xếp lại các\nthuật ngữ để có được\nNói tóm lại, đối với hai vectơ cụ thể này, tích chấm kết hợp với các\nđịnh mức cho chúng ta biết góc giữa hai vectơ. Thực tế tương tự này là\nđúng nói chung. Tuy nhiên, chúng tôi sẽ không lấy được biểu thức ở đây,\nnếu chúng ta xem xét viết \\(\\|\\mathbf{v} - \\mathbf{w}\\|^2\\) theo hai\ncách: một với sản phẩm chấm và một hình học khác sử dụng định luật\ncosin, chúng ta có thể có được mối quan hệ đầy đủ. Thật vậy, đối với bất\nkỳ hai vectơ \\(\\mathbf{v}\\) và \\(\\mathbf{w}\\) , góc giữa hai\nvectơ là\nĐây là một kết quả tốt đẹp vì không có gì trong các tài liệu tham khảo\ntính toán hai chiều. Thật vậy, chúng ta có thể sử dụng điều này trong ba\nhoặc ba triệu chiều mà không gặp vấn đề gì.\nNhư một ví dụ đơn giản, chúng ta hãy xem làm thế nào để tính toán góc\ngiữa một cặp vectơ:\nChúng tôi sẽ không sử dụng nó ngay bây giờ, nhưng rất hữu ích khi biết\nrằng chúng ta sẽ đề cập đến các vectơ mà góc là \\(\\pi/2\\) (hoặc\ntương đương \\(90^{\\circ}\\) ) là * trực tho*. Bằng cách kiểm tra\nphương trình trên, chúng ta thấy rằng điều này xảy ra khi \\(\\theta = \\pi/2\\) , đó là điều tương tự như \\(\\cos(\\theta) = 0\\) . Cách duy nhất điều này có thể xảy ra là nếu\nbản thân sản phẩm chấm bằng 0, và hai vectơ là trực giao nếu và chỉ khi \\(\\mathbf{v}\\cdot\\mathbf{w} = 0\\) . Điều này sẽ chứng minh là một\ncông thức hữu ích khi hiểu các đối tượng về mặt hình học.\nIt is reasonable to ask: why is computing the angle useful? The answer\ncomes in the kind of invariance we expect data to have. Consider an\nimage, and a duplicate image, where every pixel value is the same but \\(10\\%\\) the brightness. The values of the individual pixels are in\ngeneral far from the original values. Thus, if one computed the distance\nbetween the original image and the darker one, the distance can be\nlarge. However, for most ML applications, the content is the same—it\nis still an image of a cat as far as a cat/dog classifier is concerned.\nHowever, if we consider the angle, it is not hard to see that for any\nvector \\(\\mathbf{v}\\) , the angle between \\(\\mathbf{v}\\) and \\(0.1\\cdot\\mathbf{v}\\) is zero. This corresponds to the fact that\nscaling vectors keeps the same direction and just changes the length.\nThe angle considers the darker image identical.\nVí dụ như thế này ở khắp mọi nơi. Trong văn bản, chúng ta có thể muốn\nchủ đề được thảo luận không thay đổi nếu chúng ta viết dài gấp đôi tài\nliệu nói cùng một điều. Đối với một số mã hóa (chẳng hạn như đếm số lần\nxuất hiện của các từ trong một số từ vựng), điều này tương ứng với việc\ntăng gấp đôi vector mã hóa tài liệu, vì vậy một lần nữa chúng ta có thể\nsử dụng góc.\n18.1.2.1. Cosine Similarity\nIn ML contexts where the angle is employed to measure the closeness of\ntwo vectors, practitioners adopt the term cosine similarity to refer\nto the portion\nCosin có giá trị lớn nhất là \\(1\\) khi hai vectơ trỏ theo cùng một\nhướng, giá trị tối thiểu là \\(-1\\) khi chúng chỉ theo hướng ngược\nlại, và giá trị \\(0\\) khi hai vectơ là trực giao. Lưu ý rằng nếu các\nthành phần của vectơ chiều cao được lấy mẫu ngẫu nhiên với trung bình \\(0\\) , cosin của chúng gần như sẽ luôn gần với \\(0\\) .\n18.1.3. Siêu máy bay\nNgoài việc làm việc với các vectơ, một đối tượng chính khác mà bạn phải\nhiểu để đi xa trong đại số tuyến tính là * hyperplane*, một khái quát\nhóa cho các kích thước cao hơn của một đường thẳng (hai chiều) hoặc của\nmột mặt phẳng (ba chiều). Trong một không gian vectơ \\(d\\) chiều,\nmột siêu phẳng có \\(d-1\\) kích thước và chia không gian thành hai\nnửa không gian.\nHãy để chúng tôi bắt đầu với một ví dụ. Giả sử rằng chúng ta có một\nvector cột \\(\\mathbf{w}=[2,1]^\\top\\) . Chúng tôi muốn biết, “những\nđiểm \\(\\mathbf{v}\\) với \\(\\mathbf{w}\\cdot\\mathbf{v} = 1\\) là\ngì?” Bằng cách nhớ lại kết nối giữa các sản phẩm chấm và góc trên (18.1.8) , chúng ta có thể thấy rằng điều này tương\nđương với\nFig. 18.1.5 Recalling trigonometry, we see the formula \\(\\|\\mathbf{v}\\|\\cos(\\theta)\\) is the length of the projection of\nthe vector \\(\\mathbf{v}\\) onto the direction of \\(\\mathbf{w}\\) ¶\nNếu chúng ta xem xét ý nghĩa hình học của biểu thức này, chúng ta thấy\nrằng điều này tương đương với việc nói rằng độ dài của phép chiếu \\(\\mathbf{v}\\) theo hướng \\(\\mathbf{w}\\) chính xác là \\(1/\\|\\mathbf{w}\\|\\) , như được thể hiện trong Fig. 18.1.5 . Tập hợp tất cả các điểm mà điều này là\nđúng là một đường thẳng ở góc phải với vector \\(\\mathbf{w}\\) . Nếu\nchúng ta muốn, chúng ta có thể tìm thấy phương trình cho dòng này và\nthấy rằng nó là \\(2x + y = 1\\) hoặc tương đương \\(y = 1 - 2x\\) .\nNếu bây giờ chúng ta nhìn vào những gì xảy ra khi chúng ta hỏi về tập\nhợp các điểm với \\(\\mathbf{w}\\cdot\\mathbf{v} > 1\\) hoặc \\(\\mathbf{w}\\cdot\\mathbf{v} < 1\\) , chúng ta có thể thấy rằng đây là\nnhững trường hợp các dự báo dài hơn hoặc ngắn hơn \\(1/\\|\\mathbf{w}\\|\\) , tương ứng. Do đó, hai bất bình đẳng đó xác\nđịnh hai bên của dòng. Bằng cách này, chúng tôi đã tìm ra cách cắt không\ngian của chúng tôi thành hai nửa, trong đó tất cả các điểm ở một bên đều\ncó sản phẩm chấm dưới ngưỡng và phía bên kia ở trên như chúng ta thấy\ntrong Fig. 18.1.6 .\nFig. 18.1.6 If we now consider the inequality version of the expression, we see\nthat our hyperplane (in this case: just a line) separates the space\ninto two halves. ¶\nCâu chuyện trong chiều cao hơn là nhiều như nhau. Nếu bây giờ chúng ta\nlấy \\(\\mathbf{w} = [1,2,3]^\\top\\) và hỏi về các điểm trong ba chiều\nvới \\(\\mathbf{w}\\cdot\\mathbf{v} = 1\\) , chúng ta có được một mặt\nphẳng ở góc phải với vector \\(\\mathbf{w}\\) đã cho. Hai bất đẳng thức\nlại xác định hai mặt của mặt phẳng như được thể hiện trong Fig. 18.1.7 .\nFig. 18.1.7 Hyperplanes in any dimension separate the space into two halves. ¶\nTrong khi khả năng hình dung của chúng ta hết vào thời điểm này, không\ncó gì ngăn cản chúng ta làm điều này trong hàng chục, hàng trăm hoặc\nhàng tỷ chiều. Điều này xảy ra thường xuyên khi nghĩ về các mô hình học\nmáy. Ví dụ, chúng ta có thể hiểu các mô hình phân loại tuyến tính như\ncác mô hình từ Section 3.4 , như các phương pháp để tìm các\nsiêu phẳng tách biệt các lớp mục tiêu khác nhau. Trong bối cảnh này, các\nsiêu máy bay như vậy thường được gọi là kế hoạch quyết định . Phần lớn\ncác mô hình phân loại học sâu kết thúc bằng một lớp tuyến tính được đưa\nvào một softmax, do đó người ta có thể diễn giải vai trò của mạng nơ-ron\nsâu là tìm một nhúng phi tuyến tính sao cho các lớp mục tiêu có thể được\ntách sạch bằng các siêu phẳng.\nĐể đưa ra một ví dụ được xây dựng bằng tay, hãy chú ý rằng chúng ta có\nthể tạo ra một mô hình hợp lý để phân loại hình ảnh nhỏ của áo phông và\nquần dài từ tập dữ liệu thời trang MNIST (thấy trong Section 3.5 ) bằng cách chỉ lấy vectơ giữa phương tiện\ncủa chúng để xác định mặt phẳng quyết định và nhãn cầu một ngưỡng thô.\nĐầu tiên chúng ta sẽ tải dữ liệu và tính toán trung bình.\nNó có thể là thông tin để kiểm tra các trung bình này một cách chi tiết,\nvì vậy hãy để chúng tôi vẽ những gì họ trông như thế nào. Trong trường\nhợp này, chúng ta thấy rằng trung bình thực sự giống như một hình ảnh mờ\ncủa một chiếc áo phông.\nTrong trường hợp thứ hai, chúng ta lại thấy rằng trung bình giống như\nmột hình ảnh mờ của quần.\nTrong một giải pháp hoàn toàn máy học, chúng ta sẽ tìm hiểu ngưỡng từ\ntập dữ liệu. Trong trường hợp này, tôi chỉ đơn giản là mắt một ngưỡng\ntrông tốt trên dữ liệu đào tạo bằng tay.\n18.1.4. Hình học của biến đổi tuyến tính\nThông qua Section 2.3 và các cuộc thảo luận trên,\nchúng ta có một sự hiểu biết vững chắc về hình học của vectơ, độ dài và\ngóc. Tuy nhiên, có một đối tượng quan trọng mà chúng ta đã bỏ qua thảo\nluận, và đó là một sự hiểu biết hình học về các biến đổi tuyến tính được\nthể hiện bằng ma trận. Nội bộ hoàn toàn những gì ma trận có thể làm để\nchuyển đổi dữ liệu giữa hai không gian chiều cao có khả năng khác nhau\ncần thực hành đáng kể, và vượt quá phạm vi của phụ lục này. Tuy nhiên,\nchúng ta có thể bắt đầu xây dựng trực giác theo hai chiều.\nGiả sử rằng chúng ta có một số ma trận:\nIf we want to apply this to an arbitrary vector \\(\\mathbf{v} = [x, y]^\\top\\) , we multiply and see that\nĐiều này có vẻ giống như một tính toán kỳ lạ, nơi một cái gì đó rõ ràng\ntrở nên hơi bất khả xâm phạm. Tuy nhiên, nó cho chúng ta biết rằng chúng\nta có thể viết cách mà ma trận biến đổi vectơ any về cách nó biến đổi\n* hai vectơ cụ thể : :math:`[1,0]^top` và :math:`[0,1]^top`. Điều\nnày đáng để xem xét trong một khoảnh khắc. Về cơ bản chúng ta đã giảm\nmột bài toán vô hạn (những gì xảy ra với bất kỳ cặp số thực nào) thành\nmột vấn đề hữu hạn (những gì xảy ra với các vectơ cụ thể này). Các vectơ\nnày là một ví dụ a *basis*, nơi chúng ta có thể viết bất kỳ vectơ\nnào trong không gian của chúng ta dưới dạng tổng trọng số của các vectơ\ncơ bản này*.\nHãy để chúng tôi vẽ những gì xảy ra khi chúng ta sử dụng ma trận cụ thể\nNếu chúng ta nhìn vào vector cụ thể \\(\\mathbf{v} = [2, -1]^\\top\\) ,\nchúng ta thấy đây là \\(2\\cdot[1,0]^\\top + -1\\cdot[0,1]^\\top\\) và do\nđó chúng ta biết rằng ma trận \\(A\\) sẽ gửi điều này đến \\(2(\\mathbf{A}[1,0]^\\top) + -1(\\mathbf{A}[0,1])^\\top = 2[1, -1]^\\top - [2,3]^\\top = [0, -5]^\\top\\) .\nNếu chúng ta làm theo logic này thông qua một cách cẩn thận, nói bằng\ncách xem xét lưới của tất cả các cặp số nguyên của điểm, chúng ta thấy\nrằng những gì xảy ra là phép nhân ma trận có thể nghiêng, xoay, và quy\nmô lưới điện, nhưng cấu trúc lưới phải vẫn như bạn thấy trong Fig. 18.1.8 .\nFig. 18.1.8 The matrix \\(\\mathbf{A}\\) acting on the given basis vectors.\nNotice how the entire grid is transported along with it. ¶\nĐây là điểm trực quan quan trọng nhất để nội tâm hóa về các biến đổi\ntuyến tính được thể hiện bằng ma trận. Ma trận không có khả năng làm\nbiến dạng một số phần của không gian khác với những phần khác. Tất cả\nnhững gì họ có thể làm là lấy tọa độ ban đầu trên không gian của chúng\nta và nghiêng, xoay và quy mô chúng.\nMột số biến dạng có thể nghiêm trọng. For instance ví dụ the matrix ma\ntrận\nnén toàn bộ mặt phẳng hai chiều xuống một dòng duy nhất. Xác định và làm\nviệc với các biến đổi như vậy là chủ đề của một phần sau, nhưng về mặt\nhình học chúng ta có thể thấy rằng điều này về cơ bản khác với các loại\nbiến đổi mà chúng ta đã thấy ở trên. Ví dụ, kết quả từ ma trận \\(\\mathbf{A}\\) có thể là “uốn cong trở lại” vào lưới gốc. Kết quả từ\nma trận \\(\\mathbf{B}\\) không thể vì chúng ta sẽ không bao giờ biết\nvector \\([1,2]^\\top\\) đến từ đâu - nó là \\([1,1]^\\top\\) hay \\([0, -1]^\\top\\) ?\nTrong khi bức ảnh này dành cho ma trận \\(2\\times2\\) , không có gì\nngăn cản chúng ta tham gia các bài học đã học vào các chiều cao hơn. Nếu\nchúng ta lấy vectơ cơ bản tương tự như \\([1,0, \\ldots,0]\\) và xem ma\ntrận của chúng ta gửi chúng ở đâu, chúng ta có thể bắt đầu có cảm giác\nvề cách nhân ma trận biến dạng toàn bộ không gian trong bất kỳ không\ngian chiều nào chúng ta đang xử lý.\n18.1.5. Sự phụ thuộc tuyến tính\nXem xét lại ma trận\nĐiều này nén toàn bộ mặt phẳng xuống để sống trên dòng đơn \\(y = 2x\\) . Câu hỏi bây giờ đặt ra: có cách nào đó chúng ta có thể\nphát hiện ra điều này chỉ nhìn vào chính ma trận? Câu trả lời là thực sự\nchúng ta có thể. Chúng ta hãy lấy \\(\\mathbf{b}_1 = [2,4]^\\top\\) và \\(\\mathbf{b}_2 = [-1, -2]^\\top\\) là hai cột của \\(\\mathbf{B}\\) .\nHãy nhớ rằng chúng ta có thể viết mọi thứ được chuyển đổi bởi ma trận \\(\\mathbf{B}\\) như một tổng trọng số của các cột của ma trận: như \\(a_1\\mathbf{b}_1 + a_2\\mathbf{b}_2\\) . Chúng tôi gọi đây là một kết\nhợp tuyến tính*. Thực tế là \\(\\mathbf{b}_1 = -2\\cdot\\mathbf{b}_2\\) có nghĩa là chúng ta có thể viết bất kỳ sự kết hợp tuyến tính nào của\nhai cột đó hoàn toàn về nói \\(\\mathbf{b}_2\\) kể từ\nĐiều này có nghĩa là một trong các cột, theo một nghĩa nào đó, dư thừa\nvì nó không xác định một hướng duy nhất trong không gian. Điều này không\nnên làm chúng ta ngạc nhiên quá nhiều vì chúng ta đã thấy rằng ma trận\nnày sụp đổ toàn bộ mặt phẳng xuống thành một dòng duy nhất. Hơn nữa,\nchúng ta thấy rằng sự phụ thuộc tuyến tính \\(\\mathbf{b}_1 = -2\\cdot\\mathbf{b}_2\\) nắm bắt điều này. Để làm cho\nđiều này đối xứng hơn giữa hai vectơ, chúng ta sẽ viết cái này là\nNói chung, chúng ta sẽ nói rằng một tập hợp các vectơ \\(\\mathbf{v}_1, \\ldots, \\mathbf{v}_k\\) là * phụ thuộc tuyến tính*\nnếu có hệ số tồn tại \\(a_1, \\ldots, a_k\\) * không bằng 0* để\nTrong trường hợp này, chúng ta có thể giải quyết cho một trong các vectơ\nvề một số sự kết hợp của những người khác, và hiệu quả làm cho nó dư\nthừa. Do đó, sự phụ thuộc tuyến tính trong các cột của ma trận là một\nnhân chứng cho thực tế là ma trận của chúng ta đang nén không gian xuống\nmột số chiều thấp hơn. Nếu không có sự phụ thuộc tuyến tính, chúng tôi\nnói rằng các vectơ là * độc lập tuyến tính*. Nếu các cột của ma trận\nđộc lập tuyến tính, không xảy ra nén và thao tác có thể được hoàn tác.\n18.1.6. thứ hạng\nNếu chúng ta có một ma trận \\(n\\times m\\) chung, nó là hợp lý để hỏi\nkhông gian kích thước mà ma trận ánh xạ vào. Một khái niệm được gọi là rank sẽ là câu trả lời của chúng tôi. Trong phần trước, chúng tôi lưu\ný rằng một sự phụ thuộc tuyến tính làm chứng cho việc nén không gian vào\nmột chiều thấp hơn và vì vậy chúng tôi sẽ có thể sử dụng điều này để xác\nđịnh khái niệm về cấp bậc. Đặc biệt, cấp bậc của một ma trận \\(\\mathbf{A}\\) là số lượng lớn nhất các cột độc lập tuyến tính giữa\ntất cả các tập con của cột. Ví dụ, ma trận\ncó \\(\\mathrm{rank}(B)=1\\) , vì hai cột phụ thuộc tuyến tính, nhưng\nbản thân một trong hai cột không phụ thuộc tuyến tính. Đối với một ví dụ\nkhó khăn hơn, chúng ta có thể xem xét\nvà cho thấy \\(\\mathbf{C}\\) đã xếp hạng hai vì, ví dụ, hai cột đầu\ntiên độc lập tuyến tính, tuy nhiên bất kỳ bộ sưu tập nào trong bốn cột\nphụ thuộc.\nThủ tục này, như mô tả, rất không hiệu quả. Nó đòi hỏi phải xem xét mọi\ntập hợp con của các cột của ma trận nhất định của chúng ta, và do đó có\nkhả năng hàm mũ trong số cột. Sau đó chúng ta sẽ thấy một cách hiệu quả\nhơn về tính toán để tính toán thứ hạng của ma trận, nhưng hiện tại, điều\nnày là đủ để thấy rằng khái niệm này được xác định rõ và hiểu ý nghĩa.\n18.1.7. Khả năng đảo ngược\nChúng ta đã thấy ở trên rằng phép nhân của một ma trận với các cột phụ\nthuộc tuyến tính không thể hoàn tác, tức là, không có hoạt động nghịch\nđảo nào luôn có thể khôi phục đầu vào. Tuy nhiên, nhân với ma trận cấp\nbậc đầy đủ (tức là, một số \\(\\mathbf{A}\\) là ma trận \\(n \\times n\\) với thứ hạng \\(n\\) ), chúng ta nên luôn luôn có\nthể hoàn tác nó. Xem xét ma trận\nmà là ma trận với những người dọc theo đường chéo, và số không ở nơi\nkhác. Chúng tôi gọi đây là ma trận identity . Đó là ma trận khiến dữ\nliệu của chúng tôi không thay đổi khi áp dụng. Để tìm một ma trận hoàn\ntác những gì ma trận của chúng tôi \\(\\mathbf{A}\\) đã làm, chúng tôi\nmuốn tìm một ma trận \\(\\mathbf{A}^{-1}\\) sao cho\nNếu chúng ta xem xét điều này như một hệ thống, chúng ta có \\(n \\times n\\) ẩn số (các mục của \\(\\mathbf{A}^{-1}\\) ) và \\(n \\times n\\) phương trình (bình đẳng cần giữ giữa mọi mục nhập của\nsản phẩm \\(\\mathbf{A}^{-1}\\mathbf{A}\\) và mọi mục nhập của \\(\\mathbf{I}\\) ) vì vậy chúng ta nên khái quát mong đợi một giải pháp\ntồn tại. Thật vậy, trong phần tiếp theo chúng ta sẽ thấy một đại lượng\nđược gọi là determinant , có thuộc tính miễn là yếu tố quyết định không\nphải bằng 0, chúng ta có thể tìm ra giải pháp. Chúng tôi gọi ma trận \\(\\mathbf{A}^{-1}\\) như ma trận inverse . Ví dụ, nếu \\(\\mathbf{A}\\) là ma trận \\(2 \\times 2\\) chung\nsau đó chúng ta có thể thấy rằng nghịch đảo là\nChúng ta có thể kiểm tra để xem điều này bằng cách thấy rằng nhân với\nnghịch đảo được đưa ra bởi công thức trên hoạt động trong thực tế.\n18.1.7.1. Các vấn đề số Trong khi nghịch đảo của ma trận rất hữu ích về lý thuyết, chúng ta phải nói rằng hầu hết thời gian chúng ta không muốn sử dụng ma trận nghịch đảo để giải quyết một vấn đề trong thực tế. Nói chung, có nhiều thuật toán ổn định số hơn để giải các phương trình tuyến tính như\nhơn là tính toán nghịch đảo và nhân lên để có được\nCũng giống như phân chia bởi một số nhỏ có thể dẫn đến sự bất ổn số, vì\nvậy có thể đảo ngược của một ma trận gần với có thứ hạng thấp.\nHơn nữa, thông thường ma trận \\(\\mathbf{A}\\) là * thưa thớt *, có\nnghĩa là nó chỉ chứa một số lượng nhỏ các giá trị không phải bằng không.\nNếu chúng ta khám phá các ví dụ, chúng ta sẽ thấy rằng điều này không có\nnghĩa là nghịch đảo thưa thớt. Ngay cả khi \\(\\mathbf{A}\\) là một \\(1\\) triệu bởi \\(1\\) triệu ma trận với chỉ \\(5\\) triệu mục\nkhông phải bằng không (và do đó chúng tôi chỉ cần lưu trữ những \\(5\\) triệu), nghịch đảo thường sẽ có hầu hết mọi mục không âm, yêu\ncầu chúng tôi lưu trữ tất cả \\(1\\text{M}^2\\) mục đó là \\(1\\) nghìn tỷ mục!\nMặc dù chúng ta không có thời gian để lặn tất cả các cách vào các vấn đề\nsố gai góc thường gặp khi làm việc với đại số tuyến tính, chúng tôi muốn\ncung cấp cho bạn một số trực giác về khi nào cần tiến hành thận trọng,\nvà nói chung tránh đảo ngược trong thực tế là một nguyên tắc tốt.\n18.1.8. Xác định Quan điểm hình học của đại số tuyến tính đưa ra một cách trực quan để diễn giải một đại lượng cơ bản được gọi là quyết định . Hãy xem xét hình ảnh lưới từ trước, nhưng bây giờ với một khu vực được tô sáng ( Fig. 18.1.9 ).\nFig. 18.1.9 The matrix \\(\\mathbf{A}\\) again distorting the grid. This time, I\nwant to draw particular attention to what happens to the highlighted\nsquare. ¶\nNhìn vào hình vuông được tô sáng. Đây là một hình vuông với các cạnh\nđược đưa ra bởi \\((0, 1)\\) và \\((1, 0)\\) và do đó nó có diện\ntích một. Sau \\(\\mathbf{A}\\) biến hình vuông này, chúng ta thấy rằng\nnó trở thành một hình bình hành. Không có lý do gì hình bình hành này\nnên có cùng một khu vực mà chúng ta bắt đầu, và thực sự trong trường hợp\ncụ thể được hiển thị ở đây\nnó là một bài tập trong hình học tọa độ để tính toán diện tích của hình\nbình hành này và có được rằng khu vực này là \\(5\\) .\nNói chung, nếu chúng ta có một ma trận\nchúng ta có thể thấy với một số tính toán rằng diện tích của hình bình\nhành kết quả là \\(ad-bc\\) . Khu vực này được gọi là quyết định .\nHãy để chúng tôi kiểm tra điều này một cách nhanh chóng với một số mã ví\ndụ.\nMắt đại bàng giữa chúng ta sẽ nhận thấy rằng biểu thức này có thể bằng 0\nhoặc thậm chí tiêu cực. Đối với thuật ngữ tiêu cực, đây là vấn đề quy\nước được thực hiện chung trong toán học: nếu ma trận lật hình, chúng ta\nnói khu vực này bị phủ định. Chúng ta hãy xem bây giờ rằng khi yếu tố\nquyết định bằng không, chúng ta tìm hiểu thêm.\nHãy để chúng tôi xem xét\nNếu chúng ta tính toán yếu tố quyết định của ma trận này, chúng ta nhận\nđược \\(2\\cdot(-2 ) - 4\\cdot(-1) = 0\\) . Với sự hiểu biết của chúng\ntôi ở trên, điều này có ý nghĩa. \\(\\mathbf{B}\\) nén hình vuông từ\nhình ảnh gốc xuống một đoạn đường, có diện tích bằng không. Và quả thực,\nbị nén thành một không gian chiều thấp hơn là cách duy nhất để có diện\ntích bằng 0 sau khi biến đổi. Như vậy chúng ta thấy kết quả sau là đúng:\nmột ma trận \\(A\\) có thể đảo ngược nếu và chỉ khi yếu tố quyết định\nkhông bằng 0.\nNhư một nhận xét cuối cùng, hãy tưởng tượng rằng chúng ta có bất kỳ con\nsố nào được vẽ trên mặt phẳng. Suy nghĩ giống như các nhà khoa học máy\ntính, chúng ta có thể phân hủy con số đó thành một tập hợp các ô vuông\nnhỏ để diện tích của hình là về bản chất chỉ là số lượng hình vuông\ntrong phân hủy. Nếu bây giờ chúng ta biến đổi con số đó bằng một ma\ntrận, chúng ta sẽ gửi từng ô vuông này thành hình bình hành, mỗi ô có\ndiện tích được đưa ra bởi yếu tố quyết định. Chúng ta thấy rằng đối với\nbất kỳ con số nào, yếu tố quyết định cho số (ký) mà ma trận quy mô diện\ntích của bất kỳ hình nào.\nCác yếu tố quyết định tính toán cho ma trận lớn hơn có thể tốn nhiều\ncông sức, nhưng trực giác là như nhau. Yếu tố quyết định vẫn là yếu tố\nmà \\(n\\times n\\) ma trận quy mô \\(n\\) -khối lượng chiều.\n18.1.9. Tensors và hoạt động đại số tuyến tính phổ biến\nNăm Section 2.3 khái niệm về hàng chục đã được giới\nthiệu. Trong phần này, chúng ta sẽ đi sâu hơn vào các cơn co thắt tensor\n(tensor tương đương với phép nhân ma trận), và xem làm thế nào nó có thể\ncung cấp một cái nhìn thống nhất về một số hoạt động ma trận và vector.\nVới ma trận và vectơ, chúng ta biết cách nhân chúng để chuyển đổi dữ\nliệu. Chúng ta cần phải có một định nghĩa tương tự cho hàng chục nếu\nchúng hữu ích cho chúng ta. Hãy suy nghĩ về phép nhân ma trận:\nhoặc tương đương\nMô hình này là một trong những chúng ta có thể lặp lại cho hàng chục.\nĐối với hàng chục, không có một trường hợp nào để tổng hợp những gì có\nthể được lựa chọn phổ biến, vì vậy chúng ta cần xác định chính xác những\nchỉ số chúng ta muốn tổng hợp lại. For instance ví dụ we could consider\nxem xét\nMột sự chuyển đổi như vậy được gọi là co lại tensor . Nó có thể đại\ndiện cho một gia đình biến đổi linh hoạt hơn nhiều mà phép nhân ma trận\nmột mình.\nLà một đơn giản hóa ký hiệu thường được sử dụng, chúng ta có thể nhận\nthấy rằng tổng là trên chính xác những chỉ số xảy ra nhiều hơn một lần\ntrong biểu thức, do đó mọi người thường làm việc với ký hiệu *\nEinstein*, trong đó tổng kết được thực hiện trong tất cả các chỉ số lặp\nđi lặp lại. Điều này cho phép biểu thức nhỏ gọn:\n18.1.9.1. Ví dụ phổ biến từ đại số tuyến tính\nChúng ta hãy xem có bao nhiêu định nghĩa đại số tuyến tính mà chúng ta\nđã thấy trước đây có thể được thể hiện trong ký hiệu tensor nén này:\n\\(\\mathbf{v} \\cdot \\mathbf{w} = \\sum_i v_iw_i\\)\n\\(\\|\\mathbf{v}\\|_2^{2} = \\sum_i v_iv_i\\)\n\\((\\mathbf{A}\\mathbf{v})_i = \\sum_j a_{ij}v_j\\)\n\\((\\mathbf{A}\\mathbf{B})_{ik} = \\sum_j a_{ij}b_{jk}\\)\n\\(\\mathrm{tr}(\\mathbf{A}) = \\sum_i a_{ii}\\)\nBằng cách này, chúng ta có thể thay thế vô số ký hiệu chuyên biệt bằng\ncác biểu thức tensor ngắn.\n18.1.9.2. Expressing in Code Tensors cũng có thể được vận hành linh hoạt trong mã. Như đã thấy trong Section 2.3 , chúng ta có thể tạo ra hàng chục như được hiển thị dưới đây.\nTổng kết Einstein đã được thực hiện trực tiếp. Các chỉ số xảy ra trong\ntổng kết Einstein có thể được truyền như một chuỗi, tiếp theo là các\nhàng chục đang được hành động. Ví dụ, để thực hiện phép nhân ma trận,\nchúng ta có thể xem xét tổng kết Einstein thấy ở trên\n( \\(\\mathbf{A}\\mathbf{v} = a_{ij}v_j\\) ) và tự loại bỏ các chỉ số để\nthực hiện:\nĐây là một ký hiệu rất linh hoạt. Ví dụ nếu chúng ta muốn tính toán\nnhững gì sẽ được viết theo truyền thống như\nnó có thể được thực hiện thông qua tổng kết Einstein như:\nKý hiệu này có thể đọc được và hiệu quả đối với con người, tuy nhiên\ncồng kềnh nếu vì bất kỳ lý do gì chúng ta cần tạo ra sự co lại căng\nthẳng theo chương trình. Vì lý do này, einsum cung cấp một ký hiệu\nthay thế bằng cách cung cấp các chỉ số nguyên cho mỗi tensor. Ví dụ,\ncùng một sự co lại tensor cũng có thể được viết là:\nMột trong hai ký hiệu cho phép đại diện ngắn gọn và hiệu quả các cơn co\nthắt tensor trong mã.\n18.1.10. Tóm tắt * Vectơ có thể được giải thích về mặt hình học như một trong hai điểm hoặc hướng trong không gian * Các sản phẩm chấm xác định khái niệm góc đến không gian chiều cao tùy ý. Chúng có thể được sử dụng để xác định các mặt phẳng quyết định thường được sử dụng như là bước cuối cùng trong một nhiệm vụ phân loại. * Phép nhân ma trận có thể được giải thích về mặt hình học là biến dạng thống nhất của tọa độ bên dưới. Chúng đại diện cho một cách rất hạn chế, nhưng về mặt toán học sạch, để biến đổi vectơ. * Phụ thuộc tuyến tính là một cách để biết khi một tập hợp các vectơ nằm trong một không gian chiều thấp hơn chúng ta mong đợi (giả sử bạn có \\(3\\) vectơ sống trong một không gian \\(2\\) chiều). Thứ hạng của ma trận là kích thước của tập hợp con lớn nhất của các cột của nó độc lập tuyến tính * Khi nghịch đảo của ma trận được xác định, đảo ngược ma trận cho phép chúng ta tìm một ma trận khác hoàn tác hành động của đầu tiên. Ma trận đảo ngược là hữu ích trong lý thuyết, nhưng đòi hỏi sự chăm sóc trong thực tế do sự bất ổn số.* yếu tố quyết định cho phép chúng ta đo lường bao nhiêu ma trận mở rộng hoặc ký hợp đồng một không gian. Một yếu tố quyết định nonzero ngụ ý một ma trận đảo ngược (không số ít) và một yếu tố xác định có giá trị không có nghĩa là ma trận không thể đảo ngược (số ít). * co thắt tensor và tổng kết Einstein cung cấp cho một ký hiệu gọn gàng và sạch sẽ để thể hiện nhiều tính toán được nhìn thấy trong học máy.\n18.1.11. Exercises\nWhat is the angle between (18.1.35) ¶ \\[\\begin{split}\\vec v_1 = \\begin{bmatrix}\n1 \\\\ 0 \\\\ -1 \\\\ 2\n\\end{bmatrix}, \\qquad \\vec v_2 = \\begin{bmatrix}\n3 \\\\ 1 \\\\ 0 \\\\ 1\n\\end{bmatrix}?\\end{split}\\]\nTrue or false: \\(\\begin{bmatrix}1 & 2\\\\0&1\\end{bmatrix}\\) and \\(\\begin{bmatrix}1 & -2\\\\0&1\\end{bmatrix}\\) are inverses of one\nanother?\nSuppose that we draw a shape in the plane with area \\(100\\mathrm{m}^2\\) . What is the area after transforming the\nfigure by the matrix (18.1.36) ¶ \\[\\begin{split}\\begin{bmatrix}\n2 & 3\\\\\n1 & 2\n\\end{bmatrix}.\\end{split}\\]\nWhich of the following sets of vectors are linearly independent?\n\\(\\left\\{\\begin{pmatrix}1\\\\0\\\\-1\\end{pmatrix}, \\begin{pmatrix}2\\\\1\\\\-1\\end{pmatrix}, \\begin{pmatrix}3\\\\1\\\\1\\end{pmatrix}\\right\\}\\)\n\\(\\left\\{\\begin{pmatrix}3\\\\1\\\\1\\end{pmatrix}, \\begin{pmatrix}1\\\\1\\\\1\\end{pmatrix}, \\begin{pmatrix}0\\\\0\\\\0\\end{pmatrix}\\right\\}\\)\n\\(\\left\\{\\begin{pmatrix}1\\\\1\\\\0\\end{pmatrix}, \\begin{pmatrix}0\\\\1\\\\-1\\end{pmatrix}, \\begin{pmatrix}1\\\\0\\\\1\\end{pmatrix}\\right\\}\\)\nSuppose that you have a matrix written as \\(A = \\begin{bmatrix}c\\\\d\\end{bmatrix}\\cdot\\begin{bmatrix}a & b\\end{bmatrix}\\) for some choice of values \\(a, b, c\\) , and \\(d\\) . True or\nfalse: the determinant of such a matrix is always \\(0\\) ?\nThe vectors \\(e_1 = \\begin{bmatrix}1\\\\0\\end{bmatrix}\\) and \\(e_2 = \\begin{bmatrix}0\\\\1\\end{bmatrix}\\) are orthogonal. What\nis the condition on a matrix \\(A\\) so that \\(Ae_1\\) and \\(Ae_2\\) are orthogonal?\nHow can you write \\(\\mathrm{tr}(\\mathbf{A}^4)\\) in Einstein\nnotation for an arbitrary matrix \\(A\\) ?\nDiscussions\nDiscussions\nDiscussions"
+}

@@ -1,0 +1,244 @@
+{
+  "url": "https://vi.d2l.ai/chapter_installation/index.html",
+  "chapter": "chapter_installation",
+  "title": "Cài đặt",
+  "crawled_at": "2026-07-20T12:39:08.518144+00:00",
+  "headings": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "cai-dat",
+      "text": "Cài đặt"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "cai-dat-miniconda",
+      "text": "Cài đặt Miniconda"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tai-xuong-may-tinh-xach-tay-d2l",
+      "text": "Tải xuống máy tính xách tay D2L"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "cai-dat-framework-va-goi-d2l",
+      "text": "Cài đặt Framework và gói d2l"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "ho-tro-gpu",
+      "text": "Hỗ trợ GPU"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bai-tap",
+      "text": "Bài tập"
+    }
+  ],
+  "content": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "cai-dat",
+      "text": "Cài đặt"
+    },
+    {
+      "type": "paragraph",
+      "text": "Để giúp bạn có được và chạy trải nghiệm học tập thực hành, chúng tôi cần\nthiết lập cho bạn một môi trường để chạy Python, máy tính xách tay\nJupyter, các thư viện có liên quan và mã cần thiết để tự chạy cuốn sách."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "cai-dat-miniconda",
+      "text": "Cài đặt Miniconda"
+    },
+    {
+      "type": "paragraph",
+      "text": "Cách đơn giản nhất để có được đi sẽ là cài đặt Miniconda . Phiên bản\nPython 3.x là bắt buộc. Bạn có thể bỏ qua các bước sau nếu máy của bạn\nđã cài đặt conda."
+    },
+    {
+      "type": "paragraph",
+      "text": "Truy cập trang web Miniconda và xác định phiên bản thích hợp cho hệ\nthống của bạn dựa trên phiên bản Python 3.x và kiến trúc máy của bạn. Ví\ndụ: nếu bạn đang sử dụng macOS và Python 3.x, bạn sẽ tải xuống tập lệnh\nbash có tên chứa chuỗi “Miniconda3” và “MacOSX”, điều hướng đến vị trí\ntải xuống và thực hiện cài đặt như sau:"
+    },
+    {
+      "type": "code",
+      "language": "bash",
+      "text": "sh Miniconda3-latest-MacOSX-x86_64.sh -b"
+    },
+    {
+      "type": "paragraph",
+      "text": "Một người dùng Linux với Python 3.x sẽ tải xuống tệp có tên chứa chuỗi\n“Miniconda3” và “Linux” và thực hiện như sau tại vị trí tải xuống:"
+    },
+    {
+      "type": "code",
+      "language": "bash",
+      "text": "sh Miniconda3-latest-Linux-x86_64.sh -b"
+    },
+    {
+      "type": "paragraph",
+      "text": "Tiếp theo, khởi tạo shell để chúng ta có thể chạy trực tiếp conda ."
+    },
+    {
+      "type": "code",
+      "language": "bash",
+      "text": "~/miniconda3/bin/conda init"
+    },
+    {
+      "type": "paragraph",
+      "text": "Bây giờ đóng và mở lại vỏ hiện tại của bạn. Bạn sẽ có thể tạo ra một môi\ntrường mới như sau:"
+    },
+    {
+      "type": "code",
+      "language": "bash",
+      "text": "conda create --name d2l python=3.8 -y"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tai-xuong-may-tinh-xach-tay-d2l",
+      "text": "Tải xuống máy tính xách tay D2L"
+    },
+    {
+      "type": "paragraph",
+      "text": "Tiếp theo, chúng ta cần tải xuống mã của cuốn sách này. Bạn có thể nhấp\nvào tab “Tất cả máy tính xách tay” ở đầu bất kỳ trang HTML nào để tải\nxuống và giải nén mã. Ngoài ra, nếu bạn có unzip (nếu không chạy sudo apt install unzip ) có sẵn:"
+    },
+    {
+      "type": "code",
+      "language": "bash",
+      "text": "mkdir d2l-en && cd d2l-en\ncurl https://d2l.ai/d2l-en.zip -o d2l-en.zip\nunzip d2l-en.zip && rm d2l-en.zip"
+    },
+    {
+      "type": "paragraph",
+      "text": "Bây giờ chúng ta có thể kích hoạt môi trường d2l :"
+    },
+    {
+      "type": "code",
+      "language": "bash",
+      "text": "conda activate d2l"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "cai-dat-framework-va-goi-d2l",
+      "text": "Cài đặt Framework và gói d2l"
+    },
+    {
+      "type": "paragraph",
+      "text": "Trước khi cài đặt bất kỳ khung học sâu nào, trước tiên hãy kiểm tra xem\nbạn có GPU thích hợp trên máy tính của mình hay không (GPU cung cấp năng\nlượng cho màn hình trên máy tính xách tay tiêu chuẩn không phù hợp với\nmục đích của chúng tôi). Nếu bạn đang làm việc trên máy chủ GPU, hãy\ntiến hành Hỗ trợ GPU để được hướng dẫn về cách cài đặt các\nphiên bản thân thiện với GPU của các thư viện có liên quan."
+    },
+    {
+      "type": "paragraph",
+      "text": "Nếu máy của bạn không chứa bất kỳ GPU nào, không cần phải lo lắng. CPU\ncủa bạn cung cấp quá đủ mã lực để giúp bạn vượt qua một vài chương đầu\ntiên. Chỉ cần nhớ rằng bạn sẽ muốn truy cập GPU trước khi chạy các mô\nhình lớn hơn. Để cài đặt phiên bản CPU, hãy thực hiện lệnh sau."
+    },
+    {
+      "type": "code",
+      "language": "bash",
+      "text": "pip install mxnet==1.7.0.post1"
+    },
+    {
+      "type": "code",
+      "language": "bash",
+      "text": "pip install torch torchvision"
+    },
+    {
+      "type": "paragraph",
+      "text": "Bạn có thể cài đặt TensorFlow với cả hỗ trợ CPU và GPU như sau:"
+    },
+    {
+      "type": "code",
+      "language": "bash",
+      "text": "pip install tensorflow tensorflow-probability"
+    },
+    {
+      "type": "paragraph",
+      "text": "Bước tiếp theo của chúng tôi là cài đặt gói d2l mà chúng tôi đã phát\ntriển để đóng gói các chức năng và lớp thường được sử dụng được tìm thấy\ntrong suốt cuốn sách này."
+    },
+    {
+      "type": "code",
+      "language": "bash",
+      "text": "# -U: Upgrade all packages to the newest available version\npip install -U d2l"
+    },
+    {
+      "type": "paragraph",
+      "text": "Khi bạn đã hoàn thành các bước cài đặt này, chúng tôi có thể máy chủ máy\ntính xách tay Jupyter bằng cách chạy:"
+    },
+    {
+      "type": "code",
+      "language": "bash",
+      "text": "jupyter notebook"
+    },
+    {
+      "type": "paragraph",
+      "text": "Tại thời điểm này, bạn có thể mở http://localhost:8888 (nó có thể đã tự\nđộng mở) trong trình duyệt Web của bạn. Sau đó, chúng ta có thể chạy mã\ncho mỗi phần của cuốn sách. Vui lòng luôn thực hiện conda activate d2l để kích hoạt môi trường thời gian chạy trước khi\nchạy mã của cuốn sách hoặc cập nhật khung học sâu hoặc gói d2l . Để\nthoát khỏi môi trường, chạy conda deactivate ."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "ho-tro-gpu",
+      "text": "Hỗ trợ GPU"
+    },
+    {
+      "type": "paragraph",
+      "text": "Theo mặc định, MXNet được cài đặt mà không cần hỗ trợ GPU để đảm bảo\nrằng nó sẽ chạy trên bất kỳ máy tính nào (bao gồm hầu hết các máy tính\nxách tay). Một phần của cuốn sách này yêu cầu hoặc khuyến nghị chạy với\nGPU. Nếu máy tính của bạn có card đồ họa NVIDIA và đã cài đặt CUDA , thì bạn nên cài\nđặt phiên bản hỗ trợ GPU. Nếu bạn đã cài đặt phiên bản chỉ CPU, bạn có\nthể cần gỡ bỏ nó trước bằng cách chạy:"
+    },
+    {
+      "type": "code",
+      "language": "bash",
+      "text": "pip uninstall mxnet"
+    },
+    {
+      "type": "paragraph",
+      "text": "Bây giờ chúng ta cần tìm hiểu phiên bản CIDA bạn đã cài đặt. Bạn có thể\nkiểm tra điều này bằng cách chạy nvcc --version hoặc cat /usr/local/cuda/version.txt . Giả sử rằng bạn đã cài đặt CDA\n10.1, sau đó bạn có thể cài đặt với lệnh sau:"
+    },
+    {
+      "type": "code",
+      "language": "bash",
+      "text": "# For Windows users\npip install mxnet-cu101==1.7.0 -f https://dist.mxnet.io/python\n\n# For Linux and macOS users\npip install mxnet-cu101==1.7.0"
+    },
+    {
+      "type": "paragraph",
+      "text": "Bạn có thể thay đổi các chữ số cuối theo phiên bản CIDA của mình, ví dụ: cu100 cho CIDA 10.0 và cu90 cho CIDA 9.0."
+    },
+    {
+      "type": "paragraph",
+      "text": "Theo mặc định, khung học sâu được cài đặt với hỗ trợ GPU. Nếu máy tính\ncủa bạn có GPU NVIDIA và đã cài đặt CUDA , thì tất cả bạn\nđã thiết lập."
+    },
+    {
+      "type": "paragraph",
+      "text": "Theo mặc định, khung học sâu được cài đặt với hỗ trợ GPU. Nếu máy tính\ncủa bạn có GPU NVIDIA và đã cài đặt CUDA , thì tất cả bạn\nđã thiết lập."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bai-tap",
+      "text": "Bài tập"
+    },
+    {
+      "type": "list",
+      "ordered": true,
+      "items": [
+        "Tải xuống mã cho cuốn sách và cài đặt môi trường thời gian chạy."
+      ]
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    }
+  ],
+  "images": [],
+  "text": "Cài đặt\nĐể giúp bạn có được và chạy trải nghiệm học tập thực hành, chúng tôi cần\nthiết lập cho bạn một môi trường để chạy Python, máy tính xách tay\nJupyter, các thư viện có liên quan và mã cần thiết để tự chạy cuốn sách.\nCài đặt Miniconda\nCách đơn giản nhất để có được đi sẽ là cài đặt Miniconda . Phiên bản\nPython 3.x là bắt buộc. Bạn có thể bỏ qua các bước sau nếu máy của bạn\nđã cài đặt conda.\nTruy cập trang web Miniconda và xác định phiên bản thích hợp cho hệ\nthống của bạn dựa trên phiên bản Python 3.x và kiến trúc máy của bạn. Ví\ndụ: nếu bạn đang sử dụng macOS và Python 3.x, bạn sẽ tải xuống tập lệnh\nbash có tên chứa chuỗi “Miniconda3” và “MacOSX”, điều hướng đến vị trí\ntải xuống và thực hiện cài đặt như sau:\nMột người dùng Linux với Python 3.x sẽ tải xuống tệp có tên chứa chuỗi\n“Miniconda3” và “Linux” và thực hiện như sau tại vị trí tải xuống:\nTiếp theo, khởi tạo shell để chúng ta có thể chạy trực tiếp conda .\nBây giờ đóng và mở lại vỏ hiện tại của bạn. Bạn sẽ có thể tạo ra một môi\ntrường mới như sau:\nTải xuống máy tính xách tay D2L\nTiếp theo, chúng ta cần tải xuống mã của cuốn sách này. Bạn có thể nhấp\nvào tab “Tất cả máy tính xách tay” ở đầu bất kỳ trang HTML nào để tải\nxuống và giải nén mã. Ngoài ra, nếu bạn có unzip (nếu không chạy sudo apt install unzip ) có sẵn:\nBây giờ chúng ta có thể kích hoạt môi trường d2l :\nCài đặt Framework và gói d2l\nTrước khi cài đặt bất kỳ khung học sâu nào, trước tiên hãy kiểm tra xem\nbạn có GPU thích hợp trên máy tính của mình hay không (GPU cung cấp năng\nlượng cho màn hình trên máy tính xách tay tiêu chuẩn không phù hợp với\nmục đích của chúng tôi). Nếu bạn đang làm việc trên máy chủ GPU, hãy\ntiến hành Hỗ trợ GPU để được hướng dẫn về cách cài đặt các\nphiên bản thân thiện với GPU của các thư viện có liên quan.\nNếu máy của bạn không chứa bất kỳ GPU nào, không cần phải lo lắng. CPU\ncủa bạn cung cấp quá đủ mã lực để giúp bạn vượt qua một vài chương đầu\ntiên. Chỉ cần nhớ rằng bạn sẽ muốn truy cập GPU trước khi chạy các mô\nhình lớn hơn. Để cài đặt phiên bản CPU, hãy thực hiện lệnh sau.\nBạn có thể cài đặt TensorFlow với cả hỗ trợ CPU và GPU như sau:\nBước tiếp theo của chúng tôi là cài đặt gói d2l mà chúng tôi đã phát\ntriển để đóng gói các chức năng và lớp thường được sử dụng được tìm thấy\ntrong suốt cuốn sách này.\nKhi bạn đã hoàn thành các bước cài đặt này, chúng tôi có thể máy chủ máy\ntính xách tay Jupyter bằng cách chạy:\nTại thời điểm này, bạn có thể mở http://localhost:8888 (nó có thể đã tự\nđộng mở) trong trình duyệt Web của bạn. Sau đó, chúng ta có thể chạy mã\ncho mỗi phần của cuốn sách. Vui lòng luôn thực hiện conda activate d2l để kích hoạt môi trường thời gian chạy trước khi\nchạy mã của cuốn sách hoặc cập nhật khung học sâu hoặc gói d2l . Để\nthoát khỏi môi trường, chạy conda deactivate .\nHỗ trợ GPU\nTheo mặc định, MXNet được cài đặt mà không cần hỗ trợ GPU để đảm bảo\nrằng nó sẽ chạy trên bất kỳ máy tính nào (bao gồm hầu hết các máy tính\nxách tay). Một phần của cuốn sách này yêu cầu hoặc khuyến nghị chạy với\nGPU. Nếu máy tính của bạn có card đồ họa NVIDIA và đã cài đặt CUDA , thì bạn nên cài\nđặt phiên bản hỗ trợ GPU. Nếu bạn đã cài đặt phiên bản chỉ CPU, bạn có\nthể cần gỡ bỏ nó trước bằng cách chạy:\nBây giờ chúng ta cần tìm hiểu phiên bản CIDA bạn đã cài đặt. Bạn có thể\nkiểm tra điều này bằng cách chạy nvcc --version hoặc cat /usr/local/cuda/version.txt . Giả sử rằng bạn đã cài đặt CDA\n10.1, sau đó bạn có thể cài đặt với lệnh sau:\nBạn có thể thay đổi các chữ số cuối theo phiên bản CIDA của mình, ví dụ: cu100 cho CIDA 10.0 và cu90 cho CIDA 9.0.\nTheo mặc định, khung học sâu được cài đặt với hỗ trợ GPU. Nếu máy tính\ncủa bạn có GPU NVIDIA và đã cài đặt CUDA , thì tất cả bạn\nđã thiết lập.\nTheo mặc định, khung học sâu được cài đặt với hỗ trợ GPU. Nếu máy tính\ncủa bạn có GPU NVIDIA và đã cài đặt CUDA , thì tất cả bạn\nđã thiết lập.\nBài tập\nTải xuống mã cho cuốn sách và cài đặt môi trường thời gian chạy.\nDiscussions\nDiscussions\nDiscussions"
+}

@@ -1,0 +1,148 @@
+{
+  "url": "https://vi.d2l.ai/chapter_recommender-systems/ctr.html",
+  "chapter": "chapter_recommender-systems",
+  "title": "16.8. Hệ thống giới thiệu giàu tính năng",
+  "crawled_at": "2026-07-20T12:41:16.093743+00:00",
+  "headings": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "he-thong-gioi-thieu-giau-tinh-nang",
+      "text": "16.8. Hệ thống giới thiệu giàu tính năng"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "mot-bo-du-lieu-quang-cao-truc-tuyen",
+      "text": "16.8.1. Một bộ dữ liệu quảng cáo trực tuyến"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "goi-du-lieu",
+      "text": "16.8.2. Gói dữ liệu"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tom-tat-ty-le-nhap-chuot-la-mot-so-lieu-quan-trong-duoc-su-dung-de-do-luong-hieu-qua-cua-he-thong-quang-cao-va-he-thong-gioi-thieu-muc-tieu-la-du-doan-xem-quang-cao-muc-se-duoc-nhap-hay-khong-dua-tren-cac-tinh-nang-da-cho",
+      "text": "16.8.3. Tóm tắt * Tỷ lệ nhấp chuột là một số liệu quan trọng được sử dụng để đo lường hiệu quả của hệ thống quảng cáo và hệ thống giới thiệu. Mục tiêu là dự đoán xem quảng cáo/mục sẽ được nhấp hay không dựa trên các tính năng đã cho."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bai-tap",
+      "text": "16.8.4. Bài tập"
+    }
+  ],
+  "content": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "he-thong-gioi-thieu-giau-tinh-nang",
+      "text": "16.8. Hệ thống giới thiệu giàu tính năng"
+    },
+    {
+      "type": "paragraph",
+      "text": "Dữ liệu tương tác là dấu hiệu cơ bản nhất về sở thích và sở thích của\nngười dùng. Nó đóng một vai trò quan trọng trong các mô hình được giới\nthiệu trước đây. Tuy nhiên, dữ liệu tương tác thường cực kỳ thưa thớt và\nđôi khi có thể ồn ào. Để giải quyết vấn đề này, chúng ta có thể tích hợp\nthông tin phụ như các tính năng của các mục, hồ sơ của người dùng và\nthậm chí trong bối cảnh mà sự tương tác xảy ra vào mô hình đề xuất. Sử\ndụng các tính năng này rất hữu ích trong việc đưa ra các khuyến nghị ở\nchỗ các tính năng này có thể là một dự đoán hiệu quả của người dùng quan\ntâm đặc biệt là khi dữ liệu tương tác là thiếu. Do đó, điều cần thiết là\ncác mô hình đề xuất cũng có khả năng đối phó với các tính năng đó và\ncung cấp cho mô hình một số nhận thức nội dung/bối cảnh. Để chứng minh\nloại mô hình đề xuất này, chúng tôi giới thiệu một nhiệm vụ khác về tỷ\nlệ nhấp (CTR) cho các khuyến nghị quảng cáo trực tuyến [McMahan et al., 2013] và trình bày dữ liệu quảng cáo ẩn\ndanh. Các dịch vụ quảng cáo được nhắm mục tiêu đã thu hút sự chú ý rộng\nrãi và thường được đóng khung như các công cụ đề xuất. Việc đề xuất\nquảng cáo phù hợp với sở thích cá nhân và sở thích của người dùng là rất\nquan trọng để cải thiện tỷ lệ nhấp chuột."
+    },
+    {
+      "type": "paragraph",
+      "text": "Các nhà tiếp thị kỹ thuật số sử dụng quảng cáo trực tuyến để hiển thị\nquảng cáo cho khách hàng. Tỷ lệ nhấp là một số liệu đo lường số lần nhấp\nnhà quảng cáo nhận được trên quảng cáo của họ cho mỗi số lần hiển thị và\nnó được biểu thị dưới dạng phần trăm được tính theo công thức:"
+    },
+    {
+      "type": "math",
+      "latex": "(16.8.1)¶\\[\\text{CTR} = \\frac{\\#\\text{Clicks}} {\\#\\text{Impressions}} \\times 100 \\% .\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Tỷ lệ nhấp chuột là một tín hiệu quan trọng chỉ ra hiệu quả của các\nthuật toán dự đoán. Dự đoán tỷ lệ nhấp chuột là một nhiệm vụ dự đoán khả\nnăng một cái gì đó trên một trang web sẽ được nhấp. Các mô hình về dự\nđoán CTR không chỉ có thể được sử dụng trong các hệ thống quảng cáo được\nnhắm mục tiêu mà còn trong mục chung (ví dụ: phim, tin tức, sản phẩm) hệ\nthống giới thiệu, chiến dịch email và thậm chí cả công cụ tìm kiếm. Nó\ncũng liên quan chặt chẽ đến sự hài lòng của người dùng, tỷ lệ chuyển đổi\nvà có thể hữu ích trong việc thiết lập các mục tiêu chiến dịch vì nó có\nthể giúp các nhà quảng cáo đặt ra kỳ vọng thực tế."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "import os\nfrom collections import defaultdict\nfrom mxnet import gluon, np\nfrom d2l import mxnet as d2l"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "mot-bo-du-lieu-quang-cao-truc-tuyen",
+      "text": "16.8.1. Một bộ dữ liệu quảng cáo trực tuyến"
+    },
+    {
+      "type": "paragraph",
+      "text": "Với những tiến bộ đáng kể của Internet và công nghệ di động, quảng cáo\ntrực tuyến đã trở thành một nguồn thu nhập quan trọng và tạo ra phần lớn\ndoanh thu trong ngành công nghiệp Internet. Điều quan trọng là hiển thị\ncác quảng cáo hoặc quảng cáo có liên quan rằng lợi ích của người dùng để\nkhách truy cập thông thường có thể được chuyển đổi thành khách hàng trả\ntiền. Tập dữ liệu chúng tôi giới thiệu là một tập dữ liệu quảng cáo trực\ntuyến. Nó bao gồm 34 trường, với cột đầu tiên đại diện cho biến đích cho\nbiết một quảng cáo đã được nhấp (1) hay không (0). Tất cả các cột khác\nlà các tính năng phân loại. Các cột có thể đại diện cho id quảng cáo,\ntrang web hoặc id ứng dụng, id thiết bị, thời gian, hồ sơ người dùng,\nv.v. Ngữ nghĩa thực sự của các tính năng không được tiết lộ do ẩn danh\nvà mối quan tâm riêng tư."
+    },
+    {
+      "type": "paragraph",
+      "text": "Mã sau tải tập dữ liệu từ máy chủ của chúng tôi và lưu nó vào thư mục dữ\nliệu cục bộ."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "#@save\nd2l.DATA_HUB['ctr'] = (d2l.DATA_URL + 'ctr.zip',\n                       'e18327c48c8e8e5c23da714dd614e390d369843f')\n\ndata_dir = d2l.download_extract('ctr')"
+    },
+    {
+      "type": "paragraph",
+      "text": "Có một bộ đào tạo và một bộ thử nghiệm, bao gồm 15000 và 3000 mẫu/dòng,\ntương ứng."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "goi-du-lieu",
+      "text": "16.8.2. Gói dữ liệu"
+    },
+    {
+      "type": "paragraph",
+      "text": "Để thuận tiện cho việc tải dữ liệu, chúng tôi triển khai CTRDataset tải tập dữ liệu quảng cáo từ tệp CSV và có thể được sử dụng bởi DataLoader ."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "#@save\nclass CTRDataset(gluon.data.Dataset):\n    def __init__(self, data_path, feat_mapper=None, defaults=None,\n                 min_threshold=4, num_feat=34):\n        self.NUM_FEATS, self.count, self.data = num_feat, 0, {}\n        feat_cnts = defaultdict(lambda: defaultdict(int))\n        self.feat_mapper, self.defaults = feat_mapper, defaults\n        self.field_dims = np.zeros(self.NUM_FEATS, dtype=np.int64)\n        with open(data_path) as f:\n            for line in f:\n                instance = {}\n                values = line.rstrip('\\n').split('\\t')\n                if len(values) != self.NUM_FEATS + 1:\n                    continue\n                label = np.float32([0, 0])\n                label[int(values[0])] = 1\n                instance['y'] = [np.float32(values[0])]\n                for i in range(1, self.NUM_FEATS + 1):\n                    feat_cnts[i][values[i]] += 1\n                    instance.setdefault('x', []).append(values[i])\n                self.data[self.count] = instance\n                self.count = self.count + 1\n        if self.feat_mapper is None and self.defaults is None:\n            feat_mapper = {i: {feat for feat, c in cnt.items() if c >=\n                               min_threshold} for i, cnt in feat_cnts.items()}\n            self.feat_mapper = {i: {feat_v: idx for idx, feat_v in enumerate(feat_values)}\n                                for i, feat_values in feat_mapper.items()}\n            self.defaults = {i: len(feat_values) for i, feat_values in feat_mapper.items()}\n        for i, fm in self.feat_mapper.items():\n            self.field_dims[i - 1] = len(fm) + 1\n        self.offsets = np.array((0, *np.cumsum(self.field_dims).asnumpy()\n                                 [:-1]))\n\n    def __len__(self):\n        return self.count\n\n    def __getitem__(self, idx):\n        feat = np.array([self.feat_mapper[i + 1].get(v, self.defaults[i + 1])\n                         for i, v in enumerate(self.data[idx]['x'])])\n        return feat + self.offsets, self.data[idx]['y']"
+    },
+    {
+      "type": "paragraph",
+      "text": "Ví dụ sau tải dữ liệu đào tạo và in ra bản ghi đầu tiên."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "train_data = CTRDataset(os.path.join(data_dir, 'train.csv'))\ntrain_data[0]"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "(array([ 143.,  145.,  227.,  257.,  957., 1250., 1471., 1566., 1624.,\n        1979., 2008., 2061., 2087., 2304., 2305., 2360., 2745., 2746.,\n        2747., 2748., 2892., 2988., 3165., 3168., 3194., 3195., 3289.,\n        3681., 3687., 3705., 3731., 3747., 3779., 3798.]),\n [1.0])"
+    },
+    {
+      "type": "paragraph",
+      "text": "Như có thể thấy, tất cả 34 trường là các tính năng phân loại. Mỗi giá\ntrị đại diện cho chỉ số một nóng của mục nhập tương ứng. Nhãn \\(0\\) có nghĩa là nó không được nhấp. CTRDataset này cũng có thể được sử\ndụng để tải các bộ dữ liệu khác như thử thách quảng cáo hiển thị Criteo Dataset và dự đoán tỷ lệ nhấp qua Avazu Dataset ."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tom-tat-ty-le-nhap-chuot-la-mot-so-lieu-quan-trong-duoc-su-dung-de-do-luong-hieu-qua-cua-he-thong-quang-cao-va-he-thong-gioi-thieu-muc-tieu-la-du-doan-xem-quang-cao-muc-se-duoc-nhap-hay-khong-dua-tren-cac-tinh-nang-da-cho",
+      "text": "16.8.3. Tóm tắt * Tỷ lệ nhấp chuột là một số liệu quan trọng được sử dụng để đo lường hiệu quả của hệ thống quảng cáo và hệ thống giới thiệu. Mục tiêu là dự đoán xem quảng cáo/mục sẽ được nhấp hay không dựa trên các tính năng đã cho."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bai-tap",
+      "text": "16.8.4. Bài tập"
+    },
+    {
+      "type": "list",
+      "ordered": false,
+      "items": [
+        "Bạn có thể tải tập dữ liệu Criteo và Avazu với CTRDataset được\ncung cấp. Điều đáng chú ý là tập dữ liệu Criteo bao gồm các tính năng\ncó giá trị thực để bạn có thể phải sửa đổi mã một chút."
+      ]
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    }
+  ],
+  "images": [],
+  "text": "16.8. Hệ thống giới thiệu giàu tính năng\nDữ liệu tương tác là dấu hiệu cơ bản nhất về sở thích và sở thích của\nngười dùng. Nó đóng một vai trò quan trọng trong các mô hình được giới\nthiệu trước đây. Tuy nhiên, dữ liệu tương tác thường cực kỳ thưa thớt và\nđôi khi có thể ồn ào. Để giải quyết vấn đề này, chúng ta có thể tích hợp\nthông tin phụ như các tính năng của các mục, hồ sơ của người dùng và\nthậm chí trong bối cảnh mà sự tương tác xảy ra vào mô hình đề xuất. Sử\ndụng các tính năng này rất hữu ích trong việc đưa ra các khuyến nghị ở\nchỗ các tính năng này có thể là một dự đoán hiệu quả của người dùng quan\ntâm đặc biệt là khi dữ liệu tương tác là thiếu. Do đó, điều cần thiết là\ncác mô hình đề xuất cũng có khả năng đối phó với các tính năng đó và\ncung cấp cho mô hình một số nhận thức nội dung/bối cảnh. Để chứng minh\nloại mô hình đề xuất này, chúng tôi giới thiệu một nhiệm vụ khác về tỷ\nlệ nhấp (CTR) cho các khuyến nghị quảng cáo trực tuyến [McMahan et al., 2013] và trình bày dữ liệu quảng cáo ẩn\ndanh. Các dịch vụ quảng cáo được nhắm mục tiêu đã thu hút sự chú ý rộng\nrãi và thường được đóng khung như các công cụ đề xuất. Việc đề xuất\nquảng cáo phù hợp với sở thích cá nhân và sở thích của người dùng là rất\nquan trọng để cải thiện tỷ lệ nhấp chuột.\nCác nhà tiếp thị kỹ thuật số sử dụng quảng cáo trực tuyến để hiển thị\nquảng cáo cho khách hàng. Tỷ lệ nhấp là một số liệu đo lường số lần nhấp\nnhà quảng cáo nhận được trên quảng cáo của họ cho mỗi số lần hiển thị và\nnó được biểu thị dưới dạng phần trăm được tính theo công thức:\nTỷ lệ nhấp chuột là một tín hiệu quan trọng chỉ ra hiệu quả của các\nthuật toán dự đoán. Dự đoán tỷ lệ nhấp chuột là một nhiệm vụ dự đoán khả\nnăng một cái gì đó trên một trang web sẽ được nhấp. Các mô hình về dự\nđoán CTR không chỉ có thể được sử dụng trong các hệ thống quảng cáo được\nnhắm mục tiêu mà còn trong mục chung (ví dụ: phim, tin tức, sản phẩm) hệ\nthống giới thiệu, chiến dịch email và thậm chí cả công cụ tìm kiếm. Nó\ncũng liên quan chặt chẽ đến sự hài lòng của người dùng, tỷ lệ chuyển đổi\nvà có thể hữu ích trong việc thiết lập các mục tiêu chiến dịch vì nó có\nthể giúp các nhà quảng cáo đặt ra kỳ vọng thực tế.\n16.8.1. Một bộ dữ liệu quảng cáo trực tuyến\nVới những tiến bộ đáng kể của Internet và công nghệ di động, quảng cáo\ntrực tuyến đã trở thành một nguồn thu nhập quan trọng và tạo ra phần lớn\ndoanh thu trong ngành công nghiệp Internet. Điều quan trọng là hiển thị\ncác quảng cáo hoặc quảng cáo có liên quan rằng lợi ích của người dùng để\nkhách truy cập thông thường có thể được chuyển đổi thành khách hàng trả\ntiền. Tập dữ liệu chúng tôi giới thiệu là một tập dữ liệu quảng cáo trực\ntuyến. Nó bao gồm 34 trường, với cột đầu tiên đại diện cho biến đích cho\nbiết một quảng cáo đã được nhấp (1) hay không (0). Tất cả các cột khác\nlà các tính năng phân loại. Các cột có thể đại diện cho id quảng cáo,\ntrang web hoặc id ứng dụng, id thiết bị, thời gian, hồ sơ người dùng,\nv.v. Ngữ nghĩa thực sự của các tính năng không được tiết lộ do ẩn danh\nvà mối quan tâm riêng tư.\nMã sau tải tập dữ liệu từ máy chủ của chúng tôi và lưu nó vào thư mục dữ\nliệu cục bộ.\nCó một bộ đào tạo và một bộ thử nghiệm, bao gồm 15000 và 3000 mẫu/dòng,\ntương ứng.\n16.8.2. Gói dữ liệu\nĐể thuận tiện cho việc tải dữ liệu, chúng tôi triển khai CTRDataset tải tập dữ liệu quảng cáo từ tệp CSV và có thể được sử dụng bởi DataLoader .\nVí dụ sau tải dữ liệu đào tạo và in ra bản ghi đầu tiên.\nNhư có thể thấy, tất cả 34 trường là các tính năng phân loại. Mỗi giá\ntrị đại diện cho chỉ số một nóng của mục nhập tương ứng. Nhãn \\(0\\) có nghĩa là nó không được nhấp. CTRDataset này cũng có thể được sử\ndụng để tải các bộ dữ liệu khác như thử thách quảng cáo hiển thị Criteo Dataset và dự đoán tỷ lệ nhấp qua Avazu Dataset .\n16.8.3. Tóm tắt * Tỷ lệ nhấp chuột là một số liệu quan trọng được sử dụng để đo lường hiệu quả của hệ thống quảng cáo và hệ thống giới thiệu. Mục tiêu là dự đoán xem quảng cáo/mục sẽ được nhấp hay không dựa trên các tính năng đã cho.\n16.8.4. Bài tập\nBạn có thể tải tập dữ liệu Criteo và Avazu với CTRDataset được\ncung cấp. Điều đáng chú ý là tập dữ liệu Criteo bao gồm các tính năng\ncó giá trị thực để bạn có thể phải sửa đổi mã một chút.\nDiscussions"
+}

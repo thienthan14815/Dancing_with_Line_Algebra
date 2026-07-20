@@ -9,23 +9,7 @@ export default function Home() {
   return (
     <div className="page">
       <div className="hero">
-        <h1>LinAlgLab</h1>
-        <p>
-          Học <strong>Đại số tuyến tính</strong> một cách trực quan với hình ảnh động 2D/3D.
-          Kéo vector, biến đổi lưới, chạy code — hiểu bản chất thay vì học thuộc. Lộ trình 8 chương từ
-          kiến thức nền đến SVD và ứng dụng.
-        </p>
-        <div className="hero-actions">
-          <button className="btn btn-primary" onClick={() => navigate('/lo-trinh')}>
-            🗺️ Xem lộ trình học
-          </button>
-          <button className="btn" onClick={() => navigate('/wiki')}>
-            📖 Math Wiki — tra cứu ký hiệu
-          </button>
-          <button className="btn" onClick={() => navigate('/luyen-tap')}>
-            ✍️ Luyện tập
-          </button>
-        </div>
+        <h1>Bài học</h1>
       </div>
 
       <div className="ch-grid">
@@ -43,16 +27,28 @@ export default function Home() {
             >
               <span className="ch-card-num">CHƯƠNG {ch.num}</span>
               <h3>{ch.title}</h3>
-              <p>{ch.subtitle}</p>
               <div className="progress-bar">
                 <span style={{ width: `${pct}%` }} />
               </div>
               <span className="progress-label">
-                {done}/{total} bài · {pct}%
+                {done}/{total} bài
               </span>
             </div>
           );
         })}
+      </div>
+
+      {/* Lối vào theo ngữ cảnh (Roadmap / Wiki / Luyện tập) — không nằm ở sidebar */}
+      <div className="ch-links">
+        <button className="btn" onClick={() => navigate('/lo-trinh')}>
+          🗺️ Lộ trình
+        </button>
+        <button className="btn" onClick={() => navigate('/wiki')}>
+          📖 Wiki
+        </button>
+        <button className="btn" onClick={() => navigate('/luyen-tap')}>
+          ✍️ Luyện tập
+        </button>
       </div>
     </div>
   );

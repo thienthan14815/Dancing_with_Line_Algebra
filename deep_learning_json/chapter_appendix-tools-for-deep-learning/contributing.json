@@ -1,0 +1,420 @@
+{
+  "url": "https://vi.d2l.ai/chapter_appendix-tools-for-deep-learning/contributing.html",
+  "chapter": "chapter_appendix-tools-for-deep-learning",
+  "title": "19.6. Đóng góp cho cuốn sách này",
+  "crawled_at": "2026-07-20T12:41:37.426345+00:00",
+  "headings": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "dong-gop-cho-cuon-sach-nay",
+      "text": "19.6. Đóng góp cho cuốn sách này"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "thay-doi-van-ban-nho",
+      "text": "19.6.1. Thay đổi văn bản nhỏ"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "de-xuat-mot-su-thay-doi-lon",
+      "text": "19.6.2. Đề xuất một sự thay đổi lớn"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "them-mot-phan-moi-hoac-mot-trien-khai-khung-moi",
+      "text": "19.6.3. Thêm một phần mới hoặc một triển khai khung mới"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "gui-mot-thay-doi-lon",
+      "text": "19.6.4. Gửi một thay đổi lớn"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "cai-dat-git",
+      "text": "19.6.4.1. Cài đặt Git"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "dang-nhap-vao-github",
+      "text": "19.6.4.2. Đăng nhập vào GitHub"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "nhan-ban-kho-luu-tru",
+      "text": "19.6.4.3. Nhân bản kho lưu trữ"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "chinh-sua-sach-va-day",
+      "text": "19.6.4.4. Chỉnh sửa sách và đẩy"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "yeu-cau-keo",
+      "text": "19.6.4.5. Yêu cầu kéo"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "gui-yeu-cau-keo",
+      "text": "19.6.4.6. Gửi yêu cầu kéo"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tom-tat",
+      "text": "19.6.5. Tóm tắt"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bai-tap",
+      "text": "19.6.6. Bài tập"
+    }
+  ],
+  "content": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "dong-gop-cho-cuon-sach-nay",
+      "text": "19.6. Đóng góp cho cuốn sách này"
+    },
+    {
+      "type": "paragraph",
+      "text": "Đóng góp của readers giúp\nchúng tôi cải thiện cuốn sách này. Nếu bạn tìm thấy một lỗi đánh máy,\nmột liên kết lỗi thời, một cái gì đó mà bạn nghĩ rằng chúng tôi đã bỏ lỡ\nmột trích dẫn, trong đó mã trông không thanh lịch hoặc nơi một lời giải\nthích là không rõ ràng, vui lòng đóng góp lại và giúp chúng tôi giúp đỡ\nđộc giả của chúng tôi. Mặc dù trong các cuốn sách thông thường, sự chậm\ntrễ giữa các lần chạy in (và do đó giữa các sửa lỗi đánh máy) có thể\nđược đo bằng nhiều năm, thường mất hàng giờ đến nhiều ngày để kết hợp\ncải tiến trong cuốn sách này. Điều này là tất cả có thể do kiểm soát\nphiên bản và kiểm tra tích hợp liên tục. Để làm như vậy, bạn cần phải\ngửi một pull request vào\nkho lưu trữ GitHub. Khi yêu cầu kéo của bạn được hợp nhất vào kho lưu\ntrữ mã của tác giả, bạn sẽ trở thành người đóng góp."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "thay-doi-van-ban-nho",
+      "text": "19.6.1. Thay đổi văn bản nhỏ"
+    },
+    {
+      "type": "paragraph",
+      "text": "Các đóng góp phổ biến nhất là chỉnh sửa một câu hoặc sửa lỗi chính tả.\nChúng tôi khuyên bạn nên tìm tệp nguồn trong github\nrepo để xác định vị trí tệp nguồn, đây là tệp\nmarkdown. Sau đó, bạn nhấp vào nút “Chỉnh sửa tệp này” ở góc trên bên\nphải để thực hiện các thay đổi của bạn trong tệp markdown."
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/edit-file.png",
+      "local_path": "_images/edit-file.png",
+      "alt": "../_images/edit-file.png"
+    },
+    {
+      "type": "paragraph",
+      "text": "Fig. 19.6.1 Edit the file on Github. ¶"
+    },
+    {
+      "type": "paragraph",
+      "text": "Sau khi bạn hoàn tất, hãy điền vào mô tả thay đổi của bạn trong bảng “Đề\nxuất thay đổi tệp” ở phía dưới trang và sau đó nhấp vào nút “Đề xuất\nthay đổi tệp”. Nó sẽ chuyển hướng bạn đến một trang mới để xem xét các\nthay đổi của bạn ( Fig. 19.6.7 ). Nếu mọi thứ đều tốt,\nbạn có thể gửi yêu cầu kéo bằng cách nhấp vào nút “Tạo yêu cầu kéo”."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "de-xuat-mot-su-thay-doi-lon",
+      "text": "19.6.2. Đề xuất một sự thay đổi lớn"
+    },
+    {
+      "type": "paragraph",
+      "text": "Nếu bạn có kế hoạch cập nhật một phần lớn văn bản hoặc mã, thì bạn cần\nbiết thêm một chút về định dạng cuốn sách này đang sử dụng. Tệp nguồn\ndựa trên markdown\nformat với một\ntập hợp các phần mở rộng thông qua gói d2lbook như đề cập đến\nphương trình, hình ảnh, chương và trích dẫn. Bạn có thể sử dụng bất kỳ\ntrình chỉnh sửa Markdown nào để mở các tệp này và thực hiện các thay đổi\ncủa mình."
+    },
+    {
+      "type": "paragraph",
+      "text": "Nếu bạn muốn thay đổi mã, chúng tôi khuyên bạn nên sử dụng Jupyter để mở\ncác tệp Markdown này như được mô tả trong Section 19.1 . Để\nbạn có thể chạy và kiểm tra các thay đổi của bạn. Vui lòng nhớ xóa tất\ncả các đầu ra trước khi gửi các thay đổi của bạn, hệ thống CI của chúng\ntôi sẽ thực hiện các phần bạn cập nhật để tạo ra kết quả đầu ra."
+    },
+    {
+      "type": "paragraph",
+      "text": "Một số phần có thể hỗ trợ nhiều triển khai framework, bạn có thể sử dụng d2lbook để kích hoạt một framework cụ thể, do đó các triển khai\nframework khác trở thành các khối mã Markdown và sẽ không được thực thi\nkhi bạn “Run All” trong Jupyter. Nói cách khác, lần đầu tiên cài đặt d2lbook bằng cách chạy"
+    },
+    {
+      "type": "code",
+      "language": "bash",
+      "text": "pip install git+https://github.com/d2l-ai/d2l-book"
+    },
+    {
+      "type": "paragraph",
+      "text": "Sau đó, trong thư mục gốc của d2l-en , bạn có thể kích hoạt một triển\nkhai cụ thể bằng cách chạy một trong các lệnh sau:"
+    },
+    {
+      "type": "code",
+      "language": "bash",
+      "text": "d2lbook activate mxnet chapter_multilayer-perceptrons/mlp-scratch.md\nd2lbook activate pytorch chapter_multilayer-perceptrons/mlp-scratch.md\nd2lbook activate tensorflow chapter_multilayer-perceptrons/mlp-scratch.md"
+    },
+    {
+      "type": "paragraph",
+      "text": "Trước khi gửi các thay đổi của bạn, vui lòng xóa tất cả các đầu ra khối\nmã và kích hoạt tất cả bởi"
+    },
+    {
+      "type": "code",
+      "language": "bash",
+      "text": "d2lbook activate all chapter_multilayer-perceptrons/mlp-scratch.md"
+    },
+    {
+      "type": "paragraph",
+      "text": "Nếu bạn thêm một khối mã mới không cho triển khai mặc định, đó là MXNet,\nvui lòng sử dụng # @tab to mark this block on the beginning line.\nFor example, # @tab pytorch for a PyTorch code block, # @tab tensorflow for a TensorFlow code block, or # @tab all một\nkhối mã được chia sẻ cho tất cả các triển khai. Bạn có thể tham khảo d2lbook để biết thêm thông\ntin."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "them-mot-phan-moi-hoac-mot-trien-khai-khung-moi",
+      "text": "19.6.3. Thêm một phần mới hoặc một triển khai khung mới"
+    },
+    {
+      "type": "paragraph",
+      "text": "Nếu bạn muốn tạo một chương mới, ví dụ: học tập củng cố hoặc thêm triển\nkhai các framework mới, chẳng hạn như TensorFlow, vui lòng liên hệ với\ncác tác giả trước, bằng cách gửi email hoặc sử dụng github\nissues ."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "gui-mot-thay-doi-lon",
+      "text": "19.6.4. Gửi một thay đổi lớn"
+    },
+    {
+      "type": "paragraph",
+      "text": "Chúng tôi khuyên bạn nên sử dụng quy trình git tiêu chuẩn để gửi một\nthay đổi lớn. Tóm lại, quá trình hoạt động như được mô tả trong Fig. 19.6.2 ."
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/contribute.svg",
+      "local_path": "_images/contribute.svg",
+      "alt": "../_images/contribute.svg"
+    },
+    {
+      "type": "paragraph",
+      "text": "Fig. 19.6.2 Contributing to the book. ¶"
+    },
+    {
+      "type": "paragraph",
+      "text": "Chúng tôi sẽ hướng dẫn bạn qua các bước chi tiết. Nếu bạn đã quen thuộc\nvới Git, bạn có thể bỏ qua phần này. Đối với cụ thể, chúng tôi giả định\nrằng tên người dùng của người đóng góp là “astonzhang”."
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "cai-dat-git",
+      "text": "19.6.4.1. Cài đặt Git"
+    },
+    {
+      "type": "paragraph",
+      "text": "Sách mã nguồn mở Git mô tả how to install\nGit . Điều này thường hoạt động thông\nqua apt install git trên Ubuntu Linux, bằng cách cài đặt các công cụ\nphát triển Xcode trên macOS hoặc bằng cách sử dụng desktop\nclient của GitHub. Nếu bạn không có tài\nkhoản GitHub, bạn cần đăng ký một tài khoản."
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "dang-nhap-vao-github",
+      "text": "19.6.4.2. Đăng nhập vào GitHub"
+    },
+    {
+      "type": "paragraph",
+      "text": "Nhập address kho lưu trữ mã của\ncuốn sách trong trình duyệt của bạn. Nhấp vào nút Fork trong hộp màu\nđỏ ở phía trên bên phải của Fig. 19.6.3 , để tạo một bản sao\ncủa kho lưu trữ của cuốn sách này. Đây là bây giờ * bản sao của bạn*\nvà bạn có thể thay đổi nó bất kỳ cách nào bạn muốn."
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/git-fork.png",
+      "local_path": "_images/git-fork.png",
+      "alt": "../_images/git-fork.png"
+    },
+    {
+      "type": "paragraph",
+      "text": "Fig. 19.6.3 The code repository page. ¶"
+    },
+    {
+      "type": "paragraph",
+      "text": "Bây giờ, kho lưu trữ mã của cuốn sách này sẽ được chia nhỏ (tức là sao\nchép) vào tên người dùng của bạn, chẳng hạn như astonzhang/d2l-en được hiển thị ở phía trên bên trái của ảnh chụp màn hình Fig. 19.6.4 ."
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/git-forked.png",
+      "local_path": "_images/git-forked.png",
+      "alt": "../_images/git-forked.png"
+    },
+    {
+      "type": "paragraph",
+      "text": "Fig. 19.6.4 Fork the code repository. ¶"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "nhan-ban-kho-luu-tru",
+      "text": "19.6.4.3. Nhân bản kho lưu trữ"
+    },
+    {
+      "type": "paragraph",
+      "text": "Để sao chép kho lưu trữ (tức là, để tạo một bản sao địa phương) chúng ta\ncần phải có được địa chỉ kho lưu trữ của nó. Nút màu xanh lá cây trong Fig. 19.6.5 hiển thị điều này. Đảm bảo rằng bản sao cục bộ\ncủa bạn được cập nhật với kho lưu trữ chính nếu bạn quyết định giữ fork\nnày lâu hơn. Bây giờ chỉ cần làm theo các hướng dẫn trong Cài đặt để bắt đầu. Sự khác biệt chính là bây giờ bạn\nđang tải xuống * fork riêng của bạn* của kho lưu trữ."
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/git-clone.png",
+      "local_path": "_images/git-clone.png",
+      "alt": "../_images/git-clone.png"
+    },
+    {
+      "type": "paragraph",
+      "text": "Fig. 19.6.5 Git clone. ¶"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "# Replace your_github_username with your GitHub username\ngit clone https://github.com/your_github_username/d2l-en.git"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "chinh-sua-sach-va-day",
+      "text": "19.6.4.4. Chỉnh sửa sách và đẩy"
+    },
+    {
+      "type": "paragraph",
+      "text": "Bây giờ là lúc để chỉnh sửa cuốn sách. Tốt nhất là chỉnh sửa sổ ghi chép\ntrong Jupyter theo hướng dẫn trong Section 19.1 . Thực hiện\ncác thay đổi và kiểm tra xem chúng có ổn không. Giả sử chúng ta đã sửa\nđổi một lỗi đánh máy trong tập tin ~/d2l-en/chapter_appendix_tools/how-to-contribute.md . Sau đó, bạn có\nthể kiểm tra những tập tin bạn đã thay đổi:"
+    },
+    {
+      "type": "paragraph",
+      "text": "Tại thời điểm này Git sẽ nhắc rằng tập tin chapter_appendix_tools/how-to-contribute.md đã được sửa đổi."
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "mylaptop:d2l-en me$ git status\nOn branch master\nYour branch is up-to-date with 'origin/master'.\n\nChanges not staged for commit:\n  (use \"git add <file>...\" to update what will be committed)\n  (use \"git checkout -- <file>...\" to discard changes in working directory)\n\n    modified:   chapter_appendix_tools/how-to-contribute.md"
+    },
+    {
+      "type": "paragraph",
+      "text": "Sau khi xác nhận rằng đây là những gì bạn muốn, hãy thực hiện lệnh sau:"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "git add chapter_appendix_tools/how-to-contribute.md\ngit commit -m 'fix typo in git documentation'\ngit push"
+    },
+    {
+      "type": "paragraph",
+      "text": "Mã đã thay đổi sau đó sẽ nằm trong ngã ba cá nhân của kho lưu trữ. Để\nyêu cầu bổ sung thay đổi của bạn, bạn phải tạo một yêu cầu kéo cho kho\nlưu trữ chính thức của cuốn sách."
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "yeu-cau-keo",
+      "text": "19.6.4.5. Yêu cầu kéo"
+    },
+    {
+      "type": "paragraph",
+      "text": "Như thể hiện trong Fig. 19.6.6 , đi đến ngã ba của kho lưu\ntrữ trên GitHub và chọn “New pull request”. Thao tác này sẽ mở ra một\nmàn hình hiển thị cho bạn những thay đổi giữa các chỉnh sửa của bạn và\nnhững gì hiện tại trong kho lưu trữ chính của cuốn sách."
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/git-newpr.png",
+      "local_path": "_images/git-newpr.png",
+      "alt": "../_images/git-newpr.png"
+    },
+    {
+      "type": "paragraph",
+      "text": "Fig. 19.6.6 Pull Request. ¶"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "gui-yeu-cau-keo",
+      "text": "19.6.4.6. Gửi yêu cầu kéo"
+    },
+    {
+      "type": "paragraph",
+      "text": "Cuối cùng, gửi yêu cầu kéo bằng cách nhấp vào nút như thể hiện trong Fig. 19.6.7 . Đảm bảo mô tả những thay đổi bạn đã thực\nhiện trong yêu cầu kéo. Điều này sẽ giúp các tác giả xem xét nó dễ dàng\nhơn và hợp nhất nó với cuốn sách. Tùy thuộc vào những thay đổi, điều này\ncó thể được chấp nhận ngay lập tức, bị từ chối hoặc nhiều khả năng hơn,\nbạn sẽ nhận được một số phản hồi về những thay đổi. Một khi bạn đã kết\nhợp chúng, bạn rất tốt để đi."
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/git-createpr.png",
+      "local_path": "_images/git-createpr.png",
+      "alt": "../_images/git-createpr.png"
+    },
+    {
+      "type": "paragraph",
+      "text": "Fig. 19.6.7 Create Pull Request. ¶"
+    },
+    {
+      "type": "paragraph",
+      "text": "Yêu cầu kéo của bạn sẽ xuất hiện trong danh sách các yêu cầu trong kho\nlưu trữ chính. Chúng tôi sẽ cố gắng hết sức để xử lý nó một cách nhanh\nchóng."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tom-tat",
+      "text": "19.6.5. Tóm tắt"
+    },
+    {
+      "type": "list",
+      "ordered": false,
+      "items": [
+        "Bạn có thể sử dụng GitHub để đóng góp cho cuốn sách này.",
+        "Bạn có thể chỉnh sửa tệp trên GitHub trực tiếp cho các thay đổi nhỏ.",
+        "Đối với một thay đổi lớn, vui lòng ngã ba kho lưu trữ, chỉnh sửa mọi\nthứ cục bộ và chỉ đóng góp trở lại một khi bạn đã sẵn sàng.",
+        "Yêu cầu kéo là cách đóng góp đang được gói lại. Cố gắng không gửi yêu\ncầu kéo khổng lồ vì điều này khiến họ khó hiểu và kết hợp. Tốt hơn\ngửi một số cái nhỏ hơn."
+      ]
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bai-tap",
+      "text": "19.6.6. Bài tập"
+    },
+    {
+      "type": "list",
+      "ordered": true,
+      "items": [
+        "Sao và ngã ba kho lưu trữ d2l-en .",
+        "Tìm một số mã cần cải tiến và gửi yêu cầu kéo.",
+        "Tìm một tài liệu tham khảo mà chúng tôi đã bỏ lỡ và gửi yêu cầu kéo.",
+        "Nó thường là một thực hành tốt hơn để tạo một yêu cầu kéo bằng cách\nsử dụng một nhánh mới. Tìm hiểu làm thế nào để làm điều đó với Git\nbranching ."
+      ]
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    }
+  ],
+  "images": [
+    {
+      "original_url": "https://vi.d2l.ai/_images/edit-file.png",
+      "local_path": "_images/edit-file.png",
+      "alt": "../_images/edit-file.png"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/contribute.svg",
+      "local_path": "_images/contribute.svg",
+      "alt": "../_images/contribute.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/git-fork.png",
+      "local_path": "_images/git-fork.png",
+      "alt": "../_images/git-fork.png"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/git-forked.png",
+      "local_path": "_images/git-forked.png",
+      "alt": "../_images/git-forked.png"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/git-clone.png",
+      "local_path": "_images/git-clone.png",
+      "alt": "../_images/git-clone.png"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/git-newpr.png",
+      "local_path": "_images/git-newpr.png",
+      "alt": "../_images/git-newpr.png"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/git-createpr.png",
+      "local_path": "_images/git-createpr.png",
+      "alt": "../_images/git-createpr.png"
+    }
+  ],
+  "text": "19.6. Đóng góp cho cuốn sách này\nĐóng góp của readers giúp\nchúng tôi cải thiện cuốn sách này. Nếu bạn tìm thấy một lỗi đánh máy,\nmột liên kết lỗi thời, một cái gì đó mà bạn nghĩ rằng chúng tôi đã bỏ lỡ\nmột trích dẫn, trong đó mã trông không thanh lịch hoặc nơi một lời giải\nthích là không rõ ràng, vui lòng đóng góp lại và giúp chúng tôi giúp đỡ\nđộc giả của chúng tôi. Mặc dù trong các cuốn sách thông thường, sự chậm\ntrễ giữa các lần chạy in (và do đó giữa các sửa lỗi đánh máy) có thể\nđược đo bằng nhiều năm, thường mất hàng giờ đến nhiều ngày để kết hợp\ncải tiến trong cuốn sách này. Điều này là tất cả có thể do kiểm soát\nphiên bản và kiểm tra tích hợp liên tục. Để làm như vậy, bạn cần phải\ngửi một pull request vào\nkho lưu trữ GitHub. Khi yêu cầu kéo của bạn được hợp nhất vào kho lưu\ntrữ mã của tác giả, bạn sẽ trở thành người đóng góp.\n19.6.1. Thay đổi văn bản nhỏ\nCác đóng góp phổ biến nhất là chỉnh sửa một câu hoặc sửa lỗi chính tả.\nChúng tôi khuyên bạn nên tìm tệp nguồn trong github\nrepo để xác định vị trí tệp nguồn, đây là tệp\nmarkdown. Sau đó, bạn nhấp vào nút “Chỉnh sửa tệp này” ở góc trên bên\nphải để thực hiện các thay đổi của bạn trong tệp markdown.\nFig. 19.6.1 Edit the file on Github. ¶\nSau khi bạn hoàn tất, hãy điền vào mô tả thay đổi của bạn trong bảng “Đề\nxuất thay đổi tệp” ở phía dưới trang và sau đó nhấp vào nút “Đề xuất\nthay đổi tệp”. Nó sẽ chuyển hướng bạn đến một trang mới để xem xét các\nthay đổi của bạn ( Fig. 19.6.7 ). Nếu mọi thứ đều tốt,\nbạn có thể gửi yêu cầu kéo bằng cách nhấp vào nút “Tạo yêu cầu kéo”.\n19.6.2. Đề xuất một sự thay đổi lớn\nNếu bạn có kế hoạch cập nhật một phần lớn văn bản hoặc mã, thì bạn cần\nbiết thêm một chút về định dạng cuốn sách này đang sử dụng. Tệp nguồn\ndựa trên markdown\nformat với một\ntập hợp các phần mở rộng thông qua gói d2lbook như đề cập đến\nphương trình, hình ảnh, chương và trích dẫn. Bạn có thể sử dụng bất kỳ\ntrình chỉnh sửa Markdown nào để mở các tệp này và thực hiện các thay đổi\ncủa mình.\nNếu bạn muốn thay đổi mã, chúng tôi khuyên bạn nên sử dụng Jupyter để mở\ncác tệp Markdown này như được mô tả trong Section 19.1 . Để\nbạn có thể chạy và kiểm tra các thay đổi của bạn. Vui lòng nhớ xóa tất\ncả các đầu ra trước khi gửi các thay đổi của bạn, hệ thống CI của chúng\ntôi sẽ thực hiện các phần bạn cập nhật để tạo ra kết quả đầu ra.\nMột số phần có thể hỗ trợ nhiều triển khai framework, bạn có thể sử dụng d2lbook để kích hoạt một framework cụ thể, do đó các triển khai\nframework khác trở thành các khối mã Markdown và sẽ không được thực thi\nkhi bạn “Run All” trong Jupyter. Nói cách khác, lần đầu tiên cài đặt d2lbook bằng cách chạy\nSau đó, trong thư mục gốc của d2l-en , bạn có thể kích hoạt một triển\nkhai cụ thể bằng cách chạy một trong các lệnh sau:\nTrước khi gửi các thay đổi của bạn, vui lòng xóa tất cả các đầu ra khối\nmã và kích hoạt tất cả bởi\nNếu bạn thêm một khối mã mới không cho triển khai mặc định, đó là MXNet,\nvui lòng sử dụng # @tab to mark this block on the beginning line.\nFor example, # @tab pytorch for a PyTorch code block, # @tab tensorflow for a TensorFlow code block, or # @tab all một\nkhối mã được chia sẻ cho tất cả các triển khai. Bạn có thể tham khảo d2lbook để biết thêm thông\ntin.\n19.6.3. Thêm một phần mới hoặc một triển khai khung mới\nNếu bạn muốn tạo một chương mới, ví dụ: học tập củng cố hoặc thêm triển\nkhai các framework mới, chẳng hạn như TensorFlow, vui lòng liên hệ với\ncác tác giả trước, bằng cách gửi email hoặc sử dụng github\nissues .\n19.6.4. Gửi một thay đổi lớn\nChúng tôi khuyên bạn nên sử dụng quy trình git tiêu chuẩn để gửi một\nthay đổi lớn. Tóm lại, quá trình hoạt động như được mô tả trong Fig. 19.6.2 .\nFig. 19.6.2 Contributing to the book. ¶\nChúng tôi sẽ hướng dẫn bạn qua các bước chi tiết. Nếu bạn đã quen thuộc\nvới Git, bạn có thể bỏ qua phần này. Đối với cụ thể, chúng tôi giả định\nrằng tên người dùng của người đóng góp là “astonzhang”.\n19.6.4.1. Cài đặt Git\nSách mã nguồn mở Git mô tả how to install\nGit . Điều này thường hoạt động thông\nqua apt install git trên Ubuntu Linux, bằng cách cài đặt các công cụ\nphát triển Xcode trên macOS hoặc bằng cách sử dụng desktop\nclient của GitHub. Nếu bạn không có tài\nkhoản GitHub, bạn cần đăng ký một tài khoản.\n19.6.4.2. Đăng nhập vào GitHub\nNhập address kho lưu trữ mã của\ncuốn sách trong trình duyệt của bạn. Nhấp vào nút Fork trong hộp màu\nđỏ ở phía trên bên phải của Fig. 19.6.3 , để tạo một bản sao\ncủa kho lưu trữ của cuốn sách này. Đây là bây giờ * bản sao của bạn*\nvà bạn có thể thay đổi nó bất kỳ cách nào bạn muốn.\nFig. 19.6.3 The code repository page. ¶\nBây giờ, kho lưu trữ mã của cuốn sách này sẽ được chia nhỏ (tức là sao\nchép) vào tên người dùng của bạn, chẳng hạn như astonzhang/d2l-en được hiển thị ở phía trên bên trái của ảnh chụp màn hình Fig. 19.6.4 .\nFig. 19.6.4 Fork the code repository. ¶\n19.6.4.3. Nhân bản kho lưu trữ\nĐể sao chép kho lưu trữ (tức là, để tạo một bản sao địa phương) chúng ta\ncần phải có được địa chỉ kho lưu trữ của nó. Nút màu xanh lá cây trong Fig. 19.6.5 hiển thị điều này. Đảm bảo rằng bản sao cục bộ\ncủa bạn được cập nhật với kho lưu trữ chính nếu bạn quyết định giữ fork\nnày lâu hơn. Bây giờ chỉ cần làm theo các hướng dẫn trong Cài đặt để bắt đầu. Sự khác biệt chính là bây giờ bạn\nđang tải xuống * fork riêng của bạn* của kho lưu trữ.\nFig. 19.6.5 Git clone. ¶\n19.6.4.4. Chỉnh sửa sách và đẩy\nBây giờ là lúc để chỉnh sửa cuốn sách. Tốt nhất là chỉnh sửa sổ ghi chép\ntrong Jupyter theo hướng dẫn trong Section 19.1 . Thực hiện\ncác thay đổi và kiểm tra xem chúng có ổn không. Giả sử chúng ta đã sửa\nđổi một lỗi đánh máy trong tập tin ~/d2l-en/chapter_appendix_tools/how-to-contribute.md . Sau đó, bạn có\nthể kiểm tra những tập tin bạn đã thay đổi:\nTại thời điểm này Git sẽ nhắc rằng tập tin chapter_appendix_tools/how-to-contribute.md đã được sửa đổi.\nSau khi xác nhận rằng đây là những gì bạn muốn, hãy thực hiện lệnh sau:\nMã đã thay đổi sau đó sẽ nằm trong ngã ba cá nhân của kho lưu trữ. Để\nyêu cầu bổ sung thay đổi của bạn, bạn phải tạo một yêu cầu kéo cho kho\nlưu trữ chính thức của cuốn sách.\n19.6.4.5. Yêu cầu kéo\nNhư thể hiện trong Fig. 19.6.6 , đi đến ngã ba của kho lưu\ntrữ trên GitHub và chọn “New pull request”. Thao tác này sẽ mở ra một\nmàn hình hiển thị cho bạn những thay đổi giữa các chỉnh sửa của bạn và\nnhững gì hiện tại trong kho lưu trữ chính của cuốn sách.\nFig. 19.6.6 Pull Request. ¶\n19.6.4.6. Gửi yêu cầu kéo\nCuối cùng, gửi yêu cầu kéo bằng cách nhấp vào nút như thể hiện trong Fig. 19.6.7 . Đảm bảo mô tả những thay đổi bạn đã thực\nhiện trong yêu cầu kéo. Điều này sẽ giúp các tác giả xem xét nó dễ dàng\nhơn và hợp nhất nó với cuốn sách. Tùy thuộc vào những thay đổi, điều này\ncó thể được chấp nhận ngay lập tức, bị từ chối hoặc nhiều khả năng hơn,\nbạn sẽ nhận được một số phản hồi về những thay đổi. Một khi bạn đã kết\nhợp chúng, bạn rất tốt để đi.\nFig. 19.6.7 Create Pull Request. ¶\nYêu cầu kéo của bạn sẽ xuất hiện trong danh sách các yêu cầu trong kho\nlưu trữ chính. Chúng tôi sẽ cố gắng hết sức để xử lý nó một cách nhanh\nchóng.\n19.6.5. Tóm tắt\nBạn có thể sử dụng GitHub để đóng góp cho cuốn sách này.\nBạn có thể chỉnh sửa tệp trên GitHub trực tiếp cho các thay đổi nhỏ.\nĐối với một thay đổi lớn, vui lòng ngã ba kho lưu trữ, chỉnh sửa mọi\nthứ cục bộ và chỉ đóng góp trở lại một khi bạn đã sẵn sàng.\nYêu cầu kéo là cách đóng góp đang được gói lại. Cố gắng không gửi yêu\ncầu kéo khổng lồ vì điều này khiến họ khó hiểu và kết hợp. Tốt hơn\ngửi một số cái nhỏ hơn.\n19.6.6. Bài tập\nSao và ngã ba kho lưu trữ d2l-en .\nTìm một số mã cần cải tiến và gửi yêu cầu kéo.\nTìm một tài liệu tham khảo mà chúng tôi đã bỏ lỡ và gửi yêu cầu kéo.\nNó thường là một thực hành tốt hơn để tạo một yêu cầu kéo bằng cách\nsử dụng một nhánh mới. Tìm hiểu làm thế nào để làm điều đó với Git\nbranching .\nDiscussions"
+}

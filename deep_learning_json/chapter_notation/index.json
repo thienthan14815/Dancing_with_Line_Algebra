@@ -1,0 +1,175 @@
+{
+  "url": "https://vi.d2l.ai/chapter_notation/index.html",
+  "chapter": "chapter_notation",
+  "title": "Ký hiệu",
+  "crawled_at": "2026-07-20T12:39:09.407301+00:00",
+  "headings": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "ky-hieu",
+      "text": "Ký hiệu"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "cac-doi-tuong-so",
+      "text": "Các đối tượng số"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "ly-thuyet-dat",
+      "text": "Lý thuyết đặt"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "chuc-nang-va-toan-tu",
+      "text": "Chức năng và toán tử"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "calculus-giai-tich",
+      "text": "Calculus (Giải tích)"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "ly-thuyet-xac-suat-va-thong-tin",
+      "text": "Lý thuyết xác suất và thông tin"
+    }
+  ],
+  "content": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "ky-hieu",
+      "text": "Ký hiệu"
+    },
+    {
+      "type": "paragraph",
+      "text": "Trong suốt cuốn sách này, chúng tôi tuân thủ các quy ước công ước sau\nđây. Lưu ý rằng một số ký hiệu này là giữ chỗ, trong khi những ký hiệu\nkhác đề cập đến các đối tượng cụ thể. Theo nguyên tắc chung của ngón tay\ncái, bài viết không xác định “a” chỉ ra rằng ký hiệu là một giữ chỗ và\ncác ký hiệu được định dạng tương tự có thể biểu thị các đối tượng khác\ncùng loại. Ví dụ, “ \\(x\\) : một vô hướng” có nghĩa là các chữ cái\nviết thường đại diện cho các giá trị vô hướng."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "cac-doi-tuong-so",
+      "text": "Các đối tượng số"
+    },
+    {
+      "type": "list",
+      "ordered": false,
+      "items": [
+        "\\(x\\) : một vô hướng",
+        "\\(\\mathbf{x}\\) : một vector",
+        "\\(\\mathbf{X}\\) : một ma trận",
+        "\\(\\mathsf{X}\\) : một tensor chung",
+        "\\(\\mathbf{I}\\) : một ma trận nhận dạng - vuông, với \\(1\\) trên\ntất cả các mục chéo và \\(0\\) trên tất cả các đường chéo",
+        "\\(x_i\\) , \\([\\mathbf{x}]_i\\) : yếu tố \\(i^\\mathrm{th}\\) của\nvector \\(\\mathbf{x}\\)",
+        "\\(x_{ij}\\) , \\(x_{i,j}\\) , \\([\\mathbf{X}]_{ij}\\) , \\([\\mathbf{X}]_{i,j}\\) : phần tử của ma trận \\(\\mathbf{X}\\) tại hàng \\(i\\) và cột \\(j\\) ."
+      ]
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "ly-thuyet-dat",
+      "text": "Lý thuyết đặt"
+    },
+    {
+      "type": "list",
+      "ordered": false,
+      "items": [
+        "\\(\\mathcal{X}\\) : một bộ",
+        "\\(\\mathbb{Z}\\) : tập hợp các số nguyên",
+        "\\(\\mathbb{Z}^+\\) : tập hợp các số nguyên dương",
+        "\\(\\mathbb{R}\\) : tập hợp các số thực",
+        "\\(\\mathbb{R}^n\\) : tập hợp các vectơ \\(n\\) chiều của số thực",
+        "\\(\\mathbb{R}^{a\\times b}\\) : Tập hợp các ma trận số thực với \\(a\\) hàng và \\(b\\) cột",
+        "\\(|\\mathcal{X}|\\) : cardinality (số phần tử) của bộ \\(\\mathcal{X}\\)",
+        "\\(\\mathcal{A}\\cup\\mathcal{B}\\) : liên minh các bộ \\(\\mathcal{A}\\) và \\(\\mathcal{B}\\)",
+        "\\(\\mathcal{A}\\cap\\mathcal{B}\\) : giao điểm của bộ \\(\\mathcal{A}\\) và \\(\\mathcal{B}\\)",
+        "\\(\\mathcal{A}\\setminus\\mathcal{B}\\) : đặt phép trừ \\(\\mathcal{B}\\) từ \\(\\mathcal{A}\\) (chỉ chứa những yếu tố của \\(\\mathcal{A}\\) không thuộc về \\(\\mathcal{B}\\) )"
+      ]
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "chuc-nang-va-toan-tu",
+      "text": "Chức năng và toán tử"
+    },
+    {
+      "type": "list",
+      "ordered": false,
+      "items": [
+        "\\(f(\\cdot)\\) : một chức năng",
+        "\\(\\log(\\cdot)\\) : logarit tự nhiên (cơ sở \\(e\\) )",
+        "\\(\\log_2(\\cdot)\\) : logarit với cơ sở \\(2\\)",
+        "\\(\\exp(\\cdot)\\) : hàm mũ",
+        "\\(\\mathbf{1}(\\cdot)\\) : hàm chỉ báo, đánh giá thành \\(1\\) nếu\nđối số boolean là đúng và \\(0\\) nếu không",
+        "\\(\\mathbf{1}_{\\mathcal{X}}(z)\\) : chức năng chỉ báo thành viên\nthiết lập, đánh giá \\(1\\) nếu phần tử \\(z\\) thuộc về bộ \\(\\mathcal{X}\\) và \\(0\\) nếu không",
+        "\\(\\mathbf{(\\cdot)}^\\top\\) : transpose của một vectơ hoặc ma trận",
+        "\\(\\mathbf{X}^{-1}\\) : nghịch đảo của ma trận \\(\\mathbf{X}\\)",
+        "\\(\\odot\\) : Sản phẩm Hadamard (elementwise)",
+        "\\([\\cdot, \\cdot]\\) : nối",
+        "\\(\\|\\cdot\\|_p\\) : \\(L_p\\) định mức",
+        "\\(\\|\\cdot\\|\\) : \\(L_2\\) định mức",
+        "\\(\\langle \\mathbf{x}, \\mathbf{y} \\rangle\\) : sản phẩm chấm của\nvectơ \\(\\mathbf{x}\\) và \\(\\mathbf{y}\\)",
+        "\\(\\sum\\) : tổng kết về một bộ sưu tập các yếu tố",
+        "\\(\\prod\\) : sản phẩm trên một bộ sưu tập các yếu tố",
+        "\\(\\stackrel{\\mathrm{def}}{=}\\) : một sự bình đẳng khẳng định như\nmột định nghĩa của ký hiệu ở phía bên trái"
+      ]
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "calculus-giai-tich",
+      "text": "Calculus (Giải tích)"
+    },
+    {
+      "type": "list",
+      "ordered": false,
+      "items": [
+        "\\(\\frac{dy}{dx}\\) : dẫn xuất của \\(y\\) đối với \\(x\\)",
+        "\\(\\frac{\\partial y}{\\partial x}\\) : phái sinh một phần của \\(y\\) đối với \\(x\\)",
+        "\\(\\nabla_{\\mathbf{x}} y\\) : gradient của \\(y\\) đối với \\(\\mathbf{x}\\)",
+        "\\(\\int_a^b f(x) \\;dx\\) : tích phân xác định của \\(f\\) từ \\(a\\) đến \\(b\\) đối với \\(x\\)",
+        "\\(\\int f(x) \\;dx\\) : tích phân không xác định của \\(f\\) đối\nvới \\(x\\)"
+      ]
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "ly-thuyet-xac-suat-va-thong-tin",
+      "text": "Lý thuyết xác suất và thông tin"
+    },
+    {
+      "type": "list",
+      "ordered": false,
+      "items": [
+        "\\(X\\) : một biến ngẫu nhiên",
+        "\\(P\\) : một phân phối xác suất",
+        "\\(X \\sim P\\) : biến ngẫu nhiên \\(X\\) có phân phối \\(P\\)",
+        "\\(P(X=x)\\) : xác suất được gán cho sự kiện mà biến ngẫu nhiên \\(X\\) lấy giá trị \\(x\\)",
+        "\\(P(X \\mid Y)\\) : phân phối xác suất có điều kiện của \\(X\\) cho \\(Y\\)",
+        "\\(p(\\cdot)\\) : một hàm mật độ xác suất (PDF) liên quan đến phân\nphối P",
+        "\\({E}[X]\\) : kỳ vọng của một biến ngẫu nhiên \\(X\\)",
+        "\\(X \\perp Y\\) : các biến ngẫu nhiên \\(X\\) và \\(Y\\) độc lập",
+        "\\(X \\perp Y \\mid Z\\) : các biến ngẫu nhiên \\(X\\) và \\(Y\\) có điều kiện độc lập cho \\(Z\\)",
+        "\\(\\sigma_X\\) : độ lệch chuẩn của biến ngẫu nhiên \\(X\\)",
+        "\\(\\mathrm{Var}(X)\\) : phương sai của biến ngẫu nhiên \\(X\\) ,\nbằng \\(\\sigma^2_X\\)",
+        "\\(\\mathrm{Cov}(X, Y)\\) : đồng phương sai của các biến ngẫu nhiên \\(X\\) và \\(Y\\)",
+        "\\(\\rho(X, Y)\\) : hệ số tương quan Pearson giữa \\(X\\) và \\(Y\\) , bằng \\(\\frac{\\mathrm{Cov}(X, Y)}{\\sigma_X \\sigma_Y}\\)",
+        "\\(H(X)\\) : entropy của biến ngẫu nhiên \\(X\\)",
+        "\\(D_{\\mathrm{KL}}(P\\|Q)\\) : phân kỳ KL-phân kỳ (hoặc entropy tương\nđối) từ phân phối \\(Q\\) đến phân phối \\(P\\)"
+      ]
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    }
+  ],
+  "images": [],
+  "text": "Ký hiệu\nTrong suốt cuốn sách này, chúng tôi tuân thủ các quy ước công ước sau\nđây. Lưu ý rằng một số ký hiệu này là giữ chỗ, trong khi những ký hiệu\nkhác đề cập đến các đối tượng cụ thể. Theo nguyên tắc chung của ngón tay\ncái, bài viết không xác định “a” chỉ ra rằng ký hiệu là một giữ chỗ và\ncác ký hiệu được định dạng tương tự có thể biểu thị các đối tượng khác\ncùng loại. Ví dụ, “ \\(x\\) : một vô hướng” có nghĩa là các chữ cái\nviết thường đại diện cho các giá trị vô hướng.\nCác đối tượng số\n\\(x\\) : một vô hướng\n\\(\\mathbf{x}\\) : một vector\n\\(\\mathbf{X}\\) : một ma trận\n\\(\\mathsf{X}\\) : một tensor chung\n\\(\\mathbf{I}\\) : một ma trận nhận dạng - vuông, với \\(1\\) trên\ntất cả các mục chéo và \\(0\\) trên tất cả các đường chéo\n\\(x_i\\) , \\([\\mathbf{x}]_i\\) : yếu tố \\(i^\\mathrm{th}\\) của\nvector \\(\\mathbf{x}\\)\n\\(x_{ij}\\) , \\(x_{i,j}\\) , \\([\\mathbf{X}]_{ij}\\) , \\([\\mathbf{X}]_{i,j}\\) : phần tử của ma trận \\(\\mathbf{X}\\) tại hàng \\(i\\) và cột \\(j\\) .\nLý thuyết đặt\n\\(\\mathcal{X}\\) : một bộ\n\\(\\mathbb{Z}\\) : tập hợp các số nguyên\n\\(\\mathbb{Z}^+\\) : tập hợp các số nguyên dương\n\\(\\mathbb{R}\\) : tập hợp các số thực\n\\(\\mathbb{R}^n\\) : tập hợp các vectơ \\(n\\) chiều của số thực\n\\(\\mathbb{R}^{a\\times b}\\) : Tập hợp các ma trận số thực với \\(a\\) hàng và \\(b\\) cột\n\\(|\\mathcal{X}|\\) : cardinality (số phần tử) của bộ \\(\\mathcal{X}\\)\n\\(\\mathcal{A}\\cup\\mathcal{B}\\) : liên minh các bộ \\(\\mathcal{A}\\) và \\(\\mathcal{B}\\)\n\\(\\mathcal{A}\\cap\\mathcal{B}\\) : giao điểm của bộ \\(\\mathcal{A}\\) và \\(\\mathcal{B}\\)\n\\(\\mathcal{A}\\setminus\\mathcal{B}\\) : đặt phép trừ \\(\\mathcal{B}\\) từ \\(\\mathcal{A}\\) (chỉ chứa những yếu tố của \\(\\mathcal{A}\\) không thuộc về \\(\\mathcal{B}\\) )\nChức năng và toán tử\n\\(f(\\cdot)\\) : một chức năng\n\\(\\log(\\cdot)\\) : logarit tự nhiên (cơ sở \\(e\\) )\n\\(\\log_2(\\cdot)\\) : logarit với cơ sở \\(2\\)\n\\(\\exp(\\cdot)\\) : hàm mũ\n\\(\\mathbf{1}(\\cdot)\\) : hàm chỉ báo, đánh giá thành \\(1\\) nếu\nđối số boolean là đúng và \\(0\\) nếu không\n\\(\\mathbf{1}_{\\mathcal{X}}(z)\\) : chức năng chỉ báo thành viên\nthiết lập, đánh giá \\(1\\) nếu phần tử \\(z\\) thuộc về bộ \\(\\mathcal{X}\\) và \\(0\\) nếu không\n\\(\\mathbf{(\\cdot)}^\\top\\) : transpose của một vectơ hoặc ma trận\n\\(\\mathbf{X}^{-1}\\) : nghịch đảo của ma trận \\(\\mathbf{X}\\)\n\\(\\odot\\) : Sản phẩm Hadamard (elementwise)\n\\([\\cdot, \\cdot]\\) : nối\n\\(\\|\\cdot\\|_p\\) : \\(L_p\\) định mức\n\\(\\|\\cdot\\|\\) : \\(L_2\\) định mức\n\\(\\langle \\mathbf{x}, \\mathbf{y} \\rangle\\) : sản phẩm chấm của\nvectơ \\(\\mathbf{x}\\) và \\(\\mathbf{y}\\)\n\\(\\sum\\) : tổng kết về một bộ sưu tập các yếu tố\n\\(\\prod\\) : sản phẩm trên một bộ sưu tập các yếu tố\n\\(\\stackrel{\\mathrm{def}}{=}\\) : một sự bình đẳng khẳng định như\nmột định nghĩa của ký hiệu ở phía bên trái\nCalculus (Giải tích)\n\\(\\frac{dy}{dx}\\) : dẫn xuất của \\(y\\) đối với \\(x\\)\n\\(\\frac{\\partial y}{\\partial x}\\) : phái sinh một phần của \\(y\\) đối với \\(x\\)\n\\(\\nabla_{\\mathbf{x}} y\\) : gradient của \\(y\\) đối với \\(\\mathbf{x}\\)\n\\(\\int_a^b f(x) \\;dx\\) : tích phân xác định của \\(f\\) từ \\(a\\) đến \\(b\\) đối với \\(x\\)\n\\(\\int f(x) \\;dx\\) : tích phân không xác định của \\(f\\) đối\nvới \\(x\\)\nLý thuyết xác suất và thông tin\n\\(X\\) : một biến ngẫu nhiên\n\\(P\\) : một phân phối xác suất\n\\(X \\sim P\\) : biến ngẫu nhiên \\(X\\) có phân phối \\(P\\)\n\\(P(X=x)\\) : xác suất được gán cho sự kiện mà biến ngẫu nhiên \\(X\\) lấy giá trị \\(x\\)\n\\(P(X \\mid Y)\\) : phân phối xác suất có điều kiện của \\(X\\) cho \\(Y\\)\n\\(p(\\cdot)\\) : một hàm mật độ xác suất (PDF) liên quan đến phân\nphối P\n\\({E}[X]\\) : kỳ vọng của một biến ngẫu nhiên \\(X\\)\n\\(X \\perp Y\\) : các biến ngẫu nhiên \\(X\\) và \\(Y\\) độc lập\n\\(X \\perp Y \\mid Z\\) : các biến ngẫu nhiên \\(X\\) và \\(Y\\) có điều kiện độc lập cho \\(Z\\)\n\\(\\sigma_X\\) : độ lệch chuẩn của biến ngẫu nhiên \\(X\\)\n\\(\\mathrm{Var}(X)\\) : phương sai của biến ngẫu nhiên \\(X\\) ,\nbằng \\(\\sigma^2_X\\)\n\\(\\mathrm{Cov}(X, Y)\\) : đồng phương sai của các biến ngẫu nhiên \\(X\\) và \\(Y\\)\n\\(\\rho(X, Y)\\) : hệ số tương quan Pearson giữa \\(X\\) và \\(Y\\) , bằng \\(\\frac{\\mathrm{Cov}(X, Y)}{\\sigma_X \\sigma_Y}\\)\n\\(H(X)\\) : entropy của biến ngẫu nhiên \\(X\\)\n\\(D_{\\mathrm{KL}}(P\\|Q)\\) : phân kỳ KL-phân kỳ (hoặc entropy tương\nđối) từ phân phối \\(Q\\) đến phân phối \\(P\\)\nDiscussions"
+}

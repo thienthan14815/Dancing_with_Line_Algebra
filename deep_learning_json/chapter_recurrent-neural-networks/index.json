@@ -1,0 +1,96 @@
+{
+  "url": "https://vi.d2l.ai/chapter_recurrent-neural-networks/index.html",
+  "chapter": "chapter_recurrent-neural-networks",
+  "title": "8. Mạng nơ-ron tái phát",
+  "crawled_at": "2026-07-20T12:39:54.392909+00:00",
+  "headings": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "mang-no-ron-tai-phat",
+      "text": "8. Mạng nơ-ron tái phát"
+    }
+  ],
+  "content": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "mang-no-ron-tai-phat",
+      "text": "8. Mạng nơ-ron tái phát"
+    },
+    {
+      "type": "paragraph",
+      "text": "Cho đến nay chúng tôi đã gặp hai loại dữ liệu: dữ liệu dạng bảng và dữ\nliệu hình ảnh. Đối với cái sau, chúng tôi đã thiết kế các lớp chuyên\ndụng để tận dụng sự đều đặn trong chúng. Nói cách khác, nếu chúng ta\nhoán vị các pixel trong một hình ảnh, sẽ khó khăn hơn nhiều để lý luận\nvề nội dung của nó về một cái gì đó trông giống như nền của một mẫu thử\nnghiệm trong thời đại TV analog."
+    },
+    {
+      "type": "paragraph",
+      "text": "Quan trọng nhất, cho đến nay chúng tôi ngầm cho rằng dữ liệu của chúng\ntôi đều được rút ra từ một số phân phối và tất cả các ví dụ được phân\nphối độc lập và giống hệt nhau (i.i.d.). Thật không may, điều này không\nđúng đối với hầu hết dữ liệu. Ví dụ, các từ trong đoạn này được viết\ntheo thứ tự, và sẽ khá khó để giải mã ý nghĩa của nó nếu chúng được hoán\nvị ngẫu nhiên. Tương tự như vậy, khung hình ảnh trong video, tín hiệu âm\nthanh trong cuộc trò chuyện và hành vi duyệt web trên một trang web, tất\ncả đều theo thứ tự tuần tự. Do đó, hợp lý khi cho rằng các mô hình\nchuyên dụng cho dữ liệu như vậy sẽ làm tốt hơn trong việc mô tả chúng."
+    },
+    {
+      "type": "paragraph",
+      "text": "Một vấn đề khác phát sinh từ thực tế là chúng ta có thể không chỉ nhận\nđược một chuỗi như một đầu vào mà có thể được dự kiến sẽ tiếp tục trình\ntự. Ví dụ, nhiệm vụ có thể là tiếp tục loạt \\(2, 4, 6, 8, 10, \\ldots\\) Điều này khá phổ biến trong phân tích\nchuỗi thời gian, để dự đoán thị trường chứng khoán, đường cong sốt của\nbệnh nhân hoặc khả năng tăng tốc cần thiết cho một chiếc xe đua. Một lần\nnữa chúng tôi muốn có các mô hình có thể xử lý dữ liệu như vậy."
+    },
+    {
+      "type": "paragraph",
+      "text": "Nói tóm lại, trong khi CNN có thể xử lý hiệu quả thông tin không gian,\n* mạng thần kinh định kỳ* (RNN) được thiết kế để xử lý thông tin tuần\ntự tốt hơn. RNNs giới thiệu các biến trạng thái để lưu trữ thông tin quá\nkhứ, cùng với các đầu vào hiện tại, để xác định các đầu ra hiện tại."
+    },
+    {
+      "type": "paragraph",
+      "text": "Nhiều ví dụ để sử dụng các mạng định kỳ dựa trên dữ liệu văn bản. Do đó,\nchúng tôi sẽ nhấn mạnh các mô hình ngôn ngữ trong chương này. Sau khi\nxem xét chính thức hơn về dữ liệu trình tự, chúng tôi giới thiệu các kỹ\nthuật thực tế để xử lý trước dữ liệu văn bản. Tiếp theo, chúng ta thảo\nluận về các khái niệm cơ bản về mô hình ngôn ngữ và sử dụng cuộc thảo\nluận này làm nguồn cảm hứng cho việc thiết kế RNNs. Cuối cùng, chúng tôi\nmô tả phương pháp tính toán gradient cho RNNs để khám phá các vấn đề có\nthể gặp phải khi đào tạo các mạng như vậy."
+    },
+    {
+      "type": "list",
+      "ordered": false,
+      "items": [
+        "8.1. Mô hình trình tự 8.1.1. Công cụ thống kê 8.1.2. Đào tạo 8.1.3. Prediction 8.1.4. Tóm tắt 8.1.5. Bài tập",
+        "8.1.1. Công cụ thống kê",
+        "8.1.2. Đào tạo",
+        "8.1.3. Prediction",
+        "8.1.4. Tóm tắt",
+        "8.1.5. Bài tập",
+        "8.2. Xử lý sơ bộ văn bản 8.2.1. Đọc tập dữ liệu 8.2.2. Mã hóa 8.2.3. Từ vựng 8.2.4. Đặt tất cả mọi thứ lại với nhau 8.2.5. Tóm tắt 8.2.6. Bài tập",
+        "8.2.1. Đọc tập dữ liệu",
+        "8.2.2. Mã hóa",
+        "8.2.3. Từ vựng",
+        "8.2.4. Đặt tất cả mọi thứ lại với nhau",
+        "8.2.5. Tóm tắt",
+        "8.2.6. Bài tập",
+        "8.3. Mô hình ngôn ngữ và bộ dữ liệu 8.3.1. Học một mô hình ngôn ngữ 8.3.2. Mô hình Markov và \\(n\\) -gram 8.3.3. Natural Language Thống kê 8.3.4. Đọc dữ liệu trình tự dài 8.3.5. Tóm tắt 8.3.6. Bài tập",
+        "8.3.1. Học một mô hình ngôn ngữ",
+        "8.3.2. Mô hình Markov và \\(n\\) -gram",
+        "8.3.3. Natural Language Thống kê",
+        "8.3.4. Đọc dữ liệu trình tự dài",
+        "8.3.5. Tóm tắt",
+        "8.3.6. Bài tập",
+        "8.4. Mạng nơ-ron tái phát 8.4.1. Mạng thần kinh không có trạng thái ẩn 8.4.2. Mạng thần kinh định kỳ với các trạng thái ẩn 8.4.3. Mô hình ngôn ngữ cấp ký tự dựa trên RNN 8.4.4. Bối rối 8.4.5. Tóm tắt 8.4.6. Bài tập",
+        "8.4.1. Mạng thần kinh không có trạng thái ẩn",
+        "8.4.2. Mạng thần kinh định kỳ với các trạng thái ẩn",
+        "8.4.3. Mô hình ngôn ngữ cấp ký tự dựa trên RNN",
+        "8.4.4. Bối rối",
+        "8.4.5. Tóm tắt",
+        "8.4.6. Bài tập",
+        "8.5. Thực hiện các mạng nơ-ron tái phát từ đầu 8.5.1. Mã hóa Một-Hot 8.5.2. Khởi tạo các tham số mô hình 8.5.3. Mô hình RNN 8.5.4. Prediction 8.5.5. Clipping Gradient 8.5.6. Đào tạo 8.5.7. Tóm tắt 8.5.8. Bài tập",
+        "8.5.1. Mã hóa Một-Hot",
+        "8.5.2. Khởi tạo các tham số mô hình",
+        "8.5.3. Mô hình RNN",
+        "8.5.4. Prediction",
+        "8.5.5. Clipping Gradient",
+        "8.5.6. Đào tạo",
+        "8.5.7. Tóm tắt",
+        "8.5.8. Bài tập",
+        "8.6. Thực hiện ngắn gọn các mạng nơ-ron tái phát 8.6.1. Định nghĩa mẫu 8.6.2. Đào tạo và dự đoán 8.6.3. Tóm tắt 8.6.4. Bài tập",
+        "8.6.1. Định nghĩa mẫu",
+        "8.6.2. Đào tạo và dự đoán",
+        "8.6.3. Tóm tắt",
+        "8.6.4. Bài tập",
+        "8.7. Backpropagation qua thời gian 8.7.1. Phân tích Gradient trong RNNs 8.7.2. Backpropagation qua thời gian chi tiết 8.7.3. Tóm tắt 8.7.4. Bài tập",
+        "8.7.1. Phân tích Gradient trong RNNs",
+        "8.7.2. Backpropagation qua thời gian chi tiết",
+        "8.7.3. Tóm tắt",
+        "8.7.4. Bài tập"
+      ]
+    }
+  ],
+  "images": [],
+  "text": "8. Mạng nơ-ron tái phát\nCho đến nay chúng tôi đã gặp hai loại dữ liệu: dữ liệu dạng bảng và dữ\nliệu hình ảnh. Đối với cái sau, chúng tôi đã thiết kế các lớp chuyên\ndụng để tận dụng sự đều đặn trong chúng. Nói cách khác, nếu chúng ta\nhoán vị các pixel trong một hình ảnh, sẽ khó khăn hơn nhiều để lý luận\nvề nội dung của nó về một cái gì đó trông giống như nền của một mẫu thử\nnghiệm trong thời đại TV analog.\nQuan trọng nhất, cho đến nay chúng tôi ngầm cho rằng dữ liệu của chúng\ntôi đều được rút ra từ một số phân phối và tất cả các ví dụ được phân\nphối độc lập và giống hệt nhau (i.i.d.). Thật không may, điều này không\nđúng đối với hầu hết dữ liệu. Ví dụ, các từ trong đoạn này được viết\ntheo thứ tự, và sẽ khá khó để giải mã ý nghĩa của nó nếu chúng được hoán\nvị ngẫu nhiên. Tương tự như vậy, khung hình ảnh trong video, tín hiệu âm\nthanh trong cuộc trò chuyện và hành vi duyệt web trên một trang web, tất\ncả đều theo thứ tự tuần tự. Do đó, hợp lý khi cho rằng các mô hình\nchuyên dụng cho dữ liệu như vậy sẽ làm tốt hơn trong việc mô tả chúng.\nMột vấn đề khác phát sinh từ thực tế là chúng ta có thể không chỉ nhận\nđược một chuỗi như một đầu vào mà có thể được dự kiến sẽ tiếp tục trình\ntự. Ví dụ, nhiệm vụ có thể là tiếp tục loạt \\(2, 4, 6, 8, 10, \\ldots\\) Điều này khá phổ biến trong phân tích\nchuỗi thời gian, để dự đoán thị trường chứng khoán, đường cong sốt của\nbệnh nhân hoặc khả năng tăng tốc cần thiết cho một chiếc xe đua. Một lần\nnữa chúng tôi muốn có các mô hình có thể xử lý dữ liệu như vậy.\nNói tóm lại, trong khi CNN có thể xử lý hiệu quả thông tin không gian,\n* mạng thần kinh định kỳ* (RNN) được thiết kế để xử lý thông tin tuần\ntự tốt hơn. RNNs giới thiệu các biến trạng thái để lưu trữ thông tin quá\nkhứ, cùng với các đầu vào hiện tại, để xác định các đầu ra hiện tại.\nNhiều ví dụ để sử dụng các mạng định kỳ dựa trên dữ liệu văn bản. Do đó,\nchúng tôi sẽ nhấn mạnh các mô hình ngôn ngữ trong chương này. Sau khi\nxem xét chính thức hơn về dữ liệu trình tự, chúng tôi giới thiệu các kỹ\nthuật thực tế để xử lý trước dữ liệu văn bản. Tiếp theo, chúng ta thảo\nluận về các khái niệm cơ bản về mô hình ngôn ngữ và sử dụng cuộc thảo\nluận này làm nguồn cảm hứng cho việc thiết kế RNNs. Cuối cùng, chúng tôi\nmô tả phương pháp tính toán gradient cho RNNs để khám phá các vấn đề có\nthể gặp phải khi đào tạo các mạng như vậy.\n8.1. Mô hình trình tự 8.1.1. Công cụ thống kê 8.1.2. Đào tạo 8.1.3. Prediction 8.1.4. Tóm tắt 8.1.5. Bài tập\n8.1.1. Công cụ thống kê\n8.1.2. Đào tạo\n8.1.3. Prediction\n8.1.4. Tóm tắt\n8.1.5. Bài tập\n8.2. Xử lý sơ bộ văn bản 8.2.1. Đọc tập dữ liệu 8.2.2. Mã hóa 8.2.3. Từ vựng 8.2.4. Đặt tất cả mọi thứ lại với nhau 8.2.5. Tóm tắt 8.2.6. Bài tập\n8.2.1. Đọc tập dữ liệu\n8.2.2. Mã hóa\n8.2.3. Từ vựng\n8.2.4. Đặt tất cả mọi thứ lại với nhau\n8.2.5. Tóm tắt\n8.2.6. Bài tập\n8.3. Mô hình ngôn ngữ và bộ dữ liệu 8.3.1. Học một mô hình ngôn ngữ 8.3.2. Mô hình Markov và \\(n\\) -gram 8.3.3. Natural Language Thống kê 8.3.4. Đọc dữ liệu trình tự dài 8.3.5. Tóm tắt 8.3.6. Bài tập\n8.3.1. Học một mô hình ngôn ngữ\n8.3.2. Mô hình Markov và \\(n\\) -gram\n8.3.3. Natural Language Thống kê\n8.3.4. Đọc dữ liệu trình tự dài\n8.3.5. Tóm tắt\n8.3.6. Bài tập\n8.4. Mạng nơ-ron tái phát 8.4.1. Mạng thần kinh không có trạng thái ẩn 8.4.2. Mạng thần kinh định kỳ với các trạng thái ẩn 8.4.3. Mô hình ngôn ngữ cấp ký tự dựa trên RNN 8.4.4. Bối rối 8.4.5. Tóm tắt 8.4.6. Bài tập\n8.4.1. Mạng thần kinh không có trạng thái ẩn\n8.4.2. Mạng thần kinh định kỳ với các trạng thái ẩn\n8.4.3. Mô hình ngôn ngữ cấp ký tự dựa trên RNN\n8.4.4. Bối rối\n8.4.5. Tóm tắt\n8.4.6. Bài tập\n8.5. Thực hiện các mạng nơ-ron tái phát từ đầu 8.5.1. Mã hóa Một-Hot 8.5.2. Khởi tạo các tham số mô hình 8.5.3. Mô hình RNN 8.5.4. Prediction 8.5.5. Clipping Gradient 8.5.6. Đào tạo 8.5.7. Tóm tắt 8.5.8. Bài tập\n8.5.1. Mã hóa Một-Hot\n8.5.2. Khởi tạo các tham số mô hình\n8.5.3. Mô hình RNN\n8.5.4. Prediction\n8.5.5. Clipping Gradient\n8.5.6. Đào tạo\n8.5.7. Tóm tắt\n8.5.8. Bài tập\n8.6. Thực hiện ngắn gọn các mạng nơ-ron tái phát 8.6.1. Định nghĩa mẫu 8.6.2. Đào tạo và dự đoán 8.6.3. Tóm tắt 8.6.4. Bài tập\n8.6.1. Định nghĩa mẫu\n8.6.2. Đào tạo và dự đoán\n8.6.3. Tóm tắt\n8.6.4. Bài tập\n8.7. Backpropagation qua thời gian 8.7.1. Phân tích Gradient trong RNNs 8.7.2. Backpropagation qua thời gian chi tiết 8.7.3. Tóm tắt 8.7.4. Bài tập\n8.7.1. Phân tích Gradient trong RNNs\n8.7.2. Backpropagation qua thời gian chi tiết\n8.7.3. Tóm tắt\n8.7.4. Bài tập"
+}

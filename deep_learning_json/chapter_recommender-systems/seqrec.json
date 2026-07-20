@@ -1,0 +1,266 @@
+{
+  "url": "https://vi.d2l.ai/chapter_recommender-systems/seqrec.html",
+  "chapter": "chapter_recommender-systems",
+  "title": "16.7. Hệ thống khuyến cáo Sequence-Aware",
+  "crawled_at": "2026-07-20T12:41:15.316757+00:00",
+  "headings": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "he-thong-khuyen-cao-sequence-aware",
+      "text": "16.7. Hệ thống khuyến cáo Sequence-Aware"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "model-architectures",
+      "text": "16.7.1. Model Architectures"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "model-implementation-code-sau-day-thuc-hien-mo-hinh-caser-no-bao-gom-mot-lop-phuc-tap-doc-mot-lop-ghep-ngang-va-mot-lop-ket-noi-day-du",
+      "text": "16.7.2. Model Implementation Code sau đây thực hiện mô hình Caser. Nó bao gồm một lớp phức tạp dọc, một lớp ghép ngang và một lớp kết nối đầy đủ."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "sequential-dataset-with-negative-sampling-de-xu-ly-du-lieu-tuong-tac-tuan-tu-chung-ta-can-thuc-hien-lai-class-dataset-doan-code-sau-day-tao-ra-mot-lop-tap-du-lieu-moi-co-ten-la-seqdataset-trong-moi-mau-no-xuat-ra-danh-tinh-nguoi-dung-l-truoc-do-cua-anh-ay-da-tuong-tac-cac-muc-nhu-mot-chuoi-va-muc-tiep-theo-ma-anh-ta-tuong-tac-nhu-muc-tieu-hinh-duoi-day-cho-thay-qua-trinh-tai-du-lieu-cho-mot-nguoi-dung-gia-su-rang-nguoi-dung-nay-thich-9-bo-phim-chung-toi-sap-xep-chin-bo-phim-nay-theo-thu-tu-thoi-gian-bo-phim-moi-nhat-bi-bo-lai-nhu-la-muc-thu-nghiem-doi-voi-tam-bo-phim-con-lai-chung-ta-co-the-nhan-duoc-ba-mau-dao-tao-voi-moi-mau-chua-mot-chuoi-nam-l-5-phim-va-muc-tiep-theo-cua-no-lam-muc-tieu-cac-mau-am-cung-duoc-bao-gom-trong-tap-du-lieu-tuy-chinh",
+      "text": "16.7.3. Sequential Dataset with Negative Sampling Để xử lý dữ liệu tương tác tuần tự, chúng ta cần thực hiện lại class Dataset. Đoạn code sau đây tạo ra một lớp tập dữ liệu mới có tên là SeqDataset . Trong mỗi mẫu, nó xuất ra danh tính người dùng, \\(L\\) trước đó của anh ấy đã tương tác các mục như một chuỗi và mục tiếp theo mà anh ta tương tác như mục tiêu. Hình dưới đây cho thấy quá trình tải dữ liệu cho một người dùng. Giả sử rằng người dùng này thích 9 bộ phim, chúng tôi sắp xếp chín bộ phim này theo thứ tự thời gian. Bộ phim mới nhất bị bỏ lại như là mục thử nghiệm. Đối với tám bộ phim còn lại, chúng ta có thể nhận được ba mẫu đào tạo, với mỗi mẫu chứa một chuỗi năm ( \\(L=5\\) ) phim và mục tiếp theo của nó làm mục tiêu. Các mẫu âm cũng được bao gồm trong tập dữ liệu tùy chỉnh."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tai-tap-du-lieu-movielens-100k",
+      "text": "16.7.4. Tải tập dữ liệu MovieLens 100K"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "dao-tao-mo-hinh-ngay-bay-gio-chung-ta-hay-dao-tao-mo-hinh-chung-toi-su-dung-cai-dat-tuong-tu-nhu-neumf-bao-gom-toc-do-hoc-tap-trinh-toi-uu-hoa-va-k-trong-phan-cuoi-de-ket-qua-co-the-so-sanh-duoc",
+      "text": "16.7.5. Đào tạo mô hình ngay bây giờ, chúng ta hãy đào tạo mô hình. Chúng tôi sử dụng cài đặt tương tự như NeuMF, bao gồm tốc độ học tập, trình tối ưu hóa và \\(k\\) , trong phần cuối để kết quả có thể so sánh được."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tom-tat-suy-ra-loi-ich-ngan-han-va-dai-han-cua-nguoi-dung-co-the-dua-ra-du-doan-ve-muc-tiep-theo-ma-anh-ta-ua-thich-hieu-qua-hon-mang-than-kinh-phuc-tap-co-the-duoc-su-dung-de-thu-hut-loi-ich-ngan-han-cua-nguoi-dung-tu-cac-tuong-tac-tuan-tu",
+      "text": "16.7.6. Tóm tắt * Suy ra lợi ích ngắn hạn và dài hạn của người dùng có thể đưa ra dự đoán về mục tiếp theo mà anh ta ưa thích hiệu quả hơn* Mạng thần kinh phức tạp có thể được sử dụng để thu hút lợi ích ngắn hạn của người dùng từ các tương tác tuần tự."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bai-tap",
+      "text": "16.7.7. Bài tập"
+    }
+  ],
+  "content": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "he-thong-khuyen-cao-sequence-aware",
+      "text": "16.7. Hệ thống khuyến cáo Sequence-Aware"
+    },
+    {
+      "type": "paragraph",
+      "text": "Trong các phần trước, chúng tôi tóm tắt tác vụ đề xuất như một vấn đề\nhoàn thành ma trận mà không xem xét hành vi ngắn hạn của người dùng.\nTrong phần này, chúng tôi sẽ giới thiệu một mô hình khuyến nghị đưa các\nbản ghi tương tác người dùng theo thứ tự theo thứ tự vào tài khoản. Đây\nlà một đề xuất nhận thức trình tự [Quadrana et al., 2018] trong đó đầu vào là một danh\nsách có thứ tự và thường có dấu thời gian của hành động người dùng trong\nquá khứ. Một số văn học gần đây đã chứng minh tính hữu ích của việc kết\nhợp thông tin đó trong mô hình hóa các mô hình hành vi thời gian của\nngười dùng và khám phá sự trôi dạt quan tâm của họ."
+    },
+    {
+      "type": "paragraph",
+      "text": "Mô hình chúng tôi sẽ giới thiệu, Caser [Tang & Wang, 2018] , viết\ntắt của mô hình đề xuất nhúng trình tự phức tạp, thông qua các mạng thần\nkinh phức tạp nắm bắt các ảnh hưởng mô hình động của các hoạt động gần\nđây của người dùng. Thành phần chính của Caser bao gồm một mạng xã hội\nngang và một mạng xã hội theo chiều dọc, nhằm phát hiện ra các mẫu trình\ntự cấp độ và cấp điểm liên minh, tương ứng. Mẫu cấp điểm chỉ ra tác động\ncủa một mục trong trình tự lịch sử trên mục tiêu, trong khi mẫu cấp liên\nkết ngụ ý ảnh hưởng của một số hành động trước đó đối với mục tiêu tiếp\ntheo. Ví dụ, mua cả sữa và bơ cùng nhau dẫn đến xác suất mua bột cao hơn\nlà chỉ mua một trong số chúng. Hơn nữa, sở thích chung của người dùng\nhoặc sở thích dài hạn cũng được mô hình hóa trong các lớp kết nối hoàn\ntoàn cuối cùng, dẫn đến mô hình hóa toàn diện hơn về sở thích người\ndùng. Chi tiết của mô hình được mô tả như sau."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "model-architectures",
+      "text": "16.7.1. Model Architectures"
+    },
+    {
+      "type": "paragraph",
+      "text": "Trong hệ thống đề xuất nhận thức được trình tự, mỗi người dùng được liên\nkết với một chuỗi một số mục từ bộ mục. Hãy để \\(S^u = (S_1^u, ... S_{|S_u|}^u)\\) biểu thị trình tự được đặt hàng.\nMục tiêu của Caser là giới thiệu mặt hàng bằng cách xem xét thị hiếu\nchung của người dùng cũng như ý định ngắn hạn. Giả sử chúng ta xem xét\ncác mục \\(L\\) trước đó, một ma trận nhúng đại diện cho các tương tác\ntrước đây cho bước thời gian \\(t\\) có thể được xây dựng:"
+    },
+    {
+      "type": "math",
+      "latex": "(16.7.1)¶\\[\\mathbf{E}^{(u, t)} = [ \\mathbf{q}_{S_{t-L}^u} , ..., \\mathbf{q}_{S_{t-2}^u}, \\mathbf{q}_{S_{t-1}^u} ]^\\top,\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "trong đó \\(\\mathbf{Q} \\in \\mathbb{R}^{n \\times k}\\) đại diện cho\nnhúng mục và \\(\\mathbf{q}_i\\) biểu thị hàng \\(i^\\mathrm{th}\\) . \\(\\mathbf{E}^{(u, t)} \\in \\mathbb{R}^{L \\times k}\\) có thể được sử\ndụng để suy ra sự quan tâm thoáng qua của người dùng \\(u\\) tại bước\nthời gian \\(t\\) . Chúng ta có thể xem ma trận đầu vào \\(\\mathbf{E}^{(u, t)}\\) như một hình ảnh đó là đầu vào của hai thành\nphần phức tạp tiếp theo."
+    },
+    {
+      "type": "paragraph",
+      "text": "Lớp ghép ngang có \\(d\\) bộ lọc ngang \\(\\mathbf{F}^j \\in \\mathbb{R}^{h \\times k}, 1 \\leq j \\leq d, h = \\{1, ..., L\\}\\) ,\nvà lớp ghép dọc có \\(d'\\) bộ lọc dọc \\(\\mathbf{G}^j \\in \\mathbb{R}^{ L \\times 1}, 1 \\leq j \\leq d'\\) . Sau\nmột loạt các hoạt động phức tạp và pool, chúng tôi nhận được hai đầu ra:"
+    },
+    {
+      "type": "math",
+      "latex": "(16.7.2)¶\\[\\begin{split}\\mathbf{o} = \\text{HConv}(\\mathbf{E}^{(u, t)}, \\mathbf{F}) \\\\\n\\mathbf{o}'= \\text{VConv}(\\mathbf{E}^{(u, t)}, \\mathbf{G}) ,\\end{split}\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "trong đó \\(\\mathbf{o} \\in \\mathbb{R}^d\\) là đầu ra của mạng xã hội\nngang và \\(\\mathbf{o}' \\in \\mathbb{R}^{kd'}\\) là đầu ra của mạng\nghép dọc. Để đơn giản, chúng tôi bỏ qua các chi tiết về các hoạt động\nphức tạp và hồ bơi. Chúng được nối và đưa vào một lớp mạng thần kinh\nđược kết nối hoàn toàn để có được nhiều biểu diễn cấp cao hơn."
+    },
+    {
+      "type": "math",
+      "latex": "(16.7.3)¶\\[\\mathbf{z} = \\phi(\\mathbf{W}[\\mathbf{o}, \\mathbf{o}']^\\top + \\mathbf{b}),\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "trong đó \\(\\mathbf{W} \\in \\mathbb{R}^{k \\times (d + kd')}\\) là ma\ntrận trọng lượng và \\(\\mathbf{b} \\in \\mathbb{R}^k\\) là thiên vị.\nVector đã học được \\(\\mathbf{z} \\in \\mathbb{R}^k\\) là đại diện cho ý\nđịnh ngắn hạn của người dùng."
+    },
+    {
+      "type": "paragraph",
+      "text": "Cuối cùng, hàm dự đoán kết hợp hương vị ngắn hạn và chung của người dùng\nvới nhau, được định nghĩa là:"
+    },
+    {
+      "type": "math",
+      "latex": "(16.7.4)¶\\[\\hat{y}_{uit} = \\mathbf{v}_i \\cdot [\\mathbf{z}, \\mathbf{p}_u]^\\top + \\mathbf{b}'_i,\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "trong đó \\(\\mathbf{V} \\in \\mathbb{R}^{n \\times 2k}\\) là một ma trận\nnhúng mục khác. \\(\\mathbf{b}' \\in \\mathbb{R}^n\\) là mục thiên vị cụ\nthể. \\(\\mathbf{P} \\in \\mathbb{R}^{m \\times k}\\) là ma trận nhúng\nngười dùng cho thị hiếu chung của người dùng. \\(\\mathbf{p}_u \\in \\mathbb{R}^{ k}\\) là hàng \\(u^\\mathrm{th}\\) của \\(P\\) và \\(\\mathbf{v}_i \\in \\mathbb{R}^{2k}\\) là hàng \\(i^\\mathrm{th}\\) của \\(i^\\mathrm{th}\\) ."
+    },
+    {
+      "type": "paragraph",
+      "text": "Mô hình có thể được học với mất BPR hoặc Bản lề. Kiến trúc của Caser\nđược hiển thị dưới đây:"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/rec-caser.svg",
+      "local_path": "_images/rec-caser.svg",
+      "alt": "../_images/rec-caser.svg"
+    },
+    {
+      "type": "paragraph",
+      "text": "Fig. 16.7.1 Illustration of the Caser Model ¶"
+    },
+    {
+      "type": "paragraph",
+      "text": "Đầu tiên chúng tôi nhập các thư viện cần thiết."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "import random\nimport mxnet as mx\nfrom mxnet import gluon, np, npx\nfrom mxnet.gluon import nn\nfrom d2l import mxnet as d2l\n\nnpx.set_np()"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "model-implementation-code-sau-day-thuc-hien-mo-hinh-caser-no-bao-gom-mot-lop-phuc-tap-doc-mot-lop-ghep-ngang-va-mot-lop-ket-noi-day-du",
+      "text": "16.7.2. Model Implementation Code sau đây thực hiện mô hình Caser. Nó bao gồm một lớp phức tạp dọc, một lớp ghép ngang và một lớp kết nối đầy đủ."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "class Caser(nn.Block):\n    def __init__(self, num_factors, num_users, num_items, L=5, d=16,\n                 d_prime=4, drop_ratio=0.05, **kwargs):\n        super(Caser, self).__init__(**kwargs)\n        self.P = nn.Embedding(num_users, num_factors)\n        self.Q = nn.Embedding(num_items, num_factors)\n        self.d_prime, self.d = d_prime, d\n        # Vertical convolution layer\n        self.conv_v = nn.Conv2D(d_prime, (L, 1), in_channels=1)\n        # Horizontal convolution layer\n        h = [i + 1 for i in range(L)]\n        self.conv_h, self.max_pool = nn.Sequential(), nn.Sequential()\n        for i in h:\n            self.conv_h.add(nn.Conv2D(d, (i, num_factors), in_channels=1))\n            self.max_pool.add(nn.MaxPool1D(L - i + 1))\n        # Fully-connected layer\n        self.fc1_dim_v, self.fc1_dim_h = d_prime * num_factors, d * len(h)\n        self.fc = nn.Dense(in_units=d_prime * num_factors + d * L,\n                           activation='relu', units=num_factors)\n        self.Q_prime = nn.Embedding(num_items, num_factors * 2)\n        self.b = nn.Embedding(num_items, 1)\n        self.dropout = nn.Dropout(drop_ratio)\n\n    def forward(self, user_id, seq, item_id):\n        item_embs = np.expand_dims(self.Q(seq), 1)\n        user_emb = self.P(user_id)\n        out, out_h, out_v, out_hs = None, None, None, []\n        if self.d_prime:\n            out_v = self.conv_v(item_embs)\n            out_v = out_v.reshape(out_v.shape[0], self.fc1_dim_v)\n        if self.d:\n            for conv, maxp in zip(self.conv_h, self.max_pool):\n                conv_out = np.squeeze(npx.relu(conv(item_embs)), axis=3)\n                t = maxp(conv_out)\n                pool_out = np.squeeze(t, axis=2)\n                out_hs.append(pool_out)\n            out_h = np.concatenate(out_hs, axis=1)\n        out = np.concatenate([out_v, out_h], axis=1)\n        z = self.fc(self.dropout(out))\n        x = np.concatenate([z, user_emb], axis=1)\n        q_prime_i = np.squeeze(self.Q_prime(item_id))\n        b = np.squeeze(self.b(item_id))\n        res = (x * q_prime_i).sum(1) + b\n        return res"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "sequential-dataset-with-negative-sampling-de-xu-ly-du-lieu-tuong-tac-tuan-tu-chung-ta-can-thuc-hien-lai-class-dataset-doan-code-sau-day-tao-ra-mot-lop-tap-du-lieu-moi-co-ten-la-seqdataset-trong-moi-mau-no-xuat-ra-danh-tinh-nguoi-dung-l-truoc-do-cua-anh-ay-da-tuong-tac-cac-muc-nhu-mot-chuoi-va-muc-tiep-theo-ma-anh-ta-tuong-tac-nhu-muc-tieu-hinh-duoi-day-cho-thay-qua-trinh-tai-du-lieu-cho-mot-nguoi-dung-gia-su-rang-nguoi-dung-nay-thich-9-bo-phim-chung-toi-sap-xep-chin-bo-phim-nay-theo-thu-tu-thoi-gian-bo-phim-moi-nhat-bi-bo-lai-nhu-la-muc-thu-nghiem-doi-voi-tam-bo-phim-con-lai-chung-ta-co-the-nhan-duoc-ba-mau-dao-tao-voi-moi-mau-chua-mot-chuoi-nam-l-5-phim-va-muc-tiep-theo-cua-no-lam-muc-tieu-cac-mau-am-cung-duoc-bao-gom-trong-tap-du-lieu-tuy-chinh",
+      "text": "16.7.3. Sequential Dataset with Negative Sampling Để xử lý dữ liệu tương tác tuần tự, chúng ta cần thực hiện lại class Dataset. Đoạn code sau đây tạo ra một lớp tập dữ liệu mới có tên là SeqDataset . Trong mỗi mẫu, nó xuất ra danh tính người dùng, \\(L\\) trước đó của anh ấy đã tương tác các mục như một chuỗi và mục tiếp theo mà anh ta tương tác như mục tiêu. Hình dưới đây cho thấy quá trình tải dữ liệu cho một người dùng. Giả sử rằng người dùng này thích 9 bộ phim, chúng tôi sắp xếp chín bộ phim này theo thứ tự thời gian. Bộ phim mới nhất bị bỏ lại như là mục thử nghiệm. Đối với tám bộ phim còn lại, chúng ta có thể nhận được ba mẫu đào tạo, với mỗi mẫu chứa một chuỗi năm ( \\(L=5\\) ) phim và mục tiếp theo của nó làm mục tiêu. Các mẫu âm cũng được bao gồm trong tập dữ liệu tùy chỉnh."
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/rec-seq-data.svg",
+      "local_path": "_images/rec-seq-data.svg",
+      "alt": "../_images/rec-seq-data.svg"
+    },
+    {
+      "type": "paragraph",
+      "text": "Fig. 16.7.2 Illustration of the data generation process ¶"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "class SeqDataset(gluon.data.Dataset):\n    def __init__(self, user_ids, item_ids, L, num_users, num_items,\n                 candidates):\n        user_ids, item_ids = np.array(user_ids), np.array(item_ids)\n        sort_idx = np.array(sorted(range(len(user_ids)),\n                                   key=lambda k: user_ids[k]))\n        u_ids, i_ids = user_ids[sort_idx], item_ids[sort_idx]\n        temp, u_ids, self.cand = {}, u_ids.asnumpy(), candidates\n        self.all_items = set([i for i in range(num_items)])\n        [temp.setdefault(u_ids[i], []).append(i) for i, _ in enumerate(u_ids)]\n        temp = sorted(temp.items(), key=lambda x: x[0])\n        u_ids = np.array([i[0] for i in temp])\n        idx = np.array([i[1][0] for i in temp])\n        self.ns = ns = int(sum([c - L if c >= L + 1 else 1 for c\n                                in np.array([len(i[1]) for i in temp])]))\n        self.seq_items = np.zeros((ns, L))\n        self.seq_users = np.zeros(ns, dtype='int32')\n        self.seq_tgt = np.zeros((ns, 1))\n        self.test_seq = np.zeros((num_users, L))\n        test_users, _uid = np.empty(num_users), None\n        for i, (uid, i_seq) in enumerate(self._seq(u_ids, i_ids, idx, L + 1)):\n            if uid != _uid:\n                self.test_seq[uid][:] = i_seq[-L:]\n                test_users[uid], _uid = uid, uid\n            self.seq_tgt[i][:] = i_seq[-1:]\n            self.seq_items[i][:], self.seq_users[i] = i_seq[:L], uid\n\n    def _win(self, tensor, window_size, step_size=1):\n        if len(tensor) - window_size >= 0:\n            for i in range(len(tensor), 0, - step_size):\n                if i - window_size >= 0:\n                    yield tensor[i - window_size:i]\n                else:\n                    break\n        else:\n            yield tensor\n\n    def _seq(self, u_ids, i_ids, idx, max_len):\n        for i in range(len(idx)):\n            stop_idx = None if i >= len(idx) - 1 else int(idx[i + 1])\n            for s in self._win(i_ids[int(idx[i]):stop_idx], max_len):\n                yield (int(u_ids[i]), s)\n\n    def __len__(self):\n        return self.ns\n\n    def __getitem__(self, idx):\n        neg = list(self.all_items - set(self.cand[int(self.seq_users[idx])]))\n        i = random.randint(0, len(neg) - 1)\n        return (self.seq_users[idx], self.seq_items[idx], self.seq_tgt[idx],\n                neg[i])"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tai-tap-du-lieu-movielens-100k",
+      "text": "16.7.4. Tải tập dữ liệu MovieLens 100K"
+    },
+    {
+      "type": "paragraph",
+      "text": "Sau đó, chúng tôi đọc và chia bộ dữ liệu MovieLens 100K ở chế độ nhận\nthức được trình tự và tải dữ liệu đào tạo với dataloader tuần tự được\nthực hiện ở trên."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "TARGET_NUM, L, batch_size = 1, 5, 4096\ndf, num_users, num_items = d2l.read_data_ml100k()\ntrain_data, test_data = d2l.split_data_ml100k(df, num_users, num_items,\n                                              'seq-aware')\nusers_train, items_train, ratings_train, candidates = d2l.load_data_ml100k(\n    train_data, num_users, num_items, feedback=\"implicit\")\nusers_test, items_test, ratings_test, test_iter = d2l.load_data_ml100k(\n    test_data, num_users, num_items, feedback=\"implicit\")\ntrain_seq_data = SeqDataset(users_train, items_train, L, num_users,\n                            num_items, candidates)\ntrain_iter = gluon.data.DataLoader(train_seq_data, batch_size, True,\n                                   last_batch=\"rollover\",\n                                   num_workers=d2l.get_dataloader_workers())\ntest_seq_iter = train_seq_data.test_seq\ntrain_seq_data[0]"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "(array(0, dtype=int32),\n array([241., 170., 110., 255.,   4.]),\n array([101.]),\n 320)"
+    },
+    {
+      "type": "paragraph",
+      "text": "Cấu trúc dữ liệu đào tạo được hiển thị ở trên. Phần tử đầu tiên là danh\ntính người dùng, danh sách tiếp theo chỉ ra năm mục cuối cùng mà người\ndùng này thích và phần tử cuối cùng là mục mà người dùng này thích sau\nnăm mục."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "dao-tao-mo-hinh-ngay-bay-gio-chung-ta-hay-dao-tao-mo-hinh-chung-toi-su-dung-cai-dat-tuong-tu-nhu-neumf-bao-gom-toc-do-hoc-tap-trinh-toi-uu-hoa-va-k-trong-phan-cuoi-de-ket-qua-co-the-so-sanh-duoc",
+      "text": "16.7.5. Đào tạo mô hình ngay bây giờ, chúng ta hãy đào tạo mô hình. Chúng tôi sử dụng cài đặt tương tự như NeuMF, bao gồm tốc độ học tập, trình tối ưu hóa và \\(k\\) , trong phần cuối để kết quả có thể so sánh được."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "devices = d2l.try_all_gpus()\nnet = Caser(10, num_users, num_items, L)\nnet.initialize(ctx=devices, force_reinit=True, init=mx.init.Normal(0.01))\nlr, num_epochs, wd, optimizer = 0.04, 8, 1e-5, 'adam'\nloss = d2l.BPRLoss()\ntrainer = gluon.Trainer(net.collect_params(), optimizer,\n                        {\"learning_rate\": lr, 'wd': wd})\n\nd2l.train_ranking(net, train_iter, test_iter, loss, trainer, test_seq_iter,\n                  num_users, num_items, num_epochs, devices,\n                  d2l.evaluate_ranking, candidates, eval_step=1)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "train loss 0.807, test hit rate 0.392, test AUC 0.757\n22.5 examples/sec on [gpu(0), gpu(1)]"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_seqrec_28363e_9_1.svg",
+      "local_path": "_images/output_seqrec_28363e_9_1.svg",
+      "alt": "../_images/output_seqrec_28363e_9_1.svg"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tom-tat-suy-ra-loi-ich-ngan-han-va-dai-han-cua-nguoi-dung-co-the-dua-ra-du-doan-ve-muc-tiep-theo-ma-anh-ta-ua-thich-hieu-qua-hon-mang-than-kinh-phuc-tap-co-the-duoc-su-dung-de-thu-hut-loi-ich-ngan-han-cua-nguoi-dung-tu-cac-tuong-tac-tuan-tu",
+      "text": "16.7.6. Tóm tắt * Suy ra lợi ích ngắn hạn và dài hạn của người dùng có thể đưa ra dự đoán về mục tiếp theo mà anh ta ưa thích hiệu quả hơn* Mạng thần kinh phức tạp có thể được sử dụng để thu hút lợi ích ngắn hạn của người dùng từ các tương tác tuần tự."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bai-tap",
+      "text": "16.7.7. Bài tập"
+    },
+    {
+      "type": "list",
+      "ordered": false,
+      "items": [
+        "Tiến hành một nghiên cứu cắt bỏ bằng cách loại bỏ một trong các mạng\nxã hội ngang và dọc, thành phần nào quan trọng hơn?",
+        "Thay đổi siêu tham số \\(L\\) . Tương tác lịch sử lâu hơn có mang\nlại độ chính xác cao hơn không?",
+        "Ngoài nhiệm vụ đề xuất nhận thức trình tự mà chúng tôi đã giới thiệu\nở trên, còn có một loại tác vụ đề xuất nhận thức trình tự khác được\ngọi là đề xuất dựa trên phiên [Hidasi et al., 2015] . Bạn có thể giải thích\nsự khác biệt giữa hai nhiệm vụ này không?"
+      ]
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    }
+  ],
+  "images": [
+    {
+      "original_url": "https://vi.d2l.ai/_images/rec-caser.svg",
+      "local_path": "_images/rec-caser.svg",
+      "alt": "../_images/rec-caser.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/rec-seq-data.svg",
+      "local_path": "_images/rec-seq-data.svg",
+      "alt": "../_images/rec-seq-data.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_seqrec_28363e_9_1.svg",
+      "local_path": "_images/output_seqrec_28363e_9_1.svg",
+      "alt": "../_images/output_seqrec_28363e_9_1.svg"
+    }
+  ],
+  "text": "16.7. Hệ thống khuyến cáo Sequence-Aware\nTrong các phần trước, chúng tôi tóm tắt tác vụ đề xuất như một vấn đề\nhoàn thành ma trận mà không xem xét hành vi ngắn hạn của người dùng.\nTrong phần này, chúng tôi sẽ giới thiệu một mô hình khuyến nghị đưa các\nbản ghi tương tác người dùng theo thứ tự theo thứ tự vào tài khoản. Đây\nlà một đề xuất nhận thức trình tự [Quadrana et al., 2018] trong đó đầu vào là một danh\nsách có thứ tự và thường có dấu thời gian của hành động người dùng trong\nquá khứ. Một số văn học gần đây đã chứng minh tính hữu ích của việc kết\nhợp thông tin đó trong mô hình hóa các mô hình hành vi thời gian của\nngười dùng và khám phá sự trôi dạt quan tâm của họ.\nMô hình chúng tôi sẽ giới thiệu, Caser [Tang & Wang, 2018] , viết\ntắt của mô hình đề xuất nhúng trình tự phức tạp, thông qua các mạng thần\nkinh phức tạp nắm bắt các ảnh hưởng mô hình động của các hoạt động gần\nđây của người dùng. Thành phần chính của Caser bao gồm một mạng xã hội\nngang và một mạng xã hội theo chiều dọc, nhằm phát hiện ra các mẫu trình\ntự cấp độ và cấp điểm liên minh, tương ứng. Mẫu cấp điểm chỉ ra tác động\ncủa một mục trong trình tự lịch sử trên mục tiêu, trong khi mẫu cấp liên\nkết ngụ ý ảnh hưởng của một số hành động trước đó đối với mục tiêu tiếp\ntheo. Ví dụ, mua cả sữa và bơ cùng nhau dẫn đến xác suất mua bột cao hơn\nlà chỉ mua một trong số chúng. Hơn nữa, sở thích chung của người dùng\nhoặc sở thích dài hạn cũng được mô hình hóa trong các lớp kết nối hoàn\ntoàn cuối cùng, dẫn đến mô hình hóa toàn diện hơn về sở thích người\ndùng. Chi tiết của mô hình được mô tả như sau.\n16.7.1. Model Architectures\nTrong hệ thống đề xuất nhận thức được trình tự, mỗi người dùng được liên\nkết với một chuỗi một số mục từ bộ mục. Hãy để \\(S^u = (S_1^u, ... S_{|S_u|}^u)\\) biểu thị trình tự được đặt hàng.\nMục tiêu của Caser là giới thiệu mặt hàng bằng cách xem xét thị hiếu\nchung của người dùng cũng như ý định ngắn hạn. Giả sử chúng ta xem xét\ncác mục \\(L\\) trước đó, một ma trận nhúng đại diện cho các tương tác\ntrước đây cho bước thời gian \\(t\\) có thể được xây dựng:\ntrong đó \\(\\mathbf{Q} \\in \\mathbb{R}^{n \\times k}\\) đại diện cho\nnhúng mục và \\(\\mathbf{q}_i\\) biểu thị hàng \\(i^\\mathrm{th}\\) . \\(\\mathbf{E}^{(u, t)} \\in \\mathbb{R}^{L \\times k}\\) có thể được sử\ndụng để suy ra sự quan tâm thoáng qua của người dùng \\(u\\) tại bước\nthời gian \\(t\\) . Chúng ta có thể xem ma trận đầu vào \\(\\mathbf{E}^{(u, t)}\\) như một hình ảnh đó là đầu vào của hai thành\nphần phức tạp tiếp theo.\nLớp ghép ngang có \\(d\\) bộ lọc ngang \\(\\mathbf{F}^j \\in \\mathbb{R}^{h \\times k}, 1 \\leq j \\leq d, h = \\{1, ..., L\\}\\) ,\nvà lớp ghép dọc có \\(d'\\) bộ lọc dọc \\(\\mathbf{G}^j \\in \\mathbb{R}^{ L \\times 1}, 1 \\leq j \\leq d'\\) . Sau\nmột loạt các hoạt động phức tạp và pool, chúng tôi nhận được hai đầu ra:\ntrong đó \\(\\mathbf{o} \\in \\mathbb{R}^d\\) là đầu ra của mạng xã hội\nngang và \\(\\mathbf{o}' \\in \\mathbb{R}^{kd'}\\) là đầu ra của mạng\nghép dọc. Để đơn giản, chúng tôi bỏ qua các chi tiết về các hoạt động\nphức tạp và hồ bơi. Chúng được nối và đưa vào một lớp mạng thần kinh\nđược kết nối hoàn toàn để có được nhiều biểu diễn cấp cao hơn.\ntrong đó \\(\\mathbf{W} \\in \\mathbb{R}^{k \\times (d + kd')}\\) là ma\ntrận trọng lượng và \\(\\mathbf{b} \\in \\mathbb{R}^k\\) là thiên vị.\nVector đã học được \\(\\mathbf{z} \\in \\mathbb{R}^k\\) là đại diện cho ý\nđịnh ngắn hạn của người dùng.\nCuối cùng, hàm dự đoán kết hợp hương vị ngắn hạn và chung của người dùng\nvới nhau, được định nghĩa là:\ntrong đó \\(\\mathbf{V} \\in \\mathbb{R}^{n \\times 2k}\\) là một ma trận\nnhúng mục khác. \\(\\mathbf{b}' \\in \\mathbb{R}^n\\) là mục thiên vị cụ\nthể. \\(\\mathbf{P} \\in \\mathbb{R}^{m \\times k}\\) là ma trận nhúng\nngười dùng cho thị hiếu chung của người dùng. \\(\\mathbf{p}_u \\in \\mathbb{R}^{ k}\\) là hàng \\(u^\\mathrm{th}\\) của \\(P\\) và \\(\\mathbf{v}_i \\in \\mathbb{R}^{2k}\\) là hàng \\(i^\\mathrm{th}\\) của \\(i^\\mathrm{th}\\) .\nMô hình có thể được học với mất BPR hoặc Bản lề. Kiến trúc của Caser\nđược hiển thị dưới đây:\nFig. 16.7.1 Illustration of the Caser Model ¶\nĐầu tiên chúng tôi nhập các thư viện cần thiết.\n16.7.2. Model Implementation Code sau đây thực hiện mô hình Caser. Nó bao gồm một lớp phức tạp dọc, một lớp ghép ngang và một lớp kết nối đầy đủ.\n16.7.3. Sequential Dataset with Negative Sampling Để xử lý dữ liệu tương tác tuần tự, chúng ta cần thực hiện lại class Dataset. Đoạn code sau đây tạo ra một lớp tập dữ liệu mới có tên là SeqDataset . Trong mỗi mẫu, nó xuất ra danh tính người dùng, \\(L\\) trước đó của anh ấy đã tương tác các mục như một chuỗi và mục tiếp theo mà anh ta tương tác như mục tiêu. Hình dưới đây cho thấy quá trình tải dữ liệu cho một người dùng. Giả sử rằng người dùng này thích 9 bộ phim, chúng tôi sắp xếp chín bộ phim này theo thứ tự thời gian. Bộ phim mới nhất bị bỏ lại như là mục thử nghiệm. Đối với tám bộ phim còn lại, chúng ta có thể nhận được ba mẫu đào tạo, với mỗi mẫu chứa một chuỗi năm ( \\(L=5\\) ) phim và mục tiếp theo của nó làm mục tiêu. Các mẫu âm cũng được bao gồm trong tập dữ liệu tùy chỉnh.\nFig. 16.7.2 Illustration of the data generation process ¶\n16.7.4. Tải tập dữ liệu MovieLens 100K\nSau đó, chúng tôi đọc và chia bộ dữ liệu MovieLens 100K ở chế độ nhận\nthức được trình tự và tải dữ liệu đào tạo với dataloader tuần tự được\nthực hiện ở trên.\nCấu trúc dữ liệu đào tạo được hiển thị ở trên. Phần tử đầu tiên là danh\ntính người dùng, danh sách tiếp theo chỉ ra năm mục cuối cùng mà người\ndùng này thích và phần tử cuối cùng là mục mà người dùng này thích sau\nnăm mục.\n16.7.5. Đào tạo mô hình ngay bây giờ, chúng ta hãy đào tạo mô hình. Chúng tôi sử dụng cài đặt tương tự như NeuMF, bao gồm tốc độ học tập, trình tối ưu hóa và \\(k\\) , trong phần cuối để kết quả có thể so sánh được.\n16.7.6. Tóm tắt * Suy ra lợi ích ngắn hạn và dài hạn của người dùng có thể đưa ra dự đoán về mục tiếp theo mà anh ta ưa thích hiệu quả hơn* Mạng thần kinh phức tạp có thể được sử dụng để thu hút lợi ích ngắn hạn của người dùng từ các tương tác tuần tự.\n16.7.7. Bài tập\nTiến hành một nghiên cứu cắt bỏ bằng cách loại bỏ một trong các mạng\nxã hội ngang và dọc, thành phần nào quan trọng hơn?\nThay đổi siêu tham số \\(L\\) . Tương tác lịch sử lâu hơn có mang\nlại độ chính xác cao hơn không?\nNgoài nhiệm vụ đề xuất nhận thức trình tự mà chúng tôi đã giới thiệu\nở trên, còn có một loại tác vụ đề xuất nhận thức trình tự khác được\ngọi là đề xuất dựa trên phiên [Hidasi et al., 2015] . Bạn có thể giải thích\nsự khác biệt giữa hai nhiệm vụ này không?\nDiscussions"
+}

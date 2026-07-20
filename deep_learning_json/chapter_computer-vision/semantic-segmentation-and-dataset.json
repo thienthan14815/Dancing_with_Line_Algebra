@@ -1,0 +1,425 @@
+{
+  "url": "https://vi.d2l.ai/chapter_computer-vision/semantic-segmentation-and-dataset.html",
+  "chapter": "chapter_computer-vision",
+  "title": "13.9. Phân đoạn ngữ nghĩa và tập dữ liệu",
+  "crawled_at": "2026-07-20T12:40:46.695779+00:00",
+  "headings": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "phan-doan-ngu-nghia-va-tap-du-lieu",
+      "text": "13.9. Phân đoạn ngữ nghĩa và tập dữ liệu"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "phan-doan-hinh-anh-va-phan-doan-phien-ban",
+      "text": "13.9.1. Phân đoạn hình ảnh và Phân đoạn phiên bản"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tap-du-lieu-phan-doan-ngu-nghia-pascal-voc2012",
+      "text": "13.9.2. Tập dữ liệu phân đoạn ngữ nghĩa Pascal VOC2012"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "xu-ly-so-bo-du-lieu",
+      "text": "13.9.2.1. Xử lý sơ bộ dữ liệu"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "custom-semantic-segmentation-dataset-class",
+      "text": "13.9.2.2. Custom Semantic Segmentation Dataset Class"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "doc-du-lieu",
+      "text": "13.9.2.3. Đọc dữ liệu"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "putting-all-things-together",
+      "text": "13.9.2.4. Putting All Things Together"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tom-tat",
+      "text": "13.9.3. Tóm tắt"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bai-tap",
+      "text": "13.9.4. Bài tập"
+    }
+  ],
+  "content": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "phan-doan-ngu-nghia-va-tap-du-lieu",
+      "text": "13.9. Phân đoạn ngữ nghĩa và tập dữ liệu"
+    },
+    {
+      "type": "paragraph",
+      "text": "Khi thảo luận về các tác vụ phát hiện đối tượng trong Section 13.3 — Section 13.8 , các hộp giới hạn hình chữ\nnhật được sử dụng để dán nhãn và dự đoán các đối tượng trong ảnh. Phần\nnày sẽ thảo luận về vấn đề phân đoạn * ngữ nghĩa * , tập trung vào cách\nchia hình ảnh thành các vùng thuộc các lớp ngữ nghĩa khác nhau. Khác với\nphát hiện đối tượng, phân đoạn ngữ nghĩa nhận ra và hiểu những gì có\ntrong hình ảnh ở cấp độ pixel: ghi nhãn và dự đoán các vùng ngữ nghĩa\ncủa nó ở mức pixel. Fig. 13.9.1 hiển thị nhãn của chó,\nmèo và nền của hình ảnh trong phân khúc ngữ nghĩa. So với trong phát\nhiện đối tượng, các đường viền cấp pixel được dán nhãn trong phân đoạn\nngữ nghĩa rõ ràng là hạt mịn hơn."
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/segmentation.svg",
+      "local_path": "_images/segmentation.svg",
+      "alt": "../_images/segmentation.svg"
+    },
+    {
+      "type": "paragraph",
+      "text": "Fig. 13.9.1 Labels of the dog, cat, and background of the image in semantic\nsegmentation. ¶"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "phan-doan-hinh-anh-va-phan-doan-phien-ban",
+      "text": "13.9.1. Phân đoạn hình ảnh và Phân đoạn phiên bản"
+    },
+    {
+      "type": "paragraph",
+      "text": "Ngoài ra còn có hai nhiệm vụ quan trọng trong lĩnh vực thị giác máy tính\ntương tự như phân đoạn ngữ nghĩa, đó là phân đoạn hình ảnh và phân đoạn\nphiên bản. Chúng tôi sẽ phân biệt ngắn gọn chúng với phân khúc ngữ nghĩa\nnhư sau."
+    },
+    {
+      "type": "list",
+      "ordered": false,
+      "items": [
+        "Phân khúc hình ảnh chia một hình ảnh thành nhiều vùng cấu thành.\nCác phương pháp cho loại vấn đề này thường sử dụng mối tương quan\ngiữa các pixel trong hình ảnh. Nó không cần thông tin nhãn về pixel\nhình ảnh trong quá trình đào tạo và nó không thể đảm bảo rằng các\nvùng được phân đoạn sẽ có ngữ nghĩa mà chúng tôi hy vọng sẽ có được\ntrong quá trình dự đoán. Chụp ảnh trong Fig. 13.9.1 làm đầu vào, phân đoạn hình ảnh có thể chia chó thành hai vùng: một\nvùng che miệng và mắt chủ yếu là màu đen, và phần còn lại bao phủ\nphần còn lại của cơ thể chủ yếu là màu vàng.",
+        "Phân khúc Instance* còn được gọi là * phát hiện và phân đoạn\nđồng thời*. Nó nghiên cứu làm thế nào để nhận ra các vùng cấp\npixel của mỗi đối tượng trong một hình ảnh. Khác với phân đoạn ngữ\nnghĩa, phân đoạn phiên bản cần phân biệt không chỉ ngữ nghĩa, mà\ncòn các trường hợp đối tượng khác nhau. Ví dụ, nếu có hai chú chó\ntrong hình ảnh, phân đoạn ví dụ cần phân biệt một pixel thuộc về\ncái nào trong hai chú chó.",
+        "Phân khúc Instance* còn được gọi là * phát hiện và phân đoạn\nđồng thời*. Nó nghiên cứu làm thế nào để nhận ra các vùng cấp\npixel của mỗi đối tượng trong một hình ảnh. Khác với phân đoạn ngữ\nnghĩa, phân đoạn phiên bản cần phân biệt không chỉ ngữ nghĩa, mà\ncòn các trường hợp đối tượng khác nhau. Ví dụ, nếu có hai chú chó\ntrong hình ảnh, phân đoạn ví dụ cần phân biệt một pixel thuộc về\ncái nào trong hai chú chó."
+      ]
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tap-du-lieu-phan-doan-ngu-nghia-pascal-voc2012",
+      "text": "13.9.2. Tập dữ liệu phân đoạn ngữ nghĩa Pascal VOC2012"
+    },
+    {
+      "type": "paragraph",
+      "text": "Trên tập dữ liệu phân đoạn ngữ nghĩa quan trọng nhất là Pascal\nVOC2012 . Sau đây,\nchúng ta sẽ xem tập dữ liệu này."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "%matplotlib inline\nimport os\nfrom mxnet import gluon, image, np, npx\nfrom d2l import mxnet as d2l\n\nnpx.set_np()"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "%matplotlib inline\nimport os\nimport torch\nimport torchvision\nfrom d2l import torch as d2l"
+    },
+    {
+      "type": "paragraph",
+      "text": "Tệp tar của tập dữ liệu khoảng 2 GB, vì vậy có thể mất một thời gian để\ntải xuống tệp. Tập dữ liệu được trích xuất nằm ở ../data/VOCdevkit/VOC2012 ."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "#@save\nd2l.DATA_HUB['voc2012'] = (d2l.DATA_URL + 'VOCtrainval_11-May-2012.tar',\n                           '4e443f8a2eca6b1dac8a6c57641b67dd40621a49')\n\nvoc_dir = d2l.download_extract('voc2012', 'VOCdevkit/VOC2012')"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "#@save\nd2l.DATA_HUB['voc2012'] = (d2l.DATA_URL + 'VOCtrainval_11-May-2012.tar',\n                           '4e443f8a2eca6b1dac8a6c57641b67dd40621a49')\n\nvoc_dir = d2l.download_extract('voc2012', 'VOCdevkit/VOC2012')"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "Downloading ../data/VOCtrainval_11-May-2012.tar from http://d2l-data.s3-accelerate.amazonaws.com/VOCtrainval_11-May-2012.tar..."
+    },
+    {
+      "type": "paragraph",
+      "text": "Sau khi nhập đường dẫn ../data/VOCdevkit/VOC2012 , chúng ta có thể\nthấy các thành phần khác nhau của tập dữ liệu. Đường dẫn ImageSets/Segmentation chứa các tệp văn bản chỉ định các mẫu đào tạo\nvà thử nghiệm, trong khi các đường dẫn JPEGImages và SegmentationClass lưu trữ hình ảnh đầu vào và nhãn cho mỗi ví dụ\ntương ứng. Nhãn ở đây cũng ở định dạng hình ảnh, có cùng kích thước với\nhình ảnh đầu vào được dán nhãn của nó. Bên cạnh đó, các pixel có cùng\nmàu trong bất kỳ hình ảnh nhãn nào thuộc cùng một lớp ngữ nghĩa. Sau đây\nxác định hàm read_voc_images thành đọc tất cả các hình ảnh đầu vào\nvà nhãn vào bộ nhớ."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "#@save\ndef read_voc_images(voc_dir, is_train=True):\n    \"\"\"Read all VOC feature and label images.\"\"\"\n    txt_fname = os.path.join(voc_dir, 'ImageSets', 'Segmentation',\n                             'train.txt' if is_train else 'val.txt')\n    with open(txt_fname, 'r') as f:\n        images = f.read().split()\n    features, labels = [], []\n    for i, fname in enumerate(images):\n        features.append(image.imread(os.path.join(\n            voc_dir, 'JPEGImages', f'{fname}.jpg')))\n        labels.append(image.imread(os.path.join(\n            voc_dir, 'SegmentationClass', f'{fname}.png')))\n    return features, labels\n\ntrain_features, train_labels = read_voc_images(voc_dir, True)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "#@save\ndef read_voc_images(voc_dir, is_train=True):\n    \"\"\"Read all VOC feature and label images.\"\"\"\n    txt_fname = os.path.join(voc_dir, 'ImageSets', 'Segmentation',\n                             'train.txt' if is_train else 'val.txt')\n    mode = torchvision.io.image.ImageReadMode.RGB\n    with open(txt_fname, 'r') as f:\n        images = f.read().split()\n    features, labels = [], []\n    for i, fname in enumerate(images):\n        features.append(torchvision.io.read_image(os.path.join(\n            voc_dir, 'JPEGImages', f'{fname}.jpg')))\n        labels.append(torchvision.io.read_image(os.path.join(\n            voc_dir, 'SegmentationClass' ,f'{fname}.png'), mode))\n    return features, labels\n\ntrain_features, train_labels = read_voc_images(voc_dir, True)"
+    },
+    {
+      "type": "paragraph",
+      "text": "Chúng tôi vẽ năm hình ảnh đầu vào đầu tiên và nhãn của chúng. Trong hình\nảnh nhãn, màu trắng và đen đại diện cho đường viền và nền tương ứng,\ntrong khi các màu khác tương ứng với các lớp khác nhau."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "n = 5\nimgs = train_features[0:n] + train_labels[0:n]\nd2l.show_images(imgs, 2, n);"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_semantic-segmentation-and-dataset_23ff18_30_0.png",
+      "local_path": "_images/output_semantic-segmentation-and-dataset_23ff18_30_0.png",
+      "alt": "../_images/output_semantic-segmentation-and-dataset_23ff18_30_0.png"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "n = 5\nimgs = train_features[0:n] + train_labels[0:n]\nimgs = [img.permute(1,2,0) for img in imgs]\nd2l.show_images(imgs, 2, n);"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_semantic-segmentation-and-dataset_23ff18_33_0.png",
+      "local_path": "_images/output_semantic-segmentation-and-dataset_23ff18_33_0.png",
+      "alt": "../_images/output_semantic-segmentation-and-dataset_23ff18_33_0.png"
+    },
+    {
+      "type": "paragraph",
+      "text": "Tiếp theo, chúng ta liệt kê các giá trị màu RGB và tên lớp cho tất cả\ncác nhãn trong tập dữ liệu này."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "#@save\nVOC_COLORMAP = [[0, 0, 0], [128, 0, 0], [0, 128, 0], [128, 128, 0],\n                [0, 0, 128], [128, 0, 128], [0, 128, 128], [128, 128, 128],\n                [64, 0, 0], [192, 0, 0], [64, 128, 0], [192, 128, 0],\n                [64, 0, 128], [192, 0, 128], [64, 128, 128], [192, 128, 128],\n                [0, 64, 0], [128, 64, 0], [0, 192, 0], [128, 192, 0],\n                [0, 64, 128]]\n\n#@save\nVOC_CLASSES = ['background', 'aeroplane', 'bicycle', 'bird', 'boat',\n               'bottle', 'bus', 'car', 'cat', 'chair', 'cow',\n               'diningtable', 'dog', 'horse', 'motorbike', 'person',\n               'potted plant', 'sheep', 'sofa', 'train', 'tv/monitor']"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "#@save\nVOC_COLORMAP = [[0, 0, 0], [128, 0, 0], [0, 128, 0], [128, 128, 0],\n                [0, 0, 128], [128, 0, 128], [0, 128, 128], [128, 128, 128],\n                [64, 0, 0], [192, 0, 0], [64, 128, 0], [192, 128, 0],\n                [64, 0, 128], [192, 0, 128], [64, 128, 128], [192, 128, 128],\n                [0, 64, 0], [128, 64, 0], [0, 192, 0], [128, 192, 0],\n                [0, 64, 128]]\n\n#@save\nVOC_CLASSES = ['background', 'aeroplane', 'bicycle', 'bird', 'boat',\n               'bottle', 'bus', 'car', 'cat', 'chair', 'cow',\n               'diningtable', 'dog', 'horse', 'motorbike', 'person',\n               'potted plant', 'sheep', 'sofa', 'train', 'tv/monitor']"
+    },
+    {
+      "type": "paragraph",
+      "text": "Với hai hằng số được định nghĩa ở trên, chúng ta có thể thuận tiện tìm\nchỉ mục lớp cho mỗi pixel trong một nhãy. Chúng tôi xác định hàm voc_colormap2label để xây dựng ánh xạ từ các giá trị màu RGB ở trên\nđến các chỉ số lớp và hàm voc_label_indices để ánh xạ bất kỳ giá trị\nRGB nào với chỉ số lớp của chúng trong bộ dữ liệu Pascal VOC2012 này."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "#@save\ndef voc_colormap2label():\n    \"\"\"Build the mapping from RGB to class indices for VOC labels.\"\"\"\n    colormap2label = np.zeros(256 ** 3)\n    for i, colormap in enumerate(VOC_COLORMAP):\n        colormap2label[\n            (colormap[0] * 256 + colormap[1]) * 256 + colormap[2]] = i\n    return colormap2label\n\n#@save\ndef voc_label_indices(colormap, colormap2label):\n    \"\"\"Map any RGB values in VOC labels to their class indices.\"\"\"\n    colormap = colormap.astype(np.int32)\n    idx = ((colormap[:, :, 0] * 256 + colormap[:, :, 1]) * 256\n           + colormap[:, :, 2])\n    return colormap2label[idx]"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "#@save\ndef voc_colormap2label():\n    \"\"\"Build the mapping from RGB to class indices for VOC labels.\"\"\"\n    colormap2label = torch.zeros(256 ** 3, dtype=torch.long)\n    for i, colormap in enumerate(VOC_COLORMAP):\n        colormap2label[\n            (colormap[0] * 256 + colormap[1]) * 256 + colormap[2]] = i\n    return colormap2label\n\n#@save\ndef voc_label_indices(colormap, colormap2label):\n    \"\"\"Map any RGB values in VOC labels to their class indices.\"\"\"\n    colormap = colormap.permute(1, 2, 0).numpy().astype('int32')\n    idx = ((colormap[:, :, 0] * 256 + colormap[:, :, 1]) * 256\n           + colormap[:, :, 2])\n    return colormap2label[idx]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Ví dụ, trong ảnh ví dụ đầu tiên, chỉ mục lớp cho phần trước của máy bay\nlà 1, trong khi chỉ mục nền là 0."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "y = voc_label_indices(train_labels[0], voc_colormap2label())\ny[105:115, 130:140], VOC_CLASSES[1]"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "(array([[0., 0., 0., 0., 0., 0., 0., 0., 0., 1.],\n        [0., 0., 0., 0., 0., 0., 0., 1., 1., 1.],\n        [0., 0., 0., 0., 0., 0., 1., 1., 1., 1.],\n        [0., 0., 0., 0., 0., 1., 1., 1., 1., 1.],\n        [0., 0., 0., 0., 0., 1., 1., 1., 1., 1.],\n        [0., 0., 0., 0., 1., 1., 1., 1., 1., 1.],\n        [0., 0., 0., 0., 0., 1., 1., 1., 1., 1.],\n        [0., 0., 0., 0., 0., 1., 1., 1., 1., 1.],\n        [0., 0., 0., 0., 0., 0., 1., 1., 1., 1.],\n        [0., 0., 0., 0., 0., 0., 0., 0., 1., 1.]]),\n 'aeroplane')"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "y = voc_label_indices(train_labels[0], voc_colormap2label())\ny[105:115, 130:140], VOC_CLASSES[1]"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "(tensor([[0, 0, 0, 0, 0, 0, 0, 0, 0, 1],\n         [0, 0, 0, 0, 0, 0, 0, 1, 1, 1],\n         [0, 0, 0, 0, 0, 0, 1, 1, 1, 1],\n         [0, 0, 0, 0, 0, 1, 1, 1, 1, 1],\n         [0, 0, 0, 0, 0, 1, 1, 1, 1, 1],\n         [0, 0, 0, 0, 1, 1, 1, 1, 1, 1],\n         [0, 0, 0, 0, 0, 1, 1, 1, 1, 1],\n         [0, 0, 0, 0, 0, 1, 1, 1, 1, 1],\n         [0, 0, 0, 0, 0, 0, 1, 1, 1, 1],\n         [0, 0, 0, 0, 0, 0, 0, 0, 1, 1]]),\n 'aeroplane')"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "xu-ly-so-bo-du-lieu",
+      "text": "13.9.2.1. Xử lý sơ bộ dữ liệu"
+    },
+    {
+      "type": "paragraph",
+      "text": "Trong các thí nghiệm trước đó như trong Section 7.1 — Section 7.4 , hình ảnh được thay\nđổi lại để phù hợp với hình dạng đầu vào yêu cầu của mô hình. Tuy nhiên,\ntrong phân đoạn ngữ nghĩa, làm như vậy đòi hỏi phải thay đổi lại các lớp\npixel dự đoán trở lại hình dạng ban đầu của hình ảnh đầu vào. Việc tái\ncặn như vậy có thể không chính xác, đặc biệt là đối với các vùng được\nphân đoạn với các lớp khác nhau. Để tránh sự cố này, chúng tôi cắt hình\nảnh thành một hình dạng fixed thay vì rescaling. Cụ thể, sử dụng cắt\nxén ngẫu nhiên từ nâng hình ảnh, chúng ta cắt cùng một vùng của hình ảnh\nđầu vào và nhãn."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "#@save\ndef voc_rand_crop(feature, label, height, width):\n    \"\"\"Randomly crop both feature and label images.\"\"\"\n    feature, rect = image.random_crop(feature, (width, height))\n    label = image.fixed_crop(label, *rect)\n    return feature, label\n\nimgs = []\nfor _ in range(n):\n    imgs += voc_rand_crop(train_features[0], train_labels[0], 200, 300)\nd2l.show_images(imgs[::2] + imgs[1::2], 2, n);"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_semantic-segmentation-and-dataset_23ff18_66_0.png",
+      "local_path": "_images/output_semantic-segmentation-and-dataset_23ff18_66_0.png",
+      "alt": "../_images/output_semantic-segmentation-and-dataset_23ff18_66_0.png"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "#@save\ndef voc_rand_crop(feature, label, height, width):\n    \"\"\"Randomly crop both feature and label images.\"\"\"\n    rect = torchvision.transforms.RandomCrop.get_params(\n        feature, (height, width))\n    feature = torchvision.transforms.functional.crop(feature, *rect)\n    label = torchvision.transforms.functional.crop(label, *rect)\n    return feature, label\n\nimgs = []\nfor _ in range(n):\n    imgs += voc_rand_crop(train_features[0], train_labels[0], 200, 300)\n\nimgs = [img.permute(1, 2, 0) for img in imgs]\nd2l.show_images(imgs[::2] + imgs[1::2], 2, n);"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_semantic-segmentation-and-dataset_23ff18_69_0.png",
+      "local_path": "_images/output_semantic-segmentation-and-dataset_23ff18_69_0.png",
+      "alt": "../_images/output_semantic-segmentation-and-dataset_23ff18_69_0.png"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "custom-semantic-segmentation-dataset-class",
+      "text": "13.9.2.2. Custom Semantic Segmentation Dataset Class"
+    },
+    {
+      "type": "paragraph",
+      "text": "Chúng tôi xác định một tập dữ liệu phân đoạn ngữ nghĩa tùy chỉnh lớp VOCSegDataset bằng cách kế thừa lớp Dataset được cung cấp bởi\ncác API cấp cao. Bằng cách thực hiện hàm __getitem__ , chúng ta có\nthể tùy ý truy cập vào hình ảnh đầu vào được lập chỉ mục là idx trong tập dữ liệu và chỉ số lớp của mỗi pixel trong hình ảnh này. Vì một\nsố hình ảnh trong tập dữ liệu có kích thước nhỏ hơn kích thước đầu ra\ncủa cắt ngẫu nhiên, các ví dụ này được lọc ra bởi một hàm filter tùy\nchỉnh. Ngoài ra, chúng tôi cũng xác định hàm normalize_image để\nchuẩn hóa các giá trị của ba kênh RGB của hình ảnh đầu vào."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "#@save\nclass VOCSegDataset(gluon.data.Dataset):\n    \"\"\"A customized dataset to load the VOC dataset.\"\"\"\n    def __init__(self, is_train, crop_size, voc_dir):\n        self.rgb_mean = np.array([0.485, 0.456, 0.406])\n        self.rgb_std = np.array([0.229, 0.224, 0.225])\n        self.crop_size = crop_size\n        features, labels = read_voc_images(voc_dir, is_train=is_train)\n        self.features = [self.normalize_image(feature)\n                         for feature in self.filter(features)]\n        self.labels = self.filter(labels)\n        self.colormap2label = voc_colormap2label()\n        print('read ' + str(len(self.features)) + ' examples')\n\n    def normalize_image(self, img):\n        return (img.astype('float32') / 255 - self.rgb_mean) / self.rgb_std\n\n    def filter(self, imgs):\n        return [img for img in imgs if (\n            img.shape[0] >= self.crop_size[0] and\n            img.shape[1] >= self.crop_size[1])]\n\n    def __getitem__(self, idx):\n        feature, label = voc_rand_crop(self.features[idx], self.labels[idx],\n                                       *self.crop_size)\n        return (feature.transpose(2, 0, 1),\n                voc_label_indices(label, self.colormap2label))\n\n    def __len__(self):\n        return len(self.features)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "#@save\nclass VOCSegDataset(torch.utils.data.Dataset):\n    \"\"\"A customized dataset to load the VOC dataset.\"\"\"\n\n    def __init__(self, is_train, crop_size, voc_dir):\n        self.transform = torchvision.transforms.Normalize(\n            mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])\n        self.crop_size = crop_size\n        features, labels = read_voc_images(voc_dir, is_train=is_train)\n        self.features = [self.normalize_image(feature)\n                         for feature in self.filter(features)]\n        self.labels = self.filter(labels)\n        self.colormap2label = voc_colormap2label()\n        print('read ' + str(len(self.features)) + ' examples')\n\n    def normalize_image(self, img):\n        return self.transform(img.float() / 255)\n\n    def filter(self, imgs):\n        return [img for img in imgs if (\n            img.shape[1] >= self.crop_size[0] and\n            img.shape[2] >= self.crop_size[1])]\n\n    def __getitem__(self, idx):\n        feature, label = voc_rand_crop(self.features[idx], self.labels[idx],\n                                       *self.crop_size)\n        return (feature, voc_label_indices(label, self.colormap2label))\n\n    def __len__(self):\n        return len(self.features)"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "doc-du-lieu",
+      "text": "13.9.2.3. Đọc dữ liệu"
+    },
+    {
+      "type": "paragraph",
+      "text": "Chúng tôi sử dụng lớp VOCSegDatase t tùy chỉnh để tạo các phiên bản\ncủa bộ đào tạo và bộ kiểm tra, tương ứng. Giả sử rằng chúng ta chỉ định\nrằng hình dạng đầu ra của hình ảnh được cắt ngẫu nhiên là \\(320\\times 480\\) . Dưới đây chúng ta có thể xem số ví dụ được giữ\nlại trong bộ đào tạo và bộ kiểm tra."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "crop_size = (320, 480)\nvoc_train = VOCSegDataset(True, crop_size, voc_dir)\nvoc_test = VOCSegDataset(False, crop_size, voc_dir)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "read 1114 examples\nread 1078 examples"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "crop_size = (320, 480)\nvoc_train = VOCSegDataset(True, crop_size, voc_dir)\nvoc_test = VOCSegDataset(False, crop_size, voc_dir)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "read 1114 examples\nread 1078 examples"
+    },
+    {
+      "type": "paragraph",
+      "text": "Đặt kích thước lô thành 64, chúng tôi xác định bộ lặp dữ liệu cho bộ đào\ntạo. Hãy để chúng tôi in hình dạng của minibatch đầu tiên. Khác với phân\nloại hình ảnh hoặc phát hiện đối tượng, nhãn ở đây là hàng chục ba\nchiều."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "batch_size = 64\ntrain_iter = gluon.data.DataLoader(voc_train, batch_size, shuffle=True,\n                                   last_batch='discard',\n                                   num_workers=d2l.get_dataloader_workers())\nfor X, Y in train_iter:\n    print(X.shape)\n    print(Y.shape)\n    break"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "(64, 3, 320, 480)\n(64, 320, 480)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "batch_size = 64\ntrain_iter = torch.utils.data.DataLoader(voc_train, batch_size, shuffle=True,\n                                    drop_last=True,\n                                    num_workers=d2l.get_dataloader_workers())\nfor X, Y in train_iter:\n    print(X.shape)\n    print(Y.shape)\n    break"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "torch.Size([64, 3, 320, 480])\ntorch.Size([64, 320, 480])"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "putting-all-things-together",
+      "text": "13.9.2.4. Putting All Things Together"
+    },
+    {
+      "type": "paragraph",
+      "text": "Cuối cùng, chúng tôi xác định hàm load_data_voc sau để tải xuống và\nđọc tập dữ liệu phân đoạn ngữ nghĩa Pascal VOC2012. Nó trả về bộ lặp dữ\nliệu cho cả tập dữ liệu đào tạo và kiểm tra."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "#@save\ndef load_data_voc(batch_size, crop_size):\n    \"\"\"Load the VOC semantic segmentation dataset.\"\"\"\n    voc_dir = d2l.download_extract('voc2012', os.path.join(\n        'VOCdevkit', 'VOC2012'))\n    num_workers = d2l.get_dataloader_workers()\n    train_iter = gluon.data.DataLoader(\n        VOCSegDataset(True, crop_size, voc_dir), batch_size,\n        shuffle=True, last_batch='discard', num_workers=num_workers)\n    test_iter = gluon.data.DataLoader(\n        VOCSegDataset(False, crop_size, voc_dir), batch_size,\n        last_batch='discard', num_workers=num_workers)\n    return train_iter, test_iter"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "#@save\ndef load_data_voc(batch_size, crop_size):\n    \"\"\"Load the VOC semantic segmentation dataset.\"\"\"\n    voc_dir = d2l.download_extract('voc2012', os.path.join(\n        'VOCdevkit', 'VOC2012'))\n    num_workers = d2l.get_dataloader_workers()\n    train_iter = torch.utils.data.DataLoader(\n        VOCSegDataset(True, crop_size, voc_dir), batch_size,\n        shuffle=True, drop_last=True, num_workers=num_workers)\n    test_iter = torch.utils.data.DataLoader(\n        VOCSegDataset(False, crop_size, voc_dir), batch_size,\n        drop_last=True, num_workers=num_workers)\n    return train_iter, test_iter"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tom-tat",
+      "text": "13.9.3. Tóm tắt"
+    },
+    {
+      "type": "list",
+      "ordered": false,
+      "items": [
+        "Phân đoạn ngữ nghĩa nhận ra và hiểu những gì trong một hình ảnh ở mức\npixel bằng cách chia hình ảnh thành các vùng thuộc các lớp ngữ nghĩa\nkhác nhau.",
+        "Trên của tập dữ liệu phân khúc ngữ nghĩa quan trọng nhất là Pascal\nVOC2012.",
+        "Trong phân đoạn ngữ nghĩa, vì hình ảnh đầu vào và nhãn tương ứng\nmột-một trên pixel, hình ảnh đầu vào được cắt ngẫu nhiên thành một\nhình dạng cố định chứ không phải rescaled."
+      ]
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bai-tap",
+      "text": "13.9.4. Bài tập"
+    },
+    {
+      "type": "list",
+      "ordered": true,
+      "items": [
+        "Làm thế nào phân khúc ngữ nghĩa có thể được áp dụng trong các phương\ntiện tự trị và chẩn đoán hình ảnh y tế? Bạn có thể nghĩ về các ứng\ndụng khác?",
+        "Nhớ lại các mô tả về tăng cường dữ liệu trong Section 13.1 . Phương pháp nâng hình ảnh nào\nđược sử dụng trong phân loại hình ảnh sẽ không khả thi được áp dụng\ntrong phân khúc ngữ nghĩa?"
+      ]
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    }
+  ],
+  "images": [
+    {
+      "original_url": "https://vi.d2l.ai/_images/segmentation.svg",
+      "local_path": "_images/segmentation.svg",
+      "alt": "../_images/segmentation.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_semantic-segmentation-and-dataset_23ff18_30_0.png",
+      "local_path": "_images/output_semantic-segmentation-and-dataset_23ff18_30_0.png",
+      "alt": "../_images/output_semantic-segmentation-and-dataset_23ff18_30_0.png"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_semantic-segmentation-and-dataset_23ff18_33_0.png",
+      "local_path": "_images/output_semantic-segmentation-and-dataset_23ff18_33_0.png",
+      "alt": "../_images/output_semantic-segmentation-and-dataset_23ff18_33_0.png"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_semantic-segmentation-and-dataset_23ff18_66_0.png",
+      "local_path": "_images/output_semantic-segmentation-and-dataset_23ff18_66_0.png",
+      "alt": "../_images/output_semantic-segmentation-and-dataset_23ff18_66_0.png"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_semantic-segmentation-and-dataset_23ff18_69_0.png",
+      "local_path": "_images/output_semantic-segmentation-and-dataset_23ff18_69_0.png",
+      "alt": "../_images/output_semantic-segmentation-and-dataset_23ff18_69_0.png"
+    }
+  ],
+  "text": "13.9. Phân đoạn ngữ nghĩa và tập dữ liệu\nKhi thảo luận về các tác vụ phát hiện đối tượng trong Section 13.3 — Section 13.8 , các hộp giới hạn hình chữ\nnhật được sử dụng để dán nhãn và dự đoán các đối tượng trong ảnh. Phần\nnày sẽ thảo luận về vấn đề phân đoạn * ngữ nghĩa * , tập trung vào cách\nchia hình ảnh thành các vùng thuộc các lớp ngữ nghĩa khác nhau. Khác với\nphát hiện đối tượng, phân đoạn ngữ nghĩa nhận ra và hiểu những gì có\ntrong hình ảnh ở cấp độ pixel: ghi nhãn và dự đoán các vùng ngữ nghĩa\ncủa nó ở mức pixel. Fig. 13.9.1 hiển thị nhãn của chó,\nmèo và nền của hình ảnh trong phân khúc ngữ nghĩa. So với trong phát\nhiện đối tượng, các đường viền cấp pixel được dán nhãn trong phân đoạn\nngữ nghĩa rõ ràng là hạt mịn hơn.\nFig. 13.9.1 Labels of the dog, cat, and background of the image in semantic\nsegmentation. ¶\n13.9.1. Phân đoạn hình ảnh và Phân đoạn phiên bản\nNgoài ra còn có hai nhiệm vụ quan trọng trong lĩnh vực thị giác máy tính\ntương tự như phân đoạn ngữ nghĩa, đó là phân đoạn hình ảnh và phân đoạn\nphiên bản. Chúng tôi sẽ phân biệt ngắn gọn chúng với phân khúc ngữ nghĩa\nnhư sau.\nPhân khúc hình ảnh chia một hình ảnh thành nhiều vùng cấu thành.\nCác phương pháp cho loại vấn đề này thường sử dụng mối tương quan\ngiữa các pixel trong hình ảnh. Nó không cần thông tin nhãn về pixel\nhình ảnh trong quá trình đào tạo và nó không thể đảm bảo rằng các\nvùng được phân đoạn sẽ có ngữ nghĩa mà chúng tôi hy vọng sẽ có được\ntrong quá trình dự đoán. Chụp ảnh trong Fig. 13.9.1 làm đầu vào, phân đoạn hình ảnh có thể chia chó thành hai vùng: một\nvùng che miệng và mắt chủ yếu là màu đen, và phần còn lại bao phủ\nphần còn lại của cơ thể chủ yếu là màu vàng.\nPhân khúc Instance* còn được gọi là * phát hiện và phân đoạn\nđồng thời*. Nó nghiên cứu làm thế nào để nhận ra các vùng cấp\npixel của mỗi đối tượng trong một hình ảnh. Khác với phân đoạn ngữ\nnghĩa, phân đoạn phiên bản cần phân biệt không chỉ ngữ nghĩa, mà\ncòn các trường hợp đối tượng khác nhau. Ví dụ, nếu có hai chú chó\ntrong hình ảnh, phân đoạn ví dụ cần phân biệt một pixel thuộc về\ncái nào trong hai chú chó.\nPhân khúc Instance* còn được gọi là * phát hiện và phân đoạn\nđồng thời*. Nó nghiên cứu làm thế nào để nhận ra các vùng cấp\npixel của mỗi đối tượng trong một hình ảnh. Khác với phân đoạn ngữ\nnghĩa, phân đoạn phiên bản cần phân biệt không chỉ ngữ nghĩa, mà\ncòn các trường hợp đối tượng khác nhau. Ví dụ, nếu có hai chú chó\ntrong hình ảnh, phân đoạn ví dụ cần phân biệt một pixel thuộc về\ncái nào trong hai chú chó.\n13.9.2. Tập dữ liệu phân đoạn ngữ nghĩa Pascal VOC2012\nTrên tập dữ liệu phân đoạn ngữ nghĩa quan trọng nhất là Pascal\nVOC2012 . Sau đây,\nchúng ta sẽ xem tập dữ liệu này.\nTệp tar của tập dữ liệu khoảng 2 GB, vì vậy có thể mất một thời gian để\ntải xuống tệp. Tập dữ liệu được trích xuất nằm ở ../data/VOCdevkit/VOC2012 .\nSau khi nhập đường dẫn ../data/VOCdevkit/VOC2012 , chúng ta có thể\nthấy các thành phần khác nhau của tập dữ liệu. Đường dẫn ImageSets/Segmentation chứa các tệp văn bản chỉ định các mẫu đào tạo\nvà thử nghiệm, trong khi các đường dẫn JPEGImages và SegmentationClass lưu trữ hình ảnh đầu vào và nhãn cho mỗi ví dụ\ntương ứng. Nhãn ở đây cũng ở định dạng hình ảnh, có cùng kích thước với\nhình ảnh đầu vào được dán nhãn của nó. Bên cạnh đó, các pixel có cùng\nmàu trong bất kỳ hình ảnh nhãn nào thuộc cùng một lớp ngữ nghĩa. Sau đây\nxác định hàm read_voc_images thành đọc tất cả các hình ảnh đầu vào\nvà nhãn vào bộ nhớ.\nChúng tôi vẽ năm hình ảnh đầu vào đầu tiên và nhãn của chúng. Trong hình\nảnh nhãn, màu trắng và đen đại diện cho đường viền và nền tương ứng,\ntrong khi các màu khác tương ứng với các lớp khác nhau.\nTiếp theo, chúng ta liệt kê các giá trị màu RGB và tên lớp cho tất cả\ncác nhãn trong tập dữ liệu này.\nVới hai hằng số được định nghĩa ở trên, chúng ta có thể thuận tiện tìm\nchỉ mục lớp cho mỗi pixel trong một nhãy. Chúng tôi xác định hàm voc_colormap2label để xây dựng ánh xạ từ các giá trị màu RGB ở trên\nđến các chỉ số lớp và hàm voc_label_indices để ánh xạ bất kỳ giá trị\nRGB nào với chỉ số lớp của chúng trong bộ dữ liệu Pascal VOC2012 này.\nVí dụ, trong ảnh ví dụ đầu tiên, chỉ mục lớp cho phần trước của máy bay\nlà 1, trong khi chỉ mục nền là 0.\n13.9.2.1. Xử lý sơ bộ dữ liệu\nTrong các thí nghiệm trước đó như trong Section 7.1 — Section 7.4 , hình ảnh được thay\nđổi lại để phù hợp với hình dạng đầu vào yêu cầu của mô hình. Tuy nhiên,\ntrong phân đoạn ngữ nghĩa, làm như vậy đòi hỏi phải thay đổi lại các lớp\npixel dự đoán trở lại hình dạng ban đầu của hình ảnh đầu vào. Việc tái\ncặn như vậy có thể không chính xác, đặc biệt là đối với các vùng được\nphân đoạn với các lớp khác nhau. Để tránh sự cố này, chúng tôi cắt hình\nảnh thành một hình dạng fixed thay vì rescaling. Cụ thể, sử dụng cắt\nxén ngẫu nhiên từ nâng hình ảnh, chúng ta cắt cùng một vùng của hình ảnh\nđầu vào và nhãn.\n13.9.2.2. Custom Semantic Segmentation Dataset Class\nChúng tôi xác định một tập dữ liệu phân đoạn ngữ nghĩa tùy chỉnh lớp VOCSegDataset bằng cách kế thừa lớp Dataset được cung cấp bởi\ncác API cấp cao. Bằng cách thực hiện hàm __getitem__ , chúng ta có\nthể tùy ý truy cập vào hình ảnh đầu vào được lập chỉ mục là idx trong tập dữ liệu và chỉ số lớp của mỗi pixel trong hình ảnh này. Vì một\nsố hình ảnh trong tập dữ liệu có kích thước nhỏ hơn kích thước đầu ra\ncủa cắt ngẫu nhiên, các ví dụ này được lọc ra bởi một hàm filter tùy\nchỉnh. Ngoài ra, chúng tôi cũng xác định hàm normalize_image để\nchuẩn hóa các giá trị của ba kênh RGB của hình ảnh đầu vào.\n13.9.2.3. Đọc dữ liệu\nChúng tôi sử dụng lớp VOCSegDatase t tùy chỉnh để tạo các phiên bản\ncủa bộ đào tạo và bộ kiểm tra, tương ứng. Giả sử rằng chúng ta chỉ định\nrằng hình dạng đầu ra của hình ảnh được cắt ngẫu nhiên là \\(320\\times 480\\) . Dưới đây chúng ta có thể xem số ví dụ được giữ\nlại trong bộ đào tạo và bộ kiểm tra.\nĐặt kích thước lô thành 64, chúng tôi xác định bộ lặp dữ liệu cho bộ đào\ntạo. Hãy để chúng tôi in hình dạng của minibatch đầu tiên. Khác với phân\nloại hình ảnh hoặc phát hiện đối tượng, nhãn ở đây là hàng chục ba\nchiều.\n13.9.2.4. Putting All Things Together\nCuối cùng, chúng tôi xác định hàm load_data_voc sau để tải xuống và\nđọc tập dữ liệu phân đoạn ngữ nghĩa Pascal VOC2012. Nó trả về bộ lặp dữ\nliệu cho cả tập dữ liệu đào tạo và kiểm tra.\n13.9.3. Tóm tắt\nPhân đoạn ngữ nghĩa nhận ra và hiểu những gì trong một hình ảnh ở mức\npixel bằng cách chia hình ảnh thành các vùng thuộc các lớp ngữ nghĩa\nkhác nhau.\nTrên của tập dữ liệu phân khúc ngữ nghĩa quan trọng nhất là Pascal\nVOC2012.\nTrong phân đoạn ngữ nghĩa, vì hình ảnh đầu vào và nhãn tương ứng\nmột-một trên pixel, hình ảnh đầu vào được cắt ngẫu nhiên thành một\nhình dạng cố định chứ không phải rescaled.\n13.9.4. Bài tập\nLàm thế nào phân khúc ngữ nghĩa có thể được áp dụng trong các phương\ntiện tự trị và chẩn đoán hình ảnh y tế? Bạn có thể nghĩ về các ứng\ndụng khác?\nNhớ lại các mô tả về tăng cường dữ liệu trong Section 13.1 . Phương pháp nâng hình ảnh nào\nđược sử dụng trong phân loại hình ảnh sẽ không khả thi được áp dụng\ntrong phân khúc ngữ nghĩa?\nDiscussions\nDiscussions"
+}

@@ -1,0 +1,481 @@
+{
+  "url": "https://vi.d2l.ai/chapter_convolutional-neural-networks/pooling.html",
+  "chapter": "chapter_convolutional-neural-networks",
+  "title": "6.5. Pooling",
+  "crawled_at": "2026-07-20T12:39:45.119862+00:00",
+  "headings": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "pooling",
+      "text": "6.5. Pooling"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "pooling-toi-da-va-pooling-trung-binh",
+      "text": "6.5.1. Pooling tối đa và Pooling trung bình"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "padding-va-stride",
+      "text": "6.5.2. Padding và Stride"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "nhieu-kenh",
+      "text": "6.5.3. Nhiều kênh"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tom-tat",
+      "text": "6.5.4. Tóm tắt"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bai-tap",
+      "text": "6.5.5. Bài tập"
+    }
+  ],
+  "content": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "pooling",
+      "text": "6.5. Pooling"
+    },
+    {
+      "type": "paragraph",
+      "text": "Thông thường, khi chúng tôi xử lý hình ảnh, chúng tôi muốn giảm dần độ\nphân giải không gian của các biểu diễn ẩn của chúng tôi, tổng hợp thông\ntin để chúng ta đi lên cao hơn trong mạng, trường tiếp nhận càng lớn\n(trong đầu vào) mà mỗi nút ẩn nhạy cảm."
+    },
+    {
+      "type": "paragraph",
+      "text": "Thường thì nhiệm vụ cuối cùng của chúng tôi hỏi một số câu hỏi toàn cầu\nvề hình ảnh, ví dụ: * nó có chứa một con mèo không? * Vì vậy, thông\nthường các đơn vị của lớp cuối cùng của chúng ta phải nhạy cảm với toàn\nbộ đầu vào. Bằng cách dần dần tổng hợp thông tin, mang lại bản đồ thô\nhơn và thô hơn, chúng tôi hoàn thành mục tiêu này cuối cùng là học một\nđại diện toàn cầu, đồng thời giữ tất cả các lợi thế của các lớp phức tạp\nở các lớp xử lý trung gian."
+    },
+    {
+      "type": "paragraph",
+      "text": "Hơn nữa, khi phát hiện các tính năng cấp thấp hơn, chẳng hạn như các\ncạnh (như đã thảo luận trong Section 6.2 ), chúng ta\nthường muốn các đại diện của mình có phần bất biến với bản dịch. Ví dụ,\nnếu chúng ta chụp ảnh X với sự phân định sắc nét giữa đen và trắng\nvà thay đổi toàn bộ hình ảnh theo một pixel sang phải, tức là Z[i, j] = X[i, j + 1] , thì đầu ra cho hình ảnh mới Z có thể rất\nkhác nhau. Các cạnh sẽ thay đổi bởi một pixel. Trong thực tế, các vật\nthể hầu như không bao giờ xảy ra chính xác ở cùng một nơi. Trên thực tế,\nngay cả với một chân máy và một đối tượng đứng yên, rung động của máy\nảnh do chuyển động của màn trập có thể thay đổi mọi thứ bằng một pixel\nhoặc lâu hơn (máy ảnh cao cấp được tải với các tính năng đặc biệt để\ngiải quyết vấn đề này)."
+    },
+    {
+      "type": "paragraph",
+      "text": "Phần này giới thiệu các lớp * pooling*, phục vụ các mục đích kép của\nviệc giảm thiểu độ nhạy của các lớp phức tạp đến vị trí và các biểu diễn\nlấy mẫu không gian."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "pooling-toi-da-va-pooling-trung-binh",
+      "text": "6.5.1. Pooling tối đa và Pooling trung bình"
+    },
+    {
+      "type": "paragraph",
+      "text": "Giống như các lớp phức tạp, các toán tử * bộ* bao gồm một cửa sổ hình\ndạng cố định được trượt trên tất cả các vùng trong đầu vào theo sải chân\ncủa nó, tính toán một đầu ra duy nhất cho mỗi vị trí đi qua bởi cửa sổ\nhình dạng cố định (đôi khi được gọi là cửa sổ * gộp lọc * ). Tuy nhiên,\nkhông giống như tính toán tương quan chéo của các đầu vào và hạt nhân\ntrong lớp phức tạp, lớp tổng hợp không chứa tham số (không có *\nkernel * ). Thay vào đó, toán tử tổng hợp là xác định, thường tính toán\ngiá trị tối đa hoặc giá trị trung bình của các phần tử trong cửa sổ tổng\nhợp. Các hoạt động này được gọi là * bể tối đa* (* tổng hợp tối đa*\ncho ngắn hạn) và * trung bình*, tương ứng."
+    },
+    {
+      "type": "paragraph",
+      "text": "Trong cả hai trường hợp, như với toán tử tương quan chéo, chúng ta có\nthể nghĩ về cửa sổ tổng hợp như bắt đầu từ phía trên bên trái của tensor\nđầu vào và trượt qua tensor đầu vào từ trái sang phải và trên xuống\ndưới. Tại mỗi vị trí mà cửa sổ pooling nhấn, nó tính toán giá trị lớn\nnhất hoặc trung bình của subtensor đầu vào trong cửa sổ, tùy thuộc vào\nviệc tổng hợp tối đa hay trung bình được sử dụng."
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/pooling.svg",
+      "local_path": "_images/pooling.svg",
+      "alt": "../_images/pooling.svg"
+    },
+    {
+      "type": "paragraph",
+      "text": "Fig. 6.5.1 Maximum pooling with a pooling window shape of \\(2\\times 2\\) . The\nshaded portions are the first output element as well as the input\ntensor elements used for the output computation: \\(\\max(0, 1, 3, 4)=4\\) . ¶"
+    },
+    {
+      "type": "paragraph",
+      "text": "Tensor đầu ra trong Fig. 6.5.1 có chiều cao 2 và chiều rộng\nlà 2. Bốn phần tử được bắt nguồn từ giá trị lớn nhất trong mỗi cửa sổ\npooling:"
+    },
+    {
+      "type": "math",
+      "latex": "(6.5.1)¶\\[\\begin{split}\\max(0, 1, 3, 4)=4,\\\\\n\\max(1, 2, 4, 5)=5,\\\\\n\\max(3, 4, 6, 7)=7,\\\\\n\\max(4, 5, 7, 8)=8.\\\\\\end{split}\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Một lớp tổng hợp với hình dạng cửa sổ tổng hợp là \\(p \\times q\\) được gọi là một lớp tổng hợp \\(p \\times q\\) . Các hoạt động pooling\nđược gọi là \\(p \\times q\\) gộp."
+    },
+    {
+      "type": "paragraph",
+      "text": "Chúng ta hãy quay lại ví dụ phát hiện cạnh đối tượng được đề cập ở đầu\nphần này. Bây giờ chúng ta sẽ sử dụng đầu ra của lớp phức tạp làm đầu\nvào cho tổng hợp tối đa \\(2\\times 2\\) . Đặt đầu vào lớp phức tạp là X và đầu ra lớp pooling là Y . Các giá trị của X[i, j] và X[i, j + 1] có khác nhau hay không, hoặc X[i, j + 1] và X[i, j + 2] có khác nhau hay không, lớp tổng hợp luôn xuất ra Y[i, j] = 1 . Có nghĩa là, sử dụng lớp tổng hợp tối đa \\(2\\times 2\\) , chúng ta vẫn có thể phát hiện xem mẫu được lớp phức\ntạp nhận ra không di chuyển không quá một phần tử về chiều cao hoặc\nchiều rộng."
+    },
+    {
+      "type": "paragraph",
+      "text": "Trong đoạn code dưới đây, chúng ta thực hiện sự lan truyền chuyển tiếp\ncủa lớp gộp trong hàm pool2d . Chức năng này tương tự như hàm corr2d trong Section 6.2 . Tuy nhiên, ở đây chúng tôi\nkhông có hạt nhân, tính toán đầu ra là mức tối đa hoặc trung bình của\ntừng vùng trong đầu vào."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "from mxnet import np, npx\nfrom mxnet.gluon import nn\nfrom d2l import mxnet as d2l\n\nnpx.set_np()\n\ndef pool2d(X, pool_size, mode='max'):\n    p_h, p_w = pool_size\n    Y = np.zeros((X.shape[0] - p_h + 1, X.shape[1] - p_w + 1))\n    for i in range(Y.shape[0]):\n        for j in range(Y.shape[1]):\n            if mode == 'max':\n                Y[i, j] = X[i: i + p_h, j: j + p_w].max()\n            elif mode == 'avg':\n                Y[i, j] = X[i: i + p_h, j: j + p_w].mean()\n    return Y"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "import torch\nfrom torch import nn\nfrom d2l import torch as d2l\n\ndef pool2d(X, pool_size, mode='max'):\n    p_h, p_w = pool_size\n    Y = torch.zeros((X.shape[0] - p_h + 1, X.shape[1] - p_w + 1))\n    for i in range(Y.shape[0]):\n        for j in range(Y.shape[1]):\n            if mode == 'max':\n                Y[i, j] = X[i: i + p_h, j: j + p_w].max()\n            elif mode == 'avg':\n                Y[i, j] = X[i: i + p_h, j: j + p_w].mean()\n    return Y"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "import tensorflow as tf\n\n\ndef pool2d(X, pool_size, mode='max'):\n    p_h, p_w = pool_size\n    Y = tf.Variable(tf.zeros((X.shape[0] - p_h + 1, X.shape[1] - p_w +1)))\n    for i in range(Y.shape[0]):\n        for j in range(Y.shape[1]):\n            if mode == 'max':\n                Y[i, j].assign(tf.reduce_max(X[i: i + p_h, j: j + p_w]))\n            elif mode =='avg':\n                Y[i, j].assign(tf.reduce_mean(X[i: i + p_h, j: j + p_w]))\n    return Y"
+    },
+    {
+      "type": "paragraph",
+      "text": "Chúng ta có thể xây dựng tensor đầu vào X trong Fig. 6.5.1 để xác nhận đầu ra của lớp tổng hợp tối đa hai\nchiều."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "X = np.array([[0.0, 1.0, 2.0], [3.0, 4.0, 5.0], [6.0, 7.0, 8.0]])\npool2d(X, (2, 2))"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "array([[4., 5.],\n       [7., 8.]])"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "X = torch.tensor([[0.0, 1.0, 2.0], [3.0, 4.0, 5.0], [6.0, 7.0, 8.0]])\npool2d(X, (2, 2))"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "tensor([[4., 5.],\n        [7., 8.]])"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "X = tf.constant([[0.0, 1.0, 2.0], [3.0, 4.0, 5.0], [6.0, 7.0, 8.0]])\npool2d(X, (2, 2))"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "<tf.Variable 'Variable:0' shape=(2, 2) dtype=float32, numpy=\narray([[4., 5.],\n       [7., 8.]], dtype=float32)>"
+    },
+    {
+      "type": "paragraph",
+      "text": "Ngoài ra, chúng tôi thử nghiệm với lớp tổng hợp trung bình."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "pool2d(X, (2, 2), 'avg')"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "array([[2., 3.],\n       [5., 6.]])"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "pool2d(X, (2, 2), 'avg')"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "tensor([[2., 3.],\n        [5., 6.]])"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "pool2d(X, (2, 2), 'avg')"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "<tf.Variable 'Variable:0' shape=(2, 2) dtype=float32, numpy=\narray([[2., 3.],\n       [5., 6.]], dtype=float32)>"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "padding-va-stride",
+      "text": "6.5.2. Padding và Stride"
+    },
+    {
+      "type": "paragraph",
+      "text": "Như với các lớp phức tạp, các lớp gộp cũng có thể thay đổi hình dạng đầu\nra. Và như trước đây, chúng ta có thể thay đổi hoạt động để đạt được\nhình dạng đầu ra mong muốn bằng cách đệm đầu vào và điều chỉnh sải chân.\nChúng ta có thể chứng minh việc sử dụng đệm và bước tiến trong các lớp\ntổng hợp thông qua lớp tổng hợp tối đa hai chiều tích hợp từ khung học\nsâu. Đầu tiên chúng ta xây dựng một tensor đầu vào X có hình dạng có\nbốn chiều, trong đó số lượng ví dụ (kích thước lô) và số kênh đều là 1."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "X = np.arange(16, dtype=np.float32).reshape((1, 1, 4, 4))\nX"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "array([[[[ 0.,  1.,  2.,  3.],\n         [ 4.,  5.,  6.,  7.],\n         [ 8.,  9., 10., 11.],\n         [12., 13., 14., 15.]]]])"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "X = torch.arange(16, dtype=torch.float32).reshape((1, 1, 4, 4))\nX"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "tensor([[[[ 0.,  1.,  2.,  3.],\n          [ 4.,  5.,  6.,  7.],\n          [ 8.,  9., 10., 11.],\n          [12., 13., 14., 15.]]]])"
+    },
+    {
+      "type": "paragraph",
+      "text": "Điều quan trọng cần lưu ý là tensorflow thích và được tối ưu hóa cho *\nchannels-last* đầu vào."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "X = tf.reshape(tf.range(16, dtype=tf.float32), (1, 4, 4, 1))\nX"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "<tf.Tensor: shape=(1, 4, 4, 1), dtype=float32, numpy=\narray([[[[ 0.],\n         [ 1.],\n         [ 2.],\n         [ 3.]],\n\n        [[ 4.],\n         [ 5.],\n         [ 6.],\n         [ 7.]],\n\n        [[ 8.],\n         [ 9.],\n         [10.],\n         [11.]],\n\n        [[12.],\n         [13.],\n         [14.],\n         [15.]]]], dtype=float32)>"
+    },
+    {
+      "type": "paragraph",
+      "text": "Theo mặc định, sải chân và cửa sổ tổng hợp trong ví dụ từ lớp tích hợp\ncủa framework có cùng hình dạng. Dưới đây, chúng ta sử dụng một cửa sổ\ntổng hợp hình dạng (3, 3) , vì vậy chúng ta có được một hình dạng sải\nchân của (3, 3) theo mặc định."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "pool2d = nn.MaxPool2D(3)\n# Because there are no model parameters in the pooling layer, we do not need\n# to call the parameter initialization function\npool2d(X)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "array([[[[10.]]]])"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "pool2d = nn.MaxPool2d(3)\npool2d(X)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "tensor([[[[10.]]]])"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "pool2d = tf.keras.layers.MaxPool2D(pool_size=[3, 3])\npool2d(X)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "<tf.Tensor: shape=(1, 1, 1, 1), dtype=float32, numpy=array([[[[10.]]]], dtype=float32)>"
+    },
+    {
+      "type": "paragraph",
+      "text": "Sải chân và đệm có thể được chỉ định thủ công."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "pool2d = nn.MaxPool2D(3, padding=1, strides=2)\npool2d(X)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "array([[[[ 5.,  7.],\n         [13., 15.]]]])"
+    },
+    {
+      "type": "paragraph",
+      "text": "Tất nhiên, chúng ta có thể chỉ định một cửa sổ tổng hợp hình chữ nhật\ntùy ý và chỉ định đệm và sải chân cho chiều cao và chiều rộng, tương\nứng."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "pool2d = nn.MaxPool2D((2, 3), padding=(0, 1), strides=(2, 3))\npool2d(X)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "array([[[[ 5.,  7.],\n         [13., 15.]]]])"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "pool2d = nn.MaxPool2d(3, padding=1, stride=2)\npool2d(X)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "tensor([[[[ 5.,  7.],\n          [13., 15.]]]])"
+    },
+    {
+      "type": "paragraph",
+      "text": "Tất nhiên, chúng ta có thể chỉ định một cửa sổ tổng hợp hình chữ nhật\ntùy ý và chỉ định padding và sải chân cho chiều cao và chiều rộng, tương\nứng."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "pool2d = nn.MaxPool2d((2, 3), stride=(2, 3), padding=(0, 1))\npool2d(X)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "tensor([[[[ 5.,  7.],\n          [13., 15.]]]])"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "paddings = tf.constant([[0, 0], [1,0], [1,0], [0,0]])\nX_padded = tf.pad(X, paddings, \"CONSTANT\")\npool2d = tf.keras.layers.MaxPool2D(pool_size=[3, 3], padding='valid',\n                                   strides=2)\npool2d(X_padded)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "<tf.Tensor: shape=(1, 2, 2, 1), dtype=float32, numpy=\narray([[[[ 5.],\n         [ 7.]],\n\n        [[13.],\n         [15.]]]], dtype=float32)>"
+    },
+    {
+      "type": "paragraph",
+      "text": "Tất nhiên, chúng ta có thể chỉ định một cửa sổ tổng hợp hình chữ nhật\ntùy ý và chỉ định đệm và sải chân cho chiều cao và chiều rộng, tương\nứng."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "paddings = tf.constant([[0, 0], [0, 0], [1, 1], [0, 0]])\nX_padded = tf.pad(X, paddings, \"CONSTANT\")\n\npool2d = tf.keras.layers.MaxPool2D(pool_size=[2, 3], padding='valid',\n                                   strides=(2, 3))\npool2d(X_padded)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "<tf.Tensor: shape=(1, 2, 2, 1), dtype=float32, numpy=\narray([[[[ 5.],\n         [ 7.]],\n\n        [[13.],\n         [15.]]]], dtype=float32)>"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "nhieu-kenh",
+      "text": "6.5.3. Nhiều kênh"
+    },
+    {
+      "type": "paragraph",
+      "text": "Khi xử lý dữ liệu đầu vào đa kênh, lớp tổng hợp nhóm mỗi kênh đầu vào\nriêng biệt, thay vì tổng hợp các đầu vào lên trên các kênh như trong một\nlớp phức tạp. Điều này có nghĩa là số kênh đầu ra cho lớp tổng hợp giống\nnhư số kênh đầu vào. Dưới đây, chúng tôi sẽ nối hàng chục X và X + 1 trên kích thước kênh để xây dựng một đầu vào với 2 kênh."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "X = np.concatenate((X, X + 1), 1)\nX"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "array([[[[ 0.,  1.,  2.,  3.],\n         [ 4.,  5.,  6.,  7.],\n         [ 8.,  9., 10., 11.],\n         [12., 13., 14., 15.]],\n\n        [[ 1.,  2.,  3.,  4.],\n         [ 5.,  6.,  7.,  8.],\n         [ 9., 10., 11., 12.],\n         [13., 14., 15., 16.]]]])"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "X = torch.cat((X, X + 1), 1)\nX"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "tensor([[[[ 0.,  1.,  2.,  3.],\n          [ 4.,  5.,  6.,  7.],\n          [ 8.,  9., 10., 11.],\n          [12., 13., 14., 15.]],\n\n         [[ 1.,  2.,  3.,  4.],\n          [ 5.,  6.,  7.,  8.],\n          [ 9., 10., 11., 12.],\n          [13., 14., 15., 16.]]]])"
+    },
+    {
+      "type": "paragraph",
+      "text": "Lưu ý rằng điều này sẽ yêu cầu một nối dọc theo chiều cuối cùng cho\nTensorFlow do cú pháp kênh-cuối cùng."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "X = tf.concat([X, X + 1], 3)  # Concatenate along `dim=3` due to channels-last syntax"
+    },
+    {
+      "type": "paragraph",
+      "text": "Như chúng ta có thể thấy, số lượng kênh đầu ra vẫn còn 2 sau khi tổng\nhợp."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "pool2d = nn.MaxPool2D(3, padding=1, strides=2)\npool2d(X)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "array([[[[ 5.,  7.],\n         [13., 15.]],\n\n        [[ 6.,  8.],\n         [14., 16.]]]])"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "pool2d = nn.MaxPool2d(3, padding=1, stride=2)\npool2d(X)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "tensor([[[[ 5.,  7.],\n          [13., 15.]],\n\n         [[ 6.,  8.],\n          [14., 16.]]]])"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "paddings = tf.constant([[0, 0], [1,0], [1,0], [0,0]])\nX_padded = tf.pad(X, paddings, \"CONSTANT\")\npool2d = tf.keras.layers.MaxPool2D(pool_size=[3, 3], padding='valid',\n                                   strides=2)\npool2d(X_padded)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "<tf.Tensor: shape=(1, 2, 2, 2), dtype=float32, numpy=\narray([[[[ 5.,  6.],\n         [ 7.,  8.]],\n\n        [[13., 14.],\n         [15., 16.]]]], dtype=float32)>"
+    },
+    {
+      "type": "paragraph",
+      "text": "Lưu ý rằng đầu ra cho các tập hợp tensorflow xuất hiện ở cái nhìn đầu\ntiên là khác nhau, tuy nhiên số lượng các kết quả tương tự được trình\nbày như MXNet và PyTorch. Sự khác biệt nằm ở chiều, và đọc đầu ra theo\nchiều dọc mang lại cùng một đầu ra như các triển khai khác."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tom-tat",
+      "text": "6.5.4. Tóm tắt"
+    },
+    {
+      "type": "list",
+      "ordered": false,
+      "items": [
+        "Lấy các phần tử đầu vào trong cửa sổ tổng hợp, thao tác tổng hợp tối\nđa gán giá trị lớn nhất làm đầu ra và hoạt động tổng hợp trung bình\ngán giá trị trung bình làm đầu ra.",
+        "Một trong những lợi ích chính của một lớp tổng hợp là làm giảm bớt độ\nnhạy quá mức của lớp phức tạp với vị trí.",
+        "Chúng ta có thể chỉ định padding và sải chân cho layer pooling.",
+        "Tổng hợp tối đa, kết hợp với một sải chân lớn hơn 1 có thể được sử\ndụng để giảm kích thước không gian (ví dụ, chiều rộng và chiều cao).",
+        "Số kênh đầu ra của lớp tổng hợp giống như số kênh đầu vào."
+      ]
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bai-tap",
+      "text": "6.5.5. Bài tập"
+    },
+    {
+      "type": "list",
+      "ordered": true,
+      "items": [
+        "Bạn có thể thực hiện tổng hợp trung bình như một trường hợp đặc biệt\ncủa một lớp phức tạp không? Nếu vậy, hãy làm điều đó.",
+        "Bạn có thể thực hiện pooling tối đa như một trường hợp đặc biệt của\nmột lớp phức tạp? Nếu vậy, hãy làm điều đó.",
+        "Chi phí tính toán của lớp pooling là bao nhiêu? Giả sử rằng đầu vào\ncủa lớp pooling có kích thước \\(c\\times h\\times w\\) , cửa sổ\npooling có hình dạng \\(p_h\\times p_w\\) với một padding là \\((p_h, p_w)\\) và một sải chân là \\((s_h, s_w)\\) .",
+        "Tại sao bạn mong đợi tổng hợp tối đa và trung bình để làm việc khác\nnhau?",
+        "Chúng ta có cần một lớp tổng hợp tối thiểu riêng biệt không? Bạn có\nthể thay thế nó bằng một hoạt động khác không?",
+        "Có một hoạt động khác giữa tổng hợp trung bình và tối đa mà bạn có\nthể xem xét (gợi ý: nhớ lại softmax)? Tại sao nó có thể không được\nphổ biến như vậy?"
+      ]
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    }
+  ],
+  "images": [
+    {
+      "original_url": "https://vi.d2l.ai/_images/pooling.svg",
+      "local_path": "_images/pooling.svg",
+      "alt": "../_images/pooling.svg"
+    }
+  ],
+  "text": "6.5. Pooling\nThông thường, khi chúng tôi xử lý hình ảnh, chúng tôi muốn giảm dần độ\nphân giải không gian của các biểu diễn ẩn của chúng tôi, tổng hợp thông\ntin để chúng ta đi lên cao hơn trong mạng, trường tiếp nhận càng lớn\n(trong đầu vào) mà mỗi nút ẩn nhạy cảm.\nThường thì nhiệm vụ cuối cùng của chúng tôi hỏi một số câu hỏi toàn cầu\nvề hình ảnh, ví dụ: * nó có chứa một con mèo không? * Vì vậy, thông\nthường các đơn vị của lớp cuối cùng của chúng ta phải nhạy cảm với toàn\nbộ đầu vào. Bằng cách dần dần tổng hợp thông tin, mang lại bản đồ thô\nhơn và thô hơn, chúng tôi hoàn thành mục tiêu này cuối cùng là học một\nđại diện toàn cầu, đồng thời giữ tất cả các lợi thế của các lớp phức tạp\nở các lớp xử lý trung gian.\nHơn nữa, khi phát hiện các tính năng cấp thấp hơn, chẳng hạn như các\ncạnh (như đã thảo luận trong Section 6.2 ), chúng ta\nthường muốn các đại diện của mình có phần bất biến với bản dịch. Ví dụ,\nnếu chúng ta chụp ảnh X với sự phân định sắc nét giữa đen và trắng\nvà thay đổi toàn bộ hình ảnh theo một pixel sang phải, tức là Z[i, j] = X[i, j + 1] , thì đầu ra cho hình ảnh mới Z có thể rất\nkhác nhau. Các cạnh sẽ thay đổi bởi một pixel. Trong thực tế, các vật\nthể hầu như không bao giờ xảy ra chính xác ở cùng một nơi. Trên thực tế,\nngay cả với một chân máy và một đối tượng đứng yên, rung động của máy\nảnh do chuyển động của màn trập có thể thay đổi mọi thứ bằng một pixel\nhoặc lâu hơn (máy ảnh cao cấp được tải với các tính năng đặc biệt để\ngiải quyết vấn đề này).\nPhần này giới thiệu các lớp * pooling*, phục vụ các mục đích kép của\nviệc giảm thiểu độ nhạy của các lớp phức tạp đến vị trí và các biểu diễn\nlấy mẫu không gian.\n6.5.1. Pooling tối đa và Pooling trung bình\nGiống như các lớp phức tạp, các toán tử * bộ* bao gồm một cửa sổ hình\ndạng cố định được trượt trên tất cả các vùng trong đầu vào theo sải chân\ncủa nó, tính toán một đầu ra duy nhất cho mỗi vị trí đi qua bởi cửa sổ\nhình dạng cố định (đôi khi được gọi là cửa sổ * gộp lọc * ). Tuy nhiên,\nkhông giống như tính toán tương quan chéo của các đầu vào và hạt nhân\ntrong lớp phức tạp, lớp tổng hợp không chứa tham số (không có *\nkernel * ). Thay vào đó, toán tử tổng hợp là xác định, thường tính toán\ngiá trị tối đa hoặc giá trị trung bình của các phần tử trong cửa sổ tổng\nhợp. Các hoạt động này được gọi là * bể tối đa* (* tổng hợp tối đa*\ncho ngắn hạn) và * trung bình*, tương ứng.\nTrong cả hai trường hợp, như với toán tử tương quan chéo, chúng ta có\nthể nghĩ về cửa sổ tổng hợp như bắt đầu từ phía trên bên trái của tensor\nđầu vào và trượt qua tensor đầu vào từ trái sang phải và trên xuống\ndưới. Tại mỗi vị trí mà cửa sổ pooling nhấn, nó tính toán giá trị lớn\nnhất hoặc trung bình của subtensor đầu vào trong cửa sổ, tùy thuộc vào\nviệc tổng hợp tối đa hay trung bình được sử dụng.\nFig. 6.5.1 Maximum pooling with a pooling window shape of \\(2\\times 2\\) . The\nshaded portions are the first output element as well as the input\ntensor elements used for the output computation: \\(\\max(0, 1, 3, 4)=4\\) . ¶\nTensor đầu ra trong Fig. 6.5.1 có chiều cao 2 và chiều rộng\nlà 2. Bốn phần tử được bắt nguồn từ giá trị lớn nhất trong mỗi cửa sổ\npooling:\nMột lớp tổng hợp với hình dạng cửa sổ tổng hợp là \\(p \\times q\\) được gọi là một lớp tổng hợp \\(p \\times q\\) . Các hoạt động pooling\nđược gọi là \\(p \\times q\\) gộp.\nChúng ta hãy quay lại ví dụ phát hiện cạnh đối tượng được đề cập ở đầu\nphần này. Bây giờ chúng ta sẽ sử dụng đầu ra của lớp phức tạp làm đầu\nvào cho tổng hợp tối đa \\(2\\times 2\\) . Đặt đầu vào lớp phức tạp là X và đầu ra lớp pooling là Y . Các giá trị của X[i, j] và X[i, j + 1] có khác nhau hay không, hoặc X[i, j + 1] và X[i, j + 2] có khác nhau hay không, lớp tổng hợp luôn xuất ra Y[i, j] = 1 . Có nghĩa là, sử dụng lớp tổng hợp tối đa \\(2\\times 2\\) , chúng ta vẫn có thể phát hiện xem mẫu được lớp phức\ntạp nhận ra không di chuyển không quá một phần tử về chiều cao hoặc\nchiều rộng.\nTrong đoạn code dưới đây, chúng ta thực hiện sự lan truyền chuyển tiếp\ncủa lớp gộp trong hàm pool2d . Chức năng này tương tự như hàm corr2d trong Section 6.2 . Tuy nhiên, ở đây chúng tôi\nkhông có hạt nhân, tính toán đầu ra là mức tối đa hoặc trung bình của\ntừng vùng trong đầu vào.\nChúng ta có thể xây dựng tensor đầu vào X trong Fig. 6.5.1 để xác nhận đầu ra của lớp tổng hợp tối đa hai\nchiều.\nNgoài ra, chúng tôi thử nghiệm với lớp tổng hợp trung bình.\n6.5.2. Padding và Stride\nNhư với các lớp phức tạp, các lớp gộp cũng có thể thay đổi hình dạng đầu\nra. Và như trước đây, chúng ta có thể thay đổi hoạt động để đạt được\nhình dạng đầu ra mong muốn bằng cách đệm đầu vào và điều chỉnh sải chân.\nChúng ta có thể chứng minh việc sử dụng đệm và bước tiến trong các lớp\ntổng hợp thông qua lớp tổng hợp tối đa hai chiều tích hợp từ khung học\nsâu. Đầu tiên chúng ta xây dựng một tensor đầu vào X có hình dạng có\nbốn chiều, trong đó số lượng ví dụ (kích thước lô) và số kênh đều là 1.\nĐiều quan trọng cần lưu ý là tensorflow thích và được tối ưu hóa cho *\nchannels-last* đầu vào.\nTheo mặc định, sải chân và cửa sổ tổng hợp trong ví dụ từ lớp tích hợp\ncủa framework có cùng hình dạng. Dưới đây, chúng ta sử dụng một cửa sổ\ntổng hợp hình dạng (3, 3) , vì vậy chúng ta có được một hình dạng sải\nchân của (3, 3) theo mặc định.\nSải chân và đệm có thể được chỉ định thủ công.\nTất nhiên, chúng ta có thể chỉ định một cửa sổ tổng hợp hình chữ nhật\ntùy ý và chỉ định đệm và sải chân cho chiều cao và chiều rộng, tương\nứng.\nTất nhiên, chúng ta có thể chỉ định một cửa sổ tổng hợp hình chữ nhật\ntùy ý và chỉ định padding và sải chân cho chiều cao và chiều rộng, tương\nứng.\nTất nhiên, chúng ta có thể chỉ định một cửa sổ tổng hợp hình chữ nhật\ntùy ý và chỉ định đệm và sải chân cho chiều cao và chiều rộng, tương\nứng.\n6.5.3. Nhiều kênh\nKhi xử lý dữ liệu đầu vào đa kênh, lớp tổng hợp nhóm mỗi kênh đầu vào\nriêng biệt, thay vì tổng hợp các đầu vào lên trên các kênh như trong một\nlớp phức tạp. Điều này có nghĩa là số kênh đầu ra cho lớp tổng hợp giống\nnhư số kênh đầu vào. Dưới đây, chúng tôi sẽ nối hàng chục X và X + 1 trên kích thước kênh để xây dựng một đầu vào với 2 kênh.\nLưu ý rằng điều này sẽ yêu cầu một nối dọc theo chiều cuối cùng cho\nTensorFlow do cú pháp kênh-cuối cùng.\nNhư chúng ta có thể thấy, số lượng kênh đầu ra vẫn còn 2 sau khi tổng\nhợp.\nLưu ý rằng đầu ra cho các tập hợp tensorflow xuất hiện ở cái nhìn đầu\ntiên là khác nhau, tuy nhiên số lượng các kết quả tương tự được trình\nbày như MXNet và PyTorch. Sự khác biệt nằm ở chiều, và đọc đầu ra theo\nchiều dọc mang lại cùng một đầu ra như các triển khai khác.\n6.5.4. Tóm tắt\nLấy các phần tử đầu vào trong cửa sổ tổng hợp, thao tác tổng hợp tối\nđa gán giá trị lớn nhất làm đầu ra và hoạt động tổng hợp trung bình\ngán giá trị trung bình làm đầu ra.\nMột trong những lợi ích chính của một lớp tổng hợp là làm giảm bớt độ\nnhạy quá mức của lớp phức tạp với vị trí.\nChúng ta có thể chỉ định padding và sải chân cho layer pooling.\nTổng hợp tối đa, kết hợp với một sải chân lớn hơn 1 có thể được sử\ndụng để giảm kích thước không gian (ví dụ, chiều rộng và chiều cao).\nSố kênh đầu ra của lớp tổng hợp giống như số kênh đầu vào.\n6.5.5. Bài tập\nBạn có thể thực hiện tổng hợp trung bình như một trường hợp đặc biệt\ncủa một lớp phức tạp không? Nếu vậy, hãy làm điều đó.\nBạn có thể thực hiện pooling tối đa như một trường hợp đặc biệt của\nmột lớp phức tạp? Nếu vậy, hãy làm điều đó.\nChi phí tính toán của lớp pooling là bao nhiêu? Giả sử rằng đầu vào\ncủa lớp pooling có kích thước \\(c\\times h\\times w\\) , cửa sổ\npooling có hình dạng \\(p_h\\times p_w\\) với một padding là \\((p_h, p_w)\\) và một sải chân là \\((s_h, s_w)\\) .\nTại sao bạn mong đợi tổng hợp tối đa và trung bình để làm việc khác\nnhau?\nChúng ta có cần một lớp tổng hợp tối thiểu riêng biệt không? Bạn có\nthể thay thế nó bằng một hoạt động khác không?\nCó một hoạt động khác giữa tổng hợp trung bình và tối đa mà bạn có\nthể xem xét (gợi ý: nhớ lại softmax)? Tại sao nó có thể không được\nphổ biến như vậy?\nDiscussions\nDiscussions\nDiscussions"
+}

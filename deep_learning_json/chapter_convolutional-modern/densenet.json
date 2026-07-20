@@ -1,0 +1,471 @@
+{
+  "url": "https://vi.d2l.ai/chapter_convolutional-modern/densenet.html",
+  "chapter": "chapter_convolutional-modern",
+  "title": "7.7. Mạng kết nối mật độ (DenseNet)",
+  "crawled_at": "2026-07-20T12:39:53.647483+00:00",
+  "headings": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "mang-ket-noi-mat-do-densenet",
+      "text": "7.7. Mạng kết nối mật độ (DenseNet)"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tu-resnet-den-densenet",
+      "text": "7.7.1. Từ ResNet đến DenseNet"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "khoi-day-dang",
+      "text": "7.7.2. Khối dày dàng"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "layers-transition",
+      "text": "7.7.3. Layers Transition"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "mo-hinh-densenet",
+      "text": "7.7.4. Mô hình DenseNet"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "dao-tao",
+      "text": "7.7.5. Đào tạo"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tom-tat",
+      "text": "7.7.6. Tóm tắt"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bai-tap",
+      "text": "7.7.7. Bài tập"
+    }
+  ],
+  "content": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "mang-ket-noi-mat-do-densenet",
+      "text": "7.7. Mạng kết nối mật độ (DenseNet)"
+    },
+    {
+      "type": "paragraph",
+      "text": "ResNet thay đổi đáng kể quan điểm về cách tham số hóa các chức năng\ntrong các mạng sâu. * DenseNet* (mạng phức tạp dày đặc) ở một mức độ\nnào đó là phần mở rộng hợp lý của [Huang et al., 2017] này. Để hiểu làm thế nào để\nđến nó, chúng ta hãy đi một đường vòng nhỏ đến toán học."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tu-resnet-den-densenet",
+      "text": "7.7.1. Từ ResNet đến DenseNet"
+    },
+    {
+      "type": "paragraph",
+      "text": "Nhớ lại bản mở rộng Taylor cho các chức năng. Đối với điểm \\(x = 0\\) nó có thể được viết là"
+    },
+    {
+      "type": "math",
+      "latex": "(7.7.1)¶\\[f(x) = f(0) + f'(0) x + \\frac{f''(0)}{2!}  x^2 + \\frac{f'''(0)}{3!}  x^3 + \\ldots.\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Điểm mấu chốt là nó phân hủy một hàm thành các thuật ngữ thứ tự ngày\ncàng cao hơn. Trong một tĩnh mạch tương tự, ResNet phân hủy các chức\nnăng thành"
+    },
+    {
+      "type": "math",
+      "latex": "(7.7.2)¶\\[f(\\mathbf{x}) = \\mathbf{x} + g(\\mathbf{x}).\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Đó là, ResNet phân hủy \\(f\\) thành một thuật ngữ tuyến tính đơn giản\nvà một thuật ngữ phi tuyến phức tạp hơn. Điều gì sẽ xảy ra nếu chúng ta\nmuốn nắm bắt (không nhất thiết phải thêm) thông tin ngoài hai thuật ngữ?\nMột giải pháp là DenseNet [Huang et al., 2017] ."
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/densenet-block.svg",
+      "local_path": "_images/densenet-block.svg",
+      "alt": "../_images/densenet-block.svg"
+    },
+    {
+      "type": "paragraph",
+      "text": "Fig. 7.7.1 The main difference between ResNet (left) and DenseNet (right) in\ncross-layer connections: use of addition and use of concatenation. ¶"
+    },
+    {
+      "type": "paragraph",
+      "text": "Như thể hiện trong Fig. 7.7.1 , sự khác biệt chính\ngiữa ResNet và DenseNet là trong trường hợp đầu ra sau là *\nconcatenated* (được biểu thị bởi \\([,]\\) ) thay vì được thêm vào. Do\nđó, chúng tôi thực hiện ánh xạ từ \\(\\mathbf{x}\\) đến các giá trị của\nnó sau khi áp dụng một chuỗi hàm ngày càng phức tạp:"
+    },
+    {
+      "type": "math",
+      "latex": "(7.7.3)¶\\[\\mathbf{x} \\to \\left[\n\\mathbf{x},\nf_1(\\mathbf{x}),\nf_2([\\mathbf{x}, f_1(\\mathbf{x})]), f_3([\\mathbf{x}, f_1(\\mathbf{x}), f_2([\\mathbf{x}, f_1(\\mathbf{x})])]), \\ldots\\right].\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Cuối cùng, tất cả các chức năng này được kết hợp trong MLP để giảm số\nlượng tính năng một lần nữa. Về mặt thực hiện, điều này khá đơn giản:\nthay vì thêm các thuật ngữ, chúng tôi nối chúng. Tên DenseNet phát sinh\ntừ thực tế là đồ thị phụ thuộc giữa các biến trở nên khá dày đặc. Lớp\ncuối cùng của một chuỗi như vậy được kết nối mật độ với tất cả các lớp\ntrước đó. Các kết nối dày đặc được hiển thị trong Fig. 7.7.2 ."
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/densenet.svg",
+      "local_path": "_images/densenet.svg",
+      "alt": "../_images/densenet.svg"
+    },
+    {
+      "type": "paragraph",
+      "text": "Fig. 7.7.2 Dense connections in DenseNet. ¶"
+    },
+    {
+      "type": "paragraph",
+      "text": "Các thành phần chính tạo ra DenseNet là các khối * dày đặc * và lớp\nchuyển thuyền*. Cái trước xác định cách các đầu vào và đầu ra được nối,\ntrong khi cái sau kiểm soát số lượng kênh để nó không quá lớn."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "khoi-day-dang",
+      "text": "7.7.2. Khối dày dàng"
+    },
+    {
+      "type": "paragraph",
+      "text": "DenseNet sử dụng cấu trúc “chuẩn hóa hàng loạt, kích hoạt và phức tạp”\nđược sửa đổi của ResNet (xem bài tập trong Section 7.6 ). Đầu\ntiên, chúng tôi thực hiện cấu trúc khối phức tạp này."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "from mxnet import np, npx\nfrom mxnet.gluon import nn\nfrom d2l import mxnet as d2l\n\nnpx.set_np()\n\ndef conv_block(num_channels):\n    blk = nn.Sequential()\n    blk.add(nn.BatchNorm(),\n            nn.Activation('relu'),\n            nn.Conv2D(num_channels, kernel_size=3, padding=1))\n    return blk"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "import torch\nfrom torch import nn\nfrom d2l import torch as d2l\n\n\ndef conv_block(input_channels, num_channels):\n    return nn.Sequential(\n        nn.BatchNorm2d(input_channels), nn.ReLU(),\n        nn.Conv2d(input_channels, num_channels, kernel_size=3, padding=1))"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "import tensorflow as tf\nfrom d2l import tensorflow as d2l\n\n\nclass ConvBlock(tf.keras.layers.Layer):\n    def __init__(self, num_channels):\n        super(ConvBlock, self).__init__()\n        self.bn = tf.keras.layers.BatchNormalization()\n        self.relu = tf.keras.layers.ReLU()\n        self.conv = tf.keras.layers.Conv2D(\n            filters=num_channels, kernel_size=(3, 3), padding='same')\n\n        self.listLayers = [self.bn, self.relu, self.conv]\n\n    def call(self, x):\n        y = x\n        for layer in self.listLayers.layers:\n            y = layer(y)\n        y = tf.keras.layers.concatenate([x,y], axis=-1)\n        return y"
+    },
+    {
+      "type": "paragraph",
+      "text": "Một khối * dày dàng* bao gồm nhiều khối phức tạp, mỗi khối sử dụng\ncùng một số kênh đầu ra. Tuy nhiên, trong quá trình lan truyền về phía\ntrước, chúng tôi nối đầu vào và đầu ra của mỗi khối phức tạp trên kích\nthước kênh."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "class DenseBlock(nn.Block):\n    def __init__(self, num_convs, num_channels, **kwargs):\n        super().__init__(**kwargs)\n        self.net = nn.Sequential()\n        for _ in range(num_convs):\n            self.net.add(conv_block(num_channels))\n\n    def forward(self, X):\n        for blk in self.net:\n            Y = blk(X)\n            # Concatenate the input and output of each block on the channel\n            # dimension\n            X = np.concatenate((X, Y), axis=1)\n        return X"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "class DenseBlock(nn.Module):\n    def __init__(self, num_convs, input_channels, num_channels):\n        super(DenseBlock, self).__init__()\n        layer = []\n        for i in range(num_convs):\n            layer.append(conv_block(\n                num_channels * i + input_channels, num_channels))\n        self.net = nn.Sequential(*layer)\n\n    def forward(self, X):\n        for blk in self.net:\n            Y = blk(X)\n            # Concatenate the input and output of each block on the channel\n            # dimension\n            X = torch.cat((X, Y), dim=1)\n        return X"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "class DenseBlock(tf.keras.layers.Layer):\n    def __init__(self, num_convs, num_channels):\n        super(DenseBlock, self).__init__()\n        self.listLayers = []\n        for _ in range(num_convs):\n            self.listLayers.append(ConvBlock(num_channels))\n\n    def call(self, x):\n        for layer in self.listLayers.layers:\n            x = layer(x)\n        return x"
+    },
+    {
+      "type": "paragraph",
+      "text": "Trong ví dụ sau, chúng ta define a DenseBlock instance với 2 khối\nphức tạp của 10 kênh đầu ra. Khi sử dụng đầu vào với 3 kênh, chúng tôi\nsẽ nhận được đầu ra với \\(3+2\\times 10=23\\) kênh. Số lượng các kênh\nkhối phức tạp kiểm soát sự tăng trưởng về số lượng kênh đầu ra so với số\nlượng kênh đầu vào. Đây cũng được gọi là * tốc độ tăng trưởng*."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "blk = DenseBlock(2, 10)\nblk.initialize()\nX = np.random.uniform(size=(4, 3, 8, 8))\nY = blk(X)\nY.shape"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "(4, 23, 8, 8)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "blk = DenseBlock(2, 3, 10)\nX = torch.randn(4, 3, 8, 8)\nY = blk(X)\nY.shape"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "torch.Size([4, 23, 8, 8])"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "blk = DenseBlock(2, 10)\nX = tf.random.uniform((4, 8, 8, 3))\nY = blk(X)\nY.shape"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "TensorShape([4, 8, 8, 23])"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "layers-transition",
+      "text": "7.7.3. Layers Transition"
+    },
+    {
+      "type": "paragraph",
+      "text": "Vì mỗi khối dày đặc sẽ làm tăng số lượng kênh, việc thêm quá nhiều trong\nsố chúng sẽ dẫn đến một mô hình quá phức tạp. Một lớp chuyển đổi* được\nsử dụng để kiểm soát độ phức tạp của mô hình. Nó làm giảm số lượng kênh\nbằng cách sử dụng lớp ghép \\(1\\times 1\\) và giảm một nửa chiều cao\nvà chiều rộng của lớp tổng hợp trung bình với một bước tiến là 2, làm\ngiảm thêm độ phức tạp của mô hình."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def transition_block(num_channels):\n    blk = nn.Sequential()\n    blk.add(nn.BatchNorm(), nn.Activation('relu'),\n            nn.Conv2D(num_channels, kernel_size=1),\n            nn.AvgPool2D(pool_size=2, strides=2))\n    return blk"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def transition_block(input_channels, num_channels):\n    return nn.Sequential(\n        nn.BatchNorm2d(input_channels), nn.ReLU(),\n        nn.Conv2d(input_channels, num_channels, kernel_size=1),\n        nn.AvgPool2d(kernel_size=2, stride=2))"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "class TransitionBlock(tf.keras.layers.Layer):\n    def __init__(self, num_channels, **kwargs):\n        super(TransitionBlock, self).__init__(**kwargs)\n        self.batch_norm = tf.keras.layers.BatchNormalization()\n        self.relu = tf.keras.layers.ReLU()\n        self.conv = tf.keras.layers.Conv2D(num_channels, kernel_size=1)\n        self.avg_pool = tf.keras.layers.AvgPool2D(pool_size=2, strides=2)\n\n    def call(self, x):\n        x = self.batch_norm(x)\n        x = self.relu(x)\n        x = self.conv(x)\n        return self.avg_pool(x)"
+    },
+    {
+      "type": "paragraph",
+      "text": "Áp dụng một lớp chuyển tiếp với 10 kênh đến đầu ra của khối dày đặc\ntrong ví dụ trước. Điều này làm giảm số lượng kênh đầu ra xuống 10 và\ngiảm một nửa chiều cao và chiều rộng."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "blk = transition_block(10)\nblk.initialize()\nblk(Y).shape"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "(4, 10, 4, 4)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "blk = transition_block(23, 10)\nblk(Y).shape"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "torch.Size([4, 10, 4, 4])"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "blk = TransitionBlock(10)\nblk(Y).shape"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "TensorShape([4, 4, 4, 10])"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "mo-hinh-densenet",
+      "text": "7.7.4. Mô hình DenseNet"
+    },
+    {
+      "type": "paragraph",
+      "text": "Tiếp theo, chúng ta sẽ xây dựng một mô hình DenseNet. DenseNet lần đầu\ntiên sử dụng cùng một lớp tích hợp đơn và lớp tổng hợp tối đa như trong\nResNet."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "net = nn.Sequential()\nnet.add(nn.Conv2D(64, kernel_size=7, strides=2, padding=3),\n        nn.BatchNorm(), nn.Activation('relu'),\n        nn.MaxPool2D(pool_size=3, strides=2, padding=1))"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "b1 = nn.Sequential(\n    nn.Conv2d(1, 64, kernel_size=7, stride=2, padding=3),\n    nn.BatchNorm2d(64), nn.ReLU(),\n    nn.MaxPool2d(kernel_size=3, stride=2, padding=1))"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def block_1():\n    return tf.keras.Sequential([\n       tf.keras.layers.Conv2D(64, kernel_size=7, strides=2, padding='same'),\n       tf.keras.layers.BatchNormalization(),\n       tf.keras.layers.ReLU(),\n       tf.keras.layers.MaxPool2D(pool_size=3, strides=2, padding='same')])"
+    },
+    {
+      "type": "paragraph",
+      "text": "Sau đó, tương tự như bốn mô-đun được tạo thành từ các khối còn lại mà\nResNet sử dụng, DenseNet sử dụng bốn khối dày đặc. Tương tự như ResNet,\nchúng ta có thể đặt số lớp phức tạp được sử dụng trong mỗi khối dày đặc.\nỞ đây, chúng tôi đặt nó thành 4, phù hợp với mô hình ResNet-18 trong Section 7.6 . Hơn nữa, chúng tôi đặt số lượng kênh (tức là tốc\nđộ tăng trưởng) cho các lớp phức tạp trong khối dày đặc thành 32, vì vậy\n128 kênh sẽ được thêm vào mỗi khối dày đặc."
+    },
+    {
+      "type": "paragraph",
+      "text": "Trong ResNet, chiều cao và chiều rộng được giảm giữa mỗi mô-đun bởi một\nkhối còn lại với một sải chân là 2. Ở đây, chúng ta sử dụng layer\ntransition để giảm một nửa chiều cao và chiều rộng và giảm một nửa số\nkênh."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "# `num_channels`: the current number of channels\nnum_channels, growth_rate = 64, 32\nnum_convs_in_dense_blocks = [4, 4, 4, 4]\n\nfor i, num_convs in enumerate(num_convs_in_dense_blocks):\n    net.add(DenseBlock(num_convs, growth_rate))\n    # This is the number of output channels in the previous dense block\n    num_channels += num_convs * growth_rate\n    # A transition layer that halves the number of channels is added between\n    # the dense blocks\n    if i != len(num_convs_in_dense_blocks) - 1:\n        num_channels //= 2\n        net.add(transition_block(num_channels))"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "# `num_channels`: the current number of channels\nnum_channels, growth_rate = 64, 32\nnum_convs_in_dense_blocks = [4, 4, 4, 4]\nblks = []\nfor i, num_convs in enumerate(num_convs_in_dense_blocks):\n    blks.append(DenseBlock(num_convs, num_channels, growth_rate))\n    # This is the number of output channels in the previous dense block\n    num_channels += num_convs * growth_rate\n    # A transition layer that halves the number of channels is added between\n    # the dense blocks\n    if i != len(num_convs_in_dense_blocks) - 1:\n        blks.append(transition_block(num_channels, num_channels // 2))\n        num_channels = num_channels // 2"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def block_2():\n    net = block_1()\n    # `num_channels`: the current number of channels\n    num_channels, growth_rate = 64, 32\n    num_convs_in_dense_blocks = [4, 4, 4, 4]\n\n    for i, num_convs in enumerate(num_convs_in_dense_blocks):\n        net.add(DenseBlock(num_convs, growth_rate))\n        # This is the number of output channels in the previous dense block\n        num_channels += num_convs * growth_rate\n        # A transition layer that halves the number of channels is added\n        # between the dense blocks\n        if i != len(num_convs_in_dense_blocks) - 1:\n            num_channels //= 2\n            net.add(TransitionBlock(num_channels))\n    return net"
+    },
+    {
+      "type": "paragraph",
+      "text": "Tương tự như ResNet, một lớp tổng hợp toàn cầu và một lớp kết nối hoàn\ntoàn được kết nối ở cuối để tạo ra đầu ra."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "net.add(nn.BatchNorm(),\n        nn.Activation('relu'),\n        nn.GlobalAvgPool2D(),\n        nn.Dense(10))"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "net = nn.Sequential(\n    b1, *blks,\n    nn.BatchNorm2d(num_channels), nn.ReLU(),\n    nn.AdaptiveAvgPool2d((1, 1)),\n    nn.Flatten(),\n    nn.Linear(num_channels, 10))"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def net():\n    net = block_2()\n    net.add(tf.keras.layers.BatchNormalization())\n    net.add(tf.keras.layers.ReLU())\n    net.add(tf.keras.layers.GlobalAvgPool2D())\n    net.add(tf.keras.layers.Flatten())\n    net.add(tf.keras.layers.Dense(10))\n    return net"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "dao-tao",
+      "text": "7.7.5. Đào tạo"
+    },
+    {
+      "type": "paragraph",
+      "text": "Vì chúng ta đang sử dụng mạng sâu hơn ở đây, trong phần này, chúng ta sẽ\ngiảm chiều cao và chiều rộng đầu vào từ 224 xuống 96 để đơn giản hóa\ntính toán."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "lr, num_epochs, batch_size = 0.1, 10, 256\ntrain_iter, test_iter = d2l.load_data_fashion_mnist(batch_size, resize=96)\nd2l.train_ch6(net, train_iter, test_iter, num_epochs, lr, d2l.try_gpu())"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "loss 0.145, train acc 0.947, test acc 0.890\n5159.7 examples/sec on gpu(0)"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_densenet_e82156_99_1.svg",
+      "local_path": "_images/output_densenet_e82156_99_1.svg",
+      "alt": "../_images/output_densenet_e82156_99_1.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "lr, num_epochs, batch_size = 0.1, 10, 256\ntrain_iter, test_iter = d2l.load_data_fashion_mnist(batch_size, resize=96)\nd2l.train_ch6(net, train_iter, test_iter, num_epochs, lr, d2l.try_gpu())"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "loss 0.146, train acc 0.946, test acc 0.905\n5558.7 examples/sec on cuda:0"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_densenet_e82156_102_1.svg",
+      "local_path": "_images/output_densenet_e82156_102_1.svg",
+      "alt": "../_images/output_densenet_e82156_102_1.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "lr, num_epochs, batch_size = 0.1, 10, 256\ntrain_iter, test_iter = d2l.load_data_fashion_mnist(batch_size, resize=96)\nd2l.train_ch6(net, train_iter, test_iter, num_epochs, lr, d2l.try_gpu())"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "loss 0.136, train acc 0.950, test acc 0.907\n5707.5 examples/sec on /GPU:0"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "<keras.engine.sequential.Sequential at 0x7f3897c38730>"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_densenet_e82156_105_2.svg",
+      "local_path": "_images/output_densenet_e82156_105_2.svg",
+      "alt": "../_images/output_densenet_e82156_105_2.svg"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tom-tat",
+      "text": "7.7.6. Tóm tắt"
+    },
+    {
+      "type": "list",
+      "ordered": false,
+      "items": [
+        "Về kết nối chéo lớp, không giống như ResNet, nơi đầu vào và đầu ra\nđược thêm vào với nhau, DenseNet nối đầu vào và đầu ra trên kích\nthước kênh.",
+        "Các thành phần chính sáng tác DenseNet là các khối dày đặc và các lớp\nchuyển tiếp.",
+        "Chúng ta cần phải kiểm soát kích thước khi soạn mạng bằng cách thêm\ncác lớp chuyển tiếp thu nhỏ lại số kênh."
+      ]
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bai-tap",
+      "text": "7.7.7. Bài tập"
+    },
+    {
+      "type": "list",
+      "ordered": true,
+      "items": [
+        "Tại sao chúng ta sử dụng tổng hợp trung bình chứ không phải là tổng\nhợp tối đa trong layer chuyển tiếp?",
+        "Một trong những lợi thế được đề cập trong giấy DenseNet là các thông\nsố mô hình của nó nhỏ hơn so với các thông số của ResNet. Tại sao lại\nlà trường hợp này?",
+        "Một vấn đề mà DenseNet đã bị chỉ trích là mức tiêu thụ bộ nhớ cao. Đây có thực sự là trường hợp? Cố gắng thay đổi hình dạng đầu vào\nthành \\(224\\times 224\\) để xem mức tiêu thụ bộ nhớ GPU thực\ntế. Bạn có thể nghĩ về một phương tiện thay thế để giảm tiêu thụ bộ\nnhớ? Làm thế nào bạn sẽ cần phải thay đổi khuôn khổ?",
+        "Đây có thực sự là trường hợp? Cố gắng thay đổi hình dạng đầu vào\nthành \\(224\\times 224\\) để xem mức tiêu thụ bộ nhớ GPU thực\ntế.",
+        "Bạn có thể nghĩ về một phương tiện thay thế để giảm tiêu thụ bộ\nnhớ? Làm thế nào bạn sẽ cần phải thay đổi khuôn khổ?",
+        "Thực hiện các phiên bản DenseNet khác nhau được trình bày trong Bảng\n1 của giấy DenseNet [Huang et al., 2017] .",
+        "Thiết kế mô hình dựa trên MLP bằng cách áp dụng ý tưởng DenseNet. Áp\ndụng nó cho nhiệm vụ dự đoán giá nhà ở trong Section 4.10 ."
+      ]
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    }
+  ],
+  "images": [
+    {
+      "original_url": "https://vi.d2l.ai/_images/densenet-block.svg",
+      "local_path": "_images/densenet-block.svg",
+      "alt": "../_images/densenet-block.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/densenet.svg",
+      "local_path": "_images/densenet.svg",
+      "alt": "../_images/densenet.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_densenet_e82156_99_1.svg",
+      "local_path": "_images/output_densenet_e82156_99_1.svg",
+      "alt": "../_images/output_densenet_e82156_99_1.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_densenet_e82156_102_1.svg",
+      "local_path": "_images/output_densenet_e82156_102_1.svg",
+      "alt": "../_images/output_densenet_e82156_102_1.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_densenet_e82156_105_2.svg",
+      "local_path": "_images/output_densenet_e82156_105_2.svg",
+      "alt": "../_images/output_densenet_e82156_105_2.svg"
+    }
+  ],
+  "text": "7.7. Mạng kết nối mật độ (DenseNet)\nResNet thay đổi đáng kể quan điểm về cách tham số hóa các chức năng\ntrong các mạng sâu. * DenseNet* (mạng phức tạp dày đặc) ở một mức độ\nnào đó là phần mở rộng hợp lý của [Huang et al., 2017] này. Để hiểu làm thế nào để\nđến nó, chúng ta hãy đi một đường vòng nhỏ đến toán học.\n7.7.1. Từ ResNet đến DenseNet\nNhớ lại bản mở rộng Taylor cho các chức năng. Đối với điểm \\(x = 0\\) nó có thể được viết là\nĐiểm mấu chốt là nó phân hủy một hàm thành các thuật ngữ thứ tự ngày\ncàng cao hơn. Trong một tĩnh mạch tương tự, ResNet phân hủy các chức\nnăng thành\nĐó là, ResNet phân hủy \\(f\\) thành một thuật ngữ tuyến tính đơn giản\nvà một thuật ngữ phi tuyến phức tạp hơn. Điều gì sẽ xảy ra nếu chúng ta\nmuốn nắm bắt (không nhất thiết phải thêm) thông tin ngoài hai thuật ngữ?\nMột giải pháp là DenseNet [Huang et al., 2017] .\nFig. 7.7.1 The main difference between ResNet (left) and DenseNet (right) in\ncross-layer connections: use of addition and use of concatenation. ¶\nNhư thể hiện trong Fig. 7.7.1 , sự khác biệt chính\ngiữa ResNet và DenseNet là trong trường hợp đầu ra sau là *\nconcatenated* (được biểu thị bởi \\([,]\\) ) thay vì được thêm vào. Do\nđó, chúng tôi thực hiện ánh xạ từ \\(\\mathbf{x}\\) đến các giá trị của\nnó sau khi áp dụng một chuỗi hàm ngày càng phức tạp:\nCuối cùng, tất cả các chức năng này được kết hợp trong MLP để giảm số\nlượng tính năng một lần nữa. Về mặt thực hiện, điều này khá đơn giản:\nthay vì thêm các thuật ngữ, chúng tôi nối chúng. Tên DenseNet phát sinh\ntừ thực tế là đồ thị phụ thuộc giữa các biến trở nên khá dày đặc. Lớp\ncuối cùng của một chuỗi như vậy được kết nối mật độ với tất cả các lớp\ntrước đó. Các kết nối dày đặc được hiển thị trong Fig. 7.7.2 .\nFig. 7.7.2 Dense connections in DenseNet. ¶\nCác thành phần chính tạo ra DenseNet là các khối * dày đặc * và lớp\nchuyển thuyền*. Cái trước xác định cách các đầu vào và đầu ra được nối,\ntrong khi cái sau kiểm soát số lượng kênh để nó không quá lớn.\n7.7.2. Khối dày dàng\nDenseNet sử dụng cấu trúc “chuẩn hóa hàng loạt, kích hoạt và phức tạp”\nđược sửa đổi của ResNet (xem bài tập trong Section 7.6 ). Đầu\ntiên, chúng tôi thực hiện cấu trúc khối phức tạp này.\nMột khối * dày dàng* bao gồm nhiều khối phức tạp, mỗi khối sử dụng\ncùng một số kênh đầu ra. Tuy nhiên, trong quá trình lan truyền về phía\ntrước, chúng tôi nối đầu vào và đầu ra của mỗi khối phức tạp trên kích\nthước kênh.\nTrong ví dụ sau, chúng ta define a DenseBlock instance với 2 khối\nphức tạp của 10 kênh đầu ra. Khi sử dụng đầu vào với 3 kênh, chúng tôi\nsẽ nhận được đầu ra với \\(3+2\\times 10=23\\) kênh. Số lượng các kênh\nkhối phức tạp kiểm soát sự tăng trưởng về số lượng kênh đầu ra so với số\nlượng kênh đầu vào. Đây cũng được gọi là * tốc độ tăng trưởng*.\n7.7.3. Layers Transition\nVì mỗi khối dày đặc sẽ làm tăng số lượng kênh, việc thêm quá nhiều trong\nsố chúng sẽ dẫn đến một mô hình quá phức tạp. Một lớp chuyển đổi* được\nsử dụng để kiểm soát độ phức tạp của mô hình. Nó làm giảm số lượng kênh\nbằng cách sử dụng lớp ghép \\(1\\times 1\\) và giảm một nửa chiều cao\nvà chiều rộng của lớp tổng hợp trung bình với một bước tiến là 2, làm\ngiảm thêm độ phức tạp của mô hình.\nÁp dụng một lớp chuyển tiếp với 10 kênh đến đầu ra của khối dày đặc\ntrong ví dụ trước. Điều này làm giảm số lượng kênh đầu ra xuống 10 và\ngiảm một nửa chiều cao và chiều rộng.\n7.7.4. Mô hình DenseNet\nTiếp theo, chúng ta sẽ xây dựng một mô hình DenseNet. DenseNet lần đầu\ntiên sử dụng cùng một lớp tích hợp đơn và lớp tổng hợp tối đa như trong\nResNet.\nSau đó, tương tự như bốn mô-đun được tạo thành từ các khối còn lại mà\nResNet sử dụng, DenseNet sử dụng bốn khối dày đặc. Tương tự như ResNet,\nchúng ta có thể đặt số lớp phức tạp được sử dụng trong mỗi khối dày đặc.\nỞ đây, chúng tôi đặt nó thành 4, phù hợp với mô hình ResNet-18 trong Section 7.6 . Hơn nữa, chúng tôi đặt số lượng kênh (tức là tốc\nđộ tăng trưởng) cho các lớp phức tạp trong khối dày đặc thành 32, vì vậy\n128 kênh sẽ được thêm vào mỗi khối dày đặc.\nTrong ResNet, chiều cao và chiều rộng được giảm giữa mỗi mô-đun bởi một\nkhối còn lại với một sải chân là 2. Ở đây, chúng ta sử dụng layer\ntransition để giảm một nửa chiều cao và chiều rộng và giảm một nửa số\nkênh.\nTương tự như ResNet, một lớp tổng hợp toàn cầu và một lớp kết nối hoàn\ntoàn được kết nối ở cuối để tạo ra đầu ra.\n7.7.5. Đào tạo\nVì chúng ta đang sử dụng mạng sâu hơn ở đây, trong phần này, chúng ta sẽ\ngiảm chiều cao và chiều rộng đầu vào từ 224 xuống 96 để đơn giản hóa\ntính toán.\n7.7.6. Tóm tắt\nVề kết nối chéo lớp, không giống như ResNet, nơi đầu vào và đầu ra\nđược thêm vào với nhau, DenseNet nối đầu vào và đầu ra trên kích\nthước kênh.\nCác thành phần chính sáng tác DenseNet là các khối dày đặc và các lớp\nchuyển tiếp.\nChúng ta cần phải kiểm soát kích thước khi soạn mạng bằng cách thêm\ncác lớp chuyển tiếp thu nhỏ lại số kênh.\n7.7.7. Bài tập\nTại sao chúng ta sử dụng tổng hợp trung bình chứ không phải là tổng\nhợp tối đa trong layer chuyển tiếp?\nMột trong những lợi thế được đề cập trong giấy DenseNet là các thông\nsố mô hình của nó nhỏ hơn so với các thông số của ResNet. Tại sao lại\nlà trường hợp này?\nMột vấn đề mà DenseNet đã bị chỉ trích là mức tiêu thụ bộ nhớ cao. Đây có thực sự là trường hợp? Cố gắng thay đổi hình dạng đầu vào\nthành \\(224\\times 224\\) để xem mức tiêu thụ bộ nhớ GPU thực\ntế. Bạn có thể nghĩ về một phương tiện thay thế để giảm tiêu thụ bộ\nnhớ? Làm thế nào bạn sẽ cần phải thay đổi khuôn khổ?\nĐây có thực sự là trường hợp? Cố gắng thay đổi hình dạng đầu vào\nthành \\(224\\times 224\\) để xem mức tiêu thụ bộ nhớ GPU thực\ntế.\nBạn có thể nghĩ về một phương tiện thay thế để giảm tiêu thụ bộ\nnhớ? Làm thế nào bạn sẽ cần phải thay đổi khuôn khổ?\nThực hiện các phiên bản DenseNet khác nhau được trình bày trong Bảng\n1 của giấy DenseNet [Huang et al., 2017] .\nThiết kế mô hình dựa trên MLP bằng cách áp dụng ý tưởng DenseNet. Áp\ndụng nó cho nhiệm vụ dự đoán giá nhà ở trong Section 4.10 .\nDiscussions\nDiscussions\nDiscussions"
+}

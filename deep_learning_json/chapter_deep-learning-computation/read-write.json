@@ -1,0 +1,328 @@
+{
+  "url": "https://vi.d2l.ai/chapter_deep-learning-computation/read-write.html",
+  "chapter": "chapter_deep-learning-computation",
+  "title": "5.5. Tệp I/O",
+  "crawled_at": "2026-07-20T12:39:39.052982+00:00",
+  "headings": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "tep-i-o",
+      "text": "5.5. Tệp I/O"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tai-va-tiet-kiem-tensors",
+      "text": "5.5.1. Tải và tiết kiệm Tensors"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tai-va-luu-thong-so-mo-hinh",
+      "text": "5.5.2. Tải và lưu thông số mô hình"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tom-tat",
+      "text": "5.5.3. Tóm tắt"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bai-tap",
+      "text": "5.5.4. Bài tập"
+    }
+  ],
+  "content": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "tep-i-o",
+      "text": "5.5. Tệp I/O"
+    },
+    {
+      "type": "paragraph",
+      "text": "Cho đến nay chúng tôi đã thảo luận về cách xử lý dữ liệu và cách xây\ndựng, đào tạo và kiểm tra các mô hình học sâu. Tuy nhiên, tại một số\nđiểm, chúng tôi hy vọng sẽ đủ hạnh phúc với các mô hình đã học mà chúng\ntôi sẽ muốn lưu kết quả để sử dụng sau này trong các bối cảnh khác nhau\n(thậm chí có thể đưa ra dự đoán trong triển khai). Ngoài ra, khi chạy\nmột quá trình đào tạo dài, thực hành tốt nhất là lưu định kỳ kết quả\ntrung gian (checkpointing) để đảm bảo rằng chúng tôi không mất vài ngày\ngiá trị tính toán nếu chúng ta đi qua dây nguồn của máy chủ của chúng\ntôi. Vì vậy, đã đến lúc học cách tải và lưu trữ cả vectơ trọng lượng\nriêng lẻ và toàn bộ mô hình. Phần này giải quyết cả hai vấn đề."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tai-va-tiet-kiem-tensors",
+      "text": "5.5.1. Tải và tiết kiệm Tensors"
+    },
+    {
+      "type": "paragraph",
+      "text": "Đối với hàng chục cá nhân, chúng ta có thể gọi trực tiếp các hàm load và save để đọc và viết chúng tương ứng. Cả hai chức năng\nyêu cầu chúng tôi cung cấp một tên, và save yêu cầu như là đầu vào\nbiến được lưu."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "from mxnet import np, npx\nfrom mxnet.gluon import nn\n\nnpx.set_np()\n\nx = np.arange(4)\nnpx.save('x-file', x)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "import torch\nfrom torch import nn\nfrom torch.nn import functional as F\n\nx = torch.arange(4)\ntorch.save(x, 'x-file')"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "import numpy as np\nimport tensorflow as tf\n\nx = tf.range(4)\nnp.save('x-file.npy', x)"
+    },
+    {
+      "type": "paragraph",
+      "text": "Bây giờ chúng ta có thể đọc dữ liệu từ tệp được lưu trữ trở lại vào bộ\nnhớ."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "x2 = npx.load('x-file')\nx2"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "[array([0., 1., 2., 3.])]"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "x2 = torch.load('x-file')\nx2"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "tensor([0, 1, 2, 3])"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "x2 = np.load('x-file.npy', allow_pickle=True)\nx2"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "array([0, 1, 2, 3], dtype=int32)"
+    },
+    {
+      "type": "paragraph",
+      "text": "Chúng ta có thể lưu trữ một danh sách các hàng chục và đọc lại vào bộ\nnhớ."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "y = np.zeros(4)\nnpx.save('x-files', [x, y])\nx2, y2 = npx.load('x-files')\n(x2, y2)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "(array([0., 1., 2., 3.]), array([0., 0., 0., 0.]))"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "y = torch.zeros(4)\ntorch.save([x, y],'x-files')\nx2, y2 = torch.load('x-files')\n(x2, y2)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "(tensor([0, 1, 2, 3]), tensor([0., 0., 0., 0.]))"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "y = tf.zeros(4)\nnp.save('xy-files.npy', [x, y])\nx2, y2 = np.load('xy-files.npy', allow_pickle=True)\n(x2, y2)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "(array([0., 1., 2., 3.]), array([0., 0., 0., 0.]))"
+    },
+    {
+      "type": "paragraph",
+      "text": "Chúng ta thậm chí có thể viết và đọc một từ điển bản đồ từ chuỗi đến\ntensors. Điều này thuận tiện khi chúng ta muốn đọc hoặc viết tất cả các\ntrọng lượng trong một mô hình."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "mydict = {'x': x, 'y': y}\nnpx.save('mydict', mydict)\nmydict2 = npx.load('mydict')\nmydict2"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "{'x': array([0., 1., 2., 3.]), 'y': array([0., 0., 0., 0.])}"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "mydict = {'x': x, 'y': y}\ntorch.save(mydict, 'mydict')\nmydict2 = torch.load('mydict')\nmydict2"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "{'x': tensor([0, 1, 2, 3]), 'y': tensor([0., 0., 0., 0.])}"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "mydict = {'x': x, 'y': y}\nnp.save('mydict.npy', mydict)\nmydict2 = np.load('mydict.npy', allow_pickle=True)\nmydict2"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "array({'x': <tf.Tensor: shape=(4,), dtype=int32, numpy=array([0, 1, 2, 3], dtype=int32)>, 'y': <tf.Tensor: shape=(4,), dtype=float32, numpy=array([0., 0., 0., 0.], dtype=float32)>},\n      dtype=object)"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tai-va-luu-thong-so-mo-hinh",
+      "text": "5.5.2. Tải và lưu thông số mô hình"
+    },
+    {
+      "type": "paragraph",
+      "text": "Tiết kiệm vectơ trọng lượng riêng lẻ (hoặc các hàng chục khác) rất hữu\ních, nhưng nó trở nên rất tẻ nhạt nếu chúng ta muốn lưu (và sau đó tải)\ntoàn bộ mô hình. Rốt cuộc, chúng ta có thể có hàng trăm nhóm tham số rắc\nkhắp. Vì lý do này, khung học sâu cung cấp các chức năng tích hợp để tải\nvà lưu toàn bộ mạng. Một chi tiết quan trọng cần lưu ý là điều này lưu\nmô hình tham số chứ không phải toàn bộ mô hình. Ví dụ: nếu chúng ta có\nMLP 3 lớp, chúng ta cần chỉ định kiến trúc riêng biệt. Lý do cho điều\nnày là bản thân các mô hình có thể chứa mã tùy ý, do đó chúng không thể\nđược serialized như một cách tự nhiên. Do đó, để khôi phục lại một mô\nhình, chúng ta cần tạo kiến trúc trong mã và sau đó tải các tham số từ\nđĩa. Hãy để chúng tôi bắt đầu với MLP.quen thuộc của chúng tôi"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "class MLP(nn.Block):\n    def __init__(self, **kwargs):\n        super(MLP, self).__init__(**kwargs)\n        self.hidden = nn.Dense(256, activation='relu')\n        self.output = nn.Dense(10)\n\n    def forward(self, x):\n        return self.output(self.hidden(x))\n\nnet = MLP()\nnet.initialize()\nX = np.random.uniform(size=(2, 20))\nY = net(X)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "class MLP(nn.Module):\n    def __init__(self):\n        super().__init__()\n        self.hidden = nn.Linear(20, 256)\n        self.output = nn.Linear(256, 10)\n\n    def forward(self, x):\n        return self.output(F.relu(self.hidden(x)))\n\nnet = MLP()\nX = torch.randn(size=(2, 20))\nY = net(X)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "class MLP(tf.keras.Model):\n    def __init__(self):\n        super().__init__()\n        self.flatten = tf.keras.layers.Flatten()\n        self.hidden = tf.keras.layers.Dense(units=256, activation=tf.nn.relu)\n        self.out = tf.keras.layers.Dense(units=10)\n\n    def call(self, inputs):\n        x = self.flatten(inputs)\n        x = self.hidden(x)\n        return self.out(x)\n\nnet = MLP()\nX = tf.random.uniform((2, 20))\nY = net(X)"
+    },
+    {
+      "type": "paragraph",
+      "text": "Tiếp theo, chúng ta lưu trữ các tham số của mô hình dưới dạng tệp với\ntên “mlp.params”."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "net.save_parameters('mlp.params')"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "torch.save(net.state_dict(), 'mlp.params')"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "net.save_weights('mlp.params')"
+    },
+    {
+      "type": "paragraph",
+      "text": "Để khôi phục mô hình, chúng tôi khởi tạo một bản sao của mô hình MLP ban\nđầu. Thay vì khởi tạo ngẫu nhiên các tham số model, chúng ta đọc các\ntham số được lưu trữ trong tập tin trực tiếp."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "clone = MLP()\nclone.load_parameters('mlp.params')"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "clone = MLP()\nclone.load_state_dict(torch.load('mlp.params'))\nclone.eval()"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "MLP(\n  (hidden): Linear(in_features=20, out_features=256, bias=True)\n  (output): Linear(in_features=256, out_features=10, bias=True)\n)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "clone = MLP()\nclone.load_weights('mlp.params')"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "<tensorflow.python.training.tracking.util.CheckpointLoadStatus at 0x7f79502a7880>"
+    },
+    {
+      "type": "paragraph",
+      "text": "Vì cả hai trường hợp đều có cùng tham số mô hình, kết quả tính toán của\ncùng một đầu vào X phải giống nhau. Hãy để chúng tôi xác minh điều\nnày."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "Y_clone = clone(X)\nY_clone == Y"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "array([[ True,  True,  True,  True,  True,  True,  True,  True,  True,\n         True],\n       [ True,  True,  True,  True,  True,  True,  True,  True,  True,\n         True]])"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "Y_clone = clone(X)\nY_clone == Y"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "tensor([[True, True, True, True, True, True, True, True, True, True],\n        [True, True, True, True, True, True, True, True, True, True]])"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "Y_clone = clone(X)\nY_clone == Y"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "<tf.Tensor: shape=(2, 10), dtype=bool, numpy=\narray([[ True,  True,  True,  True,  True,  True,  True,  True,  True,\n         True],\n       [ True,  True,  True,  True,  True,  True,  True,  True,  True,\n         True]])>"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tom-tat",
+      "text": "5.5.3. Tóm tắt"
+    },
+    {
+      "type": "list",
+      "ordered": false,
+      "items": [
+        "Các chức năng save và load có thể được sử dụng để thực hiện\nI/O tệp cho các đối tượng tensor.",
+        "Chúng ta có thể lưu và tải toàn bộ bộ tham số cho một mạng thông qua\nmột từ điển tham số.",
+        "Lưu kiến trúc phải được thực hiện trong mã chứ không phải trong các\ntham số."
+      ]
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bai-tap",
+      "text": "5.5.4. Bài tập"
+    },
+    {
+      "type": "list",
+      "ordered": true,
+      "items": [
+        "Ngay cả khi không cần triển khai các mô hình được đào tạo cho một\nthiết bị khác, lợi ích thiết thực của việc lưu trữ các thông số mô\nhình là gì?",
+        "Giả sử rằng chúng ta chỉ muốn sử dụng lại các phần của mạng để được\nkết hợp vào một mạng của một kiến trúc khác nhau. Làm thế nào bạn sẽ\nđi về sử dụng, nói hai lớp đầu tiên từ một mạng trước đó trong một\nmạng mới?",
+        "Làm thế nào bạn sẽ đi về lưu kiến trúc mạng và các tham số? Bạn sẽ áp\nđặt những hạn chế nào đối với kiến trúc?"
+      ]
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    }
+  ],
+  "images": [],
+  "text": "5.5. Tệp I/O\nCho đến nay chúng tôi đã thảo luận về cách xử lý dữ liệu và cách xây\ndựng, đào tạo và kiểm tra các mô hình học sâu. Tuy nhiên, tại một số\nđiểm, chúng tôi hy vọng sẽ đủ hạnh phúc với các mô hình đã học mà chúng\ntôi sẽ muốn lưu kết quả để sử dụng sau này trong các bối cảnh khác nhau\n(thậm chí có thể đưa ra dự đoán trong triển khai). Ngoài ra, khi chạy\nmột quá trình đào tạo dài, thực hành tốt nhất là lưu định kỳ kết quả\ntrung gian (checkpointing) để đảm bảo rằng chúng tôi không mất vài ngày\ngiá trị tính toán nếu chúng ta đi qua dây nguồn của máy chủ của chúng\ntôi. Vì vậy, đã đến lúc học cách tải và lưu trữ cả vectơ trọng lượng\nriêng lẻ và toàn bộ mô hình. Phần này giải quyết cả hai vấn đề.\n5.5.1. Tải và tiết kiệm Tensors\nĐối với hàng chục cá nhân, chúng ta có thể gọi trực tiếp các hàm load và save để đọc và viết chúng tương ứng. Cả hai chức năng\nyêu cầu chúng tôi cung cấp một tên, và save yêu cầu như là đầu vào\nbiến được lưu.\nBây giờ chúng ta có thể đọc dữ liệu từ tệp được lưu trữ trở lại vào bộ\nnhớ.\nChúng ta có thể lưu trữ một danh sách các hàng chục và đọc lại vào bộ\nnhớ.\nChúng ta thậm chí có thể viết và đọc một từ điển bản đồ từ chuỗi đến\ntensors. Điều này thuận tiện khi chúng ta muốn đọc hoặc viết tất cả các\ntrọng lượng trong một mô hình.\n5.5.2. Tải và lưu thông số mô hình\nTiết kiệm vectơ trọng lượng riêng lẻ (hoặc các hàng chục khác) rất hữu\ních, nhưng nó trở nên rất tẻ nhạt nếu chúng ta muốn lưu (và sau đó tải)\ntoàn bộ mô hình. Rốt cuộc, chúng ta có thể có hàng trăm nhóm tham số rắc\nkhắp. Vì lý do này, khung học sâu cung cấp các chức năng tích hợp để tải\nvà lưu toàn bộ mạng. Một chi tiết quan trọng cần lưu ý là điều này lưu\nmô hình tham số chứ không phải toàn bộ mô hình. Ví dụ: nếu chúng ta có\nMLP 3 lớp, chúng ta cần chỉ định kiến trúc riêng biệt. Lý do cho điều\nnày là bản thân các mô hình có thể chứa mã tùy ý, do đó chúng không thể\nđược serialized như một cách tự nhiên. Do đó, để khôi phục lại một mô\nhình, chúng ta cần tạo kiến trúc trong mã và sau đó tải các tham số từ\nđĩa. Hãy để chúng tôi bắt đầu với MLP.quen thuộc của chúng tôi\nTiếp theo, chúng ta lưu trữ các tham số của mô hình dưới dạng tệp với\ntên “mlp.params”.\nĐể khôi phục mô hình, chúng tôi khởi tạo một bản sao của mô hình MLP ban\nđầu. Thay vì khởi tạo ngẫu nhiên các tham số model, chúng ta đọc các\ntham số được lưu trữ trong tập tin trực tiếp.\nVì cả hai trường hợp đều có cùng tham số mô hình, kết quả tính toán của\ncùng một đầu vào X phải giống nhau. Hãy để chúng tôi xác minh điều\nnày.\n5.5.3. Tóm tắt\nCác chức năng save và load có thể được sử dụng để thực hiện\nI/O tệp cho các đối tượng tensor.\nChúng ta có thể lưu và tải toàn bộ bộ tham số cho một mạng thông qua\nmột từ điển tham số.\nLưu kiến trúc phải được thực hiện trong mã chứ không phải trong các\ntham số.\n5.5.4. Bài tập\nNgay cả khi không cần triển khai các mô hình được đào tạo cho một\nthiết bị khác, lợi ích thiết thực của việc lưu trữ các thông số mô\nhình là gì?\nGiả sử rằng chúng ta chỉ muốn sử dụng lại các phần của mạng để được\nkết hợp vào một mạng của một kiến trúc khác nhau. Làm thế nào bạn sẽ\nđi về sử dụng, nói hai lớp đầu tiên từ một mạng trước đó trong một\nmạng mới?\nLàm thế nào bạn sẽ đi về lưu kiến trúc mạng và các tham số? Bạn sẽ áp\nđặt những hạn chế nào đối với kiến trúc?\nDiscussions\nDiscussions\nDiscussions"
+}

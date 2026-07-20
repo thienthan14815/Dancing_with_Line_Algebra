@@ -1,0 +1,1202 @@
+{
+  "url": "https://vi.d2l.ai/chapter_appendix-mathematics-for-deep-learning/information-theory.html",
+  "chapter": "chapter_appendix-mathematics-for-deep-learning",
+  "title": "18.10. Lý thuyết thông tin",
+  "crawled_at": "2026-07-20T12:41:31.856383+00:00",
+  "headings": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "ly-thuyet-thong-tin",
+      "text": "18.10. Lý thuyết thông tin"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "thong-tin",
+      "text": "18.10.1. Thông tin"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "tu-thong-tin",
+      "text": "18.10.1.1. Tự thông tin"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "entropy",
+      "text": "18.10.2. Entropy"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "thuc-day-entropy",
+      "text": "18.10.2.1. Thúc đẩy Entropy"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "definition",
+      "text": "18.10.2.2. Definition"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "giai-thich",
+      "text": "18.10.2.3. Giải thích"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "tinh-chat-cua-entropy",
+      "text": "18.10.2.4. Tính chất của Entropy"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "thong-tin-lan-nhau",
+      "text": "18.10.3. Thông tin lẫn nhau"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "entropy-chung",
+      "text": "18.10.3.1. Entropy chung"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "entropy-co-dieu-kien",
+      "text": "18.10.3.2. Entropy có điều kiện"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "id3",
+      "text": "18.10.3.3. Thông tin lẫn nhau"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "properties-of-mutual-information",
+      "text": "18.10.3.4. Properties of Mutual Information"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "pointwise-thong-tin-lan-nhau",
+      "text": "18.10.3.5. Pointwise Thông tin lẫn nhau"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "cac-ung-dung-cua-thong-tin-lan-nhau",
+      "text": "18.10.3.6. Các ứng dụng của thông tin lẫn nhau"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "kullback-phan-ky-leibler",
+      "text": "18.10.4. Kullback — Phân kỳ Leibler"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "id12",
+      "text": "18.10.4.1. Definition"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "thuoc-tinh-phan-ky-kl",
+      "text": "18.10.4.2. Thuộc tính phân kỳ KL"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "vi-du",
+      "text": "18.10.4.3. Ví dụ"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "cross-entropy",
+      "text": "18.10.5. Cross-Entropy"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "formal-definition",
+      "text": "18.10.5.1. Formal Definition"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "thuoc-tinh",
+      "text": "18.10.5.2. Thuộc tính"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "cross-entropy-nhu-mot-chuc-nang-muc-tieu-cua-phan-loai-da-lop",
+      "text": "18.10.5.3. Cross-Entropy như một chức năng mục tiêu của phân loại đa lớp"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tom-tat",
+      "text": "18.10.6. Tóm tắt"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bai-tap",
+      "text": "18.10.7. Bài tập"
+    }
+  ],
+  "content": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "ly-thuyet-thong-tin",
+      "text": "18.10. Lý thuyết thông tin"
+    },
+    {
+      "type": "paragraph",
+      "text": "Vũ trụ tràn đầy thông tin. Thông tin cung cấp một ngôn ngữ chung giữa\ncác rạn nứt kỷ luật: từ Sonnet của Shakespeare đến bài báo của các nhà\nnghiên cứu trên Cornell ArXiv, từ Starry Night in của Van Gogh đến Bản\ngiao hưởng âm nhạc số 5 của Beethoven, từ ngôn ngữ lập trình đầu tiên\nPlankalkül đến các thuật toán máy học hiện đại. Mọi thứ phải tuân theo\ncác quy tắc của lý thuyết thông tin, bất kể định dạng. Với lý thuyết\nthông tin, chúng ta có thể đo lường và so sánh lượng thông tin có mặt\ntrong các tín hiệu khác nhau. Trong phần này, chúng tôi sẽ điều tra các\nkhái niệm cơ bản về lý thuyết thông tin và ứng dụng lý thuyết thông tin\ntrong học máy."
+    },
+    {
+      "type": "paragraph",
+      "text": "Trước khi bắt đầu, chúng ta hãy phác thảo mối quan hệ giữa học máy và lý\nthuyết thông tin. Machine learning nhằm mục đích trích xuất các tín hiệu\nthú vị từ dữ liệu và đưa ra các dự đoán quan trọng. Mặt khác, lý thuyết\nthông tin nghiên cứu mã hóa, giải mã, truyền và thao túng thông tin. Kết\nquả là lý thuyết thông tin cung cấp ngôn ngữ cơ bản để thảo luận về việc\nxử lý thông tin trong các hệ thống học máy. Ví dụ, nhiều ứng dụng máy\nhọc sử dụng mất liên ngẫu nhiên như được mô tả trong Section 3.4 . Sự mất mát này có thể được bắt nguồn trực tiếp\ntừ những cân nhắc lý thuyết thông tin."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "thong-tin",
+      "text": "18.10.1. Thông tin"
+    },
+    {
+      "type": "paragraph",
+      "text": "Hãy để chúng tôi bắt đầu với “linh hồn” của lý thuyết thông tin: thông\ntin. Thông tin có thể được mã hóa trong bất cứ điều gì với một chuỗi\ncụ thể của một hoặc nhiều định dạng mã hóa. Giả sử rằng chúng ta tự\nnhiệm vụ với việc cố gắng xác định một khái niệm về thông tin. Điều gì\ncó thể là điểm khởi đầu của chúng ta?"
+    },
+    {
+      "type": "paragraph",
+      "text": "Hãy xem xét thí nghiệm suy nghĩ sau đây. Chúng tôi có một người bạn với\nmột bộ bài. Họ sẽ xáo trộn bộ bài, lật qua một số thẻ, và cho chúng tôi\nbiết tuyên bố về các thẻ. Chúng tôi sẽ cố gắng đánh giá nội dung thông\ntin của từng tuyên bố."
+    },
+    {
+      "type": "paragraph",
+      "text": "Đầu tiên, họ lật qua một lá bài và nói với chúng tôi, “Tôi thấy một lá\nbài.” Điều này cung cấp cho chúng tôi không có thông tin nào cả. Chúng\ntôi đã chắc chắn rằng đây là trường hợp vì vậy chúng tôi hy vọng thông\ntin sẽ bằng không."
+    },
+    {
+      "type": "paragraph",
+      "text": "Tiếp theo, họ lật qua một lá bài và nói, “Tôi thấy một trái tim.” Điều\nnày cung cấp cho chúng tôi một số thông tin, nhưng trong thực tế chỉ có \\(4\\) bộ đồ khác nhau có thể, mỗi bộ đồ có khả năng như nhau, vì vậy\nchúng tôi không ngạc nhiên bởi kết quả này. Chúng tôi hy vọng rằng bất\nkể thước đo thông tin, sự kiện này nên có nội dung thông tin thấp."
+    },
+    {
+      "type": "paragraph",
+      "text": "Tiếp theo, họ lật qua một lá bài và nói, “Đây là \\(3\\) của spades.”\nĐây là thêm thông tin. Thật vậy, có \\(52\\) kết quả có khả năng như\nnhau, và bạn của chúng tôi đã nói với chúng tôi đó là cái nào. Đây phải\nlà một lượng thông tin trung bình."
+    },
+    {
+      "type": "paragraph",
+      "text": "Hãy để chúng tôi đưa điều này đến cực đoan logic. Giả sử rằng cuối cùng\nhọ lật qua mỗi thẻ từ boong và đọc toàn bộ chuỗi của boong shuffled. Có\n52 đô la! $ đơn đặt hàng khác nhau để boong, một lần nữa tất cả đều có\nkhả năng, vì vậy chúng tôi cần rất nhiều thông tin để biết đó là cái\nnào."
+    },
+    {
+      "type": "paragraph",
+      "text": "Bất kỳ khái niệm về thông tin chúng tôi phát triển phải phù hợp với trực\ngiác này. Thật vậy, trong các phần tiếp theo, chúng ta sẽ học cách tính\ntoán rằng các sự kiện này có \\(0\\text{ bits}\\) , \\(2\\text{ bits}\\) , $~5.7 text {bits} $, and $ ~ 225.6 text {bit} $\nthông tin tương ứng."
+    },
+    {
+      "type": "paragraph",
+      "text": "Nếu chúng ta đọc qua những thí nghiệm tư tưởng này, chúng ta thấy một ý\ntưởng tự nhiên. Là một điểm khởi đầu, thay vì quan tâm đến kiến thức,\nchúng ta có thể xây dựng ra ý tưởng rằng thông tin đại diện cho mức độ\nbất ngờ hoặc khả năng trừu tượng của sự kiện. Ví dụ, nếu chúng ta muốn\nmô tả một sự kiện bất thường, chúng ta cần rất nhiều thông tin. Đối với\nmột sự kiện phổ biến, chúng tôi có thể không cần nhiều thông tin."
+    },
+    {
+      "type": "paragraph",
+      "text": "Năm 1948, Claude E. Shannon xuất bản A Math Theory of Communication [Shannon, 1948] thiết lập lý thuyết thông tin. Trong bài viết của\nmình, Shannon lần đầu tiên giới thiệu khái niệm về entropy thông tin.\nChúng tôi sẽ bắt đầu hành trình của chúng tôi ở đây."
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "tu-thong-tin",
+      "text": "18.10.1.1. Tự thông tin"
+    },
+    {
+      "type": "paragraph",
+      "text": "Vì thông tin thể hiện khả năng trừu tượng của một sự kiện, làm thế nào\nđể chúng ta lập bản đồ khả năng với số bit? Shannon giới thiệu thuật ngữ\n* bit* là đơn vị thông tin, ban đầu được tạo ra bởi John Tukey. Vậy\n“bit” là gì và tại sao chúng ta sử dụng nó để đo lường thông tin? Trong\nlịch sử, một máy phát cổ chỉ có thể gửi hoặc nhận hai loại mã: \\(0\\) và \\(1\\) . Thật vậy, mã hóa nhị phân vẫn được sử dụng phổ biến trên\ntất cả các máy tính kỹ thuật số hiện đại. Bằng cách này, bất kỳ thông\ntin nào được mã hóa bởi một loạt \\(0\\) và \\(1\\) . Và do đó, một\nloạt các chữ số nhị phân có chiều dài \\(n\\) chứa \\(n\\) bit thông\ntin."
+    },
+    {
+      "type": "paragraph",
+      "text": "Bây giờ, giả sử rằng đối với bất kỳ loạt mã nào, mỗi mã \\(0\\) hoặc \\(1\\) xảy ra với xác suất \\(\\frac{1}{2}\\) . Do đó, một sự kiện \\(X\\) với một loạt các mã có độ dài \\(n\\) , xảy ra với xác suất \\(\\frac{1}{2^n}\\) . Đồng thời, như chúng tôi đã đề cập trước đây,\nloạt bài này chứa \\(n\\) bit thông tin. Vì vậy, chúng ta có thể khái\nquát hóa một hàm toán học mà có thể chuyển xác suất \\(p\\) đến số\nbit? Shannon đã đưa ra câu trả lời bằng cách xác định tự thông tin"
+    },
+    {
+      "type": "math",
+      "latex": "(18.10.1)¶\\[I(X) = - \\log_2 (p),\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "như bit thông tin chúng tôi đã nhận được cho sự kiện này \\(X\\) .\nLưu ý rằng chúng ta sẽ luôn sử dụng logarit base-2 trong phần này. Vì\nlợi ích của sự đơn giản, phần còn lại của phần này sẽ bỏ qua chỉ số dưới\n2 trong ký hiệu logarit, tức là, \\(\\log(.)\\) luôn đề cập đến \\(\\log_2(.)\\) . Ví dụ, mã “0010” có một thông tin tự"
+    },
+    {
+      "type": "math",
+      "latex": "(18.10.2)¶\\[I(\\text{\"0010\"}) = - \\log (p(\\text{\"0010\"})) = - \\log \\left( \\frac{1}{2^4} \\right) = 4 \\text{ bits}.\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Chúng ta có thể tính toán thông tin tự như hình dưới đây. Trước đó,\ntrước tiên chúng ta hãy nhập tất cả các gói cần thiết trong phần này."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "import random\nfrom mxnet import np\nfrom mxnet.metric import NegativeLogLikelihood\nfrom mxnet.ndarray import nansum\n\n\ndef self_information(p):\n    return -np.log2(p)\n\nself_information(1 / 64)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "6.0"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "import torch\nfrom torch.nn import NLLLoss\n\n\ndef nansum(x):\n    # Define nansum, as pytorch doesn't offer it inbuilt.\n    return x[~torch.isnan(x)].sum()\n\ndef self_information(p):\n    return -torch.log2(torch.tensor(p)).item()\n\nself_information(1 / 64)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "6.0"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "import tensorflow as tf\n\n\ndef log2(x):\n    return tf.math.log(x) / tf.math.log(2.)\n\ndef nansum(x):\n    return tf.reduce_sum(tf.where(tf.math.is_nan(\n        x), tf.zeros_like(x), x), axis=-1)\n\ndef self_information(p):\n    return -log2(tf.constant(p)).numpy()\n\nself_information(1 / 64)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "6.0"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "entropy",
+      "text": "18.10.2. Entropy"
+    },
+    {
+      "type": "paragraph",
+      "text": "Vì tự thông tin chỉ đo lường thông tin của một sự kiện rời rạc duy nhất,\nchúng ta cần một thước đo tổng quát hơn cho bất kỳ biến ngẫu nhiên nào\ncủa phân phối rời rạc hoặc liên tục."
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "thuc-day-entropy",
+      "text": "18.10.2.1. Thúc đẩy Entropy"
+    },
+    {
+      "type": "paragraph",
+      "text": "Hãy để chúng tôi cố gắng để có được cụ thể về những gì chúng tôi muốn.\nĐây sẽ là một tuyên bố không chính thức về những gì được gọi là * tiên\nđề của entropy Shannon*. Nó sẽ chỉ ra rằng bộ sưu tập các tuyên bố\nthông thường sau đây buộc chúng ta phải có một định nghĩa duy nhất về\nthông tin. Một phiên bản chính thức của các tiên đề này, cùng với một số\ntiên đề khác có thể được tìm thấy trong [Csiszar, 2008] ."
+    },
+    {
+      "type": "list",
+      "ordered": true,
+      "items": [
+        "Thông tin chúng ta đạt được bằng cách quan sát một biến ngẫu nhiên\nkhông phụ thuộc vào cái mà chúng ta gọi là các phần tử, hoặc sự hiện\ndiện của các yếu tố bổ sung có xác suất không.",
+        "Thông tin chúng tôi đạt được bằng cách quan sát hai biến ngẫu nhiên\nkhông nhiều hơn tổng thông tin chúng tôi đạt được bằng cách quan sát\nchúng một cách riêng biệt. Nếu chúng độc lập, thì đó chính xác là\ntổng.",
+        "Thông tin thu được khi quan sát (gần) một số sự kiện nhất định là\n(gần) bằng không."
+      ]
+    },
+    {
+      "type": "paragraph",
+      "text": "Trong khi chứng minh thực tế này nằm ngoài phạm vi văn bản của chúng ta,\nđiều quan trọng là phải biết rằng điều này xác định duy nhất hình thức\nmà entropy phải thực hiện. Sự mơ hồ duy nhất mà chúng cho phép là lựa\nchọn các đơn vị cơ bản, thường được bình thường hóa bằng cách đưa ra lựa\nchọn chúng ta đã thấy trước đó thông tin được cung cấp bởi một lần lật\nđồng xu công bằng là một bit."
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "definition",
+      "text": "18.10.2.2. Definition"
+    },
+    {
+      "type": "paragraph",
+      "text": "Đối với bất kỳ biến ngẫu nhiên \\(X\\) nào theo phân phối xác suất \\(P\\) với hàm mật độ xác suất (p.d.f.) hoặc hàm khối xác suất\n(p.m.f.) \\(p(x)\\) , chúng tôi đo lượng thông tin dự kiến thông qua entropy (hoặc entropy Shannon*)"
+    },
+    {
+      "type": "math",
+      "latex": "(18.10.3)¶\\[H(X) = - E_{x \\sim P} [\\log p(x)].\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Cụ thể, nếu \\(X\\) là rời rạc,"
+    },
+    {
+      "type": "math",
+      "latex": "(18.10.4)¶\\[H(X) = - \\sum_i p_i \\log p_i \\text{, where } p_i = P(X_i).\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Nếu không, nếu \\(X\\) là liên tục, chúng tôi cũng đề cập đến entropy\nlà * entropyvisai*"
+    },
+    {
+      "type": "math",
+      "latex": "(18.10.5)¶\\[H(X) = - \\int_x p(x) \\log p(x) \\; dx.\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Chúng ta có thể định nghĩa entropy như dưới đây."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def entropy(p):\n    entropy = - p * np.log2(p)\n    # Operator `nansum` will sum up the non-nan number\n    out = nansum(entropy.as_nd_ndarray())\n    return out\n\nentropy(np.array([0.1, 0.5, 0.1, 0.3]))"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "[1.6854753]\n<NDArray 1 @cpu(0)>"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def entropy(p):\n    entropy = - p * torch.log2(p)\n    # Operator `nansum` will sum up the non-nan number\n    out = nansum(entropy)\n    return out\n\nentropy(torch.tensor([0.1, 0.5, 0.1, 0.3]))"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "tensor(1.6855)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def entropy(p):\n    return nansum(- p * log2(p))\n\nentropy(tf.constant([0.1, 0.5, 0.1, 0.3]))"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "<tf.Tensor: shape=(), dtype=float32, numpy=1.6854753>"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "giai-thich",
+      "text": "18.10.2.3. Giải thích"
+    },
+    {
+      "type": "paragraph",
+      "text": "Bạn có thể tò mò: in the entropy definition (18.10.3) , tại\nsao chúng ta sử dụng kỳ vọng về một logarit tiêu cực? Dưới đây là một số\ntrực giác."
+    },
+    {
+      "type": "paragraph",
+      "text": "Đầu tiên, tại sao chúng ta sử dụng hàm logarit \\(\\log\\) ? Giả sử\nrằng \\(p(x) = f_1(x) f_2(x) \\ldots, f_n(x)\\) , trong đó mỗi hàm thành\nphần \\(f_i(x)\\) độc lập với nhau. Điều này có nghĩa là mỗi \\(f_i(x)\\) đóng góp độc lập vào tổng thông tin thu được từ \\(p(x)\\) . Như đã thảo luận ở trên, chúng ta muốn công thức entropy\nlà phụ gia trên các biến ngẫu nhiên độc lập. May mắn thay, \\(\\log\\) có thể tự nhiên biến một sản phẩm phân phối xác suất thành tổng hợp các\nthuật ngữ riêng lẻ."
+    },
+    {
+      "type": "paragraph",
+      "text": "Tiếp theo, tại sao chúng ta sử dụng * âm* \\(\\log\\) ? Trực giác, các\nsự kiện thường xuyên hơn nên chứa ít thông tin hơn các sự kiện ít phổ\nbiến hơn, vì chúng ta thường thu được nhiều thông tin hơn từ một trường\nhợp bất thường hơn là từ một trường hợp thông thường. Tuy nhiên, \\(\\log\\) đang tăng đơn điệu với xác suất, và thực sự tiêu cực cho\ntất cả các giá trị trong \\([0, 1]\\) . Chúng ta cần xây dựng một mối\nquan hệ giảm đơn điệu giữa xác suất của các sự kiện và entropy của\nchúng, điều này lý tưởng sẽ luôn tích cực (không có gì chúng ta quan sát\nnên buộc chúng ta quên những gì chúng ta đã biết). Do đó, chúng tôi thêm\nmột dấu âm ở phía trước của chức năng \\(\\log\\) ."
+    },
+    {
+      "type": "paragraph",
+      "text": "Cuối cùng, hàm expectation đến từ đâu? Xem xét một biến ngẫu nhiên \\(X\\) . Chúng tôi có thể giải thích thông tin bản thân\n( \\(-\\log(p)\\) ) là số lượng ngạc nhiên chúng tôi có khi thấy một\nkết quả cụ thể. Thật vậy, khi xác suất tiếp cận bằng không, sự ngạc\nnhiên trở nên vô hạn. Tương tự, chúng ta có thể giải thích entropy là\nlượng bất ngờ trung bình từ quan sát \\(X\\) . Ví dụ, hãy tưởng tượng\nrằng một hệ thống máy đánh bạc phát ra các ký hiệu độc lập thống kê \\({s_1, \\ldots, s_k}\\) với xác suất tương ứng \\({p_1, \\ldots, p_k}\\) . Sau đó, entropy của hệ thống này bằng với\nthông tin tự trung bình từ quan sát từng đầu ra, tức là,"
+    },
+    {
+      "type": "math",
+      "latex": "(18.10.6)¶\\[H(S) = \\sum_i {p_i \\cdot I(s_i)} = - \\sum_i {p_i \\cdot \\log p_i}.\\]"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "tinh-chat-cua-entropy",
+      "text": "18.10.2.4. Tính chất của Entropy"
+    },
+    {
+      "type": "paragraph",
+      "text": "Bằng các ví dụ và giải thích trên, chúng ta có thể lấy được các thuộc\ntính sau của entropy (18.10.3) . Ở đây, chúng tôi đề cập đến \\(X\\) là một sự kiện và \\(P\\) là phân phối xác suất của \\(X\\) ."
+    },
+    {
+      "type": "list",
+      "ordered": false,
+      "items": [
+        "H (X) geq 0$ for all discrete \\(X\\) (entropy can be negative for\ncontinuous \\(X\\) ).",
+        "Nếu \\(X \\sim P\\) với một p.d.f. hoặc một p.m.f. \\(p(x)\\) , và\nchúng tôi cố gắng ước tính \\(P\\) bởi một phân phối xác suất mới \\(Q\\) với p.d.f. hoặc một p.m.f. 73229363620, sau đó (18.10.7) ¶ \\[H(X) = - E_{x \\sim P} [\\log p(x)] \\leq  - E_{x \\sim P} [\\log q(x)], \\text{ with equality if and only if } P = Q.\\] Alternatively, $H (X) $ gives a lower bound of the average number of\nbits needed to encode symbols drawn from $P $.",
+        "Nếu \\(X \\sim P\\) , thì \\(x\\) truyền tải lượng thông tin tối đa\nnếu nó lây lan đều trong tất cả các kết quả có thể. Cụ thể, nếu phân\nphối xác suất \\(P\\) là rời rạc với \\(k\\) -lớp \\(\\{p_1, \\ldots, p_k \\}\\) , thì (18.10.8) ¶ \\[H(X) \\leq \\log(k), \\text{ with equality if and only if } p_i = \\frac{1}{k}, \\forall i.\\] If \\(P\\) is a continuous random variable, then the story becomes\nmuch more complicated. However, if we additionally impose that \\(P\\) is supported on a finite interval (with all values between \\(0\\) and \\(1\\) ), then $P $ có entropy cao nhất nếu đó là sự\nphân bố thống nhất trong khoảng thời gian đó."
+      ]
+    },
+    {
+      "type": "math",
+      "latex": "(18.10.7)¶\\[H(X) = - E_{x \\sim P} [\\log p(x)] \\leq  - E_{x \\sim P} [\\log q(x)], \\text{ with equality if and only if } P = Q.\\]"
+    },
+    {
+      "type": "math",
+      "latex": "(18.10.8)¶\\[H(X) \\leq \\log(k), \\text{ with equality if and only if } p_i = \\frac{1}{k}, \\forall i.\\]"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "thong-tin-lan-nhau",
+      "text": "18.10.3. Thông tin lẫn nhau"
+    },
+    {
+      "type": "paragraph",
+      "text": "Trước đây chúng ta đã định nghĩa entropy của một biến ngẫu nhiên duy\nnhất \\(X\\) , làm thế nào về entropy của một cặp biến ngẫu nhiên \\((X, Y)\\) ? Chúng ta có thể nghĩ về những kỹ thuật này là cố gắng\ntrả lời loại câu hỏi sau đây, “Thông tin nào được chứa trong \\(X\\) và \\(Y\\) cùng nhau so với từng loại riêng biệt? Có thông tin dư\nthừa, hay tất cả là duy nhất?”"
+    },
+    {
+      "type": "paragraph",
+      "text": "Đối với các cuộc thảo luận sau đây, chúng tôi luôn sử dụng \\((X, Y)\\) như một cặp biến ngẫu nhiên mà sau một phân phối xác suất\nchung \\(P\\) với một p.d.f. hoặc một p.m.f. \\(p_{X, Y}(x, y)\\) ,\ntrong khi \\(X\\) và \\(Y\\) theo phân phối xác suất \\(p_X(x)\\) và \\(p_Y(y)\\) , tương ứng."
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "entropy-chung",
+      "text": "18.10.3.1. Entropy chung"
+    },
+    {
+      "type": "paragraph",
+      "text": "Tương tự như entropy của một biến ngẫu nhiên duy nhất (18.10.3) , chúng tôi xác định entropy* doanh entropy* \\(H(X, Y)\\) của một cặp biến ngẫu nhiên \\((X, Y)\\) như"
+    },
+    {
+      "type": "math",
+      "latex": "(18.10.9)¶\\[H(X, Y) = −E_{(x, y) \\sim P} [\\log p_{X, Y}(x, y)].\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Chính xác, một mặt, nếu \\((X, Y)\\) là một cặp biến ngẫu nhiên rời\nrạc, thì"
+    },
+    {
+      "type": "math",
+      "latex": "(18.10.10)¶\\[H(X, Y) = - \\sum_{x} \\sum_{y} p_{X, Y}(x, y) \\log p_{X, Y}(x, y).\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Mặt khác, nếu \\((X, Y)\\) là một cặp biến ngẫu nhiên liên tục, thì ta\nđịnh nghĩa entropydoanh vi sai * như"
+    },
+    {
+      "type": "math",
+      "latex": "(18.10.11)¶\\[H(X, Y) = - \\int_{x, y} p_{X, Y}(x, y) \\ \\log p_{X, Y}(x, y) \\;dx \\;dy.\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Chúng ta có thể nghĩ về (18.10.9) như cho chúng ta\nbiết tổng ngẫu nhiên trong cặp biến ngẫu nhiên. Là một cặp cực đoan, nếu \\(X = Y\\) là hai biến ngẫu nhiên giống hệt nhau, thì thông tin trong\ncặp chính xác là thông tin trong một và chúng ta có \\(H(X, Y) = H(X) = H(Y)\\) . Ở thái cực khác, nếu \\(X\\) và \\(Y\\) độc lập thì \\(H(X, Y) = H(X) + H(Y)\\) . Thật vậy chúng ta\nsẽ luôn có rằng thông tin chứa trong một cặp biến ngẫu nhiên không nhỏ\nhơn entropy của một trong hai biến ngẫu nhiên và không nhiều hơn tổng\ncủa cả hai."
+    },
+    {
+      "type": "math",
+      "latex": "(18.10.12)¶\\[H(X), H(Y) \\le H(X, Y) \\le H(X) + H(Y).\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Hãy để chúng tôi thực hiện entropy chung từ đầu."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def joint_entropy(p_xy):\n    joint_ent = -p_xy * np.log2(p_xy)\n    # Operator `nansum` will sum up the non-nan number\n    out = nansum(joint_ent.as_nd_ndarray())\n    return out\n\njoint_entropy(np.array([[0.1, 0.5], [0.1, 0.3]]))"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "[1.6854753]\n<NDArray 1 @cpu(0)>"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def joint_entropy(p_xy):\n    joint_ent = -p_xy * torch.log2(p_xy)\n    # Operator `nansum` will sum up the non-nan number\n    out = nansum(joint_ent)\n    return out\n\njoint_entropy(torch.tensor([[0.1, 0.5], [0.1, 0.3]]))"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "tensor(1.6855)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def joint_entropy(p_xy):\n    joint_ent = -p_xy * log2(p_xy)\n    # Operator `nansum` will sum up the non-nan number\n    out = nansum(joint_ent)\n    return out\n\njoint_entropy(tf.constant([[0.1, 0.5], [0.1, 0.3]]))"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "<tf.Tensor: shape=(2,), dtype=float32, numpy=array([0.8321928, 0.8532826], dtype=float32)>"
+    },
+    {
+      "type": "paragraph",
+      "text": "Chú ý rằng đây là cùng code như trước đây, nhưng bây giờ chúng ta giải\nthích nó khác nhau như làm việc trên phân phối chung của hai biến ngẫu\nnhiên."
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "entropy-co-dieu-kien",
+      "text": "18.10.3.2. Entropy có điều kiện"
+    },
+    {
+      "type": "paragraph",
+      "text": "Entropy chung được xác định phía trên lượng thông tin chứa trong một cặp\nbiến ngẫu nhiên. Điều này rất hữu ích, nhưng đôi khi nó không phải là\nnhững gì chúng ta quan tâm. Xem xét các thiết lập của máy học. Chúng ta\nhãy lấy \\(X\\) là biến ngẫu nhiên (hoặc vector của các biến ngẫu\nnhiên) mô tả các giá trị điểm ảnh của một hình ảnh, và \\(Y\\) là biến\nngẫu nhiên là nhãn lớp. \\(X\\) nên chứa thông tin đáng kể - một hình\nảnh tự nhiên là một điều phức tạp. Tuy nhiên, thông tin chứa trong \\(Y\\) khi hình ảnh đã được hiển thị nên thấp. Thật vậy, hình ảnh của\nmột chữ số nên đã chứa thông tin về chữ số nào trừ khi chữ số không thể\nđọc được. Do đó, để tiếp tục mở rộng vốn từ vựng của chúng ta về lý\nthuyết thông tin, chúng ta cần có khả năng lý luận về nội dung thông tin\ntrong một biến ngẫu nhiên có điều kiện trên một biến khác."
+    },
+    {
+      "type": "paragraph",
+      "text": "Trong lý thuyết xác suất, chúng ta đã thấy định nghĩa về xác suất có\nđiều kiện * để đo lường mối quan hệ giữa các biến. Bây giờ chúng ta\nmuốn xác định tương tự các entropy* có điều kiện* \\(H(Y \\mid X)\\) .\nChúng ta có thể viết cái này như"
+    },
+    {
+      "type": "math",
+      "latex": "(18.10.13)¶\\[H(Y \\mid X) = - E_{(x, y) \\sim P} [\\log p(y \\mid x)],\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "trong đó \\(p(y \\mid x) = \\frac{p_{X, Y}(x, y)}{p_X(x)}\\) là xác suất\ncó điều kiện. Cụ thể, nếu \\((X, Y)\\) là một cặp biến ngẫu nhiên rời\nrạc, thì"
+    },
+    {
+      "type": "math",
+      "latex": "(18.10.14)¶\\[H(Y \\mid X) = - \\sum_{x} \\sum_{y} p(x, y) \\log p(y \\mid x).\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Nếu \\((X, Y)\\) là một cặp biến ngẫu nhiên liên tục, thì entropy có\nđiều kiện vi sai * được định nghĩa tương tự như"
+    },
+    {
+      "type": "math",
+      "latex": "(18.10.15)¶\\[H(Y \\mid X) = - \\int_x \\int_y p(x, y) \\ \\log p(y \\mid x) \\;dx \\;dy.\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Bây giờ nó là tự nhiên để hỏi, làm thế nào để entropy* có điều kiện* \\(H(Y \\mid X)\\) liên quan đến entropy \\(H(X)\\) và entropy khớp \\(H(X, Y)\\) ? Sử dụng các định nghĩa ở trên, chúng ta có thể thể hiện\nđiều này một cách sạch sẽ:"
+    },
+    {
+      "type": "math",
+      "latex": "(18.10.16)¶\\[H(Y \\mid X) = H(X, Y) - H(X).\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Điều này có một cách giải thích trực quan: thông tin trong \\(Y\\) được đưa ra \\(X\\) ( \\(H(Y \\mid X)\\) ) giống như thông tin trong cả \\(X\\) và \\(Y\\) cùng nhau ( \\(H(X, Y)\\) ) trừ đi thông tin đã\ncó trong \\(X\\) . Điều này cung cấp cho chúng ta thông tin trong \\(Y\\) mà cũng không được đại diện trong \\(X\\) ."
+    },
+    {
+      "type": "paragraph",
+      "text": "Bây giờ, chúng ta hãy thực hiện entropy có điều kiện (18.10.13) từ đầu."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def conditional_entropy(p_xy, p_x):\n    p_y_given_x = p_xy/p_x\n    cond_ent = -p_xy * np.log2(p_y_given_x)\n    # Operator `nansum` will sum up the non-nan number\n    out = nansum(cond_ent.as_nd_ndarray())\n    return out\n\nconditional_entropy(np.array([[0.1, 0.5], [0.2, 0.3]]), np.array([0.2, 0.8]))"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "[0.8635472]\n<NDArray 1 @cpu(0)>"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def conditional_entropy(p_xy, p_x):\n    p_y_given_x = p_xy/p_x\n    cond_ent = -p_xy * torch.log2(p_y_given_x)\n    # Operator `nansum` will sum up the non-nan number\n    out = nansum(cond_ent)\n    return out\n\nconditional_entropy(torch.tensor([[0.1, 0.5], [0.2, 0.3]]),\n                    torch.tensor([0.2, 0.8]))"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "tensor(0.8635)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def conditional_entropy(p_xy, p_x):\n    p_y_given_x = p_xy/p_x\n    cond_ent = -p_xy * log2(p_y_given_x)\n    # Operator `nansum` will sum up the non-nan number\n    out = nansum(cond_ent)\n    return out\n\nconditional_entropy(tf.constant([[0.1, 0.5], [0.2, 0.3]]),\n                    tf.constant([0.2, 0.8]))"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "<tf.Tensor: shape=(2,), dtype=float32, numpy=array([0.43903595, 0.42451128], dtype=float32)>"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "id3",
+      "text": "18.10.3.3. Thông tin lẫn nhau"
+    },
+    {
+      "type": "paragraph",
+      "text": "Với cài đặt trước đó của các biến ngẫu nhiên \\((X, Y)\\) , bạn có thể\ntự hỏi: “Bây giờ chúng ta biết có bao nhiêu thông tin được chứa trong \\(Y\\) nhưng không phải trong \\(X\\) , chúng ta có thể hỏi tương tự\nbao nhiêu thông tin được chia sẻ giữa \\(X\\) và \\(Y\\) không?” Câu\ntrả lời sẽ là * thông tin lẫn nhau* của \\((X, Y)\\) , mà chúng tôi\nsẽ viết là \\(I(X, Y)\\) ."
+    },
+    {
+      "type": "paragraph",
+      "text": "Thay vì đi thẳng vào định nghĩa chính thức, chúng ta hãy thực hành trực\ngiác của mình bằng cách đầu tiên cố gắng lấy được một biểu hiện cho\nthông tin lẫn nhau hoàn toàn dựa trên các thuật ngữ mà chúng ta đã xây\ndựng trước đây. Chúng tôi muốn tìm thông tin được chia sẻ giữa hai biến\nngẫu nhiên. Một cách chúng ta có thể cố gắng làm điều này là bắt đầu với\ntất cả thông tin có trong cả \\(X\\) và \\(Y\\) cùng nhau, và sau đó\nchúng tôi gỡ bỏ các phần không được chia sẻ. Thông tin chứa trong cả \\(X\\) và \\(Y\\) cùng nhau được viết là \\(H(X, Y)\\) . Chúng tôi\nmuốn trừ đi thông tin này trong \\(X\\) nhưng không phải trong \\(Y\\) và thông tin chứa trong \\(Y\\) nhưng không phải trong \\(X\\) . Như chúng ta đã thấy trong phần trước, điều này được đưa ra\nbởi \\(H(X \\mid Y)\\) và \\(H(Y \\mid X)\\) tương ứng. Vì vậy, chúng\ntôi có rằng thông tin lẫn nhau nên được"
+    },
+    {
+      "type": "math",
+      "latex": "(18.10.17)¶\\[I(X, Y) = H(X, Y) - H(Y \\mid X) − H(X \\mid Y).\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Thật vậy, đây là một định nghĩa hợp lệ cho các thông tin lẫn nhau. Nếu\nchúng ta mở rộng các định nghĩa của các thuật ngữ này và kết hợp chúng,\nmột chút đại số cho thấy điều này giống như"
+    },
+    {
+      "type": "math",
+      "latex": "(18.10.18)¶\\[I(X, Y) = E_{x} E_{y} \\left\\{ p_{X, Y}(x, y) \\log\\frac{p_{X, Y}(x, y)}{p_X(x) p_Y(y)} \\right\\}.\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Chúng ta có thể tóm tắt tất cả các mối quan hệ này trong hình Fig. 18.10.1 . Đó là một thử nghiệm tuyệt vời của\ntrực giác để xem tại sao các tuyên bố sau đây đều tương đương với \\(I(X, Y)\\) ."
+    },
+    {
+      "type": "list",
+      "ordered": false,
+      "items": [
+        "$H (X) − H (X giữa Y) $",
+        "$H (Y) − H (Y giữa X) $",
+        "$H (X) + H (Y) − H (X, Y) $"
+      ]
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/mutual-information.svg",
+      "local_path": "_images/mutual-information.svg",
+      "alt": "../_images/mutual-information.svg"
+    },
+    {
+      "type": "paragraph",
+      "text": "Fig. 18.10.1 Mutual information’s relationship with joint entropy and conditional\nentropy. ¶"
+    },
+    {
+      "type": "paragraph",
+      "text": "Theo nhiều cách, chúng ta có thể nghĩ về thông tin lẫn nhau (18.10.18) là phần mở rộng nguyên tắc của hệ số tương\nquan mà chúng ta đã thấy trong Section 18.6 . Điều\nnày cho phép chúng tôi yêu cầu không chỉ mối quan hệ tuyến tính giữa các\nbiến, mà còn cho thông tin tối đa được chia sẻ giữa hai biến ngẫu nhiên\ncủa bất kỳ loại nào."
+    },
+    {
+      "type": "paragraph",
+      "text": "Bây giờ, chúng ta hãy thực hiện thông tin lẫn nhau từ đầu."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def mutual_information(p_xy, p_x, p_y):\n    p = p_xy / (p_x * p_y)\n    mutual = p_xy * np.log2(p)\n    # Operator `nansum` will sum up the non-nan number\n    out = nansum(mutual.as_nd_ndarray())\n    return out\n\nmutual_information(np.array([[0.1, 0.5], [0.1, 0.3]]),\n                   np.array([0.2, 0.8]), np.array([[0.75, 0.25]]))"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "[0.7194603]\n<NDArray 1 @cpu(0)>"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def mutual_information(p_xy, p_x, p_y):\n    p = p_xy / (p_x * p_y)\n    mutual = p_xy * torch.log2(p)\n    # Operator `nansum` will sum up the non-nan number\n    out = nansum(mutual)\n    return out\n\nmutual_information(torch.tensor([[0.1, 0.5], [0.1, 0.3]]),\n                   torch.tensor([0.2, 0.8]), torch.tensor([[0.75, 0.25]]))"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "tensor(0.7195)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def mutual_information(p_xy, p_x, p_y):\n    p = p_xy / (p_x * p_y)\n    mutual = p_xy * log2(p)\n    # Operator `nansum` will sum up the non-nan number\n    out = nansum(mutual)\n    return out\n\nmutual_information(tf.constant([[0.1, 0.5], [0.1, 0.3]]),\n                   tf.constant([0.2, 0.8]), tf.constant([[0.75, 0.25]]))"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "<tf.Tensor: shape=(2,), dtype=float32, numpy=array([0.60246783, 0.1169925 ], dtype=float32)>"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "properties-of-mutual-information",
+      "text": "18.10.3.4. Properties of Mutual Information"
+    },
+    {
+      "type": "paragraph",
+      "text": "Rather than memorizing the definition of mutual information (18.10.18) , you only need to keep in mind its notable\nproperties:"
+    },
+    {
+      "type": "list",
+      "ordered": false,
+      "items": [
+        "Mutual information is symmetric, i.e., \\(I(X, Y) = I(Y, X)\\) .",
+        "Mutual information is non-negative, i.e., \\(I(X, Y) \\geq 0\\) .",
+        "\\(I(X, Y) = 0\\) if and only if \\(X\\) and \\(Y\\) are\nindependent. For example, if \\(X\\) and \\(Y\\) are independent,\nthen knowing \\(Y\\) does not give any information about \\(X\\) and vice versa, so their mutual information is zero.",
+        "Alternatively, if \\(X\\) is an invertible function of \\(Y\\) ,\nthen \\(Y\\) and \\(X\\) share all information and (18.10.19) ¶ \\[I(X, Y) = H(Y) = H(X).\\]"
+      ]
+    },
+    {
+      "type": "math",
+      "latex": "(18.10.19)¶\\[I(X, Y) = H(Y) = H(X).\\]"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "pointwise-thong-tin-lan-nhau",
+      "text": "18.10.3.5. Pointwise Thông tin lẫn nhau"
+    },
+    {
+      "type": "paragraph",
+      "text": "Khi chúng tôi làm việc với entropy vào đầu chương này, chúng tôi đã có\nthể cung cấp một giải thích về \\(-\\log(p_X(x))\\) như thế nào ngạc\nnhiên chúng tôi đã với kết quả cụ thể. Chúng tôi có thể đưa ra một cách\ngiải thích tương tự cho thuật ngữ logarit trong thông tin lẫn nhau,\nthường được gọi là thông tin lẫn nhau * pointwise*:"
+    },
+    {
+      "type": "math",
+      "latex": "(18.10.20)¶\\[\\mathrm{pmi}(x, y) = \\log\\frac{p_{X, Y}(x, y)}{p_X(x) p_Y(y)}.\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Chúng ta có thể nghĩ về (18.10.20) là đo lường bao nhiêu\nnhiều khả năng sự kết hợp cụ thể của kết quả \\(x\\) và \\(y\\) được\nso sánh với những gì chúng ta mong đợi cho kết quả ngẫu nhiên độc lập.\nNếu nó lớn và tích cực, thì hai kết quả cụ thể này xảy ra thường xuyên\nhơn nhiều so với cơ hội ngẫu nhiên (* lưu ý*: mẫu số là \\(p_X(x) p_Y(y)\\) , xác suất của hai kết quả là độc lập), trong khi\nnếu nó lớn và tiêu cực, nó đại diện cho hai kết quả xảy ra xa lessít hơn\nthan we would expect đợi by randomngẫu nhiên chancecơ hội."
+    },
+    {
+      "type": "paragraph",
+      "text": "Điều này cho phép chúng tôi giải thích thông tin lẫn nhau (18.10.18) là số tiền trung bình mà chúng tôi ngạc nhiên\nkhi thấy hai kết quả xảy ra cùng nhau so với những gì chúng tôi mong đợi\nnếu chúng độc lập."
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "cac-ung-dung-cua-thong-tin-lan-nhau",
+      "text": "18.10.3.6. Các ứng dụng của thông tin lẫn nhau"
+    },
+    {
+      "type": "paragraph",
+      "text": "Thông tin lẫn nhau có thể là một chút trừu tượng trong nó định nghĩa\nthuần túy, vậy nó liên quan đến máy học như thế nào? Trong xử lý ngôn\nngữ tự nhiên, một trong những vấn đề khó khăn nhất là độ phân giải * mơ\nhồ * , hoặc vấn đề về ý nghĩa của một từ không rõ ràng từ ngữ cảnh. Ví\ndụ, gần đây một tiêu đề trong tin tức báo cáo rằng “Amazon đang cháy”.\nBạn có thể tự hỏi liệu công ty Amazon có một tòa nhà đang cháy, hoặc\nrừng mưa Amazon đang cháy."
+    },
+    {
+      "type": "paragraph",
+      "text": "Trong trường hợp này, thông tin lẫn nhau có thể giúp chúng ta giải quyết\nsự mơ hồ này. Trước tiên, chúng tôi tìm thấy nhóm từ mà mỗi từ có thông\ntin tương đối lớn với công ty Amazon, chẳng hạn như thương mại điện tử,\ncông nghệ và trực tuyến. Thứ hai, chúng tôi tìm thấy một nhóm từ khác mà\nmỗi từ có thông tin tương đối lớn với rừng mưa Amazon, chẳng hạn như\nmưa, rừng và nhiệt đới. Khi chúng ta cần định hướng “Amazon”, chúng ta\ncó thể so sánh nhóm nào có nhiều sự xuất hiện hơn trong bối cảnh của từ\nAmazon. Trong trường hợp này, bài viết sẽ tiếp tục mô tả rừng và làm cho\nbối cảnh rõ ràng."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "kullback-phan-ky-leibler",
+      "text": "18.10.4. Kullback — Phân kỳ Leibler"
+    },
+    {
+      "type": "paragraph",
+      "text": "Như những gì chúng ta đã thảo luận trong Section 2.3 ,\nchúng ta có thể sử dụng các định mức để đo khoảng cách giữa hai điểm\ntrong không gian của bất kỳ chiều chiều nào. Chúng tôi muốn có thể thực\nhiện một nhiệm vụ tương tự với các phân phối xác suất. Có nhiều cách để\nđi về điều này, nhưng lý thuyết thông tin cung cấp một trong những cách\nđẹp nhất. Bây giờ chúng ta khám phá sự phân kỳ * Kullback—Leibler (KL) * ,\ncung cấp một cách để đo lường nếu hai phân phối có gần nhau hay không."
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "id12",
+      "text": "18.10.4.1. Definition"
+    },
+    {
+      "type": "paragraph",
+      "text": "Cho một biến ngẫu nhiên \\(X\\) mà sau phân phối xác suất \\(P\\) với một p.d.f. hoặc một p.m.f. \\(p(x)\\) , và chúng tôi ước tính \\(P\\) bởi một phân phối xác suất khác \\(Q\\) với một p.d.f. hoặc\nmột p.m.f. \\(q(x)\\) . Sau đó, phân kỳ * Kullback—Leibler (KL) * (hoặc\n* entropy tương tự*) giữa \\(P\\) và \\(Q\\) là"
+    },
+    {
+      "type": "math",
+      "latex": "(18.10.21)¶\\[D_{\\mathrm{KL}}(P\\|Q) = E_{x \\sim P} \\left[ \\log \\frac{p(x)}{q(x)} \\right].\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Như với thông tin tương hỗ theo chiều ngang (18.10.20) , chúng\nta lại có thể cung cấp một cách giải thích thuật ngữ logarit: \\(-\\log \\frac{q(x)}{p(x)} = -\\log(q(x)) - (-\\log(p(x)))\\) sẽ lớn và\ntích cực nếu chúng ta thấy \\(x\\) thường xuyên hơn nhiều dưới \\(P\\) so với chúng ta mong đợi cho \\(Q\\) , và lớn và tiêu cực nếu\nchúng ta thấy kết quả ít hơn nhiều so với dự kiến. Bằng cách này, chúng\ntôi có thể hiểu nó là bất ngờ * tương tự* của chúng tôi khi quan sát\nkết quả so với việc chúng tôi sẽ ngạc nhiên như thế nào chúng tôi sẽ\nquan sát nó từ phân phối tham chiếu của chúng tôi."
+    },
+    {
+      "type": "paragraph",
+      "text": "Hãy để chúng tôi thực hiện sự phân kỳ KL từ Scratch."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def kl_divergence(p, q):\n    kl = p * np.log2(p / q)\n    out = nansum(kl.as_nd_ndarray())\n    return out.abs().asscalar()"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def kl_divergence(p, q):\n    kl = p * torch.log2(p / q)\n    out = nansum(kl)\n    return out.abs().item()"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def kl_divergence(p, q):\n    kl = p * log2(p / q)\n    out = nansum(kl)\n    return tf.abs(out).numpy()"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "thuoc-tinh-phan-ky-kl",
+      "text": "18.10.4.2. Thuộc tính phân kỳ KL"
+    },
+    {
+      "type": "paragraph",
+      "text": "Chúng ta hãy xem xét một số thuộc tính của sự phân kỳ KL (18.10.21) ."
+    },
+    {
+      "type": "list",
+      "ordered": false,
+      "items": [
+        "Sự phân kỳ KL là không đối xứng, tức là, có \\(P,Q\\) sao cho (18.10.22) ¶ \\[D_{\\mathrm{KL}}(P\\|Q) \\neq D_{\\mathrm{KL}}(Q\\|P).\\]",
+        "Sự phân kỳ KL là không âm tính, tức là (18.10.23) ¶ \\[D_{\\mathrm{KL}}(P\\|Q) \\geq 0.\\] Note that the equality holds only when \\(P = Q\\) .",
+        "Nếu tồn tại một \\(x\\) như vậy mà \\(p(x) > 0\\) và \\(q(x) = 0\\) , sau đó \\(D_{\\mathrm{KL}}(P\\|Q) = \\infty\\) .",
+        "Có một mối quan hệ chặt chẽ giữa sự phân kỳ KL và thông tin lẫn nhau.\nBên cạnh mối quan hệ thể hiện trong Fig. 18.10.1 , \\(I(X, Y)\\) cũng tương đương\nsố với các thuật ngữ sau: \\(D_{\\mathrm{KL}}(P(X, Y) \\ \\| \\ P(X)P(Y))\\) ; \\(E_Y \\{ D_{\\mathrm{KL}}(P(X \\mid Y) \\ \\| \\ P(X)) \\}\\) ; \\(E_X \\{ D_{\\mathrm{KL}}(P(Y \\mid X) \\ \\| \\ P(Y)) \\}\\) .",
+        "\\(D_{\\mathrm{KL}}(P(X, Y) \\ \\| \\ P(X)P(Y))\\) ;",
+        "\\(E_Y \\{ D_{\\mathrm{KL}}(P(X \\mid Y) \\ \\| \\ P(X)) \\}\\) ;",
+        "\\(E_X \\{ D_{\\mathrm{KL}}(P(Y \\mid X) \\ \\| \\ P(Y)) \\}\\) ."
+      ]
+    },
+    {
+      "type": "math",
+      "latex": "(18.10.22)¶\\[D_{\\mathrm{KL}}(P\\|Q) \\neq D_{\\mathrm{KL}}(Q\\|P).\\]"
+    },
+    {
+      "type": "math",
+      "latex": "(18.10.23)¶\\[D_{\\mathrm{KL}}(P\\|Q) \\geq 0.\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Đối với nhiệm kỳ đầu tiên, chúng tôi giải thích thông tin lẫn nhau là sự\nphân kỳ KL giữa \\(P(X, Y)\\) và sản phẩm của \\(P(X)\\) và \\(P(Y)\\) , và do đó là thước đo sự khác biệt của sự phân phối chung\nso với phân phối nếu chúng độc lập. Đối với thuật ngữ thứ hai, thông tin\nlẫn nhau cho chúng ta biết sự giảm trung bình về sự không chắc chắn về \\(Y\\) là kết quả từ việc tìm hiểu giá trị của phân phối \\(X\\) .\nTương tự như nhiệm kỳ thứ ba."
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "vi-du",
+      "text": "18.10.4.3. Ví dụ"
+    },
+    {
+      "type": "paragraph",
+      "text": "Chúng ta hãy đi qua một ví dụ đồ chơi để xem sự không đối xứng một cách\nrõ ràng."
+    },
+    {
+      "type": "paragraph",
+      "text": "Đầu tiên, chúng ta hãy tạo ra và sắp xếp ba hàng chục chiều dài \\(10,000\\) : một tensor khách quan \\(p\\) mà sau một phân phối\nbình thường \\(N(0, 1)\\) , và hai học sinh ứng cử viên \\(q_1\\) và \\(q_2\\) mà theo phân phối bình thường \\(N(-1, 1)\\) và \\(N(1, 1)\\) tương ứng."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "random.seed(1)\n\nnd_len = 10000\np = np.random.normal(loc=0, scale=1, size=(nd_len, ))\nq1 = np.random.normal(loc=-1, scale=1, size=(nd_len, ))\nq2 = np.random.normal(loc=1, scale=1, size=(nd_len, ))\n\np = np.array(sorted(p.asnumpy()))\nq1 = np.array(sorted(q1.asnumpy()))\nq2 = np.array(sorted(q2.asnumpy()))"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "torch.manual_seed(1)\n\ntensor_len = 10000\np = torch.normal(0, 1, (tensor_len, ))\nq1 = torch.normal(-1, 1, (tensor_len, ))\nq2 = torch.normal(1, 1, (tensor_len, ))\n\np = torch.sort(p)[0]\nq1 = torch.sort(q1)[0]\nq2 = torch.sort(q2)[0]"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "tensor_len = 10000\np = tf.random.normal((tensor_len, ), 0, 1)\nq1 = tf.random.normal((tensor_len, ), -1, 1)\nq2 = tf.random.normal((tensor_len, ), 1, 1)\n\np = tf.sort(p)\nq1 = tf.sort(q1)\nq2 = tf.sort(q2)"
+    },
+    {
+      "type": "paragraph",
+      "text": "Vì \\(q_1\\) và \\(q_2\\) đối xứng với trục y (tức là \\(x=0\\) ),\nchúng tôi mong đợi một giá trị tương tự của sự phân kỳ KL giữa \\(D_{\\mathrm{KL}}(p\\|q_1)\\) và \\(D_{\\mathrm{KL}}(p\\|q_2)\\) . Như\nbạn có thể thấy bên dưới, chỉ có một ít hơn 3% tắt giữa \\(D_{\\mathrm{KL}}(p\\|q_1)\\) và \\(D_{\\mathrm{KL}}(p\\|q_2)\\) ."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "kl_pq1 = kl_divergence(p, q1)\nkl_pq2 = kl_divergence(p, q2)\nsimilar_percentage = abs(kl_pq1 - kl_pq2) / ((kl_pq1 + kl_pq2) / 2) * 100\n\nkl_pq1, kl_pq2, similar_percentage"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "(8470.638, 8664.998, 2.268492904612395)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "kl_pq1 = kl_divergence(p, q1)\nkl_pq2 = kl_divergence(p, q2)\nsimilar_percentage = abs(kl_pq1 - kl_pq2) / ((kl_pq1 + kl_pq2) / 2) * 100\n\nkl_pq1, kl_pq2, similar_percentage"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "(8582.0341796875, 8828.3095703125, 2.8290698237936858)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "kl_pq1 = kl_divergence(p, q1)\nkl_pq2 = kl_divergence(p, q2)\nsimilar_percentage = abs(kl_pq1 - kl_pq2) / ((kl_pq1 + kl_pq2) / 2) * 100\n\nkl_pq1, kl_pq2, similar_percentage"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "(8468.274, 8746.4, 3.231265927940754)"
+    },
+    {
+      "type": "paragraph",
+      "text": "Ngược lại, bạn có thể thấy rằng \\(D_{\\mathrm{KL}}(q_2 \\|p)\\) và \\(D_{\\mathrm{KL}}(p \\| q_2)\\) bị tắt rất nhiều, với khoảng 40% giảm\ngiá như hình dưới đây."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "kl_q2p = kl_divergence(q2, p)\ndiffer_percentage = abs(kl_q2p - kl_pq2) / ((kl_q2p + kl_pq2) / 2) * 100\n\nkl_q2p, differ_percentage"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "(13536.835, 43.88680093791528)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "kl_q2p = kl_divergence(q2, p)\ndiffer_percentage = abs(kl_q2p - kl_pq2) / ((kl_q2p + kl_pq2) / 2) * 100\n\nkl_q2p, differ_percentage"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "(14130.125, 46.18621024399691)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "kl_q2p = kl_divergence(q2, p)\ndiffer_percentage = abs(kl_q2p - kl_pq2) / ((kl_q2p + kl_pq2) / 2) * 100\n\nkl_q2p, differ_percentage"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "(13882.982, 45.39745581052841)"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "cross-entropy",
+      "text": "18.10.5. Cross-Entropy"
+    },
+    {
+      "type": "paragraph",
+      "text": "Nếu bạn tò mò về các ứng dụng của lý thuyết thông tin trong học sâu, đây\nlà một ví dụ nhanh. Chúng tôi xác định phân phối thực sự \\(P\\) với\nphân phối xác suất \\(p(x)\\) và phân phối ước tính \\(Q\\) với phân\nphối xác suất \\(q(x)\\) và chúng tôi sẽ sử dụng chúng trong phần còn\nlại của phần này."
+    },
+    {
+      "type": "paragraph",
+      "text": "Giả sử chúng ta cần giải quyết một bài toán phân loại nhị phân dựa trên \\(n\\) ví dụ dữ liệu cho { \\(x_1, \\ldots, x_n\\) }. Giả sử rằng\nchúng tôi mã hóa \\(1\\) và \\(0\\) như là nhãn lớp dương và âm \\(y_i\\) tương ứng, và mạng thần kinh của chúng tôi được tham số hóa\nbởi \\(\\theta\\) . Nếu chúng ta muốn tìm một \\(\\theta\\) tốt nhất để \\(\\hat{y}_i= p_{\\theta}(y_i \\mid x_i)\\) , nó là tự nhiên để áp dụng\ncách tiếp cận khả năng đăng nhập tối đa như đã thấy trong Section 18.7 . Cụ thể, đối với nhãn thực \\(y_i\\) và dự đoán \\(\\hat{y}_i= p_{\\theta}(y_i \\mid x_i)\\) , xác\nsuất được phân loại là dương tính là \\(\\pi_i= p_{\\theta}(y_i = 1 \\mid x_i)\\) . Do đó, hàm log-likelihood\nsẽ là"
+    },
+    {
+      "type": "math",
+      "latex": "(18.10.24)¶\\[\\begin{split}\\begin{aligned}\nl(\\theta) &= \\log L(\\theta) \\\\\n  &= \\log \\prod_{i=1}^n \\pi_i^{y_i} (1 - \\pi_i)^{1 - y_i} \\\\\n  &= \\sum_{i=1}^n y_i \\log(\\pi_i) + (1 - y_i) \\log (1 - \\pi_i). \\\\\n\\end{aligned}\\end{split}\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Tối đa hóa chức năng log-likelihood \\(l(\\theta)\\) giống hệt với việc\ngiảm thiểu \\(- l(\\theta)\\) , và do đó chúng ta có thể tìm thấy \\(\\theta\\) tốt nhất từ đây. Để khái quát hóa tổn thất trên đối với\nbất kỳ bản phân phối nào, chúng tôi cũng gọi \\(-l(\\theta)\\) là mất cross-entropy \\(\\mathrm{CE}(y, \\hat{y})\\) , trong đó \\(y\\) theo\ndõi phân phối thực sự \\(P\\) và \\(\\hat{y}\\) theo phân phối ước\ntính \\(Q\\) ."
+    },
+    {
+      "type": "paragraph",
+      "text": "Tất cả điều này có nguồn gốc bằng cách làm việc từ quan điểm khả năng\ntối đa. Tuy nhiên, nếu chúng ta nhìn kỹ, chúng ta có thể thấy rằng các\nthuật ngữ như \\(\\log(\\pi_i)\\) đã nhập vào tính toán của chúng ta, đó\nlà một dấu hiệu vững chắc cho thấy chúng ta có thể hiểu được biểu thức\ntừ quan điểm lý thuyết thông tin."
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "formal-definition",
+      "text": "18.10.5.1. Formal Definition"
+    },
+    {
+      "type": "paragraph",
+      "text": "Giống như sự phân kỳ KL, đối với một biến ngẫu nhiên \\(X\\) , chúng ta\ncũng có thể đo phân kỳ giữa phân phối ước tính \\(Q\\) và phân phối\nthật \\(P\\) qua cross-entropy ,"
+    },
+    {
+      "type": "math",
+      "latex": "(18.10.25)¶\\[\\mathrm{CE}(P, Q) = - E_{x \\sim P} [\\log(q(x))].\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Bằng cách sử dụng các thuộc tính của entropy được thảo luận ở trên,\nchúng ta cũng có thể giải thích nó như là tổng kết của entropy \\(H(P)\\) và phân kỳ KL giữa \\(P\\) và \\(Q\\) , tức là,"
+    },
+    {
+      "type": "math",
+      "latex": "(18.10.26)¶\\[\\mathrm{CE} (P, Q) = H(P) + D_{\\mathrm{KL}}(P\\|Q).\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Chúng ta có thể thực hiện sự mất mát cross-entropy như dưới đây."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def cross_entropy(y_hat, y):\n    ce = -np.log(y_hat[range(len(y_hat)), y])\n    return ce.mean()"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def cross_entropy(y_hat, y):\n    ce = -torch.log(y_hat[range(len(y_hat)), y])\n    return ce.mean()"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def cross_entropy(y_hat, y):\n    # `tf.gather_nd` is used to select specific indices of a tensor.\n    ce = -tf.math.log(tf.gather_nd(y_hat, indices = [[i, j] for i, j in zip(\n        range(len(y_hat)), y)]))\n    return tf.reduce_mean(ce).numpy()"
+    },
+    {
+      "type": "paragraph",
+      "text": "Bây giờ xác định hai hàng chục cho các nhãn và dự đoán, và tính toán sự\nmất mát cross-entropy của chúng."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "labels = np.array([0, 2])\npreds = np.array([[0.3, 0.6, 0.1], [0.2, 0.3, 0.5]])\n\ncross_entropy(preds, labels)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "array(0.94856)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "labels = torch.tensor([0, 2])\npreds = torch.tensor([[0.3, 0.6, 0.1], [0.2, 0.3, 0.5]])\n\ncross_entropy(preds, labels)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "tensor(0.9486)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "labels = tf.constant([0, 2])\npreds = tf.constant([[0.3, 0.6, 0.1], [0.2, 0.3, 0.5]])\n\ncross_entropy(preds, labels)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "0.94856"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "thuoc-tinh",
+      "text": "18.10.5.2. Thuộc tính"
+    },
+    {
+      "type": "paragraph",
+      "text": "Như đã ám chỉ ở phần đầu của phần này, cross-entropy (18.10.25) có thể được sử dụng để định nghĩa một hàm mất mát\ntrong bài toán tối ưu hóa. Nó chỉ ra rằng những điều sau đây là tương\nđương:"
+    },
+    {
+      "type": "list",
+      "ordered": true,
+      "items": [
+        "Tối đa hóa xác suất dự đoán của \\(Q\\) cho phân phối \\(P\\) ,\n(tức là, $ E_ {x  sim P} [ log (q (x))] $);",
+        "Giảm thiểu chéo entropy \\(\\mathrm{CE} (P, Q)\\) ;",
+        "Giảm thiểu sự phân kỳ KL \\(D_{\\mathrm{KL}}(P\\|Q)\\) ."
+      ]
+    },
+    {
+      "type": "paragraph",
+      "text": "Định nghĩa của cross-entropy gián tiếp chứng minh mối quan hệ tương\nđương giữa mục tiêu 2 và mục tiêu 3, miễn là entropy của dữ liệu thật \\(H(P)\\) là không đổi."
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "cross-entropy-nhu-mot-chuc-nang-muc-tieu-cua-phan-loai-da-lop",
+      "text": "18.10.5.3. Cross-Entropy như một chức năng mục tiêu của phân loại đa lớp"
+    },
+    {
+      "type": "paragraph",
+      "text": "Nếu chúng ta đi sâu vào hàm mục tiêu phân loại với tổn thất chéo entropy \\(\\mathrm{CE}\\) , chúng ta sẽ thấy việc giảm thiểu \\(\\mathrm{CE}\\) tương đương với việc tối đa hóa hàm khả năng log \\(L\\) ."
+    },
+    {
+      "type": "paragraph",
+      "text": "Để bắt đầu, giả sử rằng chúng ta được cung cấp một tập dữ liệu với \\(n\\) ví dụ và nó có thể được phân loại thành \\(k\\) -lớp. Đối với\nmỗi ví dụ dữ liệu \\(i\\) , chúng tôi đại diện cho bất kỳ nhãn \\(k\\) -lớp \\(\\mathbf{y}_i = (y_{i1}, \\ldots, y_{ik})\\) bằng cách\n* mã hóa một nóng*. Cụ thể, nếu ví dụ \\(i\\) thuộc về lớp \\(j\\) , thì chúng ta đặt mục \\(j\\) -th thành \\(1\\) và tất cả\ncác thành phần khác thành \\(0\\) , tức là,"
+    },
+    {
+      "type": "math",
+      "latex": "(18.10.27)¶\\[\\begin{split}y_{ij} = \\begin{cases}1 & j \\in J; \\\\ 0 &\\text{otherwise.}\\end{cases}\\end{split}\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Ví dụ, nếu một bài toán phân loại nhiều lớp chứa ba lớp \\(A\\) , \\(B\\) và \\(C\\) , thì nhãn \\(\\mathbf{y}_i\\) có thể được mã hóa\ntrong { \\(A: (1, 0, 0); B: (0, 1, 0); C: (0, 0, 1)\\) }."
+    },
+    {
+      "type": "paragraph",
+      "text": "Giả sử rằng mạng thần kinh của chúng tôi được tham số hóa bởi \\(\\theta\\) . Đối với vectơ nhãn thật \\(\\mathbf{y}_i\\) và dự đoán"
+    },
+    {
+      "type": "math",
+      "latex": "(18.10.28)¶\\[\\hat{\\mathbf{y}}_i= p_{\\theta}(\\mathbf{y}_i \\mid \\mathbf{x}_i) = \\sum_{j=1}^k y_{ij} p_{\\theta} (y_{ij}  \\mid  \\mathbf{x}_i).\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Do đó, cross-entropy mất sẽ là"
+    },
+    {
+      "type": "math",
+      "latex": "(18.10.29)¶\\[\\begin{split}\\mathrm{CE}(\\mathbf{y}, \\hat{\\mathbf{y}}) = - \\sum_{i=1}^n \\mathbf{y}_i \\log \\hat{\\mathbf{y}}_i\n = - \\sum_{i=1}^n \\sum_{j=1}^k y_{ij} \\log{p_{\\theta} (y_{ij}  \\mid  \\mathbf{x}_i)}.\\\\\\end{split}\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Mặt khác, chúng ta cũng có thể tiếp cận vấn đề thông qua ước tính khả\nnăng tối đa. Để bắt đầu, chúng ta hãy nhanh chóng giới thiệu một phân\nphối multinoulli \\(k\\) lớp. Nó là một phần mở rộng của phân phối\nBernoulli từ lớp nhị phân sang đa lớp. Nếu một biến ngẫu nhiên \\(\\mathbf{z} = (z_{1}, \\ldots, z_{k})\\) theo sau một \\(k\\) -class * multinoulli phân phối * với xác suất \\(\\mathbf{p} =\\) ( \\(p_{1}, \\ldots, p_{k}\\) ), tức là"
+    },
+    {
+      "type": "math",
+      "latex": "(18.10.30)¶\\[p(\\mathbf{z}) = p(z_1, \\ldots, z_k) = \\mathrm{Multi} (p_1, \\ldots, p_k), \\text{ where } \\sum_{i=1}^k p_i = 1,\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "then the joint probability mass function(p.m.f.) of $ mathbf {z} $ là"
+    },
+    {
+      "type": "math",
+      "latex": "(18.10.31)¶\\[\\mathbf{p}^\\mathbf{z} = \\prod_{j=1}^k p_{j}^{z_{j}}.\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Có thể thấy rằng nhãn của mỗi ví dụ dữ liệu, \\(\\mathbf{y}_i\\) , đang\ntheo một phân phối multinoulli \\(k\\) -lớp với xác suất \\(\\boldsymbol{\\pi} =\\) ( \\(\\pi_{1}, \\ldots, \\pi_{k}\\) ). Do đó,\np.m.f. chung của mỗi ví dụ dữ liệu \\(\\mathbf{y}_i\\) là \\(\\mathbf{\\pi}^{\\mathbf{y}_i} = \\prod_{j=1}^k \\pi_{j}^{y_{ij}}.\\) Do\nđó, chức năng log-likelihood sẽ là"
+    },
+    {
+      "type": "math",
+      "latex": "(18.10.32)¶\\[\\begin{split}\\begin{aligned}\nl(\\theta)\n = \\log L(\\theta)\n = \\log \\prod_{i=1}^n \\boldsymbol{\\pi}^{\\mathbf{y}_i}\n = \\log \\prod_{i=1}^n \\prod_{j=1}^k \\pi_{j}^{y_{ij}}\n = \\sum_{i=1}^n \\sum_{j=1}^k y_{ij} \\log{\\pi_{j}}.\\\\\n\\end{aligned}\\end{split}\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Kể từ khi ước tính khả năng tối đa, chúng tôi tối đa hóa hàm khách quan \\(l(\\theta)\\) bằng cách có \\(\\pi_{j} = p_{\\theta} (y_{ij} \\mid \\mathbf{x}_i)\\) . Do đó, đối với\nbất kỳ phân loại đa lớp nào, tối đa hóa hàm log-likelihood trên \\(l(\\theta)\\) tương đương với việc giảm thiểu tổn thất CE \\(\\mathrm{CE}(y, \\hat{y})\\) ."
+    },
+    {
+      "type": "paragraph",
+      "text": "Để kiểm tra bằng chứng trên, chúng ta hãy áp dụng biện pháp tích hợp NegativeLogLikelihood . Sử dụng tương tự labels và preds như\ntrong ví dụ trước đó, chúng ta sẽ nhận được tổn thất số tương tự như ví\ndụ trước cho đến 5 vị trí thập phân."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "nll_loss = NegativeLogLikelihood()\nnll_loss.update(labels.as_nd_ndarray(), preds.as_nd_ndarray())\nnll_loss.get()"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "('nll-loss', 0.9485599994659424)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "# Implementation of cross-entropy loss in PyTorch combines `nn.LogSoftmax()`\n# and `nn.NLLLoss()`\nnll_loss = NLLLoss()\nloss = nll_loss(torch.log(preds), labels)\nloss"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "tensor(0.9486)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def nll_loss(y_hat, y):\n    # Convert labels to one-hot vectors.\n    y = tf.keras.utils.to_categorical(y, num_classes= y_hat.shape[1])\n    # We will not calculate negative log-likelihood from the definition.\n    # Rather, we will follow a circular argument. Because NLL is same as\n    # `cross_entropy`, if we calculate cross_entropy that would give us NLL\n    cross_entropy = tf.keras.losses.CategoricalCrossentropy(\n        from_logits = True, reduction = tf.keras.losses.Reduction.NONE)\n    return tf.reduce_mean(cross_entropy(y, y_hat)).numpy()\n\nloss = nll_loss(tf.math.log(preds), labels)\nloss"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "0.94856"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tom-tat",
+      "text": "18.10.6. Tóm tắt"
+    },
+    {
+      "type": "list",
+      "ordered": false,
+      "items": [
+        "Lý thuyết thông tin là một lĩnh vực nghiên cứu về mã hóa, giải mã,\ntruyền tải, và thao túng thông tin.",
+        "Entropy là đơn vị để đo lượng thông tin được trình bày trong các tín\nhiệu khác nhau.",
+        "Sự phân kỳ KL cũng có thể đo lường sự phân kỳ giữa hai bản phân phối.",
+        "Cross-entropy có thể được xem như là một chức năng khách quan của\nphân loại nhiều lớp. Giảm thiểu tổn thất chéo entropy tương đương với\nviệc tối đa hóa chức năng log-likelihood."
+      ]
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bai-tap",
+      "text": "18.10.7. Bài tập"
+    },
+    {
+      "type": "list",
+      "ordered": true,
+      "items": [
+        "Xác minh rằng các ví dụ thẻ từ phần đầu tiên thực sự có entropy tuyên\nbố.",
+        "Cho thấy sự phân kỳ KL \\(D(p\\|q)\\) là không âm tính cho tất cả\ncác bản phân phối \\(p\\) và \\(q\\) . Gợi ý: sử dụng bất đẳng\nthức của Jensen, tức là sử dụng thực tế là \\(-\\log x\\) là một hàm\nlồi.",
+        "Hãy để chúng tôi tính toán entropy từ một vài nguồn dữ liệu: Giả sử rằng bạn đang xem đầu ra được tạo ra bởi một con khỉ tại\nmột máy đánh chữ. Khỉ nhấn bất kỳ phím \\(44\\) nào của máy đánh\nchữ một cách ngẫu nhiên (bạn có thể giả định rằng nó chưa phát\nhiện ra bất kỳ phím đặc biệt nào hoặc phím shift nào). Bạn quan\nsát bao nhiêu bit ngẫu nhiên trên mỗi ký tự? Không hài lòng với con khỉ, bạn đã thay thế nó bằng một máy sắp\nchữ say rượu. Nó có thể tạo ra từ, mặc dù không mạch lạc. Thay vào\nđó, nó chọn một từ ngẫu nhiên từ một từ vựng gồm \\(2,000\\) từ.\nChúng ta hãy giả định rằng độ dài trung bình của một từ là \\(4.5\\) chữ cái trong tiếng Anh. Bạn quan sát bao nhiêu bit\nngẫu nhiên trên mỗi ký tự bây giờ? Vẫn không hài lòng với kết quả, bạn thay thế máy sắp chữ bằng một\nmô hình ngôn ngữ chất lượng cao. Mô hình ngôn ngữ hiện có thể có\nđược sự bối rối thấp tới \\(15\\) điểm cho mỗi từ. Ký tự perplexity của một mô hình ngôn ngữ được định nghĩa là nghịch\nđảo của trung bình hình học của một tập hợp xác suất, mỗi xác suất\ntương ứng với một ký tự trong từ. Cụ thể, nếu độ dài của một từ\nnhất định là \\(l\\) , thì \\(\\mathrm{PPL}(\\text{word}) = \\left[\\prod_i p(\\text{character}_i)\\right]^{ -\\frac{1}{l}} = \\exp \\left[ - \\frac{1}{l} \\sum_i{\\log p(\\text{character}_i)} \\right].\\) Giả sử rằng từ kiểm tra có 4,5 chữ cái, bạn quan sát bao nhiêu bit\nngẫu nhiên trên mỗi ký tự bây giờ?",
+        "Giả sử rằng bạn đang xem đầu ra được tạo ra bởi một con khỉ tại\nmột máy đánh chữ. Khỉ nhấn bất kỳ phím \\(44\\) nào của máy đánh\nchữ một cách ngẫu nhiên (bạn có thể giả định rằng nó chưa phát\nhiện ra bất kỳ phím đặc biệt nào hoặc phím shift nào). Bạn quan\nsát bao nhiêu bit ngẫu nhiên trên mỗi ký tự?",
+        "Không hài lòng với con khỉ, bạn đã thay thế nó bằng một máy sắp\nchữ say rượu. Nó có thể tạo ra từ, mặc dù không mạch lạc. Thay vào\nđó, nó chọn một từ ngẫu nhiên từ một từ vựng gồm \\(2,000\\) từ.\nChúng ta hãy giả định rằng độ dài trung bình của một từ là \\(4.5\\) chữ cái trong tiếng Anh. Bạn quan sát bao nhiêu bit\nngẫu nhiên trên mỗi ký tự bây giờ?",
+        "Vẫn không hài lòng với kết quả, bạn thay thế máy sắp chữ bằng một\nmô hình ngôn ngữ chất lượng cao. Mô hình ngôn ngữ hiện có thể có\nđược sự bối rối thấp tới \\(15\\) điểm cho mỗi từ. Ký tự perplexity của một mô hình ngôn ngữ được định nghĩa là nghịch\nđảo của trung bình hình học của một tập hợp xác suất, mỗi xác suất\ntương ứng với một ký tự trong từ. Cụ thể, nếu độ dài của một từ\nnhất định là \\(l\\) , thì \\(\\mathrm{PPL}(\\text{word}) = \\left[\\prod_i p(\\text{character}_i)\\right]^{ -\\frac{1}{l}} = \\exp \\left[ - \\frac{1}{l} \\sum_i{\\log p(\\text{character}_i)} \\right].\\) Giả sử rằng từ kiểm tra có 4,5 chữ cái, bạn quan sát bao nhiêu bit\nngẫu nhiên trên mỗi ký tự bây giờ?",
+        "Giải thích trực giác tại sao \\(I(X, Y) = H(X) - H(X|Y)\\) . Sau đó,\ncho thấy điều này là đúng bằng cách thể hiện cả hai bên như một kỳ\nvọng liên quan đến phân phối chung.",
+        "Sự phân kỳ KL giữa hai bản phân phối Gaussian \\(\\mathcal{N}(\\mu_1, \\sigma_1^2)\\) và \\(\\mathcal{N}(\\mu_2, \\sigma_2^2)\\) là gì?"
+      ]
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    }
+  ],
+  "images": [
+    {
+      "original_url": "https://vi.d2l.ai/_images/mutual-information.svg",
+      "local_path": "_images/mutual-information.svg",
+      "alt": "../_images/mutual-information.svg"
+    }
+  ],
+  "text": "18.10. Lý thuyết thông tin\nVũ trụ tràn đầy thông tin. Thông tin cung cấp một ngôn ngữ chung giữa\ncác rạn nứt kỷ luật: từ Sonnet của Shakespeare đến bài báo của các nhà\nnghiên cứu trên Cornell ArXiv, từ Starry Night in của Van Gogh đến Bản\ngiao hưởng âm nhạc số 5 của Beethoven, từ ngôn ngữ lập trình đầu tiên\nPlankalkül đến các thuật toán máy học hiện đại. Mọi thứ phải tuân theo\ncác quy tắc của lý thuyết thông tin, bất kể định dạng. Với lý thuyết\nthông tin, chúng ta có thể đo lường và so sánh lượng thông tin có mặt\ntrong các tín hiệu khác nhau. Trong phần này, chúng tôi sẽ điều tra các\nkhái niệm cơ bản về lý thuyết thông tin và ứng dụng lý thuyết thông tin\ntrong học máy.\nTrước khi bắt đầu, chúng ta hãy phác thảo mối quan hệ giữa học máy và lý\nthuyết thông tin. Machine learning nhằm mục đích trích xuất các tín hiệu\nthú vị từ dữ liệu và đưa ra các dự đoán quan trọng. Mặt khác, lý thuyết\nthông tin nghiên cứu mã hóa, giải mã, truyền và thao túng thông tin. Kết\nquả là lý thuyết thông tin cung cấp ngôn ngữ cơ bản để thảo luận về việc\nxử lý thông tin trong các hệ thống học máy. Ví dụ, nhiều ứng dụng máy\nhọc sử dụng mất liên ngẫu nhiên như được mô tả trong Section 3.4 . Sự mất mát này có thể được bắt nguồn trực tiếp\ntừ những cân nhắc lý thuyết thông tin.\n18.10.1. Thông tin\nHãy để chúng tôi bắt đầu với “linh hồn” của lý thuyết thông tin: thông\ntin. Thông tin có thể được mã hóa trong bất cứ điều gì với một chuỗi\ncụ thể của một hoặc nhiều định dạng mã hóa. Giả sử rằng chúng ta tự\nnhiệm vụ với việc cố gắng xác định một khái niệm về thông tin. Điều gì\ncó thể là điểm khởi đầu của chúng ta?\nHãy xem xét thí nghiệm suy nghĩ sau đây. Chúng tôi có một người bạn với\nmột bộ bài. Họ sẽ xáo trộn bộ bài, lật qua một số thẻ, và cho chúng tôi\nbiết tuyên bố về các thẻ. Chúng tôi sẽ cố gắng đánh giá nội dung thông\ntin của từng tuyên bố.\nĐầu tiên, họ lật qua một lá bài và nói với chúng tôi, “Tôi thấy một lá\nbài.” Điều này cung cấp cho chúng tôi không có thông tin nào cả. Chúng\ntôi đã chắc chắn rằng đây là trường hợp vì vậy chúng tôi hy vọng thông\ntin sẽ bằng không.\nTiếp theo, họ lật qua một lá bài và nói, “Tôi thấy một trái tim.” Điều\nnày cung cấp cho chúng tôi một số thông tin, nhưng trong thực tế chỉ có \\(4\\) bộ đồ khác nhau có thể, mỗi bộ đồ có khả năng như nhau, vì vậy\nchúng tôi không ngạc nhiên bởi kết quả này. Chúng tôi hy vọng rằng bất\nkể thước đo thông tin, sự kiện này nên có nội dung thông tin thấp.\nTiếp theo, họ lật qua một lá bài và nói, “Đây là \\(3\\) của spades.”\nĐây là thêm thông tin. Thật vậy, có \\(52\\) kết quả có khả năng như\nnhau, và bạn của chúng tôi đã nói với chúng tôi đó là cái nào. Đây phải\nlà một lượng thông tin trung bình.\nHãy để chúng tôi đưa điều này đến cực đoan logic. Giả sử rằng cuối cùng\nhọ lật qua mỗi thẻ từ boong và đọc toàn bộ chuỗi của boong shuffled. Có\n52 đô la! $ đơn đặt hàng khác nhau để boong, một lần nữa tất cả đều có\nkhả năng, vì vậy chúng tôi cần rất nhiều thông tin để biết đó là cái\nnào.\nBất kỳ khái niệm về thông tin chúng tôi phát triển phải phù hợp với trực\ngiác này. Thật vậy, trong các phần tiếp theo, chúng ta sẽ học cách tính\ntoán rằng các sự kiện này có \\(0\\text{ bits}\\) , \\(2\\text{ bits}\\) , $~5.7 text {bits} $, and $ ~ 225.6 text {bit} $\nthông tin tương ứng.\nNếu chúng ta đọc qua những thí nghiệm tư tưởng này, chúng ta thấy một ý\ntưởng tự nhiên. Là một điểm khởi đầu, thay vì quan tâm đến kiến thức,\nchúng ta có thể xây dựng ra ý tưởng rằng thông tin đại diện cho mức độ\nbất ngờ hoặc khả năng trừu tượng của sự kiện. Ví dụ, nếu chúng ta muốn\nmô tả một sự kiện bất thường, chúng ta cần rất nhiều thông tin. Đối với\nmột sự kiện phổ biến, chúng tôi có thể không cần nhiều thông tin.\nNăm 1948, Claude E. Shannon xuất bản A Math Theory of Communication [Shannon, 1948] thiết lập lý thuyết thông tin. Trong bài viết của\nmình, Shannon lần đầu tiên giới thiệu khái niệm về entropy thông tin.\nChúng tôi sẽ bắt đầu hành trình của chúng tôi ở đây.\n18.10.1.1. Tự thông tin\nVì thông tin thể hiện khả năng trừu tượng của một sự kiện, làm thế nào\nđể chúng ta lập bản đồ khả năng với số bit? Shannon giới thiệu thuật ngữ\n* bit* là đơn vị thông tin, ban đầu được tạo ra bởi John Tukey. Vậy\n“bit” là gì và tại sao chúng ta sử dụng nó để đo lường thông tin? Trong\nlịch sử, một máy phát cổ chỉ có thể gửi hoặc nhận hai loại mã: \\(0\\) và \\(1\\) . Thật vậy, mã hóa nhị phân vẫn được sử dụng phổ biến trên\ntất cả các máy tính kỹ thuật số hiện đại. Bằng cách này, bất kỳ thông\ntin nào được mã hóa bởi một loạt \\(0\\) và \\(1\\) . Và do đó, một\nloạt các chữ số nhị phân có chiều dài \\(n\\) chứa \\(n\\) bit thông\ntin.\nBây giờ, giả sử rằng đối với bất kỳ loạt mã nào, mỗi mã \\(0\\) hoặc \\(1\\) xảy ra với xác suất \\(\\frac{1}{2}\\) . Do đó, một sự kiện \\(X\\) với một loạt các mã có độ dài \\(n\\) , xảy ra với xác suất \\(\\frac{1}{2^n}\\) . Đồng thời, như chúng tôi đã đề cập trước đây,\nloạt bài này chứa \\(n\\) bit thông tin. Vì vậy, chúng ta có thể khái\nquát hóa một hàm toán học mà có thể chuyển xác suất \\(p\\) đến số\nbit? Shannon đã đưa ra câu trả lời bằng cách xác định tự thông tin\nnhư bit thông tin chúng tôi đã nhận được cho sự kiện này \\(X\\) .\nLưu ý rằng chúng ta sẽ luôn sử dụng logarit base-2 trong phần này. Vì\nlợi ích của sự đơn giản, phần còn lại của phần này sẽ bỏ qua chỉ số dưới\n2 trong ký hiệu logarit, tức là, \\(\\log(.)\\) luôn đề cập đến \\(\\log_2(.)\\) . Ví dụ, mã “0010” có một thông tin tự\nChúng ta có thể tính toán thông tin tự như hình dưới đây. Trước đó,\ntrước tiên chúng ta hãy nhập tất cả các gói cần thiết trong phần này.\n18.10.2. Entropy\nVì tự thông tin chỉ đo lường thông tin của một sự kiện rời rạc duy nhất,\nchúng ta cần một thước đo tổng quát hơn cho bất kỳ biến ngẫu nhiên nào\ncủa phân phối rời rạc hoặc liên tục.\n18.10.2.1. Thúc đẩy Entropy\nHãy để chúng tôi cố gắng để có được cụ thể về những gì chúng tôi muốn.\nĐây sẽ là một tuyên bố không chính thức về những gì được gọi là * tiên\nđề của entropy Shannon*. Nó sẽ chỉ ra rằng bộ sưu tập các tuyên bố\nthông thường sau đây buộc chúng ta phải có một định nghĩa duy nhất về\nthông tin. Một phiên bản chính thức của các tiên đề này, cùng với một số\ntiên đề khác có thể được tìm thấy trong [Csiszar, 2008] .\nThông tin chúng ta đạt được bằng cách quan sát một biến ngẫu nhiên\nkhông phụ thuộc vào cái mà chúng ta gọi là các phần tử, hoặc sự hiện\ndiện của các yếu tố bổ sung có xác suất không.\nThông tin chúng tôi đạt được bằng cách quan sát hai biến ngẫu nhiên\nkhông nhiều hơn tổng thông tin chúng tôi đạt được bằng cách quan sát\nchúng một cách riêng biệt. Nếu chúng độc lập, thì đó chính xác là\ntổng.\nThông tin thu được khi quan sát (gần) một số sự kiện nhất định là\n(gần) bằng không.\nTrong khi chứng minh thực tế này nằm ngoài phạm vi văn bản của chúng ta,\nđiều quan trọng là phải biết rằng điều này xác định duy nhất hình thức\nmà entropy phải thực hiện. Sự mơ hồ duy nhất mà chúng cho phép là lựa\nchọn các đơn vị cơ bản, thường được bình thường hóa bằng cách đưa ra lựa\nchọn chúng ta đã thấy trước đó thông tin được cung cấp bởi một lần lật\nđồng xu công bằng là một bit.\n18.10.2.2. Definition\nĐối với bất kỳ biến ngẫu nhiên \\(X\\) nào theo phân phối xác suất \\(P\\) với hàm mật độ xác suất (p.d.f.) hoặc hàm khối xác suất\n(p.m.f.) \\(p(x)\\) , chúng tôi đo lượng thông tin dự kiến thông qua entropy (hoặc entropy Shannon*)\nCụ thể, nếu \\(X\\) là rời rạc,\nNếu không, nếu \\(X\\) là liên tục, chúng tôi cũng đề cập đến entropy\nlà * entropyvisai*\nChúng ta có thể định nghĩa entropy như dưới đây.\n18.10.2.3. Giải thích\nBạn có thể tò mò: in the entropy definition (18.10.3) , tại\nsao chúng ta sử dụng kỳ vọng về một logarit tiêu cực? Dưới đây là một số\ntrực giác.\nĐầu tiên, tại sao chúng ta sử dụng hàm logarit \\(\\log\\) ? Giả sử\nrằng \\(p(x) = f_1(x) f_2(x) \\ldots, f_n(x)\\) , trong đó mỗi hàm thành\nphần \\(f_i(x)\\) độc lập với nhau. Điều này có nghĩa là mỗi \\(f_i(x)\\) đóng góp độc lập vào tổng thông tin thu được từ \\(p(x)\\) . Như đã thảo luận ở trên, chúng ta muốn công thức entropy\nlà phụ gia trên các biến ngẫu nhiên độc lập. May mắn thay, \\(\\log\\) có thể tự nhiên biến một sản phẩm phân phối xác suất thành tổng hợp các\nthuật ngữ riêng lẻ.\nTiếp theo, tại sao chúng ta sử dụng * âm* \\(\\log\\) ? Trực giác, các\nsự kiện thường xuyên hơn nên chứa ít thông tin hơn các sự kiện ít phổ\nbiến hơn, vì chúng ta thường thu được nhiều thông tin hơn từ một trường\nhợp bất thường hơn là từ một trường hợp thông thường. Tuy nhiên, \\(\\log\\) đang tăng đơn điệu với xác suất, và thực sự tiêu cực cho\ntất cả các giá trị trong \\([0, 1]\\) . Chúng ta cần xây dựng một mối\nquan hệ giảm đơn điệu giữa xác suất của các sự kiện và entropy của\nchúng, điều này lý tưởng sẽ luôn tích cực (không có gì chúng ta quan sát\nnên buộc chúng ta quên những gì chúng ta đã biết). Do đó, chúng tôi thêm\nmột dấu âm ở phía trước của chức năng \\(\\log\\) .\nCuối cùng, hàm expectation đến từ đâu? Xem xét một biến ngẫu nhiên \\(X\\) . Chúng tôi có thể giải thích thông tin bản thân\n( \\(-\\log(p)\\) ) là số lượng ngạc nhiên chúng tôi có khi thấy một\nkết quả cụ thể. Thật vậy, khi xác suất tiếp cận bằng không, sự ngạc\nnhiên trở nên vô hạn. Tương tự, chúng ta có thể giải thích entropy là\nlượng bất ngờ trung bình từ quan sát \\(X\\) . Ví dụ, hãy tưởng tượng\nrằng một hệ thống máy đánh bạc phát ra các ký hiệu độc lập thống kê \\({s_1, \\ldots, s_k}\\) với xác suất tương ứng \\({p_1, \\ldots, p_k}\\) . Sau đó, entropy của hệ thống này bằng với\nthông tin tự trung bình từ quan sát từng đầu ra, tức là,\n18.10.2.4. Tính chất của Entropy\nBằng các ví dụ và giải thích trên, chúng ta có thể lấy được các thuộc\ntính sau của entropy (18.10.3) . Ở đây, chúng tôi đề cập đến \\(X\\) là một sự kiện và \\(P\\) là phân phối xác suất của \\(X\\) .\nH (X) geq 0$ for all discrete \\(X\\) (entropy can be negative for\ncontinuous \\(X\\) ).\nNếu \\(X \\sim P\\) với một p.d.f. hoặc một p.m.f. \\(p(x)\\) , và\nchúng tôi cố gắng ước tính \\(P\\) bởi một phân phối xác suất mới \\(Q\\) với p.d.f. hoặc một p.m.f. 73229363620, sau đó (18.10.7) ¶ \\[H(X) = - E_{x \\sim P} [\\log p(x)] \\leq  - E_{x \\sim P} [\\log q(x)], \\text{ with equality if and only if } P = Q.\\] Alternatively, $H (X) $ gives a lower bound of the average number of\nbits needed to encode symbols drawn from $P $.\nNếu \\(X \\sim P\\) , thì \\(x\\) truyền tải lượng thông tin tối đa\nnếu nó lây lan đều trong tất cả các kết quả có thể. Cụ thể, nếu phân\nphối xác suất \\(P\\) là rời rạc với \\(k\\) -lớp \\(\\{p_1, \\ldots, p_k \\}\\) , thì (18.10.8) ¶ \\[H(X) \\leq \\log(k), \\text{ with equality if and only if } p_i = \\frac{1}{k}, \\forall i.\\] If \\(P\\) is a continuous random variable, then the story becomes\nmuch more complicated. However, if we additionally impose that \\(P\\) is supported on a finite interval (with all values between \\(0\\) and \\(1\\) ), then $P $ có entropy cao nhất nếu đó là sự\nphân bố thống nhất trong khoảng thời gian đó.\n18.10.3. Thông tin lẫn nhau\nTrước đây chúng ta đã định nghĩa entropy của một biến ngẫu nhiên duy\nnhất \\(X\\) , làm thế nào về entropy của một cặp biến ngẫu nhiên \\((X, Y)\\) ? Chúng ta có thể nghĩ về những kỹ thuật này là cố gắng\ntrả lời loại câu hỏi sau đây, “Thông tin nào được chứa trong \\(X\\) và \\(Y\\) cùng nhau so với từng loại riêng biệt? Có thông tin dư\nthừa, hay tất cả là duy nhất?”\nĐối với các cuộc thảo luận sau đây, chúng tôi luôn sử dụng \\((X, Y)\\) như một cặp biến ngẫu nhiên mà sau một phân phối xác suất\nchung \\(P\\) với một p.d.f. hoặc một p.m.f. \\(p_{X, Y}(x, y)\\) ,\ntrong khi \\(X\\) và \\(Y\\) theo phân phối xác suất \\(p_X(x)\\) và \\(p_Y(y)\\) , tương ứng.\n18.10.3.1. Entropy chung\nTương tự như entropy của một biến ngẫu nhiên duy nhất (18.10.3) , chúng tôi xác định entropy* doanh entropy* \\(H(X, Y)\\) của một cặp biến ngẫu nhiên \\((X, Y)\\) như\nChính xác, một mặt, nếu \\((X, Y)\\) là một cặp biến ngẫu nhiên rời\nrạc, thì\nMặt khác, nếu \\((X, Y)\\) là một cặp biến ngẫu nhiên liên tục, thì ta\nđịnh nghĩa entropydoanh vi sai * như\nChúng ta có thể nghĩ về (18.10.9) như cho chúng ta\nbiết tổng ngẫu nhiên trong cặp biến ngẫu nhiên. Là một cặp cực đoan, nếu \\(X = Y\\) là hai biến ngẫu nhiên giống hệt nhau, thì thông tin trong\ncặp chính xác là thông tin trong một và chúng ta có \\(H(X, Y) = H(X) = H(Y)\\) . Ở thái cực khác, nếu \\(X\\) và \\(Y\\) độc lập thì \\(H(X, Y) = H(X) + H(Y)\\) . Thật vậy chúng ta\nsẽ luôn có rằng thông tin chứa trong một cặp biến ngẫu nhiên không nhỏ\nhơn entropy của một trong hai biến ngẫu nhiên và không nhiều hơn tổng\ncủa cả hai.\nHãy để chúng tôi thực hiện entropy chung từ đầu.\nChú ý rằng đây là cùng code như trước đây, nhưng bây giờ chúng ta giải\nthích nó khác nhau như làm việc trên phân phối chung của hai biến ngẫu\nnhiên.\n18.10.3.2. Entropy có điều kiện\nEntropy chung được xác định phía trên lượng thông tin chứa trong một cặp\nbiến ngẫu nhiên. Điều này rất hữu ích, nhưng đôi khi nó không phải là\nnhững gì chúng ta quan tâm. Xem xét các thiết lập của máy học. Chúng ta\nhãy lấy \\(X\\) là biến ngẫu nhiên (hoặc vector của các biến ngẫu\nnhiên) mô tả các giá trị điểm ảnh của một hình ảnh, và \\(Y\\) là biến\nngẫu nhiên là nhãn lớp. \\(X\\) nên chứa thông tin đáng kể - một hình\nảnh tự nhiên là một điều phức tạp. Tuy nhiên, thông tin chứa trong \\(Y\\) khi hình ảnh đã được hiển thị nên thấp. Thật vậy, hình ảnh của\nmột chữ số nên đã chứa thông tin về chữ số nào trừ khi chữ số không thể\nđọc được. Do đó, để tiếp tục mở rộng vốn từ vựng của chúng ta về lý\nthuyết thông tin, chúng ta cần có khả năng lý luận về nội dung thông tin\ntrong một biến ngẫu nhiên có điều kiện trên một biến khác.\nTrong lý thuyết xác suất, chúng ta đã thấy định nghĩa về xác suất có\nđiều kiện * để đo lường mối quan hệ giữa các biến. Bây giờ chúng ta\nmuốn xác định tương tự các entropy* có điều kiện* \\(H(Y \\mid X)\\) .\nChúng ta có thể viết cái này như\ntrong đó \\(p(y \\mid x) = \\frac{p_{X, Y}(x, y)}{p_X(x)}\\) là xác suất\ncó điều kiện. Cụ thể, nếu \\((X, Y)\\) là một cặp biến ngẫu nhiên rời\nrạc, thì\nNếu \\((X, Y)\\) là một cặp biến ngẫu nhiên liên tục, thì entropy có\nđiều kiện vi sai * được định nghĩa tương tự như\nBây giờ nó là tự nhiên để hỏi, làm thế nào để entropy* có điều kiện* \\(H(Y \\mid X)\\) liên quan đến entropy \\(H(X)\\) và entropy khớp \\(H(X, Y)\\) ? Sử dụng các định nghĩa ở trên, chúng ta có thể thể hiện\nđiều này một cách sạch sẽ:\nĐiều này có một cách giải thích trực quan: thông tin trong \\(Y\\) được đưa ra \\(X\\) ( \\(H(Y \\mid X)\\) ) giống như thông tin trong cả \\(X\\) và \\(Y\\) cùng nhau ( \\(H(X, Y)\\) ) trừ đi thông tin đã\ncó trong \\(X\\) . Điều này cung cấp cho chúng ta thông tin trong \\(Y\\) mà cũng không được đại diện trong \\(X\\) .\nBây giờ, chúng ta hãy thực hiện entropy có điều kiện (18.10.13) từ đầu.\n18.10.3.3. Thông tin lẫn nhau\nVới cài đặt trước đó của các biến ngẫu nhiên \\((X, Y)\\) , bạn có thể\ntự hỏi: “Bây giờ chúng ta biết có bao nhiêu thông tin được chứa trong \\(Y\\) nhưng không phải trong \\(X\\) , chúng ta có thể hỏi tương tự\nbao nhiêu thông tin được chia sẻ giữa \\(X\\) và \\(Y\\) không?” Câu\ntrả lời sẽ là * thông tin lẫn nhau* của \\((X, Y)\\) , mà chúng tôi\nsẽ viết là \\(I(X, Y)\\) .\nThay vì đi thẳng vào định nghĩa chính thức, chúng ta hãy thực hành trực\ngiác của mình bằng cách đầu tiên cố gắng lấy được một biểu hiện cho\nthông tin lẫn nhau hoàn toàn dựa trên các thuật ngữ mà chúng ta đã xây\ndựng trước đây. Chúng tôi muốn tìm thông tin được chia sẻ giữa hai biến\nngẫu nhiên. Một cách chúng ta có thể cố gắng làm điều này là bắt đầu với\ntất cả thông tin có trong cả \\(X\\) và \\(Y\\) cùng nhau, và sau đó\nchúng tôi gỡ bỏ các phần không được chia sẻ. Thông tin chứa trong cả \\(X\\) và \\(Y\\) cùng nhau được viết là \\(H(X, Y)\\) . Chúng tôi\nmuốn trừ đi thông tin này trong \\(X\\) nhưng không phải trong \\(Y\\) và thông tin chứa trong \\(Y\\) nhưng không phải trong \\(X\\) . Như chúng ta đã thấy trong phần trước, điều này được đưa ra\nbởi \\(H(X \\mid Y)\\) và \\(H(Y \\mid X)\\) tương ứng. Vì vậy, chúng\ntôi có rằng thông tin lẫn nhau nên được\nThật vậy, đây là một định nghĩa hợp lệ cho các thông tin lẫn nhau. Nếu\nchúng ta mở rộng các định nghĩa của các thuật ngữ này và kết hợp chúng,\nmột chút đại số cho thấy điều này giống như\nChúng ta có thể tóm tắt tất cả các mối quan hệ này trong hình Fig. 18.10.1 . Đó là một thử nghiệm tuyệt vời của\ntrực giác để xem tại sao các tuyên bố sau đây đều tương đương với \\(I(X, Y)\\) .\n$H (X) − H (X giữa Y) $\n$H (Y) − H (Y giữa X) $\n$H (X) + H (Y) − H (X, Y) $\nFig. 18.10.1 Mutual information’s relationship with joint entropy and conditional\nentropy. ¶\nTheo nhiều cách, chúng ta có thể nghĩ về thông tin lẫn nhau (18.10.18) là phần mở rộng nguyên tắc của hệ số tương\nquan mà chúng ta đã thấy trong Section 18.6 . Điều\nnày cho phép chúng tôi yêu cầu không chỉ mối quan hệ tuyến tính giữa các\nbiến, mà còn cho thông tin tối đa được chia sẻ giữa hai biến ngẫu nhiên\ncủa bất kỳ loại nào.\nBây giờ, chúng ta hãy thực hiện thông tin lẫn nhau từ đầu.\n18.10.3.4. Properties of Mutual Information\nRather than memorizing the definition of mutual information (18.10.18) , you only need to keep in mind its notable\nproperties:\nMutual information is symmetric, i.e., \\(I(X, Y) = I(Y, X)\\) .\nMutual information is non-negative, i.e., \\(I(X, Y) \\geq 0\\) .\n\\(I(X, Y) = 0\\) if and only if \\(X\\) and \\(Y\\) are\nindependent. For example, if \\(X\\) and \\(Y\\) are independent,\nthen knowing \\(Y\\) does not give any information about \\(X\\) and vice versa, so their mutual information is zero.\nAlternatively, if \\(X\\) is an invertible function of \\(Y\\) ,\nthen \\(Y\\) and \\(X\\) share all information and (18.10.19) ¶ \\[I(X, Y) = H(Y) = H(X).\\]\n18.10.3.5. Pointwise Thông tin lẫn nhau\nKhi chúng tôi làm việc với entropy vào đầu chương này, chúng tôi đã có\nthể cung cấp một giải thích về \\(-\\log(p_X(x))\\) như thế nào ngạc\nnhiên chúng tôi đã với kết quả cụ thể. Chúng tôi có thể đưa ra một cách\ngiải thích tương tự cho thuật ngữ logarit trong thông tin lẫn nhau,\nthường được gọi là thông tin lẫn nhau * pointwise*:\nChúng ta có thể nghĩ về (18.10.20) là đo lường bao nhiêu\nnhiều khả năng sự kết hợp cụ thể của kết quả \\(x\\) và \\(y\\) được\nso sánh với những gì chúng ta mong đợi cho kết quả ngẫu nhiên độc lập.\nNếu nó lớn và tích cực, thì hai kết quả cụ thể này xảy ra thường xuyên\nhơn nhiều so với cơ hội ngẫu nhiên (* lưu ý*: mẫu số là \\(p_X(x) p_Y(y)\\) , xác suất của hai kết quả là độc lập), trong khi\nnếu nó lớn và tiêu cực, nó đại diện cho hai kết quả xảy ra xa lessít hơn\nthan we would expect đợi by randomngẫu nhiên chancecơ hội.\nĐiều này cho phép chúng tôi giải thích thông tin lẫn nhau (18.10.18) là số tiền trung bình mà chúng tôi ngạc nhiên\nkhi thấy hai kết quả xảy ra cùng nhau so với những gì chúng tôi mong đợi\nnếu chúng độc lập.\n18.10.3.6. Các ứng dụng của thông tin lẫn nhau\nThông tin lẫn nhau có thể là một chút trừu tượng trong nó định nghĩa\nthuần túy, vậy nó liên quan đến máy học như thế nào? Trong xử lý ngôn\nngữ tự nhiên, một trong những vấn đề khó khăn nhất là độ phân giải * mơ\nhồ * , hoặc vấn đề về ý nghĩa của một từ không rõ ràng từ ngữ cảnh. Ví\ndụ, gần đây một tiêu đề trong tin tức báo cáo rằng “Amazon đang cháy”.\nBạn có thể tự hỏi liệu công ty Amazon có một tòa nhà đang cháy, hoặc\nrừng mưa Amazon đang cháy.\nTrong trường hợp này, thông tin lẫn nhau có thể giúp chúng ta giải quyết\nsự mơ hồ này. Trước tiên, chúng tôi tìm thấy nhóm từ mà mỗi từ có thông\ntin tương đối lớn với công ty Amazon, chẳng hạn như thương mại điện tử,\ncông nghệ và trực tuyến. Thứ hai, chúng tôi tìm thấy một nhóm từ khác mà\nmỗi từ có thông tin tương đối lớn với rừng mưa Amazon, chẳng hạn như\nmưa, rừng và nhiệt đới. Khi chúng ta cần định hướng “Amazon”, chúng ta\ncó thể so sánh nhóm nào có nhiều sự xuất hiện hơn trong bối cảnh của từ\nAmazon. Trong trường hợp này, bài viết sẽ tiếp tục mô tả rừng và làm cho\nbối cảnh rõ ràng.\n18.10.4. Kullback — Phân kỳ Leibler\nNhư những gì chúng ta đã thảo luận trong Section 2.3 ,\nchúng ta có thể sử dụng các định mức để đo khoảng cách giữa hai điểm\ntrong không gian của bất kỳ chiều chiều nào. Chúng tôi muốn có thể thực\nhiện một nhiệm vụ tương tự với các phân phối xác suất. Có nhiều cách để\nđi về điều này, nhưng lý thuyết thông tin cung cấp một trong những cách\nđẹp nhất. Bây giờ chúng ta khám phá sự phân kỳ * Kullback—Leibler (KL) * ,\ncung cấp một cách để đo lường nếu hai phân phối có gần nhau hay không.\n18.10.4.1. Definition\nCho một biến ngẫu nhiên \\(X\\) mà sau phân phối xác suất \\(P\\) với một p.d.f. hoặc một p.m.f. \\(p(x)\\) , và chúng tôi ước tính \\(P\\) bởi một phân phối xác suất khác \\(Q\\) với một p.d.f. hoặc\nmột p.m.f. \\(q(x)\\) . Sau đó, phân kỳ * Kullback—Leibler (KL) * (hoặc\n* entropy tương tự*) giữa \\(P\\) và \\(Q\\) là\nNhư với thông tin tương hỗ theo chiều ngang (18.10.20) , chúng\nta lại có thể cung cấp một cách giải thích thuật ngữ logarit: \\(-\\log \\frac{q(x)}{p(x)} = -\\log(q(x)) - (-\\log(p(x)))\\) sẽ lớn và\ntích cực nếu chúng ta thấy \\(x\\) thường xuyên hơn nhiều dưới \\(P\\) so với chúng ta mong đợi cho \\(Q\\) , và lớn và tiêu cực nếu\nchúng ta thấy kết quả ít hơn nhiều so với dự kiến. Bằng cách này, chúng\ntôi có thể hiểu nó là bất ngờ * tương tự* của chúng tôi khi quan sát\nkết quả so với việc chúng tôi sẽ ngạc nhiên như thế nào chúng tôi sẽ\nquan sát nó từ phân phối tham chiếu của chúng tôi.\nHãy để chúng tôi thực hiện sự phân kỳ KL từ Scratch.\n18.10.4.2. Thuộc tính phân kỳ KL\nChúng ta hãy xem xét một số thuộc tính của sự phân kỳ KL (18.10.21) .\nSự phân kỳ KL là không đối xứng, tức là, có \\(P,Q\\) sao cho (18.10.22) ¶ \\[D_{\\mathrm{KL}}(P\\|Q) \\neq D_{\\mathrm{KL}}(Q\\|P).\\]\nSự phân kỳ KL là không âm tính, tức là (18.10.23) ¶ \\[D_{\\mathrm{KL}}(P\\|Q) \\geq 0.\\] Note that the equality holds only when \\(P = Q\\) .\nNếu tồn tại một \\(x\\) như vậy mà \\(p(x) > 0\\) và \\(q(x) = 0\\) , sau đó \\(D_{\\mathrm{KL}}(P\\|Q) = \\infty\\) .\nCó một mối quan hệ chặt chẽ giữa sự phân kỳ KL và thông tin lẫn nhau.\nBên cạnh mối quan hệ thể hiện trong Fig. 18.10.1 , \\(I(X, Y)\\) cũng tương đương\nsố với các thuật ngữ sau: \\(D_{\\mathrm{KL}}(P(X, Y) \\ \\| \\ P(X)P(Y))\\) ; \\(E_Y \\{ D_{\\mathrm{KL}}(P(X \\mid Y) \\ \\| \\ P(X)) \\}\\) ; \\(E_X \\{ D_{\\mathrm{KL}}(P(Y \\mid X) \\ \\| \\ P(Y)) \\}\\) .\n\\(D_{\\mathrm{KL}}(P(X, Y) \\ \\| \\ P(X)P(Y))\\) ;\n\\(E_Y \\{ D_{\\mathrm{KL}}(P(X \\mid Y) \\ \\| \\ P(X)) \\}\\) ;\n\\(E_X \\{ D_{\\mathrm{KL}}(P(Y \\mid X) \\ \\| \\ P(Y)) \\}\\) .\nĐối với nhiệm kỳ đầu tiên, chúng tôi giải thích thông tin lẫn nhau là sự\nphân kỳ KL giữa \\(P(X, Y)\\) và sản phẩm của \\(P(X)\\) và \\(P(Y)\\) , và do đó là thước đo sự khác biệt của sự phân phối chung\nso với phân phối nếu chúng độc lập. Đối với thuật ngữ thứ hai, thông tin\nlẫn nhau cho chúng ta biết sự giảm trung bình về sự không chắc chắn về \\(Y\\) là kết quả từ việc tìm hiểu giá trị của phân phối \\(X\\) .\nTương tự như nhiệm kỳ thứ ba.\n18.10.4.3. Ví dụ\nChúng ta hãy đi qua một ví dụ đồ chơi để xem sự không đối xứng một cách\nrõ ràng.\nĐầu tiên, chúng ta hãy tạo ra và sắp xếp ba hàng chục chiều dài \\(10,000\\) : một tensor khách quan \\(p\\) mà sau một phân phối\nbình thường \\(N(0, 1)\\) , và hai học sinh ứng cử viên \\(q_1\\) và \\(q_2\\) mà theo phân phối bình thường \\(N(-1, 1)\\) và \\(N(1, 1)\\) tương ứng.\nVì \\(q_1\\) và \\(q_2\\) đối xứng với trục y (tức là \\(x=0\\) ),\nchúng tôi mong đợi một giá trị tương tự của sự phân kỳ KL giữa \\(D_{\\mathrm{KL}}(p\\|q_1)\\) và \\(D_{\\mathrm{KL}}(p\\|q_2)\\) . Như\nbạn có thể thấy bên dưới, chỉ có một ít hơn 3% tắt giữa \\(D_{\\mathrm{KL}}(p\\|q_1)\\) và \\(D_{\\mathrm{KL}}(p\\|q_2)\\) .\nNgược lại, bạn có thể thấy rằng \\(D_{\\mathrm{KL}}(q_2 \\|p)\\) và \\(D_{\\mathrm{KL}}(p \\| q_2)\\) bị tắt rất nhiều, với khoảng 40% giảm\ngiá như hình dưới đây.\n18.10.5. Cross-Entropy\nNếu bạn tò mò về các ứng dụng của lý thuyết thông tin trong học sâu, đây\nlà một ví dụ nhanh. Chúng tôi xác định phân phối thực sự \\(P\\) với\nphân phối xác suất \\(p(x)\\) và phân phối ước tính \\(Q\\) với phân\nphối xác suất \\(q(x)\\) và chúng tôi sẽ sử dụng chúng trong phần còn\nlại của phần này.\nGiả sử chúng ta cần giải quyết một bài toán phân loại nhị phân dựa trên \\(n\\) ví dụ dữ liệu cho { \\(x_1, \\ldots, x_n\\) }. Giả sử rằng\nchúng tôi mã hóa \\(1\\) và \\(0\\) như là nhãn lớp dương và âm \\(y_i\\) tương ứng, và mạng thần kinh của chúng tôi được tham số hóa\nbởi \\(\\theta\\) . Nếu chúng ta muốn tìm một \\(\\theta\\) tốt nhất để \\(\\hat{y}_i= p_{\\theta}(y_i \\mid x_i)\\) , nó là tự nhiên để áp dụng\ncách tiếp cận khả năng đăng nhập tối đa như đã thấy trong Section 18.7 . Cụ thể, đối với nhãn thực \\(y_i\\) và dự đoán \\(\\hat{y}_i= p_{\\theta}(y_i \\mid x_i)\\) , xác\nsuất được phân loại là dương tính là \\(\\pi_i= p_{\\theta}(y_i = 1 \\mid x_i)\\) . Do đó, hàm log-likelihood\nsẽ là\nTối đa hóa chức năng log-likelihood \\(l(\\theta)\\) giống hệt với việc\ngiảm thiểu \\(- l(\\theta)\\) , và do đó chúng ta có thể tìm thấy \\(\\theta\\) tốt nhất từ đây. Để khái quát hóa tổn thất trên đối với\nbất kỳ bản phân phối nào, chúng tôi cũng gọi \\(-l(\\theta)\\) là mất cross-entropy \\(\\mathrm{CE}(y, \\hat{y})\\) , trong đó \\(y\\) theo\ndõi phân phối thực sự \\(P\\) và \\(\\hat{y}\\) theo phân phối ước\ntính \\(Q\\) .\nTất cả điều này có nguồn gốc bằng cách làm việc từ quan điểm khả năng\ntối đa. Tuy nhiên, nếu chúng ta nhìn kỹ, chúng ta có thể thấy rằng các\nthuật ngữ như \\(\\log(\\pi_i)\\) đã nhập vào tính toán của chúng ta, đó\nlà một dấu hiệu vững chắc cho thấy chúng ta có thể hiểu được biểu thức\ntừ quan điểm lý thuyết thông tin.\n18.10.5.1. Formal Definition\nGiống như sự phân kỳ KL, đối với một biến ngẫu nhiên \\(X\\) , chúng ta\ncũng có thể đo phân kỳ giữa phân phối ước tính \\(Q\\) và phân phối\nthật \\(P\\) qua cross-entropy ,\nBằng cách sử dụng các thuộc tính của entropy được thảo luận ở trên,\nchúng ta cũng có thể giải thích nó như là tổng kết của entropy \\(H(P)\\) và phân kỳ KL giữa \\(P\\) và \\(Q\\) , tức là,\nChúng ta có thể thực hiện sự mất mát cross-entropy như dưới đây.\nBây giờ xác định hai hàng chục cho các nhãn và dự đoán, và tính toán sự\nmất mát cross-entropy của chúng.\n18.10.5.2. Thuộc tính\nNhư đã ám chỉ ở phần đầu của phần này, cross-entropy (18.10.25) có thể được sử dụng để định nghĩa một hàm mất mát\ntrong bài toán tối ưu hóa. Nó chỉ ra rằng những điều sau đây là tương\nđương:\nTối đa hóa xác suất dự đoán của \\(Q\\) cho phân phối \\(P\\) ,\n(tức là, $ E_ {x  sim P} [ log (q (x))] $);\nGiảm thiểu chéo entropy \\(\\mathrm{CE} (P, Q)\\) ;\nGiảm thiểu sự phân kỳ KL \\(D_{\\mathrm{KL}}(P\\|Q)\\) .\nĐịnh nghĩa của cross-entropy gián tiếp chứng minh mối quan hệ tương\nđương giữa mục tiêu 2 và mục tiêu 3, miễn là entropy của dữ liệu thật \\(H(P)\\) là không đổi.\n18.10.5.3. Cross-Entropy như một chức năng mục tiêu của phân loại đa lớp\nNếu chúng ta đi sâu vào hàm mục tiêu phân loại với tổn thất chéo entropy \\(\\mathrm{CE}\\) , chúng ta sẽ thấy việc giảm thiểu \\(\\mathrm{CE}\\) tương đương với việc tối đa hóa hàm khả năng log \\(L\\) .\nĐể bắt đầu, giả sử rằng chúng ta được cung cấp một tập dữ liệu với \\(n\\) ví dụ và nó có thể được phân loại thành \\(k\\) -lớp. Đối với\nmỗi ví dụ dữ liệu \\(i\\) , chúng tôi đại diện cho bất kỳ nhãn \\(k\\) -lớp \\(\\mathbf{y}_i = (y_{i1}, \\ldots, y_{ik})\\) bằng cách\n* mã hóa một nóng*. Cụ thể, nếu ví dụ \\(i\\) thuộc về lớp \\(j\\) , thì chúng ta đặt mục \\(j\\) -th thành \\(1\\) và tất cả\ncác thành phần khác thành \\(0\\) , tức là,\nVí dụ, nếu một bài toán phân loại nhiều lớp chứa ba lớp \\(A\\) , \\(B\\) và \\(C\\) , thì nhãn \\(\\mathbf{y}_i\\) có thể được mã hóa\ntrong { \\(A: (1, 0, 0); B: (0, 1, 0); C: (0, 0, 1)\\) }.\nGiả sử rằng mạng thần kinh của chúng tôi được tham số hóa bởi \\(\\theta\\) . Đối với vectơ nhãn thật \\(\\mathbf{y}_i\\) và dự đoán\nDo đó, cross-entropy mất sẽ là\nMặt khác, chúng ta cũng có thể tiếp cận vấn đề thông qua ước tính khả\nnăng tối đa. Để bắt đầu, chúng ta hãy nhanh chóng giới thiệu một phân\nphối multinoulli \\(k\\) lớp. Nó là một phần mở rộng của phân phối\nBernoulli từ lớp nhị phân sang đa lớp. Nếu một biến ngẫu nhiên \\(\\mathbf{z} = (z_{1}, \\ldots, z_{k})\\) theo sau một \\(k\\) -class * multinoulli phân phối * với xác suất \\(\\mathbf{p} =\\) ( \\(p_{1}, \\ldots, p_{k}\\) ), tức là\nthen the joint probability mass function(p.m.f.) of $ mathbf {z} $ là\nCó thể thấy rằng nhãn của mỗi ví dụ dữ liệu, \\(\\mathbf{y}_i\\) , đang\ntheo một phân phối multinoulli \\(k\\) -lớp với xác suất \\(\\boldsymbol{\\pi} =\\) ( \\(\\pi_{1}, \\ldots, \\pi_{k}\\) ). Do đó,\np.m.f. chung của mỗi ví dụ dữ liệu \\(\\mathbf{y}_i\\) là \\(\\mathbf{\\pi}^{\\mathbf{y}_i} = \\prod_{j=1}^k \\pi_{j}^{y_{ij}}.\\) Do\nđó, chức năng log-likelihood sẽ là\nKể từ khi ước tính khả năng tối đa, chúng tôi tối đa hóa hàm khách quan \\(l(\\theta)\\) bằng cách có \\(\\pi_{j} = p_{\\theta} (y_{ij} \\mid \\mathbf{x}_i)\\) . Do đó, đối với\nbất kỳ phân loại đa lớp nào, tối đa hóa hàm log-likelihood trên \\(l(\\theta)\\) tương đương với việc giảm thiểu tổn thất CE \\(\\mathrm{CE}(y, \\hat{y})\\) .\nĐể kiểm tra bằng chứng trên, chúng ta hãy áp dụng biện pháp tích hợp NegativeLogLikelihood . Sử dụng tương tự labels và preds như\ntrong ví dụ trước đó, chúng ta sẽ nhận được tổn thất số tương tự như ví\ndụ trước cho đến 5 vị trí thập phân.\n18.10.6. Tóm tắt\nLý thuyết thông tin là một lĩnh vực nghiên cứu về mã hóa, giải mã,\ntruyền tải, và thao túng thông tin.\nEntropy là đơn vị để đo lượng thông tin được trình bày trong các tín\nhiệu khác nhau.\nSự phân kỳ KL cũng có thể đo lường sự phân kỳ giữa hai bản phân phối.\nCross-entropy có thể được xem như là một chức năng khách quan của\nphân loại nhiều lớp. Giảm thiểu tổn thất chéo entropy tương đương với\nviệc tối đa hóa chức năng log-likelihood.\n18.10.7. Bài tập\nXác minh rằng các ví dụ thẻ từ phần đầu tiên thực sự có entropy tuyên\nbố.\nCho thấy sự phân kỳ KL \\(D(p\\|q)\\) là không âm tính cho tất cả\ncác bản phân phối \\(p\\) và \\(q\\) . Gợi ý: sử dụng bất đẳng\nthức của Jensen, tức là sử dụng thực tế là \\(-\\log x\\) là một hàm\nlồi.\nHãy để chúng tôi tính toán entropy từ một vài nguồn dữ liệu: Giả sử rằng bạn đang xem đầu ra được tạo ra bởi một con khỉ tại\nmột máy đánh chữ. Khỉ nhấn bất kỳ phím \\(44\\) nào của máy đánh\nchữ một cách ngẫu nhiên (bạn có thể giả định rằng nó chưa phát\nhiện ra bất kỳ phím đặc biệt nào hoặc phím shift nào). Bạn quan\nsát bao nhiêu bit ngẫu nhiên trên mỗi ký tự? Không hài lòng với con khỉ, bạn đã thay thế nó bằng một máy sắp\nchữ say rượu. Nó có thể tạo ra từ, mặc dù không mạch lạc. Thay vào\nđó, nó chọn một từ ngẫu nhiên từ một từ vựng gồm \\(2,000\\) từ.\nChúng ta hãy giả định rằng độ dài trung bình của một từ là \\(4.5\\) chữ cái trong tiếng Anh. Bạn quan sát bao nhiêu bit\nngẫu nhiên trên mỗi ký tự bây giờ? Vẫn không hài lòng với kết quả, bạn thay thế máy sắp chữ bằng một\nmô hình ngôn ngữ chất lượng cao. Mô hình ngôn ngữ hiện có thể có\nđược sự bối rối thấp tới \\(15\\) điểm cho mỗi từ. Ký tự perplexity của một mô hình ngôn ngữ được định nghĩa là nghịch\nđảo của trung bình hình học của một tập hợp xác suất, mỗi xác suất\ntương ứng với một ký tự trong từ. Cụ thể, nếu độ dài của một từ\nnhất định là \\(l\\) , thì \\(\\mathrm{PPL}(\\text{word}) = \\left[\\prod_i p(\\text{character}_i)\\right]^{ -\\frac{1}{l}} = \\exp \\left[ - \\frac{1}{l} \\sum_i{\\log p(\\text{character}_i)} \\right].\\) Giả sử rằng từ kiểm tra có 4,5 chữ cái, bạn quan sát bao nhiêu bit\nngẫu nhiên trên mỗi ký tự bây giờ?\nGiả sử rằng bạn đang xem đầu ra được tạo ra bởi một con khỉ tại\nmột máy đánh chữ. Khỉ nhấn bất kỳ phím \\(44\\) nào của máy đánh\nchữ một cách ngẫu nhiên (bạn có thể giả định rằng nó chưa phát\nhiện ra bất kỳ phím đặc biệt nào hoặc phím shift nào). Bạn quan\nsát bao nhiêu bit ngẫu nhiên trên mỗi ký tự?\nKhông hài lòng với con khỉ, bạn đã thay thế nó bằng một máy sắp\nchữ say rượu. Nó có thể tạo ra từ, mặc dù không mạch lạc. Thay vào\nđó, nó chọn một từ ngẫu nhiên từ một từ vựng gồm \\(2,000\\) từ.\nChúng ta hãy giả định rằng độ dài trung bình của một từ là \\(4.5\\) chữ cái trong tiếng Anh. Bạn quan sát bao nhiêu bit\nngẫu nhiên trên mỗi ký tự bây giờ?\nVẫn không hài lòng với kết quả, bạn thay thế máy sắp chữ bằng một\nmô hình ngôn ngữ chất lượng cao. Mô hình ngôn ngữ hiện có thể có\nđược sự bối rối thấp tới \\(15\\) điểm cho mỗi từ. Ký tự perplexity của một mô hình ngôn ngữ được định nghĩa là nghịch\nđảo của trung bình hình học của một tập hợp xác suất, mỗi xác suất\ntương ứng với một ký tự trong từ. Cụ thể, nếu độ dài của một từ\nnhất định là \\(l\\) , thì \\(\\mathrm{PPL}(\\text{word}) = \\left[\\prod_i p(\\text{character}_i)\\right]^{ -\\frac{1}{l}} = \\exp \\left[ - \\frac{1}{l} \\sum_i{\\log p(\\text{character}_i)} \\right].\\) Giả sử rằng từ kiểm tra có 4,5 chữ cái, bạn quan sát bao nhiêu bit\nngẫu nhiên trên mỗi ký tự bây giờ?\nGiải thích trực giác tại sao \\(I(X, Y) = H(X) - H(X|Y)\\) . Sau đó,\ncho thấy điều này là đúng bằng cách thể hiện cả hai bên như một kỳ\nvọng liên quan đến phân phối chung.\nSự phân kỳ KL giữa hai bản phân phối Gaussian \\(\\mathcal{N}(\\mu_1, \\sigma_1^2)\\) và \\(\\mathcal{N}(\\mu_2, \\sigma_2^2)\\) là gì?\nDiscussions\nDiscussions\nDiscussions"
+}

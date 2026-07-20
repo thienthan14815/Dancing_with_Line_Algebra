@@ -1,0 +1,818 @@
+{
+  "url": "https://vi.d2l.ai/chapter_appendix-mathematics-for-deep-learning/statistics.html",
+  "chapter": "chapter_appendix-mathematics-for-deep-learning",
+  "title": "18.9. Thống kê",
+  "crawled_at": "2026-07-20T12:41:30.792206+00:00",
+  "headings": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "thong-ke",
+      "text": "18.9. Thống kê"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "danh-gia-va-so-sanh-uoc-tinh",
+      "text": "18.9.1. Đánh giá và so sánh ước tính"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "loi-binh-phuong-trung-binh",
+      "text": "18.9.1.1. Lỗi bình phương trung bình"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "thien-vi-thong-ke",
+      "text": "18.9.1.2. Thiên vị thống kê"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "phuong-sai-va-do-lech-chuan",
+      "text": "18.9.1.3. Phương sai và độ lệch chuẩn"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "su-bias-variance-trade-off",
+      "text": "18.9.1.4. Sự Bias-Variance Trade-off"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "danh-gia-uoc-tinh-trong-ma",
+      "text": "18.9.1.5. Đánh giá Ước tính trong Mã"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tien-hanh-cac-bai-kiem-tra-gia-thuyet",
+      "text": "18.9.2. Tiến hành các bài kiểm tra giả thuyết"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "statistical-significance",
+      "text": "18.9.2.1. Statistical Significance"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "suc-manh-thong-ke",
+      "text": "18.9.2.2. Sức mạnh thống kê"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "test-statistic",
+      "text": "18.9.2.3. Test Statistic"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "p-value",
+      "text": "18.9.2.4. \\(p\\) -value"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "kiem-tra-mot-mat-va-thu-nghiem-hai-mat",
+      "text": "18.9.2.5. Kiểm tra một mặt và thử nghiệm hai mặt"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "cac-buoc-chung-cua-thu-nghiem-gia-thuyet",
+      "text": "18.9.2.6. Các bước chung của thử nghiệm giả thuyết"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "xay-dung-khoang-tu-tin",
+      "text": "18.9.3. Xây dựng khoảng tự tin"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "definition",
+      "text": "18.9.3.1. Definition"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "interpretation",
+      "text": "18.9.3.2. Interpretation"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "a-gaussian-example",
+      "text": "18.9.3.3. A Gaussian Example"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tom-tat",
+      "text": "18.9.4. Tóm tắt"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bai-tap",
+      "text": "18.9.5. Bài tập"
+    }
+  ],
+  "content": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "thong-ke",
+      "text": "18.9. Thống kê"
+    },
+    {
+      "type": "paragraph",
+      "text": "Không còn nghi ngờ gì nữa, để trở thành một học viên học sâu hàng đầu,\nkhả năng đào tạo các mô hình hiện đại và chính xác cao là rất quan\ntrọng. Tuy nhiên, người ta thường không rõ khi nào cải tiến là đáng kể,\nhoặc chỉ là kết quả của những biến động ngẫu nhiên trong quá trình đào\ntạo. Để có thể thảo luận về sự không chắc chắn về các giá trị ước tính,\nchúng ta phải tìm hiểu một số thống kê."
+    },
+    {
+      "type": "paragraph",
+      "text": "Tài liệu tham khảo sớm nhất của * thống kê * có thể được bắt nguồn từ một\nhọc giả Ả Rập Al-Kindi trong thế kỷ \\(9^{\\mathrm{th}}\\) , người đã\nđưa ra một mô tả chi tiết về cách sử dụng thống kê và phân tích tần số\nđể giải mã các tin nhắn được mã hóa. Sau 800 năm, số liệu thống kê hiện\nđại phát sinh từ Đức vào những năm 1700, khi các nhà nghiên cứu tập\ntrung vào việc thu thập và phân tích dữ liệu nhân khẩu học và kinh tế.\nNgày nay, thống kê là môn khoa học liên quan đến việc thu thập, xử lý,\nphân tích, giải thích và trực quan hóa dữ liệu. Hơn nữa, lý thuyết cốt\nlõi của thống kê đã được sử dụng rộng rãi trong nghiên cứu trong học\nviện, công nghiệp và chính phủ."
+    },
+    {
+      "type": "paragraph",
+      "text": "Cụ thể hơn, số liệu thống kê có thể được chia thành thống kê mô tả và\n* suy luận thống ký . Tập trung trước đây vào việc tóm tắt và minh\nhọa các tính năng của một bộ sưu tập dữ liệu quan sát được, được gọi là\nmẫu * . Mẫu được rút ra từ một * dân số * , biểu thị tổng số các cá\nnhân, vật phẩm hoặc sự kiện tương tự của lợi ích thí nghiệm của chúng\ntôi. Trái ngược với thống kê mô tả, * suy luận thống ký* suy luận thêm\ncác đặc điểm của một quần thể từ các mẫu* đã cho, dựa trên các giả định\nrằng phân phối mẫu có thể nhân rộng phân bố dân số ở một mức độ nào đó."
+    },
+    {
+      "type": "paragraph",
+      "text": "Bạn có thể tự hỏi: “Sự khác biệt thiết yếu giữa học máy và thống kê là\ngì?” Nói về cơ bản, thống kê tập trung vào bài toán suy luận. Loại bài\ntoán này bao gồm mô hình hóa mối quan hệ giữa các biến, chẳng hạn như\nsuy luận nhân quả, và kiểm tra ý nghĩa thống kê của các tham số mô hình,\nchẳng hạn như thử nghiệm A/B. Ngược lại, machine learning nhấn mạnh vào\nviệc đưa ra các dự đoán chính xác, mà không cần lập trình và hiểu rõ\nchức năng của từng tham số."
+    },
+    {
+      "type": "paragraph",
+      "text": "Trong phần này, chúng tôi sẽ giới thiệu ba loại phương pháp suy luận\nthống kê: đánh giá và so sánh các ước lượng, tiến hành các bài kiểm tra\ngiả thuyết và xây dựng khoảng thời gian tin cậy. Những phương pháp này\ncó thể giúp chúng ta suy ra các đặc điểm của một quần thể nhất định, tức\nlà tham số thực sự \\(\\theta\\) . Đối với ngắn gọn, chúng ta giả định\nrằng tham số thật \\(\\theta\\) của một quần thể nhất định là một giá\ntrị vô hướng. Thật đơn giản để mở rộng đến trường hợp \\(\\theta\\) là\nmột vectơ hoặc tensor, do đó chúng tôi bỏ qua nó trong cuộc thảo luận\ncủa chúng tôi."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "danh-gia-va-so-sanh-uoc-tinh",
+      "text": "18.9.1. Đánh giá và so sánh ước tính"
+    },
+    {
+      "type": "paragraph",
+      "text": "Trong thống kê, một estimator là một hàm của các mẫu đã cho được sử\ndụng để ước tính tham số đúng \\(\\theta\\) . Chúng tôi sẽ viết \\(\\hat{\\theta}_n = \\hat{f}(x_1, \\ldots, x_n)\\) cho ước tính \\(\\theta\\) sau khi quan sát các mẫu { \\(x_1, x_2, \\ldots, x_n\\) }."
+    },
+    {
+      "type": "paragraph",
+      "text": "Chúng ta đã thấy các ví dụ đơn giản về các chứng thực trước đây trong\nphần Section 18.7 . Nếu bạn có một số mẫu từ một\nbiến ngẫu nhiên Bernoulli, thì ước tính khả năng tối đa cho xác suất\nbiến ngẫu nhiên là một có thể thu được bằng cách đếm số cái quan sát và\nchia cho tổng số mẫu. Tương tự, một bài tập yêu cầu bạn chỉ ra rằng ước\ntính khả năng tối đa của trung bình của một Gaussian được đưa ra một số\nmẫu được đưa ra bởi giá trị trung bình của tất cả các mẫu. Những ước\nlượng này hầu như sẽ không bao giờ cung cấp giá trị thực sự của tham số,\nnhưng lý tưởng cho một số lượng lớn các mẫu ước tính sẽ gần gũi."
+    },
+    {
+      "type": "paragraph",
+      "text": "Ví dụ, chúng ta hiển thị bên dưới mật độ thực của một biến ngẫu nhiên\nGaussian với trung bình 0 và phương sai một, cùng với một mẫu thu thập\ntừ Gaussian đó. Chúng tôi xây dựng tọa độ \\(y\\) để mọi điểm đều có\nthể nhìn thấy và mối quan hệ với mật độ ban đầu rõ ràng hơn."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "import random\nfrom mxnet import np, npx\nfrom d2l import mxnet as d2l\n\nnpx.set_np()\n\n# Sample datapoints and create y coordinate\nepsilon = 0.1\nrandom.seed(8675309)\nxs = np.random.normal(loc=0, scale=1, size=(300,))\n\nys = [np.sum(np.exp(-(xs[:i] - xs[i])**2 / (2 * epsilon**2))\n             / np.sqrt(2*np.pi*epsilon**2)) / len(xs) for i in range(len(xs))]\n\n# Compute true density\nxd = np.arange(np.min(xs), np.max(xs), 0.01)\nyd = np.exp(-xd**2/2) / np.sqrt(2 * np.pi)\n\n# Plot the results\nd2l.plot(xd, yd, 'x', 'density')\nd2l.plt.scatter(xs, ys)\nd2l.plt.axvline(x=0)\nd2l.plt.axvline(x=np.mean(xs), linestyle='--', color='purple')\nd2l.plt.title(f'sample mean: {float(np.mean(xs)):.2f}')\nd2l.plt.show()"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_statistics_bc7dd5_3_0.svg",
+      "local_path": "_images/output_statistics_bc7dd5_3_0.svg",
+      "alt": "../_images/output_statistics_bc7dd5_3_0.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "import torch\nfrom d2l import torch as d2l\n\ntorch.pi = torch.acos(torch.zeros(1)) * 2  #define pi in torch\n\n# Sample datapoints and create y coordinate\nepsilon = 0.1\ntorch.manual_seed(8675309)\nxs = torch.randn(size=(300,))\n\nys = torch.tensor(\n    [torch.sum(torch.exp(-(xs[:i] - xs[i])**2 / (2 * epsilon**2))\\\n               / torch.sqrt(2*torch.pi*epsilon**2)) / len(xs)\\\n     for i in range(len(xs))])\n\n# Compute true density\nxd = torch.arange(torch.min(xs), torch.max(xs), 0.01)\nyd = torch.exp(-xd**2/2) / torch.sqrt(2 * torch.pi)\n\n# Plot the results\nd2l.plot(xd, yd, 'x', 'density')\nd2l.plt.scatter(xs, ys)\nd2l.plt.axvline(x=0)\nd2l.plt.axvline(x=torch.mean(xs), linestyle='--', color='purple')\nd2l.plt.title(f'sample mean: {float(torch.mean(xs).item()):.2f}')\nd2l.plt.show()"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_statistics_bc7dd5_6_0.svg",
+      "local_path": "_images/output_statistics_bc7dd5_6_0.svg",
+      "alt": "../_images/output_statistics_bc7dd5_6_0.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "import tensorflow as tf\nfrom d2l import tensorflow as d2l\n\ntf.pi = tf.acos(tf.zeros(1)) * 2  # define pi in TensorFlow\n\n# Sample datapoints and create y coordinate\nepsilon = 0.1\nxs = tf.random.normal((300,))\n\nys = tf.constant(\n    [(tf.reduce_sum(tf.exp(-(xs[:i] - xs[i])**2 / (2 * epsilon**2)) \\\n               / tf.sqrt(2*tf.pi*epsilon**2)) / tf.cast(\n        tf.size(xs), dtype=tf.float32)).numpy() \\\n     for i in range(tf.size(xs))])\n\n# Compute true density\nxd = tf.range(tf.reduce_min(xs), tf.reduce_max(xs), 0.01)\nyd = tf.exp(-xd**2/2) / tf.sqrt(2 * tf.pi)\n\n# Plot the results\nd2l.plot(xd, yd, 'x', 'density')\nd2l.plt.scatter(xs, ys)\nd2l.plt.axvline(x=0)\nd2l.plt.axvline(x=tf.reduce_mean(xs), linestyle='--', color='purple')\nd2l.plt.title(f'sample mean: {float(tf.reduce_mean(xs).numpy()):.2f}')\nd2l.plt.show()"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_statistics_bc7dd5_9_0.svg",
+      "local_path": "_images/output_statistics_bc7dd5_9_0.svg",
+      "alt": "../_images/output_statistics_bc7dd5_9_0.svg"
+    },
+    {
+      "type": "paragraph",
+      "text": "Có thể có nhiều cách để tính toán một ước tính của một tham số \\(\\hat{\\theta}_n\\) . Trong phần này, chúng tôi giới thiệu ba phương\npháp phổ biến để đánh giá và so sánh các ước lượng: lỗi bình phương\ntrung bình, độ lệch chuẩn và thiên vị thống kê."
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "loi-binh-phuong-trung-binh",
+      "text": "18.9.1.1. Lỗi bình phương trung bình"
+    },
+    {
+      "type": "paragraph",
+      "text": "Có lẽ số liệu đơn giản nhất được sử dụng để đánh giá các ước lượng là\nlỗi bình phương * trung bình (MSE) * (hoặc mất \\(l_2\\) ) của một\nước tính có thể được định nghĩa là"
+    },
+    {
+      "type": "math",
+      "latex": "(18.9.1)¶\\[\\mathrm{MSE} (\\hat{\\theta}_n, \\theta) = E[(\\hat{\\theta}_n - \\theta)^2].\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "This allows us to quantify the average squared deviation from the true\nvalue. MSE is always non-negative. If you have read Section 3.1 , you will recognize it as the most\ncommonly used regression loss function. As a measure to evaluate an\nestimator, the closer its value to zero, the closer the estimator is\nclose to the true parameter \\(\\theta\\) ."
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "thien-vi-thong-ke",
+      "text": "18.9.1.2. Thiên vị thống kê"
+    },
+    {
+      "type": "paragraph",
+      "text": "MSE cung cấp một số liệu tự nhiên, nhưng chúng ta có thể dễ dàng tưởng\ntượng nhiều hiện tượng khác nhau có thể làm cho nó lớn. Hai cơ bản quan\ntrọng là biến động trong ước tính do tính ngẫu nhiên trong tập dữ liệu,\nvà lỗi có hệ thống trong ước tính do quy trình ước tính."
+    },
+    {
+      "type": "paragraph",
+      "text": "Đầu tiên, chúng ta hãy đo lỗi có hệ thống. Đối với một ước tính \\(\\hat{\\theta}_n\\) , minh họa toán học của thiên vị thống ký có thể\nđược định nghĩa là"
+    },
+    {
+      "type": "math",
+      "latex": "(18.9.2)¶\\[\\mathrm{bias}(\\hat{\\theta}_n) = E(\\hat{\\theta}_n - \\theta) = E(\\hat{\\theta}_n) - \\theta.\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Lưu ý rằng khi \\(\\mathrm{bias}(\\hat{\\theta}_n) = 0\\) , kỳ vọng của\nước tính \\(\\hat{\\theta}_n\\) bằng giá trị thực của tham số. Trong\ntrường hợp này, chúng tôi nói \\(\\hat{\\theta}_n\\) là một ước tính\nkhông thiên vị. Nói chung, một ước tính không thiên vị tốt hơn một ước\ntính thiên vị vì kỳ vọng của nó giống như tham số thực sự."
+    },
+    {
+      "type": "paragraph",
+      "text": "Tuy nhiên, điều đáng để nhận thức được rằng những người dự kiến thiên vị\nthường được sử dụng trong thực tế. Có những trường hợp mà các ước lượng\nkhông thiên vị không tồn tại mà không có giả định thêm, hoặc không thể\nchữa được để tính toán. Điều này có vẻ như là một lỗ hổng đáng kể trong\nmột nhà ước tính, tuy nhiên phần lớn các ước lượng gặp phải trong thực\ntế ít nhất là không thiên vị theo nghĩa là sự thiên vị có xu hướng bằng\nkhông vì số lượng mẫu có sẵn có xu hướng vô cùng: \\(\\lim_{n \\rightarrow \\infty} \\mathrm{bias}(\\hat{\\theta}_n) = 0\\) ."
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "phuong-sai-va-do-lech-chuan",
+      "text": "18.9.1.3. Phương sai và độ lệch chuẩn"
+    },
+    {
+      "type": "paragraph",
+      "text": "Thứ hai, chúng ta hãy đo lường sự ngẫu nhiên trong ước tính. Nhớ lại từ Section 18.6 , độ lệch chuẩn (hoặc lỗi tiêu\nchuẩn ) được định nghĩa là gốc bình phương của phương sai. Chúng tôi có\nthể đo mức độ dao động của một ước tính bằng cách đo độ lệch chuẩn hoặc\nphương sai của ước tính đó."
+    },
+    {
+      "type": "math",
+      "latex": "(18.9.3)¶\\[\\sigma_{\\hat{\\theta}_n} = \\sqrt{\\mathrm{Var} (\\hat{\\theta}_n )} = \\sqrt{E[(\\hat{\\theta}_n - E(\\hat{\\theta}_n))^2]}.\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Điều quan trọng là so sánh (18.9.3) đến (18.9.1) . Trong phương trình này, chúng ta không so sánh\nvới giá trị dân số thực sự \\(\\theta\\) , mà thay vào đó là \\(E(\\hat{\\theta}_n)\\) , mẫu dự kiến có nghĩa là. Do đó, chúng tôi\nkhông đo lường mức độ ước tính có xu hướng từ giá trị thực sự, mà thay\nvào đó chúng ta đo lường sự dao động của chính ước tính."
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "su-bias-variance-trade-off",
+      "text": "18.9.1.4. Sự Bias-Variance Trade-off"
+    },
+    {
+      "type": "paragraph",
+      "text": "Rõ ràng bằng trực giác rằng hai thành phần chính này góp phần vào lỗi\nbình phương trung bình. Điều hơi gây sốc là chúng ta có thể cho thấy\nrằng đây thực sự là một * decomposition* của lỗi bình phương trung\nbình vào hai đóng góp này cộng với một phần ba. Điều đó có nghĩa là\nchúng ta có thể viết sai số bình phương trung bình là tổng của bình\nphương của sự thiên vị, phương sai và lỗi không thể khắc phục được."
+    },
+    {
+      "type": "math",
+      "latex": "(18.9.4)¶\\[\\begin{split}\\begin{aligned}\n\\mathrm{MSE} (\\hat{\\theta}_n, \\theta) &= E[(\\hat{\\theta}_n - \\theta)^2] \\\\\n &= E[(\\hat{\\theta}_n)^2] + E[\\theta^2] - 2E[\\hat{\\theta}_n\\theta] \\\\\n &= \\mathrm{Var} [\\hat{\\theta}_n] + E[\\hat{\\theta}_n]^2 + \\mathrm{Var} [\\theta] + E[\\theta]^2 - 2E[\\hat{\\theta}_n]E[\\theta] \\\\\n &= (E[\\hat{\\theta}_n] - E[\\theta])^2 + \\mathrm{Var} [\\hat{\\theta}_n] + \\mathrm{Var} [\\theta] \\\\\n &= (E[\\hat{\\theta}_n - \\theta])^2 + \\mathrm{Var} [\\hat{\\theta}_n] + \\mathrm{Var} [\\theta] \\\\\n &= (\\mathrm{bias} [\\hat{\\theta}_n])^2 + \\mathrm{Var} (\\hat{\\theta}_n) + \\mathrm{Var} [\\theta].\\\\\n\\end{aligned}\\end{split}\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Chúng tôi đề cập đến công thức trên là bias-variance trade-off . Lỗi\nbình phương trung bình có thể được chia thành ba nguồn error: the error\nfrom high bias, the error from high variance and the irreducible error.\nThe bias error is commonly seen in a simple model (such as a linear\nregression model), which cannot extract high dimensional relations\nbetween the features and the outputs. If a model suffers from high bias\nerror, we often say it is underfitting or lack of flexibilty as\nintroduced in ( Section 4.4 ). Phương sai cao thường\nlà kết quả từ một mô hình quá phức tạp, vượt quá dữ liệu đào tạo. Do đó,\nmô hình * overfitting* nhạy cảm với các biến động nhỏ trong dữ liệu.\nNếu một mô hình bị phương sai cao, chúng ta thường nói rằng đó là *\noverfitting* và thiếu khái quát hóa như được giới thiệu trong\n( Section 4.4 ). Lỗi không thể khắc phục là kết quả từ\ntiếng ồn trong chính \\(\\theta\\) ."
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "danh-gia-uoc-tinh-trong-ma",
+      "text": "18.9.1.5. Đánh giá Ước tính trong Mã"
+    },
+    {
+      "type": "paragraph",
+      "text": "Vì độ lệch chuẩn của một ước tính đã được thực hiện bằng cách gọi đơn\ngiản a.std() cho tensor a , chúng tôi sẽ bỏ qua nó nhưng thực\nhiện thiên vị thống kê và sai số bình phương trung bình."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "# Statistical bias\ndef stat_bias(true_theta, est_theta):\n    return(np.mean(est_theta) - true_theta)\n\n# Mean squared error\ndef mse(data, true_theta):\n    return(np.mean(np.square(data - true_theta)))"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "# Statistical bias\ndef stat_bias(true_theta, est_theta):\n    return(torch.mean(est_theta) - true_theta)\n\n# Mean squared error\ndef mse(data, true_theta):\n    return(torch.mean(torch.square(data - true_theta)))"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "# Statistical bias\ndef stat_bias(true_theta, est_theta):\n    return(tf.reduce_mean(est_theta) - true_theta)\n\n# Mean squared error\ndef mse(data, true_theta):\n    return(tf.reduce_mean(tf.square(data - true_theta)))"
+    },
+    {
+      "type": "paragraph",
+      "text": "Để minh họa phương trình của sự cân bằng sai lệch, chúng ta hãy mô phỏng\nphân phối bình thường \\(\\mathcal{N}(\\theta, \\sigma^2)\\) với \\(10,000\\) mẫu. Ở đây, chúng tôi sử dụng một \\(\\theta = 1\\) và \\(\\sigma = 4\\) . Vì ước tính là một chức năng của các mẫu đã cho, ở\nđây chúng tôi sử dụng trung bình của các mẫu như một ước tính cho \\(\\theta\\) đúng trong phân phối bình thường này \\(\\mathcal{N}(\\theta, \\sigma^2)\\) ."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "theta_true = 1\nsigma = 4\nsample_len = 10000\nsamples = np.random.normal(theta_true, sigma, sample_len)\ntheta_est = np.mean(samples)\ntheta_est"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "array(0.9503336)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "theta_true = 1\nsigma = 4\nsample_len = 10000\nsamples = torch.normal(theta_true, sigma, size=(sample_len, 1))\ntheta_est = torch.mean(samples)\ntheta_est"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "tensor(1.0170)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "theta_true = 1\nsigma = 4\nsample_len = 10000\nsamples = tf.random.normal((sample_len, 1), theta_true, sigma)\ntheta_est = tf.reduce_mean(samples)\ntheta_est"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "<tf.Tensor: shape=(), dtype=float32, numpy=0.9668943>"
+    },
+    {
+      "type": "paragraph",
+      "text": "Chúng ta hãy xác nhận phương trình đánh đổi bằng cách tính tổng của sự\nthiên vị bình phương và phương sai của ước tính của chúng ta. Đầu tiên,\ntính toán MSE của ước tính của chúng tôi."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "mse(samples, theta_true)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "array(15.781996)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "mse(samples, theta_true)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "tensor(16.0298)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "mse(samples, theta_true)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "<tf.Tensor: shape=(), dtype=float32, numpy=16.373869>"
+    },
+    {
+      "type": "paragraph",
+      "text": "Tiếp theo, chúng tôi tính \\(\\mathrm{Var} (\\hat{\\theta}_n) + [\\mathrm{bias} (\\hat{\\theta}_n)]^2\\) như dưới đây. Như bạn có thể thấy, hai giá trị đồng ý với độ chính xác\nsố."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "bias = stat_bias(theta_true, theta_est)\nnp.square(samples.std()) + np.square(bias)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "array(15.781995)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "bias = stat_bias(theta_true, theta_est)\ntorch.square(samples.std(unbiased=False)) + torch.square(bias)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "tensor(16.0298)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "bias = stat_bias(theta_true, theta_est)\ntf.square(tf.math.reduce_std(samples)) + tf.square(bias)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "<tf.Tensor: shape=(), dtype=float32, numpy=16.373867>"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tien-hanh-cac-bai-kiem-tra-gia-thuyet",
+      "text": "18.9.2. Tiến hành các bài kiểm tra giả thuyết"
+    },
+    {
+      "type": "paragraph",
+      "text": "Chủ đề thường gặp nhất trong suy luận thống kê là thử nghiệm giả thuyết.\nTrong khi thử nghiệm giả thuyết được phổ biến vào đầu thế kỷ 20, việc sử\ndụng đầu tiên có thể được truy trở lại John Arbuthnot vào những năm\n1700. John đã theo dõi kỷ lục sinh 80 năm ở London và kết luận rằng\nnhiều nam giới được sinh ra hơn phụ nữ mỗi năm. Tiếp theo đó, thử nghiệm\ný nghĩa hiện đại là di sản tình báo của Karl Pearson, người đã phát minh\nra \\(p\\) giá trị và bài kiểm tra chi bình phương của Pearson,\nWilliam Gosset là cha đẻ của phân phối t của Sinh viên, và Ronald\nFisher, người đã khởi xướng giả thuyết vô giá trị và bài kiểm tra ý\nnghĩa."
+    },
+    {
+      "type": "paragraph",
+      "text": "A giả thuyết test là một cách để đánh giá một số bằng chứng chống lại\ntuyên bố mặc định về một dân số. Chúng tôi tham khảo câu lệnh mặc định\nlà giả thuyết * null * \\(H_0\\) , mà chúng tôi cố gắng từ chối bằng\ncách sử dụng dữ liệu quan sát. Ở đây, chúng tôi sử dụng \\(H_0\\) làm\nđiểm khởi đầu cho việc kiểm tra ý nghĩa thống kê. Giả thuyết thay thế* \\(H_A\\) (hoặc \\(H_1\\) ) là một tuyên bố trái với giả thuyết null.\nMột giả thuyết null thường được nêu trong một hình thức khai báo đặt ra\nmột mối quan hệ giữa các biến. Nó sẽ phản ánh ngắn gọn càng rõ ràng càng\ntốt, và được kiểm tra bởi lý thuyết thống kê."
+    },
+    {
+      "type": "paragraph",
+      "text": "Hãy tưởng tượng bạn là một nhà hóa học. Sau khi dành hàng ngàn giờ trong\nphòng thí nghiệm, bạn phát triển một loại thuốc mới có thể cải thiện\nđáng kể khả năng hiểu toán của một người. Để thể hiện sức mạnh ma thuật\ncủa nó, bạn cần phải kiểm tra nó. Đương nhiên, bạn có thể cần một số\ntình nguyện viên uống thuốc và xem liệu nó có thể giúp họ học toán tốt\nhơn hay không. Làm thế nào để bạn bắt đầu?"
+    },
+    {
+      "type": "paragraph",
+      "text": "Đầu tiên, bạn sẽ cần hai nhóm tình nguyện viên được lựa chọn ngẫu nhiên\ncẩn thận, để không có sự khác biệt giữa khả năng hiểu biết toán học của\nhọ được đo bằng một số số chỉ số. Hai nhóm thường được gọi là nhóm thử\nnghiệm và nhóm kiểm soát. kiểm tra nhóm (hoặc nhóm điều trị ) là một\nnhóm các cá nhân sẽ trải nghiệm thuốc, trong khi nhóm kiểm soát * đại\ndiện cho nhóm người dùng được đặt sang một bên như một chuẩn mực, tức là\nthiết lập môi trường giống hệt nhau trừ khi dùng thuốc này. Bằng cách\nnày, ảnh hưởng của tất cả các biến được giảm thiểu, ngoại trừ tác động\ncủa biến độc lập trong điều trị."
+    },
+    {
+      "type": "paragraph",
+      "text": "Thứ hai, sau một thời gian dùng thuốc, bạn sẽ cần đo lường sự hiểu biết\ntoán của hai nhóm bằng các chỉ số tương tự, chẳng hạn như để các tình\nnguyện viên làm các bài kiểm tra tương tự sau khi học một công thức toán\nmới. Sau đó, bạn có thể thu thập hiệu suất của họ và so sánh kết quả.\nTrong trường hợp này, giả thuyết null của chúng ta sẽ là không có sự\nkhác biệt giữa hai nhóm, và sự thay thế của chúng ta sẽ là có."
+    },
+    {
+      "type": "paragraph",
+      "text": "Điều này vẫn chưa hoàn toàn chính thức. Có rất nhiều chi tiết bạn phải\nsuy nghĩ cẩn thận. Ví dụ, các số liệu phù hợp để kiểm tra khả năng hiểu\nbiết toán học của họ là gì? Có bao nhiêu tình nguyện viên cho bài kiểm\ntra của bạn để bạn có thể tự tin để khẳng định hiệu quả của thuốc của\nbạn? Bạn nên chạy bài kiểm tra trong bao lâu? Làm thế nào để bạn quyết\nđịnh nếu có sự khác biệt giữa hai nhóm? Bạn có quan tâm đến hiệu suất\ntrung bình chỉ, hoặc cũng là phạm vi biến thể của điểm số? Và như vậy."
+    },
+    {
+      "type": "paragraph",
+      "text": "Bằng cách này, thử nghiệm giả thuyết cung cấp một khuôn khổ cho thiết kế\nthực nghiệm và lý luận về sự chắc chắn trong các kết quả quan sát được.\nNếu bây giờ chúng ta có thể chỉ ra rằng giả thuyết null là rất khó có\nthể là đúng, chúng ta có thể từ chối nó với sự tự tin."
+    },
+    {
+      "type": "paragraph",
+      "text": "Để hoàn thành câu chuyện về cách làm việc với thử nghiệm giả thuyết, bây\ngiờ chúng ta cần giới thiệu một số thuật ngữ bổ sung và đưa ra một số\nkhái niệm của chúng tôi ở trên chính thức."
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "statistical-significance",
+      "text": "18.9.2.1. Statistical Significance"
+    },
+    {
+      "type": "paragraph",
+      "text": "The statistical significance measures the probability of erroneously\nrejecting the null hypothesis, \\(H_0\\) , when it should not be\nrejected, i.e.,"
+    },
+    {
+      "type": "math",
+      "latex": "(18.9.5)¶\\[\\text{statistical significance }= 1 - \\alpha = 1 - P(\\text{reject } H_0 \\mid H_0 \\text{ is true} ).\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "It is also referred to as the type I error or false positive . The \\(\\alpha\\) , is called as the significance level and its commonly\nused value is \\(5\\%\\) , i.e., \\(1-\\alpha = 95\\%\\) . The\nsignificance level can be explained as the level of risk that we are\nwilling to take, when we reject a true null hypothesis."
+    },
+    {
+      "type": "paragraph",
+      "text": "Fig. 18.9.1 shows the observations’ values\nand probability of a given normal distribution in a two-sample\nhypothesis test. If the observation data example is located outsides the \\(95\\%\\) threshold, it will be a very unlikely observation under the\nnull hypothesis assumption. Hence, there might be something wrong with\nthe null hypothesis and we will reject it."
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/statistical-significance.svg",
+      "local_path": "_images/statistical-significance.svg",
+      "alt": "../_images/statistical-significance.svg"
+    },
+    {
+      "type": "paragraph",
+      "text": "Fig. 18.9.1 Statistical significance. ¶"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "suc-manh-thong-ke",
+      "text": "18.9.2.2. Sức mạnh thống kê"
+    },
+    {
+      "type": "paragraph",
+      "text": "The statistical power (or sensitivity ) measures the probability of\nreject the null hypothesis, \\(H_0\\) , when it should be rejected,\ni.e.,"
+    },
+    {
+      "type": "math",
+      "latex": "(18.9.6)¶\\[\\text{statistical power }= 1 - \\beta = 1 - P(\\text{ fail to reject } H_0  \\mid H_0 \\text{ is false} ).\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Recall that a type I error is error caused by rejecting the null\nhypothesis when it is true, whereas a type II error is resulted from\nfailing to reject the null hypothesis when it is false. A type II error\nis usually denoted as \\(\\beta\\) , and hence the corresponding\nstatistical power is \\(1-\\beta\\) ."
+    },
+    {
+      "type": "paragraph",
+      "text": "Intuitively, statistical power can be interpreted as how likely our test\nwill detect a real discrepancy of some minimum magnitude at a desired\nstatistical significance level. \\(80\\%\\) is a commonly used\nstatistical power threshold. The higher the statistical power, the more\nlikely we are to detect true differences."
+    },
+    {
+      "type": "paragraph",
+      "text": "Một trong những cách sử dụng phổ biến nhất của sức mạnh thống kê là xác\nđịnh số lượng mẫu cần thiết. Xác suất bạn từ chối giả thuyết null khi nó\nlà sai phụ thuộc vào mức độ sai (được gọi là kích thước hiệu ứng ) và\nsố lượng mẫu bạn có. Như bạn có thể mong đợi, kích thước hiệu ứng nhỏ sẽ\nyêu cầu một số lượng rất lớn các mẫu được phát hiện với xác suất cao.\nTrong khi vượt quá phạm vi của phụ lục ngắn gọn này để lấy ra chi tiết,\nnhư một ví dụ, muốn có thể từ chối một giả thuyết null rằng mẫu của\nchúng tôi đến từ một phương sai trung bình bằng 0 một Gaussian, và chúng\ntôi tin rằng trung bình mẫu của chúng tôi thực sự gần với một, chúng tôi\ncó thể làm như vậy với tỷ lệ lỗi chấp nhận được với kích thước mẫu của\nchỉ \\(8\\) . Tuy nhiên, nếu chúng ta nghĩ rằng trung bình thực sự dân\nsố mẫu của chúng ta gần \\(0.01\\) , thì chúng ta cần một kích thước\nmẫu gần \\(80000\\) để phát hiện sự khác biệt."
+    },
+    {
+      "type": "paragraph",
+      "text": "Chúng ta có thể tưởng tượng sức mạnh như một bộ lọc nước. Trong sự tương\ntự này, một bài kiểm tra giả thuyết công suất cao giống như một hệ thống\nlọc nước chất lượng cao sẽ làm giảm các chất độc hại trong nước càng\nnhiều càng tốt. Mặt khác, sự khác biệt nhỏ hơn giống như một bộ lọc nước\nchất lượng thấp, nơi một số chất nhỏ tương đối có thể dễ dàng thoát ra\nkhỏi các khoảng trống. Tương tự, nếu sức mạnh thống kê không đủ công\nsuất cao, thì thử nghiệm có thể không bắt được sự khác biệt nhỏ hơn."
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "test-statistic",
+      "text": "18.9.2.3. Test Statistic"
+    },
+    {
+      "type": "paragraph",
+      "text": "Một * thống kê thử nghiệm* \\(T(x)\\) là một vô hướng tóm tắt một số\nđặc điểm của dữ liệu mẫu. Mục tiêu của việc xác định một thống kê như\nvậy là nó sẽ cho phép chúng ta phân biệt giữa các phân phối khác nhau và\ntiến hành kiểm tra giả thuyết của chúng tôi. Suy nghĩ lại ví dụ của nhà\nhóa học của chúng tôi, nếu chúng ta muốn chứng minh rằng một dân số hoạt\nđộng tốt hơn người kia, nó có thể là hợp lý để lấy trung bình như thống\nkê thử nghiệm. Các lựa chọn khác nhau của thống kê thử nghiệm có thể dẫn\nđến kiểm tra thống kê với sức mạnh thống kê khác nhau đáng kể."
+    },
+    {
+      "type": "paragraph",
+      "text": "Thông thường, \\(T(X)\\) (sự phân bố của thống kê thử nghiệm theo giả\nthuyết null của chúng tôi) sẽ theo sau, ít nhất là khoảng, một phân phối\nxác suất chung như phân phối bình thường khi được xem xét theo giả\nthuyết null. Nếu chúng ta có thể lấy được một phân phối rõ ràng như vậy,\nvà sau đó đo thống kê thử nghiệm của chúng tôi về tập dữ liệu của chúng\ntôi, chúng ta có thể từ chối một cách an toàn giả thuyết null nếu thống\nkê của chúng tôi nằm ngoài phạm vi mà chúng ta mong đợi. Làm cho định\nlượng này dẫn chúng ta đến khái niệm \\(p\\) -giá trị."
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "p-value",
+      "text": "18.9.2.4. \\(p\\) -value"
+    },
+    {
+      "type": "paragraph",
+      "text": "Giá trị \\(p\\) -( hoặc giá trị xác suất * ) là xác suất \\(T(X)\\) ít\nnhất là cực đoan như thống kê thử nghiệm quan sát \\(T(x)\\) giả định\nrằng giả thuyết null là * true*, tức là,"
+    },
+    {
+      "type": "math",
+      "latex": "(18.9.7)¶\\[p\\text{-value} = P_{H_0}(T(X) \\geq T(x)).\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Nếu giá trị \\(p\\) -nhỏ hơn hoặc bằng một mức ý nghĩa thống kê được\nxác định trước và cố định \\(\\alpha\\) , chúng ta có thể từ chối giả\nthuyết null. Nếu không, chúng ta sẽ kết luận rằng chúng ta thiếu bằng\nchứng để từ chối giả thuyết null. Đối với một phân bố dân số nhất định, khu vực từ khóa sẽ là khoảng thời gian chứa tất cả các điểm có giá trị \\(p\\) nhỏ hơn mức ý nghĩa thống kê \\(\\alpha\\) ."
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "kiem-tra-mot-mat-va-thu-nghiem-hai-mat",
+      "text": "18.9.2.5. Kiểm tra một mặt và thử nghiệm hai mặt"
+    },
+    {
+      "type": "paragraph",
+      "text": "Thông thường có hai loại kiểm tra ý nghĩa: bài kiểm tra một mặt và thử\nnghiệm hai mặt. Kiểm tra * một mặt* (hoặc * kiểm tra một đuôi * ) được\náp dụng khi giả thuyết null và giả thuyết thay thế chỉ có một hướng. Ví\ndụ, giả thuyết null có thể nói rằng tham số thực \\(\\theta\\) nhỏ hơn\nhoặc bằng một giá trị \\(c\\) . Giả thuyết thay thế sẽ là \\(\\theta\\) lớn hơn \\(c\\) . Đó là, khu vực từ chối chỉ ở một bên\ncủa phân phối lấy mẫu. Trái ngược với thử nghiệm một mặt, thử nghiệm hai\nmặt* (hoặc * kiểm tra hai đuôi *) được áp dụng khi vùng từ chối nằm ở\ncả hai mặt của phân phối lấy mẫu. Một ví dụ trong trường hợp này có thể\ncó một trạng thái giả thuyết null rằng tham số đúng \\(\\theta\\) bằng\nmột giá trị \\(c\\) . Giả thuyết thay thế sẽ là \\(\\theta\\) không\nbằng \\(c\\) ."
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "cac-buoc-chung-cua-thu-nghiem-gia-thuyet",
+      "text": "18.9.2.6. Các bước chung của thử nghiệm giả thuyết"
+    },
+    {
+      "type": "paragraph",
+      "text": "Sau khi làm quen với các khái niệm trên, chúng ta hãy trải qua các bước\nchung của thử nghiệm giả thuyết."
+    },
+    {
+      "type": "list",
+      "ordered": true,
+      "items": [
+        "Nêu câu hỏi và thiết lập một giả thuyết vô giá trị \\(H_0\\) .",
+        "Đặt mức ý nghĩa thống kê \\(\\alpha\\) và một sức mạnh thống kê\n( \\(1 - \\beta\\) ).",
+        "Lấy mẫu thông qua các thí nghiệm. Số lượng mẫu cần thiết sẽ phụ thuộc\nvào sức mạnh thống kê và kích thước hiệu ứng mong đợi.",
+        "Tính số liệu thống kê thử nghiệm và giá trị \\(p\\) -.",
+        "Đưa ra quyết định giữ hoặc từ chối giả thuyết null dựa trên giá trị \\(p\\) -giá trị và mức ý nghĩa thống kê \\(\\alpha\\) ."
+      ]
+    },
+    {
+      "type": "paragraph",
+      "text": "Để tiến hành một bài kiểm tra giả thuyết, chúng ta bắt đầu bằng cách xác\nđịnh một giả thuyết null và mức độ rủi ro mà chúng tôi sẵn sàng thực\nhiện. Sau đó, chúng tôi tính toán thống kê thử nghiệm của mẫu, lấy một\ngiá trị cực đoan của thống kê thử nghiệm làm bằng chứng chống lại giả\nthuyết null. Nếu thống kê thử nghiệm nằm trong khu vực từ chối, chúng ta\ncó thể từ chối giả thuyết null có lợi cho sự thay thế."
+    },
+    {
+      "type": "paragraph",
+      "text": "Xét nghiệm giả thuyết được áp dụng trong một loạt các tình huống như\nđường mòn lâm sàng và thử nghiệm A/B."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "xay-dung-khoang-tu-tin",
+      "text": "18.9.3. Xây dựng khoảng tự tin"
+    },
+    {
+      "type": "paragraph",
+      "text": "Khi ước tính giá trị của một tham số \\(\\theta\\) , các chứng thực điểm\nnhư \\(\\hat \\theta\\) có tiện ích hạn chế vì chúng không chứa khái\nniệm về sự không chắc chắn. Thay vào đó, sẽ tốt hơn nhiều nếu chúng ta\ncó thể tạo ra một khoảng thời gian có chứa tham số thực \\(\\theta\\) với xác suất cao. Nếu bạn quan tâm đến những ý tưởng như vậy một thế kỷ\ntrước, thì bạn sẽ rất vui mừng khi đọc “Phác thảo của một lý thuyết ước\ntính thống kê dựa trên lý thuyết xác suất cổ điển” của Jerzy Neyman [Neyman, 1937] , người lần đầu tiên giới thiệu khái niệm khoảng\nthời gian tin cậy vào năm 1937."
+    },
+    {
+      "type": "paragraph",
+      "text": "Để hữu ích, một khoảng thời gian tin cậy nên càng nhỏ càng tốt cho một\nmức độ chắc chắn nhất định. Hãy để chúng tôi xem làm thế nào để lấy được\nnó."
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "definition",
+      "text": "18.9.3.1. Definition"
+    },
+    {
+      "type": "paragraph",
+      "text": "Mathematically, a confidence interval for the true parameter \\(\\theta\\) is an interval \\(C_n\\) that computed from the sample\ndata such that"
+    },
+    {
+      "type": "math",
+      "latex": "(18.9.8)¶\\[P_{\\theta} (C_n \\ni \\theta) \\geq 1 - \\alpha, \\forall \\theta.\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Here \\(\\alpha \\in (0, 1)\\) , and \\(1 - \\alpha\\) is called the confidence level or coverage of the interval. This is the same \\(\\alpha\\) as the significance level as we discussed about above."
+    },
+    {
+      "type": "paragraph",
+      "text": "Note that (18.9.8) is about variable \\(C_n\\) , not\nabout the fixed \\(\\theta\\) . To emphasize this, we write \\(P_{\\theta} (C_n \\ni \\theta)\\) rather than \\(P_{\\theta} (\\theta \\in C_n)\\) ."
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "interpretation",
+      "text": "18.9.3.2. Interpretation"
+    },
+    {
+      "type": "paragraph",
+      "text": "It is very tempting to interpret a \\(95\\%\\) confidence interval as\nan interval where you can be \\(95\\%\\) sure the true parameter lies,\nhowever this is sadly not true. The true parameter is fixed, and it is\nthe interval that is random. Thus a better interpretation would be to\nsay that if you generated a large number of confidence intervals by this\nprocedure, \\(95\\%\\) of the generated intervals would contain the\ntrue parameter."
+    },
+    {
+      "type": "paragraph",
+      "text": "This may seem pedantic, but it can have real implications for the\ninterpretation of the results. In particular, we may satisfy (18.9.8) by constructing intervals that we are almost\ncertain do not contain the true value, as long as we only do so rarely\nenough. We close this section by providing three tempting but false\nstatements. An in-depth discussion of these points can be found in [Morey et al., 2016] ."
+    },
+    {
+      "type": "list",
+      "ordered": false,
+      "items": [
+        "Fallacy 1 . Narrow confidence intervals mean we can estimate the\nparameter precisely.",
+        "Fallacy 2 . The values inside the confidence interval are more\nlikely to be the true value than those outside the interval.",
+        "Fallacy 3 . The probability that a particular observed \\(95\\%\\) confidence interval contains the true value is \\(95\\%\\) ."
+      ]
+    },
+    {
+      "type": "paragraph",
+      "text": "Sufficed to say, confidence intervals are subtle objects. However, if\nyou keep the interpretation clear, they can be powerful tools."
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "a-gaussian-example",
+      "text": "18.9.3.3. A Gaussian Example"
+    },
+    {
+      "type": "paragraph",
+      "text": "Let us discuss the most classical example, the confidence interval for\nthe mean of a Gaussian of unknown mean and variance. Suppose we collect \\(n\\) samples \\(\\{x_i\\}_{i=1}^n\\) from our Gaussian \\(\\mathcal{N}(\\mu, \\sigma^2)\\) . We can compute estimators for the\nmean and standard deviation by taking"
+    },
+    {
+      "type": "math",
+      "latex": "(18.9.9)¶\\[\\hat\\mu_n = \\frac{1}{n}\\sum_{i=1}^n x_i \\;\\text{and}\\; \\hat\\sigma^2_n = \\frac{1}{n-1}\\sum_{i=1}^n (x_i - \\hat\\mu)^2.\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "If we now consider the random variable"
+    },
+    {
+      "type": "math",
+      "latex": "(18.9.10)¶\\[T = \\frac{\\hat\\mu_n - \\mu}{\\hat\\sigma_n/\\sqrt{n}},\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "we obtain a random variable following a well-known distribution called\nthe Student’s t-distribution on \\(n-1\\) degrees of freedom ."
+    },
+    {
+      "type": "paragraph",
+      "text": "This distribution is very well studied, and it is known, for instance,\nthat as \\(n\\rightarrow \\infty\\) , it is approximately a standard\nGaussian, and thus by looking up values of the Gaussian c.d.f. in a\ntable, we may conclude that the value of \\(T\\) is in the interval \\([-1.96, 1.96]\\) at least \\(95\\%\\) of the time. For finite\nvalues of \\(n\\) , the interval needs to be somewhat larger, but are\nwell known and precomputed in tables."
+    },
+    {
+      "type": "paragraph",
+      "text": "Thus, we may conclude that for large \\(n\\) ,"
+    },
+    {
+      "type": "math",
+      "latex": "(18.9.11)¶\\[P\\left(\\frac{\\hat\\mu_n - \\mu}{\\hat\\sigma_n/\\sqrt{n}} \\in [-1.96, 1.96]\\right) \\ge 0.95.\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Rearranging this by multiplying both sides by \\(\\hat\\sigma_n/\\sqrt{n}\\) and then adding \\(\\hat\\mu_n\\) , we\nobtain"
+    },
+    {
+      "type": "math",
+      "latex": "(18.9.12)¶\\[P\\left(\\mu \\in \\left[\\hat\\mu_n - 1.96\\frac{\\hat\\sigma_n}{\\sqrt{n}}, \\hat\\mu_n + 1.96\\frac{\\hat\\sigma_n}{\\sqrt{n}}\\right]\\right) \\ge 0.95.\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Thus we know that we have found our \\(95\\%\\) confidence interval:"
+    },
+    {
+      "type": "math",
+      "latex": "(18.9.13)¶\\[\\left[\\hat\\mu_n - 1.96\\frac{\\hat\\sigma_n}{\\sqrt{n}}, \\hat\\mu_n + 1.96\\frac{\\hat\\sigma_n}{\\sqrt{n}}\\right].\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "It is safe to say that (18.9.13) is one of the most\nused formula in statistics. Let us close our discussion of statistics by\nimplementing it. For simplicity, we assume we are in the asymptotic\nregime. Small values of \\(N\\) should include the correct value of t_star obtained either programmatically or from a \\(t\\) -table."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "# Number of samples\nN = 1000\n\n# Sample dataset\nsamples = np.random.normal(loc=0, scale=1, size=(N,))\n\n# Lookup Students's t-distribution c.d.f.\nt_star = 1.96\n\n# Construct interval\nmu_hat = np.mean(samples)\nsigma_hat = samples.std(ddof=1)\n(mu_hat - t_star*sigma_hat/np.sqrt(N), mu_hat + t_star*sigma_hat/np.sqrt(N))"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "(array(-0.07853346), array(0.04412608))"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "# PyTorch uses Bessel's correction by default, which means the use of ddof=1\n# instead of default ddof=0 in numpy. We can use unbiased=False to imitate\n# ddof=0.\n\n# Number of samples\nN = 1000\n\n# Sample dataset\nsamples = torch.normal(0, 1, size=(N,))\n\n# Lookup Students's t-distribution c.d.f.\nt_star = 1.96\n\n# Construct interval\nmu_hat = torch.mean(samples)\nsigma_hat = samples.std(unbiased=True)\n(mu_hat - t_star*sigma_hat/torch.sqrt(torch.tensor(N, dtype=torch.float32)),\\\n mu_hat + t_star*sigma_hat/torch.sqrt(torch.tensor(N, dtype=torch.float32)))"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "(tensor(-0.0568), tensor(0.0704))"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "# Number of samples\nN = 1000\n\n# Sample dataset\nsamples = tf.random.normal((N,), 0, 1)\n\n# Lookup Students's t-distribution c.d.f.\nt_star = 1.96\n\n# Construct interval\nmu_hat = tf.reduce_mean(samples)\nsigma_hat = tf.math.reduce_std(samples)\n(mu_hat - t_star*sigma_hat/tf.sqrt(tf.constant(N, dtype=tf.float32)), \\\n mu_hat + t_star*sigma_hat/tf.sqrt(tf.constant(N, dtype=tf.float32)))"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "(<tf.Tensor: shape=(), dtype=float32, numpy=-0.043828737>,\n <tf.Tensor: shape=(), dtype=float32, numpy=0.07689236>)"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tom-tat",
+      "text": "18.9.4. Tóm tắt"
+    },
+    {
+      "type": "list",
+      "ordered": false,
+      "items": [
+        "Thống kê tập trung vào các bài toán suy luận, trong khi học sâu nhấn\nmạnh vào việc đưa ra các dự đoán chính xác mà không cần lập trình và\nhiểu biết rõ ràng.",
+        "Có ba phương pháp suy luận thống kê phổ biến: đánh giá và so sánh các\nước lượng, tiến hành các bài kiểm tra giả thuyết, và xây dựng các\nkhoảng tự tin.",
+        "Có ba điều kiện phổ biến nhất: thiên vị thống kê, độ lệch chuẩn và\nsai số vuông trung bình.",
+        "Khoảng thời gian tin cậy là một phạm vi ước tính của một tham số dân\nsố thực sự mà chúng ta có thể xây dựng bằng cách đưa ra các mẫu.",
+        "Xét nghiệm giả thuyết là một cách để đánh giá một số bằng chứng chống\nlại tuyên bố mặc định về một dân số."
+      ]
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bai-tap",
+      "text": "18.9.5. Bài tập"
+    },
+    {
+      "type": "list",
+      "ordered": true,
+      "items": [
+        "Hãy để \\(X_1, X_2, \\ldots, X_n \\overset{\\text{iid}}{\\sim} \\mathrm{Unif}(0, \\theta)\\) ,\ntrong đó “iid” là viết tắt của * độc lập và phân phối giống hệt\nnhau*. Hãy xem xét các chứng thực sau đây của \\(\\theta\\) : (18.9.14) ¶ \\[\\hat{\\theta} = \\max \\{X_1, X_2, \\ldots, X_n \\};\\] (18.9.15) ¶ \\[\\tilde{\\theta} = 2 \\bar{X_n} = \\frac{2}{n} \\sum_{i=1}^n X_i.\\] Tìm thiên vị thống kê, độ lệch chuẩn và sai số vuông trung bình\ncủa \\(\\hat{\\theta}.\\) Tìm thiên vị thống kê, độ lệch chuẩn và sai số vuông trung bình\ncủa \\(\\tilde{\\theta}.\\) Ước tính nào tốt hơn?",
+        "Tìm thiên vị thống kê, độ lệch chuẩn và sai số vuông trung bình\ncủa \\(\\hat{\\theta}.\\)",
+        "Tìm thiên vị thống kê, độ lệch chuẩn và sai số vuông trung bình\ncủa \\(\\tilde{\\theta}.\\)",
+        "Ước tính nào tốt hơn?",
+        "Đối với ví dụ nhà hóa học của chúng tôi trong phần giới thiệu, bạn có\nthể lấy được 5 bước để tiến hành thử nghiệm giả thuyết hai mặt không?\nVới mức ý nghĩa thống kê \\(\\alpha = 0.05\\) và sức mạnh thống kê \\(1 - \\beta = 0.8\\) .",
+        "Chạy mã khoảng thời gian tin cậy với \\(N=2\\) và \\(\\alpha = 0.5\\) cho \\(100\\) tập dữ liệu được tạo độc lập và\nvẽ các khoảng thời gian kết quả (trong trường hợp này là t_star = 1.0 ). Bạn sẽ thấy một số khoảng thời gian rất ngắn rất\nxa chứa trung bình thực sự \\(0\\) . Điều này có mâu thuẫn với việc\ngiải thích khoảng thời gian tin cậy không? Bạn có cảm thấy thoải mái\nkhi sử dụng khoảng thời gian ngắn để chỉ ra ước tính chính xác cao\nkhông?"
+      ]
+    },
+    {
+      "type": "math",
+      "latex": "(18.9.14)¶\\[\\hat{\\theta} = \\max \\{X_1, X_2, \\ldots, X_n \\};\\]"
+    },
+    {
+      "type": "math",
+      "latex": "(18.9.15)¶\\[\\tilde{\\theta} = 2 \\bar{X_n} = \\frac{2}{n} \\sum_{i=1}^n X_i.\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    }
+  ],
+  "images": [
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_statistics_bc7dd5_3_0.svg",
+      "local_path": "_images/output_statistics_bc7dd5_3_0.svg",
+      "alt": "../_images/output_statistics_bc7dd5_3_0.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_statistics_bc7dd5_6_0.svg",
+      "local_path": "_images/output_statistics_bc7dd5_6_0.svg",
+      "alt": "../_images/output_statistics_bc7dd5_6_0.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_statistics_bc7dd5_9_0.svg",
+      "local_path": "_images/output_statistics_bc7dd5_9_0.svg",
+      "alt": "../_images/output_statistics_bc7dd5_9_0.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/statistical-significance.svg",
+      "local_path": "_images/statistical-significance.svg",
+      "alt": "../_images/statistical-significance.svg"
+    }
+  ],
+  "text": "18.9. Thống kê\nKhông còn nghi ngờ gì nữa, để trở thành một học viên học sâu hàng đầu,\nkhả năng đào tạo các mô hình hiện đại và chính xác cao là rất quan\ntrọng. Tuy nhiên, người ta thường không rõ khi nào cải tiến là đáng kể,\nhoặc chỉ là kết quả của những biến động ngẫu nhiên trong quá trình đào\ntạo. Để có thể thảo luận về sự không chắc chắn về các giá trị ước tính,\nchúng ta phải tìm hiểu một số thống kê.\nTài liệu tham khảo sớm nhất của * thống kê * có thể được bắt nguồn từ một\nhọc giả Ả Rập Al-Kindi trong thế kỷ \\(9^{\\mathrm{th}}\\) , người đã\nđưa ra một mô tả chi tiết về cách sử dụng thống kê và phân tích tần số\nđể giải mã các tin nhắn được mã hóa. Sau 800 năm, số liệu thống kê hiện\nđại phát sinh từ Đức vào những năm 1700, khi các nhà nghiên cứu tập\ntrung vào việc thu thập và phân tích dữ liệu nhân khẩu học và kinh tế.\nNgày nay, thống kê là môn khoa học liên quan đến việc thu thập, xử lý,\nphân tích, giải thích và trực quan hóa dữ liệu. Hơn nữa, lý thuyết cốt\nlõi của thống kê đã được sử dụng rộng rãi trong nghiên cứu trong học\nviện, công nghiệp và chính phủ.\nCụ thể hơn, số liệu thống kê có thể được chia thành thống kê mô tả và\n* suy luận thống ký . Tập trung trước đây vào việc tóm tắt và minh\nhọa các tính năng của một bộ sưu tập dữ liệu quan sát được, được gọi là\nmẫu * . Mẫu được rút ra từ một * dân số * , biểu thị tổng số các cá\nnhân, vật phẩm hoặc sự kiện tương tự của lợi ích thí nghiệm của chúng\ntôi. Trái ngược với thống kê mô tả, * suy luận thống ký* suy luận thêm\ncác đặc điểm của một quần thể từ các mẫu* đã cho, dựa trên các giả định\nrằng phân phối mẫu có thể nhân rộng phân bố dân số ở một mức độ nào đó.\nBạn có thể tự hỏi: “Sự khác biệt thiết yếu giữa học máy và thống kê là\ngì?” Nói về cơ bản, thống kê tập trung vào bài toán suy luận. Loại bài\ntoán này bao gồm mô hình hóa mối quan hệ giữa các biến, chẳng hạn như\nsuy luận nhân quả, và kiểm tra ý nghĩa thống kê của các tham số mô hình,\nchẳng hạn như thử nghiệm A/B. Ngược lại, machine learning nhấn mạnh vào\nviệc đưa ra các dự đoán chính xác, mà không cần lập trình và hiểu rõ\nchức năng của từng tham số.\nTrong phần này, chúng tôi sẽ giới thiệu ba loại phương pháp suy luận\nthống kê: đánh giá và so sánh các ước lượng, tiến hành các bài kiểm tra\ngiả thuyết và xây dựng khoảng thời gian tin cậy. Những phương pháp này\ncó thể giúp chúng ta suy ra các đặc điểm của một quần thể nhất định, tức\nlà tham số thực sự \\(\\theta\\) . Đối với ngắn gọn, chúng ta giả định\nrằng tham số thật \\(\\theta\\) của một quần thể nhất định là một giá\ntrị vô hướng. Thật đơn giản để mở rộng đến trường hợp \\(\\theta\\) là\nmột vectơ hoặc tensor, do đó chúng tôi bỏ qua nó trong cuộc thảo luận\ncủa chúng tôi.\n18.9.1. Đánh giá và so sánh ước tính\nTrong thống kê, một estimator là một hàm của các mẫu đã cho được sử\ndụng để ước tính tham số đúng \\(\\theta\\) . Chúng tôi sẽ viết \\(\\hat{\\theta}_n = \\hat{f}(x_1, \\ldots, x_n)\\) cho ước tính \\(\\theta\\) sau khi quan sát các mẫu { \\(x_1, x_2, \\ldots, x_n\\) }.\nChúng ta đã thấy các ví dụ đơn giản về các chứng thực trước đây trong\nphần Section 18.7 . Nếu bạn có một số mẫu từ một\nbiến ngẫu nhiên Bernoulli, thì ước tính khả năng tối đa cho xác suất\nbiến ngẫu nhiên là một có thể thu được bằng cách đếm số cái quan sát và\nchia cho tổng số mẫu. Tương tự, một bài tập yêu cầu bạn chỉ ra rằng ước\ntính khả năng tối đa của trung bình của một Gaussian được đưa ra một số\nmẫu được đưa ra bởi giá trị trung bình của tất cả các mẫu. Những ước\nlượng này hầu như sẽ không bao giờ cung cấp giá trị thực sự của tham số,\nnhưng lý tưởng cho một số lượng lớn các mẫu ước tính sẽ gần gũi.\nVí dụ, chúng ta hiển thị bên dưới mật độ thực của một biến ngẫu nhiên\nGaussian với trung bình 0 và phương sai một, cùng với một mẫu thu thập\ntừ Gaussian đó. Chúng tôi xây dựng tọa độ \\(y\\) để mọi điểm đều có\nthể nhìn thấy và mối quan hệ với mật độ ban đầu rõ ràng hơn.\nCó thể có nhiều cách để tính toán một ước tính của một tham số \\(\\hat{\\theta}_n\\) . Trong phần này, chúng tôi giới thiệu ba phương\npháp phổ biến để đánh giá và so sánh các ước lượng: lỗi bình phương\ntrung bình, độ lệch chuẩn và thiên vị thống kê.\n18.9.1.1. Lỗi bình phương trung bình\nCó lẽ số liệu đơn giản nhất được sử dụng để đánh giá các ước lượng là\nlỗi bình phương * trung bình (MSE) * (hoặc mất \\(l_2\\) ) của một\nước tính có thể được định nghĩa là\nThis allows us to quantify the average squared deviation from the true\nvalue. MSE is always non-negative. If you have read Section 3.1 , you will recognize it as the most\ncommonly used regression loss function. As a measure to evaluate an\nestimator, the closer its value to zero, the closer the estimator is\nclose to the true parameter \\(\\theta\\) .\n18.9.1.2. Thiên vị thống kê\nMSE cung cấp một số liệu tự nhiên, nhưng chúng ta có thể dễ dàng tưởng\ntượng nhiều hiện tượng khác nhau có thể làm cho nó lớn. Hai cơ bản quan\ntrọng là biến động trong ước tính do tính ngẫu nhiên trong tập dữ liệu,\nvà lỗi có hệ thống trong ước tính do quy trình ước tính.\nĐầu tiên, chúng ta hãy đo lỗi có hệ thống. Đối với một ước tính \\(\\hat{\\theta}_n\\) , minh họa toán học của thiên vị thống ký có thể\nđược định nghĩa là\nLưu ý rằng khi \\(\\mathrm{bias}(\\hat{\\theta}_n) = 0\\) , kỳ vọng của\nước tính \\(\\hat{\\theta}_n\\) bằng giá trị thực của tham số. Trong\ntrường hợp này, chúng tôi nói \\(\\hat{\\theta}_n\\) là một ước tính\nkhông thiên vị. Nói chung, một ước tính không thiên vị tốt hơn một ước\ntính thiên vị vì kỳ vọng của nó giống như tham số thực sự.\nTuy nhiên, điều đáng để nhận thức được rằng những người dự kiến thiên vị\nthường được sử dụng trong thực tế. Có những trường hợp mà các ước lượng\nkhông thiên vị không tồn tại mà không có giả định thêm, hoặc không thể\nchữa được để tính toán. Điều này có vẻ như là một lỗ hổng đáng kể trong\nmột nhà ước tính, tuy nhiên phần lớn các ước lượng gặp phải trong thực\ntế ít nhất là không thiên vị theo nghĩa là sự thiên vị có xu hướng bằng\nkhông vì số lượng mẫu có sẵn có xu hướng vô cùng: \\(\\lim_{n \\rightarrow \\infty} \\mathrm{bias}(\\hat{\\theta}_n) = 0\\) .\n18.9.1.3. Phương sai và độ lệch chuẩn\nThứ hai, chúng ta hãy đo lường sự ngẫu nhiên trong ước tính. Nhớ lại từ Section 18.6 , độ lệch chuẩn (hoặc lỗi tiêu\nchuẩn ) được định nghĩa là gốc bình phương của phương sai. Chúng tôi có\nthể đo mức độ dao động của một ước tính bằng cách đo độ lệch chuẩn hoặc\nphương sai của ước tính đó.\nĐiều quan trọng là so sánh (18.9.3) đến (18.9.1) . Trong phương trình này, chúng ta không so sánh\nvới giá trị dân số thực sự \\(\\theta\\) , mà thay vào đó là \\(E(\\hat{\\theta}_n)\\) , mẫu dự kiến có nghĩa là. Do đó, chúng tôi\nkhông đo lường mức độ ước tính có xu hướng từ giá trị thực sự, mà thay\nvào đó chúng ta đo lường sự dao động của chính ước tính.\n18.9.1.4. Sự Bias-Variance Trade-off\nRõ ràng bằng trực giác rằng hai thành phần chính này góp phần vào lỗi\nbình phương trung bình. Điều hơi gây sốc là chúng ta có thể cho thấy\nrằng đây thực sự là một * decomposition* của lỗi bình phương trung\nbình vào hai đóng góp này cộng với một phần ba. Điều đó có nghĩa là\nchúng ta có thể viết sai số bình phương trung bình là tổng của bình\nphương của sự thiên vị, phương sai và lỗi không thể khắc phục được.\nChúng tôi đề cập đến công thức trên là bias-variance trade-off . Lỗi\nbình phương trung bình có thể được chia thành ba nguồn error: the error\nfrom high bias, the error from high variance and the irreducible error.\nThe bias error is commonly seen in a simple model (such as a linear\nregression model), which cannot extract high dimensional relations\nbetween the features and the outputs. If a model suffers from high bias\nerror, we often say it is underfitting or lack of flexibilty as\nintroduced in ( Section 4.4 ). Phương sai cao thường\nlà kết quả từ một mô hình quá phức tạp, vượt quá dữ liệu đào tạo. Do đó,\nmô hình * overfitting* nhạy cảm với các biến động nhỏ trong dữ liệu.\nNếu một mô hình bị phương sai cao, chúng ta thường nói rằng đó là *\noverfitting* và thiếu khái quát hóa như được giới thiệu trong\n( Section 4.4 ). Lỗi không thể khắc phục là kết quả từ\ntiếng ồn trong chính \\(\\theta\\) .\n18.9.1.5. Đánh giá Ước tính trong Mã\nVì độ lệch chuẩn của một ước tính đã được thực hiện bằng cách gọi đơn\ngiản a.std() cho tensor a , chúng tôi sẽ bỏ qua nó nhưng thực\nhiện thiên vị thống kê và sai số bình phương trung bình.\nĐể minh họa phương trình của sự cân bằng sai lệch, chúng ta hãy mô phỏng\nphân phối bình thường \\(\\mathcal{N}(\\theta, \\sigma^2)\\) với \\(10,000\\) mẫu. Ở đây, chúng tôi sử dụng một \\(\\theta = 1\\) và \\(\\sigma = 4\\) . Vì ước tính là một chức năng của các mẫu đã cho, ở\nđây chúng tôi sử dụng trung bình của các mẫu như một ước tính cho \\(\\theta\\) đúng trong phân phối bình thường này \\(\\mathcal{N}(\\theta, \\sigma^2)\\) .\nChúng ta hãy xác nhận phương trình đánh đổi bằng cách tính tổng của sự\nthiên vị bình phương và phương sai của ước tính của chúng ta. Đầu tiên,\ntính toán MSE của ước tính của chúng tôi.\nTiếp theo, chúng tôi tính \\(\\mathrm{Var} (\\hat{\\theta}_n) + [\\mathrm{bias} (\\hat{\\theta}_n)]^2\\) như dưới đây. Như bạn có thể thấy, hai giá trị đồng ý với độ chính xác\nsố.\n18.9.2. Tiến hành các bài kiểm tra giả thuyết\nChủ đề thường gặp nhất trong suy luận thống kê là thử nghiệm giả thuyết.\nTrong khi thử nghiệm giả thuyết được phổ biến vào đầu thế kỷ 20, việc sử\ndụng đầu tiên có thể được truy trở lại John Arbuthnot vào những năm\n1700. John đã theo dõi kỷ lục sinh 80 năm ở London và kết luận rằng\nnhiều nam giới được sinh ra hơn phụ nữ mỗi năm. Tiếp theo đó, thử nghiệm\ný nghĩa hiện đại là di sản tình báo của Karl Pearson, người đã phát minh\nra \\(p\\) giá trị và bài kiểm tra chi bình phương của Pearson,\nWilliam Gosset là cha đẻ của phân phối t của Sinh viên, và Ronald\nFisher, người đã khởi xướng giả thuyết vô giá trị và bài kiểm tra ý\nnghĩa.\nA giả thuyết test là một cách để đánh giá một số bằng chứng chống lại\ntuyên bố mặc định về một dân số. Chúng tôi tham khảo câu lệnh mặc định\nlà giả thuyết * null * \\(H_0\\) , mà chúng tôi cố gắng từ chối bằng\ncách sử dụng dữ liệu quan sát. Ở đây, chúng tôi sử dụng \\(H_0\\) làm\nđiểm khởi đầu cho việc kiểm tra ý nghĩa thống kê. Giả thuyết thay thế* \\(H_A\\) (hoặc \\(H_1\\) ) là một tuyên bố trái với giả thuyết null.\nMột giả thuyết null thường được nêu trong một hình thức khai báo đặt ra\nmột mối quan hệ giữa các biến. Nó sẽ phản ánh ngắn gọn càng rõ ràng càng\ntốt, và được kiểm tra bởi lý thuyết thống kê.\nHãy tưởng tượng bạn là một nhà hóa học. Sau khi dành hàng ngàn giờ trong\nphòng thí nghiệm, bạn phát triển một loại thuốc mới có thể cải thiện\nđáng kể khả năng hiểu toán của một người. Để thể hiện sức mạnh ma thuật\ncủa nó, bạn cần phải kiểm tra nó. Đương nhiên, bạn có thể cần một số\ntình nguyện viên uống thuốc và xem liệu nó có thể giúp họ học toán tốt\nhơn hay không. Làm thế nào để bạn bắt đầu?\nĐầu tiên, bạn sẽ cần hai nhóm tình nguyện viên được lựa chọn ngẫu nhiên\ncẩn thận, để không có sự khác biệt giữa khả năng hiểu biết toán học của\nhọ được đo bằng một số số chỉ số. Hai nhóm thường được gọi là nhóm thử\nnghiệm và nhóm kiểm soát. kiểm tra nhóm (hoặc nhóm điều trị ) là một\nnhóm các cá nhân sẽ trải nghiệm thuốc, trong khi nhóm kiểm soát * đại\ndiện cho nhóm người dùng được đặt sang một bên như một chuẩn mực, tức là\nthiết lập môi trường giống hệt nhau trừ khi dùng thuốc này. Bằng cách\nnày, ảnh hưởng của tất cả các biến được giảm thiểu, ngoại trừ tác động\ncủa biến độc lập trong điều trị.\nThứ hai, sau một thời gian dùng thuốc, bạn sẽ cần đo lường sự hiểu biết\ntoán của hai nhóm bằng các chỉ số tương tự, chẳng hạn như để các tình\nnguyện viên làm các bài kiểm tra tương tự sau khi học một công thức toán\nmới. Sau đó, bạn có thể thu thập hiệu suất của họ và so sánh kết quả.\nTrong trường hợp này, giả thuyết null của chúng ta sẽ là không có sự\nkhác biệt giữa hai nhóm, và sự thay thế của chúng ta sẽ là có.\nĐiều này vẫn chưa hoàn toàn chính thức. Có rất nhiều chi tiết bạn phải\nsuy nghĩ cẩn thận. Ví dụ, các số liệu phù hợp để kiểm tra khả năng hiểu\nbiết toán học của họ là gì? Có bao nhiêu tình nguyện viên cho bài kiểm\ntra của bạn để bạn có thể tự tin để khẳng định hiệu quả của thuốc của\nbạn? Bạn nên chạy bài kiểm tra trong bao lâu? Làm thế nào để bạn quyết\nđịnh nếu có sự khác biệt giữa hai nhóm? Bạn có quan tâm đến hiệu suất\ntrung bình chỉ, hoặc cũng là phạm vi biến thể của điểm số? Và như vậy.\nBằng cách này, thử nghiệm giả thuyết cung cấp một khuôn khổ cho thiết kế\nthực nghiệm và lý luận về sự chắc chắn trong các kết quả quan sát được.\nNếu bây giờ chúng ta có thể chỉ ra rằng giả thuyết null là rất khó có\nthể là đúng, chúng ta có thể từ chối nó với sự tự tin.\nĐể hoàn thành câu chuyện về cách làm việc với thử nghiệm giả thuyết, bây\ngiờ chúng ta cần giới thiệu một số thuật ngữ bổ sung và đưa ra một số\nkhái niệm của chúng tôi ở trên chính thức.\n18.9.2.1. Statistical Significance\nThe statistical significance measures the probability of erroneously\nrejecting the null hypothesis, \\(H_0\\) , when it should not be\nrejected, i.e.,\nIt is also referred to as the type I error or false positive . The \\(\\alpha\\) , is called as the significance level and its commonly\nused value is \\(5\\%\\) , i.e., \\(1-\\alpha = 95\\%\\) . The\nsignificance level can be explained as the level of risk that we are\nwilling to take, when we reject a true null hypothesis.\nFig. 18.9.1 shows the observations’ values\nand probability of a given normal distribution in a two-sample\nhypothesis test. If the observation data example is located outsides the \\(95\\%\\) threshold, it will be a very unlikely observation under the\nnull hypothesis assumption. Hence, there might be something wrong with\nthe null hypothesis and we will reject it.\nFig. 18.9.1 Statistical significance. ¶\n18.9.2.2. Sức mạnh thống kê\nThe statistical power (or sensitivity ) measures the probability of\nreject the null hypothesis, \\(H_0\\) , when it should be rejected,\ni.e.,\nRecall that a type I error is error caused by rejecting the null\nhypothesis when it is true, whereas a type II error is resulted from\nfailing to reject the null hypothesis when it is false. A type II error\nis usually denoted as \\(\\beta\\) , and hence the corresponding\nstatistical power is \\(1-\\beta\\) .\nIntuitively, statistical power can be interpreted as how likely our test\nwill detect a real discrepancy of some minimum magnitude at a desired\nstatistical significance level. \\(80\\%\\) is a commonly used\nstatistical power threshold. The higher the statistical power, the more\nlikely we are to detect true differences.\nMột trong những cách sử dụng phổ biến nhất của sức mạnh thống kê là xác\nđịnh số lượng mẫu cần thiết. Xác suất bạn từ chối giả thuyết null khi nó\nlà sai phụ thuộc vào mức độ sai (được gọi là kích thước hiệu ứng ) và\nsố lượng mẫu bạn có. Như bạn có thể mong đợi, kích thước hiệu ứng nhỏ sẽ\nyêu cầu một số lượng rất lớn các mẫu được phát hiện với xác suất cao.\nTrong khi vượt quá phạm vi của phụ lục ngắn gọn này để lấy ra chi tiết,\nnhư một ví dụ, muốn có thể từ chối một giả thuyết null rằng mẫu của\nchúng tôi đến từ một phương sai trung bình bằng 0 một Gaussian, và chúng\ntôi tin rằng trung bình mẫu của chúng tôi thực sự gần với một, chúng tôi\ncó thể làm như vậy với tỷ lệ lỗi chấp nhận được với kích thước mẫu của\nchỉ \\(8\\) . Tuy nhiên, nếu chúng ta nghĩ rằng trung bình thực sự dân\nsố mẫu của chúng ta gần \\(0.01\\) , thì chúng ta cần một kích thước\nmẫu gần \\(80000\\) để phát hiện sự khác biệt.\nChúng ta có thể tưởng tượng sức mạnh như một bộ lọc nước. Trong sự tương\ntự này, một bài kiểm tra giả thuyết công suất cao giống như một hệ thống\nlọc nước chất lượng cao sẽ làm giảm các chất độc hại trong nước càng\nnhiều càng tốt. Mặt khác, sự khác biệt nhỏ hơn giống như một bộ lọc nước\nchất lượng thấp, nơi một số chất nhỏ tương đối có thể dễ dàng thoát ra\nkhỏi các khoảng trống. Tương tự, nếu sức mạnh thống kê không đủ công\nsuất cao, thì thử nghiệm có thể không bắt được sự khác biệt nhỏ hơn.\n18.9.2.3. Test Statistic\nMột * thống kê thử nghiệm* \\(T(x)\\) là một vô hướng tóm tắt một số\nđặc điểm của dữ liệu mẫu. Mục tiêu của việc xác định một thống kê như\nvậy là nó sẽ cho phép chúng ta phân biệt giữa các phân phối khác nhau và\ntiến hành kiểm tra giả thuyết của chúng tôi. Suy nghĩ lại ví dụ của nhà\nhóa học của chúng tôi, nếu chúng ta muốn chứng minh rằng một dân số hoạt\nđộng tốt hơn người kia, nó có thể là hợp lý để lấy trung bình như thống\nkê thử nghiệm. Các lựa chọn khác nhau của thống kê thử nghiệm có thể dẫn\nđến kiểm tra thống kê với sức mạnh thống kê khác nhau đáng kể.\nThông thường, \\(T(X)\\) (sự phân bố của thống kê thử nghiệm theo giả\nthuyết null của chúng tôi) sẽ theo sau, ít nhất là khoảng, một phân phối\nxác suất chung như phân phối bình thường khi được xem xét theo giả\nthuyết null. Nếu chúng ta có thể lấy được một phân phối rõ ràng như vậy,\nvà sau đó đo thống kê thử nghiệm của chúng tôi về tập dữ liệu của chúng\ntôi, chúng ta có thể từ chối một cách an toàn giả thuyết null nếu thống\nkê của chúng tôi nằm ngoài phạm vi mà chúng ta mong đợi. Làm cho định\nlượng này dẫn chúng ta đến khái niệm \\(p\\) -giá trị.\n18.9.2.4. \\(p\\) -value\nGiá trị \\(p\\) -( hoặc giá trị xác suất * ) là xác suất \\(T(X)\\) ít\nnhất là cực đoan như thống kê thử nghiệm quan sát \\(T(x)\\) giả định\nrằng giả thuyết null là * true*, tức là,\nNếu giá trị \\(p\\) -nhỏ hơn hoặc bằng một mức ý nghĩa thống kê được\nxác định trước và cố định \\(\\alpha\\) , chúng ta có thể từ chối giả\nthuyết null. Nếu không, chúng ta sẽ kết luận rằng chúng ta thiếu bằng\nchứng để từ chối giả thuyết null. Đối với một phân bố dân số nhất định, khu vực từ khóa sẽ là khoảng thời gian chứa tất cả các điểm có giá trị \\(p\\) nhỏ hơn mức ý nghĩa thống kê \\(\\alpha\\) .\n18.9.2.5. Kiểm tra một mặt và thử nghiệm hai mặt\nThông thường có hai loại kiểm tra ý nghĩa: bài kiểm tra một mặt và thử\nnghiệm hai mặt. Kiểm tra * một mặt* (hoặc * kiểm tra một đuôi * ) được\náp dụng khi giả thuyết null và giả thuyết thay thế chỉ có một hướng. Ví\ndụ, giả thuyết null có thể nói rằng tham số thực \\(\\theta\\) nhỏ hơn\nhoặc bằng một giá trị \\(c\\) . Giả thuyết thay thế sẽ là \\(\\theta\\) lớn hơn \\(c\\) . Đó là, khu vực từ chối chỉ ở một bên\ncủa phân phối lấy mẫu. Trái ngược với thử nghiệm một mặt, thử nghiệm hai\nmặt* (hoặc * kiểm tra hai đuôi *) được áp dụng khi vùng từ chối nằm ở\ncả hai mặt của phân phối lấy mẫu. Một ví dụ trong trường hợp này có thể\ncó một trạng thái giả thuyết null rằng tham số đúng \\(\\theta\\) bằng\nmột giá trị \\(c\\) . Giả thuyết thay thế sẽ là \\(\\theta\\) không\nbằng \\(c\\) .\n18.9.2.6. Các bước chung của thử nghiệm giả thuyết\nSau khi làm quen với các khái niệm trên, chúng ta hãy trải qua các bước\nchung của thử nghiệm giả thuyết.\nNêu câu hỏi và thiết lập một giả thuyết vô giá trị \\(H_0\\) .\nĐặt mức ý nghĩa thống kê \\(\\alpha\\) và một sức mạnh thống kê\n( \\(1 - \\beta\\) ).\nLấy mẫu thông qua các thí nghiệm. Số lượng mẫu cần thiết sẽ phụ thuộc\nvào sức mạnh thống kê và kích thước hiệu ứng mong đợi.\nTính số liệu thống kê thử nghiệm và giá trị \\(p\\) -.\nĐưa ra quyết định giữ hoặc từ chối giả thuyết null dựa trên giá trị \\(p\\) -giá trị và mức ý nghĩa thống kê \\(\\alpha\\) .\nĐể tiến hành một bài kiểm tra giả thuyết, chúng ta bắt đầu bằng cách xác\nđịnh một giả thuyết null và mức độ rủi ro mà chúng tôi sẵn sàng thực\nhiện. Sau đó, chúng tôi tính toán thống kê thử nghiệm của mẫu, lấy một\ngiá trị cực đoan của thống kê thử nghiệm làm bằng chứng chống lại giả\nthuyết null. Nếu thống kê thử nghiệm nằm trong khu vực từ chối, chúng ta\ncó thể từ chối giả thuyết null có lợi cho sự thay thế.\nXét nghiệm giả thuyết được áp dụng trong một loạt các tình huống như\nđường mòn lâm sàng và thử nghiệm A/B.\n18.9.3. Xây dựng khoảng tự tin\nKhi ước tính giá trị của một tham số \\(\\theta\\) , các chứng thực điểm\nnhư \\(\\hat \\theta\\) có tiện ích hạn chế vì chúng không chứa khái\nniệm về sự không chắc chắn. Thay vào đó, sẽ tốt hơn nhiều nếu chúng ta\ncó thể tạo ra một khoảng thời gian có chứa tham số thực \\(\\theta\\) với xác suất cao. Nếu bạn quan tâm đến những ý tưởng như vậy một thế kỷ\ntrước, thì bạn sẽ rất vui mừng khi đọc “Phác thảo của một lý thuyết ước\ntính thống kê dựa trên lý thuyết xác suất cổ điển” của Jerzy Neyman [Neyman, 1937] , người lần đầu tiên giới thiệu khái niệm khoảng\nthời gian tin cậy vào năm 1937.\nĐể hữu ích, một khoảng thời gian tin cậy nên càng nhỏ càng tốt cho một\nmức độ chắc chắn nhất định. Hãy để chúng tôi xem làm thế nào để lấy được\nnó.\n18.9.3.1. Definition\nMathematically, a confidence interval for the true parameter \\(\\theta\\) is an interval \\(C_n\\) that computed from the sample\ndata such that\nHere \\(\\alpha \\in (0, 1)\\) , and \\(1 - \\alpha\\) is called the confidence level or coverage of the interval. This is the same \\(\\alpha\\) as the significance level as we discussed about above.\nNote that (18.9.8) is about variable \\(C_n\\) , not\nabout the fixed \\(\\theta\\) . To emphasize this, we write \\(P_{\\theta} (C_n \\ni \\theta)\\) rather than \\(P_{\\theta} (\\theta \\in C_n)\\) .\n18.9.3.2. Interpretation\nIt is very tempting to interpret a \\(95\\%\\) confidence interval as\nan interval where you can be \\(95\\%\\) sure the true parameter lies,\nhowever this is sadly not true. The true parameter is fixed, and it is\nthe interval that is random. Thus a better interpretation would be to\nsay that if you generated a large number of confidence intervals by this\nprocedure, \\(95\\%\\) of the generated intervals would contain the\ntrue parameter.\nThis may seem pedantic, but it can have real implications for the\ninterpretation of the results. In particular, we may satisfy (18.9.8) by constructing intervals that we are almost\ncertain do not contain the true value, as long as we only do so rarely\nenough. We close this section by providing three tempting but false\nstatements. An in-depth discussion of these points can be found in [Morey et al., 2016] .\nFallacy 1 . Narrow confidence intervals mean we can estimate the\nparameter precisely.\nFallacy 2 . The values inside the confidence interval are more\nlikely to be the true value than those outside the interval.\nFallacy 3 . The probability that a particular observed \\(95\\%\\) confidence interval contains the true value is \\(95\\%\\) .\nSufficed to say, confidence intervals are subtle objects. However, if\nyou keep the interpretation clear, they can be powerful tools.\n18.9.3.3. A Gaussian Example\nLet us discuss the most classical example, the confidence interval for\nthe mean of a Gaussian of unknown mean and variance. Suppose we collect \\(n\\) samples \\(\\{x_i\\}_{i=1}^n\\) from our Gaussian \\(\\mathcal{N}(\\mu, \\sigma^2)\\) . We can compute estimators for the\nmean and standard deviation by taking\nIf we now consider the random variable\nwe obtain a random variable following a well-known distribution called\nthe Student’s t-distribution on \\(n-1\\) degrees of freedom .\nThis distribution is very well studied, and it is known, for instance,\nthat as \\(n\\rightarrow \\infty\\) , it is approximately a standard\nGaussian, and thus by looking up values of the Gaussian c.d.f. in a\ntable, we may conclude that the value of \\(T\\) is in the interval \\([-1.96, 1.96]\\) at least \\(95\\%\\) of the time. For finite\nvalues of \\(n\\) , the interval needs to be somewhat larger, but are\nwell known and precomputed in tables.\nThus, we may conclude that for large \\(n\\) ,\nRearranging this by multiplying both sides by \\(\\hat\\sigma_n/\\sqrt{n}\\) and then adding \\(\\hat\\mu_n\\) , we\nobtain\nThus we know that we have found our \\(95\\%\\) confidence interval:\nIt is safe to say that (18.9.13) is one of the most\nused formula in statistics. Let us close our discussion of statistics by\nimplementing it. For simplicity, we assume we are in the asymptotic\nregime. Small values of \\(N\\) should include the correct value of t_star obtained either programmatically or from a \\(t\\) -table.\n18.9.4. Tóm tắt\nThống kê tập trung vào các bài toán suy luận, trong khi học sâu nhấn\nmạnh vào việc đưa ra các dự đoán chính xác mà không cần lập trình và\nhiểu biết rõ ràng.\nCó ba phương pháp suy luận thống kê phổ biến: đánh giá và so sánh các\nước lượng, tiến hành các bài kiểm tra giả thuyết, và xây dựng các\nkhoảng tự tin.\nCó ba điều kiện phổ biến nhất: thiên vị thống kê, độ lệch chuẩn và\nsai số vuông trung bình.\nKhoảng thời gian tin cậy là một phạm vi ước tính của một tham số dân\nsố thực sự mà chúng ta có thể xây dựng bằng cách đưa ra các mẫu.\nXét nghiệm giả thuyết là một cách để đánh giá một số bằng chứng chống\nlại tuyên bố mặc định về một dân số.\n18.9.5. Bài tập\nHãy để \\(X_1, X_2, \\ldots, X_n \\overset{\\text{iid}}{\\sim} \\mathrm{Unif}(0, \\theta)\\) ,\ntrong đó “iid” là viết tắt của * độc lập và phân phối giống hệt\nnhau*. Hãy xem xét các chứng thực sau đây của \\(\\theta\\) : (18.9.14) ¶ \\[\\hat{\\theta} = \\max \\{X_1, X_2, \\ldots, X_n \\};\\] (18.9.15) ¶ \\[\\tilde{\\theta} = 2 \\bar{X_n} = \\frac{2}{n} \\sum_{i=1}^n X_i.\\] Tìm thiên vị thống kê, độ lệch chuẩn và sai số vuông trung bình\ncủa \\(\\hat{\\theta}.\\) Tìm thiên vị thống kê, độ lệch chuẩn và sai số vuông trung bình\ncủa \\(\\tilde{\\theta}.\\) Ước tính nào tốt hơn?\nTìm thiên vị thống kê, độ lệch chuẩn và sai số vuông trung bình\ncủa \\(\\hat{\\theta}.\\)\nTìm thiên vị thống kê, độ lệch chuẩn và sai số vuông trung bình\ncủa \\(\\tilde{\\theta}.\\)\nƯớc tính nào tốt hơn?\nĐối với ví dụ nhà hóa học của chúng tôi trong phần giới thiệu, bạn có\nthể lấy được 5 bước để tiến hành thử nghiệm giả thuyết hai mặt không?\nVới mức ý nghĩa thống kê \\(\\alpha = 0.05\\) và sức mạnh thống kê \\(1 - \\beta = 0.8\\) .\nChạy mã khoảng thời gian tin cậy với \\(N=2\\) và \\(\\alpha = 0.5\\) cho \\(100\\) tập dữ liệu được tạo độc lập và\nvẽ các khoảng thời gian kết quả (trong trường hợp này là t_star = 1.0 ). Bạn sẽ thấy một số khoảng thời gian rất ngắn rất\nxa chứa trung bình thực sự \\(0\\) . Điều này có mâu thuẫn với việc\ngiải thích khoảng thời gian tin cậy không? Bạn có cảm thấy thoải mái\nkhi sử dụng khoảng thời gian ngắn để chỉ ra ước tính chính xác cao\nkhông?\nDiscussions\nDiscussions\nDiscussions"
+}

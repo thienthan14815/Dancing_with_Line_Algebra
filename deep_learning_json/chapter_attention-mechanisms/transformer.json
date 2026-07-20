@@ -1,0 +1,860 @@
+{
+  "url": "https://vi.d2l.ai/chapter_attention-mechanisms/transformer.html",
+  "chapter": "chapter_attention-mechanisms",
+  "title": "10.7. Máy biến áp",
+  "crawled_at": "2026-07-20T12:40:17.679058+00:00",
+  "headings": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "may-bien-ap",
+      "text": "10.7. Máy biến áp"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "mo-hinh",
+      "text": "10.7.1. Mô hình"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "cac-mang-thuc-an-chuyen-tiep-vi-tri",
+      "text": "10.7.2. Các mạng thức ăn chuyển tiếp vị trí"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "ket-noi-con-lai-va-chuan-hoa-lop",
+      "text": "10.7.3. Kết nối còn lại và chuẩn hóa lớp"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bo-ma-hoa",
+      "text": "10.7.4. Bộ mã hóa"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bo-giai-ma",
+      "text": "10.7.5. Bộ giải mã"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "dao-tao",
+      "text": "10.7.6. Đào tạo"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tom-tat",
+      "text": "10.7.7. Tóm tắt"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bai-tap",
+      "text": "10.7.8. Bài tập"
+    }
+  ],
+  "content": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "may-bien-ap",
+      "text": "10.7. Máy biến áp"
+    },
+    {
+      "type": "paragraph",
+      "text": "Chúng tôi đã so sánh CNN, RNN và sự tự chú ý trong Section 10.6.2 . Đáng chú ý, sự tự chú ý thích\ncả tính toán song song và độ dài đường tối đa ngắn nhất. Do đó về mặt tự\nnhiên, nó là hấp dẫn để thiết kế kiến trúc sâu sắc bằng cách sử dụng sự\ntự chú ý. Không giống như các mô hình tự chú ý trước đó vẫn dựa vào RNN\nđể biểu diễn đầu vào [Cheng.Dong.Lapata.2016] [Lin.Feng.Santos.ea.2017] [Paulus.Xiong.Socher.2017] ,\nmô hình máy biến áp chỉ dựa trên các cơ chế chú ý mà không có bất kỳ lớp\nphức tạp hoặc tái phát nào [Vaswani et al., 2017] . Mặc\ndù ban đầu được đề xuất cho trình tự để học trình tự về dữ liệu văn bản,\ncác máy biến áp đã phổ biến trong một loạt các ứng dụng học sâu hiện\nđại, chẳng hạn như trong các lĩnh vực ngôn ngữ, tầm nhìn, lời nói và học\ntập củng cố."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "mo-hinh",
+      "text": "10.7.1. Mô hình"
+    },
+    {
+      "type": "paragraph",
+      "text": "Là một ví dụ của kiến trúc bộ mã hóa-giải mã, kiến trúc tổng thể của máy\nbiến áp được trình bày trong Fig. 10.7.1 . Như chúng ta\ncó thể thấy, máy biến áp bao gồm một bộ mã hóa và bộ giải mã. Khác với\nsự chú ý của Bahdanau cho trình tự để học trình tự trong Fig. 10.4.1 , các nhúng chuỗi đầu vào (nguồn)\nvà đầu ra (mục tiêu) được thêm vào với mã hóa vị trí trước khi được đưa\nvào bộ mã hóa và bộ giải mã ngăn xếp các mô-đun dựa trên sự tự chú ý."
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/transformer.svg",
+      "local_path": "_images/transformer.svg",
+      "alt": "../_images/transformer.svg"
+    },
+    {
+      "type": "paragraph",
+      "text": "Fig. 10.7.1 The transformer architecture. ¶"
+    },
+    {
+      "type": "paragraph",
+      "text": "Bây giờ chúng tôi cung cấp một cái nhìn tổng quan về kiến trúc biến áp\ntrong Fig. 10.7.1 . Ở mức độ cao, bộ mã hóa biến áp là\nmột chồng của nhiều lớp giống hệt nhau, trong đó mỗi lớp có hai lớp con\n(hoặc được ký hiệu là \\(\\mathrm{sublayer}\\) ). Đầu tiên là một tập\nhợp tự chú ý nhiều đầu và thứ hai là một mạng lưới chuyển tiếp nguồn cấp\ndữ liệu theo định vị. Cụ thể, trong bộ mã hóa tự chú ý, truy vấn, phím\nvà giá trị đều từ đầu ra của lớp mã hóa trước đó. Lấy cảm hứng từ thiết\nkế ResNet trong Section 7.6 , một kết nối còn lại được sử dụng\nxung quanh cả hai lớp con. Trong máy biến áp, đối với bất kỳ đầu vào \\(\\mathbf{x} \\in \\mathbb{R}^d\\) nào ở bất kỳ vị trí nào của chuỗi,\nchúng tôi yêu cầu \\(\\mathrm{sublayer}(\\mathbf{x}) \\in \\mathbb{R}^d\\) để kết nối còn lại \\(\\mathbf{x} + \\mathrm{sublayer}(\\mathbf{x}) \\in \\mathbb{R}^d\\) là\nkhả thi. Bổ sung này từ kết nối còn lại ngay lập tức được theo sau bởi\nchuẩn hóa lớp [Ba.Kiros.Hinton.2016] . Kết quả là, bộ mã hóa biến\náp xuất ra một biểu diễn vector \\(d\\) chiều cho mỗi vị trí của chuỗi\nđầu vào."
+    },
+    {
+      "type": "paragraph",
+      "text": "Bộ giải mã biến áp cũng là một chồng của nhiều lớp giống hệt nhau với\ncác kết nối còn lại và chuẩn hóa lớp. Bên cạnh hai sublayers được mô tả\ntrong bộ mã hóa, bộ giải mã chèn một sublayer thứ ba, được gọi là sự chú\ný của bộ mã hóa-giải mã, giữa hai bộ giải mã này. Trong sự chú ý của bộ\nmã hóa giải mã, các truy vấn là từ đầu ra của lớp giải mã trước đó và\ncác phím và giá trị là từ đầu ra bộ mã hóa biến áp. Trong bộ giải mã tự\nchú ý, truy vấn, khóa và giá trị đều từ đầu ra của lớp giải mã trước đó.\nTuy nhiên, mỗi vị trí trong bộ giải mã chỉ được phép tham dự tất cả các\nvị trí trong bộ giải mã cho đến vị trí đó. Chú ý masked này bảo tồn\nthuộc tính tự động hồi quy, đảm bảo rằng dự đoán chỉ phụ thuộc vào các\ntoken đầu ra đã được tạo ra."
+    },
+    {
+      "type": "paragraph",
+      "text": "Chúng tôi đã mô tả và thực hiện sự chú ý nhiều đầu dựa trên các sản phẩm\ndot-thu nhỏ trong Section 10.5 và mã hóa vị trí\ntrong Section 10.6.3 . Sau đây, chúng tôi sẽ thực\nhiện phần còn lại của mô hình máy biến áp."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "import math\nimport pandas as pd\nfrom mxnet import autograd, np, npx\nfrom mxnet.gluon import nn\nfrom d2l import mxnet as d2l\n\nnpx.set_np()"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "import math\nimport pandas as pd\nimport torch\nfrom torch import nn\nfrom d2l import torch as d2l"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "import numpy as np\nimport pandas as pd\nimport tensorflow as tf\nfrom d2l import tensorflow as d2l"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "cac-mang-thuc-an-chuyen-tiep-vi-tri",
+      "text": "10.7.2. Các mạng thức ăn chuyển tiếp vị trí"
+    },
+    {
+      "type": "paragraph",
+      "text": "Mạng chuyển tiếp nguồn cấp dữ liệu định vị biến đổi biểu diễn ở tất cả\ncác vị trí trình tự bằng cách sử dụng cùng một MLP. Đây là lý do tại sao\nchúng tôi gọi nó là positionwise . Trong phần thực hiện dưới đây, đầu\nvào X với hình dạng (kích thước lô, số bước thời gian hoặc độ dài\nchuỗi trong thẻ, số đơn vị ẩn hoặc kích thước tính năng) sẽ được chuyển\nđổi bởi một MLP hai lớp thành một tensor đầu ra của hình dạng (kích\nthước lô, số bước thời gian, ffn_num_outputs )."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "#@save\nclass PositionWiseFFN(nn.Block):\n    \"\"\"Positionwise feed-forward network.\"\"\"\n    def __init__(self, ffn_num_hiddens, ffn_num_outputs, **kwargs):\n        super(PositionWiseFFN, self).__init__(**kwargs)\n        self.dense1 = nn.Dense(ffn_num_hiddens, flatten=False,\n                               activation='relu')\n        self.dense2 = nn.Dense(ffn_num_outputs, flatten=False)\n\n    def forward(self, X):\n        return self.dense2(self.dense1(X))"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "#@save\nclass PositionWiseFFN(nn.Module):\n    \"\"\"Positionwise feed-forward network.\"\"\"\n    def __init__(self, ffn_num_input, ffn_num_hiddens, ffn_num_outputs,\n                 **kwargs):\n        super(PositionWiseFFN, self).__init__(**kwargs)\n        self.dense1 = nn.Linear(ffn_num_input, ffn_num_hiddens)\n        self.relu = nn.ReLU()\n        self.dense2 = nn.Linear(ffn_num_hiddens, ffn_num_outputs)\n\n    def forward(self, X):\n        return self.dense2(self.relu(self.dense1(X)))"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "#@save\nclass PositionWiseFFN(tf.keras.layers.Layer):\n    \"\"\"Positionwise feed-forward network.\"\"\"\n    def __init__(self, ffn_num_hiddens, ffn_num_outputs, **kwargs):\n        super().__init__(*kwargs)\n        self.dense1 = tf.keras.layers.Dense(ffn_num_hiddens)\n        self.relu = tf.keras.layers.ReLU()\n        self.dense2 = tf.keras.layers.Dense(ffn_num_outputs)\n\n    def call(self, X):\n        return self.dense2(self.relu(self.dense1(X)))"
+    },
+    {
+      "type": "paragraph",
+      "text": "Ví dụ sau đây cho thấy chiều trong cùng của một tensor thay đổi thành số\nlượng đầu ra trong mạng chuyển tiếp theo vị trí. Vì cùng một MLP biến\nđổi ở tất cả các vị trí, khi các đầu vào ở tất cả các vị trí này giống\nnhau, đầu ra của chúng cũng giống hệt nhau."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "ffn = PositionWiseFFN(4, 8)\nffn.initialize()\nffn(np.ones((2, 3, 4)))[0]"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "array([[ 0.00239431,  0.00927085, -0.00021069, -0.00923989, -0.0082903 ,\n        -0.00162741,  0.00659031,  0.00023905],\n       [ 0.00239431,  0.00927085, -0.00021069, -0.00923989, -0.0082903 ,\n        -0.00162741,  0.00659031,  0.00023905],\n       [ 0.00239431,  0.00927085, -0.00021069, -0.00923989, -0.0082903 ,\n        -0.00162741,  0.00659031,  0.00023905]])"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "ffn = PositionWiseFFN(4, 4, 8)\nffn.eval()\nffn(torch.ones((2, 3, 4)))[0]"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "tensor([[ 0.3415, -0.6896, -0.0887, -0.0173, -0.1739,  0.2835,  0.6384,  0.3857],\n        [ 0.3415, -0.6896, -0.0887, -0.0173, -0.1739,  0.2835,  0.6384,  0.3857],\n        [ 0.3415, -0.6896, -0.0887, -0.0173, -0.1739,  0.2835,  0.6384,  0.3857]],\n       grad_fn=<SelectBackward0>)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "ffn = PositionWiseFFN(4, 8)\nffn(tf.ones((2, 3, 4)))[0]"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "<tf.Tensor: shape=(3, 8), dtype=float32, numpy=\narray([[-0.14346594, -0.3371375 , -0.42130935, -0.8160425 , -0.9820863 ,\n        -0.41416663,  0.70194864,  0.2981241 ],\n       [-0.14346594, -0.3371375 , -0.42130935, -0.8160425 , -0.9820863 ,\n        -0.41416663,  0.70194864,  0.2981241 ],\n       [-0.14346594, -0.3371375 , -0.42130935, -0.8160425 , -0.9820863 ,\n        -0.41416663,  0.70194864,  0.2981241 ]], dtype=float32)>"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "ket-noi-con-lai-va-chuan-hoa-lop",
+      "text": "10.7.3. Kết nối còn lại và chuẩn hóa lớp"
+    },
+    {
+      "type": "paragraph",
+      "text": "Bây giờ chúng ta hãy tập trung vào thành phần “add & norm” trong Fig. 10.7.1 . Như chúng tôi đã mô tả ở đầu phần này, đây\nlà một kết nối còn lại ngay lập tức theo sau là chuẩn hóa lớp. Cả hai\nđều là chìa khóa cho các kiến trúc sâu hiệu quả."
+    },
+    {
+      "type": "paragraph",
+      "text": "Trong Section 7.5 , chúng tôi đã giải thích cách bình\nthường hóa hàng loạt lại và rescales trên các ví dụ trong một minibatch.\nChuẩn hóa lớp giống như bình thường hóa hàng loạt ngoại trừ việc trước\nđây bình thường hóa trên kích thước tính năng. Mặc dù các ứng dụng phổ\nbiến của nó trong tầm nhìn máy tính, việc bình thường hóa hàng loạt\nthường kém hiệu quả hơn so với bình thường hóa lớp trong các tác vụ xử\nlý ngôn ngữ tự nhiên, có đầu vào thường là chuỗi độ dài thay đổi."
+    },
+    {
+      "type": "paragraph",
+      "text": "Đoạn mã sau đây so sánh bình thường hóa trên các kích thước khác nhau\ntheo chuẩn hóa lớp và chuẩn hóa hàng lạnh."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "ln = nn.LayerNorm()\nln.initialize()\nbn = nn.BatchNorm()\nbn.initialize()\nX = np.array([[1, 2], [2, 3]])\n# Compute mean and variance from `X` in the training mode\nwith autograd.record():\n    print('layer norm:', ln(X), '\\nbatch norm:', bn(X))"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "layer norm: [[-0.99998  0.99998]\n [-0.99998  0.99998]]\nbatch norm: [[-0.99998 -0.99998]\n [ 0.99998  0.99998]]"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "ln = nn.LayerNorm(2)\nbn = nn.BatchNorm1d(2)\nX = torch.tensor([[1, 2], [2, 3]], dtype=torch.float32)\n# Compute mean and variance from `X` in the training mode\nprint('layer norm:', ln(X), '\\nbatch norm:', bn(X))"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "layer norm: tensor([[-1.0000,  1.0000],\n        [-1.0000,  1.0000]], grad_fn=<NativeLayerNormBackward0>)\nbatch norm: tensor([[-1.0000, -1.0000],\n        [ 1.0000,  1.0000]], grad_fn=<NativeBatchNormBackward0>)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "ln = tf.keras.layers.LayerNormalization()\nbn = tf.keras.layers.BatchNormalization()\nX = tf.constant([[1, 2], [2, 3]], dtype=tf.float32)\nprint('layer norm:', ln(X), '\\nbatch norm:', bn(X, training=True))"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "layer norm: tf.Tensor(\n[[-0.998006   0.9980061]\n [-0.9980061  0.998006 ]], shape=(2, 2), dtype=float32)\nbatch norm: tf.Tensor(\n[[-0.998006   -0.9980061 ]\n [ 0.9980061   0.99800587]], shape=(2, 2), dtype=float32)"
+    },
+    {
+      "type": "paragraph",
+      "text": "Bây giờ chúng ta có thể thực hiện lớp AddNorm sử dụng một kết nối\ncòn lại theo sau là chuẩn hóa lớp . Dropout cũng được áp dụng để thường\nxuyên hóa."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "#@save\nclass AddNorm(nn.Block):\n    \"\"\"Residual connection followed by layer normalization.\"\"\"\n    def __init__(self, dropout, **kwargs):\n        super(AddNorm, self).__init__(**kwargs)\n        self.dropout = nn.Dropout(dropout)\n        self.ln = nn.LayerNorm()\n\n    def forward(self, X, Y):\n        return self.ln(self.dropout(Y) + X)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "#@save\nclass AddNorm(nn.Module):\n    \"\"\"Residual connection followed by layer normalization.\"\"\"\n    def __init__(self, normalized_shape, dropout, **kwargs):\n        super(AddNorm, self).__init__(**kwargs)\n        self.dropout = nn.Dropout(dropout)\n        self.ln = nn.LayerNorm(normalized_shape)\n\n    def forward(self, X, Y):\n        return self.ln(self.dropout(Y) + X)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "#@save\nclass AddNorm(tf.keras.layers.Layer):\n    \"\"\"Residual connection followed by layer normalization.\"\"\"\n    def __init__(self, normalized_shape, dropout, **kwargs):\n        super().__init__(**kwargs)\n        self.dropout = tf.keras.layers.Dropout(dropout)\n        self.ln = tf.keras.layers.LayerNormalization(normalized_shape)\n\n    def call(self, X, Y, **kwargs):\n        return self.ln(self.dropout(Y, **kwargs) + X)"
+    },
+    {
+      "type": "paragraph",
+      "text": "Kết nối còn lại yêu cầu hai đầu vào có cùng hình dạng sao cho tensor đầu\nra cũng có hình dạng giống nhau sau khi hoạt động bổ sung."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "add_norm = AddNorm(0.5)\nadd_norm.initialize()\nadd_norm(np.ones((2, 3, 4)), np.ones((2, 3, 4))).shape"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "(2, 3, 4)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "add_norm = AddNorm([3, 4], 0.5) # Normalized_shape is input.size()[1:]\nadd_norm.eval()\nadd_norm(torch.ones((2, 3, 4)), torch.ones((2, 3, 4))).shape"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "torch.Size([2, 3, 4])"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "add_norm = AddNorm([1, 2], 0.5) # Normalized_shape is: [i for i in range(len(input.shape))][1:]\nadd_norm(tf.ones((2, 3, 4)), tf.ones((2, 3, 4)), training=False).shape"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "TensorShape([2, 3, 4])"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bo-ma-hoa",
+      "text": "10.7.4. Bộ mã hóa"
+    },
+    {
+      "type": "paragraph",
+      "text": "Với tất cả các thành phần thiết yếu để lắp ráp bộ mã hóa biến áp, chúng\nta hãy bắt đầu bằng cách thực hiện một lớp duy nhất trong bộ mã hóa. Lớp EncoderBlock sau chứa hai lớp con: nhiều đầu tự chú ý và các mạng\nchuyển tiếp theo định vị, trong đó một kết nối còn lại tiếp theo là\nchuẩn hóa lớp được sử dụng xung quanh cả hai lớp con."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "#@save\nclass EncoderBlock(nn.Block):\n    \"\"\"Transformer encoder block.\"\"\"\n    def __init__(self, num_hiddens, ffn_num_hiddens, num_heads, dropout,\n                 use_bias=False, **kwargs):\n        super(EncoderBlock, self).__init__(**kwargs)\n        self.attention = d2l.MultiHeadAttention(\n            num_hiddens, num_heads, dropout, use_bias)\n        self.addnorm1 = AddNorm(dropout)\n        self.ffn = PositionWiseFFN(ffn_num_hiddens, num_hiddens)\n        self.addnorm2 = AddNorm(dropout)\n\n    def forward(self, X, valid_lens):\n        Y = self.addnorm1(X, self.attention(X, X, X, valid_lens))\n        return self.addnorm2(Y, self.ffn(Y))"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "#@save\nclass EncoderBlock(nn.Module):\n    \"\"\"Transformer encoder block.\"\"\"\n    def __init__(self, key_size, query_size, value_size, num_hiddens,\n                 norm_shape, ffn_num_input, ffn_num_hiddens, num_heads,\n                 dropout, use_bias=False, **kwargs):\n        super(EncoderBlock, self).__init__(**kwargs)\n        self.attention = d2l.MultiHeadAttention(\n            key_size, query_size, value_size, num_hiddens, num_heads, dropout,\n            use_bias)\n        self.addnorm1 = AddNorm(norm_shape, dropout)\n        self.ffn = PositionWiseFFN(\n            ffn_num_input, ffn_num_hiddens, num_hiddens)\n        self.addnorm2 = AddNorm(norm_shape, dropout)\n\n    def forward(self, X, valid_lens):\n        Y = self.addnorm1(X, self.attention(X, X, X, valid_lens))\n        return self.addnorm2(Y, self.ffn(Y))"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "#@save\nclass EncoderBlock(tf.keras.layers.Layer):\n    \"\"\"Transformer encoder block.\"\"\"\n    def __init__(self, key_size, query_size, value_size, num_hiddens,\n                 norm_shape, ffn_num_hiddens, num_heads, dropout, bias=False, **kwargs):\n        super().__init__(**kwargs)\n        self.attention = d2l.MultiHeadAttention(key_size, query_size, value_size, num_hiddens,\n                                                num_heads, dropout, bias)\n        self.addnorm1 = AddNorm(norm_shape, dropout)\n        self.ffn = PositionWiseFFN(ffn_num_hiddens, num_hiddens)\n        self.addnorm2 = AddNorm(norm_shape, dropout)\n\n    def call(self, X, valid_lens, **kwargs):\n        Y = self.addnorm1(X, self.attention(X, X, X, valid_lens, **kwargs), **kwargs)\n        return self.addnorm2(Y, self.ffn(Y), **kwargs)"
+    },
+    {
+      "type": "paragraph",
+      "text": "Như chúng ta có thể thấy, bất kỳ lớp nào trong bộ mã hóa biến áp không\nthay đổi hình dạng của đầu vào của nó."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "X = np.ones((2, 100, 24))\nvalid_lens = np.array([3, 2])\nencoder_blk = EncoderBlock(24, 48, 8, 0.5)\nencoder_blk.initialize()\nencoder_blk(X, valid_lens).shape"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "(2, 100, 24)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "X = torch.ones((2, 100, 24))\nvalid_lens = torch.tensor([3, 2])\nencoder_blk = EncoderBlock(24, 24, 24, 24, [100, 24], 24, 48, 8, 0.5)\nencoder_blk.eval()\nencoder_blk(X, valid_lens).shape"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "torch.Size([2, 100, 24])"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "X = tf.ones((2, 100, 24))\nvalid_lens = tf.constant([3, 2])\nnorm_shape = [i for i in range(len(X.shape))][1:]\nencoder_blk = EncoderBlock(24, 24, 24, 24, norm_shape, 48, 8, 0.5)\nencoder_blk(X, valid_lens, training=False).shape"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "TensorShape([2, 100, 24])"
+    },
+    {
+      "type": "paragraph",
+      "text": "Trong thực hiện transformer encoder sau đây, chúng tôi xếp chồng num_layers phiên bản của EncoderBlock lớp trên. Vì chúng ta sử\ndụng mã hóa vị trí cố định có giá trị luôn nằm trong khoảng từ -1 đến 1,\nchúng ta nhân các giá trị của các nhúng đầu vào có thể học được bằng căn\nbậc hai của kích thước nhúng để giải phóng trước khi tổng hợp nhúng đầu\nvào và mã hóa vị trí."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "#@save\nclass TransformerEncoder(d2l.Encoder):\n    \"\"\"Transformer encoder.\"\"\"\n    def __init__(self, vocab_size, num_hiddens, ffn_num_hiddens,\n                 num_heads, num_layers, dropout, use_bias=False, **kwargs):\n        super(TransformerEncoder, self).__init__(**kwargs)\n        self.num_hiddens = num_hiddens\n        self.embedding = nn.Embedding(vocab_size, num_hiddens)\n        self.pos_encoding = d2l.PositionalEncoding(num_hiddens, dropout)\n        self.blks = nn.Sequential()\n        for _ in range(num_layers):\n            self.blks.add(\n                EncoderBlock(num_hiddens, ffn_num_hiddens, num_heads, dropout,\n                             use_bias))\n\n    def forward(self, X, valid_lens, *args):\n        # Since positional encoding values are between -1 and 1, the embedding\n        # values are multiplied by the square root of the embedding dimension\n        # to rescale before they are summed up\n        X = self.pos_encoding(self.embedding(X) * math.sqrt(self.num_hiddens))\n        self.attention_weights = [None] * len(self.blks)\n        for i, blk in enumerate(self.blks):\n            X = blk(X, valid_lens)\n            self.attention_weights[\n                i] = blk.attention.attention.attention_weights\n        return X"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "#@save\nclass TransformerEncoder(d2l.Encoder):\n    \"\"\"Transformer encoder.\"\"\"\n    def __init__(self, vocab_size, key_size, query_size, value_size,\n                 num_hiddens, norm_shape, ffn_num_input, ffn_num_hiddens,\n                 num_heads, num_layers, dropout, use_bias=False, **kwargs):\n        super(TransformerEncoder, self).__init__(**kwargs)\n        self.num_hiddens = num_hiddens\n        self.embedding = nn.Embedding(vocab_size, num_hiddens)\n        self.pos_encoding = d2l.PositionalEncoding(num_hiddens, dropout)\n        self.blks = nn.Sequential()\n        for i in range(num_layers):\n            self.blks.add_module(\"block\"+str(i),\n                EncoderBlock(key_size, query_size, value_size, num_hiddens,\n                             norm_shape, ffn_num_input, ffn_num_hiddens,\n                             num_heads, dropout, use_bias))\n\n    def forward(self, X, valid_lens, *args):\n        # Since positional encoding values are between -1 and 1, the embedding\n        # values are multiplied by the square root of the embedding dimension\n        # to rescale before they are summed up\n        X = self.pos_encoding(self.embedding(X) * math.sqrt(self.num_hiddens))\n        self.attention_weights = [None] * len(self.blks)\n        for i, blk in enumerate(self.blks):\n            X = blk(X, valid_lens)\n            self.attention_weights[\n                i] = blk.attention.attention.attention_weights\n        return X"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "#@save\nclass TransformerEncoder(d2l.Encoder):\n    \"\"\"Transformer encoder.\"\"\"\n    def __init__(self, vocab_size, key_size, query_size, value_size,\n                 num_hiddens, norm_shape, ffn_num_hiddens, num_heads,\n                 num_layers, dropout, bias=False, **kwargs):\n        super().__init__(**kwargs)\n        self.num_hiddens = num_hiddens\n        self.embedding = tf.keras.layers.Embedding(vocab_size, num_hiddens)\n        self.pos_encoding = d2l.PositionalEncoding(num_hiddens, dropout)\n        self.blks = [EncoderBlock(\n            key_size, query_size, value_size, num_hiddens, norm_shape,\n            ffn_num_hiddens, num_heads, dropout, bias) for _ in range(\n            num_layers)]\n\n    def call(self, X, valid_lens, **kwargs):\n        # Since positional encoding values are between -1 and 1, the embedding\n        # values are multiplied by the square root of the embedding dimension\n        # to rescale before they are summed up\n        X = self.pos_encoding(self.embedding(X) * tf.math.sqrt(\n            tf.cast(self.num_hiddens, dtype=tf.float32)), **kwargs)\n        self.attention_weights = [None] * len(self.blks)\n        for i, blk in enumerate(self.blks):\n            X = blk(X, valid_lens, **kwargs)\n            self.attention_weights[\n                i] = blk.attention.attention.attention_weights\n        return X"
+    },
+    {
+      "type": "paragraph",
+      "text": "Dưới đây chúng tôi chỉ định các siêu tham số để tạo một bộ mã hóa biến\náp hai lớp. Hình dạng của đầu ra bộ mã hóa biến áp là (kích thước lô, số\nbước thời gian, num_hiddens )."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "encoder = TransformerEncoder(200, 24, 48, 8, 2, 0.5)\nencoder.initialize()\nencoder(np.ones((2, 100)), valid_lens).shape"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "(2, 100, 24)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "encoder = TransformerEncoder(\n    200, 24, 24, 24, 24, [100, 24], 24, 48, 8, 2, 0.5)\nencoder.eval()\nencoder(torch.ones((2, 100), dtype=torch.long), valid_lens).shape"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "torch.Size([2, 100, 24])"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "encoder = TransformerEncoder(200, 24, 24, 24, 24, [1, 2], 48, 8, 2, 0.5)\nencoder(tf.ones((2, 100)), valid_lens, training=False).shape"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "TensorShape([2, 100, 24])"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bo-giai-ma",
+      "text": "10.7.5. Bộ giải mã"
+    },
+    {
+      "type": "paragraph",
+      "text": "Như thể hiện trong Fig. 10.7.1 , bộ giải mã biến áp bao\ngồm nhiều lớp giống hệt nhau. Mỗi lớp được triển khai trong lớp DecoderBlock sau, chứa ba lớp con: bộ giải mã tự chú ý, chú ý bộ mã\nhóa-giải mã, và các mạng chuyển tiếp nguồn cấp dữ liệu định vị. Các lớp\ncon này sử dụng một kết nối còn lại xung quanh chúng theo sau là chuẩn\nhóa lớp."
+    },
+    {
+      "type": "paragraph",
+      "text": "Như chúng ta đã mô tả trước đó trong phần này, trong bộ giải mã đa đầu\nđược đeo mặt nạ tự chú ý (con đầu tiên), truy vấn, khóa và giá trị đều\nđến từ đầu ra của lớp giải mã trước đó. Khi đào tạo các mô hình trình tự\ntheo trình tự, mã thông báo ở tất cả các vị trí (bước thời gian) của\nchuỗi đầu ra được biết đến. Tuy nhiên, trong quá trình dự đoán chuỗi đầu\nra được tạo ra token bằng mã thông báo; do đó, tại bất kỳ bước thời gian\ngiải mã nào chỉ có các token được tạo ra có thể được sử dụng trong bộ\ngiải mã tự chú ý. Để duy trì hồi quy tự động trong bộ giải mã, sự tự chú\ný đeo mặt nạ của nó chỉ định dec_valid_lens để bất kỳ truy vấn nào\nchỉ tham quan đến tất cả các vị trí trong bộ giải mã cho đến vị trí truy\nvấn."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "class DecoderBlock(nn.Block):\n    # The `i`-th block in the decoder\n    def __init__(self, num_hiddens, ffn_num_hiddens, num_heads,\n                 dropout, i, **kwargs):\n        super(DecoderBlock, self).__init__(**kwargs)\n        self.i = i\n        self.attention1 = d2l.MultiHeadAttention(num_hiddens, num_heads,\n                                                 dropout)\n        self.addnorm1 = AddNorm(dropout)\n        self.attention2 = d2l.MultiHeadAttention(num_hiddens, num_heads,\n                                                 dropout)\n        self.addnorm2 = AddNorm(dropout)\n        self.ffn = PositionWiseFFN(ffn_num_hiddens, num_hiddens)\n        self.addnorm3 = AddNorm(dropout)\n\n    def forward(self, X, state):\n        enc_outputs, enc_valid_lens = state[0], state[1]\n        # During training, all the tokens of any output sequence are processed\n        # at the same time, so `state[2][self.i]` is `None` as initialized.\n        # When decoding any output sequence token by token during prediction,\n        # `state[2][self.i]` contains representations of the decoded output at\n        # the `i`-th block up to the current time step\n        if state[2][self.i] is None:\n            key_values = X\n        else:\n            key_values = np.concatenate((state[2][self.i], X), axis=1)\n        state[2][self.i] = key_values\n\n        if autograd.is_training():\n            batch_size, num_steps, _ = X.shape\n            # Shape of `dec_valid_lens`: (`batch_size`, `num_steps`), where\n            # every row is [1, 2, ..., `num_steps`]\n            dec_valid_lens = np.tile(np.arange(1, num_steps + 1, ctx=X.ctx),\n                                     (batch_size, 1))\n        else:\n            dec_valid_lens = None\n\n        # Self-attention\n        X2 = self.attention1(X, key_values, key_values, dec_valid_lens)\n        Y = self.addnorm1(X, X2)\n        # Encoder-decoder attention. Shape of `enc_outputs`:\n        # (`batch_size`, `num_steps`, `num_hiddens`)\n        Y2 = self.attention2(Y, enc_outputs, enc_outputs, enc_valid_lens)\n        Z = self.addnorm2(Y, Y2)\n        return self.addnorm3(Z, self.ffn(Z)), state"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "class DecoderBlock(nn.Module):\n    # The `i`-th block in the decoder\n    def __init__(self, key_size, query_size, value_size, num_hiddens,\n                 norm_shape, ffn_num_input, ffn_num_hiddens, num_heads,\n                 dropout, i, **kwargs):\n        super(DecoderBlock, self).__init__(**kwargs)\n        self.i = i\n        self.attention1 = d2l.MultiHeadAttention(\n            key_size, query_size, value_size, num_hiddens, num_heads, dropout)\n        self.addnorm1 = AddNorm(norm_shape, dropout)\n        self.attention2 = d2l.MultiHeadAttention(\n            key_size, query_size, value_size, num_hiddens, num_heads, dropout)\n        self.addnorm2 = AddNorm(norm_shape, dropout)\n        self.ffn = PositionWiseFFN(ffn_num_input, ffn_num_hiddens,\n                                   num_hiddens)\n        self.addnorm3 = AddNorm(norm_shape, dropout)\n\n    def forward(self, X, state):\n        enc_outputs, enc_valid_lens = state[0], state[1]\n        # During training, all the tokens of any output sequence are processed\n        # at the same time, so `state[2][self.i]` is `None` as initialized.\n        # When decoding any output sequence token by token during prediction,\n        # `state[2][self.i]` contains representations of the decoded output at\n        # the `i`-th block up to the current time step\n        if state[2][self.i] is None:\n            key_values = X\n        else:\n            key_values = torch.cat((state[2][self.i], X), axis=1)\n        state[2][self.i] = key_values\n        if self.training:\n            batch_size, num_steps, _ = X.shape\n            # Shape of `dec_valid_lens`: (`batch_size`, `num_steps`), where\n            # every row is [1, 2, ..., `num_steps`]\n            dec_valid_lens = torch.arange(\n                1, num_steps + 1, device=X.device).repeat(batch_size, 1)\n        else:\n            dec_valid_lens = None\n\n        # Self-attention\n        X2 = self.attention1(X, key_values, key_values, dec_valid_lens)\n        Y = self.addnorm1(X, X2)\n        # Encoder-decoder attention. Shape of `enc_outputs`:\n        # (`batch_size`, `num_steps`, `num_hiddens`)\n        Y2 = self.attention2(Y, enc_outputs, enc_outputs, enc_valid_lens)\n        Z = self.addnorm2(Y, Y2)\n        return self.addnorm3(Z, self.ffn(Z)), state"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "class DecoderBlock(tf.keras.layers.Layer):\n    # The `i`-th block in the decoder\n    def __init__(self, key_size, query_size, value_size, num_hiddens,\n                 norm_shape, ffn_num_hiddens, num_heads, dropout, i, **kwargs):\n        super().__init__(**kwargs)\n        self.i = i\n        self.attention1 = d2l.MultiHeadAttention(key_size, query_size, value_size, num_hiddens, num_heads, dropout)\n        self.addnorm1 = AddNorm(norm_shape, dropout)\n        self.attention2 = d2l.MultiHeadAttention(key_size, query_size, value_size, num_hiddens, num_heads, dropout)\n        self.addnorm2 = AddNorm(norm_shape, dropout)\n        self.ffn = PositionWiseFFN(ffn_num_hiddens, num_hiddens)\n        self.addnorm3 = AddNorm(norm_shape, dropout)\n\n    def call(self, X, state, **kwargs):\n        enc_outputs, enc_valid_lens = state[0], state[1]\n        # During training, all the tokens of any output sequence are processed\n        # at the same time, so `state[2][self.i]` is `None` as initialized.\n        # When decoding any output sequence token by token during prediction,\n        # `state[2][self.i]` contains representations of the decoded output at\n        # the `i`-th block up to the current time step\n        if state[2][self.i] is None:\n            key_values = X\n        else:\n            key_values = tf.concat((state[2][self.i], X), axis=1)\n        state[2][self.i] = key_values\n        if kwargs[\"training\"]:\n            batch_size, num_steps, _ = X.shape\n            # Shape of `dec_valid_lens`: (`batch_size`, `num_steps`), where\n            # every row is [1, 2, ..., `num_steps`]\n            dec_valid_lens = tf.repeat(tf.reshape(tf.range(1, num_steps + 1),\n                                                 shape=(-1, num_steps)), repeats=batch_size, axis=0)\n\n        else:\n            dec_valid_lens = None\n\n        # Self-attention\n        X2 = self.attention1(X, key_values, key_values, dec_valid_lens, **kwargs)\n        Y = self.addnorm1(X, X2, **kwargs)\n        # Encoder-decoder attention. Shape of `enc_outputs`: (`batch_size`, `num_steps`, `num_hiddens`)\n        Y2 = self.attention2(Y, enc_outputs, enc_outputs, enc_valid_lens, **kwargs)\n        Z = self.addnorm2(Y, Y2, **kwargs)\n        return self.addnorm3(Z, self.ffn(Z), **kwargs), state"
+    },
+    {
+      "type": "paragraph",
+      "text": "Để tạo điều kiện cho các hoạt động sản phẩm điểm thu nhỏ trong bộ giải\nmã mã hóa chú ý và các hoạt động bổ sung trong các kết nối còn lại, kích\nthước tính năng ( num_hiddens ) của bộ giải mã giống như của bộ mã\nhóa."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "decoder_blk = DecoderBlock(24, 48, 8, 0.5, 0)\ndecoder_blk.initialize()\nX = np.ones((2, 100, 24))\nstate = [encoder_blk(X, valid_lens), valid_lens, [None]]\ndecoder_blk(X, state)[0].shape"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "(2, 100, 24)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "decoder_blk = DecoderBlock(24, 24, 24, 24, [100, 24], 24, 48, 8, 0.5, 0)\ndecoder_blk.eval()\nX = torch.ones((2, 100, 24))\nstate = [encoder_blk(X, valid_lens), valid_lens, [None]]\ndecoder_blk(X, state)[0].shape"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "torch.Size([2, 100, 24])"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "decoder_blk = DecoderBlock(24, 24, 24, 24, [1, 2], 48, 8, 0.5, 0)\nX = tf.ones((2, 100, 24))\nstate = [encoder_blk(X, valid_lens), valid_lens, [None]]\ndecoder_blk(X, state, training=False)[0].shape"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "TensorShape([2, 100, 24])"
+    },
+    {
+      "type": "paragraph",
+      "text": "Bây giờ chúng ta xây dựng toàn bộ bộ giải mã transformer bao gồm num_layers trường hợp của DecoderBlock . Cuối cùng, một lớp kết\nnối hoàn toàn tính toán dự đoán cho tất cả các token đầu ra có thể có vocab_size . Cả hai trọng lượng tự chú ý của bộ giải mã và trọng\nlượng chú ý bộ giải mã hóa được lưu trữ để trực quan hóa sau này."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "class TransformerDecoder(d2l.AttentionDecoder):\n    def __init__(self, vocab_size, num_hiddens, ffn_num_hiddens,\n                 num_heads, num_layers, dropout, **kwargs):\n        super(TransformerDecoder, self).__init__(**kwargs)\n        self.num_hiddens = num_hiddens\n        self.num_layers = num_layers\n        self.embedding = nn.Embedding(vocab_size, num_hiddens)\n        self.pos_encoding = d2l.PositionalEncoding(num_hiddens, dropout)\n        self.blks = nn.Sequential()\n        for i in range(num_layers):\n            self.blks.add(\n                DecoderBlock(num_hiddens, ffn_num_hiddens, num_heads,\n                             dropout, i))\n        self.dense = nn.Dense(vocab_size, flatten=False)\n\n    def init_state(self, enc_outputs, enc_valid_lens, *args):\n        return [enc_outputs, enc_valid_lens, [None] * self.num_layers]\n\n    def forward(self, X, state):\n        X = self.pos_encoding(self.embedding(X) * math.sqrt(self.num_hiddens))\n        self._attention_weights = [[None] * len(self.blks) for _ in range (2)]\n        for i, blk in enumerate(self.blks):\n            X, state = blk(X, state)\n            # Decoder self-attention weights\n            self._attention_weights[0][\n                i] = blk.attention1.attention.attention_weights\n            # Encoder-decoder attention weights\n            self._attention_weights[1][\n                i] = blk.attention2.attention.attention_weights\n        return self.dense(X), state\n\n    @property\n    def attention_weights(self):\n        return self._attention_weights"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "class TransformerDecoder(d2l.AttentionDecoder):\n    def __init__(self, vocab_size, key_size, query_size, value_size,\n                 num_hiddens, norm_shape, ffn_num_input, ffn_num_hiddens,\n                 num_heads, num_layers, dropout, **kwargs):\n        super(TransformerDecoder, self).__init__(**kwargs)\n        self.num_hiddens = num_hiddens\n        self.num_layers = num_layers\n        self.embedding = nn.Embedding(vocab_size, num_hiddens)\n        self.pos_encoding = d2l.PositionalEncoding(num_hiddens, dropout)\n        self.blks = nn.Sequential()\n        for i in range(num_layers):\n            self.blks.add_module(\"block\"+str(i),\n                DecoderBlock(key_size, query_size, value_size, num_hiddens,\n                             norm_shape, ffn_num_input, ffn_num_hiddens,\n                             num_heads, dropout, i))\n        self.dense = nn.Linear(num_hiddens, vocab_size)\n\n    def init_state(self, enc_outputs, enc_valid_lens, *args):\n        return [enc_outputs, enc_valid_lens, [None] * self.num_layers]\n\n    def forward(self, X, state):\n        X = self.pos_encoding(self.embedding(X) * math.sqrt(self.num_hiddens))\n        self._attention_weights = [[None] * len(self.blks) for _ in range (2)]\n        for i, blk in enumerate(self.blks):\n            X, state = blk(X, state)\n            # Decoder self-attention weights\n            self._attention_weights[0][\n                i] = blk.attention1.attention.attention_weights\n            # Encoder-decoder attention weights\n            self._attention_weights[1][\n                i] = blk.attention2.attention.attention_weights\n        return self.dense(X), state\n\n    @property\n    def attention_weights(self):\n        return self._attention_weights"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "class TransformerDecoder(d2l.AttentionDecoder):\n    def __init__(self, vocab_size, key_size, query_size, value_size,\n                 num_hiddens, norm_shape, ffn_num_hidens, num_heads, num_layers, dropout, **kwargs):\n        super().__init__(**kwargs)\n        self.num_hiddens = num_hiddens\n        self.num_layers = num_layers\n        self.embedding = tf.keras.layers.Embedding(vocab_size, num_hiddens)\n        self.pos_encoding = d2l.PositionalEncoding(num_hiddens, dropout)\n        self.blks = [DecoderBlock(key_size, query_size, value_size, num_hiddens, norm_shape,\n                                  ffn_num_hiddens, num_heads, dropout, i) for i in range(num_layers)]\n        self.dense = tf.keras.layers.Dense(vocab_size)\n\n    def init_state(self, enc_outputs, enc_valid_lens, *args):\n        return [enc_outputs, enc_valid_lens, [None] * self.num_layers]\n\n    def call(self, X, state, **kwargs):\n        X = self.pos_encoding(self.embedding(X) * tf.math.sqrt(tf.cast(self.num_hiddens, dtype=tf.float32)), **kwargs)\n        self._attention_weights = [[None] * len(self.blks) for _ in range(2)]  # 2 Attention layers in decoder\n        for i, blk in enumerate(self.blks):\n            X, state = blk(X, state, **kwargs)\n            # Decoder self-attention weights\n            self._attention_weights[0][i] = blk.attention1.attention.attention_weights\n            # Encoder-decoder attention weights\n            self._attention_weights[1][i] = blk.attention2.attention.attention_weights\n        return self.dense(X), state\n\n    @property\n    def attention_weights(self):\n        return self._attention_weights"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "dao-tao",
+      "text": "10.7.6. Đào tạo"
+    },
+    {
+      "type": "paragraph",
+      "text": "Hãy để chúng tôi khởi tạo một mô hình bộ mã hóa-giải mã bằng cách làm\ntheo kiến trúc biến áp. Ở đây chúng tôi chỉ định rằng cả bộ mã hóa biến\náp và bộ giải mã biến áp có 2 lớp sử dụng sự chú ý 4 đầu. Tương tự như Section 9.7.4 , chúng tôi đào tạo mô hình biến áp cho\ntrình tự để học trình tự trên tập dữ liệu dịch máy tiếng Anh-Pháp."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "num_hiddens, num_layers, dropout, batch_size, num_steps = 32, 2, 0.1, 64, 10\nlr, num_epochs, device = 0.005, 200, d2l.try_gpu()\nffn_num_hiddens, num_heads = 64, 4\n\ntrain_iter, src_vocab, tgt_vocab = d2l.load_data_nmt(batch_size, num_steps)\n\nencoder = TransformerEncoder(\n    len(src_vocab), num_hiddens, ffn_num_hiddens, num_heads, num_layers,\n    dropout)\ndecoder = TransformerDecoder(\n    len(tgt_vocab), num_hiddens, ffn_num_hiddens, num_heads, num_layers,\n    dropout)\nnet = d2l.EncoderDecoder(encoder, decoder)\nd2l.train_seq2seq(net, train_iter, lr, num_epochs, tgt_vocab, device)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "loss 0.030, 2322.4 tokens/sec on gpu(0)"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_transformer_5722f1_159_1.svg",
+      "local_path": "_images/output_transformer_5722f1_159_1.svg",
+      "alt": "../_images/output_transformer_5722f1_159_1.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "num_hiddens, num_layers, dropout, batch_size, num_steps = 32, 2, 0.1, 64, 10\nlr, num_epochs, device = 0.005, 200, d2l.try_gpu()\nffn_num_input, ffn_num_hiddens, num_heads = 32, 64, 4\nkey_size, query_size, value_size = 32, 32, 32\nnorm_shape = [32]\n\ntrain_iter, src_vocab, tgt_vocab = d2l.load_data_nmt(batch_size, num_steps)\n\nencoder = TransformerEncoder(\n    len(src_vocab), key_size, query_size, value_size, num_hiddens,\n    norm_shape, ffn_num_input, ffn_num_hiddens, num_heads,\n    num_layers, dropout)\ndecoder = TransformerDecoder(\n    len(tgt_vocab), key_size, query_size, value_size, num_hiddens,\n    norm_shape, ffn_num_input, ffn_num_hiddens, num_heads,\n    num_layers, dropout)\nnet = d2l.EncoderDecoder(encoder, decoder)\nd2l.train_seq2seq(net, train_iter, lr, num_epochs, tgt_vocab, device)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "loss 0.032, 5927.0 tokens/sec on cuda:0"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_transformer_5722f1_162_1.svg",
+      "local_path": "_images/output_transformer_5722f1_162_1.svg",
+      "alt": "../_images/output_transformer_5722f1_162_1.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "num_hiddens, num_layers, dropout, batch_size, num_steps = 32, 2, 0.1, 64, 10\nlr, num_epochs, device = 0.005, 200, d2l.try_gpu()\nffn_num_hiddens, num_heads = 64, 4\nkey_size, query_size, value_size = 32, 32, 32\nnorm_shape = [2]\n\ntrain_iter, src_vocab, tgt_vocab = d2l.load_data_nmt(batch_size, num_steps)\nencoder = TransformerEncoder(\n    len(src_vocab), key_size, query_size, value_size, num_hiddens, norm_shape,\n    ffn_num_hiddens, num_heads, num_layers, dropout)\ndecoder = TransformerDecoder(\n    len(tgt_vocab), key_size, query_size, value_size, num_hiddens, norm_shape,\n    ffn_num_hiddens, num_heads, num_layers, dropout)\nnet = d2l.EncoderDecoder(encoder, decoder)\nd2l.train_seq2seq(net, train_iter, lr, num_epochs, tgt_vocab, device)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "loss 0.026, 1018.2 tokens/sec on <tensorflow.python.eager.context._EagerDeviceContext object at 0x7f69e0727c00>"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_transformer_5722f1_165_1.svg",
+      "local_path": "_images/output_transformer_5722f1_165_1.svg",
+      "alt": "../_images/output_transformer_5722f1_165_1.svg"
+    },
+    {
+      "type": "paragraph",
+      "text": "Sau khi đào tạo, chúng tôi sử dụng mô hình biến áp để dịch một vài câu\ntiếng Anh sang tiếng Pháp và tính điểm BLEU của họ."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "engs = ['go .', \"i lost .\", 'he\\'s calm .', 'i\\'m home .']\nfras = ['va !', 'j\\'ai perdu .', 'il est calme .', 'je suis chez moi .']\nfor eng, fra in zip(engs, fras):\n    translation, dec_attention_weight_seq = d2l.predict_seq2seq(\n        net, eng, src_vocab, tgt_vocab, num_steps, device, True)\n    print(f'{eng} => {translation}, ',\n          f'bleu {d2l.bleu(translation, fra, k=2):.3f}')"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "go . => va !,  bleu 1.000\ni lost . => j'ai perdu .,  bleu 1.000\nhe's calm . => il est calme .,  bleu 1.000\ni'm home . => je suis chez moi .,  bleu 1.000"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "engs = ['go .', \"i lost .\", 'he\\'s calm .', 'i\\'m home .']\nfras = ['va !', 'j\\'ai perdu .', 'il est calme .', 'je suis chez moi .']\nfor eng, fra in zip(engs, fras):\n    translation, dec_attention_weight_seq = d2l.predict_seq2seq(\n        net, eng, src_vocab, tgt_vocab, num_steps, device, True)\n    print(f'{eng} => {translation}, ',\n          f'bleu {d2l.bleu(translation, fra, k=2):.3f}')"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "go . => va !,  bleu 1.000\ni lost . => j'ai perdu .,  bleu 1.000\nhe's calm . => il est <unk> .,  bleu 0.658\ni'm home . => je suis chez moi .,  bleu 1.000"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "engs = ['go .', \"i lost .\", 'he\\'s calm .', 'i\\'m home .']\nfras = ['va !', 'j\\'ai perdu .', 'il est calme .', 'je suis chez moi .']\nfor eng, fra in zip(engs, fras):\n    translation, dec_attention_weight_seq = d2l.predict_seq2seq(\n        net, eng, src_vocab, tgt_vocab, num_steps, True)\n    print(f'{eng} => {translation}, ',\n          f'bleu {d2l.bleu(translation, fra, k=2):.3f}')"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "go . => va !,  bleu 1.000\ni lost . => j'ai perdu .,  bleu 1.000\nhe's calm . => il est mouillé .,  bleu 0.658\ni'm home . => je suis chez moi .,  bleu 1.000"
+    },
+    {
+      "type": "paragraph",
+      "text": "Hãy để chúng tôi hình dung trọng lượng chú ý của máy biến áp khi dịch\ncâu tiếng Anh cuối cùng sang tiếng Pháp. Hình dạng của các quả cân tự\nchú ý của bộ mã hóa là (số lớp mã hóa, số lượng đầu chú ý, num_steps hoặc số truy vấn, num_steps hoặc số cặp giá trị khóa)."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "enc_attention_weights = np.concatenate(net.encoder.attention_weights, 0).reshape((num_layers,\n    num_heads, -1, num_steps))\nenc_attention_weights.shape"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "(2, 4, 10, 10)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "enc_attention_weights = torch.cat(net.encoder.attention_weights, 0).reshape((num_layers, num_heads,\n    -1, num_steps))\nenc_attention_weights.shape"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "torch.Size([2, 4, 10, 10])"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "enc_attention_weights = tf.reshape(\n    tf.concat(net.encoder.attention_weights, 0),\n    (num_layers, num_heads, -1, num_steps))\nenc_attention_weights.shape"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "TensorShape([2, 4, 10, 10])"
+    },
+    {
+      "type": "paragraph",
+      "text": "Trong bộ mã hóa tự chú ý, cả truy vấn và phím đều đến từ cùng một chuỗi\nđầu vào. Vì thẻ đệm không mang ý nghĩa, với độ dài hợp lệ được chỉ định\ncủa chuỗi đầu vào, không có truy vấn nào tham dự các vị trí của thẻ đệm.\nSau đây, hai lớp trọng lượng chú ý nhiều đầu được trình bày từng hàng.\nMỗi đầu độc lập tham dự dựa trên một không gian con đại diện riêng biệt\ncủa các truy vấn, khóa và giá trị."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "d2l.show_heatmaps(\n    enc_attention_weights, xlabel='Key positions', ylabel='Query positions',\n    titles=['Head %d' % i for i in range(1, 5)], figsize=(7, 3.5))"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_transformer_5722f1_195_0.svg",
+      "local_path": "_images/output_transformer_5722f1_195_0.svg",
+      "alt": "../_images/output_transformer_5722f1_195_0.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "d2l.show_heatmaps(\n    enc_attention_weights.cpu(), xlabel='Key positions',\n    ylabel='Query positions', titles=['Head %d' % i for i in range(1, 5)],\n    figsize=(7, 3.5))"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_transformer_5722f1_198_0.svg",
+      "local_path": "_images/output_transformer_5722f1_198_0.svg",
+      "alt": "../_images/output_transformer_5722f1_198_0.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "d2l.show_heatmaps(\n    enc_attention_weights, xlabel='Key positions', ylabel='Query positions',\n    titles=['Head %d' % i for i in range(1, 5)], figsize=(7, 3.5))"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_transformer_5722f1_201_0.svg",
+      "local_path": "_images/output_transformer_5722f1_201_0.svg",
+      "alt": "../_images/output_transformer_5722f1_201_0.svg"
+    },
+    {
+      "type": "paragraph",
+      "text": "Để hình dung cả trọng lượng tự chú ý của bộ giải mã và trọng lượng chú ý\nbộ giải mã hóa, chúng ta cần nhiều thao tác dữ liệu Ví dụ, chúng tôi lấp\nđầy trọng lượng chú ý đeo mặt nạ bằng 0. Lưu ý rằng trọng lượng tự chú ý\ncủa bộ giải mã và trọng lượng chú ý bộ giải mã hóa cả hai đều có cùng\nmột truy vấn: mã thông báo bắt đầu theo sau là mã thông báo đầu ra."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "dec_attention_weights_2d = [np.array(head[0]).tolist()\n                            for step in dec_attention_weight_seq\n                            for attn in step for blk in attn for head in blk]\ndec_attention_weights_filled = np.array(\n    pd.DataFrame(dec_attention_weights_2d).fillna(0.0).values)\ndec_attention_weights = dec_attention_weights_filled.reshape((-1, 2, num_layers, num_heads, num_steps))\ndec_self_attention_weights, dec_inter_attention_weights = \\\n    dec_attention_weights.transpose(1, 2, 3, 0, 4)\ndec_self_attention_weights.shape, dec_inter_attention_weights.shape"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "((2, 4, 6, 10), (2, 4, 6, 10))"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "dec_attention_weights_2d = [head[0].tolist()\n                            for step in dec_attention_weight_seq\n                            for attn in step for blk in attn for head in blk]\ndec_attention_weights_filled = torch.tensor(\n    pd.DataFrame(dec_attention_weights_2d).fillna(0.0).values)\ndec_attention_weights = dec_attention_weights_filled.reshape((-1, 2, num_layers, num_heads, num_steps))\ndec_self_attention_weights, dec_inter_attention_weights = \\\n    dec_attention_weights.permute(1, 2, 3, 0, 4)\ndec_self_attention_weights.shape, dec_inter_attention_weights.shape"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "(torch.Size([2, 4, 6, 10]), torch.Size([2, 4, 6, 10]))"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "dec_attention_weights_2d = [head[0] for step in dec_attention_weight_seq\n                            for attn in step\n                            for blk in attn for head in blk]\ndec_attention_weights_filled = tf.convert_to_tensor(\n    np.asarray(pd.DataFrame(dec_attention_weights_2d).fillna(\n        0.0).values).astype(np.float32))\ndec_attention_weights = tf.reshape(dec_attention_weights_filled, shape=(\n    -1, 2, num_layers, num_heads, num_steps))\ndec_self_attention_weights, dec_inter_attention_weights = tf.transpose(\n    dec_attention_weights, perm=(1, 2, 3, 0, 4))\nprint(dec_self_attention_weights.shape, dec_inter_attention_weights.shape)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "(2, 4, 6, 10) (2, 4, 6, 10)"
+    },
+    {
+      "type": "paragraph",
+      "text": "Do thuộc tính tự động hồi quy của bộ giải mã tự chú ý, không có truy vấn\nnào tham dự các cặp khóa-giá trị sau vị trí truy vấn."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "# Plus one to include the beginning-of-sequence token\nd2l.show_heatmaps(\n    dec_self_attention_weights[:, :, :, :len(translation.split()) + 1],\n    xlabel='Key positions', ylabel='Query positions',\n    titles=['Head %d' % i for i in range(1, 5)], figsize=(7, 3.5))"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_transformer_5722f1_219_0.svg",
+      "local_path": "_images/output_transformer_5722f1_219_0.svg",
+      "alt": "../_images/output_transformer_5722f1_219_0.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "# Plus one to include the beginning-of-sequence token\nd2l.show_heatmaps(\n    dec_self_attention_weights[:, :, :, :len(translation.split()) + 1],\n    xlabel='Key positions', ylabel='Query positions',\n    titles=['Head %d' % i for i in range(1, 5)], figsize=(7, 3.5))"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_transformer_5722f1_222_0.svg",
+      "local_path": "_images/output_transformer_5722f1_222_0.svg",
+      "alt": "../_images/output_transformer_5722f1_222_0.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "# Plus one to include the beginning-of-sequence token\nd2l.show_heatmaps(\n    dec_self_attention_weights[:, :, :, :len(translation.split()) + 1],\n    xlabel='Key positions', ylabel='Query positions',\n    titles=['Head %d' % i for i in range(1, 5)], figsize=(7, 3.5))"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_transformer_5722f1_225_0.svg",
+      "local_path": "_images/output_transformer_5722f1_225_0.svg",
+      "alt": "../_images/output_transformer_5722f1_225_0.svg"
+    },
+    {
+      "type": "paragraph",
+      "text": "Tương tự như trường hợp trong bộ mã hóa tự chú ý, thông qua độ dài hợp\nlệ được chỉ định của chuỗi đầu vào, không có truy vấn từ chuỗi đầu ra\ntham quan đến các thẻ đệm đó từ chuỗi đầu vào."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "d2l.show_heatmaps(\n    dec_inter_attention_weights, xlabel='Key positions',\n    ylabel='Query positions', titles=['Head %d' % i for i in range(1, 5)],\n    figsize=(7, 3.5))"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_transformer_5722f1_231_0.svg",
+      "local_path": "_images/output_transformer_5722f1_231_0.svg",
+      "alt": "../_images/output_transformer_5722f1_231_0.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "d2l.show_heatmaps(\n    dec_inter_attention_weights, xlabel='Key positions',\n    ylabel='Query positions', titles=['Head %d' % i for i in range(1, 5)],\n    figsize=(7, 3.5))"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_transformer_5722f1_234_0.svg",
+      "local_path": "_images/output_transformer_5722f1_234_0.svg",
+      "alt": "../_images/output_transformer_5722f1_234_0.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "d2l.show_heatmaps(\n    dec_inter_attention_weights, xlabel='Key positions',\n    ylabel='Query positions', titles=['Head %d' % i for i in range(1, 5)],\n    figsize=(7, 3.5))"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_transformer_5722f1_237_0.svg",
+      "local_path": "_images/output_transformer_5722f1_237_0.svg",
+      "alt": "../_images/output_transformer_5722f1_237_0.svg"
+    },
+    {
+      "type": "paragraph",
+      "text": "Mặc dù kiến trúc biến áp ban đầu được đề xuất để học theo trình tự, vì\nchúng ta sẽ khám phá sau trong cuốn sách, bộ mã hóa biến áp hoặc bộ giải\nmã biến áp thường được sử dụng riêng cho các nhiệm vụ học sâu khác nhau."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tom-tat",
+      "text": "10.7.7. Tóm tắt"
+    },
+    {
+      "type": "list",
+      "ordered": false,
+      "items": [
+        "Máy biến áp là một thể hiện của kiến trúc bộ mã hóa-giải mã, mặc dù\nbộ mã hóa hoặc bộ giải mã có thể được sử dụng riêng lẻ trong thực tế.",
+        "Trong máy biến áp, tự chú ý nhiều đầu được sử dụng để biểu diễn trình\ntự đầu vào và chuỗi đầu ra, mặc dù bộ giải mã phải bảo toàn thuộc\ntính hồi quy tự động thông qua một phiên bản đeo mặt nạ.",
+        "Cả hai kết nối còn lại và bình thường hóa lớp trong máy biến áp đều\nquan trọng để đào tạo một mô hình rất sâu.",
+        "Mạng chuyển tiếp nguồn cấp dữ liệu định vị trong mô hình máy biến áp\nbiến đổi biểu diễn ở tất cả các vị trí trình tự bằng cách sử dụng\ncùng một MLP."
+      ]
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bai-tap",
+      "text": "10.7.8. Bài tập"
+    },
+    {
+      "type": "list",
+      "ordered": true,
+      "items": [
+        "Đào tạo một máy biến áp sâu hơn trong các thí nghiệm. Làm thế nào để\nnó ảnh hưởng đến tốc độ đào tạo và hiệu suất dịch thuật?",
+        "Có phải là một ý tưởng tốt để thay thế sự chú ý của sản phẩm điểm thu\nnhỏ bằng sự chú ý phụ gia trong máy biến áp? Tại sao?",
+        "Đối với mô hình hóa ngôn ngữ, chúng ta có nên sử dụng bộ mã hóa biến\náp, bộ giải mã hoặc cả hai? Làm thế nào để thiết kế phương pháp này?",
+        "Điều gì có thể là thách thức đối với máy biến áp nếu chuỗi đầu vào\nrất dài? Tại sao?",
+        "Làm thế nào để cải thiện tính toán và hiệu quả bộ nhớ của máy biến\náp? Hint: you may refer to the survey paper by Tay et al. [Tay.Dehghani.Bahri.ea.2020] .",
+        "Làm thế nào chúng ta có thể thiết kế các mô hình dựa trên máy biến áp\ncho các tác vụ phân loại hình ảnh mà không cần sử dụng CNN? Hint: you\nmay refer to the vision transformer [Dosovitskiy.Beyer.Kolesnikov.ea.2021] ."
+      ]
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    }
+  ],
+  "images": [
+    {
+      "original_url": "https://vi.d2l.ai/_images/transformer.svg",
+      "local_path": "_images/transformer.svg",
+      "alt": "../_images/transformer.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_transformer_5722f1_159_1.svg",
+      "local_path": "_images/output_transformer_5722f1_159_1.svg",
+      "alt": "../_images/output_transformer_5722f1_159_1.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_transformer_5722f1_162_1.svg",
+      "local_path": "_images/output_transformer_5722f1_162_1.svg",
+      "alt": "../_images/output_transformer_5722f1_162_1.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_transformer_5722f1_165_1.svg",
+      "local_path": "_images/output_transformer_5722f1_165_1.svg",
+      "alt": "../_images/output_transformer_5722f1_165_1.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_transformer_5722f1_195_0.svg",
+      "local_path": "_images/output_transformer_5722f1_195_0.svg",
+      "alt": "../_images/output_transformer_5722f1_195_0.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_transformer_5722f1_198_0.svg",
+      "local_path": "_images/output_transformer_5722f1_198_0.svg",
+      "alt": "../_images/output_transformer_5722f1_198_0.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_transformer_5722f1_201_0.svg",
+      "local_path": "_images/output_transformer_5722f1_201_0.svg",
+      "alt": "../_images/output_transformer_5722f1_201_0.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_transformer_5722f1_219_0.svg",
+      "local_path": "_images/output_transformer_5722f1_219_0.svg",
+      "alt": "../_images/output_transformer_5722f1_219_0.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_transformer_5722f1_222_0.svg",
+      "local_path": "_images/output_transformer_5722f1_222_0.svg",
+      "alt": "../_images/output_transformer_5722f1_222_0.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_transformer_5722f1_225_0.svg",
+      "local_path": "_images/output_transformer_5722f1_225_0.svg",
+      "alt": "../_images/output_transformer_5722f1_225_0.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_transformer_5722f1_231_0.svg",
+      "local_path": "_images/output_transformer_5722f1_231_0.svg",
+      "alt": "../_images/output_transformer_5722f1_231_0.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_transformer_5722f1_234_0.svg",
+      "local_path": "_images/output_transformer_5722f1_234_0.svg",
+      "alt": "../_images/output_transformer_5722f1_234_0.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_transformer_5722f1_237_0.svg",
+      "local_path": "_images/output_transformer_5722f1_237_0.svg",
+      "alt": "../_images/output_transformer_5722f1_237_0.svg"
+    }
+  ],
+  "text": "10.7. Máy biến áp\nChúng tôi đã so sánh CNN, RNN và sự tự chú ý trong Section 10.6.2 . Đáng chú ý, sự tự chú ý thích\ncả tính toán song song và độ dài đường tối đa ngắn nhất. Do đó về mặt tự\nnhiên, nó là hấp dẫn để thiết kế kiến trúc sâu sắc bằng cách sử dụng sự\ntự chú ý. Không giống như các mô hình tự chú ý trước đó vẫn dựa vào RNN\nđể biểu diễn đầu vào [Cheng.Dong.Lapata.2016] [Lin.Feng.Santos.ea.2017] [Paulus.Xiong.Socher.2017] ,\nmô hình máy biến áp chỉ dựa trên các cơ chế chú ý mà không có bất kỳ lớp\nphức tạp hoặc tái phát nào [Vaswani et al., 2017] . Mặc\ndù ban đầu được đề xuất cho trình tự để học trình tự về dữ liệu văn bản,\ncác máy biến áp đã phổ biến trong một loạt các ứng dụng học sâu hiện\nđại, chẳng hạn như trong các lĩnh vực ngôn ngữ, tầm nhìn, lời nói và học\ntập củng cố.\n10.7.1. Mô hình\nLà một ví dụ của kiến trúc bộ mã hóa-giải mã, kiến trúc tổng thể của máy\nbiến áp được trình bày trong Fig. 10.7.1 . Như chúng ta\ncó thể thấy, máy biến áp bao gồm một bộ mã hóa và bộ giải mã. Khác với\nsự chú ý của Bahdanau cho trình tự để học trình tự trong Fig. 10.4.1 , các nhúng chuỗi đầu vào (nguồn)\nvà đầu ra (mục tiêu) được thêm vào với mã hóa vị trí trước khi được đưa\nvào bộ mã hóa và bộ giải mã ngăn xếp các mô-đun dựa trên sự tự chú ý.\nFig. 10.7.1 The transformer architecture. ¶\nBây giờ chúng tôi cung cấp một cái nhìn tổng quan về kiến trúc biến áp\ntrong Fig. 10.7.1 . Ở mức độ cao, bộ mã hóa biến áp là\nmột chồng của nhiều lớp giống hệt nhau, trong đó mỗi lớp có hai lớp con\n(hoặc được ký hiệu là \\(\\mathrm{sublayer}\\) ). Đầu tiên là một tập\nhợp tự chú ý nhiều đầu và thứ hai là một mạng lưới chuyển tiếp nguồn cấp\ndữ liệu theo định vị. Cụ thể, trong bộ mã hóa tự chú ý, truy vấn, phím\nvà giá trị đều từ đầu ra của lớp mã hóa trước đó. Lấy cảm hứng từ thiết\nkế ResNet trong Section 7.6 , một kết nối còn lại được sử dụng\nxung quanh cả hai lớp con. Trong máy biến áp, đối với bất kỳ đầu vào \\(\\mathbf{x} \\in \\mathbb{R}^d\\) nào ở bất kỳ vị trí nào của chuỗi,\nchúng tôi yêu cầu \\(\\mathrm{sublayer}(\\mathbf{x}) \\in \\mathbb{R}^d\\) để kết nối còn lại \\(\\mathbf{x} + \\mathrm{sublayer}(\\mathbf{x}) \\in \\mathbb{R}^d\\) là\nkhả thi. Bổ sung này từ kết nối còn lại ngay lập tức được theo sau bởi\nchuẩn hóa lớp [Ba.Kiros.Hinton.2016] . Kết quả là, bộ mã hóa biến\náp xuất ra một biểu diễn vector \\(d\\) chiều cho mỗi vị trí của chuỗi\nđầu vào.\nBộ giải mã biến áp cũng là một chồng của nhiều lớp giống hệt nhau với\ncác kết nối còn lại và chuẩn hóa lớp. Bên cạnh hai sublayers được mô tả\ntrong bộ mã hóa, bộ giải mã chèn một sublayer thứ ba, được gọi là sự chú\ný của bộ mã hóa-giải mã, giữa hai bộ giải mã này. Trong sự chú ý của bộ\nmã hóa giải mã, các truy vấn là từ đầu ra của lớp giải mã trước đó và\ncác phím và giá trị là từ đầu ra bộ mã hóa biến áp. Trong bộ giải mã tự\nchú ý, truy vấn, khóa và giá trị đều từ đầu ra của lớp giải mã trước đó.\nTuy nhiên, mỗi vị trí trong bộ giải mã chỉ được phép tham dự tất cả các\nvị trí trong bộ giải mã cho đến vị trí đó. Chú ý masked này bảo tồn\nthuộc tính tự động hồi quy, đảm bảo rằng dự đoán chỉ phụ thuộc vào các\ntoken đầu ra đã được tạo ra.\nChúng tôi đã mô tả và thực hiện sự chú ý nhiều đầu dựa trên các sản phẩm\ndot-thu nhỏ trong Section 10.5 và mã hóa vị trí\ntrong Section 10.6.3 . Sau đây, chúng tôi sẽ thực\nhiện phần còn lại của mô hình máy biến áp.\n10.7.2. Các mạng thức ăn chuyển tiếp vị trí\nMạng chuyển tiếp nguồn cấp dữ liệu định vị biến đổi biểu diễn ở tất cả\ncác vị trí trình tự bằng cách sử dụng cùng một MLP. Đây là lý do tại sao\nchúng tôi gọi nó là positionwise . Trong phần thực hiện dưới đây, đầu\nvào X với hình dạng (kích thước lô, số bước thời gian hoặc độ dài\nchuỗi trong thẻ, số đơn vị ẩn hoặc kích thước tính năng) sẽ được chuyển\nđổi bởi một MLP hai lớp thành một tensor đầu ra của hình dạng (kích\nthước lô, số bước thời gian, ffn_num_outputs ).\nVí dụ sau đây cho thấy chiều trong cùng của một tensor thay đổi thành số\nlượng đầu ra trong mạng chuyển tiếp theo vị trí. Vì cùng một MLP biến\nđổi ở tất cả các vị trí, khi các đầu vào ở tất cả các vị trí này giống\nnhau, đầu ra của chúng cũng giống hệt nhau.\n10.7.3. Kết nối còn lại và chuẩn hóa lớp\nBây giờ chúng ta hãy tập trung vào thành phần “add & norm” trong Fig. 10.7.1 . Như chúng tôi đã mô tả ở đầu phần này, đây\nlà một kết nối còn lại ngay lập tức theo sau là chuẩn hóa lớp. Cả hai\nđều là chìa khóa cho các kiến trúc sâu hiệu quả.\nTrong Section 7.5 , chúng tôi đã giải thích cách bình\nthường hóa hàng loạt lại và rescales trên các ví dụ trong một minibatch.\nChuẩn hóa lớp giống như bình thường hóa hàng loạt ngoại trừ việc trước\nđây bình thường hóa trên kích thước tính năng. Mặc dù các ứng dụng phổ\nbiến của nó trong tầm nhìn máy tính, việc bình thường hóa hàng loạt\nthường kém hiệu quả hơn so với bình thường hóa lớp trong các tác vụ xử\nlý ngôn ngữ tự nhiên, có đầu vào thường là chuỗi độ dài thay đổi.\nĐoạn mã sau đây so sánh bình thường hóa trên các kích thước khác nhau\ntheo chuẩn hóa lớp và chuẩn hóa hàng lạnh.\nBây giờ chúng ta có thể thực hiện lớp AddNorm sử dụng một kết nối\ncòn lại theo sau là chuẩn hóa lớp . Dropout cũng được áp dụng để thường\nxuyên hóa.\nKết nối còn lại yêu cầu hai đầu vào có cùng hình dạng sao cho tensor đầu\nra cũng có hình dạng giống nhau sau khi hoạt động bổ sung.\n10.7.4. Bộ mã hóa\nVới tất cả các thành phần thiết yếu để lắp ráp bộ mã hóa biến áp, chúng\nta hãy bắt đầu bằng cách thực hiện một lớp duy nhất trong bộ mã hóa. Lớp EncoderBlock sau chứa hai lớp con: nhiều đầu tự chú ý và các mạng\nchuyển tiếp theo định vị, trong đó một kết nối còn lại tiếp theo là\nchuẩn hóa lớp được sử dụng xung quanh cả hai lớp con.\nNhư chúng ta có thể thấy, bất kỳ lớp nào trong bộ mã hóa biến áp không\nthay đổi hình dạng của đầu vào của nó.\nTrong thực hiện transformer encoder sau đây, chúng tôi xếp chồng num_layers phiên bản của EncoderBlock lớp trên. Vì chúng ta sử\ndụng mã hóa vị trí cố định có giá trị luôn nằm trong khoảng từ -1 đến 1,\nchúng ta nhân các giá trị của các nhúng đầu vào có thể học được bằng căn\nbậc hai của kích thước nhúng để giải phóng trước khi tổng hợp nhúng đầu\nvào và mã hóa vị trí.\nDưới đây chúng tôi chỉ định các siêu tham số để tạo một bộ mã hóa biến\náp hai lớp. Hình dạng của đầu ra bộ mã hóa biến áp là (kích thước lô, số\nbước thời gian, num_hiddens ).\n10.7.5. Bộ giải mã\nNhư thể hiện trong Fig. 10.7.1 , bộ giải mã biến áp bao\ngồm nhiều lớp giống hệt nhau. Mỗi lớp được triển khai trong lớp DecoderBlock sau, chứa ba lớp con: bộ giải mã tự chú ý, chú ý bộ mã\nhóa-giải mã, và các mạng chuyển tiếp nguồn cấp dữ liệu định vị. Các lớp\ncon này sử dụng một kết nối còn lại xung quanh chúng theo sau là chuẩn\nhóa lớp.\nNhư chúng ta đã mô tả trước đó trong phần này, trong bộ giải mã đa đầu\nđược đeo mặt nạ tự chú ý (con đầu tiên), truy vấn, khóa và giá trị đều\nđến từ đầu ra của lớp giải mã trước đó. Khi đào tạo các mô hình trình tự\ntheo trình tự, mã thông báo ở tất cả các vị trí (bước thời gian) của\nchuỗi đầu ra được biết đến. Tuy nhiên, trong quá trình dự đoán chuỗi đầu\nra được tạo ra token bằng mã thông báo; do đó, tại bất kỳ bước thời gian\ngiải mã nào chỉ có các token được tạo ra có thể được sử dụng trong bộ\ngiải mã tự chú ý. Để duy trì hồi quy tự động trong bộ giải mã, sự tự chú\ný đeo mặt nạ của nó chỉ định dec_valid_lens để bất kỳ truy vấn nào\nchỉ tham quan đến tất cả các vị trí trong bộ giải mã cho đến vị trí truy\nvấn.\nĐể tạo điều kiện cho các hoạt động sản phẩm điểm thu nhỏ trong bộ giải\nmã mã hóa chú ý và các hoạt động bổ sung trong các kết nối còn lại, kích\nthước tính năng ( num_hiddens ) của bộ giải mã giống như của bộ mã\nhóa.\nBây giờ chúng ta xây dựng toàn bộ bộ giải mã transformer bao gồm num_layers trường hợp của DecoderBlock . Cuối cùng, một lớp kết\nnối hoàn toàn tính toán dự đoán cho tất cả các token đầu ra có thể có vocab_size . Cả hai trọng lượng tự chú ý của bộ giải mã và trọng\nlượng chú ý bộ giải mã hóa được lưu trữ để trực quan hóa sau này.\n10.7.6. Đào tạo\nHãy để chúng tôi khởi tạo một mô hình bộ mã hóa-giải mã bằng cách làm\ntheo kiến trúc biến áp. Ở đây chúng tôi chỉ định rằng cả bộ mã hóa biến\náp và bộ giải mã biến áp có 2 lớp sử dụng sự chú ý 4 đầu. Tương tự như Section 9.7.4 , chúng tôi đào tạo mô hình biến áp cho\ntrình tự để học trình tự trên tập dữ liệu dịch máy tiếng Anh-Pháp.\nSau khi đào tạo, chúng tôi sử dụng mô hình biến áp để dịch một vài câu\ntiếng Anh sang tiếng Pháp và tính điểm BLEU của họ.\nHãy để chúng tôi hình dung trọng lượng chú ý của máy biến áp khi dịch\ncâu tiếng Anh cuối cùng sang tiếng Pháp. Hình dạng của các quả cân tự\nchú ý của bộ mã hóa là (số lớp mã hóa, số lượng đầu chú ý, num_steps hoặc số truy vấn, num_steps hoặc số cặp giá trị khóa).\nTrong bộ mã hóa tự chú ý, cả truy vấn và phím đều đến từ cùng một chuỗi\nđầu vào. Vì thẻ đệm không mang ý nghĩa, với độ dài hợp lệ được chỉ định\ncủa chuỗi đầu vào, không có truy vấn nào tham dự các vị trí của thẻ đệm.\nSau đây, hai lớp trọng lượng chú ý nhiều đầu được trình bày từng hàng.\nMỗi đầu độc lập tham dự dựa trên một không gian con đại diện riêng biệt\ncủa các truy vấn, khóa và giá trị.\nĐể hình dung cả trọng lượng tự chú ý của bộ giải mã và trọng lượng chú ý\nbộ giải mã hóa, chúng ta cần nhiều thao tác dữ liệu Ví dụ, chúng tôi lấp\nđầy trọng lượng chú ý đeo mặt nạ bằng 0. Lưu ý rằng trọng lượng tự chú ý\ncủa bộ giải mã và trọng lượng chú ý bộ giải mã hóa cả hai đều có cùng\nmột truy vấn: mã thông báo bắt đầu theo sau là mã thông báo đầu ra.\nDo thuộc tính tự động hồi quy của bộ giải mã tự chú ý, không có truy vấn\nnào tham dự các cặp khóa-giá trị sau vị trí truy vấn.\nTương tự như trường hợp trong bộ mã hóa tự chú ý, thông qua độ dài hợp\nlệ được chỉ định của chuỗi đầu vào, không có truy vấn từ chuỗi đầu ra\ntham quan đến các thẻ đệm đó từ chuỗi đầu vào.\nMặc dù kiến trúc biến áp ban đầu được đề xuất để học theo trình tự, vì\nchúng ta sẽ khám phá sau trong cuốn sách, bộ mã hóa biến áp hoặc bộ giải\nmã biến áp thường được sử dụng riêng cho các nhiệm vụ học sâu khác nhau.\n10.7.7. Tóm tắt\nMáy biến áp là một thể hiện của kiến trúc bộ mã hóa-giải mã, mặc dù\nbộ mã hóa hoặc bộ giải mã có thể được sử dụng riêng lẻ trong thực tế.\nTrong máy biến áp, tự chú ý nhiều đầu được sử dụng để biểu diễn trình\ntự đầu vào và chuỗi đầu ra, mặc dù bộ giải mã phải bảo toàn thuộc\ntính hồi quy tự động thông qua một phiên bản đeo mặt nạ.\nCả hai kết nối còn lại và bình thường hóa lớp trong máy biến áp đều\nquan trọng để đào tạo một mô hình rất sâu.\nMạng chuyển tiếp nguồn cấp dữ liệu định vị trong mô hình máy biến áp\nbiến đổi biểu diễn ở tất cả các vị trí trình tự bằng cách sử dụng\ncùng một MLP.\n10.7.8. Bài tập\nĐào tạo một máy biến áp sâu hơn trong các thí nghiệm. Làm thế nào để\nnó ảnh hưởng đến tốc độ đào tạo và hiệu suất dịch thuật?\nCó phải là một ý tưởng tốt để thay thế sự chú ý của sản phẩm điểm thu\nnhỏ bằng sự chú ý phụ gia trong máy biến áp? Tại sao?\nĐối với mô hình hóa ngôn ngữ, chúng ta có nên sử dụng bộ mã hóa biến\náp, bộ giải mã hoặc cả hai? Làm thế nào để thiết kế phương pháp này?\nĐiều gì có thể là thách thức đối với máy biến áp nếu chuỗi đầu vào\nrất dài? Tại sao?\nLàm thế nào để cải thiện tính toán và hiệu quả bộ nhớ của máy biến\náp? Hint: you may refer to the survey paper by Tay et al. [Tay.Dehghani.Bahri.ea.2020] .\nLàm thế nào chúng ta có thể thiết kế các mô hình dựa trên máy biến áp\ncho các tác vụ phân loại hình ảnh mà không cần sử dụng CNN? Hint: you\nmay refer to the vision transformer [Dosovitskiy.Beyer.Kolesnikov.ea.2021] .\nDiscussions\nDiscussions"
+}

@@ -1,0 +1,657 @@
+{
+  "url": "https://vi.d2l.ai/chapter_multilayer-perceptrons/weight-decay.html",
+  "chapter": "chapter_multilayer-perceptrons",
+  "title": "4.5. Trọng lượng phân rã",
+  "crawled_at": "2026-07-20T12:39:28.846157+00:00",
+  "headings": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "trong-luong-phan-ra",
+      "text": "4.5. Trọng lượng phân rã"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "dinh-muc-va-phan-ra-trong-luong",
+      "text": "4.5.1. Định mức và phân rã trọng lượng"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "high-dimensional-linear-regression",
+      "text": "4.5.2. High-Dimensional Linear Regression"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "thuc-hien-tu-dau",
+      "text": "4.5.3. Thực hiện từ đầu"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "initializing-model-parameters",
+      "text": "4.5.3.1. Initializing Model Parameters"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "dinh-nghia-l-2-hinh-phat-norm",
+      "text": "4.5.3.2. Định nghĩa \\(L_2\\) Hình phạt Norm"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "xac-dinh-vong-dao-tao",
+      "text": "4.5.3.3. Xác định vòng đào tạo"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "dao-tao-ma-khong-can-regularization",
+      "text": "4.5.3.4. Đào tạo mà không cần Regularization"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "su-dung-trong-luong",
+      "text": "4.5.3.5. Sử dụng trọng lượng"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "thiet-tap",
+      "text": "4.5.4. Thiết tập"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tom-tat",
+      "text": "4.5.5. Tóm tắt"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bai-tap",
+      "text": "4.5.6. Bài tập"
+    }
+  ],
+  "content": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "trong-luong-phan-ra",
+      "text": "4.5. Trọng lượng phân rã"
+    },
+    {
+      "type": "paragraph",
+      "text": "Bây giờ chúng tôi đã đặc trưng vấn đề overfitting, chúng tôi có thể giới\nthiệu một số kỹ thuật tiêu chuẩn để điều chỉnh các mô hình. Nhớ lại rằng\nchúng ta luôn có thể giảm thiểu quá mức bằng cách đi ra ngoài và thu\nthập thêm dữ liệu đào tạo. Điều đó có thể tốn kém, tốn thời gian hoặc\nhoàn toàn nằm ngoài tầm kiểm soát của chúng tôi, khiến nó không thể xảy\nra trong thời gian ngắn. Hiện tại, chúng ta có thể giả định rằng chúng\nta đã có nhiều dữ liệu chất lượng cao như tài nguyên của chúng tôi cho\nphép và tập trung vào các kỹ thuật chính quy hóa."
+    },
+    {
+      "type": "paragraph",
+      "text": "Nhớ lại rằng trong ví dụ hồi quy đa thức của chúng tôi\n( Section 4.4 ), chúng ta có thể giới hạn năng lực của\nmô hình của chúng tôi chỉ đơn giản bằng cách điều chỉnh mức độ của đa\nthức được trang bị. Thật vậy, hạn chế số lượng các tính năng là một kỹ\nthuật phổ biến để giảm thiểu quá mức. Tuy nhiên, chỉ cần ném các tính\nnăng sang một bên có thể quá cùn một công cụ cho công việc. Gắn bó với\nví dụ hồi quy đa thức, xem xét những gì có thể xảy ra với các đầu vào\nchiều cao. Các phần mở rộng tự nhiên của đa thức cho dữ liệu đa biến\nđược gọi là * monomials*, đơn giản là sản phẩm của quyền hạn của các\nbiến. Mức độ của một monomial là tổng của các cường quốc. Ví dụ, \\(x_1^2 x_2\\) , và \\(x_3 x_5^2\\) đều là nguyên khối của độ 3."
+    },
+    {
+      "type": "paragraph",
+      "text": "Lưu ý rằng số lượng thuật ngữ với mức độ \\(d\\) thổi lên nhanh chóng\nkhi \\(d\\) phát triển lớn hơn. Với \\(k\\) biến số, số lượng\nmonomials của độ \\(d\\) (tức là \\(k\\) multichoose \\(d\\) ) là \\({k - 1 + d} \\choose {k - 1}\\) . Ngay cả những thay đổi nhỏ về mức\nđộ, nói từ \\(2\\) đến \\(3\\) , làm tăng đáng kể độ phức tạp của mô\nhình của chúng tôi. Vì vậy chúng ta thường cần một công cụ hạt mịn hơn\nđể điều chỉnh độ phức tạp của chức năng."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "dinh-muc-va-phan-ra-trong-luong",
+      "text": "4.5.1. Định mức và phân rã trọng lượng"
+    },
+    {
+      "type": "paragraph",
+      "text": "Chúng tôi đã mô tả cả định mức \\(L_2\\) và định mức \\(L_1\\) , đây\nlà những trường hợp đặc biệt của định mức \\(L_p\\) chung hơn trong Section 2.3.10 . * Phân rã trọng lượng* (thường\nđược gọi là \\(L_2\\) regarization), có thể là kỹ thuật được sử dụng\nrộng rãi nhất để điều chỉnh các mô hình học máy tham số. Kỹ thuật này\nđược thúc đẩy bởi trực giác cơ bản trong số tất cả các chức năng \\(f\\) , chức năng \\(f = 0\\) (gán giá trị \\(0\\) cho tất cả các\nđầu vào) trong một số nghĩa là * đơn giản nhất*, và rằng chúng ta có\nthể đo lường sự phức tạp của một hàm bằng khoảng cách của nó từ 0. Nhưng\nchính xác như thế nào chúng ta nên đo khoảng cách giữa một hàm và không?\nKhông có câu trả lời đúng duy nhất. Trên thực tế, toàn bộ nhánh toán\nhọc, bao gồm các phần phân tích chức năng và lý thuyết về không gian\nBanach, được dành để trả lời vấn đề này."
+    },
+    {
+      "type": "paragraph",
+      "text": "Một cách giải thích đơn giản có thể là đo độ phức tạp của một hàm tuyến\ntính \\(f(\\mathbf{x}) = \\mathbf{w}^\\top \\mathbf{x}\\) theo một số định\nmức của vectơ trọng lượng của nó, ví dụ, \\(\\| \\mathbf{w} \\|^2\\) .\nPhương pháp phổ biến nhất để đảm bảo một vector trọng lượng nhỏ là thêm\nđịnh mức của nó như một thuật ngữ phạt cho vấn đề giảm thiểu tổn thất.\nDo đó chúng tôi thay thế mục tiêu ban đầu của chúng tôi, giảm thiểu tổn\nthất dự đoán trên nhãn đào tạo , with new Mới objective mục tiêu, giảm\nthiểu tổng số tổn thất dự đoán và thuật ngữ phạt phút . Bây giờ, nếu\nvector trọng lượng của chúng ta phát triển quá lớn, thuật toán học tập\ncủa chúng ta có thể tập trung vào việc giảm thiểu định mức trọng lượng \\(\\| \\mathbf{w} \\|^2\\) so với giảm thiểu lỗi đào tạo. Đó chính xác\nlà những gì chúng tôi muốn. Để minh họa những điều trong code, chúng ta\nhãy hồi sinh ví dụ trước đây của chúng tôi từ Section 3.1 cho hồi quy tuyến tính. Ở đó, sự mất\nmát của chúng tôi đã được đưa ra bởi"
+    },
+    {
+      "type": "math",
+      "latex": "(4.5.1)¶\\[L(\\mathbf{w}, b) = \\frac{1}{n}\\sum_{i=1}^n \\frac{1}{2}\\left(\\mathbf{w}^\\top \\mathbf{x}^{(i)} + b - y^{(i)}\\right)^2.\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Nhớ lại rằng \\(\\mathbf{x}^{(i)}\\) là các tính năng, \\(y^{(i)}\\) là nhãn cho tất cả các ví dụ dữ liệu \\(i\\) và \\((\\mathbf{w}, b)\\) là các thông số trọng lượng và thiên vị, tương\nứng. Để phạt kích thước của vector trọng lượng, bằng cách nào đó chúng\nta phải thêm \\(\\| \\mathbf{w} \\|^2\\) vào chức năng mất mát, nhưng làm\nthế nào mô hình nên thương mại mất tiêu chuẩn cho hình phạt phụ gia mới\nnày? Trong thực tế, chúng tôi mô tả sự cân bằng này thông qua hằng số *\nthường xuyệt* \\(\\lambda\\) , một siêu tham số không âm mà chúng tôi\nphù hợp bằng dữ liệu xác thực:"
+    },
+    {
+      "type": "math",
+      "latex": "(4.5.2)¶\\[L(\\mathbf{w}, b) + \\frac{\\lambda}{2} \\|\\mathbf{w}\\|^2,\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Đối với \\(\\lambda = 0\\) , chúng tôi phục hồi chức năng mất mát ban\nđầu của chúng tôi. Đối với \\(\\lambda > 0\\) , chúng tôi hạn chế kích\nthước của \\(\\| \\mathbf{w} \\|\\) . Chúng tôi chia cho \\(2\\) theo\nquy ước: khi chúng ta lấy đạo hàm của một hàm bậc hai, \\(2\\) và \\(1/2\\) hủy bỏ, đảm bảo rằng biểu thức cho bản cập nhật trông đẹp và\nđơn giản. Người đọc tinh xảo có thể tự hỏi tại sao chúng ta làm việc với\nđịnh mức bình phương chứ không phải định mức tiêu chuẩn (tức là khoảng\ncách Euclide). Chúng tôi làm điều này để thuận tiện tính toán. Bằng cách\nbình phương định mức \\(L_2\\) , chúng ta loại bỏ căn bậc hai, để lại\ntổng hình vuông của mỗi thành phần của vector trọng lượng. Điều này làm\ncho đạo hàm của hình phạt dễ tính toán: tổng các dẫn xuất bằng đạo hàm\ncủa tổng."
+    },
+    {
+      "type": "paragraph",
+      "text": "Hơn nữa, bạn có thể hỏi tại sao chúng tôi làm việc với định mức \\(L_2\\) ở nơi đầu tiên và không, nói, định mức \\(L_1\\) . Trên\nthực tế, các lựa chọn khác là hợp lệ và phổ biến trong suốt số liệu\nthống kê. Trong khi \\(L_2\\) -mô hình tuyến tính được điều chỉnh tạo\nthành thuật toán * hồi quy sườn núi cổ điển , hồi quy tuyến tính\n:math:`L_1` là một mô hình cơ bản tương tự trong thống kê, thường được\ngọi là hồi quy lasso ."
+    },
+    {
+      "type": "paragraph",
+      "text": "Một lý do để làm việc với định mức \\(L_2\\) là nó đặt một hình phạt\nlớn trên các thành phần lớn của vector trọng lượng. Điều này làm thiên\nvị thuật toán học tập của chúng tôi đối với các mô hình phân phối trọng\nlượng đều trên một số lượng lớn các tính năng. Trong thực tế, điều này\ncó thể làm cho chúng mạnh mẽ hơn với lỗi đo lường trong một biến duy\nnhất. Ngược lại, \\(L_1\\) hình phạt dẫn đến các mô hình tập trung\ntrọng lượng trên một tập hợp nhỏ các tính năng bằng cách xóa các trọng\nlượng khác về 0. Điều này được gọi là lựa chọn tính năng*, có thể mong\nmuốn vì các lý do khác."
+    },
+    {
+      "type": "paragraph",
+      "text": "Sử dụng cùng một ký hiệu trong (3.1.10) , các\nbản cập nhật xuống dốc ngẫu nhiên minibatch cho hồi quy \\(L_2\\) -regarized theo sau:"
+    },
+    {
+      "type": "math",
+      "latex": "(4.5.3)¶\\[\\begin{aligned}\n\\mathbf{w} & \\leftarrow \\left(1- \\eta\\lambda \\right) \\mathbf{w} - \\frac{\\eta}{|\\mathcal{B}|} \\sum_{i \\in \\mathcal{B}} \\mathbf{x}^{(i)} \\left(\\mathbf{w}^\\top \\mathbf{x}^{(i)} + b - y^{(i)}\\right).\n\\end{aligned}\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Như trước đây, chúng tôi cập nhật \\(\\mathbf{w}\\) dựa trên số tiền mà\nước tính của chúng tôi khác với quan sát. Tuy nhiên, chúng tôi cũng thu\nnhỏ kích thước \\(\\mathbf{w}\\) về phía không. Đó là lý do tại sao\nphương pháp đôi khi được gọi là “phân rã trọng lượng”: chỉ cho thuật ngữ\nphạt, thuật toán tối ưu hóa của chúng tôi* phân tác* trọng lượng ở mỗi\nbước tập luyện. Trái ngược với lựa chọn tính năng, trọng lượng phân rã\ncung cấp cho chúng ta một cơ chế liên tục để điều chỉnh độ phức tạp của\nmột hàm. Các giá trị nhỏ hơn của \\(\\lambda\\) tương ứng với ít bị hạn\nchế \\(\\mathbf{w}\\) , trong khi các giá trị lớn hơn của \\(\\lambda\\) hạn chế \\(\\mathbf{w}\\) đáng kể hơn."
+    },
+    {
+      "type": "paragraph",
+      "text": "Cho dù chúng ta bao gồm một hình phạt thiên vị tương ứng \\(b^2\\) có\nthể thay đổi giữa các triển khai, và có thể thay đổi giữa các lớp của\nmạng thần kinh. Thông thường, chúng ta không thường xuyên hóa thuật ngữ\nthiên vị của lớp đầu ra của mạng."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "high-dimensional-linear-regression",
+      "text": "4.5.2. High-Dimensional Linear Regression"
+    },
+    {
+      "type": "paragraph",
+      "text": "Chúng ta có thể minh họa những lợi ích của phân rã trọng lượng thông qua\nmột ví dụ tổng hợp đơn giản."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "%matplotlib inline\nfrom mxnet import autograd, gluon, init, np, npx\nfrom mxnet.gluon import nn\nfrom d2l import mxnet as d2l\n\nnpx.set_np()"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "%matplotlib inline\nimport torch\nfrom torch import nn\nfrom d2l import torch as d2l"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "%matplotlib inline\nimport tensorflow as tf\nfrom d2l import tensorflow as d2l"
+    },
+    {
+      "type": "paragraph",
+      "text": "Đầu tiên, chúng tôi tạo ra một số dữ liệu như trước"
+    },
+    {
+      "type": "math",
+      "latex": "(4.5.4)¶\\[y = 0.05 +\\ sum_ {i = 1} ^d 0.01 x_i +\\ epsilon\\ text {where}\\ epsilon\\ sim\\ mathcal {N} (0, 0.01^2) .\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Chúng tôi chọn nhãn của chúng tôi là một chức năng tuyến tính của đầu\nvào của chúng tôi, bị hỏng bởi tiếng ồn Gaussian với 0 trung bình và độ\nlệch chuẩn 0,01. Để làm cho các hiệu ứng của overfitting rõ rệt, chúng\nta có thể tăng chiều của vấn đề của chúng tôi lên \\(d = 200\\) và làm\nviệc với một bộ đào tạo nhỏ chỉ chứa 20 ví dụ."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "n_train, n_test, num_inputs, batch_size = 20, 100, 200, 5\ntrue_w, true_b = np.ones((num_inputs, 1)) * 0.01, 0.05\ntrain_data = d2l.synthetic_data(true_w, true_b, n_train)\ntrain_iter = d2l.load_array(train_data, batch_size)\ntest_data = d2l.synthetic_data(true_w, true_b, n_test)\ntest_iter = d2l.load_array(test_data, batch_size, is_train=False)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "n_train, n_test, num_inputs, batch_size = 20, 100, 200, 5\ntrue_w, true_b = torch.ones((num_inputs, 1)) * 0.01, 0.05\ntrain_data = d2l.synthetic_data(true_w, true_b, n_train)\ntrain_iter = d2l.load_array(train_data, batch_size)\ntest_data = d2l.synthetic_data(true_w, true_b, n_test)\ntest_iter = d2l.load_array(test_data, batch_size, is_train=False)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "n_train, n_test, num_inputs, batch_size = 20, 100, 200, 5\ntrue_w, true_b = tf.ones((num_inputs, 1)) * 0.01, 0.05\ntrain_data = d2l.synthetic_data(true_w, true_b, n_train)\ntrain_iter = d2l.load_array(train_data, batch_size)\ntest_data = d2l.synthetic_data(true_w, true_b, n_test)\ntest_iter = d2l.load_array(test_data, batch_size, is_train=False)"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "thuc-hien-tu-dau",
+      "text": "4.5.3. Thực hiện từ đầu"
+    },
+    {
+      "type": "paragraph",
+      "text": "Sau đây, chúng tôi sẽ thực hiện phân rã trọng lượng từ đầu, chỉ bằng\ncách thêm hình phạt \\(L_2\\) bình phương vào hàm mục tiêu ban đầu."
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "initializing-model-parameters",
+      "text": "4.5.3.1. Initializing Model Parameters"
+    },
+    {
+      "type": "paragraph",
+      "text": "Đầu tiên, chúng ta sẽ định nghĩa một hàm để khởi tạo ngẫu nhiên các tham\nsố model của chúng ta."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def init_params():\n    w = np.random.normal(scale=1, size=(num_inputs, 1))\n    b = np.zeros(1)\n    w.attach_grad()\n    b.attach_grad()\n    return [w, b]"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def init_params():\n    w = torch.normal(0, 1, size=(num_inputs, 1), requires_grad=True)\n    b = torch.zeros(1, requires_grad=True)\n    return [w, b]"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def init_params():\n    w = tf.Variable(tf.random.normal(mean=1, shape=(num_inputs, 1)))\n    b = tf.Variable(tf.zeros(shape=(1, )))\n    return [w, b]"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "dinh-nghia-l-2-hinh-phat-norm",
+      "text": "4.5.3.2. Định nghĩa \\(L_2\\) Hình phạt Norm"
+    },
+    {
+      "type": "paragraph",
+      "text": "Có lẽ cách thuận tiện nhất để thực hiện hình phạt này là để vuông tất cả\ncác điều khoản tại chỗ và tổng hợp chúng lên."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def l2_penalty(w):\n    return (w**2).sum() / 2"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def l2_penalty(w):\n    return torch.sum(w.pow(2)) / 2"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def l2_penalty(w):\n    return tf.reduce_sum(tf.pow(w, 2)) / 2"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "xac-dinh-vong-dao-tao",
+      "text": "4.5.3.3. Xác định vòng đào tạo"
+    },
+    {
+      "type": "paragraph",
+      "text": "Mã sau phù hợp với một mô hình trên bộ đào tạo và đánh giá nó trên bộ\nthử nghiệm. Mạng tuyến tính và tổn thất bình phương không thay đổi kể từ Section 3 , vì vậy chúng tôi sẽ chỉ nhập chúng qua d2l.linreg và d2l.squared_loss . Thay đổi duy nhất ở đây là mất\nmát của chúng tôi bây giờ bao gồm thời hạn phạt."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def train(lambd):\n    w, b = init_params()\n    net, loss = lambda X: d2l.linreg(X, w, b), d2l.squared_loss\n    num_epochs, lr = 100, 0.003\n    animator = d2l.Animator(xlabel='epochs', ylabel='loss', yscale='log',\n                            xlim=[5, num_epochs], legend=['train', 'test'])\n    for epoch in range(num_epochs):\n        for X, y in train_iter:\n            with autograd.record():\n                # The L2 norm penalty term has been added, and broadcasting\n                # makes `l2_penalty(w)` a vector whose length is `batch_size`\n                l = loss(net(X), y) + lambd * l2_penalty(w)\n            l.backward()\n            d2l.sgd([w, b], lr, batch_size)\n        if (epoch + 1) % 5 == 0:\n            animator.add(epoch + 1, (d2l.evaluate_loss(net, train_iter, loss),\n                                     d2l.evaluate_loss(net, test_iter, loss)))\n    print('L2 norm of w:', np.linalg.norm(w))"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def train(lambd):\n    w, b = init_params()\n    net, loss = lambda X: d2l.linreg(X, w, b), d2l.squared_loss\n    num_epochs, lr = 100, 0.003\n    animator = d2l.Animator(xlabel='epochs', ylabel='loss', yscale='log',\n                            xlim=[5, num_epochs], legend=['train', 'test'])\n    for epoch in range(num_epochs):\n        for X, y in train_iter:\n            # The L2 norm penalty term has been added, and broadcasting\n            # makes `l2_penalty(w)` a vector whose length is `batch_size`\n            l = loss(net(X), y) + lambd * l2_penalty(w)\n            l.sum().backward()\n            d2l.sgd([w, b], lr, batch_size)\n        if (epoch + 1) % 5 == 0:\n            animator.add(epoch + 1, (d2l.evaluate_loss(net, train_iter, loss),\n                                     d2l.evaluate_loss(net, test_iter, loss)))\n    print('L2 norm of w:', torch.norm(w).item())"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def train(lambd):\n    w, b = init_params()\n    net, loss = lambda X: d2l.linreg(X, w, b), d2l.squared_loss\n    num_epochs, lr = 100, 0.003\n    animator = d2l.Animator(xlabel='epochs', ylabel='loss', yscale='log',\n                            xlim=[5, num_epochs], legend=['train', 'test'])\n    for epoch in range(num_epochs):\n        for X, y in train_iter:\n            with tf.GradientTape() as tape:\n                # The L2 norm penalty term has been added, and broadcasting\n                # makes `l2_penalty(w)` a vector whose length is `batch_size`\n                l = loss(net(X), y) + lambd * l2_penalty(w)\n            grads = tape.gradient(l, [w, b])\n            d2l.sgd([w, b], grads, lr, batch_size)\n        if (epoch + 1) % 5 == 0:\n            animator.add(epoch + 1, (d2l.evaluate_loss(net, train_iter, loss),\n                                     d2l.evaluate_loss(net, test_iter, loss)))\n    print('L2 norm of w:', tf.norm(w).numpy())"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "dao-tao-ma-khong-can-regularization",
+      "text": "4.5.3.4. Đào tạo mà không cần Regularization"
+    },
+    {
+      "type": "paragraph",
+      "text": "Bây giờ chúng ta chạy mã này với lambd = 0 , vô hiệu hóa phân rã\ntrọng lượng. Lưu ý rằng chúng tôi quá phù hợp xấu, giảm lỗi đào tạo\nnhưng không phải lỗi kiểm tra - một trường hợp sách giáo khoa của\noverfitting."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "train(lambd=0)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "L2 norm of w: 13.259391"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_weight-decay_ec9cc0_63_1.svg",
+      "local_path": "_images/output_weight-decay_ec9cc0_63_1.svg",
+      "alt": "../_images/output_weight-decay_ec9cc0_63_1.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "train(lambd=0)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "L2 norm of w: 12.982525825500488"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_weight-decay_ec9cc0_66_1.svg",
+      "local_path": "_images/output_weight-decay_ec9cc0_66_1.svg",
+      "alt": "../_images/output_weight-decay_ec9cc0_66_1.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "train(lambd=0)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "L2 norm of w: 18.735968"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_weight-decay_ec9cc0_69_1.svg",
+      "local_path": "_images/output_weight-decay_ec9cc0_69_1.svg",
+      "alt": "../_images/output_weight-decay_ec9cc0_69_1.svg"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "su-dung-trong-luong",
+      "text": "4.5.3.5. Sử dụng trọng lượng"
+    },
+    {
+      "type": "paragraph",
+      "text": "Dưới đây, chúng tôi chạy với sự phân rã trọng lượng đáng kể. Lưu ý rằng\nlỗi đào tạo tăng nhưng lỗi thử nghiệm giảm. Đây chính xác là hiệu quả mà\nchúng ta mong đợi từ việc chính quy hóa."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "train(lambd=3)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "L2 norm of w: 0.38250324"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_weight-decay_ec9cc0_75_1.svg",
+      "local_path": "_images/output_weight-decay_ec9cc0_75_1.svg",
+      "alt": "../_images/output_weight-decay_ec9cc0_75_1.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "train(lambd=3)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "L2 norm of w: 0.3708249628543854"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_weight-decay_ec9cc0_78_1.svg",
+      "local_path": "_images/output_weight-decay_ec9cc0_78_1.svg",
+      "alt": "../_images/output_weight-decay_ec9cc0_78_1.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "train(lambd=3)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "L2 norm of w: 0.5375469"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_weight-decay_ec9cc0_81_1.svg",
+      "local_path": "_images/output_weight-decay_ec9cc0_81_1.svg",
+      "alt": "../_images/output_weight-decay_ec9cc0_81_1.svg"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "thiet-tap",
+      "text": "4.5.4. Thiết tập"
+    },
+    {
+      "type": "paragraph",
+      "text": "Bởi vì sự phân rã trọng lượng có mặt khắp nơi trong việc tối ưu hóa mạng\nthần kinh, khung học sâu làm cho nó đặc biệt thuận tiện, tích hợp phân\nrã trọng lượng vào thuật toán tối ưu hóa để dễ sử dụng kết hợp với bất\nkỳ chức năng mất mát nào. Hơn nữa, tích hợp này phục vụ một lợi ích tính\ntoán, cho phép các thủ thuật thực hiện thêm phân rã trọng lượng vào\nthuật toán, mà không cần bất kỳ chi phí tính toán bổ sung nào. Vì phần\nphân rã trọng lượng của bản cập nhật chỉ phụ thuộc vào giá trị hiện tại\ncủa mỗi tham số, trình tối ưu hóa phải chạm vào từng tham số một lần."
+    },
+    {
+      "type": "paragraph",
+      "text": "Trong mã sau, chúng tôi chỉ định siêu tham số phân rã trọng lượng trực\ntiếp thông qua wd khi khởi tạo Trainer của chúng tôi. Theo mặc\nđịnh, Gluon phân rã cả trọng lượng và thành kiến cùng một lúc. Lưu ý\nrằng siêu tham số wd sẽ được nhân với wd_mult khi cập nhật các\ntham số mô hình. Do đó, nếu chúng ta đặt wd_mult thành 0, tham số\nthiên vị \\(b\\) sẽ không phân rã."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def train_concise(wd):\n    net = nn.Sequential()\n    net.add(nn.Dense(1))\n    net.initialize(init.Normal(sigma=1))\n    loss = gluon.loss.L2Loss()\n    num_epochs, lr = 100, 0.003\n    trainer = gluon.Trainer(net.collect_params(), 'sgd',\n                            {'learning_rate': lr, 'wd': wd})\n    # The bias parameter has not decayed. Bias names generally end with \"bias\"\n    net.collect_params('.*bias').setattr('wd_mult', 0)\n    animator = d2l.Animator(xlabel='epochs', ylabel='loss', yscale='log',\n                            xlim=[5, num_epochs], legend=['train', 'test'])\n    for epoch in range(num_epochs):\n        for X, y in train_iter:\n            with autograd.record():\n                l = loss(net(X), y)\n            l.backward()\n            trainer.step(batch_size)\n        if (epoch + 1) % 5 == 0:\n            animator.add(epoch + 1, (d2l.evaluate_loss(net, train_iter, loss),\n                                     d2l.evaluate_loss(net, test_iter, loss)))\n    print('L2 norm of w:', np.linalg.norm(net[0].weight.data()))"
+    },
+    {
+      "type": "paragraph",
+      "text": "Trong mã sau, chúng tôi chỉ định siêu tham số phân rã trọng lượng trực\ntiếp thông qua weight_decay khi khởi tạo trình tối ưu hóa của chúng\ntôi. Theo mặc định, PyTorch phân rã cả trọng lượng và thành kiến cùng\nmột lúc. Ở đây chúng tôi chỉ đặt weight_decay cho trọng lượng, vì\nvậy tham số thiên vị \\(b\\) sẽ không phân rã."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def train_concise(wd):\n    net = nn.Sequential(nn.Linear(num_inputs, 1))\n    for param in net.parameters():\n        param.data.normal_()\n    loss = nn.MSELoss(reduction='none')\n    num_epochs, lr = 100, 0.003\n    # The bias parameter has not decayed\n    trainer = torch.optim.SGD([\n        {\"params\":net[0].weight,'weight_decay': wd},\n        {\"params\":net[0].bias}], lr=lr)\n    animator = d2l.Animator(xlabel='epochs', ylabel='loss', yscale='log',\n                            xlim=[5, num_epochs], legend=['train', 'test'])\n    for epoch in range(num_epochs):\n        for X, y in train_iter:\n            trainer.zero_grad()\n            l = loss(net(X), y)\n            l.mean().backward()\n            trainer.step()\n        if (epoch + 1) % 5 == 0:\n            animator.add(epoch + 1, (d2l.evaluate_loss(net, train_iter, loss),\n                                     d2l.evaluate_loss(net, test_iter, loss)))\n    print('L2 norm of w:', net[0].weight.norm().item())"
+    },
+    {
+      "type": "paragraph",
+      "text": "Trong đoạn code sau, chúng ta tạo ra một bộ điều chỉnh \\(L_2\\) với\nsiêu tham số phân rã trọng lượng wd và áp dụng nó vào lớp thông qua\nđối số kernel_regularizer ."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def train_concise(wd):\n    net = tf.keras.models.Sequential()\n    net.add(tf.keras.layers.Dense(\n        1, kernel_regularizer=tf.keras.regularizers.l2(wd)))\n    net.build(input_shape=(1, num_inputs))\n    w, b = net.trainable_variables\n    loss = tf.keras.losses.MeanSquaredError()\n    num_epochs, lr = 100, 0.003\n    trainer = tf.keras.optimizers.SGD(learning_rate=lr)\n    animator = d2l.Animator(xlabel='epochs', ylabel='loss', yscale='log',\n                            xlim=[5, num_epochs], legend=['train', 'test'])\n    for epoch in range(num_epochs):\n        for X, y in train_iter:\n            with tf.GradientTape() as tape:\n                # `tf.keras` requires retrieving and adding the losses from\n                # layers manually for custom training loop.\n                l = loss(net(X), y) + net.losses\n            grads = tape.gradient(l, net.trainable_variables)\n            trainer.apply_gradients(zip(grads, net.trainable_variables))\n        if (epoch + 1) % 5 == 0:\n            animator.add(epoch + 1, (d2l.evaluate_loss(net, train_iter, loss),\n                                     d2l.evaluate_loss(net, test_iter, loss)))\n    print('L2 norm of w:', tf.norm(net.get_weights()[0]).numpy())"
+    },
+    {
+      "type": "paragraph",
+      "text": "Các ô trông giống hệt với những lô khi chúng tôi thực hiện phân rã trọng\nlượng từ vết trầy xước. Tuy nhiên, chúng chạy nhanh hơn đáng kể và dễ\nthực hiện hơn, một lợi ích sẽ trở nên rõ rệt hơn đối với các vấn đề lớn\nhơn."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "train_concise(0)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "L2 norm of w: 15.014069"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_weight-decay_ec9cc0_102_1.svg",
+      "local_path": "_images/output_weight-decay_ec9cc0_102_1.svg",
+      "alt": "../_images/output_weight-decay_ec9cc0_102_1.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "train_concise(3)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "L2 norm of w: 0.3399195"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_weight-decay_ec9cc0_103_1.svg",
+      "local_path": "_images/output_weight-decay_ec9cc0_103_1.svg",
+      "alt": "../_images/output_weight-decay_ec9cc0_103_1.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "train_concise(0)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "L2 norm of w: 12.434950828552246"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_weight-decay_ec9cc0_106_1.svg",
+      "local_path": "_images/output_weight-decay_ec9cc0_106_1.svg",
+      "alt": "../_images/output_weight-decay_ec9cc0_106_1.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "train_concise(3)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "L2 norm of w: 0.37203601002693176"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_weight-decay_ec9cc0_107_1.svg",
+      "local_path": "_images/output_weight-decay_ec9cc0_107_1.svg",
+      "alt": "../_images/output_weight-decay_ec9cc0_107_1.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "train_concise(0)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "L2 norm of w: 1.3138579"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_weight-decay_ec9cc0_110_1.svg",
+      "local_path": "_images/output_weight-decay_ec9cc0_110_1.svg",
+      "alt": "../_images/output_weight-decay_ec9cc0_110_1.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "train_concise(3)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "L2 norm of w: 0.04167539"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_weight-decay_ec9cc0_111_1.svg",
+      "local_path": "_images/output_weight-decay_ec9cc0_111_1.svg",
+      "alt": "../_images/output_weight-decay_ec9cc0_111_1.svg"
+    },
+    {
+      "type": "paragraph",
+      "text": "Cho đến nay, chúng ta chỉ chạm vào một khái niệm về những gì tạo thành\nmột hàm tuyến tính đơn giản. Hơn nữa, những gì tạo thành một hàm phi\ntuyến đơn giản có thể là một câu hỏi thậm chí còn phức tạp hơn. Ví dụ, tái tạo hạt nhân Hilbert space\n(RKHS) cho phép người ta áp dụng các công cụ được giới thiệu cho các hàm tuyến\ntính trong bối cảnh phi tuyến tính. Thật không may, các thuật toán dựa\ntrên RKHS có xu hướng mở rộng quy mô dữ liệu lớn, chiều cao. Trong cuốn\nsách này, chúng tôi sẽ mặc định để heuristic đơn giản của việc áp dụng\nphân rã trọng lượng trên tất cả các lớp của một mạng sâu."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tom-tat",
+      "text": "4.5.5. Tóm tắt"
+    },
+    {
+      "type": "list",
+      "ordered": false,
+      "items": [
+        "Thường xuyên hóa là một phương pháp phổ biến để đối phó với\noverfitting. Nó bổ sung một thuật ngữ phạt cho chức năng mất trên bộ\nđào tạo để giảm độ phức tạp của mô hình đã học.",
+        "Một lựa chọn đặc biệt để giữ cho mô hình đơn giản là giảm cân bằng\ncách sử dụng hình phạt \\(L_2\\) . Điều này dẫn đến phân rã trọng\nlượng trong các bước cập nhật của thuật toán học tập.",
+        "Chức năng phân rã trọng lượng được cung cấp trong các trình tối ưu\nhóa từ các khuôn khổ học sâu.",
+        "Các bộ tham số khác nhau có thể có các hành vi cập nhật khác nhau\ntrong cùng một vòng đào tạo."
+      ]
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bai-tap",
+      "text": "4.5.6. Bài tập"
+    },
+    {
+      "type": "list",
+      "ordered": true,
+      "items": [
+        "Thử nghiệm với giá trị của \\(\\lambda\\) trong bài toán ước lượng\ntrong phần này. Đào tạo cốt truyện và độ chính xác kiểm tra như một\nchức năng của \\(\\lambda\\) . Bạn quan sát điều gì?",
+        "Sử dụng bộ xác thực để tìm giá trị tối ưu là \\(\\lambda\\) . Nó có\nthực sự là giá trị tối ưu? Điều này có quan trọng không?",
+        "Các phương trình cập nhật sẽ trông như thế nào nếu thay vì \\(\\|\\mathbf{w}\\|^2\\) chúng tôi sử dụng \\(\\sum_i |w_i|\\) làm\nhình phạt của sự lựa chọn của chúng tôi ( \\(L_1\\) chính quy hóa)?",
+        "Chúng ta biết rằng \\(\\|\\mathbf{w}\\|^2 = \\mathbf{w}^\\top \\mathbf{w}\\) . Bạn có thể tìm\nthấy một phương trình tương tự cho ma trận (xem định mức Frobenius\ntrong Section 2.3.10 )?",
+        "Xem lại mối quan hệ giữa lỗi đào tạo và lỗi tổng quát hóa. Ngoài phân\nrã trọng lượng, tăng cường đào tạo, và sử dụng một mô hình phức tạp\nphù hợp, những cách khác bạn có thể nghĩ đến để đối phó với\noverfitting?",
+        "Trong thống kê Bayesian, chúng tôi sử dụng sản phẩm trước và khả năng\nđể đến một phía sau thông qua \\(P(w \\mid x) \\propto P(x \\mid w) P(w)\\) . Làm thế nào bạn có thể\nxác định \\(P(w)\\) với quy định hóa?"
+      ]
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    }
+  ],
+  "images": [
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_weight-decay_ec9cc0_63_1.svg",
+      "local_path": "_images/output_weight-decay_ec9cc0_63_1.svg",
+      "alt": "../_images/output_weight-decay_ec9cc0_63_1.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_weight-decay_ec9cc0_66_1.svg",
+      "local_path": "_images/output_weight-decay_ec9cc0_66_1.svg",
+      "alt": "../_images/output_weight-decay_ec9cc0_66_1.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_weight-decay_ec9cc0_69_1.svg",
+      "local_path": "_images/output_weight-decay_ec9cc0_69_1.svg",
+      "alt": "../_images/output_weight-decay_ec9cc0_69_1.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_weight-decay_ec9cc0_75_1.svg",
+      "local_path": "_images/output_weight-decay_ec9cc0_75_1.svg",
+      "alt": "../_images/output_weight-decay_ec9cc0_75_1.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_weight-decay_ec9cc0_78_1.svg",
+      "local_path": "_images/output_weight-decay_ec9cc0_78_1.svg",
+      "alt": "../_images/output_weight-decay_ec9cc0_78_1.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_weight-decay_ec9cc0_81_1.svg",
+      "local_path": "_images/output_weight-decay_ec9cc0_81_1.svg",
+      "alt": "../_images/output_weight-decay_ec9cc0_81_1.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_weight-decay_ec9cc0_102_1.svg",
+      "local_path": "_images/output_weight-decay_ec9cc0_102_1.svg",
+      "alt": "../_images/output_weight-decay_ec9cc0_102_1.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_weight-decay_ec9cc0_103_1.svg",
+      "local_path": "_images/output_weight-decay_ec9cc0_103_1.svg",
+      "alt": "../_images/output_weight-decay_ec9cc0_103_1.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_weight-decay_ec9cc0_106_1.svg",
+      "local_path": "_images/output_weight-decay_ec9cc0_106_1.svg",
+      "alt": "../_images/output_weight-decay_ec9cc0_106_1.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_weight-decay_ec9cc0_107_1.svg",
+      "local_path": "_images/output_weight-decay_ec9cc0_107_1.svg",
+      "alt": "../_images/output_weight-decay_ec9cc0_107_1.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_weight-decay_ec9cc0_110_1.svg",
+      "local_path": "_images/output_weight-decay_ec9cc0_110_1.svg",
+      "alt": "../_images/output_weight-decay_ec9cc0_110_1.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_weight-decay_ec9cc0_111_1.svg",
+      "local_path": "_images/output_weight-decay_ec9cc0_111_1.svg",
+      "alt": "../_images/output_weight-decay_ec9cc0_111_1.svg"
+    }
+  ],
+  "text": "4.5. Trọng lượng phân rã\nBây giờ chúng tôi đã đặc trưng vấn đề overfitting, chúng tôi có thể giới\nthiệu một số kỹ thuật tiêu chuẩn để điều chỉnh các mô hình. Nhớ lại rằng\nchúng ta luôn có thể giảm thiểu quá mức bằng cách đi ra ngoài và thu\nthập thêm dữ liệu đào tạo. Điều đó có thể tốn kém, tốn thời gian hoặc\nhoàn toàn nằm ngoài tầm kiểm soát của chúng tôi, khiến nó không thể xảy\nra trong thời gian ngắn. Hiện tại, chúng ta có thể giả định rằng chúng\nta đã có nhiều dữ liệu chất lượng cao như tài nguyên của chúng tôi cho\nphép và tập trung vào các kỹ thuật chính quy hóa.\nNhớ lại rằng trong ví dụ hồi quy đa thức của chúng tôi\n( Section 4.4 ), chúng ta có thể giới hạn năng lực của\nmô hình của chúng tôi chỉ đơn giản bằng cách điều chỉnh mức độ của đa\nthức được trang bị. Thật vậy, hạn chế số lượng các tính năng là một kỹ\nthuật phổ biến để giảm thiểu quá mức. Tuy nhiên, chỉ cần ném các tính\nnăng sang một bên có thể quá cùn một công cụ cho công việc. Gắn bó với\nví dụ hồi quy đa thức, xem xét những gì có thể xảy ra với các đầu vào\nchiều cao. Các phần mở rộng tự nhiên của đa thức cho dữ liệu đa biến\nđược gọi là * monomials*, đơn giản là sản phẩm của quyền hạn của các\nbiến. Mức độ của một monomial là tổng của các cường quốc. Ví dụ, \\(x_1^2 x_2\\) , và \\(x_3 x_5^2\\) đều là nguyên khối của độ 3.\nLưu ý rằng số lượng thuật ngữ với mức độ \\(d\\) thổi lên nhanh chóng\nkhi \\(d\\) phát triển lớn hơn. Với \\(k\\) biến số, số lượng\nmonomials của độ \\(d\\) (tức là \\(k\\) multichoose \\(d\\) ) là \\({k - 1 + d} \\choose {k - 1}\\) . Ngay cả những thay đổi nhỏ về mức\nđộ, nói từ \\(2\\) đến \\(3\\) , làm tăng đáng kể độ phức tạp của mô\nhình của chúng tôi. Vì vậy chúng ta thường cần một công cụ hạt mịn hơn\nđể điều chỉnh độ phức tạp của chức năng.\n4.5.1. Định mức và phân rã trọng lượng\nChúng tôi đã mô tả cả định mức \\(L_2\\) và định mức \\(L_1\\) , đây\nlà những trường hợp đặc biệt của định mức \\(L_p\\) chung hơn trong Section 2.3.10 . * Phân rã trọng lượng* (thường\nđược gọi là \\(L_2\\) regarization), có thể là kỹ thuật được sử dụng\nrộng rãi nhất để điều chỉnh các mô hình học máy tham số. Kỹ thuật này\nđược thúc đẩy bởi trực giác cơ bản trong số tất cả các chức năng \\(f\\) , chức năng \\(f = 0\\) (gán giá trị \\(0\\) cho tất cả các\nđầu vào) trong một số nghĩa là * đơn giản nhất*, và rằng chúng ta có\nthể đo lường sự phức tạp của một hàm bằng khoảng cách của nó từ 0. Nhưng\nchính xác như thế nào chúng ta nên đo khoảng cách giữa một hàm và không?\nKhông có câu trả lời đúng duy nhất. Trên thực tế, toàn bộ nhánh toán\nhọc, bao gồm các phần phân tích chức năng và lý thuyết về không gian\nBanach, được dành để trả lời vấn đề này.\nMột cách giải thích đơn giản có thể là đo độ phức tạp của một hàm tuyến\ntính \\(f(\\mathbf{x}) = \\mathbf{w}^\\top \\mathbf{x}\\) theo một số định\nmức của vectơ trọng lượng của nó, ví dụ, \\(\\| \\mathbf{w} \\|^2\\) .\nPhương pháp phổ biến nhất để đảm bảo một vector trọng lượng nhỏ là thêm\nđịnh mức của nó như một thuật ngữ phạt cho vấn đề giảm thiểu tổn thất.\nDo đó chúng tôi thay thế mục tiêu ban đầu của chúng tôi, giảm thiểu tổn\nthất dự đoán trên nhãn đào tạo , with new Mới objective mục tiêu, giảm\nthiểu tổng số tổn thất dự đoán và thuật ngữ phạt phút . Bây giờ, nếu\nvector trọng lượng của chúng ta phát triển quá lớn, thuật toán học tập\ncủa chúng ta có thể tập trung vào việc giảm thiểu định mức trọng lượng \\(\\| \\mathbf{w} \\|^2\\) so với giảm thiểu lỗi đào tạo. Đó chính xác\nlà những gì chúng tôi muốn. Để minh họa những điều trong code, chúng ta\nhãy hồi sinh ví dụ trước đây của chúng tôi từ Section 3.1 cho hồi quy tuyến tính. Ở đó, sự mất\nmát của chúng tôi đã được đưa ra bởi\nNhớ lại rằng \\(\\mathbf{x}^{(i)}\\) là các tính năng, \\(y^{(i)}\\) là nhãn cho tất cả các ví dụ dữ liệu \\(i\\) và \\((\\mathbf{w}, b)\\) là các thông số trọng lượng và thiên vị, tương\nứng. Để phạt kích thước của vector trọng lượng, bằng cách nào đó chúng\nta phải thêm \\(\\| \\mathbf{w} \\|^2\\) vào chức năng mất mát, nhưng làm\nthế nào mô hình nên thương mại mất tiêu chuẩn cho hình phạt phụ gia mới\nnày? Trong thực tế, chúng tôi mô tả sự cân bằng này thông qua hằng số *\nthường xuyệt* \\(\\lambda\\) , một siêu tham số không âm mà chúng tôi\nphù hợp bằng dữ liệu xác thực:\nĐối với \\(\\lambda = 0\\) , chúng tôi phục hồi chức năng mất mát ban\nđầu của chúng tôi. Đối với \\(\\lambda > 0\\) , chúng tôi hạn chế kích\nthước của \\(\\| \\mathbf{w} \\|\\) . Chúng tôi chia cho \\(2\\) theo\nquy ước: khi chúng ta lấy đạo hàm của một hàm bậc hai, \\(2\\) và \\(1/2\\) hủy bỏ, đảm bảo rằng biểu thức cho bản cập nhật trông đẹp và\nđơn giản. Người đọc tinh xảo có thể tự hỏi tại sao chúng ta làm việc với\nđịnh mức bình phương chứ không phải định mức tiêu chuẩn (tức là khoảng\ncách Euclide). Chúng tôi làm điều này để thuận tiện tính toán. Bằng cách\nbình phương định mức \\(L_2\\) , chúng ta loại bỏ căn bậc hai, để lại\ntổng hình vuông của mỗi thành phần của vector trọng lượng. Điều này làm\ncho đạo hàm của hình phạt dễ tính toán: tổng các dẫn xuất bằng đạo hàm\ncủa tổng.\nHơn nữa, bạn có thể hỏi tại sao chúng tôi làm việc với định mức \\(L_2\\) ở nơi đầu tiên và không, nói, định mức \\(L_1\\) . Trên\nthực tế, các lựa chọn khác là hợp lệ và phổ biến trong suốt số liệu\nthống kê. Trong khi \\(L_2\\) -mô hình tuyến tính được điều chỉnh tạo\nthành thuật toán * hồi quy sườn núi cổ điển , hồi quy tuyến tính\n:math:`L_1` là một mô hình cơ bản tương tự trong thống kê, thường được\ngọi là hồi quy lasso .\nMột lý do để làm việc với định mức \\(L_2\\) là nó đặt một hình phạt\nlớn trên các thành phần lớn của vector trọng lượng. Điều này làm thiên\nvị thuật toán học tập của chúng tôi đối với các mô hình phân phối trọng\nlượng đều trên một số lượng lớn các tính năng. Trong thực tế, điều này\ncó thể làm cho chúng mạnh mẽ hơn với lỗi đo lường trong một biến duy\nnhất. Ngược lại, \\(L_1\\) hình phạt dẫn đến các mô hình tập trung\ntrọng lượng trên một tập hợp nhỏ các tính năng bằng cách xóa các trọng\nlượng khác về 0. Điều này được gọi là lựa chọn tính năng*, có thể mong\nmuốn vì các lý do khác.\nSử dụng cùng một ký hiệu trong (3.1.10) , các\nbản cập nhật xuống dốc ngẫu nhiên minibatch cho hồi quy \\(L_2\\) -regarized theo sau:\nNhư trước đây, chúng tôi cập nhật \\(\\mathbf{w}\\) dựa trên số tiền mà\nước tính của chúng tôi khác với quan sát. Tuy nhiên, chúng tôi cũng thu\nnhỏ kích thước \\(\\mathbf{w}\\) về phía không. Đó là lý do tại sao\nphương pháp đôi khi được gọi là “phân rã trọng lượng”: chỉ cho thuật ngữ\nphạt, thuật toán tối ưu hóa của chúng tôi* phân tác* trọng lượng ở mỗi\nbước tập luyện. Trái ngược với lựa chọn tính năng, trọng lượng phân rã\ncung cấp cho chúng ta một cơ chế liên tục để điều chỉnh độ phức tạp của\nmột hàm. Các giá trị nhỏ hơn của \\(\\lambda\\) tương ứng với ít bị hạn\nchế \\(\\mathbf{w}\\) , trong khi các giá trị lớn hơn của \\(\\lambda\\) hạn chế \\(\\mathbf{w}\\) đáng kể hơn.\nCho dù chúng ta bao gồm một hình phạt thiên vị tương ứng \\(b^2\\) có\nthể thay đổi giữa các triển khai, và có thể thay đổi giữa các lớp của\nmạng thần kinh. Thông thường, chúng ta không thường xuyên hóa thuật ngữ\nthiên vị của lớp đầu ra của mạng.\n4.5.2. High-Dimensional Linear Regression\nChúng ta có thể minh họa những lợi ích của phân rã trọng lượng thông qua\nmột ví dụ tổng hợp đơn giản.\nĐầu tiên, chúng tôi tạo ra một số dữ liệu như trước\nChúng tôi chọn nhãn của chúng tôi là một chức năng tuyến tính của đầu\nvào của chúng tôi, bị hỏng bởi tiếng ồn Gaussian với 0 trung bình và độ\nlệch chuẩn 0,01. Để làm cho các hiệu ứng của overfitting rõ rệt, chúng\nta có thể tăng chiều của vấn đề của chúng tôi lên \\(d = 200\\) và làm\nviệc với một bộ đào tạo nhỏ chỉ chứa 20 ví dụ.\n4.5.3. Thực hiện từ đầu\nSau đây, chúng tôi sẽ thực hiện phân rã trọng lượng từ đầu, chỉ bằng\ncách thêm hình phạt \\(L_2\\) bình phương vào hàm mục tiêu ban đầu.\n4.5.3.1. Initializing Model Parameters\nĐầu tiên, chúng ta sẽ định nghĩa một hàm để khởi tạo ngẫu nhiên các tham\nsố model của chúng ta.\n4.5.3.2. Định nghĩa \\(L_2\\) Hình phạt Norm\nCó lẽ cách thuận tiện nhất để thực hiện hình phạt này là để vuông tất cả\ncác điều khoản tại chỗ và tổng hợp chúng lên.\n4.5.3.3. Xác định vòng đào tạo\nMã sau phù hợp với một mô hình trên bộ đào tạo và đánh giá nó trên bộ\nthử nghiệm. Mạng tuyến tính và tổn thất bình phương không thay đổi kể từ Section 3 , vì vậy chúng tôi sẽ chỉ nhập chúng qua d2l.linreg và d2l.squared_loss . Thay đổi duy nhất ở đây là mất\nmát của chúng tôi bây giờ bao gồm thời hạn phạt.\n4.5.3.4. Đào tạo mà không cần Regularization\nBây giờ chúng ta chạy mã này với lambd = 0 , vô hiệu hóa phân rã\ntrọng lượng. Lưu ý rằng chúng tôi quá phù hợp xấu, giảm lỗi đào tạo\nnhưng không phải lỗi kiểm tra - một trường hợp sách giáo khoa của\noverfitting.\n4.5.3.5. Sử dụng trọng lượng\nDưới đây, chúng tôi chạy với sự phân rã trọng lượng đáng kể. Lưu ý rằng\nlỗi đào tạo tăng nhưng lỗi thử nghiệm giảm. Đây chính xác là hiệu quả mà\nchúng ta mong đợi từ việc chính quy hóa.\n4.5.4. Thiết tập\nBởi vì sự phân rã trọng lượng có mặt khắp nơi trong việc tối ưu hóa mạng\nthần kinh, khung học sâu làm cho nó đặc biệt thuận tiện, tích hợp phân\nrã trọng lượng vào thuật toán tối ưu hóa để dễ sử dụng kết hợp với bất\nkỳ chức năng mất mát nào. Hơn nữa, tích hợp này phục vụ một lợi ích tính\ntoán, cho phép các thủ thuật thực hiện thêm phân rã trọng lượng vào\nthuật toán, mà không cần bất kỳ chi phí tính toán bổ sung nào. Vì phần\nphân rã trọng lượng của bản cập nhật chỉ phụ thuộc vào giá trị hiện tại\ncủa mỗi tham số, trình tối ưu hóa phải chạm vào từng tham số một lần.\nTrong mã sau, chúng tôi chỉ định siêu tham số phân rã trọng lượng trực\ntiếp thông qua wd khi khởi tạo Trainer của chúng tôi. Theo mặc\nđịnh, Gluon phân rã cả trọng lượng và thành kiến cùng một lúc. Lưu ý\nrằng siêu tham số wd sẽ được nhân với wd_mult khi cập nhật các\ntham số mô hình. Do đó, nếu chúng ta đặt wd_mult thành 0, tham số\nthiên vị \\(b\\) sẽ không phân rã.\nTrong mã sau, chúng tôi chỉ định siêu tham số phân rã trọng lượng trực\ntiếp thông qua weight_decay khi khởi tạo trình tối ưu hóa của chúng\ntôi. Theo mặc định, PyTorch phân rã cả trọng lượng và thành kiến cùng\nmột lúc. Ở đây chúng tôi chỉ đặt weight_decay cho trọng lượng, vì\nvậy tham số thiên vị \\(b\\) sẽ không phân rã.\nTrong đoạn code sau, chúng ta tạo ra một bộ điều chỉnh \\(L_2\\) với\nsiêu tham số phân rã trọng lượng wd và áp dụng nó vào lớp thông qua\nđối số kernel_regularizer .\nCác ô trông giống hệt với những lô khi chúng tôi thực hiện phân rã trọng\nlượng từ vết trầy xước. Tuy nhiên, chúng chạy nhanh hơn đáng kể và dễ\nthực hiện hơn, một lợi ích sẽ trở nên rõ rệt hơn đối với các vấn đề lớn\nhơn.\nCho đến nay, chúng ta chỉ chạm vào một khái niệm về những gì tạo thành\nmột hàm tuyến tính đơn giản. Hơn nữa, những gì tạo thành một hàm phi\ntuyến đơn giản có thể là một câu hỏi thậm chí còn phức tạp hơn. Ví dụ, tái tạo hạt nhân Hilbert space\n(RKHS) cho phép người ta áp dụng các công cụ được giới thiệu cho các hàm tuyến\ntính trong bối cảnh phi tuyến tính. Thật không may, các thuật toán dựa\ntrên RKHS có xu hướng mở rộng quy mô dữ liệu lớn, chiều cao. Trong cuốn\nsách này, chúng tôi sẽ mặc định để heuristic đơn giản của việc áp dụng\nphân rã trọng lượng trên tất cả các lớp của một mạng sâu.\n4.5.5. Tóm tắt\nThường xuyên hóa là một phương pháp phổ biến để đối phó với\noverfitting. Nó bổ sung một thuật ngữ phạt cho chức năng mất trên bộ\nđào tạo để giảm độ phức tạp của mô hình đã học.\nMột lựa chọn đặc biệt để giữ cho mô hình đơn giản là giảm cân bằng\ncách sử dụng hình phạt \\(L_2\\) . Điều này dẫn đến phân rã trọng\nlượng trong các bước cập nhật của thuật toán học tập.\nChức năng phân rã trọng lượng được cung cấp trong các trình tối ưu\nhóa từ các khuôn khổ học sâu.\nCác bộ tham số khác nhau có thể có các hành vi cập nhật khác nhau\ntrong cùng một vòng đào tạo.\n4.5.6. Bài tập\nThử nghiệm với giá trị của \\(\\lambda\\) trong bài toán ước lượng\ntrong phần này. Đào tạo cốt truyện và độ chính xác kiểm tra như một\nchức năng của \\(\\lambda\\) . Bạn quan sát điều gì?\nSử dụng bộ xác thực để tìm giá trị tối ưu là \\(\\lambda\\) . Nó có\nthực sự là giá trị tối ưu? Điều này có quan trọng không?\nCác phương trình cập nhật sẽ trông như thế nào nếu thay vì \\(\\|\\mathbf{w}\\|^2\\) chúng tôi sử dụng \\(\\sum_i |w_i|\\) làm\nhình phạt của sự lựa chọn của chúng tôi ( \\(L_1\\) chính quy hóa)?\nChúng ta biết rằng \\(\\|\\mathbf{w}\\|^2 = \\mathbf{w}^\\top \\mathbf{w}\\) . Bạn có thể tìm\nthấy một phương trình tương tự cho ma trận (xem định mức Frobenius\ntrong Section 2.3.10 )?\nXem lại mối quan hệ giữa lỗi đào tạo và lỗi tổng quát hóa. Ngoài phân\nrã trọng lượng, tăng cường đào tạo, và sử dụng một mô hình phức tạp\nphù hợp, những cách khác bạn có thể nghĩ đến để đối phó với\noverfitting?\nTrong thống kê Bayesian, chúng tôi sử dụng sản phẩm trước và khả năng\nđể đến một phía sau thông qua \\(P(w \\mid x) \\propto P(x \\mid w) P(w)\\) . Làm thế nào bạn có thể\nxác định \\(P(w)\\) với quy định hóa?\nDiscussions\nDiscussions\nDiscussions"
+}

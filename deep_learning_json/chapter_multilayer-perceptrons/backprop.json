@@ -1,0 +1,293 @@
+{
+  "url": "https://vi.d2l.ai/chapter_multilayer-perceptrons/backprop.html",
+  "chapter": "chapter_multilayer-perceptrons",
+  "title": "4.7. Chuyển tiếp tuyên truyền, tuyên truyền ngược, và đồ thị tính toán",
+  "crawled_at": "2026-07-20T12:39:30.665313+00:00",
+  "headings": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "chuyen-tiep-tuyen-truyen-tuyen-truyen-nguoc-va-do-thi-tinh-toan",
+      "text": "4.7. Chuyển tiếp tuyên truyền, tuyên truyền ngược, và đồ thị tính toán"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "chuyen-tiep-tuyen-truyen",
+      "text": "4.7.1. Chuyển tiếp tuyên truyền"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "do-thi-tinh-toan-cua-chuyen-tiep-tuyen-truyen",
+      "text": "4.7.2. Đồ thị tính toán của chuyển tiếp tuyên truyền"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "backpropagation",
+      "text": "4.7.3. Backpropagation"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "dao-tao-mang-no-ron",
+      "text": "4.7.4. Đào tạo mạng nơ-ron"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tom-tat",
+      "text": "4.7.5. Tóm tắt"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bai-tap",
+      "text": "4.7.6. Bài tập"
+    }
+  ],
+  "content": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "chuyen-tiep-tuyen-truyen-tuyen-truyen-nguoc-va-do-thi-tinh-toan",
+      "text": "4.7. Chuyển tiếp tuyên truyền, tuyên truyền ngược, và đồ thị tính toán"
+    },
+    {
+      "type": "paragraph",
+      "text": "Cho đến nay, chúng tôi đã đào tạo các mô hình của chúng tôi với dòng dốc\nngẫu nhiên minibatch. Tuy nhiên, khi chúng tôi thực hiện thuật toán,\nchúng tôi chỉ lo lắng về các tính toán liên quan đến forward\npropagation thông qua mô hình. Khi đến lúc tính toán gradient, chúng ta\nchỉ gọi hàm backpropagation được cung cấp bởi khung học sâu."
+    },
+    {
+      "type": "paragraph",
+      "text": "Việc tính toán tự động độ dốc (phân biệt tự động) đơn giản hóa sâu sắc\nviệc thực hiện các thuật toán học sâu. Trước khi phân biệt tự động, ngay\ncả những thay đổi nhỏ đối với các mô hình phức tạp đòi hỏi phải tính\ntoán lại các dẫn xuất phức tạp bằng tay. Đáng ngạc nhiên thường xuyên,\ncác bài báo học thuật đã phải phân bổ nhiều trang để đưa ra các quy tắc\ncập nhật. Mặc dù chúng ta phải tiếp tục dựa vào sự khác biệt tự động để\nchúng ta có thể tập trung vào các phần thú vị, bạn nên biết làm thế nào\ncác gradient được tính toán dưới mui xe nếu bạn muốn vượt ra ngoài một\nsự hiểu biết nông cạn về học sâu."
+    },
+    {
+      "type": "paragraph",
+      "text": "Trong phần này, chúng tôi đi sâu vào các chi tiết của * tuyên truyền\nngược * (thường được gọi là backpropagation ). Để truyền tải một số\ncái nhìn sâu sắc cho cả kỹ thuật và triển khai của chúng, chúng tôi dựa\nvào một số toán học cơ bản và đồ thị tính toán. Để bắt đầu, chúng tôi\ntập trung triển lãm của mình vào MLP một lớp ẩn với sự phân rã trọng\nlượng ( \\(L_2\\) đều đặn)."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "chuyen-tiep-tuyen-truyen",
+      "text": "4.7.1. Chuyển tiếp tuyên truyền"
+    },
+    {
+      "type": "paragraph",
+      "text": "Tuyên truyền chuyển tiếp (hoặc * chuyển tiếp*) đề cập đến việc tính\ntoán và lưu trữ của các biến trung gian (bao gồm cả đầu ra) cho một mạng\nthần kinh theo thứ tự từ lớp đầu vào đến lớp đầu ra. Bây giờ chúng tôi\nlàm việc từng bước thông qua cơ chế của một mạng thần kinh với một lớp\nẩn. Điều này có vẻ tẻ nhạt nhưng theo lời vĩnh cửu của nghệ sĩ funk\nJames Brown, bạn phải “trả chi phí để trở thành ông chủ”."
+    },
+    {
+      "type": "paragraph",
+      "text": "Vì lợi ích của sự đơn giản, chúng ta hãy giả định rằng ví dụ đầu vào là \\(\\mathbf{x}\\in \\mathbb{R}^d\\) và lớp ẩn của chúng ta không bao gồm\nmột thuật ngữ thiên vị. Ở đây biến trung gian là:"
+    },
+    {
+      "type": "math",
+      "latex": "(4.7.1)¶\\[\\mathbf{z}= \\mathbf{W}^{(1)} \\mathbf{x},\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "trong đó \\(\\mathbf{W}^{(1)} \\in \\mathbb{R}^{h \\times d}\\) là tham số\ntrọng lượng của lớp ẩn. Sau khi chạy biến trung gian \\(\\mathbf{z}\\in \\mathbb{R}^h\\) thông qua chức năng kích hoạt \\(\\phi\\) , chúng tôi có được vector kích hoạt ẩn của chúng tôi có\nchiều dài \\(h\\) ,"
+    },
+    {
+      "type": "math",
+      "latex": "(4.7.2)¶\\[\\mathbf{h}= \\phi (\\mathbf{z}).\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Biến ẩn \\(\\mathbf{h}\\) cũng là một biến trung gian. Giả sử rằng các\ntham số của lớp đầu ra chỉ sở hữu trọng lượng \\(\\mathbf{W}^{(2)} \\in \\mathbb{R}^{q \\times h}\\) , ta có thể thu được\nmột biến lớp đầu ra với một vectơ có chiều dài \\(q\\) :"
+    },
+    {
+      "type": "math",
+      "latex": "(4.7.3)¶\\[\\mathbf{o}= \\mathbf{W}^{(2)} \\mathbf{h}.\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Giả sử hàm mất là \\(l\\) và nhãn ví dụ là \\(y\\) , sau đó chúng ta\ncó thể tính toán thuật ngữ mất mát cho một ví dụ dữ liệu duy nhất,"
+    },
+    {
+      "type": "math",
+      "latex": "(4.7.4)¶\\[L = l(\\mathbf{o}, y).\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Theo định nghĩa của \\(L_2\\) chính quy hóa, với siêu tham số \\(\\lambda\\) , thuật ngữ chính quy hóa là"
+    },
+    {
+      "type": "math",
+      "latex": "(4.7.5)¶\\[s = \\frac{\\lambda}{2} \\left(\\|\\mathbf{W}^{(1)}\\|_F^2 + \\|\\mathbf{W}^{(2)}\\|_F^2\\right),\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "trong đó định mức Frobenius của ma trận chỉ đơn giản là định mức \\(L_2\\) được áp dụng sau khi làm phẳng ma trận thành một vectơ. Cuối\ncùng, tổn thất thường xuyên của mô hình trên một ví dụ dữ liệu nhất định\nlà:"
+    },
+    {
+      "type": "math",
+      "latex": "(4.7.6)¶\\[J = L + s.\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Chúng tôi đề cập đến \\(J\\) là chức năng mục tiêu *trong cuộc thảo\nluận sau đây."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "do-thi-tinh-toan-cua-chuyen-tiep-tuyen-truyen",
+      "text": "4.7.2. Đồ thị tính toán của chuyển tiếp tuyên truyền"
+    },
+    {
+      "type": "paragraph",
+      "text": "Vẽ đồ thị tính toán * giúp chúng ta hình dung các phụ thuộc của toán tử\nvà biến trong phép tính. Fig. 4.7.1 chứa đồ thị liên kết\nvới mạng đơn giản được mô tả ở trên, trong đó các ô vuông biểu thị các\nbiến và vòng tròn biểu thị các toán tử. Góc dưới bên trái biểu thị đầu\nvào và góc trên bên phải là đầu ra. Lưu ý rằng các hướng của các mũi tên\n(minh họa luồng dữ liệu) chủ yếu là bên phải và hướng lên."
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/forward.svg",
+      "local_path": "_images/forward.svg",
+      "alt": "../_images/forward.svg"
+    },
+    {
+      "type": "paragraph",
+      "text": "Fig. 4.7.1 Computational graph of forward propagation. ¶"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "backpropagation",
+      "text": "4.7.3. Backpropagation"
+    },
+    {
+      "type": "paragraph",
+      "text": "Backpropagation đề cập đến phương pháp tính toán độ dốc của các tham\nsố mạng thần kinh. Nói tóm lại, phương pháp đi qua mạng theo thứ tự\nngược lại, từ đầu ra đến lớp đầu vào, theo quy tắc chuỗi *từ tính toán.\nThuật toán lưu trữ bất kỳ biến trung gian nào (dẫn xuất từng phần) cần\nthiết trong khi tính toán gradient đối với một số tham số. Giả sử rằng\nchúng ta có chức năng \\(\\mathsf{Y}=f(\\mathsf{X})\\) và \\(\\mathsf{Z}=g(\\mathsf{Y})\\) , trong đó đầu vào và đầu ra \\(\\mathsf{X}, \\mathsf{Y}, \\mathsf{Z}\\) là hàng chục hình dạng tùy ý.\nBằng cách sử dụng quy tắc chuỗi, chúng ta có thể tính toán đạo hàm của \\(\\mathsf{Z}\\) đối với \\(\\mathsf{X}\\) qua"
+    },
+    {
+      "type": "math",
+      "latex": "(4.7.7)¶\\[\\frac{\\partial \\mathsf{Z}}{\\partial \\mathsf{X}} = \\text{prod}\\left(\\frac{\\partial \\mathsf{Z}}{\\partial \\mathsf{Y}}, \\frac{\\partial \\mathsf{Y}}{\\partial \\mathsf{X}}\\right).\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Ở đây chúng tôi sử dụng toán tử \\(\\text{prod}\\) để nhân các đối số\ncủa nó sau các hoạt động cần thiết, chẳng hạn như chuyển vị và trao đổi\nvị trí đầu vào, đã được thực hiện. Đối với vectơ, điều này rất đơn giản:\nnó chỉ đơn giản là phép nhân ma trận ma trận. Đối với hàng chục chiều\ncao hơn, chúng tôi sử dụng đối tác thích hợp. Các nhà điều hành \\(\\text{prod}\\) ẩn tất cả các ký hiệu trên cao."
+    },
+    {
+      "type": "paragraph",
+      "text": "Nhớ lại rằng các tham số của mạng đơn giản với một lớp ẩn, có biểu đồ\ntính toán là trong Fig. 4.7.1 , là \\(\\mathbf{W}^{(1)}\\) và \\(\\mathbf{W}^{(2)}\\) . Mục tiêu của sự lan truyền ngược là tính\ntoán độ dốc \\(\\partial J/\\partial \\mathbf{W}^{(1)}\\) và \\(\\partial J/\\partial \\mathbf{W}^{(2)}\\) . Để thực hiện điều này,\nchúng ta áp dụng quy tắc chuỗi và tính toán, lần lượt, gradient của mỗi\nbiến và tham số trung gian. Thứ tự các tính toán được đảo ngược so với\ncác tính toán được thực hiện trong quá trình truyền chuyển tiếp, vì\nchúng ta cần bắt đầu với kết quả của biểu đồ tính toán và làm việc theo\ncách của chúng tôi hướng tới các tham số. Bước đầu tiên là tính toán độ\ndốc của hàm khách quan \\(J=L+s\\) liên quan đến thuật ngữ mất \\(L\\) và thuật ngữ chính quy hóa \\(s\\) ."
+    },
+    {
+      "type": "math",
+      "latex": "(4.7.8)¶\\[\\frac{\\partial J}{\\partial L} = 1 \\; \\text{and} \\; \\frac{\\partial J}{\\partial s} = 1.\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Tiếp theo, chúng ta tính toán gradient của hàm mục tiêu đối với biến của\nlớp đầu ra \\(\\mathbf{o}\\) theo quy tắc chuỗi:"
+    },
+    {
+      "type": "math",
+      "latex": "(4.7.9)¶\\[\\frac{\\partial J}{\\partial \\mathbf{o}}\n= \\text{prod}\\left(\\frac{\\partial J}{\\partial L}, \\frac{\\partial L}{\\partial \\mathbf{o}}\\right)\n= \\frac{\\partial L}{\\partial \\mathbf{o}}\n\\in \\mathbb{R}^q.\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Tiếp theo, chúng ta tính toán độ dốc của thuật ngữ chính quy hóa đối với\ncả hai tham số:"
+    },
+    {
+      "type": "math",
+      "latex": "(4.7.10)¶\\[\\frac{\\partial s}{\\partial \\mathbf{W}^{(1)}} = \\lambda \\mathbf{W}^{(1)}\n\\; \\text{and} \\;\n\\frac{\\partial s}{\\partial \\mathbf{W}^{(2)}} = \\lambda \\mathbf{W}^{(2)}.\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Bây giờ chúng ta có thể tính toán gradient \\(\\partial J/\\partial \\mathbf{W}^{(2)} \\in \\mathbb{R}^{q \\times h}\\) của các tham số mô hình gần nhất với lớp đầu ra. Sử dụng sản lượng quy\ntắc chuỗi:"
+    },
+    {
+      "type": "math",
+      "latex": "(4.7.11)¶\\[\\frac{\\partial J}{\\partial \\mathbf{W}^{(2)}}= \\text{prod}\\left(\\frac{\\partial J}{\\partial \\mathbf{o}}, \\frac{\\partial \\mathbf{o}}{\\partial \\mathbf{W}^{(2)}}\\right) + \\text{prod}\\left(\\frac{\\partial J}{\\partial s}, \\frac{\\partial s}{\\partial \\mathbf{W}^{(2)}}\\right)= \\frac{\\partial J}{\\partial \\mathbf{o}} \\mathbf{h}^\\top + \\lambda \\mathbf{W}^{(2)}.\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Để có được gradient đối với \\(\\mathbf{W}^{(1)}\\) , chúng ta cần tiếp\ntục lan truyền ngược dọc theo lớp đầu ra đến lớp ẩn. Gradient liên quan\nđến đầu ra của lớp ẩn \\(\\partial J/\\partial \\mathbf{h} \\in \\mathbb{R}^h\\) được đưa ra bởi"
+    },
+    {
+      "type": "math",
+      "latex": "(4.7.12)¶\\[\\frac{\\partial J}{\\partial \\mathbf{h}}\n= \\text{prod}\\left(\\frac{\\partial J}{\\partial \\mathbf{o}}, \\frac{\\partial \\mathbf{o}}{\\partial \\mathbf{h}}\\right)\n= {\\mathbf{W}^{(2)}}^\\top \\frac{\\partial J}{\\partial \\mathbf{o}}.\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Vì hàm kích hoạt \\(\\phi\\) áp dụng elementwise, tính gradient \\(\\partial J/\\partial \\mathbf{z} \\in \\mathbb{R}^h\\) của biến trung\ngian \\(\\mathbf{z}\\) yêu cầu chúng ta sử dụng toán tử nhân\nelementwise, mà chúng ta biểu thị bằng \\(\\odot\\) :"
+    },
+    {
+      "type": "math",
+      "latex": "(4.7.13)¶\\[\\frac{\\partial J}{\\partial \\mathbf{z}}\n= \\text{prod}\\left(\\frac{\\partial J}{\\partial \\mathbf{h}}, \\frac{\\partial \\mathbf{h}}{\\partial \\mathbf{z}}\\right)\n= \\frac{\\partial J}{\\partial \\mathbf{h}} \\odot \\phi'\\left(\\mathbf{z}\\right).\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Cuối cùng, chúng ta có thể lấy gradient \\(\\partial J/\\partial \\mathbf{W}^{(1)} \\in \\mathbb{R}^{h \\times d}\\) của các tham số mô hình gần nhất với lớp đầu vào. Theo quy tắc chuỗi,\nchúng tôi nhận được"
+    },
+    {
+      "type": "math",
+      "latex": "(4.7.14)¶\\[\\frac{\\partial J}{\\partial \\mathbf{W}^{(1)}}\n= \\text{prod}\\left(\\frac{\\partial J}{\\partial \\mathbf{z}}, \\frac{\\partial \\mathbf{z}}{\\partial \\mathbf{W}^{(1)}}\\right) + \\text{prod}\\left(\\frac{\\partial J}{\\partial s}, \\frac{\\partial s}{\\partial \\mathbf{W}^{(1)}}\\right)\n= \\frac{\\partial J}{\\partial \\mathbf{z}} \\mathbf{x}^\\top + \\lambda \\mathbf{W}^{(1)}.\\]"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "dao-tao-mang-no-ron",
+      "text": "4.7.4. Đào tạo mạng nơ-ron"
+    },
+    {
+      "type": "paragraph",
+      "text": "Khi đào tạo mạng thần kinh, sự lan truyền về phía trước và lạc hậu phụ\nthuộc vào nhau. Đặc biệt, để tuyên truyền chuyển tiếp, chúng ta đi qua\nđồ thị tính toán theo hướng phụ thuộc và tính toán tất cả các biến trên\nđường đi của nó. Chúng sau đó được sử dụng để truyền ngược nơi thứ tự\ntính toán trên đồ thị bị đảo ngược."
+    },
+    {
+      "type": "paragraph",
+      "text": "Lấy mạng đơn giản đã nói ở trên làm ví dụ để minh họa. Một mặt, tính\ntoán thuật ngữ chính quy hóa (4.7.5) trong quá trình\ntruyền chuyển tiếp phụ thuộc vào các giá trị hiện tại của các tham số mô\nhình \\(\\mathbf{W}^{(1)}\\) và \\(\\mathbf{W}^{(2)}\\) . Chúng được\nđưa ra bởi thuật toán tối ưu hóa theo backpropagation trong lần lặp mới\nnhất. Mặt khác, phép tính gradient cho tham số (4.7.11) trong quá trình truyền ngược phụ thuộc vào\ngiá trị hiện tại của biến ẩn \\(\\mathbf{h}\\) , được đưa ra bằng cách\nlan truyền chuyển tiếp."
+    },
+    {
+      "type": "paragraph",
+      "text": "Do đó khi đào tạo mạng nơ-ron, sau khi các tham số mô hình được khởi\ntạo, chúng ta thay thế lan truyền chuyển tiếp với truyền ngược, cập nhật\ncác tham số mô hình bằng cách sử dụng gradient được đưa ra bởi\nbackpropagation. Lưu ý rằng backpropagation sử dụng lại các giá trị\ntrung gian được lưu trữ từ chuyển tiếp tuyên truyền để tránh tính toán\ntrùng lặp. Một trong những hậu quả là chúng ta cần giữ lại các giá trị\ntrung gian cho đến khi truyền ngược hoàn tất. Đây cũng là một trong\nnhững lý do tại sao đào tạo đòi hỏi nhiều trí nhớ hơn đáng kể so với dự\nđoán đơn giản. Bên cạnh đó, kích thước của các giá trị trung gian như\nvậy là gần tỷ lệ thuận với số lượng lớp mạng và kích thước lô. Do đó,\nđào tạo các mạng sâu hơn bằng cách sử dụng kích thước lô lớn hơn dễ dàng\ndẫn đến * ra khỏi bộ nhớ* lỗi."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tom-tat",
+      "text": "4.7.5. Tóm tắt"
+    },
+    {
+      "type": "list",
+      "ordered": false,
+      "items": [
+        "Chuyển tiếp tuyên truyền tuần tự tính toán và lưu trữ các biến trung\ngian trong đồ thị tính toán được xác định bởi mạng nơ-ron. Nó tiến\nhành từ đầu vào đến lớp đầu ra.",
+        "Backpropagation tuần tự tính toán và lưu trữ các gradient của các\nbiến và tham số trung gian trong mạng nơ-ron theo thứ tự đảo ngược.",
+        "Khi đào tạo các mô hình học sâu, sự lan truyền về phía trước và lan\ntruyền trở lại phụ thuộc lẫn nhau.",
+        "Đào tạo đòi hỏi nhiều trí nhớ hơn đáng kể so với dự đoán."
+      ]
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bai-tap",
+      "text": "4.7.6. Bài tập"
+    },
+    {
+      "type": "list",
+      "ordered": true,
+      "items": [
+        "Giả sử rằng các đầu vào \\(\\mathbf{X}\\) đến một số hàm vô hướng \\(f\\) là ma trận \\(n \\times m\\) . Chiều của gradient của \\(f\\) đối với \\(\\mathbf{X}\\) là gì?",
+        "Thêm một thiên vị vào lớp ẩn của mô hình được mô tả trong phần này\n(bạn không cần phải bao gồm thiên vị trong thuật ngữ chính quy hóa). Vẽ đồ thị tính toán tương ứng. Lấy được các phương trình tuyên truyền tiến và lạc hậu.",
+        "Vẽ đồ thị tính toán tương ứng.",
+        "Lấy được các phương trình tuyên truyền tiến và lạc hậu.",
+        "Tính toán dấu chân bộ nhớ để đào tạo và dự đoán trong mô hình được mô\ntả trong phần này.",
+        "Giả sử rằng bạn muốn tính toán các dẫn xuất thứ hai. Điều gì xảy ra\nvới đồ thị tính toán? Bạn mong đợi tính toán mất bao lâu?",
+        "Giả sử rằng đồ thị tính toán quá lớn đối với GPU của bạn. Bạn có thể phân vùng nó trên nhiều GPU không? Những ưu điểm và nhược điểm so với đào tạo trên một minibatch nhỏ\nhơn là gì?",
+        "Bạn có thể phân vùng nó trên nhiều GPU không?",
+        "Những ưu điểm và nhược điểm so với đào tạo trên một minibatch nhỏ\nhơn là gì?"
+      ]
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    }
+  ],
+  "images": [
+    {
+      "original_url": "https://vi.d2l.ai/_images/forward.svg",
+      "local_path": "_images/forward.svg",
+      "alt": "../_images/forward.svg"
+    }
+  ],
+  "text": "4.7. Chuyển tiếp tuyên truyền, tuyên truyền ngược, và đồ thị tính toán\nCho đến nay, chúng tôi đã đào tạo các mô hình của chúng tôi với dòng dốc\nngẫu nhiên minibatch. Tuy nhiên, khi chúng tôi thực hiện thuật toán,\nchúng tôi chỉ lo lắng về các tính toán liên quan đến forward\npropagation thông qua mô hình. Khi đến lúc tính toán gradient, chúng ta\nchỉ gọi hàm backpropagation được cung cấp bởi khung học sâu.\nViệc tính toán tự động độ dốc (phân biệt tự động) đơn giản hóa sâu sắc\nviệc thực hiện các thuật toán học sâu. Trước khi phân biệt tự động, ngay\ncả những thay đổi nhỏ đối với các mô hình phức tạp đòi hỏi phải tính\ntoán lại các dẫn xuất phức tạp bằng tay. Đáng ngạc nhiên thường xuyên,\ncác bài báo học thuật đã phải phân bổ nhiều trang để đưa ra các quy tắc\ncập nhật. Mặc dù chúng ta phải tiếp tục dựa vào sự khác biệt tự động để\nchúng ta có thể tập trung vào các phần thú vị, bạn nên biết làm thế nào\ncác gradient được tính toán dưới mui xe nếu bạn muốn vượt ra ngoài một\nsự hiểu biết nông cạn về học sâu.\nTrong phần này, chúng tôi đi sâu vào các chi tiết của * tuyên truyền\nngược * (thường được gọi là backpropagation ). Để truyền tải một số\ncái nhìn sâu sắc cho cả kỹ thuật và triển khai của chúng, chúng tôi dựa\nvào một số toán học cơ bản và đồ thị tính toán. Để bắt đầu, chúng tôi\ntập trung triển lãm của mình vào MLP một lớp ẩn với sự phân rã trọng\nlượng ( \\(L_2\\) đều đặn).\n4.7.1. Chuyển tiếp tuyên truyền\nTuyên truyền chuyển tiếp (hoặc * chuyển tiếp*) đề cập đến việc tính\ntoán và lưu trữ của các biến trung gian (bao gồm cả đầu ra) cho một mạng\nthần kinh theo thứ tự từ lớp đầu vào đến lớp đầu ra. Bây giờ chúng tôi\nlàm việc từng bước thông qua cơ chế của một mạng thần kinh với một lớp\nẩn. Điều này có vẻ tẻ nhạt nhưng theo lời vĩnh cửu của nghệ sĩ funk\nJames Brown, bạn phải “trả chi phí để trở thành ông chủ”.\nVì lợi ích của sự đơn giản, chúng ta hãy giả định rằng ví dụ đầu vào là \\(\\mathbf{x}\\in \\mathbb{R}^d\\) và lớp ẩn của chúng ta không bao gồm\nmột thuật ngữ thiên vị. Ở đây biến trung gian là:\ntrong đó \\(\\mathbf{W}^{(1)} \\in \\mathbb{R}^{h \\times d}\\) là tham số\ntrọng lượng của lớp ẩn. Sau khi chạy biến trung gian \\(\\mathbf{z}\\in \\mathbb{R}^h\\) thông qua chức năng kích hoạt \\(\\phi\\) , chúng tôi có được vector kích hoạt ẩn của chúng tôi có\nchiều dài \\(h\\) ,\nBiến ẩn \\(\\mathbf{h}\\) cũng là một biến trung gian. Giả sử rằng các\ntham số của lớp đầu ra chỉ sở hữu trọng lượng \\(\\mathbf{W}^{(2)} \\in \\mathbb{R}^{q \\times h}\\) , ta có thể thu được\nmột biến lớp đầu ra với một vectơ có chiều dài \\(q\\) :\nGiả sử hàm mất là \\(l\\) và nhãn ví dụ là \\(y\\) , sau đó chúng ta\ncó thể tính toán thuật ngữ mất mát cho một ví dụ dữ liệu duy nhất,\nTheo định nghĩa của \\(L_2\\) chính quy hóa, với siêu tham số \\(\\lambda\\) , thuật ngữ chính quy hóa là\ntrong đó định mức Frobenius của ma trận chỉ đơn giản là định mức \\(L_2\\) được áp dụng sau khi làm phẳng ma trận thành một vectơ. Cuối\ncùng, tổn thất thường xuyên của mô hình trên một ví dụ dữ liệu nhất định\nlà:\nChúng tôi đề cập đến \\(J\\) là chức năng mục tiêu *trong cuộc thảo\nluận sau đây.\n4.7.2. Đồ thị tính toán của chuyển tiếp tuyên truyền\nVẽ đồ thị tính toán * giúp chúng ta hình dung các phụ thuộc của toán tử\nvà biến trong phép tính. Fig. 4.7.1 chứa đồ thị liên kết\nvới mạng đơn giản được mô tả ở trên, trong đó các ô vuông biểu thị các\nbiến và vòng tròn biểu thị các toán tử. Góc dưới bên trái biểu thị đầu\nvào và góc trên bên phải là đầu ra. Lưu ý rằng các hướng của các mũi tên\n(minh họa luồng dữ liệu) chủ yếu là bên phải và hướng lên.\nFig. 4.7.1 Computational graph of forward propagation. ¶\n4.7.3. Backpropagation\nBackpropagation đề cập đến phương pháp tính toán độ dốc của các tham\nsố mạng thần kinh. Nói tóm lại, phương pháp đi qua mạng theo thứ tự\nngược lại, từ đầu ra đến lớp đầu vào, theo quy tắc chuỗi *từ tính toán.\nThuật toán lưu trữ bất kỳ biến trung gian nào (dẫn xuất từng phần) cần\nthiết trong khi tính toán gradient đối với một số tham số. Giả sử rằng\nchúng ta có chức năng \\(\\mathsf{Y}=f(\\mathsf{X})\\) và \\(\\mathsf{Z}=g(\\mathsf{Y})\\) , trong đó đầu vào và đầu ra \\(\\mathsf{X}, \\mathsf{Y}, \\mathsf{Z}\\) là hàng chục hình dạng tùy ý.\nBằng cách sử dụng quy tắc chuỗi, chúng ta có thể tính toán đạo hàm của \\(\\mathsf{Z}\\) đối với \\(\\mathsf{X}\\) qua\nỞ đây chúng tôi sử dụng toán tử \\(\\text{prod}\\) để nhân các đối số\ncủa nó sau các hoạt động cần thiết, chẳng hạn như chuyển vị và trao đổi\nvị trí đầu vào, đã được thực hiện. Đối với vectơ, điều này rất đơn giản:\nnó chỉ đơn giản là phép nhân ma trận ma trận. Đối với hàng chục chiều\ncao hơn, chúng tôi sử dụng đối tác thích hợp. Các nhà điều hành \\(\\text{prod}\\) ẩn tất cả các ký hiệu trên cao.\nNhớ lại rằng các tham số của mạng đơn giản với một lớp ẩn, có biểu đồ\ntính toán là trong Fig. 4.7.1 , là \\(\\mathbf{W}^{(1)}\\) và \\(\\mathbf{W}^{(2)}\\) . Mục tiêu của sự lan truyền ngược là tính\ntoán độ dốc \\(\\partial J/\\partial \\mathbf{W}^{(1)}\\) và \\(\\partial J/\\partial \\mathbf{W}^{(2)}\\) . Để thực hiện điều này,\nchúng ta áp dụng quy tắc chuỗi và tính toán, lần lượt, gradient của mỗi\nbiến và tham số trung gian. Thứ tự các tính toán được đảo ngược so với\ncác tính toán được thực hiện trong quá trình truyền chuyển tiếp, vì\nchúng ta cần bắt đầu với kết quả của biểu đồ tính toán và làm việc theo\ncách của chúng tôi hướng tới các tham số. Bước đầu tiên là tính toán độ\ndốc của hàm khách quan \\(J=L+s\\) liên quan đến thuật ngữ mất \\(L\\) và thuật ngữ chính quy hóa \\(s\\) .\nTiếp theo, chúng ta tính toán gradient của hàm mục tiêu đối với biến của\nlớp đầu ra \\(\\mathbf{o}\\) theo quy tắc chuỗi:\nTiếp theo, chúng ta tính toán độ dốc của thuật ngữ chính quy hóa đối với\ncả hai tham số:\nBây giờ chúng ta có thể tính toán gradient \\(\\partial J/\\partial \\mathbf{W}^{(2)} \\in \\mathbb{R}^{q \\times h}\\) của các tham số mô hình gần nhất với lớp đầu ra. Sử dụng sản lượng quy\ntắc chuỗi:\nĐể có được gradient đối với \\(\\mathbf{W}^{(1)}\\) , chúng ta cần tiếp\ntục lan truyền ngược dọc theo lớp đầu ra đến lớp ẩn. Gradient liên quan\nđến đầu ra của lớp ẩn \\(\\partial J/\\partial \\mathbf{h} \\in \\mathbb{R}^h\\) được đưa ra bởi\nVì hàm kích hoạt \\(\\phi\\) áp dụng elementwise, tính gradient \\(\\partial J/\\partial \\mathbf{z} \\in \\mathbb{R}^h\\) của biến trung\ngian \\(\\mathbf{z}\\) yêu cầu chúng ta sử dụng toán tử nhân\nelementwise, mà chúng ta biểu thị bằng \\(\\odot\\) :\nCuối cùng, chúng ta có thể lấy gradient \\(\\partial J/\\partial \\mathbf{W}^{(1)} \\in \\mathbb{R}^{h \\times d}\\) của các tham số mô hình gần nhất với lớp đầu vào. Theo quy tắc chuỗi,\nchúng tôi nhận được\n4.7.4. Đào tạo mạng nơ-ron\nKhi đào tạo mạng thần kinh, sự lan truyền về phía trước và lạc hậu phụ\nthuộc vào nhau. Đặc biệt, để tuyên truyền chuyển tiếp, chúng ta đi qua\nđồ thị tính toán theo hướng phụ thuộc và tính toán tất cả các biến trên\nđường đi của nó. Chúng sau đó được sử dụng để truyền ngược nơi thứ tự\ntính toán trên đồ thị bị đảo ngược.\nLấy mạng đơn giản đã nói ở trên làm ví dụ để minh họa. Một mặt, tính\ntoán thuật ngữ chính quy hóa (4.7.5) trong quá trình\ntruyền chuyển tiếp phụ thuộc vào các giá trị hiện tại của các tham số mô\nhình \\(\\mathbf{W}^{(1)}\\) và \\(\\mathbf{W}^{(2)}\\) . Chúng được\nđưa ra bởi thuật toán tối ưu hóa theo backpropagation trong lần lặp mới\nnhất. Mặt khác, phép tính gradient cho tham số (4.7.11) trong quá trình truyền ngược phụ thuộc vào\ngiá trị hiện tại của biến ẩn \\(\\mathbf{h}\\) , được đưa ra bằng cách\nlan truyền chuyển tiếp.\nDo đó khi đào tạo mạng nơ-ron, sau khi các tham số mô hình được khởi\ntạo, chúng ta thay thế lan truyền chuyển tiếp với truyền ngược, cập nhật\ncác tham số mô hình bằng cách sử dụng gradient được đưa ra bởi\nbackpropagation. Lưu ý rằng backpropagation sử dụng lại các giá trị\ntrung gian được lưu trữ từ chuyển tiếp tuyên truyền để tránh tính toán\ntrùng lặp. Một trong những hậu quả là chúng ta cần giữ lại các giá trị\ntrung gian cho đến khi truyền ngược hoàn tất. Đây cũng là một trong\nnhững lý do tại sao đào tạo đòi hỏi nhiều trí nhớ hơn đáng kể so với dự\nđoán đơn giản. Bên cạnh đó, kích thước của các giá trị trung gian như\nvậy là gần tỷ lệ thuận với số lượng lớp mạng và kích thước lô. Do đó,\nđào tạo các mạng sâu hơn bằng cách sử dụng kích thước lô lớn hơn dễ dàng\ndẫn đến * ra khỏi bộ nhớ* lỗi.\n4.7.5. Tóm tắt\nChuyển tiếp tuyên truyền tuần tự tính toán và lưu trữ các biến trung\ngian trong đồ thị tính toán được xác định bởi mạng nơ-ron. Nó tiến\nhành từ đầu vào đến lớp đầu ra.\nBackpropagation tuần tự tính toán và lưu trữ các gradient của các\nbiến và tham số trung gian trong mạng nơ-ron theo thứ tự đảo ngược.\nKhi đào tạo các mô hình học sâu, sự lan truyền về phía trước và lan\ntruyền trở lại phụ thuộc lẫn nhau.\nĐào tạo đòi hỏi nhiều trí nhớ hơn đáng kể so với dự đoán.\n4.7.6. Bài tập\nGiả sử rằng các đầu vào \\(\\mathbf{X}\\) đến một số hàm vô hướng \\(f\\) là ma trận \\(n \\times m\\) . Chiều của gradient của \\(f\\) đối với \\(\\mathbf{X}\\) là gì?\nThêm một thiên vị vào lớp ẩn của mô hình được mô tả trong phần này\n(bạn không cần phải bao gồm thiên vị trong thuật ngữ chính quy hóa). Vẽ đồ thị tính toán tương ứng. Lấy được các phương trình tuyên truyền tiến và lạc hậu.\nVẽ đồ thị tính toán tương ứng.\nLấy được các phương trình tuyên truyền tiến và lạc hậu.\nTính toán dấu chân bộ nhớ để đào tạo và dự đoán trong mô hình được mô\ntả trong phần này.\nGiả sử rằng bạn muốn tính toán các dẫn xuất thứ hai. Điều gì xảy ra\nvới đồ thị tính toán? Bạn mong đợi tính toán mất bao lâu?\nGiả sử rằng đồ thị tính toán quá lớn đối với GPU của bạn. Bạn có thể phân vùng nó trên nhiều GPU không? Những ưu điểm và nhược điểm so với đào tạo trên một minibatch nhỏ\nhơn là gì?\nBạn có thể phân vùng nó trên nhiều GPU không?\nNhững ưu điểm và nhược điểm so với đào tạo trên một minibatch nhỏ\nhơn là gì?\nDiscussions"
+}

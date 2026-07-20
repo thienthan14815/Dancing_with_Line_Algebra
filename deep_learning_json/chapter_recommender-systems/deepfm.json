@@ -1,0 +1,184 @@
+{
+  "url": "https://vi.d2l.ai/chapter_recommender-systems/deepfm.html",
+  "chapter": "chapter_recommender-systems",
+  "title": "16.10. Sâu Factorization Máy móc",
+  "crawled_at": "2026-07-20T12:41:17.744012+00:00",
+  "headings": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "sau-factorization-may-moc",
+      "text": "16.10. Sâu Factorization Máy móc"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "model-architectures",
+      "text": "16.10.1. Model Architectures"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "implemenation-cua-deepfm-viec-thuc-hien-deepfm-tuong-tu-nhu-fm-chung-toi-giu-phan-fm-khong-thay-doi-va-su-dung-khoi-mlp-voi-relu-lam-chuc-nang-kich-hoat-dropout-cung-duoc-su-dung-de-thuong-xuyen-hoa-mo-hinh-so-luong-te-bao-than-kinh-cua-mlp-co-the-duoc-dieu-chinh-voi-sieu-tham-so-mlp-dims",
+      "text": "16.10.2. Implemenation của DeepFM Việc thực hiện DeepFM tương tự như FM. Chúng tôi giữ phần FM không thay đổi và sử dụng khối MLP với relu làm chức năng kích hoạt. Dropout cũng được sử dụng để thường xuyên hóa mô hình. Số lượng tế bào thần kinh của MLP có thể được điều chỉnh với siêu tham số mlp_dims ."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "dao-tao-va-danh-gia-mo-hinh-qua-trinh-tai-du-lieu-giong-nhu-cua-fm-chung-toi-dat-thanh-phan-mlp-cua-deepfm-thanh-mot-mang-day-dac-ba-lop-voi-cau-truc-kim-tu-thap-30-20-10-tat-ca-cac-sieu-tham-so-khac-van-giong-nhu-fm",
+      "text": "16.10.3. Đào tạo và Đánh giá mô hình Quá trình tải dữ liệu giống như của FM. Chúng tôi đặt thành phần MLP của DeepFM thành một mạng dày đặc ba lớp với cấu trúc kim tự tháp (30-20-10). Tất cả các siêu tham số khác vẫn giống như FM."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tom-tat",
+      "text": "16.10.4. Tóm tắt"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bai-tap",
+      "text": "16.10.5. Bài tập"
+    }
+  ],
+  "content": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "sau-factorization-may-moc",
+      "text": "16.10. Sâu Factorization Máy móc"
+    },
+    {
+      "type": "paragraph",
+      "text": "Học kết hợp tính năng hiệu quả là rất quan trọng đối với sự thành công\ncủa nhiệm vụ dự đoán tỷ lệ nhấp qua. Máy factorization mô hình tính năng\ntương tác trong một mô hình tuyến tính (ví dụ, tương tác song tuyến).\nĐiều này thường không đủ đối với dữ liệu trong thế giới thực, nơi các\ncấu trúc chéo tính năng vốn có thường rất phức tạp và phi tuyến. Điều\ntồi tệ hơn, tương tác tính năng thứ hai thường được sử dụng trong các\nmáy factorization trong thực tế. Mô hình hóa mức độ kết hợp tính năng\ncao hơn với các máy factorization là có thể về mặt lý thuyết nhưng nó\nthường không được áp dụng do sự bất ổn số và độ phức tạp tính toán cao."
+    },
+    {
+      "type": "paragraph",
+      "text": "Một giải pháp hiệu quả là sử dụng mạng thần kinh sâu. Các mạng thần kinh\nsâu mạnh mẽ trong việc học đại diện tính năng và có tiềm năng học các\ntương tác tính năng phức tạp. Như vậy, nó là tự nhiên để tích hợp các\nmạng thần kinh sâu vào các máy factorization. Thêm các lớp chuyển đổi\nphi tuyến vào các máy factorization cho phép nó khả năng mô hình hóa cả\nkết hợp tính năng bậc thấp và kết hợp tính năng bậc cao. Hơn nữa, các\ncấu trúc vốn có phi tuyến tính từ đầu vào cũng có thể được chụp bằng các\nmạng thần kinh sâu. Trong phần này, chúng tôi sẽ giới thiệu một mô hình\nđại diện có tên là máy factorization sâu (DeepFM) [Guo et al., 2017] kết hợp FM và mạng thần kinh sâu."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "model-architectures",
+      "text": "16.10.1. Model Architectures"
+    },
+    {
+      "type": "paragraph",
+      "text": "DeepFM bao gồm một thành phần FM và một thành phần sâu được tích hợp\ntrong một cấu trúc song song. Các thành phần FM là giống như các máy\nfactorization 2 chiều được sử dụng để mô hình hóa các tương tác tính\nnăng bậc thấp. Thành phần sâu là một MLP được sử dụng để nắm bắt các\ntương tác tính năng bậc cao và phi tuyến tính. Hai thành phần này chia\nsẻ cùng một đầu vào/nhúng và đầu ra của chúng được tóm tắt là dự đoán\ncuối cùng. Điều đáng để chỉ ra rằng tinh thần của DeepFM giống với kiến\ntrúc Wide & Deep có thể nắm bắt cả ghi nhớ và khái quát hóa. Ưu điểm của\nDeepFM so với mô hình Wide & Deep là nó làm giảm nỗ lực của kỹ thuật\ntính năng thủ công bằng cách xác định các kết hợp tính năng tự động."
+    },
+    {
+      "type": "paragraph",
+      "text": "Chúng tôi bỏ qua mô tả của thành phần FM cho ngắn gọn và biểu thị đầu ra\nlà \\(\\hat{y}^{(FM)}\\) . Độc giả được giới thiệu đến phần cuối cùng để\nbiết thêm chi tiết. Hãy để \\(\\mathbf{e}_i \\in \\mathbb{R}^{k}\\) biểu\nthị vector tính năng tiềm ẩn của trường \\(i^\\mathrm{th}\\) . Đầu vào\ncủa thành phần sâu là sự nối của các nhúng dày đặc của tất cả các trường\nđược nhìn lên với đầu vào tính năng phân loại thưa thớt, được ký hiệu\nlà:"
+    },
+    {
+      "type": "math",
+      "latex": "(16.10.1)¶\\[\\mathbf{z}^{(0)}  = [\\mathbf{e}_1, \\mathbf{e}_2, ..., \\mathbf{e}_f],\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "trong đó \\(f\\) là số trường. Sau đó, nó được đưa vào mạng thần kinh\nsau:"
+    },
+    {
+      "type": "math",
+      "latex": "(16.10.2)¶\\[\\mathbf{z}^{(l)}  = \\alpha(\\mathbf{W}^{(l)}\\mathbf{z}^{(l-1)} + \\mathbf{b}^{(l)}),\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "trong đó \\(\\alpha\\) là chức năng kích hoạt. \\(\\mathbf{W}_{l}\\) và \\(\\mathbf{b}_{l}\\) là trọng lượng và thiên vị ở lớp \\(l^\\mathrm{th}\\) . Hãy để \\(y_{DNN}\\) biểu thị đầu ra của dự\nđoán. Dự đoán cuối cùng của DeepFM là tổng kết các đầu ra từ cả FM và\nDNN. Vì vậy, chúng tôi có:"
+    },
+    {
+      "type": "math",
+      "latex": "(16.10.3)¶\\[\\hat{y} = \\sigma(\\hat{y}^{(FM)} + \\hat{y}^{(DNN)}),\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "trong đó \\(\\sigma\\) là chức năng sigmoid. Kiến trúc của DeepFM được\nminh họa dưới đây.! Illustration of the DeepFM\nmodel"
+    },
+    {
+      "type": "paragraph",
+      "text": "Điều đáng chú ý là DeepFM không phải là cách duy nhất để kết hợp các\nmạng thần kinh sâu với FM. Chúng ta cũng có thể thêm các lớp phi tuyến\ntrên các tương tác tính năng [He & Chua, 2017] ."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "import os\nfrom mxnet import gluon, init, np, npx\nfrom mxnet.gluon import nn\nfrom d2l import mxnet as d2l\n\nnpx.set_np()"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "implemenation-cua-deepfm-viec-thuc-hien-deepfm-tuong-tu-nhu-fm-chung-toi-giu-phan-fm-khong-thay-doi-va-su-dung-khoi-mlp-voi-relu-lam-chuc-nang-kich-hoat-dropout-cung-duoc-su-dung-de-thuong-xuyen-hoa-mo-hinh-so-luong-te-bao-than-kinh-cua-mlp-co-the-duoc-dieu-chinh-voi-sieu-tham-so-mlp-dims",
+      "text": "16.10.2. Implemenation của DeepFM Việc thực hiện DeepFM tương tự như FM. Chúng tôi giữ phần FM không thay đổi và sử dụng khối MLP với relu làm chức năng kích hoạt. Dropout cũng được sử dụng để thường xuyên hóa mô hình. Số lượng tế bào thần kinh của MLP có thể được điều chỉnh với siêu tham số mlp_dims ."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "class DeepFM(nn.Block):\n    def __init__(self, field_dims, num_factors, mlp_dims, drop_rate=0.1):\n        super(DeepFM, self).__init__()\n        num_inputs = int(sum(field_dims))\n        self.embedding = nn.Embedding(num_inputs, num_factors)\n        self.fc = nn.Embedding(num_inputs, 1)\n        self.linear_layer = nn.Dense(1, use_bias=True)\n        input_dim = self.embed_output_dim = len(field_dims) * num_factors\n        self.mlp = nn.Sequential()\n        for dim in mlp_dims:\n            self.mlp.add(nn.Dense(dim, 'relu', True, in_units=input_dim))\n            self.mlp.add(nn.Dropout(rate=drop_rate))\n            input_dim = dim\n        self.mlp.add(nn.Dense(in_units=input_dim, units=1))\n\n    def forward(self, x):\n        embed_x = self.embedding(x)\n        square_of_sum = np.sum(embed_x, axis=1) ** 2\n        sum_of_square = np.sum(embed_x ** 2, axis=1)\n        inputs = np.reshape(embed_x, (-1, self.embed_output_dim))\n        x = self.linear_layer(self.fc(x).sum(1)) \\\n            + 0.5 * (square_of_sum - sum_of_square).sum(1, keepdims=True) \\\n            + self.mlp(inputs)\n        x = npx.sigmoid(x)\n        return x"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "dao-tao-va-danh-gia-mo-hinh-qua-trinh-tai-du-lieu-giong-nhu-cua-fm-chung-toi-dat-thanh-phan-mlp-cua-deepfm-thanh-mot-mang-day-dac-ba-lop-voi-cau-truc-kim-tu-thap-30-20-10-tat-ca-cac-sieu-tham-so-khac-van-giong-nhu-fm",
+      "text": "16.10.3. Đào tạo và Đánh giá mô hình Quá trình tải dữ liệu giống như của FM. Chúng tôi đặt thành phần MLP của DeepFM thành một mạng dày đặc ba lớp với cấu trúc kim tự tháp (30-20-10). Tất cả các siêu tham số khác vẫn giống như FM."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "batch_size = 2048\ndata_dir = d2l.download_extract('ctr')\ntrain_data = d2l.CTRDataset(os.path.join(data_dir, 'train.csv'))\ntest_data = d2l.CTRDataset(os.path.join(data_dir, 'test.csv'),\n                           feat_mapper=train_data.feat_mapper,\n                           defaults=train_data.defaults)\nfield_dims = train_data.field_dims\ntrain_iter = gluon.data.DataLoader(\n    train_data, shuffle=True, last_batch='rollover', batch_size=batch_size,\n    num_workers=d2l.get_dataloader_workers())\ntest_iter = gluon.data.DataLoader(\n    test_data, shuffle=False, last_batch='rollover', batch_size=batch_size,\n    num_workers=d2l.get_dataloader_workers())\ndevices = d2l.try_all_gpus()\nnet = DeepFM(field_dims, num_factors=10, mlp_dims=[30, 20, 10])\nnet.initialize(init.Xavier(), ctx=devices)\nlr, num_epochs, optimizer = 0.01, 30, 'adam'\ntrainer = gluon.Trainer(net.collect_params(), optimizer,\n                        {'learning_rate': lr})\nloss = gluon.loss.SigmoidBinaryCrossEntropyLoss()\nd2l.train_ch13(net, train_iter, test_iter, loss, trainer, num_epochs, devices)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "loss 0.509, train acc 0.395, test acc 0.396\n110411.2 examples/sec on [gpu(0), gpu(1)]"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_deepfm_61b173_5_1.svg",
+      "local_path": "_images/output_deepfm_61b173_5_1.svg",
+      "alt": "../_images/output_deepfm_61b173_5_1.svg"
+    },
+    {
+      "type": "paragraph",
+      "text": "So với FM, DeepFM hội tụ nhanh hơn và đạt được hiệu suất tốt hơn."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tom-tat",
+      "text": "16.10.4. Tóm tắt"
+    },
+    {
+      "type": "list",
+      "ordered": false,
+      "items": [
+        "Tích hợp các mạng thần kinh với FM cho phép nó mô hình hóa các tương\ntác phức tạp và bậc cao.",
+        "DeepFM vượt trội hơn FM ban đầu trên tập dữ liệu quảng cáo."
+      ]
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bai-tap",
+      "text": "16.10.5. Bài tập"
+    },
+    {
+      "type": "list",
+      "ordered": false,
+      "items": [
+        "Thay đổi cấu trúc của MLP để kiểm tra tác động của nó đến hiệu suất\nmô hình.",
+        "Thay đổi tập dữ liệu thành Criteo và so sánh nó với mô hình FM gốc."
+      ]
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    }
+  ],
+  "images": [
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_deepfm_61b173_5_1.svg",
+      "local_path": "_images/output_deepfm_61b173_5_1.svg",
+      "alt": "../_images/output_deepfm_61b173_5_1.svg"
+    }
+  ],
+  "text": "16.10. Sâu Factorization Máy móc\nHọc kết hợp tính năng hiệu quả là rất quan trọng đối với sự thành công\ncủa nhiệm vụ dự đoán tỷ lệ nhấp qua. Máy factorization mô hình tính năng\ntương tác trong một mô hình tuyến tính (ví dụ, tương tác song tuyến).\nĐiều này thường không đủ đối với dữ liệu trong thế giới thực, nơi các\ncấu trúc chéo tính năng vốn có thường rất phức tạp và phi tuyến. Điều\ntồi tệ hơn, tương tác tính năng thứ hai thường được sử dụng trong các\nmáy factorization trong thực tế. Mô hình hóa mức độ kết hợp tính năng\ncao hơn với các máy factorization là có thể về mặt lý thuyết nhưng nó\nthường không được áp dụng do sự bất ổn số và độ phức tạp tính toán cao.\nMột giải pháp hiệu quả là sử dụng mạng thần kinh sâu. Các mạng thần kinh\nsâu mạnh mẽ trong việc học đại diện tính năng và có tiềm năng học các\ntương tác tính năng phức tạp. Như vậy, nó là tự nhiên để tích hợp các\nmạng thần kinh sâu vào các máy factorization. Thêm các lớp chuyển đổi\nphi tuyến vào các máy factorization cho phép nó khả năng mô hình hóa cả\nkết hợp tính năng bậc thấp và kết hợp tính năng bậc cao. Hơn nữa, các\ncấu trúc vốn có phi tuyến tính từ đầu vào cũng có thể được chụp bằng các\nmạng thần kinh sâu. Trong phần này, chúng tôi sẽ giới thiệu một mô hình\nđại diện có tên là máy factorization sâu (DeepFM) [Guo et al., 2017] kết hợp FM và mạng thần kinh sâu.\n16.10.1. Model Architectures\nDeepFM bao gồm một thành phần FM và một thành phần sâu được tích hợp\ntrong một cấu trúc song song. Các thành phần FM là giống như các máy\nfactorization 2 chiều được sử dụng để mô hình hóa các tương tác tính\nnăng bậc thấp. Thành phần sâu là một MLP được sử dụng để nắm bắt các\ntương tác tính năng bậc cao và phi tuyến tính. Hai thành phần này chia\nsẻ cùng một đầu vào/nhúng và đầu ra của chúng được tóm tắt là dự đoán\ncuối cùng. Điều đáng để chỉ ra rằng tinh thần của DeepFM giống với kiến\ntrúc Wide & Deep có thể nắm bắt cả ghi nhớ và khái quát hóa. Ưu điểm của\nDeepFM so với mô hình Wide & Deep là nó làm giảm nỗ lực của kỹ thuật\ntính năng thủ công bằng cách xác định các kết hợp tính năng tự động.\nChúng tôi bỏ qua mô tả của thành phần FM cho ngắn gọn và biểu thị đầu ra\nlà \\(\\hat{y}^{(FM)}\\) . Độc giả được giới thiệu đến phần cuối cùng để\nbiết thêm chi tiết. Hãy để \\(\\mathbf{e}_i \\in \\mathbb{R}^{k}\\) biểu\nthị vector tính năng tiềm ẩn của trường \\(i^\\mathrm{th}\\) . Đầu vào\ncủa thành phần sâu là sự nối của các nhúng dày đặc của tất cả các trường\nđược nhìn lên với đầu vào tính năng phân loại thưa thớt, được ký hiệu\nlà:\ntrong đó \\(f\\) là số trường. Sau đó, nó được đưa vào mạng thần kinh\nsau:\ntrong đó \\(\\alpha\\) là chức năng kích hoạt. \\(\\mathbf{W}_{l}\\) và \\(\\mathbf{b}_{l}\\) là trọng lượng và thiên vị ở lớp \\(l^\\mathrm{th}\\) . Hãy để \\(y_{DNN}\\) biểu thị đầu ra của dự\nđoán. Dự đoán cuối cùng của DeepFM là tổng kết các đầu ra từ cả FM và\nDNN. Vì vậy, chúng tôi có:\ntrong đó \\(\\sigma\\) là chức năng sigmoid. Kiến trúc của DeepFM được\nminh họa dưới đây.! Illustration of the DeepFM\nmodel\nĐiều đáng chú ý là DeepFM không phải là cách duy nhất để kết hợp các\nmạng thần kinh sâu với FM. Chúng ta cũng có thể thêm các lớp phi tuyến\ntrên các tương tác tính năng [He & Chua, 2017] .\n16.10.2. Implemenation của DeepFM Việc thực hiện DeepFM tương tự như FM. Chúng tôi giữ phần FM không thay đổi và sử dụng khối MLP với relu làm chức năng kích hoạt. Dropout cũng được sử dụng để thường xuyên hóa mô hình. Số lượng tế bào thần kinh của MLP có thể được điều chỉnh với siêu tham số mlp_dims .\n16.10.3. Đào tạo và Đánh giá mô hình Quá trình tải dữ liệu giống như của FM. Chúng tôi đặt thành phần MLP của DeepFM thành một mạng dày đặc ba lớp với cấu trúc kim tự tháp (30-20-10). Tất cả các siêu tham số khác vẫn giống như FM.\nSo với FM, DeepFM hội tụ nhanh hơn và đạt được hiệu suất tốt hơn.\n16.10.4. Tóm tắt\nTích hợp các mạng thần kinh với FM cho phép nó mô hình hóa các tương\ntác phức tạp và bậc cao.\nDeepFM vượt trội hơn FM ban đầu trên tập dữ liệu quảng cáo.\n16.10.5. Bài tập\nThay đổi cấu trúc của MLP để kiểm tra tác động của nó đến hiệu suất\nmô hình.\nThay đổi tập dữ liệu thành Criteo và so sánh nó với mô hình FM gốc.\nDiscussions"
+}

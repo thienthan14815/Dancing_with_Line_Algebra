@@ -1,0 +1,233 @@
+{
+  "url": "https://vi.d2l.ai/chapter_natural-language-processing-pretraining/subword-embedding.html",
+  "chapter": "chapter_natural-language-processing-pretraining",
+  "title": "14.6. Subword Nhúng",
+  "crawled_at": "2026-07-20T12:40:57.583473+00:00",
+  "headings": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "subword-nhung",
+      "text": "14.6. Subword Nhúng"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "mo-hinh-fasttext",
+      "text": "14.6.1. Mô hình fastText"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "ma-hoa-cap-byte",
+      "text": "14.6.2. Mã hóa cặp byte"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tom-tat",
+      "text": "14.6.3. Tóm tắt"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bai-tap",
+      "text": "14.6.4. Bài tập"
+    }
+  ],
+  "content": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "subword-nhung",
+      "text": "14.6. Subword Nhúng"
+    },
+    {
+      "type": "paragraph",
+      "text": "Trong tiếng Anh, các từ như “help”, “helped”, và “help” là những dạng\nuốn cong của cùng một từ “help”. Mối quan hệ giữa “chó” và “chó” cũng\ngiống như mối quan hệ giữa “mèo” và “mèo”, và mối quan hệ giữa “cậu bé”\nvà “bạn trai” cũng giống như giữa “cô gái” và “bạn gái”. Trong các ngôn\nngữ khác như tiếng Pháp và tiếng Tây Ban Nha, nhiều động từ có trên 40\ndạng uốn, trong khi trong tiếng Phần Lan, một danh từ có thể có tới 15\ntrường hợp. Trong ngôn ngữ học, hình thái học nghiên cứu hình thành từ\nvà các mối quan hệ từ. Tuy nhiên, cấu trúc nội bộ của các từ không được\nkhám phá trong word2vec cũng như trong Glove."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "mo-hinh-fasttext",
+      "text": "14.6.1. Mô hình fastText"
+    },
+    {
+      "type": "paragraph",
+      "text": "Nhớ lại cách các từ được biểu diễn trong word2vec. Trong cả mô hình\nskip-gram và mô hình túi-of-words liên tục, các dạng uốn khác nhau của\ncùng một từ được biểu diễn trực tiếp bởi các vectơ khác nhau mà không có\ntham số chia sẻ. Để sử dụng thông tin hình thái học, mô hình fastText đề xuất cách tiếp cận nhúng từ con * , trong đó một từ con là ký tự \\(n\\) -gram [Bojanowski et al., 2017] . Thay vì học\nbiểu diễn vectơ cấp từ, fastText có thể được coi là biểu đồ bỏ qua cấp\ntừ phụ, trong đó mỗi từ * center* được biểu diễn bằng tổng các vectơ\ntừ con của nó."
+    },
+    {
+      "type": "paragraph",
+      "text": "Hãy để chúng tôi minh họa làm thế nào để có được các từ con cho mỗi từ\ntrung tâm trong fastText bằng cách sử dụng từ “ở đâu”. Đầu tiên, thêm\ncác ký tự đặc biệt “<” and “>” ở đầu và cuối của từ để phân biệt tiền tố\nvà hậu tố với các từ con khác. Sau đó, trích xuất ký tự \\(n\\) -gram\ntừ từ. Ví dụ, khi \\(n=3\\) , ta có được tất cả các từ con có độ dài 3:\n“”, và từ con đặc biệt “”."
+    },
+    {
+      "type": "paragraph",
+      "text": "Trong fastText, đối với bất kỳ từ nào \\(w\\) , biểu thị bằng \\(\\mathcal{G}_w\\) sự kết hợp của tất cả các từ con của nó có độ dài\ngiữa 3 và 6 và từ con đặc biệt của nó. Từ vựng là sự kết hợp của các từ\ncon của tất cả các từ. Để \\(\\mathbf{z}_g\\) là vectơ của subword \\(g\\) trong từ điển, vector \\(\\mathbf{v}_w\\) cho từ \\(w\\) như một từ trung tâm trong mô hình skip-gram là tổng của vectơ từ con\ncủa nó:"
+    },
+    {
+      "type": "math",
+      "latex": "(14.6.1)¶\\[\\mathbf{v}_w = \\sum_{g\\in\\mathcal{G}_w} \\mathbf{z}_g.\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Phần còn lại của fastText giống như mô hình skip-gram. So với mô hình\nskip-gram, từ vựng trong fastText lớn hơn, dẫn đến nhiều tham số mô hình\nhơn. Bên cạnh đó, để tính toán biểu diễn của một từ, tất cả các vectơ từ\ncon của nó phải được tóm tắt, dẫn đến độ phức tạp tính toán cao hơn. Tuy\nnhiên, nhờ các tham số được chia sẻ từ các từ con giữa các từ có cấu\ntrúc tương tự, các từ hiếm và thậm chí các từ ngoài từ vựng có thể có\nđược biểu diễn vector tốt hơn trong fastText."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "ma-hoa-cap-byte",
+      "text": "14.6.2. Mã hóa cặp byte"
+    },
+    {
+      "type": "paragraph",
+      "text": "Trong fastText, tất cả các từ con được trích xuất phải có độ dài được\nchỉ định, chẳng hạn như \\(3\\) đến \\(6\\) , do đó kích thước từ\nvựng không thể được xác định trước. Để cho phép các từ con có độ dài\nbiến đổi trong từ vựng có kích thước cố định, chúng ta có thể áp dụng\nmột thuật toán nén gọi là mã hóa cặp byte * (BPE) để trích xuất các từ\ncon [Sennrich et al., 2015] ."
+    },
+    {
+      "type": "paragraph",
+      "text": "Mã hóa cặp byte thực hiện phân tích thống kê của tập dữ liệu đào tạo để\nkhám phá các ký hiệu phổ biến trong một từ, chẳng hạn như các ký tự liên\ntiếp có độ dài tùy ý. Bắt đầu từ các ký hiệu có độ dài 1, mã hóa cặp\nbyte kết hợp lặp đi lặp lại cặp ký hiệu liên tiếp thường xuyên nhất để\ntạo ra các ký hiệu dài hơn mới. Lưu ý rằng đối với hiệu quả, các cặp\nvượt qua ranh giới từ không được xem xét. Cuối cùng, chúng ta có thể sử\ndụng các ký hiệu như các từ con để phân đoạn các từ. Mã hóa cặp byte và\ncác biến thể của nó đã được sử dụng để biểu diễn đầu vào trong các mô\nhình pretraining xử lý ngôn ngữ tự nhiên phổ biến như GPT-2 [Radford et al., 2019] và roberTa [Liu et al., 2019] . Sau đây, chúng tôi sẽ minh họa cách mã\nhóa cặp byte hoạt động."
+    },
+    {
+      "type": "paragraph",
+      "text": "Đầu tiên, chúng ta khởi tạo từ vựng của các ký hiệu như tất cả các ký tự\nchữ thường tiếng Anh, một ký hiệu cuối từ đặc biệt '_' và một ký\nhiệu không xác định đặc biệt '[UNK]' ."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "import collections\n\nsymbols = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm',\n           'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',\n           '_', '[UNK]']"
+    },
+    {
+      "type": "paragraph",
+      "text": "Vì chúng ta không xem xét các cặp biểu tượng vượt qua ranh giới của các\ntừ, chúng ta chỉ cần một từ điển raw_token_freqs ánh xạ các từ đến\ntần số của chúng (số lần xuất hiện) trong một tập dữ liệu. Lưu ý rằng ký\nhiệu đặc biệt '_' được gắn vào mỗi từ để chúng ta có thể dễ dàng\nkhôi phục một chuỗi từ (ví dụ, “một người đàn ông cao hơn”) từ một chuỗi\ncác ký hiệu đầu ra (ví dụ: “a_ tall er_ man”). Vì chúng ta bắt đầu quá\ntrình hợp nhất từ một từ vựng chỉ gồm các ký tự duy nhất và các ký hiệu\nđặc biệt, khoảng trắng được chèn giữa mỗi cặp ký tự liên tiếp trong mỗi\ntừ (các phím của từ điển token_freqs ). Nói cách khác, không gian là\ndấu phân cách giữa các ký hiệu trong một từ."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "raw_token_freqs = {'fast_': 4, 'faster_': 3, 'tall_': 5, 'taller_': 4}\ntoken_freqs = {}\nfor token, freq in raw_token_freqs.items():\n    token_freqs[' '.join(list(token))] = raw_token_freqs[token]\ntoken_freqs"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "{'f a s t _': 4, 'f a s t e r _': 3, 't a l l _': 5, 't a l l e r _': 4}"
+    },
+    {
+      "type": "paragraph",
+      "text": "Chúng tôi xác định hàm get_max_freq_pair sau trả về cặp ký hiệu liên\ntiếp thường xuyên nhất trong một từ, trong đó các từ đến từ khóa của từ\nđiển đầu vào token_freqs ."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def get_max_freq_pair(token_freqs):\n    pairs = collections.defaultdict(int)\n    for token, freq in token_freqs.items():\n        symbols = token.split()\n        for i in range(len(symbols) - 1):\n            # Key of `pairs` is a tuple of two consecutive symbols\n            pairs[symbols[i], symbols[i + 1]] += freq\n    return max(pairs, key=pairs.get)  # Key of `pairs` with the max value"
+    },
+    {
+      "type": "paragraph",
+      "text": "Như một cách tiếp cận tham lam dựa trên tần số của các ký hiệu liên\ntiếp, mã hóa cặp byte sẽ sử dụng hàm merge_symbols sau để hợp nhất\ncặp ký hiệu liên tiếp thường xuyên nhất để tạo ra các ký hiệu mới."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def merge_symbols(max_freq_pair, token_freqs, symbols):\n    symbols.append(''.join(max_freq_pair))\n    new_token_freqs = dict()\n    for token, freq in token_freqs.items():\n        new_token = token.replace(' '.join(max_freq_pair),\n                                  ''.join(max_freq_pair))\n        new_token_freqs[new_token] = token_freqs[token]\n    return new_token_freqs"
+    },
+    {
+      "type": "paragraph",
+      "text": "Bây giờ chúng ta lặp đi lặp lại thực hiện thuật toán mã hóa cặp byte\ntrên các phím của từ điển token_freqs . Trong lần lặp đầu tiên, cặp\nký hiệu liên tiếp thường xuyên nhất là 't' và 'a' , do đó mã hóa\ncặp byte hợp nhất chúng để tạo ra một ký hiệu mới 'ta' . Trong lần\nlặp thứ hai, mã hóa cặp byte tiếp tục hợp nhất 'ta' và 'l' để\ndẫn đến một ký hiệu mới khác 'tal' ."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "num_merges = 10\nfor i in range(num_merges):\n    max_freq_pair = get_max_freq_pair(token_freqs)\n    token_freqs = merge_symbols(max_freq_pair, token_freqs, symbols)\n    print(f'merge #{i + 1}:', max_freq_pair)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "merge #1: ('t', 'a')\nmerge #2: ('ta', 'l')\nmerge #3: ('tal', 'l')\nmerge #4: ('f', 'a')\nmerge #5: ('fa', 's')\nmerge #6: ('fas', 't')\nmerge #7: ('e', 'r')\nmerge #8: ('er', '_')\nmerge #9: ('tall', '_')\nmerge #10: ('fast', '_')"
+    },
+    {
+      "type": "paragraph",
+      "text": "Sau 10 lần lặp lại mã hóa cặp byte, chúng ta có thể thấy rằng danh sách symbols bây giờ chứa thêm 10 ký hiệu được sáp nhập lặp đi lặp lại từ\ncác ký hiệu khác."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "print(symbols)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '_', '[UNK]', 'ta', 'tal', 'tall', 'fa', 'fas', 'fast', 'er', 'er_', 'tall_', 'fast_']"
+    },
+    {
+      "type": "paragraph",
+      "text": "Đối với cùng một tập dữ liệu được chỉ định trong các khóa của từ điển raw_token_freqs , mỗi từ trong tập dữ liệu bây giờ được phân đoạn\nbằng các từ con “fast_”, “fast”, “er_”, “tall_”, và “tall” do kết quả\ncủa thuật toán mã hóa cặp byte. Ví dụ, các từ “faster_” và “taller_”\nđược phân đoạn là “fast er_” và “tall er_”, tương ứng."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "print(list(token_freqs.keys()))"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "['fast_', 'fast er_', 'tall_', 'tall er_']"
+    },
+    {
+      "type": "paragraph",
+      "text": "Lưu ý rằng kết quả của mã hóa cặp byte phụ thuộc vào tập dữ liệu đang\nđược sử dụng. Chúng ta cũng có thể sử dụng các từ con học được từ một\ntập dữ liệu để phân đoạn các từ của tập dữ liệu khác. Như một cách tiếp\ncận tham lam, hàm segment_BPE sau cố gắng phá vỡ các từ thành các từ\ncon dài nhất có thể từ đối số đầu vào symbols ."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def segment_BPE(tokens, symbols):\n    outputs = []\n    for token in tokens:\n        start, end = 0, len(token)\n        cur_output = []\n        # Segment token with the longest possible subwords from symbols\n        while start < len(token) and start < end:\n            if token[start: end] in symbols:\n                cur_output.append(token[start: end])\n                start = end\n                end = len(token)\n            else:\n                end -= 1\n        if start < len(token):\n            cur_output.append('[UNK]')\n        outputs.append(' '.join(cur_output))\n    return outputs"
+    },
+    {
+      "type": "paragraph",
+      "text": "Sau đây, chúng ta sử dụng các từ con trong danh sách symbols , được\nhọc từ tập dữ liệu nói trên, đến phân đoạn tokens đại diện cho một\ntập dữ liệu khác."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "tokens = ['tallest_', 'fatter_']\nprint(segment_BPE(tokens, symbols))"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "['tall e s t _', 'fa t t er_']"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tom-tat",
+      "text": "14.6.3. Tóm tắt"
+    },
+    {
+      "type": "list",
+      "ordered": false,
+      "items": [
+        "Mô hình fastText đề xuất một cách tiếp cận nhúng từ con. Dựa trên mô\nhình skip-gram trong word2vec, nó đại diện cho một từ trung tâm làm\ntổng của vectơ từ con của nó.",
+        "Mã hóa cặp byte thực hiện phân tích thống kê của tập dữ liệu đào tạo\nđể khám phá các ký hiệu phổ biến trong một từ. Như một cách tiếp cận\ntham lam, mã hóa cặp byte lặp đi lặp lại hợp nhất cặp ký hiệu liên\ntiếp thường xuyên nhất.",
+        "Nhúng từ phụ có thể cải thiện chất lượng biểu diễn của các từ hiếm và\ncác từ ngoài từ điển."
+      ]
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bai-tap",
+      "text": "14.6.4. Bài tập"
+    },
+    {
+      "type": "list",
+      "ordered": true,
+      "items": [
+        "Ví dụ, có khoảng \\(3\\times 10^8\\) \\(6\\) -gram có thể bằng\ntiếng Anh. Vấn đề khi có quá nhiều subwords là gì? Làm thế nào để\ngiải quyết vấn đề? Hint: refer to the end of Section 3.2 of the\nfastText paper [Bojanowski et al., 2017] .",
+        "Làm thế nào để thiết kế một mô hình nhúng từ con dựa trên mô hình\ntúi-of-từ liên tục?",
+        "Để có được từ vựng có kích thước \\(m\\) , cần có bao nhiêu thao tác\nhợp nhất khi kích thước từ vựng biểu tượng ban đầu là \\(n\\) ?",
+        "Làm thế nào để mở rộng ý tưởng mã hóa cặp byte để trích xuất cụm từ?"
+      ]
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    }
+  ],
+  "images": [],
+  "text": "14.6. Subword Nhúng\nTrong tiếng Anh, các từ như “help”, “helped”, và “help” là những dạng\nuốn cong của cùng một từ “help”. Mối quan hệ giữa “chó” và “chó” cũng\ngiống như mối quan hệ giữa “mèo” và “mèo”, và mối quan hệ giữa “cậu bé”\nvà “bạn trai” cũng giống như giữa “cô gái” và “bạn gái”. Trong các ngôn\nngữ khác như tiếng Pháp và tiếng Tây Ban Nha, nhiều động từ có trên 40\ndạng uốn, trong khi trong tiếng Phần Lan, một danh từ có thể có tới 15\ntrường hợp. Trong ngôn ngữ học, hình thái học nghiên cứu hình thành từ\nvà các mối quan hệ từ. Tuy nhiên, cấu trúc nội bộ của các từ không được\nkhám phá trong word2vec cũng như trong Glove.\n14.6.1. Mô hình fastText\nNhớ lại cách các từ được biểu diễn trong word2vec. Trong cả mô hình\nskip-gram và mô hình túi-of-words liên tục, các dạng uốn khác nhau của\ncùng một từ được biểu diễn trực tiếp bởi các vectơ khác nhau mà không có\ntham số chia sẻ. Để sử dụng thông tin hình thái học, mô hình fastText đề xuất cách tiếp cận nhúng từ con * , trong đó một từ con là ký tự \\(n\\) -gram [Bojanowski et al., 2017] . Thay vì học\nbiểu diễn vectơ cấp từ, fastText có thể được coi là biểu đồ bỏ qua cấp\ntừ phụ, trong đó mỗi từ * center* được biểu diễn bằng tổng các vectơ\ntừ con của nó.\nHãy để chúng tôi minh họa làm thế nào để có được các từ con cho mỗi từ\ntrung tâm trong fastText bằng cách sử dụng từ “ở đâu”. Đầu tiên, thêm\ncác ký tự đặc biệt “<” and “>” ở đầu và cuối của từ để phân biệt tiền tố\nvà hậu tố với các từ con khác. Sau đó, trích xuất ký tự \\(n\\) -gram\ntừ từ. Ví dụ, khi \\(n=3\\) , ta có được tất cả các từ con có độ dài 3:\n“”, và từ con đặc biệt “”.\nTrong fastText, đối với bất kỳ từ nào \\(w\\) , biểu thị bằng \\(\\mathcal{G}_w\\) sự kết hợp của tất cả các từ con của nó có độ dài\ngiữa 3 và 6 và từ con đặc biệt của nó. Từ vựng là sự kết hợp của các từ\ncon của tất cả các từ. Để \\(\\mathbf{z}_g\\) là vectơ của subword \\(g\\) trong từ điển, vector \\(\\mathbf{v}_w\\) cho từ \\(w\\) như một từ trung tâm trong mô hình skip-gram là tổng của vectơ từ con\ncủa nó:\nPhần còn lại của fastText giống như mô hình skip-gram. So với mô hình\nskip-gram, từ vựng trong fastText lớn hơn, dẫn đến nhiều tham số mô hình\nhơn. Bên cạnh đó, để tính toán biểu diễn của một từ, tất cả các vectơ từ\ncon của nó phải được tóm tắt, dẫn đến độ phức tạp tính toán cao hơn. Tuy\nnhiên, nhờ các tham số được chia sẻ từ các từ con giữa các từ có cấu\ntrúc tương tự, các từ hiếm và thậm chí các từ ngoài từ vựng có thể có\nđược biểu diễn vector tốt hơn trong fastText.\n14.6.2. Mã hóa cặp byte\nTrong fastText, tất cả các từ con được trích xuất phải có độ dài được\nchỉ định, chẳng hạn như \\(3\\) đến \\(6\\) , do đó kích thước từ\nvựng không thể được xác định trước. Để cho phép các từ con có độ dài\nbiến đổi trong từ vựng có kích thước cố định, chúng ta có thể áp dụng\nmột thuật toán nén gọi là mã hóa cặp byte * (BPE) để trích xuất các từ\ncon [Sennrich et al., 2015] .\nMã hóa cặp byte thực hiện phân tích thống kê của tập dữ liệu đào tạo để\nkhám phá các ký hiệu phổ biến trong một từ, chẳng hạn như các ký tự liên\ntiếp có độ dài tùy ý. Bắt đầu từ các ký hiệu có độ dài 1, mã hóa cặp\nbyte kết hợp lặp đi lặp lại cặp ký hiệu liên tiếp thường xuyên nhất để\ntạo ra các ký hiệu dài hơn mới. Lưu ý rằng đối với hiệu quả, các cặp\nvượt qua ranh giới từ không được xem xét. Cuối cùng, chúng ta có thể sử\ndụng các ký hiệu như các từ con để phân đoạn các từ. Mã hóa cặp byte và\ncác biến thể của nó đã được sử dụng để biểu diễn đầu vào trong các mô\nhình pretraining xử lý ngôn ngữ tự nhiên phổ biến như GPT-2 [Radford et al., 2019] và roberTa [Liu et al., 2019] . Sau đây, chúng tôi sẽ minh họa cách mã\nhóa cặp byte hoạt động.\nĐầu tiên, chúng ta khởi tạo từ vựng của các ký hiệu như tất cả các ký tự\nchữ thường tiếng Anh, một ký hiệu cuối từ đặc biệt '_' và một ký\nhiệu không xác định đặc biệt '[UNK]' .\nVì chúng ta không xem xét các cặp biểu tượng vượt qua ranh giới của các\ntừ, chúng ta chỉ cần một từ điển raw_token_freqs ánh xạ các từ đến\ntần số của chúng (số lần xuất hiện) trong một tập dữ liệu. Lưu ý rằng ký\nhiệu đặc biệt '_' được gắn vào mỗi từ để chúng ta có thể dễ dàng\nkhôi phục một chuỗi từ (ví dụ, “một người đàn ông cao hơn”) từ một chuỗi\ncác ký hiệu đầu ra (ví dụ: “a_ tall er_ man”). Vì chúng ta bắt đầu quá\ntrình hợp nhất từ một từ vựng chỉ gồm các ký tự duy nhất và các ký hiệu\nđặc biệt, khoảng trắng được chèn giữa mỗi cặp ký tự liên tiếp trong mỗi\ntừ (các phím của từ điển token_freqs ). Nói cách khác, không gian là\ndấu phân cách giữa các ký hiệu trong một từ.\nChúng tôi xác định hàm get_max_freq_pair sau trả về cặp ký hiệu liên\ntiếp thường xuyên nhất trong một từ, trong đó các từ đến từ khóa của từ\nđiển đầu vào token_freqs .\nNhư một cách tiếp cận tham lam dựa trên tần số của các ký hiệu liên\ntiếp, mã hóa cặp byte sẽ sử dụng hàm merge_symbols sau để hợp nhất\ncặp ký hiệu liên tiếp thường xuyên nhất để tạo ra các ký hiệu mới.\nBây giờ chúng ta lặp đi lặp lại thực hiện thuật toán mã hóa cặp byte\ntrên các phím của từ điển token_freqs . Trong lần lặp đầu tiên, cặp\nký hiệu liên tiếp thường xuyên nhất là 't' và 'a' , do đó mã hóa\ncặp byte hợp nhất chúng để tạo ra một ký hiệu mới 'ta' . Trong lần\nlặp thứ hai, mã hóa cặp byte tiếp tục hợp nhất 'ta' và 'l' để\ndẫn đến một ký hiệu mới khác 'tal' .\nSau 10 lần lặp lại mã hóa cặp byte, chúng ta có thể thấy rằng danh sách symbols bây giờ chứa thêm 10 ký hiệu được sáp nhập lặp đi lặp lại từ\ncác ký hiệu khác.\nĐối với cùng một tập dữ liệu được chỉ định trong các khóa của từ điển raw_token_freqs , mỗi từ trong tập dữ liệu bây giờ được phân đoạn\nbằng các từ con “fast_”, “fast”, “er_”, “tall_”, và “tall” do kết quả\ncủa thuật toán mã hóa cặp byte. Ví dụ, các từ “faster_” và “taller_”\nđược phân đoạn là “fast er_” và “tall er_”, tương ứng.\nLưu ý rằng kết quả của mã hóa cặp byte phụ thuộc vào tập dữ liệu đang\nđược sử dụng. Chúng ta cũng có thể sử dụng các từ con học được từ một\ntập dữ liệu để phân đoạn các từ của tập dữ liệu khác. Như một cách tiếp\ncận tham lam, hàm segment_BPE sau cố gắng phá vỡ các từ thành các từ\ncon dài nhất có thể từ đối số đầu vào symbols .\nSau đây, chúng ta sử dụng các từ con trong danh sách symbols , được\nhọc từ tập dữ liệu nói trên, đến phân đoạn tokens đại diện cho một\ntập dữ liệu khác.\n14.6.3. Tóm tắt\nMô hình fastText đề xuất một cách tiếp cận nhúng từ con. Dựa trên mô\nhình skip-gram trong word2vec, nó đại diện cho một từ trung tâm làm\ntổng của vectơ từ con của nó.\nMã hóa cặp byte thực hiện phân tích thống kê của tập dữ liệu đào tạo\nđể khám phá các ký hiệu phổ biến trong một từ. Như một cách tiếp cận\ntham lam, mã hóa cặp byte lặp đi lặp lại hợp nhất cặp ký hiệu liên\ntiếp thường xuyên nhất.\nNhúng từ phụ có thể cải thiện chất lượng biểu diễn của các từ hiếm và\ncác từ ngoài từ điển.\n14.6.4. Bài tập\nVí dụ, có khoảng \\(3\\times 10^8\\) \\(6\\) -gram có thể bằng\ntiếng Anh. Vấn đề khi có quá nhiều subwords là gì? Làm thế nào để\ngiải quyết vấn đề? Hint: refer to the end of Section 3.2 of the\nfastText paper [Bojanowski et al., 2017] .\nLàm thế nào để thiết kế một mô hình nhúng từ con dựa trên mô hình\ntúi-of-từ liên tục?\nĐể có được từ vựng có kích thước \\(m\\) , cần có bao nhiêu thao tác\nhợp nhất khi kích thước từ vựng biểu tượng ban đầu là \\(n\\) ?\nLàm thế nào để mở rộng ý tưởng mã hóa cặp byte để trích xuất cụm từ?\nDiscussions"
+}

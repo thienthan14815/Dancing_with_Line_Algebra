@@ -1,0 +1,346 @@
+{
+  "url": "https://vi.d2l.ai/chapter_computer-vision/rcnn.html",
+  "chapter": "chapter_computer-vision",
+  "title": "13.8. CNN dựa trên khu vực (R-CNN)",
+  "crawled_at": "2026-07-20T12:40:45.619013+00:00",
+  "headings": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "cnn-dua-tren-khu-vuc-r-cnn",
+      "text": "13.8. CNN dựa trên khu vực (R-CNN)"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "r-cnn",
+      "text": "13.8.1. R-CNN"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "r-cnn-nhanh",
+      "text": "13.8.2. R-CNN nhanh"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "r-cnn-nhanh-hon",
+      "text": "13.8.3. R-CNN nhanh hơn"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "mat-na-r-cnn",
+      "text": "13.8.4. Mặt nạ R-CNN"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tom-tat",
+      "text": "13.8.5. Tóm tắt"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bai-tap",
+      "text": "13.8.6. Bài tập"
+    }
+  ],
+  "content": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "cnn-dua-tren-khu-vuc-r-cnn",
+      "text": "13.8. CNN dựa trên khu vực (R-CNN)"
+    },
+    {
+      "type": "paragraph",
+      "text": "Bên cạnh việc phát hiện multibox shot đơn được mô tả trong Section 13.7 , CNN dựa trên khu vực hoặc các khu vực có tính năng\nCNN (R-CNN) cũng là một trong nhiều phương pháp tiên phong trong việc áp\ndụng học sâu vào phát hiện đối tượng [Girshick et al., 2014] . Trong phần này, chúng tôi sẽ\ngiới thiệu R-CNN và một loạt các cải tiến của nó: R-CNN [Girshick, 2015] nhanh, R-CNN [Ren et al., 2015] nhanh hơn và mặt nạ R-CNN [He et al., 2017a] . Do không\ngian hạn chế, chúng tôi sẽ chỉ tập trung vào việc thiết kế các mô hình\nnày."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "r-cnn",
+      "text": "13.8.1. R-CNN"
+    },
+    {
+      "type": "paragraph",
+      "text": "R-CNN đầu tiên trích xuất nhiều (ví dụ: 2000) * khu vực đề xuất* từ\nhình ảnh đầu vào (ví dụ, hộp neo cũng có thể được coi là đề xuất khu\nvực), dán nhãn các lớp và hộp giới hạn của chúng (ví dụ: bù đắp). [Girshick et al., 2014] Sau đó, CNN được sử dụng để\nthực hiện tuyên truyền chuyển tiếp trên mỗi đề xuất khu vực để trích\nxuất của nó tính năng. Tiếp theo, các tính năng của mỗi đề xuất khu vực\nđược sử dụng để dự đoán lớp và hộp giới hạn của đề xuất khu vực này."
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/r-cnn.svg",
+      "local_path": "_images/r-cnn.svg",
+      "alt": "../_images/r-cnn.svg"
+    },
+    {
+      "type": "paragraph",
+      "text": "Fig. 13.8.1 The R-CNN model. ¶"
+    },
+    {
+      "type": "paragraph",
+      "text": "Fig. 13.8.1 cho thấy mô hình R-CNN. Cụ thể hơn, R-CNN bao gồm\nbốn bước sau:"
+    },
+    {
+      "type": "list",
+      "ordered": true,
+      "items": [
+        "Thực hiện * tìm kiếm chọn lọc* để trích xuất nhiều đề xuất khu vực\nchất lượng cao trên hình ảnh đầu vào [Uijlings et al., 2013] . Những vùng đề xuất\nnày thường được chọn ở nhiều thang đo với hình dạng và kích cỡ khác\nnhau. Mỗi đề xuất khu vực sẽ được dán nhãn với một lớp học và một hộp\ngiới hạn sự thật mặt đất.",
+        "Chọn một CNN được đào tạo trước và cắt ngắn nó trước lớp đầu ra. Thay\nđổi kích thước mỗi đề xuất khu vực theo kích thước đầu vào theo yêu\ncầu của mạng và xuất các tính năng trích xuất cho đề xuất khu vực\nthông qua tuyên truyền chuyển tiếp.",
+        "Lấy các tính năng trích xuất và lớp được dán nhãn của mỗi đề xuất khu\nvực làm ví dụ. Đào tạo nhiều máy vector hỗ trợ để phân loại các đối\ntượng, trong đó mỗi máy vector hỗ trợ riêng xác định xem ví dụ có\nchứa một lớp cụ thể hay không.",
+        "Lấy các tính năng được trích xuất và hộp giới hạn được dán nhãn của\nmỗi đề xuất khu vực làm ví dụ. Đào tạo một mô hình hồi quy tuyến tính\nđể dự đoán hộp giới hạn chân thất-chân lý."
+      ]
+    },
+    {
+      "type": "paragraph",
+      "text": "Mặc dù mô hình R-CNN sử dụng CNN được đào tạo trước để trích xuất hiệu\nquả các tính năng hình ảnh, nhưng nó chậm. Hãy tưởng tượng rằng chúng\ntôi chọn hàng ngàn đề xuất khu vực từ một hình ảnh đầu vào duy nhất:\nđiều này đòi hỏi hàng ngàn tuyên truyền chuyển tiếp CNN để thực hiện\nphát hiện đối tượng. Tải trọng điện toán lớn này làm cho việc sử dụng\nrộng rãi R-CNN trong các ứng dụng trong thế giới thực không khả thi."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "r-cnn-nhanh",
+      "text": "13.8.2. R-CNN nhanh"
+    },
+    {
+      "type": "paragraph",
+      "text": "Nút cổ chai hiệu suất chính của R-CNN nằm ở việc tuyên truyền chuyển\ntiếp CNN độc lập cho từng đề xuất khu vực, mà không chia sẻ tính toán.\nVì những vùng này thường có sự chồng chéo, các trích xuất tính năng độc\nlập dẫn đến tính toán lặp đi lặp lại nhiều. Một trong những cải tiến lớn\ncủa * nhanh R-CNN* từ R-CNN là CNN chuyển tiếp CNN chỉ được thực hiện\ntrên toàn bộ hình ảnh [Girshick, 2015] ."
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/fast-rcnn.svg",
+      "local_path": "_images/fast-rcnn.svg",
+      "alt": "../_images/fast-rcnn.svg"
+    },
+    {
+      "type": "paragraph",
+      "text": "Fig. 13.8.2 The fast R-CNN model. ¶"
+    },
+    {
+      "type": "paragraph",
+      "text": "Fig. 13.8.2 mô tả mô hình R-CNN nhanh. Các tính toán\nchính của nó như sau:"
+    },
+    {
+      "type": "list",
+      "ordered": true,
+      "items": [
+        "So với R-CNN, trong R-CNN nhanh, đầu vào của CNN để trích xuất tính\nnăng là toàn bộ hình ảnh, chứ không phải là các đề xuất khu vực riêng\nlẻ. Hơn nữa, CNN này là có thể đào tạo. Với một hình ảnh đầu vào, hãy\nđể hình dạng của đầu ra CNN là \\(1 \\times c \\times h_1 \\times w_1\\) .",
+        "Giả sử rằng tìm kiếm chọn lọc tạo ra \\(n\\) đề xuất khu vực. Các\nđề xuất khu vực này (có hình dạng khác nhau) đánh dấu các vùng được\nquan tâm (có hình dạng khác nhau) trên đầu ra CNN. Sau đó, các khu\nvực quan tâm hơn nữa trích xuất các tính năng của cùng một hình dạng\n(nói chiều cao \\(h_2\\) và chiều rộng \\(w_2\\) được chỉ định)\nđể dễ dàng nối. Để đạt được điều này, R-CNN nhanh giới thiệu lớp\ncộp* khu vực quan tâm (ROI): các đề xuất đầu ra và khu vực CNN được\nnhập vào lớp này, xuất các tính năng nối của hình dạng \\(n \\times c \\times h_2 \\times w_2\\) được trích xuất thêm cho tất\ncả các đề xuất khu vực.",
+        "Sử dụng một lớp được kết nối hoàn toàn, biến đổi các tính năng nối\nthành một đầu ra của hình dạng \\(n \\times d\\) , trong đó \\(d\\) phụ thuộc vào thiết kế mô hình.",
+        "Dự đoán lớp học và hộp giới hạn cho mỗi đề xuất khu vực \\(n\\) . Cụ\nthể hơn, trong lớp và dự đoán hộp giới hạn, biến đổi đầu ra lớp được\nkết nối hoàn toàn thành một đầu ra của hình dạng \\(n \\times q\\) ( \\(q\\) là số lớp) và một đầu ra của hình dạng \\(n \\times 4\\) ,\ntương ứng. Dự đoán lớp sử dụng hồi quy softmax."
+      ]
+    },
+    {
+      "type": "paragraph",
+      "text": "Khu vực của lớp tổng hợp quan tâm được đề xuất trong R-CNN nhanh khác\nvới lớp tổng hợp được giới thiệu vào năm Section 6.5 . Trong\nlayer pooling, chúng ta gián tiếp kiểm soát hình dạng đầu ra bằng cách\nchỉ định kích thước của cửa sổ pooling, padding, và sải chân. Ngược lại,\nchúng ta có thể trực tiếp chỉ định hình dạng đầu ra trong khu vực của\nlớp tổng hợp quan tâm."
+    },
+    {
+      "type": "paragraph",
+      "text": "Ví dụ: chúng ta hãy chỉ định chiều cao và chiều rộng đầu ra cho mỗi khu\nvực là \\(h_2\\) và \\(w_2\\) , tương ứng. Đối với bất kỳ khu vực nào\ncủa cửa sổ quan tâm của hình dạng \\(h \\times w\\) , cửa sổ này được\nchia thành một lưới \\(h_2 \\times w_2\\) của subwindows, trong đó hình\ndạng của mỗi cửa sổ con là khoảng \\((h/h_2) \\times (w/w_2)\\) . Trong\nthực tế, chiều cao và chiều rộng của bất kỳ cửa sổ con nào sẽ được làm\ntròn và phần tử lớn nhất sẽ được sử dụng làm đầu ra của cửa sổ con. Do\nđó, khu vực của lớp tổng hợp quan tâm có thể trích xuất các tính năng có\ncùng hình dạng ngay cả khi các vùng quan tâm có hình dạng khác nhau."
+    },
+    {
+      "type": "paragraph",
+      "text": "Như một ví dụ minh họa, trong Fig. 13.8.3 , khu vực quan tâm \\(3\\times 3\\) phía trên bên trái được chọn trên một đầu vào \\(4 \\times 4\\) . Đối với khu vực quan tâm này, chúng tôi sử dụng một \\(2\\times 2\\) khu vực của lớp tổng hợp quan tâm để có được một sản\nlượng \\(2\\times 2\\) . Lưu ý rằng mỗi trong bốn phân chia chứa các\nphần tử 0, 1, 4 và 5 (5 là tối đa); 2 và 6 (6 là tối đa); 8 và 9 (9 là\ntối đa); và 10."
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/roi.svg",
+      "local_path": "_images/roi.svg",
+      "alt": "../_images/roi.svg"
+    },
+    {
+      "type": "paragraph",
+      "text": "Fig. 13.8.3 A \\(2\\times 2\\) region of interest pooling layer. ¶"
+    },
+    {
+      "type": "paragraph",
+      "text": "Dưới đây chúng tôi chứng minh tính toán của khu vực của lớp tổng hợp\nquan tâm. Giả sử rằng chiều cao và chiều rộng của các tính năng trích\nxuất CNN X đều là 4 và chỉ có một kênh duy nhất."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "from mxnet import np, npx\n\nnpx.set_np()\n\nX = np.arange(16).reshape(1, 1, 4, 4)\nX"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "array([[[[ 0.,  1.,  2.,  3.],\n         [ 4.,  5.,  6.,  7.],\n         [ 8.,  9., 10., 11.],\n         [12., 13., 14., 15.]]]])"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "import torch\nimport torchvision\n\nX = torch.arange(16.).reshape(1, 1, 4, 4)\nX"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "tensor([[[[ 0.,  1.,  2.,  3.],\n          [ 4.,  5.,  6.,  7.],\n          [ 8.,  9., 10., 11.],\n          [12., 13., 14., 15.]]]])"
+    },
+    {
+      "type": "paragraph",
+      "text": "Chúng ta hãy giả sử thêm rằng chiều cao và chiều rộng của hình ảnh đầu\nvào là cả 40 pixel và tìm kiếm chọn lọc tạo ra hai đề xuất khu vực trên\nhình ảnh này. Mỗi đề xuất vùng được thể hiện dưới dạng năm yếu tố: lớp\nđối tượng của nó tiếp theo là tọa độ \\((x, y)\\) của các góc trên bên\ntrái và dưới bên phải của nó."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "rois = np.array([[0, 0, 0, 20, 20], [0, 0, 10, 30, 30]])"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "rois = torch.Tensor([[0, 0, 0, 20, 20], [0, 0, 10, 30, 30]])"
+    },
+    {
+      "type": "paragraph",
+      "text": "Bởi vì chiều cao và chiều rộng của X là \\(1/10\\) chiều cao và\nchiều rộng của hình ảnh đầu vào, các tọa độ của hai đề xuất khu vực được\nnhân với 0,1 theo đối số spatial_scale được chỉ định. Sau đó, hai\nkhu vực quan tâm được đánh dấu trên X là X[:, :, 0:3, 0:3] và X[:, :, 1:4, 0:4] , tương ứng. Cuối cùng trong khu vực \\(2\\times 2\\) thu hút sự quan tâm, mỗi khu vực quan tâm được chia\nthành một mạng lưới các cửa sổ phụ để trích xuất thêm các tính năng có\ncùng hình dạng \\(2\\times 2\\) ."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "npx.roi_pooling(X, rois, pooled_size=(2, 2), spatial_scale=0.1)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "array([[[[ 5.,  6.],\n         [ 9., 10.]]],\n\n\n       [[[ 9., 11.],\n         [13., 15.]]]])"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "torchvision.ops.roi_pool(X, rois, output_size=(2, 2), spatial_scale=0.1)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "tensor([[[[ 5.,  6.],\n          [ 9., 10.]]],\n\n\n        [[[ 9., 11.],\n          [13., 15.]]]])"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "r-cnn-nhanh-hon",
+      "text": "13.8.3. R-CNN nhanh hơn"
+    },
+    {
+      "type": "paragraph",
+      "text": "Để chính xác hơn trong việc phát hiện đối tượng, mô hình R-CNN nhanh\nthường phải tạo ra rất nhiều đề xuất khu vực trong tìm kiếm chọn lọc. Để\ngiảm đề xuất khu vực mà không mất độ chính xác, R-CNN* nhanh hơn đề\nxuất thay thế tìm kiếm chọn lọc bằng mạng đề xuất khu\nvực*:cite: Ren.He.Girshick.ea.2015 ."
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/faster-rcnn.svg",
+      "local_path": "_images/faster-rcnn.svg",
+      "alt": "../_images/faster-rcnn.svg"
+    },
+    {
+      "type": "paragraph",
+      "text": "Fig. 13.8.4 The faster R-CNN model. ¶"
+    },
+    {
+      "type": "paragraph",
+      "text": "Fig. 13.8.4 cho thấy mô hình R-CNN nhanh hơn. So với\nR-CNN nhanh, R-CNN nhanh hơn chỉ thay đổi phương pháp đề xuất khu vực từ\ntìm kiếm chọn lọc sang mạng đề xuất khu vực. Phần còn lại của mô hình\nvẫn không thay đổi. Mạng đề xuất khu vực hoạt động theo các bước sau:"
+    },
+    {
+      "type": "list",
+      "ordered": true,
+      "items": [
+        "Sử dụng lớp ghép \\(3\\times 3\\) với lớp đệm 1 để chuyển đổi đầu ra\nCNN sang đầu ra mới với \\(c\\) kênh. Bằng cách này, mỗi đơn vị dọc\ntheo kích thước không gian của các bản đồ tính năng trích xuất CNN\nđược một vector tính năng mới có chiều dài \\(c\\) .",
+        "Tập trung vào từng điểm ảnh của bản đồ tính năng, tạo ra nhiều hộp\nneo có tỷ lệ và tỷ lệ khung hình khác nhau và dán nhãn chúng.",
+        "Sử dụng vector tính năng length \\(c\\) ở giữa mỗi hộp neo, dự đoán\nlớp nhị phân (nền hoặc đối tượng) và hộp giới hạn cho hộp neo này.",
+        "Hãy xem xét những hộp giới hạn dự đoán có lớp dự đoán là các đối\ntượng. Loại bỏ kết quả chồng chéo bằng cách sử dụng ức chế không tối\nđa. Các hộp giới hạn dự đoán còn lại cho các đối tượng là các đề xuất\nkhu vực theo yêu cầu của khu vực của lớp tổng hợp quan tâm."
+      ]
+    },
+    {
+      "type": "paragraph",
+      "text": "Điều đáng chú ý là, là một phần của mô hình R-CNN nhanh hơn, mạng lưới\nđề xuất khu vực được cùng đào tạo với phần còn lại của mô hình. Nói cách\nkhác, hàm khách quan của R-CNN nhanh hơn bao gồm không chỉ dự đoán lớp\nvà hộp giới hạn trong phát hiện đối tượng, mà còn là lớp nhị phân và dự\nđoán hộp giới hạn của các hộp neo trong mạng đề xuất khu vực. Kết quả\ncủa việc đào tạo từ đầu đến cuối, mạng đề xuất khu vực học cách tạo các\nđề xuất khu vực chất lượng cao, để duy trì chính xác trong việc phát\nhiện đối tượng với số lượng đề xuất khu vực được học từ dữ liệu giảm."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "mat-na-r-cnn",
+      "text": "13.8.4. Mặt nạ R-CNN"
+    },
+    {
+      "type": "paragraph",
+      "text": "Trong tập dữ liệu đào tạo, nếu vị trí cấp pixel của đối tượng cũng được\ndán nhãn trên hình ảnh, mask R-CNN có thể tận dụng hiệu quả các nhãn\nchi tiết như vậy để cải thiện hơn nữa độ chính xác của phát hiện đối\ntượng [He et al., 2017a] ."
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/mask-rcnn.svg",
+      "local_path": "_images/mask-rcnn.svg",
+      "alt": "../_images/mask-rcnn.svg"
+    },
+    {
+      "type": "paragraph",
+      "text": "Fig. 13.8.5 The mask R-CNN model. ¶"
+    },
+    {
+      "type": "paragraph",
+      "text": "Như thể hiện trong Fig. 13.8.5 , mặt nạ R-CNN được sửa đổi\ndựa trên R-CNN nhanh hơn. Cụ thể, mặt nạ R-CNN thay thế khu vực của lớp\ntổng hợp quan tâm bằng khu vực quan tâm (ROI) sắp xếp lớp. Vùng liên\nkết mối quan tâm này sử dụng nội suy song tuyến để bảo tồn thông tin\nkhông gian trên các bản đồ tính năng, phù hợp hơn cho dự đoán mức pixel.\nĐầu ra của lớp này chứa các bản đồ tính năng có cùng hình dạng cho tất\ncả các vùng quan tâm. Chúng được sử dụng để dự đoán không chỉ lớp và hộp\ngiới hạn cho mỗi khu vực quan tâm, mà còn là vị trí cấp pixel của đối\ntượng thông qua một mạng phức tạp hoàn toàn bổ sung. Thông tin chi tiết\nvề việc sử dụng mạng phức tạp hoàn toàn để dự đoán ngữ nghĩa cấp pixel\ncủa một hình ảnh sẽ được cung cấp trong các phần tiếp theo của chương\nnày."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tom-tat",
+      "text": "13.8.5. Tóm tắt"
+    },
+    {
+      "type": "list",
+      "ordered": false,
+      "items": [
+        "R-CNN trích xuất nhiều đề xuất khu vực từ hình ảnh đầu vào, sử dụng\nCNN để thực hiện tuyên truyền chuyển tiếp trên mỗi đề xuất khu vực để\ntrích xuất các tính năng của nó, sau đó sử dụng các tính năng này để\ndự đoán lớp và hộp giới hạn của đề xuất khu vực này.",
+        "Một trong những cải tiến lớn của R-CNN nhanh từ R-CNN là việc truyền\nchuyển tiếp CNN chỉ được thực hiện trên toàn bộ hình ảnh. Nó cũng\ngiới thiệu khu vực của lớp tổng hợp quan tâm, do đó các tính năng của\ncùng một hình dạng có thể được chiết xuất thêm cho các khu vực quan\ntâm có hình dạng khác nhau.",
+        "R-CNN nhanh hơn thay thế tìm kiếm chọn lọc được sử dụng trong R-CNN\nnhanh bằng mạng lưới đề xuất khu vực được đào tạo chung, để cái trước\ncó thể giữ chính xác trong việc phát hiện đối tượng với số lượng đề\nxuất khu vực giảm.",
+        "Dựa trên R-CNN nhanh hơn, mặt nạ R-CNN cũng giới thiệu một mạng lưới\nphức tạp hoàn toàn, để tận dụng các nhãn cấp pixel để cải thiện hơn\nnữa độ chính xác của việc phát hiện đối tượng."
+      ]
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bai-tap",
+      "text": "13.8.6. Bài tập"
+    },
+    {
+      "type": "list",
+      "ordered": true,
+      "items": [
+        "Chúng ta có thể đóng khung phát hiện đối tượng như một vấn đề hồi quy\nduy nhất, chẳng hạn như dự đoán các hộp giới hạn và xác suất lớp\nkhông? Bạn có thể tham khảo thiết kế của mẫu YOLO [Redmon.Divvala.Girshick.ea.2016] .",
+        "So sánh phát hiện multibox shot đơn với các phương pháp được giới\nthiệu trong phần này. Sự khác biệt lớn của họ là gì? Bạn có thể tham\nkhảo Hình 2 của [Zhao.Zheng.Xu.ea.2019] ."
+      ]
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    }
+  ],
+  "images": [
+    {
+      "original_url": "https://vi.d2l.ai/_images/r-cnn.svg",
+      "local_path": "_images/r-cnn.svg",
+      "alt": "../_images/r-cnn.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/fast-rcnn.svg",
+      "local_path": "_images/fast-rcnn.svg",
+      "alt": "../_images/fast-rcnn.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/roi.svg",
+      "local_path": "_images/roi.svg",
+      "alt": "../_images/roi.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/faster-rcnn.svg",
+      "local_path": "_images/faster-rcnn.svg",
+      "alt": "../_images/faster-rcnn.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/mask-rcnn.svg",
+      "local_path": "_images/mask-rcnn.svg",
+      "alt": "../_images/mask-rcnn.svg"
+    }
+  ],
+  "text": "13.8. CNN dựa trên khu vực (R-CNN)\nBên cạnh việc phát hiện multibox shot đơn được mô tả trong Section 13.7 , CNN dựa trên khu vực hoặc các khu vực có tính năng\nCNN (R-CNN) cũng là một trong nhiều phương pháp tiên phong trong việc áp\ndụng học sâu vào phát hiện đối tượng [Girshick et al., 2014] . Trong phần này, chúng tôi sẽ\ngiới thiệu R-CNN và một loạt các cải tiến của nó: R-CNN [Girshick, 2015] nhanh, R-CNN [Ren et al., 2015] nhanh hơn và mặt nạ R-CNN [He et al., 2017a] . Do không\ngian hạn chế, chúng tôi sẽ chỉ tập trung vào việc thiết kế các mô hình\nnày.\n13.8.1. R-CNN\nR-CNN đầu tiên trích xuất nhiều (ví dụ: 2000) * khu vực đề xuất* từ\nhình ảnh đầu vào (ví dụ, hộp neo cũng có thể được coi là đề xuất khu\nvực), dán nhãn các lớp và hộp giới hạn của chúng (ví dụ: bù đắp). [Girshick et al., 2014] Sau đó, CNN được sử dụng để\nthực hiện tuyên truyền chuyển tiếp trên mỗi đề xuất khu vực để trích\nxuất của nó tính năng. Tiếp theo, các tính năng của mỗi đề xuất khu vực\nđược sử dụng để dự đoán lớp và hộp giới hạn của đề xuất khu vực này.\nFig. 13.8.1 The R-CNN model. ¶\nFig. 13.8.1 cho thấy mô hình R-CNN. Cụ thể hơn, R-CNN bao gồm\nbốn bước sau:\nThực hiện * tìm kiếm chọn lọc* để trích xuất nhiều đề xuất khu vực\nchất lượng cao trên hình ảnh đầu vào [Uijlings et al., 2013] . Những vùng đề xuất\nnày thường được chọn ở nhiều thang đo với hình dạng và kích cỡ khác\nnhau. Mỗi đề xuất khu vực sẽ được dán nhãn với một lớp học và một hộp\ngiới hạn sự thật mặt đất.\nChọn một CNN được đào tạo trước và cắt ngắn nó trước lớp đầu ra. Thay\nđổi kích thước mỗi đề xuất khu vực theo kích thước đầu vào theo yêu\ncầu của mạng và xuất các tính năng trích xuất cho đề xuất khu vực\nthông qua tuyên truyền chuyển tiếp.\nLấy các tính năng trích xuất và lớp được dán nhãn của mỗi đề xuất khu\nvực làm ví dụ. Đào tạo nhiều máy vector hỗ trợ để phân loại các đối\ntượng, trong đó mỗi máy vector hỗ trợ riêng xác định xem ví dụ có\nchứa một lớp cụ thể hay không.\nLấy các tính năng được trích xuất và hộp giới hạn được dán nhãn của\nmỗi đề xuất khu vực làm ví dụ. Đào tạo một mô hình hồi quy tuyến tính\nđể dự đoán hộp giới hạn chân thất-chân lý.\nMặc dù mô hình R-CNN sử dụng CNN được đào tạo trước để trích xuất hiệu\nquả các tính năng hình ảnh, nhưng nó chậm. Hãy tưởng tượng rằng chúng\ntôi chọn hàng ngàn đề xuất khu vực từ một hình ảnh đầu vào duy nhất:\nđiều này đòi hỏi hàng ngàn tuyên truyền chuyển tiếp CNN để thực hiện\nphát hiện đối tượng. Tải trọng điện toán lớn này làm cho việc sử dụng\nrộng rãi R-CNN trong các ứng dụng trong thế giới thực không khả thi.\n13.8.2. R-CNN nhanh\nNút cổ chai hiệu suất chính của R-CNN nằm ở việc tuyên truyền chuyển\ntiếp CNN độc lập cho từng đề xuất khu vực, mà không chia sẻ tính toán.\nVì những vùng này thường có sự chồng chéo, các trích xuất tính năng độc\nlập dẫn đến tính toán lặp đi lặp lại nhiều. Một trong những cải tiến lớn\ncủa * nhanh R-CNN* từ R-CNN là CNN chuyển tiếp CNN chỉ được thực hiện\ntrên toàn bộ hình ảnh [Girshick, 2015] .\nFig. 13.8.2 The fast R-CNN model. ¶\nFig. 13.8.2 mô tả mô hình R-CNN nhanh. Các tính toán\nchính của nó như sau:\nSo với R-CNN, trong R-CNN nhanh, đầu vào của CNN để trích xuất tính\nnăng là toàn bộ hình ảnh, chứ không phải là các đề xuất khu vực riêng\nlẻ. Hơn nữa, CNN này là có thể đào tạo. Với một hình ảnh đầu vào, hãy\nđể hình dạng của đầu ra CNN là \\(1 \\times c \\times h_1 \\times w_1\\) .\nGiả sử rằng tìm kiếm chọn lọc tạo ra \\(n\\) đề xuất khu vực. Các\nđề xuất khu vực này (có hình dạng khác nhau) đánh dấu các vùng được\nquan tâm (có hình dạng khác nhau) trên đầu ra CNN. Sau đó, các khu\nvực quan tâm hơn nữa trích xuất các tính năng của cùng một hình dạng\n(nói chiều cao \\(h_2\\) và chiều rộng \\(w_2\\) được chỉ định)\nđể dễ dàng nối. Để đạt được điều này, R-CNN nhanh giới thiệu lớp\ncộp* khu vực quan tâm (ROI): các đề xuất đầu ra và khu vực CNN được\nnhập vào lớp này, xuất các tính năng nối của hình dạng \\(n \\times c \\times h_2 \\times w_2\\) được trích xuất thêm cho tất\ncả các đề xuất khu vực.\nSử dụng một lớp được kết nối hoàn toàn, biến đổi các tính năng nối\nthành một đầu ra của hình dạng \\(n \\times d\\) , trong đó \\(d\\) phụ thuộc vào thiết kế mô hình.\nDự đoán lớp học và hộp giới hạn cho mỗi đề xuất khu vực \\(n\\) . Cụ\nthể hơn, trong lớp và dự đoán hộp giới hạn, biến đổi đầu ra lớp được\nkết nối hoàn toàn thành một đầu ra của hình dạng \\(n \\times q\\) ( \\(q\\) là số lớp) và một đầu ra của hình dạng \\(n \\times 4\\) ,\ntương ứng. Dự đoán lớp sử dụng hồi quy softmax.\nKhu vực của lớp tổng hợp quan tâm được đề xuất trong R-CNN nhanh khác\nvới lớp tổng hợp được giới thiệu vào năm Section 6.5 . Trong\nlayer pooling, chúng ta gián tiếp kiểm soát hình dạng đầu ra bằng cách\nchỉ định kích thước của cửa sổ pooling, padding, và sải chân. Ngược lại,\nchúng ta có thể trực tiếp chỉ định hình dạng đầu ra trong khu vực của\nlớp tổng hợp quan tâm.\nVí dụ: chúng ta hãy chỉ định chiều cao và chiều rộng đầu ra cho mỗi khu\nvực là \\(h_2\\) và \\(w_2\\) , tương ứng. Đối với bất kỳ khu vực nào\ncủa cửa sổ quan tâm của hình dạng \\(h \\times w\\) , cửa sổ này được\nchia thành một lưới \\(h_2 \\times w_2\\) của subwindows, trong đó hình\ndạng của mỗi cửa sổ con là khoảng \\((h/h_2) \\times (w/w_2)\\) . Trong\nthực tế, chiều cao và chiều rộng của bất kỳ cửa sổ con nào sẽ được làm\ntròn và phần tử lớn nhất sẽ được sử dụng làm đầu ra của cửa sổ con. Do\nđó, khu vực của lớp tổng hợp quan tâm có thể trích xuất các tính năng có\ncùng hình dạng ngay cả khi các vùng quan tâm có hình dạng khác nhau.\nNhư một ví dụ minh họa, trong Fig. 13.8.3 , khu vực quan tâm \\(3\\times 3\\) phía trên bên trái được chọn trên một đầu vào \\(4 \\times 4\\) . Đối với khu vực quan tâm này, chúng tôi sử dụng một \\(2\\times 2\\) khu vực của lớp tổng hợp quan tâm để có được một sản\nlượng \\(2\\times 2\\) . Lưu ý rằng mỗi trong bốn phân chia chứa các\nphần tử 0, 1, 4 và 5 (5 là tối đa); 2 và 6 (6 là tối đa); 8 và 9 (9 là\ntối đa); và 10.\nFig. 13.8.3 A \\(2\\times 2\\) region of interest pooling layer. ¶\nDưới đây chúng tôi chứng minh tính toán của khu vực của lớp tổng hợp\nquan tâm. Giả sử rằng chiều cao và chiều rộng của các tính năng trích\nxuất CNN X đều là 4 và chỉ có một kênh duy nhất.\nChúng ta hãy giả sử thêm rằng chiều cao và chiều rộng của hình ảnh đầu\nvào là cả 40 pixel và tìm kiếm chọn lọc tạo ra hai đề xuất khu vực trên\nhình ảnh này. Mỗi đề xuất vùng được thể hiện dưới dạng năm yếu tố: lớp\nđối tượng của nó tiếp theo là tọa độ \\((x, y)\\) của các góc trên bên\ntrái và dưới bên phải của nó.\nBởi vì chiều cao và chiều rộng của X là \\(1/10\\) chiều cao và\nchiều rộng của hình ảnh đầu vào, các tọa độ của hai đề xuất khu vực được\nnhân với 0,1 theo đối số spatial_scale được chỉ định. Sau đó, hai\nkhu vực quan tâm được đánh dấu trên X là X[:, :, 0:3, 0:3] và X[:, :, 1:4, 0:4] , tương ứng. Cuối cùng trong khu vực \\(2\\times 2\\) thu hút sự quan tâm, mỗi khu vực quan tâm được chia\nthành một mạng lưới các cửa sổ phụ để trích xuất thêm các tính năng có\ncùng hình dạng \\(2\\times 2\\) .\n13.8.3. R-CNN nhanh hơn\nĐể chính xác hơn trong việc phát hiện đối tượng, mô hình R-CNN nhanh\nthường phải tạo ra rất nhiều đề xuất khu vực trong tìm kiếm chọn lọc. Để\ngiảm đề xuất khu vực mà không mất độ chính xác, R-CNN* nhanh hơn đề\nxuất thay thế tìm kiếm chọn lọc bằng mạng đề xuất khu\nvực*:cite: Ren.He.Girshick.ea.2015 .\nFig. 13.8.4 The faster R-CNN model. ¶\nFig. 13.8.4 cho thấy mô hình R-CNN nhanh hơn. So với\nR-CNN nhanh, R-CNN nhanh hơn chỉ thay đổi phương pháp đề xuất khu vực từ\ntìm kiếm chọn lọc sang mạng đề xuất khu vực. Phần còn lại của mô hình\nvẫn không thay đổi. Mạng đề xuất khu vực hoạt động theo các bước sau:\nSử dụng lớp ghép \\(3\\times 3\\) với lớp đệm 1 để chuyển đổi đầu ra\nCNN sang đầu ra mới với \\(c\\) kênh. Bằng cách này, mỗi đơn vị dọc\ntheo kích thước không gian của các bản đồ tính năng trích xuất CNN\nđược một vector tính năng mới có chiều dài \\(c\\) .\nTập trung vào từng điểm ảnh của bản đồ tính năng, tạo ra nhiều hộp\nneo có tỷ lệ và tỷ lệ khung hình khác nhau và dán nhãn chúng.\nSử dụng vector tính năng length \\(c\\) ở giữa mỗi hộp neo, dự đoán\nlớp nhị phân (nền hoặc đối tượng) và hộp giới hạn cho hộp neo này.\nHãy xem xét những hộp giới hạn dự đoán có lớp dự đoán là các đối\ntượng. Loại bỏ kết quả chồng chéo bằng cách sử dụng ức chế không tối\nđa. Các hộp giới hạn dự đoán còn lại cho các đối tượng là các đề xuất\nkhu vực theo yêu cầu của khu vực của lớp tổng hợp quan tâm.\nĐiều đáng chú ý là, là một phần của mô hình R-CNN nhanh hơn, mạng lưới\nđề xuất khu vực được cùng đào tạo với phần còn lại của mô hình. Nói cách\nkhác, hàm khách quan của R-CNN nhanh hơn bao gồm không chỉ dự đoán lớp\nvà hộp giới hạn trong phát hiện đối tượng, mà còn là lớp nhị phân và dự\nđoán hộp giới hạn của các hộp neo trong mạng đề xuất khu vực. Kết quả\ncủa việc đào tạo từ đầu đến cuối, mạng đề xuất khu vực học cách tạo các\nđề xuất khu vực chất lượng cao, để duy trì chính xác trong việc phát\nhiện đối tượng với số lượng đề xuất khu vực được học từ dữ liệu giảm.\n13.8.4. Mặt nạ R-CNN\nTrong tập dữ liệu đào tạo, nếu vị trí cấp pixel của đối tượng cũng được\ndán nhãn trên hình ảnh, mask R-CNN có thể tận dụng hiệu quả các nhãn\nchi tiết như vậy để cải thiện hơn nữa độ chính xác của phát hiện đối\ntượng [He et al., 2017a] .\nFig. 13.8.5 The mask R-CNN model. ¶\nNhư thể hiện trong Fig. 13.8.5 , mặt nạ R-CNN được sửa đổi\ndựa trên R-CNN nhanh hơn. Cụ thể, mặt nạ R-CNN thay thế khu vực của lớp\ntổng hợp quan tâm bằng khu vực quan tâm (ROI) sắp xếp lớp. Vùng liên\nkết mối quan tâm này sử dụng nội suy song tuyến để bảo tồn thông tin\nkhông gian trên các bản đồ tính năng, phù hợp hơn cho dự đoán mức pixel.\nĐầu ra của lớp này chứa các bản đồ tính năng có cùng hình dạng cho tất\ncả các vùng quan tâm. Chúng được sử dụng để dự đoán không chỉ lớp và hộp\ngiới hạn cho mỗi khu vực quan tâm, mà còn là vị trí cấp pixel của đối\ntượng thông qua một mạng phức tạp hoàn toàn bổ sung. Thông tin chi tiết\nvề việc sử dụng mạng phức tạp hoàn toàn để dự đoán ngữ nghĩa cấp pixel\ncủa một hình ảnh sẽ được cung cấp trong các phần tiếp theo của chương\nnày.\n13.8.5. Tóm tắt\nR-CNN trích xuất nhiều đề xuất khu vực từ hình ảnh đầu vào, sử dụng\nCNN để thực hiện tuyên truyền chuyển tiếp trên mỗi đề xuất khu vực để\ntrích xuất các tính năng của nó, sau đó sử dụng các tính năng này để\ndự đoán lớp và hộp giới hạn của đề xuất khu vực này.\nMột trong những cải tiến lớn của R-CNN nhanh từ R-CNN là việc truyền\nchuyển tiếp CNN chỉ được thực hiện trên toàn bộ hình ảnh. Nó cũng\ngiới thiệu khu vực của lớp tổng hợp quan tâm, do đó các tính năng của\ncùng một hình dạng có thể được chiết xuất thêm cho các khu vực quan\ntâm có hình dạng khác nhau.\nR-CNN nhanh hơn thay thế tìm kiếm chọn lọc được sử dụng trong R-CNN\nnhanh bằng mạng lưới đề xuất khu vực được đào tạo chung, để cái trước\ncó thể giữ chính xác trong việc phát hiện đối tượng với số lượng đề\nxuất khu vực giảm.\nDựa trên R-CNN nhanh hơn, mặt nạ R-CNN cũng giới thiệu một mạng lưới\nphức tạp hoàn toàn, để tận dụng các nhãn cấp pixel để cải thiện hơn\nnữa độ chính xác của việc phát hiện đối tượng.\n13.8.6. Bài tập\nChúng ta có thể đóng khung phát hiện đối tượng như một vấn đề hồi quy\nduy nhất, chẳng hạn như dự đoán các hộp giới hạn và xác suất lớp\nkhông? Bạn có thể tham khảo thiết kế của mẫu YOLO [Redmon.Divvala.Girshick.ea.2016] .\nSo sánh phát hiện multibox shot đơn với các phương pháp được giới\nthiệu trong phần này. Sự khác biệt lớn của họ là gì? Bạn có thể tham\nkhảo Hình 2 của [Zhao.Zheng.Xu.ea.2019] .\nDiscussions\nDiscussions"
+}

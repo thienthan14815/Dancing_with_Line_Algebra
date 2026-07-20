@@ -1,0 +1,578 @@
+{
+  "url": "https://vi.d2l.ai/chapter_computer-vision/neural-style.html",
+  "chapter": "chapter_computer-vision",
+  "title": "13.12. Chuyển kiểu thần kinh",
+  "crawled_at": "2026-07-20T12:40:50.013170+00:00",
+  "headings": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "chuyen-kieu-than-kinh",
+      "text": "13.12. Chuyển kiểu thần kinh"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "phuong-phap",
+      "text": "13.12.1. Phương pháp"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "doc-noi-dung-va-phong-cach-hinh-anh",
+      "text": "13.12.2. Đọc nội dung và phong cách hình ảnh"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tien-xu-ly-va-xu-ly-sau",
+      "text": "13.12.3. Tiền xử lý và xử lý sau"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tinh-nang-chiet-xuat",
+      "text": "13.12.4. tính năng chiết xuất"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "defining-the-loss-function",
+      "text": "13.12.5. Defining the Loss Function"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "mat-noi-dung",
+      "text": "13.12.5.1. Mất nội dung"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "phong-cach-mat",
+      "text": "13.12.5.2. Phong cách mất"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "tong-bien-the-mat",
+      "text": "13.12.5.3. Tổng Biến Thể Mất"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "chuc-nang-mat",
+      "text": "13.12.5.4. Chức năng mất"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "initializing-the-synthesized-image",
+      "text": "13.12.6. Initializing the Synthesized Image"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "dao-tao",
+      "text": "13.12.7. Đào tạo"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tom-tat",
+      "text": "13.12.8. Tóm tắt"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bai-tap",
+      "text": "13.12.9. Bài tập"
+    }
+  ],
+  "content": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "chuyen-kieu-than-kinh",
+      "text": "13.12. Chuyển kiểu thần kinh"
+    },
+    {
+      "type": "paragraph",
+      "text": "Nếu bạn là một người đam mê nhiếp ảnh, bạn có thể đã quen thuộc với bộ\nlọc. Nó có thể thay đổi kiểu màu của ảnh để ảnh phong cảnh trở nên sắc\nnét hơn hoặc ảnh chân dung đã làm trắng da. Tuy nhiên, một bộ lọc thường\nchỉ thay đổi một khía cạnh của ảnh. Để áp dụng một phong cách lý tưởng\ncho ảnh, có lẽ bạn cần thử nhiều kết hợp bộ lọc khác nhau. Quá trình này\nphức tạp như điều chỉnh các siêu tham số của một mô hình."
+    },
+    {
+      "type": "paragraph",
+      "text": "Trong phần này, chúng ta sẽ tận dụng các biểu diễn theo lớp của CNN để\ntự động áp dụng kiểu của một hình ảnh cho một hình ảnh khác, tức là, *\nphong cách transfer* [Gatys et al., 2016] . Nhiệm vụ này\ncần hai hình ảnh đầu vào: một là hình ảnh* nội dung hình ảnh* và cái\ncòn lại là hình ảnh* phong cách*. Chúng tôi sẽ sử dụng mạng nơ-ron để\nsửa đổi hình ảnh nội dung để làm cho nó gần với hình ảnh phong cách theo\nphong cách. Ví dụ, hình ảnh nội dung trong Fig. 13.12.1 là một bức ảnh phong cảnh do chúng tôi\nchụp trong Vườn quốc gia Núi Rainier ở ngoại ô Seattle, trong khi hình\nảnh phong cách là một bức tranh sơn dầu với chủ đề cây sồi mùa thu.\nTrong hình ảnh tổng hợp đầu ra, các nét cọ dầu của hình ảnh phong cách\nđược áp dụng, dẫn đến màu sắc sống động hơn, đồng thời vẫn giữ được hình\ndạng chính của các đối tượng trong hình ảnh nội dung."
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/style-transfer.svg",
+      "local_path": "_images/style-transfer.svg",
+      "alt": "../_images/style-transfer.svg"
+    },
+    {
+      "type": "paragraph",
+      "text": "Fig. 13.12.1 Given content and style images, style transfer outputs a synthesized\nimage. ¶"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "phuong-phap",
+      "text": "13.12.1. Phương pháp"
+    },
+    {
+      "type": "paragraph",
+      "text": "Fig. 13.12.2 minh họa phương thức chuyển kiểu\ndựa trên CNN với một ví dụ đơn giản hóa. Đầu tiên, chúng tôi khởi tạo\nhình ảnh tổng hợp, ví dụ, vào hình ảnh nội dung. Hình ảnh tổng hợp này\nlà biến duy nhất cần được cập nhật trong quá trình chuyển kiểu, tức là\ncác tham số mô hình được cập nhật trong quá trình đào tạo. Sau đó, chúng\ntôi chọn CNN được đào tạo trước để trích xuất các tính năng hình ảnh và\nđóng băng các thông số mô hình của nó trong quá trình đào tạo. CNN sâu\nnày sử dụng nhiều lớp để trích xuất các tính năng phân cấp cho hình ảnh.\nChúng ta có thể chọn đầu ra của một số lớp này làm tính năng nội dung\nhoặc tính năng phong cách. Lấy Fig. 13.12.2 làm\nví dụ. Mạng nơ-ron được đào tạo trước ở đây có 3 lớp phức tạp, trong đó\nlớp thứ hai xuất ra các tính năng nội dung, và các lớp thứ nhất và thứ\nba xuất ra các tính năng kiểu."
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/neural-style.svg",
+      "local_path": "_images/neural-style.svg",
+      "alt": "../_images/neural-style.svg"
+    },
+    {
+      "type": "paragraph",
+      "text": "Fig. 13.12.2 CNN-based style transfer process. Solid lines show the direction of\nforward propagation and dotted lines show backward propagation. ¶"
+    },
+    {
+      "type": "paragraph",
+      "text": "Tiếp theo, chúng ta tính toán hàm mất của chuyển kiểu thông qua lan\ntruyền về phía trước (hướng của mũi tên rắn), và cập nhật các tham số mô\nhình (hình ảnh tổng hợp cho đầu ra) thông qua truyền ngược (hướng của\ncác mũi tên đứt nét). Chức năng mất thường được sử dụng trong chuyển\nphong cách bao gồm ba phần: (i) * mất nội dung* làm cho hình ảnh tổng\nhợp và hình ảnh nội dung gần gũi trong các tính năng nội dung; (ii) *\nphong cách mất đi* làm cho hình ảnh tổng hợp và phong cách gần gũi\ntrong các tính năng phong cách; và (iii) * mất biến thể* giúp giảm\nnoise tiếng ồn in the synthesized tổng hợp image hình ảnh. Cuối cùng,\nkhi đào tạo mô hình kết thúc, chúng tôi xuất các thông số mô hình của\nchuyển kiểu để tạo ra hình ảnh tổng hợp cuối cùng."
+    },
+    {
+      "type": "paragraph",
+      "text": "Sau đây, chúng tôi sẽ giải thích các chi tiết kỹ thuật của chuyển phong\ncách thông qua một thí nghiệm cụ thể."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "doc-noi-dung-va-phong-cach-hinh-anh",
+      "text": "13.12.2. Đọc nội dung và phong cách hình ảnh"
+    },
+    {
+      "type": "paragraph",
+      "text": "Đầu tiên, chúng tôi đọc nội dung và phong cách hình ảnh. Từ các trục tọa\nđộ in của chúng, chúng ta có thể nói rằng những hình ảnh này có kích\nthước khác nhau."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "%matplotlib inline\nfrom mxnet import autograd, gluon, image, init, np, npx\nfrom mxnet.gluon import nn\nfrom d2l import mxnet as d2l\n\nnpx.set_np()\n\nd2l.set_figsize()\ncontent_img = image.imread('../img/rainier.jpg')\nd2l.plt.imshow(content_img.asnumpy());"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_neural-style_5de8ca_3_0.svg",
+      "local_path": "_images/output_neural-style_5de8ca_3_0.svg",
+      "alt": "../_images/output_neural-style_5de8ca_3_0.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "style_img = image.imread('../img/autumn-oak.jpg')\nd2l.plt.imshow(style_img.asnumpy());"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_neural-style_5de8ca_4_0.svg",
+      "local_path": "_images/output_neural-style_5de8ca_4_0.svg",
+      "alt": "../_images/output_neural-style_5de8ca_4_0.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "%matplotlib inline\nimport torch\nimport torchvision\nfrom torch import nn\nfrom d2l import torch as d2l\n\nd2l.set_figsize()\ncontent_img = d2l.Image.open('../img/rainier.jpg')\nd2l.plt.imshow(content_img);"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_neural-style_5de8ca_7_0.svg",
+      "local_path": "_images/output_neural-style_5de8ca_7_0.svg",
+      "alt": "../_images/output_neural-style_5de8ca_7_0.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "style_img = d2l.Image.open('../img/autumn-oak.jpg')\nd2l.plt.imshow(style_img);"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_neural-style_5de8ca_8_0.svg",
+      "local_path": "_images/output_neural-style_5de8ca_8_0.svg",
+      "alt": "../_images/output_neural-style_5de8ca_8_0.svg"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tien-xu-ly-va-xu-ly-sau",
+      "text": "13.12.3. Tiền xử lý và xử lý sau"
+    },
+    {
+      "type": "paragraph",
+      "text": "Dưới đây, chúng tôi xác định hai chức năng cho hình ảnh tiền xử lý và xử\nlý hậu kỳ. Chức năng preprocess chuẩn hóa mỗi kênh trong ba kênh RGB\ncủa hình ảnh đầu vào và biến đổi kết quả thành định dạng đầu vào CNN.\nHàm postprocess khôi phục các giá trị điểm ảnh trong hình ảnh đầu ra\nvề giá trị ban đầu của chúng trước khi tiêu chuẩn hóa. Vì chức năng in\nảnh yêu cầu mỗi pixel có giá trị điểm nổi từ 0 đến 1, chúng ta thay thế\nbất kỳ giá trị nào nhỏ hơn 0 hoặc lớn hơn 1 với 0 hoặc 1, tương ứng."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "rgb_mean = np.array([0.485, 0.456, 0.406])\nrgb_std = np.array([0.229, 0.224, 0.225])\n\ndef preprocess(img, image_shape):\n    img = image.imresize(img, *image_shape)\n    img = (img.astype('float32') / 255 - rgb_mean) / rgb_std\n    return np.expand_dims(img.transpose(2, 0, 1), axis=0)\n\ndef postprocess(img):\n    img = img[0].as_in_ctx(rgb_std.ctx)\n    return (img.transpose(1, 2, 0) * rgb_std + rgb_mean).clip(0, 1)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "rgb_mean = torch.tensor([0.485, 0.456, 0.406])\nrgb_std = torch.tensor([0.229, 0.224, 0.225])\n\ndef preprocess(img, image_shape):\n    transforms = torchvision.transforms.Compose([\n        torchvision.transforms.Resize(image_shape),\n        torchvision.transforms.ToTensor(),\n        torchvision.transforms.Normalize(mean=rgb_mean, std=rgb_std)])\n    return transforms(img).unsqueeze(0)\n\ndef postprocess(img):\n    img = img[0].to(rgb_std.device)\n    img = torch.clamp(img.permute(1, 2, 0) * rgb_std + rgb_mean, 0, 1)\n    return torchvision.transforms.ToPILImage()(img.permute(2, 0, 1))"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tinh-nang-chiet-xuat",
+      "text": "13.12.4. tính năng chiết xuất"
+    },
+    {
+      "type": "paragraph",
+      "text": "Chúng tôi sử dụng mô hình VGG-19 được đào tạo trước trên bộ dữ liệu\nImageNet để trích xuất các tính năng hình ảnh [Gatys et al., 2016] ."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "pretrained_net = gluon.model_zoo.vision.vgg19(pretrained=True)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "pretrained_net = torchvision.models.vgg19(pretrained=True)"
+    },
+    {
+      "type": "paragraph",
+      "text": "Để trích xuất các tính năng nội dung và tính năng kiểu của hình ảnh,\nchúng ta có thể chọn đầu ra của các lớp nhất định trong mạng VGG. Nói\nchung, càng gần lớp đầu vào, dễ dàng hơn để trích xuất chi tiết của hình\nảnh, và ngược lại, dễ dàng hơn để trích xuất thông tin toàn cầu của hình\nảnh. Để tránh giữ lại quá mức các chi tiết của hình ảnh nội dung trong\nhình ảnh tổng hợp, chúng tôi chọn một lớp VGG gần đầu ra hơn làm lớp nội\ndung * để xuất các tính năng nội dung của hình ảnh. Chúng tôi cũng chọn\nđầu ra của các lớp VGG khác nhau để trích xuất các tính năng kiểu địa\nphương và toàn cầu. Các lớp này còn được gọi là lớp kiểu * . Như đã đề\ncập trong Section 7.2 , mạng VGG sử dụng 5 khối phức tạp. Trong\nthí nghiệm, chúng ta chọn lớp phức tạp cuối cùng của khối phức tạp thứ\ntư làm lớp nội dung, và lớp phức tạp đầu tiên của mỗi khối phức tạp làm\nlớp phong cách. Các chỉ số của các lớp này có thể thu được bằng cách in\nphiên bản pretrained_net ."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "style_layers, content_layers = [0, 5, 10, 19, 28], [25]"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "style_layers, content_layers = [0, 5, 10, 19, 28], [25]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Khi trích xuất các đối tượng bằng cách sử dụng các lớp VGG, chúng ta chỉ\ncần sử dụng tất cả các đối tượng từ lớp input đến lớp nội dung hoặc\nlayer style gần nhất với lớp đầu ra nhất. Chúng ta hãy xây dựng một\nphiên bản mạng mới net , chỉ giữ lại tất cả các lớp VGG được sử dụng\nđể trích xuất tính năng."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "net = nn.Sequential()\nfor i in range(max(content_layers + style_layers) + 1):\n    net.add(pretrained_net.features[i])"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "net = nn.Sequential(*[pretrained_net.features[i] for i in\n                      range(max(content_layers + style_layers) + 1)])"
+    },
+    {
+      "type": "paragraph",
+      "text": "Với đầu vào X , nếu chúng ta chỉ đơn giản gọi tuyên truyền chuyển\ntiếp net(X) , chúng ta chỉ có thể nhận được đầu ra của lớp cuối cùng.\nVì chúng ta cũng cần các đầu ra của các lớp trung gian, chúng ta cần\nthực hiện tính toán từng lớp và giữ cho các đầu ra lớp nội dung và kiểu\ndáng."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def extract_features(X, content_layers, style_layers):\n    contents = []\n    styles = []\n    for i in range(len(net)):\n        X = net[i](X)\n        if i in style_layers:\n            styles.append(X)\n        if i in content_layers:\n            contents.append(X)\n    return contents, styles"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def extract_features(X, content_layers, style_layers):\n    contents = []\n    styles = []\n    for i in range(len(net)):\n        X = net[i](X)\n        if i in style_layers:\n            styles.append(X)\n        if i in content_layers:\n            contents.append(X)\n    return contents, styles"
+    },
+    {
+      "type": "paragraph",
+      "text": "Hai chức năng được định nghĩa dưới đây: hàm get_contents trích xuất\ncác tính năng nội dung từ hình ảnh nội dung và hàm get_styles trích\nxuất các tính năng kiểu từ hình ảnh phong cách. Vì không cần cập nhật\ncác thông số mô hình của VGG được đào tạo trước trong quá trình đào tạo,\nchúng tôi có thể trích xuất nội dung và các tính năng phong cách ngay cả\ntrước khi bắt đầu đào tạo. Vì hình ảnh tổng hợp là một tập hợp các tham\nsố mô hình được cập nhật để chuyển kiểu, chúng ta chỉ có thể trích xuất\nnội dung và tính năng kiểu dáng của hình ảnh tổng hợp bằng cách gọi hàm extract_features trong quá trình đào tạo."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def get_contents(image_shape, device):\n    content_X = preprocess(content_img, image_shape).copyto(device)\n    contents_Y, _ = extract_features(content_X, content_layers, style_layers)\n    return content_X, contents_Y\n\ndef get_styles(image_shape, device):\n    style_X = preprocess(style_img, image_shape).copyto(device)\n    _, styles_Y = extract_features(style_X, content_layers, style_layers)\n    return style_X, styles_Y"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def get_contents(image_shape, device):\n    content_X = preprocess(content_img, image_shape).to(device)\n    contents_Y, _ = extract_features(content_X, content_layers, style_layers)\n    return content_X, contents_Y\n\ndef get_styles(image_shape, device):\n    style_X = preprocess(style_img, image_shape).to(device)\n    _, styles_Y = extract_features(style_X, content_layers, style_layers)\n    return style_X, styles_Y"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "defining-the-loss-function",
+      "text": "13.12.5. Defining the Loss Function"
+    },
+    {
+      "type": "paragraph",
+      "text": "Bây giờ chúng ta sẽ mô tả chức năng mất để chuyển phong cách. Chức năng\nmất bao gồm mất nội dung, mất phong cách và mất hoàn toàn biến thể."
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "mat-noi-dung",
+      "text": "13.12.5.1. Mất nội dung"
+    },
+    {
+      "type": "paragraph",
+      "text": "Tương tự như chức năng mất trong hồi quy tuyến tính, mất nội dung đo\nlường sự khác biệt về các tính năng nội dung giữa hình ảnh tổng hợp và\nhình ảnh nội dung thông qua chức năng mất bình phương. Hai đầu vào của\nhàm mất bình phương là cả hai đầu ra của lớp nội dung được tính toán bởi\nhàm extract_features ."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def content_loss(Y_hat, Y):\n    return np.square(Y_hat - Y).mean()"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def content_loss(Y_hat, Y):\n    # We detach the target content from the tree used to dynamically compute\n    # the gradient: this is a stated value, not a variable. Otherwise the loss\n    # will throw an error.\n    return torch.square(Y_hat - Y.detach()).mean()"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "phong-cach-mat",
+      "text": "13.12.5.2. Phong cách mất"
+    },
+    {
+      "type": "paragraph",
+      "text": "Mất phong cách, tương tự như mất nội dung, cũng sử dụng chức năng mất\nbình phương để đo lường sự khác biệt về phong cách giữa hình ảnh tổng\nhợp và hình ảnh phong cách. Để thể hiện đầu ra kiểu của bất kỳ layer\nstyle nào, trước tiên chúng ta sử dụng hàm extract_features để tính\ntoán đầu ra layer style. Giả sử rằng đầu ra có 1 ví dụ, \\(c\\) kênh,\nchiều cao \\(h\\) và chiều rộng \\(w\\) , chúng ta có thể chuyển đổi\nđầu ra này thành ma trận \\(\\mathbf{X}\\) với \\(c\\) hàng và \\(hw\\) cột. Ma trận này có thể được coi là sự nối của \\(c\\) vectơ \\(\\mathbf{x}_1, \\ldots, \\mathbf{x}_c\\) , mỗi vectơ có chiều dài \\(hw\\) . Ở đây, vector \\(\\mathbf{x}_i\\) đại diện cho tính năng\nphong cách của kênh \\(i\\) ."
+    },
+    {
+      "type": "paragraph",
+      "text": "Trong ma trận Gram của các vectơ \\(\\mathbf{X}\\mathbf{X}^\\top \\in \\mathbb{R}^{c \\times c}\\) , phần tử \\(x_{ij}\\) trong hàng \\(i\\) và cột \\(j\\) là tích chấm của\nvectơ \\(\\mathbf{x}_i\\) và \\(\\mathbf{x}_j\\) . Nó đại diện cho mối\ntương quan của các tính năng phong cách của các kênh \\(i\\) và \\(j\\) . Chúng tôi sử dụng ma trận Gram này để đại diện cho đầu ra\nkiểu của bất kỳ layer style nào. Lưu ý rằng khi giá trị của \\(hw\\) lớn hơn, nó có thể dẫn đến các giá trị lớn hơn trong ma trận Gram. Cũng\nlưu ý rằng chiều cao và chiều rộng của ma trận Gram đều là số kênh \\(c\\) . Để cho phép mất kiểu không bị ảnh hưởng bởi các giá trị này,\nhàm gram bên dưới chia ma trận Gram cho số phần tử của nó, tức là \\(chw\\) ."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def gram(X):\n    num_channels, n = X.shape[1], d2l.size(X) // X.shape[1]\n    X = X.reshape((num_channels, n))\n    return np.dot(X, X.T) / (num_channels * n)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def gram(X):\n    num_channels, n = X.shape[1], X.numel() // X.shape[1]\n    X = X.reshape((num_channels, n))\n    return torch.matmul(X, X.T) / (num_channels * n)"
+    },
+    {
+      "type": "paragraph",
+      "text": "Rõ ràng, hai đầu vào ma trận Gram của hàm mất bình phương để mất kiểu\nđược dựa trên đầu ra lớp kiểu cho hình ảnh tổng hợp và hình ảnh phong\ncách. Người ta cho rằng ma trận Gram gram_Y dựa trên hình ảnh phong\ncách đã được tính toán trước."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def style_loss(Y_hat, gram_Y):\n    return np.square(gram(Y_hat) - gram_Y).mean()"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def style_loss(Y_hat, gram_Y):\n    return torch.square(gram(Y_hat) - gram_Y.detach()).mean()"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "tong-bien-the-mat",
+      "text": "13.12.5.3. Tổng Biến Thể Mất"
+    },
+    {
+      "type": "paragraph",
+      "text": "Đôi khi, hình ảnh tổng hợp đã học có rất nhiều nhiễu tần số cao, tức là,\nđặc biệt là các pixel sáng hoặc tối. Một phương pháp giảm tiếng ồn phổ\nbiến là tổng biến thể biểu tượng . Biểu thị bằng \\(x_{i, j}\\) giá\ntrị điểm ảnh ở tọa độ \\((i, j)\\) . Giảm tổng tổn thất biến thể"
+    },
+    {
+      "type": "math",
+      "latex": "(13.12.1)¶\\[\\sum_{i, j} \\left|x_{i, j} - x_{i+1, j}\\right| + \\left|x_{i, j} - x_{i, j+1}\\right|\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "làm cho các giá trị của các pixel lân cận trên hình ảnh tổng hợp gần\nhơn."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def tv_loss(Y_hat):\n    return 0.5 * (np.abs(Y_hat[:, :, 1:, :] - Y_hat[:, :, :-1, :]).mean() +\n                  np.abs(Y_hat[:, :, :, 1:] - Y_hat[:, :, :, :-1]).mean())"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def tv_loss(Y_hat):\n    return 0.5 * (torch.abs(Y_hat[:, :, 1:, :] - Y_hat[:, :, :-1, :]).mean() +\n                  torch.abs(Y_hat[:, :, :, 1:] - Y_hat[:, :, :, :-1]).mean())"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "chuc-nang-mat",
+      "text": "13.12.5.4. Chức năng mất"
+    },
+    {
+      "type": "paragraph",
+      "text": "Chức năng mất của chuyển phong cách là tổng trọng số của mất nội dung,\nmất phong cách, và mất biến thể tổng số. Bằng cách điều chỉnh các siêu\ntham số trọng lượng này, chúng ta có thể cân bằng giữa việc lưu giữ nội\ndung, chuyển kiểu và giảm nhiễu trên hình ảnh tổng hợp."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "content_weight, style_weight, tv_weight = 1, 1e3, 10\n\ndef compute_loss(X, contents_Y_hat, styles_Y_hat, contents_Y, styles_Y_gram):\n    # Calculate the content, style, and total variance losses respectively\n    contents_l = [content_loss(Y_hat, Y) * content_weight for Y_hat, Y in zip(\n        contents_Y_hat, contents_Y)]\n    styles_l = [style_loss(Y_hat, Y) * style_weight for Y_hat, Y in zip(\n        styles_Y_hat, styles_Y_gram)]\n    tv_l = tv_loss(X) * tv_weight\n    # Add up all the losses\n    l = sum(10 * styles_l + contents_l + [tv_l])\n    return contents_l, styles_l, tv_l, l"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "content_weight, style_weight, tv_weight = 1, 1e3, 10\n\ndef compute_loss(X, contents_Y_hat, styles_Y_hat, contents_Y, styles_Y_gram):\n    # Calculate the content, style, and total variance losses respectively\n    contents_l = [content_loss(Y_hat, Y) * content_weight for Y_hat, Y in zip(\n        contents_Y_hat, contents_Y)]\n    styles_l = [style_loss(Y_hat, Y) * style_weight for Y_hat, Y in zip(\n        styles_Y_hat, styles_Y_gram)]\n    tv_l = tv_loss(X) * tv_weight\n    # Add up all the losses\n    l = sum(10 * styles_l + contents_l + [tv_l])\n    return contents_l, styles_l, tv_l, l"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "initializing-the-synthesized-image",
+      "text": "13.12.6. Initializing the Synthesized Image"
+    },
+    {
+      "type": "paragraph",
+      "text": "Trong chuyển phong cách, hình ảnh tổng hợp là biến duy nhất cần được cập\nnhật trong quá trình đào tạo. Do đó, chúng ta có thể xác định một mô\nhình đơn giản, SynthesizedImage và coi hình ảnh tổng hợp như các\ntham số mô hình. Trong mô hình này, tuyên truyền chuyển tiếp chỉ trả về\ncác tham số mô hình."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "class SynthesizedImage(nn.Block):\n    def __init__(self, img_shape, **kwargs):\n        super(SynthesizedImage, self).__init__(**kwargs)\n        self.weight = self.params.get('weight', shape=img_shape)\n\n    def forward(self):\n        return self.weight.data()"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "class SynthesizedImage(nn.Module):\n    def __init__(self, img_shape, **kwargs):\n        super(SynthesizedImage, self).__init__(**kwargs)\n        self.weight = nn.Parameter(torch.rand(*img_shape))\n\n    def forward(self):\n        return self.weight"
+    },
+    {
+      "type": "paragraph",
+      "text": "Tiếp theo, ta định nghĩa hàm get_inits . Hàm này tạo ra một ví dụ mô\nhình ảnh tổng hợp và khởi tạo nó thành hình ảnh X . Ma trận gram cho\nhình ảnh phong cách ở các lớp phong cách khác nhau, styles_Y_gram ,\nđược tính toán trước khi đào tạo."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def get_inits(X, device, lr, styles_Y):\n    gen_img = SynthesizedImage(X.shape)\n    gen_img.initialize(init.Constant(X), ctx=device, force_reinit=True)\n    trainer = gluon.Trainer(gen_img.collect_params(), 'adam',\n                            {'learning_rate': lr})\n    styles_Y_gram = [gram(Y) for Y in styles_Y]\n    return gen_img(), styles_Y_gram, trainer"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def get_inits(X, device, lr, styles_Y):\n    gen_img = SynthesizedImage(X.shape).to(device)\n    gen_img.weight.data.copy_(X.data)\n    trainer = torch.optim.Adam(gen_img.parameters(), lr=lr)\n    styles_Y_gram = [gram(Y) for Y in styles_Y]\n    return gen_img(), styles_Y_gram, trainer"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "dao-tao",
+      "text": "13.12.7. Đào tạo"
+    },
+    {
+      "type": "paragraph",
+      "text": "Khi đào tạo mô hình để chuyển phong cách, chúng tôi liên tục trích xuất\ncác tính năng nội dung và tính năng phong cách của hình ảnh tổng hợp và\ntính toán chức năng mất mát. Dưới đây xác định vòng lặp đào tạo."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def train(X, contents_Y, styles_Y, device, lr, num_epochs, lr_decay_epoch):\n    X, styles_Y_gram, trainer = get_inits(X, device, lr, styles_Y)\n    animator = d2l.Animator(xlabel='epoch', ylabel='loss',\n                            xlim=[10, num_epochs], ylim=[0, 20],\n                            legend=['content', 'style', 'TV'],\n                            ncols=2, figsize=(7, 2.5))\n    for epoch in range(num_epochs):\n        with autograd.record():\n            contents_Y_hat, styles_Y_hat = extract_features(\n                X, content_layers, style_layers)\n            contents_l, styles_l, tv_l, l = compute_loss(\n                X, contents_Y_hat, styles_Y_hat, contents_Y, styles_Y_gram)\n        l.backward()\n        trainer.step(1)\n        if (epoch + 1) % lr_decay_epoch == 0:\n            trainer.set_learning_rate(trainer.learning_rate * 0.8)\n        if (epoch + 1) % 10 == 0:\n            animator.axes[1].imshow(postprocess(X).asnumpy())\n            animator.add(epoch + 1, [float(sum(contents_l)),\n                                     float(sum(styles_l)), float(tv_l)])\n    return X"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def train(X, contents_Y, styles_Y, device, lr, num_epochs, lr_decay_epoch):\n    X, styles_Y_gram, trainer = get_inits(X, device, lr, styles_Y)\n    scheduler = torch.optim.lr_scheduler.StepLR(trainer, lr_decay_epoch, 0.8)\n    animator = d2l.Animator(xlabel='epoch', ylabel='loss',\n                            xlim=[10, num_epochs],\n                            legend=['content', 'style', 'TV'],\n                            ncols=2, figsize=(7, 2.5))\n    for epoch in range(num_epochs):\n        trainer.zero_grad()\n        contents_Y_hat, styles_Y_hat = extract_features(\n            X, content_layers, style_layers)\n        contents_l, styles_l, tv_l, l = compute_loss(\n            X, contents_Y_hat, styles_Y_hat, contents_Y, styles_Y_gram)\n        l.backward()\n        trainer.step()\n        scheduler.step()\n        if (epoch + 1) % 10 == 0:\n            animator.axes[1].imshow(postprocess(X))\n            animator.add(epoch + 1, [float(sum(contents_l)),\n                                     float(sum(styles_l)), float(tv_l)])\n    return X"
+    },
+    {
+      "type": "paragraph",
+      "text": "Bây giờ chúng ta bắt đầu đào tạo mô hình. Chúng tôi giải thích chiều cao\nvà chiều rộng của nội dung và phong cách hình ảnh lên 300 x 450 pixel.\nChúng tôi sử dụng hình ảnh nội dung để khởi tạo hình ảnh tổng hợp."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "device, image_shape = d2l.try_gpu(), (450, 300)\nnet.collect_params().reset_ctx(device)\ncontent_X, contents_Y = get_contents(image_shape, device)\n_, styles_Y = get_styles(image_shape, device)\noutput = train(content_X, contents_Y, styles_Y, device, 0.9, 500, 50)"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_neural-style_5de8ca_140_0.svg",
+      "local_path": "_images/output_neural-style_5de8ca_140_0.svg",
+      "alt": "../_images/output_neural-style_5de8ca_140_0.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "device, image_shape = d2l.try_gpu(), (300, 450)  # PIL Image (h, w)\nnet = net.to(device)\ncontent_X, contents_Y = get_contents(image_shape, device)\n_, styles_Y = get_styles(image_shape, device)\noutput = train(content_X, contents_Y, styles_Y, device, 0.3, 500, 50)"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_neural-style_5de8ca_143_0.svg",
+      "local_path": "_images/output_neural-style_5de8ca_143_0.svg",
+      "alt": "../_images/output_neural-style_5de8ca_143_0.svg"
+    },
+    {
+      "type": "paragraph",
+      "text": "Chúng ta có thể thấy rằng hình ảnh tổng hợp giữ lại cảnh quan và đối\ntượng của hình ảnh nội dung và chuyển màu sắc của hình ảnh phong cách\ncùng một lúc. Ví dụ, hình ảnh tổng hợp có các khối màu giống như trong\nhình ảnh phong cách. Một số khối này thậm chí còn có kết cấu tinh tế của\nnét cọ."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tom-tat",
+      "text": "13.12.8. Tóm tắt"
+    },
+    {
+      "type": "list",
+      "ordered": false,
+      "items": [
+        "Chức năng mất mát thường được sử dụng trong chuyển phong cách bao gồm\nba phần: (i) mất nội dung làm cho hình ảnh tổng hợp và hình ảnh nội\ndung gần với các tính năng nội dung; (ii) mất phong cách làm cho hình\nảnh tổng hợp và hình ảnh phong cách gần gũi trong các tính năng phong\ncách; và (iii) mất biến đổi tổng thể giúp giảm nhiễu trong the\nsynthesized tổng hợp image hình ảnh.",
+        "Chúng ta có thể sử dụng CNN được đào tạo trước để trích xuất các tính\nnăng hình ảnh và giảm thiểu chức năng mất mát để liên tục cập nhật\nhình ảnh tổng hợp dưới dạng tham số mô hình trong quá trình đào tạo.",
+        "Chúng ta sử dụng ma trận Gram để biểu diễn các đầu ra kiểu dáng từ\ncác layer style."
+      ]
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bai-tap",
+      "text": "13.12.9. Bài tập"
+    },
+    {
+      "type": "list",
+      "ordered": true,
+      "items": [
+        "Làm thế nào để đầu ra thay đổi khi bạn chọn các lớp nội dung và kiểu\nkhác nhau?",
+        "Điều chỉnh các siêu tham số trọng lượng trong chức năng mất mát. Đầu\nra có giữ được nhiều nội dung hơn hoặc ít tiếng ồn hơn?",
+        "Sử dụng nội dung khác nhau và hình ảnh phong cách. Bạn có thể tạo ra\nnhững hình ảnh tổng hợp thú vị hơn không?",
+        "Chúng ta có thể áp dụng chuyển kiểu cho văn bản không? Hint: you may\nrefer to the survey paper by Hu et al. [Hu.Lee.Aggarwal.ea.2020] ."
+      ]
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    }
+  ],
+  "images": [
+    {
+      "original_url": "https://vi.d2l.ai/_images/style-transfer.svg",
+      "local_path": "_images/style-transfer.svg",
+      "alt": "../_images/style-transfer.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/neural-style.svg",
+      "local_path": "_images/neural-style.svg",
+      "alt": "../_images/neural-style.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_neural-style_5de8ca_3_0.svg",
+      "local_path": "_images/output_neural-style_5de8ca_3_0.svg",
+      "alt": "../_images/output_neural-style_5de8ca_3_0.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_neural-style_5de8ca_4_0.svg",
+      "local_path": "_images/output_neural-style_5de8ca_4_0.svg",
+      "alt": "../_images/output_neural-style_5de8ca_4_0.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_neural-style_5de8ca_7_0.svg",
+      "local_path": "_images/output_neural-style_5de8ca_7_0.svg",
+      "alt": "../_images/output_neural-style_5de8ca_7_0.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_neural-style_5de8ca_8_0.svg",
+      "local_path": "_images/output_neural-style_5de8ca_8_0.svg",
+      "alt": "../_images/output_neural-style_5de8ca_8_0.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_neural-style_5de8ca_140_0.svg",
+      "local_path": "_images/output_neural-style_5de8ca_140_0.svg",
+      "alt": "../_images/output_neural-style_5de8ca_140_0.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_neural-style_5de8ca_143_0.svg",
+      "local_path": "_images/output_neural-style_5de8ca_143_0.svg",
+      "alt": "../_images/output_neural-style_5de8ca_143_0.svg"
+    }
+  ],
+  "text": "13.12. Chuyển kiểu thần kinh\nNếu bạn là một người đam mê nhiếp ảnh, bạn có thể đã quen thuộc với bộ\nlọc. Nó có thể thay đổi kiểu màu của ảnh để ảnh phong cảnh trở nên sắc\nnét hơn hoặc ảnh chân dung đã làm trắng da. Tuy nhiên, một bộ lọc thường\nchỉ thay đổi một khía cạnh của ảnh. Để áp dụng một phong cách lý tưởng\ncho ảnh, có lẽ bạn cần thử nhiều kết hợp bộ lọc khác nhau. Quá trình này\nphức tạp như điều chỉnh các siêu tham số của một mô hình.\nTrong phần này, chúng ta sẽ tận dụng các biểu diễn theo lớp của CNN để\ntự động áp dụng kiểu của một hình ảnh cho một hình ảnh khác, tức là, *\nphong cách transfer* [Gatys et al., 2016] . Nhiệm vụ này\ncần hai hình ảnh đầu vào: một là hình ảnh* nội dung hình ảnh* và cái\ncòn lại là hình ảnh* phong cách*. Chúng tôi sẽ sử dụng mạng nơ-ron để\nsửa đổi hình ảnh nội dung để làm cho nó gần với hình ảnh phong cách theo\nphong cách. Ví dụ, hình ảnh nội dung trong Fig. 13.12.1 là một bức ảnh phong cảnh do chúng tôi\nchụp trong Vườn quốc gia Núi Rainier ở ngoại ô Seattle, trong khi hình\nảnh phong cách là một bức tranh sơn dầu với chủ đề cây sồi mùa thu.\nTrong hình ảnh tổng hợp đầu ra, các nét cọ dầu của hình ảnh phong cách\nđược áp dụng, dẫn đến màu sắc sống động hơn, đồng thời vẫn giữ được hình\ndạng chính của các đối tượng trong hình ảnh nội dung.\nFig. 13.12.1 Given content and style images, style transfer outputs a synthesized\nimage. ¶\n13.12.1. Phương pháp\nFig. 13.12.2 minh họa phương thức chuyển kiểu\ndựa trên CNN với một ví dụ đơn giản hóa. Đầu tiên, chúng tôi khởi tạo\nhình ảnh tổng hợp, ví dụ, vào hình ảnh nội dung. Hình ảnh tổng hợp này\nlà biến duy nhất cần được cập nhật trong quá trình chuyển kiểu, tức là\ncác tham số mô hình được cập nhật trong quá trình đào tạo. Sau đó, chúng\ntôi chọn CNN được đào tạo trước để trích xuất các tính năng hình ảnh và\nđóng băng các thông số mô hình của nó trong quá trình đào tạo. CNN sâu\nnày sử dụng nhiều lớp để trích xuất các tính năng phân cấp cho hình ảnh.\nChúng ta có thể chọn đầu ra của một số lớp này làm tính năng nội dung\nhoặc tính năng phong cách. Lấy Fig. 13.12.2 làm\nví dụ. Mạng nơ-ron được đào tạo trước ở đây có 3 lớp phức tạp, trong đó\nlớp thứ hai xuất ra các tính năng nội dung, và các lớp thứ nhất và thứ\nba xuất ra các tính năng kiểu.\nFig. 13.12.2 CNN-based style transfer process. Solid lines show the direction of\nforward propagation and dotted lines show backward propagation. ¶\nTiếp theo, chúng ta tính toán hàm mất của chuyển kiểu thông qua lan\ntruyền về phía trước (hướng của mũi tên rắn), và cập nhật các tham số mô\nhình (hình ảnh tổng hợp cho đầu ra) thông qua truyền ngược (hướng của\ncác mũi tên đứt nét). Chức năng mất thường được sử dụng trong chuyển\nphong cách bao gồm ba phần: (i) * mất nội dung* làm cho hình ảnh tổng\nhợp và hình ảnh nội dung gần gũi trong các tính năng nội dung; (ii) *\nphong cách mất đi* làm cho hình ảnh tổng hợp và phong cách gần gũi\ntrong các tính năng phong cách; và (iii) * mất biến thể* giúp giảm\nnoise tiếng ồn in the synthesized tổng hợp image hình ảnh. Cuối cùng,\nkhi đào tạo mô hình kết thúc, chúng tôi xuất các thông số mô hình của\nchuyển kiểu để tạo ra hình ảnh tổng hợp cuối cùng.\nSau đây, chúng tôi sẽ giải thích các chi tiết kỹ thuật của chuyển phong\ncách thông qua một thí nghiệm cụ thể.\n13.12.2. Đọc nội dung và phong cách hình ảnh\nĐầu tiên, chúng tôi đọc nội dung và phong cách hình ảnh. Từ các trục tọa\nđộ in của chúng, chúng ta có thể nói rằng những hình ảnh này có kích\nthước khác nhau.\n13.12.3. Tiền xử lý và xử lý sau\nDưới đây, chúng tôi xác định hai chức năng cho hình ảnh tiền xử lý và xử\nlý hậu kỳ. Chức năng preprocess chuẩn hóa mỗi kênh trong ba kênh RGB\ncủa hình ảnh đầu vào và biến đổi kết quả thành định dạng đầu vào CNN.\nHàm postprocess khôi phục các giá trị điểm ảnh trong hình ảnh đầu ra\nvề giá trị ban đầu của chúng trước khi tiêu chuẩn hóa. Vì chức năng in\nảnh yêu cầu mỗi pixel có giá trị điểm nổi từ 0 đến 1, chúng ta thay thế\nbất kỳ giá trị nào nhỏ hơn 0 hoặc lớn hơn 1 với 0 hoặc 1, tương ứng.\n13.12.4. tính năng chiết xuất\nChúng tôi sử dụng mô hình VGG-19 được đào tạo trước trên bộ dữ liệu\nImageNet để trích xuất các tính năng hình ảnh [Gatys et al., 2016] .\nĐể trích xuất các tính năng nội dung và tính năng kiểu của hình ảnh,\nchúng ta có thể chọn đầu ra của các lớp nhất định trong mạng VGG. Nói\nchung, càng gần lớp đầu vào, dễ dàng hơn để trích xuất chi tiết của hình\nảnh, và ngược lại, dễ dàng hơn để trích xuất thông tin toàn cầu của hình\nảnh. Để tránh giữ lại quá mức các chi tiết của hình ảnh nội dung trong\nhình ảnh tổng hợp, chúng tôi chọn một lớp VGG gần đầu ra hơn làm lớp nội\ndung * để xuất các tính năng nội dung của hình ảnh. Chúng tôi cũng chọn\nđầu ra của các lớp VGG khác nhau để trích xuất các tính năng kiểu địa\nphương và toàn cầu. Các lớp này còn được gọi là lớp kiểu * . Như đã đề\ncập trong Section 7.2 , mạng VGG sử dụng 5 khối phức tạp. Trong\nthí nghiệm, chúng ta chọn lớp phức tạp cuối cùng của khối phức tạp thứ\ntư làm lớp nội dung, và lớp phức tạp đầu tiên của mỗi khối phức tạp làm\nlớp phong cách. Các chỉ số của các lớp này có thể thu được bằng cách in\nphiên bản pretrained_net .\nKhi trích xuất các đối tượng bằng cách sử dụng các lớp VGG, chúng ta chỉ\ncần sử dụng tất cả các đối tượng từ lớp input đến lớp nội dung hoặc\nlayer style gần nhất với lớp đầu ra nhất. Chúng ta hãy xây dựng một\nphiên bản mạng mới net , chỉ giữ lại tất cả các lớp VGG được sử dụng\nđể trích xuất tính năng.\nVới đầu vào X , nếu chúng ta chỉ đơn giản gọi tuyên truyền chuyển\ntiếp net(X) , chúng ta chỉ có thể nhận được đầu ra của lớp cuối cùng.\nVì chúng ta cũng cần các đầu ra của các lớp trung gian, chúng ta cần\nthực hiện tính toán từng lớp và giữ cho các đầu ra lớp nội dung và kiểu\ndáng.\nHai chức năng được định nghĩa dưới đây: hàm get_contents trích xuất\ncác tính năng nội dung từ hình ảnh nội dung và hàm get_styles trích\nxuất các tính năng kiểu từ hình ảnh phong cách. Vì không cần cập nhật\ncác thông số mô hình của VGG được đào tạo trước trong quá trình đào tạo,\nchúng tôi có thể trích xuất nội dung và các tính năng phong cách ngay cả\ntrước khi bắt đầu đào tạo. Vì hình ảnh tổng hợp là một tập hợp các tham\nsố mô hình được cập nhật để chuyển kiểu, chúng ta chỉ có thể trích xuất\nnội dung và tính năng kiểu dáng của hình ảnh tổng hợp bằng cách gọi hàm extract_features trong quá trình đào tạo.\n13.12.5. Defining the Loss Function\nBây giờ chúng ta sẽ mô tả chức năng mất để chuyển phong cách. Chức năng\nmất bao gồm mất nội dung, mất phong cách và mất hoàn toàn biến thể.\n13.12.5.1. Mất nội dung\nTương tự như chức năng mất trong hồi quy tuyến tính, mất nội dung đo\nlường sự khác biệt về các tính năng nội dung giữa hình ảnh tổng hợp và\nhình ảnh nội dung thông qua chức năng mất bình phương. Hai đầu vào của\nhàm mất bình phương là cả hai đầu ra của lớp nội dung được tính toán bởi\nhàm extract_features .\n13.12.5.2. Phong cách mất\nMất phong cách, tương tự như mất nội dung, cũng sử dụng chức năng mất\nbình phương để đo lường sự khác biệt về phong cách giữa hình ảnh tổng\nhợp và hình ảnh phong cách. Để thể hiện đầu ra kiểu của bất kỳ layer\nstyle nào, trước tiên chúng ta sử dụng hàm extract_features để tính\ntoán đầu ra layer style. Giả sử rằng đầu ra có 1 ví dụ, \\(c\\) kênh,\nchiều cao \\(h\\) và chiều rộng \\(w\\) , chúng ta có thể chuyển đổi\nđầu ra này thành ma trận \\(\\mathbf{X}\\) với \\(c\\) hàng và \\(hw\\) cột. Ma trận này có thể được coi là sự nối của \\(c\\) vectơ \\(\\mathbf{x}_1, \\ldots, \\mathbf{x}_c\\) , mỗi vectơ có chiều dài \\(hw\\) . Ở đây, vector \\(\\mathbf{x}_i\\) đại diện cho tính năng\nphong cách của kênh \\(i\\) .\nTrong ma trận Gram của các vectơ \\(\\mathbf{X}\\mathbf{X}^\\top \\in \\mathbb{R}^{c \\times c}\\) , phần tử \\(x_{ij}\\) trong hàng \\(i\\) và cột \\(j\\) là tích chấm của\nvectơ \\(\\mathbf{x}_i\\) và \\(\\mathbf{x}_j\\) . Nó đại diện cho mối\ntương quan của các tính năng phong cách của các kênh \\(i\\) và \\(j\\) . Chúng tôi sử dụng ma trận Gram này để đại diện cho đầu ra\nkiểu của bất kỳ layer style nào. Lưu ý rằng khi giá trị của \\(hw\\) lớn hơn, nó có thể dẫn đến các giá trị lớn hơn trong ma trận Gram. Cũng\nlưu ý rằng chiều cao và chiều rộng của ma trận Gram đều là số kênh \\(c\\) . Để cho phép mất kiểu không bị ảnh hưởng bởi các giá trị này,\nhàm gram bên dưới chia ma trận Gram cho số phần tử của nó, tức là \\(chw\\) .\nRõ ràng, hai đầu vào ma trận Gram của hàm mất bình phương để mất kiểu\nđược dựa trên đầu ra lớp kiểu cho hình ảnh tổng hợp và hình ảnh phong\ncách. Người ta cho rằng ma trận Gram gram_Y dựa trên hình ảnh phong\ncách đã được tính toán trước.\n13.12.5.3. Tổng Biến Thể Mất\nĐôi khi, hình ảnh tổng hợp đã học có rất nhiều nhiễu tần số cao, tức là,\nđặc biệt là các pixel sáng hoặc tối. Một phương pháp giảm tiếng ồn phổ\nbiến là tổng biến thể biểu tượng . Biểu thị bằng \\(x_{i, j}\\) giá\ntrị điểm ảnh ở tọa độ \\((i, j)\\) . Giảm tổng tổn thất biến thể\nlàm cho các giá trị của các pixel lân cận trên hình ảnh tổng hợp gần\nhơn.\n13.12.5.4. Chức năng mất\nChức năng mất của chuyển phong cách là tổng trọng số của mất nội dung,\nmất phong cách, và mất biến thể tổng số. Bằng cách điều chỉnh các siêu\ntham số trọng lượng này, chúng ta có thể cân bằng giữa việc lưu giữ nội\ndung, chuyển kiểu và giảm nhiễu trên hình ảnh tổng hợp.\n13.12.6. Initializing the Synthesized Image\nTrong chuyển phong cách, hình ảnh tổng hợp là biến duy nhất cần được cập\nnhật trong quá trình đào tạo. Do đó, chúng ta có thể xác định một mô\nhình đơn giản, SynthesizedImage và coi hình ảnh tổng hợp như các\ntham số mô hình. Trong mô hình này, tuyên truyền chuyển tiếp chỉ trả về\ncác tham số mô hình.\nTiếp theo, ta định nghĩa hàm get_inits . Hàm này tạo ra một ví dụ mô\nhình ảnh tổng hợp và khởi tạo nó thành hình ảnh X . Ma trận gram cho\nhình ảnh phong cách ở các lớp phong cách khác nhau, styles_Y_gram ,\nđược tính toán trước khi đào tạo.\n13.12.7. Đào tạo\nKhi đào tạo mô hình để chuyển phong cách, chúng tôi liên tục trích xuất\ncác tính năng nội dung và tính năng phong cách của hình ảnh tổng hợp và\ntính toán chức năng mất mát. Dưới đây xác định vòng lặp đào tạo.\nBây giờ chúng ta bắt đầu đào tạo mô hình. Chúng tôi giải thích chiều cao\nvà chiều rộng của nội dung và phong cách hình ảnh lên 300 x 450 pixel.\nChúng tôi sử dụng hình ảnh nội dung để khởi tạo hình ảnh tổng hợp.\nChúng ta có thể thấy rằng hình ảnh tổng hợp giữ lại cảnh quan và đối\ntượng của hình ảnh nội dung và chuyển màu sắc của hình ảnh phong cách\ncùng một lúc. Ví dụ, hình ảnh tổng hợp có các khối màu giống như trong\nhình ảnh phong cách. Một số khối này thậm chí còn có kết cấu tinh tế của\nnét cọ.\n13.12.8. Tóm tắt\nChức năng mất mát thường được sử dụng trong chuyển phong cách bao gồm\nba phần: (i) mất nội dung làm cho hình ảnh tổng hợp và hình ảnh nội\ndung gần với các tính năng nội dung; (ii) mất phong cách làm cho hình\nảnh tổng hợp và hình ảnh phong cách gần gũi trong các tính năng phong\ncách; và (iii) mất biến đổi tổng thể giúp giảm nhiễu trong the\nsynthesized tổng hợp image hình ảnh.\nChúng ta có thể sử dụng CNN được đào tạo trước để trích xuất các tính\nnăng hình ảnh và giảm thiểu chức năng mất mát để liên tục cập nhật\nhình ảnh tổng hợp dưới dạng tham số mô hình trong quá trình đào tạo.\nChúng ta sử dụng ma trận Gram để biểu diễn các đầu ra kiểu dáng từ\ncác layer style.\n13.12.9. Bài tập\nLàm thế nào để đầu ra thay đổi khi bạn chọn các lớp nội dung và kiểu\nkhác nhau?\nĐiều chỉnh các siêu tham số trọng lượng trong chức năng mất mát. Đầu\nra có giữ được nhiều nội dung hơn hoặc ít tiếng ồn hơn?\nSử dụng nội dung khác nhau và hình ảnh phong cách. Bạn có thể tạo ra\nnhững hình ảnh tổng hợp thú vị hơn không?\nChúng ta có thể áp dụng chuyển kiểu cho văn bản không? Hint: you may\nrefer to the survey paper by Hu et al. [Hu.Lee.Aggarwal.ea.2020] .\nDiscussions\nDiscussions"
+}

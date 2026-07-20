@@ -1,0 +1,333 @@
+{
+  "url": "https://vi.d2l.ai/chapter_natural-language-processing-applications/natural-language-inference-and-dataset.html",
+  "chapter": "chapter_natural-language-processing-applications",
+  "title": "15.4. Suy luận ngôn ngữ tự nhiên và tập dữ liệu",
+  "crawled_at": "2026-07-20T12:41:06.590735+00:00",
+  "headings": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "suy-luan-ngon-ngu-tu-nhien-va-tap-du-lieu",
+      "text": "15.4. Suy luận ngôn ngữ tự nhiên và tập dữ liệu"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "suy-luan-ngon-ngu-tu-nhien",
+      "text": "15.4.1. Suy luận ngôn ngữ tự nhiên"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bo-du-lieu-suy-luan-ngon-ngu-tu-nhien-stanford-snli",
+      "text": "15.4.2. Bộ dữ liệu Suy luận ngôn ngữ tự nhiên Stanford (SNLI)"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "doc-tap-du-lieu",
+      "text": "15.4.2.1. Đọc tập dữ liệu"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "xac-dinh-mot-lop-de-tai-tap-du-lieu",
+      "text": "15.4.2.2. Xác định một lớp để tải tập dữ liệu"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "dat-tat-ca-moi-thu-lai-voi-nhau",
+      "text": "15.4.2.3. Đặt tất cả mọi thứ lại với nhau"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tom-tat",
+      "text": "15.4.3. Tóm tắt"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bai-tap",
+      "text": "15.4.4. Bài tập"
+    }
+  ],
+  "content": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "suy-luan-ngon-ngu-tu-nhien-va-tap-du-lieu",
+      "text": "15.4. Suy luận ngôn ngữ tự nhiên và tập dữ liệu"
+    },
+    {
+      "type": "paragraph",
+      "text": "Năm Section 15.1 , chúng tôi đã thảo luận về vấn đề phân\ntích tình cảm. Nhiệm vụ này nhằm phân loại một chuỗi văn bản đơn lẻ\nthành các danh mục được xác định trước, chẳng hạn như một tập hợp các\nphân cực tình cảm. Tuy nhiên, khi có nhu cầu quyết định xem một câu có\nthể được suy ra dạng khác hay loại bỏ sự dư thừa bằng cách xác định các\ncâu tương đương về mặt ngữ nghĩa, biết cách phân loại một chuỗi văn bản\nlà không đủ. Thay vào đó, chúng ta cần có khả năng lý luận trên các cặp\nchuỗi văn bản."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "suy-luan-ngon-ngu-tu-nhien",
+      "text": "15.4.1. Suy luận ngôn ngữ tự nhiên"
+    },
+    {
+      "type": "paragraph",
+      "text": "Suy luận ngôn ngữ tự nhiên nghiên cứu liệu một giả thuyết ** có thể\nđược suy ra từ một premise , trong đó cả hai đều là một chuỗi văn bản.\nNói cách khác, suy luận ngôn ngữ tự nhiên xác định mối quan hệ logic\ngiữa một cặp chuỗi văn bản. Các mối quan hệ như vậy thường rơi vào ba\nloại:"
+    },
+    {
+      "type": "list",
+      "ordered": false,
+      "items": [
+        "Entailment : giả thuyết có thể được suy ra từ tiền đề.",
+        "Contradiction : sự phủ định của giả thuyết có thể được suy ra từ\ntiền đề.",
+        "Trung tính : tất cả các trường hợp khác."
+      ]
+    },
+    {
+      "type": "paragraph",
+      "text": "Suy luận ngôn ngữ tự nhiên còn được gọi là nhiệm vụ liên kết văn bản\nnhận dạng. Ví dụ, cặp sau sẽ được dán nhãn là entailment bởi vì “thể\nhiện tình cảm” trong giả thuyết có thể được suy ra từ “ôm nhau” trong\ntiền đề."
+    },
+    {
+      "type": "paragraph",
+      "text": "Sau đây là một ví dụ về * mâu thuẫn * như “chạy ví dụ mã hóa” chỉ ra\n“không ngủ” chứ không phải là “ngủ”."
+    },
+    {
+      "type": "paragraph",
+      "text": "Ví dụ thứ ba cho thấy mối quan hệ trung tính vì không “nổi tiếng” hay\n“không nổi tiếng” đều không thể suy ra từ thực tế là “đang biểu diễn cho\nchúng tôi”."
+    },
+    {
+      "type": "paragraph",
+      "text": "Suy luận ngôn ngữ tự nhiên đã là một chủ đề trung tâm để hiểu ngôn ngữ\ntự nhiên. Nó thích các ứng dụng rộng rãi, từ truy xuất thông tin đến trả\nlời câu hỏi tên miền mở. Để nghiên cứu vấn đề này, chúng ta sẽ bắt đầu\nbằng cách điều tra một tập dữ liệu chuẩn chuẩn suy luận ngôn ngữ tự\nnhiên phổ biến."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bo-du-lieu-suy-luan-ngon-ngu-tu-nhien-stanford-snli",
+      "text": "15.4.2. Bộ dữ liệu Suy luận ngôn ngữ tự nhiên Stanford (SNLI)"
+    },
+    {
+      "type": "paragraph",
+      "text": "Stanford Natural Language Inference (SNLI) Corpus là một bộ sưu tập của\nhơn 500000 cặp câu tiếng Anh được dán nhãn [Bowman et al., 2015] . Chúng tôi tải xuống và lưu trữ\ntập dữ liệu SNLI được trích xuất trong đường dẫn ../data/snli_1.0 ."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "import os\nimport re\nfrom mxnet import gluon, np, npx\nfrom d2l import mxnet as d2l\n\nnpx.set_np()\n\n#@save\nd2l.DATA_HUB['SNLI'] = (\n    'https://nlp.stanford.edu/projects/snli/snli_1.0.zip',\n    '9fcde07509c7e87ec61c640c1b2753d9041758e4')\n\ndata_dir = d2l.download_extract('SNLI')"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "import os\nimport re\nimport torch\nfrom torch import nn\nfrom d2l import torch as d2l\n\n#@save\nd2l.DATA_HUB['SNLI'] = (\n    'https://nlp.stanford.edu/projects/snli/snli_1.0.zip',\n    '9fcde07509c7e87ec61c640c1b2753d9041758e4')\n\ndata_dir = d2l.download_extract('SNLI')"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "Downloading ../data/snli_1.0.zip from https://nlp.stanford.edu/projects/snli/snli_1.0.zip..."
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "doc-tap-du-lieu",
+      "text": "15.4.2.1. Đọc tập dữ liệu"
+    },
+    {
+      "type": "paragraph",
+      "text": "Tập dữ liệu SNLI ban đầu chứa thông tin phong phú hơn nhiều so với những\ngì chúng ta thực sự cần trong các thí nghiệm của mình. Do đó, chúng tôi\nđịnh nghĩa một hàm read_snli để chỉ trích xuất một phần của tập dữ\nliệu, sau đó trả về danh sách các cơ sở, giả thuyết và nhãn của chúng."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "#@save\ndef read_snli(data_dir, is_train):\n    \"\"\"Read the SNLI dataset into premises, hypotheses, and labels.\"\"\"\n    def extract_text(s):\n        # Remove information that will not be used by us\n        s = re.sub('\\\\(', '', s)\n        s = re.sub('\\\\)', '', s)\n        # Substitute two or more consecutive whitespace with space\n        s = re.sub('\\\\s{2,}', ' ', s)\n        return s.strip()\n    label_set = {'entailment': 0, 'contradiction': 1, 'neutral': 2}\n    file_name = os.path.join(data_dir, 'snli_1.0_train.txt'\n                             if is_train else 'snli_1.0_test.txt')\n    with open(file_name, 'r') as f:\n        rows = [row.split('\\t') for row in f.readlines()[1:]]\n    premises = [extract_text(row[1]) for row in rows if row[0] in label_set]\n    hypotheses = [extract_text(row[2]) for row in rows if row[0] in label_set]\n    labels = [label_set[row[0]] for row in rows if row[0] in label_set]\n    return premises, hypotheses, labels"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "#@save\ndef read_snli(data_dir, is_train):\n    \"\"\"Read the SNLI dataset into premises, hypotheses, and labels.\"\"\"\n    def extract_text(s):\n        # Remove information that will not be used by us\n        s = re.sub('\\\\(', '', s)\n        s = re.sub('\\\\)', '', s)\n        # Substitute two or more consecutive whitespace with space\n        s = re.sub('\\\\s{2,}', ' ', s)\n        return s.strip()\n    label_set = {'entailment': 0, 'contradiction': 1, 'neutral': 2}\n    file_name = os.path.join(data_dir, 'snli_1.0_train.txt'\n                             if is_train else 'snli_1.0_test.txt')\n    with open(file_name, 'r') as f:\n        rows = [row.split('\\t') for row in f.readlines()[1:]]\n    premises = [extract_text(row[1]) for row in rows if row[0] in label_set]\n    hypotheses = [extract_text(row[2]) for row in rows if row[0] in label_set]\n    labels = [label_set[row[0]] for row in rows if row[0] in label_set]\n    return premises, hypotheses, labels"
+    },
+    {
+      "type": "paragraph",
+      "text": "Bây giờ chúng ta hãy in 3 cặp tiền đề và giả thuyết đầu tiên, cũng như\nnhãn của chúng (“0”, “1”, và “2” tương ứng với “entailment”, “mâu\nthuẫn”, và “trung lập”, tương ứng)."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "train_data = read_snli(data_dir, is_train=True)\nfor x0, x1, y in zip(train_data[0][:3], train_data[1][:3], train_data[2][:3]):\n    print('premise:', x0)\n    print('hypothesis:', x1)\n    print('label:', y)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "premise: A person on a horse jumps over a broken down airplane .\nhypothesis: A person is training his horse for a competition .\nlabel: 2\npremise: A person on a horse jumps over a broken down airplane .\nhypothesis: A person is at a diner , ordering an omelette .\nlabel: 1\npremise: A person on a horse jumps over a broken down airplane .\nhypothesis: A person is outdoors , on a horse .\nlabel: 0"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "train_data = read_snli(data_dir, is_train=True)\nfor x0, x1, y in zip(train_data[0][:3], train_data[1][:3], train_data[2][:3]):\n    print('premise:', x0)\n    print('hypothesis:', x1)\n    print('label:', y)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "premise: A person on a horse jumps over a broken down airplane .\nhypothesis: A person is training his horse for a competition .\nlabel: 2\npremise: A person on a horse jumps over a broken down airplane .\nhypothesis: A person is at a diner , ordering an omelette .\nlabel: 1\npremise: A person on a horse jumps over a broken down airplane .\nhypothesis: A person is outdoors , on a horse .\nlabel: 0"
+    },
+    {
+      "type": "paragraph",
+      "text": "Bộ huấn luyện có khoảng 550000 cặp, và bộ thử nghiệm có khoảng 10000\ncặp. Sau đây cho thấy ba nhãn “entailment”, “contradiction”, và\n“neutral” được cân bằng trong cả bộ tập huấn và bộ thử nghiệm."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "test_data = read_snli(data_dir, is_train=False)\nfor data in [train_data, test_data]:\n    print([[row for row in data[2]].count(i) for i in range(3)])"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "[183416, 183187, 182764]\n[3368, 3237, 3219]"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "test_data = read_snli(data_dir, is_train=False)\nfor data in [train_data, test_data]:\n    print([[row for row in data[2]].count(i) for i in range(3)])"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "[183416, 183187, 182764]\n[3368, 3237, 3219]"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "xac-dinh-mot-lop-de-tai-tap-du-lieu",
+      "text": "15.4.2.2. Xác định một lớp để tải tập dữ liệu"
+    },
+    {
+      "type": "paragraph",
+      "text": "Dưới đây chúng ta định nghĩa một class để tải tập dữ liệu SNLI bằng cách\nkế thừa từ lớp Dataset trong Gluon. Đối số num_steps trong hàm\ntạo lớp xác định độ dài của một chuỗi văn bản sao cho mỗi minibatch của\nchuỗi sẽ có hình dạng giống nhau. Nói cách khác, các token sau num_steps đầu tiên theo trình tự dài hơn được cắt tỉa, trong khi các\ntoken đặc biệt “” sẽ được thêm vào các chuỗi ngắn hơn cho đến khi độ dài\ncủa chúng trở thành num_steps . Bằng cách thực hiện hàm __getitem__ , chúng ta có thể tùy ý truy cập tiền đề, giả thuyết và\nnhãn với chỉ số idx ."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "#@save\nclass SNLIDataset(gluon.data.Dataset):\n    \"\"\"A customized dataset to load the SNLI dataset.\"\"\"\n    def __init__(self, dataset, num_steps, vocab=None):\n        self.num_steps = num_steps\n        all_premise_tokens = d2l.tokenize(dataset[0])\n        all_hypothesis_tokens = d2l.tokenize(dataset[1])\n        if vocab is None:\n            self.vocab = d2l.Vocab(all_premise_tokens + all_hypothesis_tokens,\n                                   min_freq=5, reserved_tokens=['<pad>'])\n        else:\n            self.vocab = vocab\n        self.premises = self._pad(all_premise_tokens)\n        self.hypotheses = self._pad(all_hypothesis_tokens)\n        self.labels = np.array(dataset[2])\n        print('read ' + str(len(self.premises)) + ' examples')\n\n    def _pad(self, lines):\n        return np.array([d2l.truncate_pad(\n            self.vocab[line], self.num_steps, self.vocab['<pad>'])\n                         for line in lines])\n\n    def __getitem__(self, idx):\n        return (self.premises[idx], self.hypotheses[idx]), self.labels[idx]\n\n    def __len__(self):\n        return len(self.premises)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "#@save\nclass SNLIDataset(torch.utils.data.Dataset):\n    \"\"\"A customized dataset to load the SNLI dataset.\"\"\"\n    def __init__(self, dataset, num_steps, vocab=None):\n        self.num_steps = num_steps\n        all_premise_tokens = d2l.tokenize(dataset[0])\n        all_hypothesis_tokens = d2l.tokenize(dataset[1])\n        if vocab is None:\n            self.vocab = d2l.Vocab(all_premise_tokens + all_hypothesis_tokens,\n                                   min_freq=5, reserved_tokens=['<pad>'])\n        else:\n            self.vocab = vocab\n        self.premises = self._pad(all_premise_tokens)\n        self.hypotheses = self._pad(all_hypothesis_tokens)\n        self.labels = torch.tensor(dataset[2])\n        print('read ' + str(len(self.premises)) + ' examples')\n\n    def _pad(self, lines):\n        return torch.tensor([d2l.truncate_pad(\n            self.vocab[line], self.num_steps, self.vocab['<pad>'])\n                         for line in lines])\n\n    def __getitem__(self, idx):\n        return (self.premises[idx], self.hypotheses[idx]), self.labels[idx]\n\n    def __len__(self):\n        return len(self.premises)"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "dat-tat-ca-moi-thu-lai-voi-nhau",
+      "text": "15.4.2.3. Đặt tất cả mọi thứ lại với nhau"
+    },
+    {
+      "type": "paragraph",
+      "text": "Bây giờ chúng ta có thể gọi hàm read_snli và lớp SNLIDataset để\ntải xuống tập dữ liệu SNLI và trả về DataLoader phiên bản cho cả bộ\nđào tạo và thử nghiệm, cùng với từ vựng của bộ đào tạo. Đáng chú ý là\nchúng ta phải sử dụng từ vựng được xây dựng từ bộ đào tạo như của bộ thử\nnghiệm. Do đó, bất kỳ mã thông báo mới nào từ bộ thử nghiệm sẽ không\nđược biết đến với mô hình được đào tạo trên bộ đào tạo."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "#@save\ndef load_data_snli(batch_size, num_steps=50):\n    \"\"\"Download the SNLI dataset and return data iterators and vocabulary.\"\"\"\n    num_workers = d2l.get_dataloader_workers()\n    data_dir = d2l.download_extract('SNLI')\n    train_data = read_snli(data_dir, True)\n    test_data = read_snli(data_dir, False)\n    train_set = SNLIDataset(train_data, num_steps)\n    test_set = SNLIDataset(test_data, num_steps, train_set.vocab)\n    train_iter = gluon.data.DataLoader(train_set, batch_size, shuffle=True,\n                                       num_workers=num_workers)\n    test_iter = gluon.data.DataLoader(test_set, batch_size, shuffle=False,\n                                      num_workers=num_workers)\n    return train_iter, test_iter, train_set.vocab"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "#@save\ndef load_data_snli(batch_size, num_steps=50):\n    \"\"\"Download the SNLI dataset and return data iterators and vocabulary.\"\"\"\n    num_workers = d2l.get_dataloader_workers()\n    data_dir = d2l.download_extract('SNLI')\n    train_data = read_snli(data_dir, True)\n    test_data = read_snli(data_dir, False)\n    train_set = SNLIDataset(train_data, num_steps)\n    test_set = SNLIDataset(test_data, num_steps, train_set.vocab)\n    train_iter = torch.utils.data.DataLoader(train_set, batch_size,\n                                             shuffle=True,\n                                             num_workers=num_workers)\n    test_iter = torch.utils.data.DataLoader(test_set, batch_size,\n                                            shuffle=False,\n                                            num_workers=num_workers)\n    return train_iter, test_iter, train_set.vocab"
+    },
+    {
+      "type": "paragraph",
+      "text": "Ở đây chúng ta đặt kích thước lô thành 128 và độ dài chuỗi là 50 và gọi\nhàm load_data_snli để lấy các bộ lặp dữ liệu và từ vựng. Sau đó,\nchúng tôi in kích thước từ vựng."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "train_iter, test_iter, vocab = load_data_snli(128, 50)\nlen(vocab)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "read 549367 examples\nread 9824 examples"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "18678"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "train_iter, test_iter, vocab = load_data_snli(128, 50)\nlen(vocab)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "read 549367 examples\nread 9824 examples"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "18678"
+    },
+    {
+      "type": "paragraph",
+      "text": "Bây giờ chúng tôi in hình dạng của minibatch đầu tiên. Trái ngược với\nphân tích tâm lý, chúng tôi có hai đầu vào X[0] và X[1] đại diện\ncho các cặp cơ sở và giả thuyết."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "for X, Y in train_iter:\n    print(X[0].shape)\n    print(X[1].shape)\n    print(Y.shape)\n    break"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "(128, 50)\n(128, 50)\n(128,)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "for X, Y in train_iter:\n    print(X[0].shape)\n    print(X[1].shape)\n    print(Y.shape)\n    break"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "torch.Size([128, 50])\ntorch.Size([128, 50])\ntorch.Size([128])"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tom-tat",
+      "text": "15.4.3. Tóm tắt"
+    },
+    {
+      "type": "list",
+      "ordered": false,
+      "items": [
+        "Suy luận ngôn ngữ tự nhiên nghiên cứu liệu một giả thuyết có thể được\nsuy ra từ một tiền đề, trong đó cả hai đều là một chuỗi văn bản.",
+        "Trong suy luận ngôn ngữ tự nhiên, các mối quan hệ giữa cơ sở và giả\nthuyết bao gồm sự đòi hỏi, mâu thuẫn, và trung lập.",
+        "Stanford Natural Language Inference (SNLI) Corpus là một tập dữ liệu\nchuẩn phổ biến của suy luận ngôn ngữ tự nhiên."
+      ]
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bai-tap",
+      "text": "15.4.4. Bài tập"
+    },
+    {
+      "type": "list",
+      "ordered": true,
+      "items": [
+        "Dịch máy từ lâu đã được đánh giá dựa trên sự phù hợp bề ngoài \\(n\\) gram giữa bản dịch đầu ra và bản dịch chân lý. Bạn có thể\nthiết kế một biện pháp để đánh giá kết quả dịch máy bằng cách sử dụng\nsuy luận ngôn ngữ tự nhiên không?",
+        "Làm thế nào chúng ta có thể thay đổi các siêu tham số để giảm kích\nthước từ vựng?"
+      ]
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    }
+  ],
+  "images": [],
+  "text": "15.4. Suy luận ngôn ngữ tự nhiên và tập dữ liệu\nNăm Section 15.1 , chúng tôi đã thảo luận về vấn đề phân\ntích tình cảm. Nhiệm vụ này nhằm phân loại một chuỗi văn bản đơn lẻ\nthành các danh mục được xác định trước, chẳng hạn như một tập hợp các\nphân cực tình cảm. Tuy nhiên, khi có nhu cầu quyết định xem một câu có\nthể được suy ra dạng khác hay loại bỏ sự dư thừa bằng cách xác định các\ncâu tương đương về mặt ngữ nghĩa, biết cách phân loại một chuỗi văn bản\nlà không đủ. Thay vào đó, chúng ta cần có khả năng lý luận trên các cặp\nchuỗi văn bản.\n15.4.1. Suy luận ngôn ngữ tự nhiên\nSuy luận ngôn ngữ tự nhiên nghiên cứu liệu một giả thuyết ** có thể\nđược suy ra từ một premise , trong đó cả hai đều là một chuỗi văn bản.\nNói cách khác, suy luận ngôn ngữ tự nhiên xác định mối quan hệ logic\ngiữa một cặp chuỗi văn bản. Các mối quan hệ như vậy thường rơi vào ba\nloại:\nEntailment : giả thuyết có thể được suy ra từ tiền đề.\nContradiction : sự phủ định của giả thuyết có thể được suy ra từ\ntiền đề.\nTrung tính : tất cả các trường hợp khác.\nSuy luận ngôn ngữ tự nhiên còn được gọi là nhiệm vụ liên kết văn bản\nnhận dạng. Ví dụ, cặp sau sẽ được dán nhãn là entailment bởi vì “thể\nhiện tình cảm” trong giả thuyết có thể được suy ra từ “ôm nhau” trong\ntiền đề.\nSau đây là một ví dụ về * mâu thuẫn * như “chạy ví dụ mã hóa” chỉ ra\n“không ngủ” chứ không phải là “ngủ”.\nVí dụ thứ ba cho thấy mối quan hệ trung tính vì không “nổi tiếng” hay\n“không nổi tiếng” đều không thể suy ra từ thực tế là “đang biểu diễn cho\nchúng tôi”.\nSuy luận ngôn ngữ tự nhiên đã là một chủ đề trung tâm để hiểu ngôn ngữ\ntự nhiên. Nó thích các ứng dụng rộng rãi, từ truy xuất thông tin đến trả\nlời câu hỏi tên miền mở. Để nghiên cứu vấn đề này, chúng ta sẽ bắt đầu\nbằng cách điều tra một tập dữ liệu chuẩn chuẩn suy luận ngôn ngữ tự\nnhiên phổ biến.\n15.4.2. Bộ dữ liệu Suy luận ngôn ngữ tự nhiên Stanford (SNLI)\nStanford Natural Language Inference (SNLI) Corpus là một bộ sưu tập của\nhơn 500000 cặp câu tiếng Anh được dán nhãn [Bowman et al., 2015] . Chúng tôi tải xuống và lưu trữ\ntập dữ liệu SNLI được trích xuất trong đường dẫn ../data/snli_1.0 .\n15.4.2.1. Đọc tập dữ liệu\nTập dữ liệu SNLI ban đầu chứa thông tin phong phú hơn nhiều so với những\ngì chúng ta thực sự cần trong các thí nghiệm của mình. Do đó, chúng tôi\nđịnh nghĩa một hàm read_snli để chỉ trích xuất một phần của tập dữ\nliệu, sau đó trả về danh sách các cơ sở, giả thuyết và nhãn của chúng.\nBây giờ chúng ta hãy in 3 cặp tiền đề và giả thuyết đầu tiên, cũng như\nnhãn của chúng (“0”, “1”, và “2” tương ứng với “entailment”, “mâu\nthuẫn”, và “trung lập”, tương ứng).\nBộ huấn luyện có khoảng 550000 cặp, và bộ thử nghiệm có khoảng 10000\ncặp. Sau đây cho thấy ba nhãn “entailment”, “contradiction”, và\n“neutral” được cân bằng trong cả bộ tập huấn và bộ thử nghiệm.\n15.4.2.2. Xác định một lớp để tải tập dữ liệu\nDưới đây chúng ta định nghĩa một class để tải tập dữ liệu SNLI bằng cách\nkế thừa từ lớp Dataset trong Gluon. Đối số num_steps trong hàm\ntạo lớp xác định độ dài của một chuỗi văn bản sao cho mỗi minibatch của\nchuỗi sẽ có hình dạng giống nhau. Nói cách khác, các token sau num_steps đầu tiên theo trình tự dài hơn được cắt tỉa, trong khi các\ntoken đặc biệt “” sẽ được thêm vào các chuỗi ngắn hơn cho đến khi độ dài\ncủa chúng trở thành num_steps . Bằng cách thực hiện hàm __getitem__ , chúng ta có thể tùy ý truy cập tiền đề, giả thuyết và\nnhãn với chỉ số idx .\n15.4.2.3. Đặt tất cả mọi thứ lại với nhau\nBây giờ chúng ta có thể gọi hàm read_snli và lớp SNLIDataset để\ntải xuống tập dữ liệu SNLI và trả về DataLoader phiên bản cho cả bộ\nđào tạo và thử nghiệm, cùng với từ vựng của bộ đào tạo. Đáng chú ý là\nchúng ta phải sử dụng từ vựng được xây dựng từ bộ đào tạo như của bộ thử\nnghiệm. Do đó, bất kỳ mã thông báo mới nào từ bộ thử nghiệm sẽ không\nđược biết đến với mô hình được đào tạo trên bộ đào tạo.\nỞ đây chúng ta đặt kích thước lô thành 128 và độ dài chuỗi là 50 và gọi\nhàm load_data_snli để lấy các bộ lặp dữ liệu và từ vựng. Sau đó,\nchúng tôi in kích thước từ vựng.\nBây giờ chúng tôi in hình dạng của minibatch đầu tiên. Trái ngược với\nphân tích tâm lý, chúng tôi có hai đầu vào X[0] và X[1] đại diện\ncho các cặp cơ sở và giả thuyết.\n15.4.3. Tóm tắt\nSuy luận ngôn ngữ tự nhiên nghiên cứu liệu một giả thuyết có thể được\nsuy ra từ một tiền đề, trong đó cả hai đều là một chuỗi văn bản.\nTrong suy luận ngôn ngữ tự nhiên, các mối quan hệ giữa cơ sở và giả\nthuyết bao gồm sự đòi hỏi, mâu thuẫn, và trung lập.\nStanford Natural Language Inference (SNLI) Corpus là một tập dữ liệu\nchuẩn phổ biến của suy luận ngôn ngữ tự nhiên.\n15.4.4. Bài tập\nDịch máy từ lâu đã được đánh giá dựa trên sự phù hợp bề ngoài \\(n\\) gram giữa bản dịch đầu ra và bản dịch chân lý. Bạn có thể\nthiết kế một biện pháp để đánh giá kết quả dịch máy bằng cách sử dụng\nsuy luận ngôn ngữ tự nhiên không?\nLàm thế nào chúng ta có thể thay đổi các siêu tham số để giảm kích\nthước từ vựng?\nDiscussions\nDiscussions"
+}

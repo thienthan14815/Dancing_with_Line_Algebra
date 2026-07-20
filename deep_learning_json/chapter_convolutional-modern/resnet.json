@@ -1,0 +1,499 @@
+{
+  "url": "https://vi.d2l.ai/chapter_convolutional-modern/resnet.html",
+  "chapter": "chapter_convolutional-modern",
+  "title": "7.6. Mạng dư (ResNet)",
+  "crawled_at": "2026-07-20T12:39:52.654044+00:00",
+  "headings": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "mang-du-resnet",
+      "text": "7.6. Mạng dư (ResNet)"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "cac-lop-ham",
+      "text": "7.6.1. Các lớp hàm"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "khoi-residual",
+      "text": "7.6.2. Khối** Residual"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "mo-hinh-resnet",
+      "text": "7.6.3. Mô hình ResNet"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "dao-tao",
+      "text": "7.6.4. Đào tạo"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tom-tat",
+      "text": "7.6.5. Tóm tắt"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bai-tap",
+      "text": "7.6.6. Bài tập"
+    }
+  ],
+  "content": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "mang-du-resnet",
+      "text": "7.6. Mạng dư (ResNet)"
+    },
+    {
+      "type": "paragraph",
+      "text": "Khi chúng ta thiết kế các mạng ngày càng sâu hơn, bắt buộc phải hiểu\ncách thêm các lớp có thể làm tăng độ phức tạp và biểu cảm của mạng. Thậm\nchí quan trọng hơn nữa là khả năng thiết kế mạng mà việc thêm các lớp\nlàm cho các mạng trở nên biểu cảm nghiêm ngặt hơn là chỉ khác biệt. Để\nđạt được một số tiến bộ, chúng ta cần một chút toán học."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "cac-lop-ham",
+      "text": "7.6.1. Các lớp hàm"
+    },
+    {
+      "type": "paragraph",
+      "text": "Xem xét \\(\\mathcal{F}\\) , lớp hàm mà một kiến trúc mạng cụ thể (cùng\nvới tốc độ học tập và các cài đặt siêu tham số khác) có thể đạt được. Đó\nlà, đối với tất cả \\(f \\in \\mathcal{F}\\) có tồn tại một số tập hợp\ncác tham số (ví dụ, trọng lượng và thành kiến) có thể thu được thông qua\nđào tạo trên một tập dữ liệu phù hợp. Chúng ta hãy giả sử rằng \\(f^*\\) là chức năng “sự thật” mà chúng ta thực sự muốn tìm thấy.\nNếu nó là trong \\(\\mathcal{F}\\) , chúng tôi đang trong tình trạng tốt\nnhưng thông thường chúng tôi sẽ không hoàn toàn may mắn như vậy. Thay\nvào đó, chúng tôi sẽ cố gắng tìm một số \\(f^*_\\mathcal{F}\\) là đặt\ncược tốt nhất của chúng tôi trong vòng \\(\\mathcal{F}\\) . Ví dụ, với\nmột tập dữ liệu với các tính năng \\(\\mathbf{X}\\) và nhãn \\(\\mathbf{y}\\) , chúng ta có thể thử tìm nó bằng cách giải quyết vấn\nđề tối ưu hóa sau:"
+    },
+    {
+      "type": "math",
+      "latex": "(7.6.1)¶\\[f^*_\\mathcal{F} \\stackrel{\\mathrm{def}}{=} \\mathop{\\mathrm{argmin}}_f L(\\mathbf{X}, \\mathbf{y}, f) \\text{ subject to } f \\in \\mathcal{F}.\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Nó chỉ là hợp lý để giả định rằng nếu chúng ta thiết kế một kiến trúc\nkhác và mạnh mẽ hơn \\(\\mathcal{F}'\\) chúng ta nên đi đến một kết quả\ntốt hơn. Nói cách khác, chúng tôi hy vọng rằng \\(f^*_{\\mathcal{F}'}\\) là “tốt hơn” so với \\(f^*_{\\mathcal{F}}\\) . Tuy nhiên, nếu \\(\\mathcal{F} \\not\\subseteq \\mathcal{F}'\\) không có gì đảm bảo rằng\nđiều này thậm chí sẽ xảy ra. Trong thực tế, \\(f^*_{\\mathcal{F}'}\\) cũng có thể tồi tệ hơn. Như minh họa bởi Fig. 7.6.1 , đối với các lớp hàm không lồng nhau,\nmột lớp hàm lớn hơn không phải lúc nào cũng di chuyển gần hơn với hàm\n“truth” \\(f^*\\) . Ví dụ, ở bên trái của Fig. 7.6.1 , mặc dù \\(\\mathcal{F}_3\\) gần \\(f^*\\) hơn \\(\\mathcal{F}_1\\) , \\(\\mathcal{F}_6\\) di chuyển\nđi và không có gì đảm bảo rằng việc tăng thêm độ phức tạp có thể làm\ngiảm khoảng cách từ \\(f^*\\) . Với các lớp hàm lồng nhau trong đó \\(\\mathcal{F}_1 \\subseteq \\ldots \\subseteq \\mathcal{F}_6\\) ở bên\nphải của Fig. 7.6.1 , chúng ta có thể tránh được vấn\nđề nói trên từ các lớp hàm không lồng nhau."
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/functionclasses.svg",
+      "local_path": "_images/functionclasses.svg",
+      "alt": "../_images/functionclasses.svg"
+    },
+    {
+      "type": "paragraph",
+      "text": "Fig. 7.6.1 For non-nested function classes, a larger (indicated by area)\nfunction class does not guarantee to get closer to the “truth”\nfunction ( \\(f^*\\) ). This does not happen in nested function\nclasses. ¶"
+    },
+    {
+      "type": "paragraph",
+      "text": "Do đó, chỉ khi các lớp hàm lớn hơn chứa các lớp nhỏ hơn, chúng tôi đảm\nbảo rằng việc tăng chúng làm tăng nghiêm ngặt sức mạnh biểu cảm của\nmạng. Đối với các mạng thần kinh sâu, nếu chúng ta có thể đào tạo lớp\nmới được thêm vào một hàm nhận dạng \\(f(\\mathbf{x}) = \\mathbf{x}\\) ,\nmô hình mới sẽ hiệu quả như mô hình ban đầu. Vì mô hình mới có thể nhận\nđược một giải pháp tốt hơn để phù hợp với tập dữ liệu đào tạo, lớp được\nthêm vào có thể giúp giảm lỗi đào tạo dễ dàng hơn."
+    },
+    {
+      "type": "paragraph",
+      "text": "Đây là câu hỏi mà Ông et al. xem xét khi làm việc trên các mô hình tầm\nnhìn máy tính rất sâu [He et al., 2016a] . Trọng tâm của họ*\nmạng dư * (* ResNet * ) được đề xuất là ý tưởng rằng mỗi lớp bổ sung\nnên dễ dàng chứa chức năng nhận dạng như một trong những yếu tố của nó.\nNhững cân nhắc này khá sâu sắc nhưng chúng dẫn đến một giải pháp đơn\ngiản đáng ngạc nhiên, một khối * dư*. Với nó, ResNet đã giành chiến\nthắng trong ImageNet Large Scale Visual Recognition Challenge vào năm\n2015. Thiết kế có ảnh hưởng sâu sắc đến cách xây dựng các mạng thần kinh\nsâu."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "khoi-residual",
+      "text": "7.6.2. Khối** Residual"
+    },
+    {
+      "type": "paragraph",
+      "text": "Chúng ta hãy tập trung vào một phần cục bộ của mạng thần kinh, như được\nmô tả trong Fig. 7.6.2 . Biểu thị đầu vào bằng \\(\\mathbf{x}\\) . Chúng tôi giả định rằng bản đồ cơ bản mong muốn mà\nchúng tôi muốn có được bằng cách học là \\(f(\\mathbf{x})\\) , được sử\ndụng làm đầu vào cho hàm kích hoạt ở trên cùng. Ở bên trái của Fig. 7.6.2 , phần trong hộp dòng dotted-line phải\ntrực tiếp tìm hiểu bản đồ \\(f(\\mathbf{x})\\) . Ở bên phải, phần trong\nhộp dòng dotted-line cần tìm hiểu ánh xạ dư* \\(f(\\mathbf{x}) - \\mathbf{x}\\) , đó là cách khối còn lại lấy tên của\nnó. Nếu ánh xạ nhận dạng \\(f(\\mathbf{x}) = \\mathbf{x}\\) là ánh xạ cơ\nbản mong muốn, ánh xạ còn lại sẽ dễ học hơn: chúng ta chỉ cần đẩy trọng\nlượng và thành kiến của lớp trọng lượng trên (ví dụ: lớp kết nối hoàn\ntoàn và lớp kết nối) trong hộp dòng dotted-line về 0. Con số bên phải\ntrong Fig. 7.6.2 minh họa khối * dư* của ResNet,\ntrong đó đường rắn mang đầu vào lớp \\(\\mathbf{x}\\) đến toán tử bổ\nsung được gọi là kết nối dư* (hoặc kết nối phím tắt *). Với các khối\ncòn lại, đầu vào có thể chuyển tiếp tuyên truyền nhanh hơn thông qua các\nkết nối còn lại trên các lớp."
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/residual-block.svg",
+      "local_path": "_images/residual-block.svg",
+      "alt": "../_images/residual-block.svg"
+    },
+    {
+      "type": "paragraph",
+      "text": "Fig. 7.6.2 A regular block (left) and a residual block (right). ¶"
+    },
+    {
+      "type": "paragraph",
+      "text": "ResNet tuân theo thiết kế lớp phức tạp \\(3\\times 3\\) đầy đủ của VGG.\nKhối còn lại có hai lớp ghép \\(3\\times 3\\) với cùng số kênh đầu ra.\nMỗi lớp phức tạp được theo sau bởi một lớp chuẩn hóa hàng loạt và một\nchức năng kích hoạt ReLU. Sau đó, chúng tôi bỏ qua hai thao tác phức tạp\nnày và thêm đầu vào trực tiếp trước chức năng kích hoạt ReLU cuối cùng.\nKiểu thiết kế này đòi hỏi đầu ra của hai lớp ghép phải có cùng hình dạng\nvới đầu vào, để chúng có thể được thêm vào lại với nhau. Nếu chúng ta\nmuốn thay đổi số lượng kênh, chúng ta cần giới thiệu thêm một lớp ghép \\(1\\times 1\\) để chuyển đổi đầu vào thành hình dạng mong muốn cho\nthao tác bổ sung. Hãy để chúng tôi có một cái nhìn tại mã dưới đây."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "from mxnet import np, npx\nfrom mxnet.gluon import nn\nfrom d2l import mxnet as d2l\n\nnpx.set_np()\n\nclass Residual(nn.Block):  #@save\n    \"\"\"The Residual block of ResNet.\"\"\"\n    def __init__(self, num_channels, use_1x1conv=False, strides=1, **kwargs):\n        super().__init__(**kwargs)\n        self.conv1 = nn.Conv2D(num_channels, kernel_size=3, padding=1,\n                               strides=strides)\n        self.conv2 = nn.Conv2D(num_channels, kernel_size=3, padding=1)\n        if use_1x1conv:\n            self.conv3 = nn.Conv2D(num_channels, kernel_size=1,\n                                   strides=strides)\n        else:\n            self.conv3 = None\n        self.bn1 = nn.BatchNorm()\n        self.bn2 = nn.BatchNorm()\n\n    def forward(self, X):\n        Y = npx.relu(self.bn1(self.conv1(X)))\n        Y = self.bn2(self.conv2(Y))\n        if self.conv3:\n            X = self.conv3(X)\n        return npx.relu(Y + X)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "import torch\nfrom torch import nn\nfrom torch.nn import functional as F\nfrom d2l import torch as d2l\n\n\nclass Residual(nn.Module):  #@save\n    \"\"\"The Residual block of ResNet.\"\"\"\n    def __init__(self, input_channels, num_channels,\n                 use_1x1conv=False, strides=1):\n        super().__init__()\n        self.conv1 = nn.Conv2d(input_channels, num_channels,\n                               kernel_size=3, padding=1, stride=strides)\n        self.conv2 = nn.Conv2d(num_channels, num_channels,\n                               kernel_size=3, padding=1)\n        if use_1x1conv:\n            self.conv3 = nn.Conv2d(input_channels, num_channels,\n                                   kernel_size=1, stride=strides)\n        else:\n            self.conv3 = None\n        self.bn1 = nn.BatchNorm2d(num_channels)\n        self.bn2 = nn.BatchNorm2d(num_channels)\n\n    def forward(self, X):\n        Y = F.relu(self.bn1(self.conv1(X)))\n        Y = self.bn2(self.conv2(Y))\n        if self.conv3:\n            X = self.conv3(X)\n        Y += X\n        return F.relu(Y)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "import tensorflow as tf\nfrom d2l import tensorflow as d2l\n\n\nclass Residual(tf.keras.Model):  #@save\n    \"\"\"The Residual block of ResNet.\"\"\"\n    def __init__(self, num_channels, use_1x1conv=False, strides=1):\n        super().__init__()\n        self.conv1 = tf.keras.layers.Conv2D(\n            num_channels, padding='same', kernel_size=3, strides=strides)\n        self.conv2 = tf.keras.layers.Conv2D(\n            num_channels, kernel_size=3, padding='same')\n        self.conv3 = None\n        if use_1x1conv:\n            self.conv3 = tf.keras.layers.Conv2D(\n                num_channels, kernel_size=1, strides=strides)\n        self.bn1 = tf.keras.layers.BatchNormalization()\n        self.bn2 = tf.keras.layers.BatchNormalization()\n\n    def call(self, X):\n        Y = tf.keras.activations.relu(self.bn1(self.conv1(X)))\n        Y = self.bn2(self.conv2(Y))\n        if self.conv3 is not None:\n            X = self.conv3(X)\n        Y += X\n        return tf.keras.activations.relu(Y)"
+    },
+    {
+      "type": "paragraph",
+      "text": "Mã này tạo ra hai loại mạng: một trong đó chúng tôi thêm đầu vào vào đầu\nra trước khi áp dụng tính phi tuyến ReLU bất cứ khi nào use_1x1conv=False và một loại mà chúng tôi điều chỉnh các kênh và độ\nphân giải bằng cách ghép \\(1 \\times 1\\) trước khi thêm. Fig. 7.6.3 minh họa điều này:"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/resnet-block.svg",
+      "local_path": "_images/resnet-block.svg",
+      "alt": "../_images/resnet-block.svg"
+    },
+    {
+      "type": "paragraph",
+      "text": "Fig. 7.6.3 ResNet block with and without \\(1 \\times 1\\) convolution. ¶"
+    },
+    {
+      "type": "paragraph",
+      "text": "Bây giờ chúng ta hãy nhìn vào một tình huống mà đầu vào và đầu ra có\ncùng hình dạng."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "blk = Residual(3)\nblk.initialize()\nX = np.random.uniform(size=(4, 3, 6, 6))\nblk(X).shape"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "(4, 3, 6, 6)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "blk = Residual(3,3)\nX = torch.rand(4, 3, 6, 6)\nY = blk(X)\nY.shape"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "torch.Size([4, 3, 6, 6])"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "blk = Residual(3)\nX = tf.random.uniform((4, 6, 6, 3))\nY = blk(X)\nY.shape"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "TensorShape([4, 6, 6, 3])"
+    },
+    {
+      "type": "paragraph",
+      "text": "Chúng tôi cũng có tùy chọn để giảm một nửa chiều cao và chiều rộng đầu\nra trong khi tăng số lượng kênh đầu ra."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "blk = Residual(6, use_1x1conv=True, strides=2)\nblk.initialize()\nblk(X).shape"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "(4, 6, 3, 3)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "blk = Residual(3,6, use_1x1conv=True, strides=2)\nblk(X).shape"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "torch.Size([4, 6, 3, 3])"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "blk = Residual(6, use_1x1conv=True, strides=2)\nblk(X).shape"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "TensorShape([4, 3, 3, 6])"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "mo-hinh-resnet",
+      "text": "7.6.3. Mô hình ResNet"
+    },
+    {
+      "type": "paragraph",
+      "text": "Hai lớp ResNet đầu tiên giống như của GoogLeNet mà chúng tôi đã mô tả\ntrước đây: lớp ghép \\(7\\times 7\\) với 64 kênh đầu ra và bước tiến 2\nđược theo sau bởi lớp tổng hợp tối đa \\(3\\times 3\\) với một sải chân\nlà 2. Sự khác biệt là lớp chuẩn hóa hàng loạt được thêm vào sau mỗi lớp\nphức tạp trong ResNet."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "net = nn.Sequential()\nnet.add(nn.Conv2D(64, kernel_size=7, strides=2, padding=3),\n        nn.BatchNorm(), nn.Activation('relu'),\n        nn.MaxPool2D(pool_size=3, strides=2, padding=1))"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "b1 = nn.Sequential(nn.Conv2d(1, 64, kernel_size=7, stride=2, padding=3),\n                   nn.BatchNorm2d(64), nn.ReLU(),\n                   nn.MaxPool2d(kernel_size=3, stride=2, padding=1))"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "b1 = tf.keras.models.Sequential([\n    tf.keras.layers.Conv2D(64, kernel_size=7, strides=2, padding='same'),\n    tf.keras.layers.BatchNormalization(),\n    tf.keras.layers.Activation('relu'),\n    tf.keras.layers.MaxPool2D(pool_size=3, strides=2, padding='same')])"
+    },
+    {
+      "type": "paragraph",
+      "text": "GoogLeNet sử dụng bốn mô-đun được tạo thành từ các khối Inception. Tuy\nnhiên, ResNet sử dụng bốn mô-đun được tạo thành từ các khối còn lại, mỗi\nkhối sử dụng một số khối còn lại với cùng một số kênh đầu ra. Số lượng\nkênh trong mô-đun đầu tiên giống như số kênh đầu vào. Kể từ khi một lớp\ntổng hợp tối đa với một sải chân là 2 đã được sử dụng, nó không phải là\ncần thiết để giảm chiều cao và chiều rộng. Trong khối dư đầu tiên cho\nmỗi mô-đun tiếp theo, số lượng kênh được tăng gấp đôi so với mô-đun\ntrước đó và chiều cao và chiều rộng giảm một nửa."
+    },
+    {
+      "type": "paragraph",
+      "text": "Bây giờ, chúng tôi thực hiện mô-đun này. Lưu ý rằng xử lý đặc biệt đã\nđược thực hiện trên mô-đun đầu tiên."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def resnet_block(num_channels, num_residuals, first_block=False):\n    blk = nn.Sequential()\n    for i in range(num_residuals):\n        if i == 0 and not first_block:\n            blk.add(Residual(num_channels, use_1x1conv=True, strides=2))\n        else:\n            blk.add(Residual(num_channels))\n    return blk"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def resnet_block(input_channels, num_channels, num_residuals,\n                 first_block=False):\n    blk = []\n    for i in range(num_residuals):\n        if i == 0 and not first_block:\n            blk.append(Residual(input_channels, num_channels,\n                                use_1x1conv=True, strides=2))\n        else:\n            blk.append(Residual(num_channels, num_channels))\n    return blk"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "class ResnetBlock(tf.keras.layers.Layer):\n    def __init__(self, num_channels, num_residuals, first_block=False,\n                 **kwargs):\n        super(ResnetBlock, self).__init__(**kwargs)\n        self.residual_layers = []\n        for i in range(num_residuals):\n            if i == 0 and not first_block:\n                self.residual_layers.append(\n                    Residual(num_channels, use_1x1conv=True, strides=2))\n            else:\n                self.residual_layers.append(Residual(num_channels))\n\n    def call(self, X):\n        for layer in self.residual_layers.layers:\n            X = layer(X)\n        return X"
+    },
+    {
+      "type": "paragraph",
+      "text": "Sau đó, chúng tôi thêm tất cả các mô-đun vào ResNet. Ở đây, hai khối còn\nlại được sử dụng cho mỗi mô-đun."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "net.add(resnet_block(64, 2, first_block=True),\n        resnet_block(128, 2),\n        resnet_block(256, 2),\n        resnet_block(512, 2))"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "b2 = nn.Sequential(*resnet_block(64, 64, 2, first_block=True))\nb3 = nn.Sequential(*resnet_block(64, 128, 2))\nb4 = nn.Sequential(*resnet_block(128, 256, 2))\nb5 = nn.Sequential(*resnet_block(256, 512, 2))"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "b2 = ResnetBlock(64, 2, first_block=True)\nb3 = ResnetBlock(128, 2)\nb4 = ResnetBlock(256, 2)\nb5 = ResnetBlock(512, 2)"
+    },
+    {
+      "type": "paragraph",
+      "text": "Cuối cùng, giống như GoogLeNet, chúng ta thêm một lớp tổng hợp trung\nbình toàn cầu, tiếp theo là đầu ra lớp được kết nối hoàn toàn."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "net.add(nn.GlobalAvgPool2D(), nn.Dense(10))"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "net = nn.Sequential(b1, b2, b3, b4, b5,\n                    nn.AdaptiveAvgPool2d((1,1)),\n                    nn.Flatten(), nn.Linear(512, 10))"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "# Recall that we define this as a function so we can reuse later and run it\n# within `tf.distribute.MirroredStrategy`'s scope to utilize various\n# computational resources, e.g. GPUs. Also note that even though we have\n# created b1, b2, b3, b4, b5 but we will recreate them inside this function's\n# scope instead\ndef net():\n    return tf.keras.Sequential([\n        # The following layers are the same as b1 that we created earlier\n        tf.keras.layers.Conv2D(64, kernel_size=7, strides=2, padding='same'),\n        tf.keras.layers.BatchNormalization(),\n        tf.keras.layers.Activation('relu'),\n        tf.keras.layers.MaxPool2D(pool_size=3, strides=2, padding='same'),\n        # The following layers are the same as b2, b3, b4, and b5 that we\n        # created earlier\n        ResnetBlock(64, 2, first_block=True),\n        ResnetBlock(128, 2),\n        ResnetBlock(256, 2),\n        ResnetBlock(512, 2),\n        tf.keras.layers.GlobalAvgPool2D(),\n        tf.keras.layers.Dense(units=10)])"
+    },
+    {
+      "type": "paragraph",
+      "text": "Có 4 lớp phức tạp trong mỗi mô-đun (không bao gồm lớp ghép \\(1\\times 1\\) ). Cùng với lớp kết nối \\(7\\times 7\\) đầu tiên và\nlớp kết nối hoàn toàn cuối cùng, tổng cộng có 18 lớp. Do đó, mô hình này\nthường được gọi là ResNet-18. Bằng cách định cấu hình các số kênh và\nkhối còn lại khác nhau trong mô-đun, chúng ta có thể tạo các mô hình\nResNet khác nhau, chẳng hạn như ResNet-152 lớp sâu hơn 152. Mặc dù kiến\ntrúc chính của ResNet tương tự như kiến trúc của GoogLeNet, cấu trúc của\nResNet đơn giản và dễ sửa đổi hơn. Tất cả những yếu tố này đã dẫn đến\nviệc sử dụng ResNet nhanh chóng và rộng rãi. Fig. 7.6.4 mô\ntả đầy đủ ResNet-18."
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/resnet18.svg",
+      "local_path": "_images/resnet18.svg",
+      "alt": "../_images/resnet18.svg"
+    },
+    {
+      "type": "paragraph",
+      "text": "Fig. 7.6.4 The ResNet-18 architecture. ¶"
+    },
+    {
+      "type": "paragraph",
+      "text": "Trước khi đào tạo ResNet, chúng ta hãy quan sát cách hình dạng đầu vào\nthay đổi trên các mô-đun khác nhau trong ResNet. Như trong tất cả các\nkiến trúc trước đó, độ phân giải giảm trong khi số lượng kênh tăng lên\ncho đến khi điểm mà một lớp tổng hợp trung bình toàn cầu tổng hợp tất cả\ncác tính năng."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "X = np.random.uniform(size=(1, 1, 224, 224))\nnet.initialize()\nfor layer in net:\n    X = layer(X)\n    print(layer.name, 'output shape:\\t', X.shape)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "conv5 output shape:  (1, 64, 112, 112)\nbatchnorm4 output shape:     (1, 64, 112, 112)\nrelu0 output shape:  (1, 64, 112, 112)\npool0 output shape:  (1, 64, 56, 56)\nsequential1 output shape:    (1, 64, 56, 56)\nsequential2 output shape:    (1, 128, 28, 28)\nsequential3 output shape:    (1, 256, 14, 14)\nsequential4 output shape:    (1, 512, 7, 7)\npool1 output shape:  (1, 512, 1, 1)\ndense0 output shape:         (1, 10)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "X = torch.rand(size=(1, 1, 224, 224))\nfor layer in net:\n    X = layer(X)\n    print(layer.__class__.__name__,'output shape:\\t', X.shape)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "Sequential output shape:     torch.Size([1, 64, 56, 56])\nSequential output shape:     torch.Size([1, 64, 56, 56])\nSequential output shape:     torch.Size([1, 128, 28, 28])\nSequential output shape:     torch.Size([1, 256, 14, 14])\nSequential output shape:     torch.Size([1, 512, 7, 7])\nAdaptiveAvgPool2d output shape:      torch.Size([1, 512, 1, 1])\nFlatten output shape:        torch.Size([1, 512])\nLinear output shape:         torch.Size([1, 10])"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "X = tf.random.uniform(shape=(1, 224, 224, 1))\nfor layer in net().layers:\n    X = layer(X)\n    print(layer.__class__.__name__,'output shape:\\t', X.shape)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "Conv2D output shape:         (1, 112, 112, 64)\nBatchNormalization output shape:     (1, 112, 112, 64)\nActivation output shape:     (1, 112, 112, 64)\nMaxPooling2D output shape:   (1, 56, 56, 64)\nResnetBlock output shape:    (1, 56, 56, 64)\nResnetBlock output shape:    (1, 28, 28, 128)\nResnetBlock output shape:    (1, 14, 14, 256)\nResnetBlock output shape:    (1, 7, 7, 512)\nGlobalAveragePooling2D output shape:         (1, 512)\nDense output shape:  (1, 10)"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "dao-tao",
+      "text": "7.6.4. Đào tạo"
+    },
+    {
+      "type": "paragraph",
+      "text": "Chúng tôi đào tạo ResNet trên bộ dữ liệu Fashion-MNIST, giống như trước\nđây."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "lr, num_epochs, batch_size = 0.05, 10, 256\ntrain_iter, test_iter = d2l.load_data_fashion_mnist(batch_size, resize=96)\nd2l.train_ch6(net, train_iter, test_iter, num_epochs, lr, d2l.try_gpu())"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "loss 0.011, train acc 0.997, test acc 0.904\n4732.6 examples/sec on gpu(0)"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_resnet_46beba_99_1.svg",
+      "local_path": "_images/output_resnet_46beba_99_1.svg",
+      "alt": "../_images/output_resnet_46beba_99_1.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "lr, num_epochs, batch_size = 0.05, 10, 256\ntrain_iter, test_iter = d2l.load_data_fashion_mnist(batch_size, resize=96)\nd2l.train_ch6(net, train_iter, test_iter, num_epochs, lr, d2l.try_gpu())"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "loss 0.006, train acc 0.999, test acc 0.924\n4716.9 examples/sec on cuda:0"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_resnet_46beba_102_1.svg",
+      "local_path": "_images/output_resnet_46beba_102_1.svg",
+      "alt": "../_images/output_resnet_46beba_102_1.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "lr, num_epochs, batch_size = 0.05, 10, 256\ntrain_iter, test_iter = d2l.load_data_fashion_mnist(batch_size, resize=96)\nd2l.train_ch6(net, train_iter, test_iter, num_epochs, lr, d2l.try_gpu())"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "loss 0.005, train acc 0.999, test acc 0.920\n4928.1 examples/sec on /GPU:0"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "<keras.engine.sequential.Sequential at 0x7fd93454c9a0>"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_resnet_46beba_105_2.svg",
+      "local_path": "_images/output_resnet_46beba_105_2.svg",
+      "alt": "../_images/output_resnet_46beba_105_2.svg"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tom-tat",
+      "text": "7.6.5. Tóm tắt"
+    },
+    {
+      "type": "list",
+      "ordered": false,
+      "items": [
+        "Các lớp hàm lồng nhau là mong muốn. Học thêm một lớp trong các mạng\nthần kinh sâu như một chức năng nhận dạng (mặc dù đây là một trường\nhợp cực đoan) nên được thực hiện dễ dàng.",
+        "Ánh xạ còn lại có thể tìm hiểu hàm nhận dạng dễ dàng hơn, chẳng hạn\nnhư đẩy các tham số trong lớp trọng lượng xuống 0.",
+        "Chúng ta có thể đào tạo một mạng lưới thần kinh sâu hiệu quả bằng\ncách có các khối còn lại. Đầu vào có thể chuyển tiếp tuyên truyền\nnhanh hơn thông qua các kết nối còn lại trên các lớp.",
+        "ResNet có ảnh hưởng lớn đến việc thiết kế các mạng thần kinh sâu tiếp\ntheo, cả về tính chất phức tạp và tuần tự."
+      ]
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bai-tap",
+      "text": "7.6.6. Bài tập"
+    },
+    {
+      "type": "list",
+      "ordered": true,
+      "items": [
+        "Sự khác biệt lớn giữa khối Inception trong Fig. 7.4.1 và khối còn lại là gì? Sau khi loại bỏ một số đường dẫn trong khối\nInception, chúng liên quan đến nhau như thế nào?",
+        "Tham khảo Bảng 1 trong giấy ResNet [He et al., 2016a] để\nthực hiện các biến thể khác nhau.",
+        "Đối với các mạng sâu hơn, ResNet giới thiệu kiến trúc “nút cổ chai”\nđể giảm độ phức tạp của mô hình. Cố gắng thực hiện nó.",
+        "Trong các phiên bản tiếp theo của ResNet, các tác giả đã thay đổi cấu\ntrúc “phức tạp, bình thường hóa hàng loạt và kích hoạt” thành cấu\ntrúc “bình thường hóa hàng loạt, kích hoạt và phức tạp”. Tự cải thiện\nnày. Xem Hình 1 trong [He et al., 2016b] để biết chi\ntiết.",
+        "Tại sao chúng ta không thể tăng độ phức tạp của hàm mà không bị ràng\nbuộc, ngay cả khi các lớp hàm được lồng nhau?"
+      ]
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    }
+  ],
+  "images": [
+    {
+      "original_url": "https://vi.d2l.ai/_images/functionclasses.svg",
+      "local_path": "_images/functionclasses.svg",
+      "alt": "../_images/functionclasses.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/residual-block.svg",
+      "local_path": "_images/residual-block.svg",
+      "alt": "../_images/residual-block.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/resnet-block.svg",
+      "local_path": "_images/resnet-block.svg",
+      "alt": "../_images/resnet-block.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/resnet18.svg",
+      "local_path": "_images/resnet18.svg",
+      "alt": "../_images/resnet18.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_resnet_46beba_99_1.svg",
+      "local_path": "_images/output_resnet_46beba_99_1.svg",
+      "alt": "../_images/output_resnet_46beba_99_1.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_resnet_46beba_102_1.svg",
+      "local_path": "_images/output_resnet_46beba_102_1.svg",
+      "alt": "../_images/output_resnet_46beba_102_1.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_resnet_46beba_105_2.svg",
+      "local_path": "_images/output_resnet_46beba_105_2.svg",
+      "alt": "../_images/output_resnet_46beba_105_2.svg"
+    }
+  ],
+  "text": "7.6. Mạng dư (ResNet)\nKhi chúng ta thiết kế các mạng ngày càng sâu hơn, bắt buộc phải hiểu\ncách thêm các lớp có thể làm tăng độ phức tạp và biểu cảm của mạng. Thậm\nchí quan trọng hơn nữa là khả năng thiết kế mạng mà việc thêm các lớp\nlàm cho các mạng trở nên biểu cảm nghiêm ngặt hơn là chỉ khác biệt. Để\nđạt được một số tiến bộ, chúng ta cần một chút toán học.\n7.6.1. Các lớp hàm\nXem xét \\(\\mathcal{F}\\) , lớp hàm mà một kiến trúc mạng cụ thể (cùng\nvới tốc độ học tập và các cài đặt siêu tham số khác) có thể đạt được. Đó\nlà, đối với tất cả \\(f \\in \\mathcal{F}\\) có tồn tại một số tập hợp\ncác tham số (ví dụ, trọng lượng và thành kiến) có thể thu được thông qua\nđào tạo trên một tập dữ liệu phù hợp. Chúng ta hãy giả sử rằng \\(f^*\\) là chức năng “sự thật” mà chúng ta thực sự muốn tìm thấy.\nNếu nó là trong \\(\\mathcal{F}\\) , chúng tôi đang trong tình trạng tốt\nnhưng thông thường chúng tôi sẽ không hoàn toàn may mắn như vậy. Thay\nvào đó, chúng tôi sẽ cố gắng tìm một số \\(f^*_\\mathcal{F}\\) là đặt\ncược tốt nhất của chúng tôi trong vòng \\(\\mathcal{F}\\) . Ví dụ, với\nmột tập dữ liệu với các tính năng \\(\\mathbf{X}\\) và nhãn \\(\\mathbf{y}\\) , chúng ta có thể thử tìm nó bằng cách giải quyết vấn\nđề tối ưu hóa sau:\nNó chỉ là hợp lý để giả định rằng nếu chúng ta thiết kế một kiến trúc\nkhác và mạnh mẽ hơn \\(\\mathcal{F}'\\) chúng ta nên đi đến một kết quả\ntốt hơn. Nói cách khác, chúng tôi hy vọng rằng \\(f^*_{\\mathcal{F}'}\\) là “tốt hơn” so với \\(f^*_{\\mathcal{F}}\\) . Tuy nhiên, nếu \\(\\mathcal{F} \\not\\subseteq \\mathcal{F}'\\) không có gì đảm bảo rằng\nđiều này thậm chí sẽ xảy ra. Trong thực tế, \\(f^*_{\\mathcal{F}'}\\) cũng có thể tồi tệ hơn. Như minh họa bởi Fig. 7.6.1 , đối với các lớp hàm không lồng nhau,\nmột lớp hàm lớn hơn không phải lúc nào cũng di chuyển gần hơn với hàm\n“truth” \\(f^*\\) . Ví dụ, ở bên trái của Fig. 7.6.1 , mặc dù \\(\\mathcal{F}_3\\) gần \\(f^*\\) hơn \\(\\mathcal{F}_1\\) , \\(\\mathcal{F}_6\\) di chuyển\nđi và không có gì đảm bảo rằng việc tăng thêm độ phức tạp có thể làm\ngiảm khoảng cách từ \\(f^*\\) . Với các lớp hàm lồng nhau trong đó \\(\\mathcal{F}_1 \\subseteq \\ldots \\subseteq \\mathcal{F}_6\\) ở bên\nphải của Fig. 7.6.1 , chúng ta có thể tránh được vấn\nđề nói trên từ các lớp hàm không lồng nhau.\nFig. 7.6.1 For non-nested function classes, a larger (indicated by area)\nfunction class does not guarantee to get closer to the “truth”\nfunction ( \\(f^*\\) ). This does not happen in nested function\nclasses. ¶\nDo đó, chỉ khi các lớp hàm lớn hơn chứa các lớp nhỏ hơn, chúng tôi đảm\nbảo rằng việc tăng chúng làm tăng nghiêm ngặt sức mạnh biểu cảm của\nmạng. Đối với các mạng thần kinh sâu, nếu chúng ta có thể đào tạo lớp\nmới được thêm vào một hàm nhận dạng \\(f(\\mathbf{x}) = \\mathbf{x}\\) ,\nmô hình mới sẽ hiệu quả như mô hình ban đầu. Vì mô hình mới có thể nhận\nđược một giải pháp tốt hơn để phù hợp với tập dữ liệu đào tạo, lớp được\nthêm vào có thể giúp giảm lỗi đào tạo dễ dàng hơn.\nĐây là câu hỏi mà Ông et al. xem xét khi làm việc trên các mô hình tầm\nnhìn máy tính rất sâu [He et al., 2016a] . Trọng tâm của họ*\nmạng dư * (* ResNet * ) được đề xuất là ý tưởng rằng mỗi lớp bổ sung\nnên dễ dàng chứa chức năng nhận dạng như một trong những yếu tố của nó.\nNhững cân nhắc này khá sâu sắc nhưng chúng dẫn đến một giải pháp đơn\ngiản đáng ngạc nhiên, một khối * dư*. Với nó, ResNet đã giành chiến\nthắng trong ImageNet Large Scale Visual Recognition Challenge vào năm\n2015. Thiết kế có ảnh hưởng sâu sắc đến cách xây dựng các mạng thần kinh\nsâu.\n7.6.2. Khối** Residual\nChúng ta hãy tập trung vào một phần cục bộ của mạng thần kinh, như được\nmô tả trong Fig. 7.6.2 . Biểu thị đầu vào bằng \\(\\mathbf{x}\\) . Chúng tôi giả định rằng bản đồ cơ bản mong muốn mà\nchúng tôi muốn có được bằng cách học là \\(f(\\mathbf{x})\\) , được sử\ndụng làm đầu vào cho hàm kích hoạt ở trên cùng. Ở bên trái của Fig. 7.6.2 , phần trong hộp dòng dotted-line phải\ntrực tiếp tìm hiểu bản đồ \\(f(\\mathbf{x})\\) . Ở bên phải, phần trong\nhộp dòng dotted-line cần tìm hiểu ánh xạ dư* \\(f(\\mathbf{x}) - \\mathbf{x}\\) , đó là cách khối còn lại lấy tên của\nnó. Nếu ánh xạ nhận dạng \\(f(\\mathbf{x}) = \\mathbf{x}\\) là ánh xạ cơ\nbản mong muốn, ánh xạ còn lại sẽ dễ học hơn: chúng ta chỉ cần đẩy trọng\nlượng và thành kiến của lớp trọng lượng trên (ví dụ: lớp kết nối hoàn\ntoàn và lớp kết nối) trong hộp dòng dotted-line về 0. Con số bên phải\ntrong Fig. 7.6.2 minh họa khối * dư* của ResNet,\ntrong đó đường rắn mang đầu vào lớp \\(\\mathbf{x}\\) đến toán tử bổ\nsung được gọi là kết nối dư* (hoặc kết nối phím tắt *). Với các khối\ncòn lại, đầu vào có thể chuyển tiếp tuyên truyền nhanh hơn thông qua các\nkết nối còn lại trên các lớp.\nFig. 7.6.2 A regular block (left) and a residual block (right). ¶\nResNet tuân theo thiết kế lớp phức tạp \\(3\\times 3\\) đầy đủ của VGG.\nKhối còn lại có hai lớp ghép \\(3\\times 3\\) với cùng số kênh đầu ra.\nMỗi lớp phức tạp được theo sau bởi một lớp chuẩn hóa hàng loạt và một\nchức năng kích hoạt ReLU. Sau đó, chúng tôi bỏ qua hai thao tác phức tạp\nnày và thêm đầu vào trực tiếp trước chức năng kích hoạt ReLU cuối cùng.\nKiểu thiết kế này đòi hỏi đầu ra của hai lớp ghép phải có cùng hình dạng\nvới đầu vào, để chúng có thể được thêm vào lại với nhau. Nếu chúng ta\nmuốn thay đổi số lượng kênh, chúng ta cần giới thiệu thêm một lớp ghép \\(1\\times 1\\) để chuyển đổi đầu vào thành hình dạng mong muốn cho\nthao tác bổ sung. Hãy để chúng tôi có một cái nhìn tại mã dưới đây.\nMã này tạo ra hai loại mạng: một trong đó chúng tôi thêm đầu vào vào đầu\nra trước khi áp dụng tính phi tuyến ReLU bất cứ khi nào use_1x1conv=False và một loại mà chúng tôi điều chỉnh các kênh và độ\nphân giải bằng cách ghép \\(1 \\times 1\\) trước khi thêm. Fig. 7.6.3 minh họa điều này:\nFig. 7.6.3 ResNet block with and without \\(1 \\times 1\\) convolution. ¶\nBây giờ chúng ta hãy nhìn vào một tình huống mà đầu vào và đầu ra có\ncùng hình dạng.\nChúng tôi cũng có tùy chọn để giảm một nửa chiều cao và chiều rộng đầu\nra trong khi tăng số lượng kênh đầu ra.\n7.6.3. Mô hình ResNet\nHai lớp ResNet đầu tiên giống như của GoogLeNet mà chúng tôi đã mô tả\ntrước đây: lớp ghép \\(7\\times 7\\) với 64 kênh đầu ra và bước tiến 2\nđược theo sau bởi lớp tổng hợp tối đa \\(3\\times 3\\) với một sải chân\nlà 2. Sự khác biệt là lớp chuẩn hóa hàng loạt được thêm vào sau mỗi lớp\nphức tạp trong ResNet.\nGoogLeNet sử dụng bốn mô-đun được tạo thành từ các khối Inception. Tuy\nnhiên, ResNet sử dụng bốn mô-đun được tạo thành từ các khối còn lại, mỗi\nkhối sử dụng một số khối còn lại với cùng một số kênh đầu ra. Số lượng\nkênh trong mô-đun đầu tiên giống như số kênh đầu vào. Kể từ khi một lớp\ntổng hợp tối đa với một sải chân là 2 đã được sử dụng, nó không phải là\ncần thiết để giảm chiều cao và chiều rộng. Trong khối dư đầu tiên cho\nmỗi mô-đun tiếp theo, số lượng kênh được tăng gấp đôi so với mô-đun\ntrước đó và chiều cao và chiều rộng giảm một nửa.\nBây giờ, chúng tôi thực hiện mô-đun này. Lưu ý rằng xử lý đặc biệt đã\nđược thực hiện trên mô-đun đầu tiên.\nSau đó, chúng tôi thêm tất cả các mô-đun vào ResNet. Ở đây, hai khối còn\nlại được sử dụng cho mỗi mô-đun.\nCuối cùng, giống như GoogLeNet, chúng ta thêm một lớp tổng hợp trung\nbình toàn cầu, tiếp theo là đầu ra lớp được kết nối hoàn toàn.\nCó 4 lớp phức tạp trong mỗi mô-đun (không bao gồm lớp ghép \\(1\\times 1\\) ). Cùng với lớp kết nối \\(7\\times 7\\) đầu tiên và\nlớp kết nối hoàn toàn cuối cùng, tổng cộng có 18 lớp. Do đó, mô hình này\nthường được gọi là ResNet-18. Bằng cách định cấu hình các số kênh và\nkhối còn lại khác nhau trong mô-đun, chúng ta có thể tạo các mô hình\nResNet khác nhau, chẳng hạn như ResNet-152 lớp sâu hơn 152. Mặc dù kiến\ntrúc chính của ResNet tương tự như kiến trúc của GoogLeNet, cấu trúc của\nResNet đơn giản và dễ sửa đổi hơn. Tất cả những yếu tố này đã dẫn đến\nviệc sử dụng ResNet nhanh chóng và rộng rãi. Fig. 7.6.4 mô\ntả đầy đủ ResNet-18.\nFig. 7.6.4 The ResNet-18 architecture. ¶\nTrước khi đào tạo ResNet, chúng ta hãy quan sát cách hình dạng đầu vào\nthay đổi trên các mô-đun khác nhau trong ResNet. Như trong tất cả các\nkiến trúc trước đó, độ phân giải giảm trong khi số lượng kênh tăng lên\ncho đến khi điểm mà một lớp tổng hợp trung bình toàn cầu tổng hợp tất cả\ncác tính năng.\n7.6.4. Đào tạo\nChúng tôi đào tạo ResNet trên bộ dữ liệu Fashion-MNIST, giống như trước\nđây.\n7.6.5. Tóm tắt\nCác lớp hàm lồng nhau là mong muốn. Học thêm một lớp trong các mạng\nthần kinh sâu như một chức năng nhận dạng (mặc dù đây là một trường\nhợp cực đoan) nên được thực hiện dễ dàng.\nÁnh xạ còn lại có thể tìm hiểu hàm nhận dạng dễ dàng hơn, chẳng hạn\nnhư đẩy các tham số trong lớp trọng lượng xuống 0.\nChúng ta có thể đào tạo một mạng lưới thần kinh sâu hiệu quả bằng\ncách có các khối còn lại. Đầu vào có thể chuyển tiếp tuyên truyền\nnhanh hơn thông qua các kết nối còn lại trên các lớp.\nResNet có ảnh hưởng lớn đến việc thiết kế các mạng thần kinh sâu tiếp\ntheo, cả về tính chất phức tạp và tuần tự.\n7.6.6. Bài tập\nSự khác biệt lớn giữa khối Inception trong Fig. 7.4.1 và khối còn lại là gì? Sau khi loại bỏ một số đường dẫn trong khối\nInception, chúng liên quan đến nhau như thế nào?\nTham khảo Bảng 1 trong giấy ResNet [He et al., 2016a] để\nthực hiện các biến thể khác nhau.\nĐối với các mạng sâu hơn, ResNet giới thiệu kiến trúc “nút cổ chai”\nđể giảm độ phức tạp của mô hình. Cố gắng thực hiện nó.\nTrong các phiên bản tiếp theo của ResNet, các tác giả đã thay đổi cấu\ntrúc “phức tạp, bình thường hóa hàng loạt và kích hoạt” thành cấu\ntrúc “bình thường hóa hàng loạt, kích hoạt và phức tạp”. Tự cải thiện\nnày. Xem Hình 1 trong [He et al., 2016b] để biết chi\ntiết.\nTại sao chúng ta không thể tăng độ phức tạp của hàm mà không bị ràng\nbuộc, ngay cả khi các lớp hàm được lồng nhau?\nDiscussions\nDiscussions\nDiscussions"
+}

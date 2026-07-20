@@ -1,0 +1,453 @@
+{
+  "url": "https://vi.d2l.ai/chapter_recurrent-modern/machine-translation-and-dataset.html",
+  "chapter": "chapter_recurrent-modern",
+  "title": "9.5. Dịch máy và bộ dữ liệu",
+  "crawled_at": "2026-07-20T12:40:07.219093+00:00",
+  "headings": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "dich-may-va-bo-du-lieu",
+      "text": "9.5. Dịch máy và bộ dữ liệu"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tai-xuong-va-xu-ly-so-bo-du-lieu",
+      "text": "9.5.1. Tải xuống và xử lý sơ bộ dữ liệu"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tokenization",
+      "text": "9.5.2. Tokenization"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tu-vu",
+      "text": "9.5.3. Từ vừ"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "doc-tap-du-lieu",
+      "text": "9.5.4. Đọc tập dữ liệu"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "putting-all-things-together",
+      "text": "9.5.5. Putting All Things Together"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tom-tat",
+      "text": "9.5.6. Tóm tắt"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bai-tap",
+      "text": "9.5.7. Bài tập"
+    }
+  ],
+  "content": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "dich-may-va-bo-du-lieu",
+      "text": "9.5. Dịch máy và bộ dữ liệu"
+    },
+    {
+      "type": "paragraph",
+      "text": "Chúng tôi đã sử dụng RNNs để thiết kế các mô hình ngôn ngữ, đó là chìa\nkhóa để xử lý ngôn ngữ tự nhiên. Một điểm chuẩn hàng đầu khác là * dịch\nmáy * , một miền vấn đề trung tâm cho các mô hình * chuyển đổi chuỗi\nlự* chuyển đổi chuỗi đầu vào thành chuỗi đầu ra. Đóng một vai trò quan\ntrọng trong các ứng dụng AI hiện đại khác nhau, các mô hình chuyển tải\nchuỗi sẽ tạo thành trọng tâm của phần còn lại của chương này và Section 10 . Để kết thúc này, phần này giới thiệu vấn đề\ndịch máy và tập dữ liệu của nó sẽ được sử dụng sau này."
+    },
+    {
+      "type": "paragraph",
+      "text": "Dịch máy đề cập đến dịch tự động của một chuỗi từ ngôn ngữ này sang\nngôn ngữ khác. Trên thực tế, lĩnh vực này có thể có niên đại từ những\nnăm 1940 ngay sau khi máy tính kỹ thuật số được phát minh, đặc biệt là\nbằng cách xem xét việc sử dụng máy tính để nứt mã ngôn ngữ trong Thế\nchiến II. Trong nhiều thập kỷ, các phương pháp thống kê đã chiếm ưu thế\ntrong lĩnh vực này [Brown et al., 1988] [Brown et al., 1990] trước khi sự gia tăng của học tập từ đầu đến cuối bằng cách sử dụng mạng\nthần kinh. Cái sau thường được gọi là dịch máy nơ-ron to distinguish\nphân biệt itself chinh no from dịch máy thống thống liên quan đến việc\nphân tích thống kê trong các thành phần như mô hình dịch thuật và mô\nhình ngôn ngữ."
+    },
+    {
+      "type": "paragraph",
+      "text": "Nhấn mạnh việc học từ đầu đến cuối, cuốn sách này sẽ tập trung vào các\nphương pháp dịch máy thần kinh. Khác với vấn đề mô hình ngôn ngữ của\nchúng tôi trong Section 8.3 có corpus là trong một\nngôn ngữ duy nhất, các tập dữ liệu dịch máy bao gồm các cặp chuỗi văn\nbản trong ngôn ngữ nguồn và ngôn ngữ đích, tương ứng. Do đó, thay vì sử\ndụng lại thói quen tiền xử lý để mô hình hóa ngôn ngữ, chúng ta cần một\ncách khác để xử lý trước các bộ dữ liệu dịch máy. Trong phần sau, chúng\ntôi chỉ ra cách tải dữ liệu được xử lý trước vào minibatches để đào tạo."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "import os\nfrom mxnet import np, npx\nfrom d2l import mxnet as d2l\n\nnpx.set_np()"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "import os\nimport torch\nfrom d2l import torch as d2l"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "import os\nimport tensorflow as tf\nfrom d2l import tensorflow as d2l"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tai-xuong-va-xu-ly-so-bo-du-lieu",
+      "text": "9.5.1. Tải xuống và xử lý sơ bộ dữ liệu"
+    },
+    {
+      "type": "paragraph",
+      "text": "Để bắt đầu, chúng tôi tải xuống một tập dữ liệu tiếng Anh-Pháp bao gồm bilingual sentence pairs from the Tatoeba\nProject . Mỗi dòng trong tập dữ liệu\nlà một cặp phân cách tab của một chuỗi văn bản tiếng Anh và chuỗi văn\nbản tiếng Pháp được dịch. Lưu ý rằng mỗi chuỗi văn bản có thể chỉ là một\ncâu hoặc một đoạn văn của nhiều câu. Trong vấn đề dịch máy này, nơi\ntiếng Anh được dịch sang tiếng Pháp, tiếng Anh là ngôn ngữ nguồn * và\ntiếng Pháp là ngôn ngữ mục tiêu *."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "#@save\nd2l.DATA_HUB['fra-eng'] = (d2l.DATA_URL + 'fra-eng.zip',\n                           '94646ad1522d915e7b0f9296181140edcf86a4f5')\n\n#@save\ndef read_data_nmt():\n    \"\"\"Load the English-French dataset.\"\"\"\n    data_dir = d2l.download_extract('fra-eng')\n    with open(os.path.join(data_dir, 'fra.txt'), 'r') as f:\n        return f.read()\n\nraw_text = read_data_nmt()\nprint(raw_text[:75])"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "Downloading ../data/fra-eng.zip from http://d2l-data.s3-accelerate.amazonaws.com/fra-eng.zip...\nGo. Va !\nHi. Salut !\nRun!        Cours !\nRun!        Courez !\nWho?        Qui ?\nWow!        Ça alors !"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "#@save\nd2l.DATA_HUB['fra-eng'] = (d2l.DATA_URL + 'fra-eng.zip',\n                           '94646ad1522d915e7b0f9296181140edcf86a4f5')\n\n#@save\ndef read_data_nmt():\n    \"\"\"Load the English-French dataset.\"\"\"\n    data_dir = d2l.download_extract('fra-eng')\n    with open(os.path.join(data_dir, 'fra.txt'), 'r') as f:\n        return f.read()\n\nraw_text = read_data_nmt()\nprint(raw_text[:75])"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "Go. Va !\nHi. Salut !\nRun!        Cours !\nRun!        Courez !\nWho?        Qui ?\nWow!        Ça alors !"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "#@save\nd2l.DATA_HUB['fra-eng'] = (d2l.DATA_URL + 'fra-eng.zip',\n                           '94646ad1522d915e7b0f9296181140edcf86a4f5')\n\n#@save\ndef read_data_nmt():\n    \"\"\"Load the English-French dataset.\"\"\"\n    data_dir = d2l.download_extract('fra-eng')\n    with open(os.path.join(data_dir, 'fra.txt'), 'r') as f:\n        return f.read()\n\nraw_text = read_data_nmt()\nprint(raw_text[:75])"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "Go. Va !\nHi. Salut !\nRun!        Cours !\nRun!        Courez !\nWho?        Qui ?\nWow!        Ça alors !"
+    },
+    {
+      "type": "paragraph",
+      "text": "Sau khi tải xuống tập dữ liệu, chúng tôi tiến hành một số bước xử lý cho\ndữ liệu văn bản thô. Ví dụ, chúng ta thay thế không gian không phá vỡ\nbằng dấu cách, chuyển đổi chữ hoa thành chữ thường và chèn khoảng cách\ngiữa các từ và dấu chấm câu."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "#@save\ndef preprocess_nmt(text):\n    \"\"\"Preprocess the English-French dataset.\"\"\"\n    def no_space(char, prev_char):\n        return char in set(',.!?') and prev_char != ' '\n\n    # Replace non-breaking space with space, and convert uppercase letters to\n    # lowercase ones\n    text = text.replace('\\u202f', ' ').replace('\\xa0', ' ').lower()\n    # Insert space between words and punctuation marks\n    out = [' ' + char if i > 0 and no_space(char, text[i - 1]) else char\n           for i, char in enumerate(text)]\n    return ''.join(out)\n\ntext = preprocess_nmt(raw_text)\nprint(text[:80])"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "go .        va !\nhi .        salut !\nrun !       cours !\nrun !       courez !\nwho ?       qui ?\nwow !       ça alors !"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "#@save\ndef preprocess_nmt(text):\n    \"\"\"Preprocess the English-French dataset.\"\"\"\n    def no_space(char, prev_char):\n        return char in set(',.!?') and prev_char != ' '\n\n    # Replace non-breaking space with space, and convert uppercase letters to\n    # lowercase ones\n    text = text.replace('\\u202f', ' ').replace('\\xa0', ' ').lower()\n    # Insert space between words and punctuation marks\n    out = [' ' + char if i > 0 and no_space(char, text[i - 1]) else char\n           for i, char in enumerate(text)]\n    return ''.join(out)\n\ntext = preprocess_nmt(raw_text)\nprint(text[:80])"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "go .        va !\nhi .        salut !\nrun !       cours !\nrun !       courez !\nwho ?       qui ?\nwow !       ça alors !"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "#@save\ndef preprocess_nmt(text):\n    \"\"\"Preprocess the English-French dataset.\"\"\"\n    def no_space(char, prev_char):\n        return char in set(',.!?') and prev_char != ' '\n\n    # Replace non-breaking space with space, and convert uppercase letters to\n    # lowercase ones\n    text = text.replace('\\u202f', ' ').replace('\\xa0', ' ').lower()\n    # Insert space between words and punctuation marks\n    out = [' ' + char if i > 0 and no_space(char, text[i - 1]) else char\n           for i, char in enumerate(text)]\n    return ''.join(out)\n\ntext = preprocess_nmt(raw_text)\nprint(text[:80])"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "go .        va !\nhi .        salut !\nrun !       cours !\nrun !       courez !\nwho ?       qui ?\nwow !       ça alors !"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tokenization",
+      "text": "9.5.2. Tokenization"
+    },
+    {
+      "type": "paragraph",
+      "text": "Khác với mã hóa cấp ký tự trong Section 8.3 , đối với\ndịch máy, chúng tôi thích mã hóa cấp từ ở đây (các mô hình hiện đại có\nthể sử dụng các kỹ thuật mã hóa tiên tiến hơn). Hàm tokenize_nmt sau\nmã hóa các cặp chuỗi văn bản num_examples đầu tiên, trong đó mỗi\ntoken là một từ hoặc dấu chấm câu. Hàm này trả về hai danh sách các danh\nsách token: source và target . Cụ thể, source[i] là danh sách\ncác mã thông báo từ chuỗi văn bản \\(i^\\mathrm{th}\\) trong ngôn ngữ\nnguồn (tiếng Anh ở đây) và target[i] là trong ngôn ngữ đích (tiếng\nPháp ở đây)."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "#@save\ndef tokenize_nmt(text, num_examples=None):\n    \"\"\"Tokenize the English-French dataset.\"\"\"\n    source, target = [], []\n    for i, line in enumerate(text.split('\\n')):\n        if num_examples and i > num_examples:\n            break\n        parts = line.split('\\t')\n        if len(parts) == 2:\n            source.append(parts[0].split(' '))\n            target.append(parts[1].split(' '))\n    return source, target\n\nsource, target = tokenize_nmt(text)\nsource[:6], target[:6]"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "([['go', '.'],\n  ['hi', '.'],\n  ['run', '!'],\n  ['run', '!'],\n  ['who', '?'],\n  ['wow', '!']],\n [['va', '!'],\n  ['salut', '!'],\n  ['cours', '!'],\n  ['courez', '!'],\n  ['qui', '?'],\n  ['ça', 'alors', '!']])"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "#@save\ndef tokenize_nmt(text, num_examples=None):\n    \"\"\"Tokenize the English-French dataset.\"\"\"\n    source, target = [], []\n    for i, line in enumerate(text.split('\\n')):\n        if num_examples and i > num_examples:\n            break\n        parts = line.split('\\t')\n        if len(parts) == 2:\n            source.append(parts[0].split(' '))\n            target.append(parts[1].split(' '))\n    return source, target\n\nsource, target = tokenize_nmt(text)\nsource[:6], target[:6]"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "([['go', '.'],\n  ['hi', '.'],\n  ['run', '!'],\n  ['run', '!'],\n  ['who', '?'],\n  ['wow', '!']],\n [['va', '!'],\n  ['salut', '!'],\n  ['cours', '!'],\n  ['courez', '!'],\n  ['qui', '?'],\n  ['ça', 'alors', '!']])"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "#@save\ndef tokenize_nmt(text, num_examples=None):\n    \"\"\"Tokenize the English-French dataset.\"\"\"\n    source, target = [], []\n    for i, line in enumerate(text.split('\\n')):\n        if num_examples and i > num_examples:\n            break\n        parts = line.split('\\t')\n        if len(parts) == 2:\n            source.append(parts[0].split(' '))\n            target.append(parts[1].split(' '))\n    return source, target\n\nsource, target = tokenize_nmt(text)\nsource[:6], target[:6]"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "([['go', '.'],\n  ['hi', '.'],\n  ['run', '!'],\n  ['run', '!'],\n  ['who', '?'],\n  ['wow', '!']],\n [['va', '!'],\n  ['salut', '!'],\n  ['cours', '!'],\n  ['courez', '!'],\n  ['qui', '?'],\n  ['ça', 'alors', '!']])"
+    },
+    {
+      "type": "paragraph",
+      "text": "Hãy để chúng tôi vẽ biểu đồ của số lượng mã thông báo trên mỗi chuỗi văn\nbản. Trong tập dữ liệu tiếng Anh-Pháp đơn giản này, hầu hết các chuỗi\nvăn bản có ít hơn 20 mã thông báo."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "#@save\ndef show_list_len_pair_hist(legend, xlabel, ylabel, xlist, ylist):\n    \"\"\"Plot the histogram for list length pairs.\"\"\"\n    d2l.set_figsize()\n    _, _, patches = d2l.plt.hist(\n        [[len(l) for l in xlist], [len(l) for l in ylist]])\n    d2l.plt.xlabel(xlabel)\n    d2l.plt.ylabel(ylabel)\n    for patch in patches[1].patches:\n        patch.set_hatch('/')\n    d2l.plt.legend(legend)\n\nshow_list_len_pair_hist(['source', 'target'], '# tokens per sequence',\n                        'count', source, target);"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_machine-translation-and-dataset_887557_51_0.svg",
+      "local_path": "_images/output_machine-translation-and-dataset_887557_51_0.svg",
+      "alt": "../_images/output_machine-translation-and-dataset_887557_51_0.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "#@save\ndef show_list_len_pair_hist(legend, xlabel, ylabel, xlist, ylist):\n    \"\"\"Plot the histogram for list length pairs.\"\"\"\n    d2l.set_figsize()\n    _, _, patches = d2l.plt.hist(\n        [[len(l) for l in xlist], [len(l) for l in ylist]])\n    d2l.plt.xlabel(xlabel)\n    d2l.plt.ylabel(ylabel)\n    for patch in patches[1].patches:\n        patch.set_hatch('/')\n    d2l.plt.legend(legend)\n\nshow_list_len_pair_hist(['source', 'target'], '# tokens per sequence',\n                        'count', source, target);"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_machine-translation-and-dataset_887557_54_0.svg",
+      "local_path": "_images/output_machine-translation-and-dataset_887557_54_0.svg",
+      "alt": "../_images/output_machine-translation-and-dataset_887557_54_0.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "#@save\ndef show_list_len_pair_hist(legend, xlabel, ylabel, xlist, ylist):\n    \"\"\"Plot the histogram for list length pairs.\"\"\"\n    d2l.set_figsize()\n    _, _, patches = d2l.plt.hist(\n        [[len(l) for l in xlist], [len(l) for l in ylist]])\n    d2l.plt.xlabel(xlabel)\n    d2l.plt.ylabel(ylabel)\n    for patch in patches[1].patches:\n        patch.set_hatch('/')\n    d2l.plt.legend(legend)\n\nshow_list_len_pair_hist(['source', 'target'], '# tokens per sequence',\n                        'count', source, target);"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_machine-translation-and-dataset_887557_57_0.svg",
+      "local_path": "_images/output_machine-translation-and-dataset_887557_57_0.svg",
+      "alt": "../_images/output_machine-translation-and-dataset_887557_57_0.svg"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tu-vu",
+      "text": "9.5.3. Từ vừ"
+    },
+    {
+      "type": "paragraph",
+      "text": "Vì tập dữ liệu dịch máy bao gồm các cặp ngôn ngữ, chúng ta có thể xây\ndựng hai từ vựng cho cả ngôn ngữ nguồn và ngôn ngữ đích riêng biệt. Với\ntokenization cấp từ, kích thước từ vựng sẽ lớn hơn đáng kể so với việc\nsử dụng tokenization cấp ký tự. Để giảm bớt điều này, ở đây chúng tôi xử\nlý các token không thường xuyên xuất hiện ít hơn 2 lần so với cùng một\nmã thông báo chưa biết (” “). Bên cạnh đó, chúng tôi chỉ định các token\nđặc biệt bổ sung như cho các chuỗi padding (” “) với cùng độ dài trong\nminibatches và để đánh dấu đầu (” “) hoặc kết thúc (” “) của chuỗi. Các\ntoken đặc biệt như vậy thường được sử dụng trong các nhiệm vụ xử lý ngôn\nngữ tự nhiên."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "src_vocab = d2l.Vocab(source, min_freq=2,\n                      reserved_tokens=['<pad>', '<bos>', '<eos>'])\nlen(src_vocab)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "10012"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "src_vocab = d2l.Vocab(source, min_freq=2,\n                      reserved_tokens=['<pad>', '<bos>', '<eos>'])\nlen(src_vocab)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "10012"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "src_vocab = d2l.Vocab(source, min_freq=2,\n                      reserved_tokens=['<pad>', '<bos>', '<eos>'])\nlen(src_vocab)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "10012"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "doc-tap-du-lieu",
+      "text": "9.5.4. Đọc tập dữ liệu"
+    },
+    {
+      "type": "paragraph",
+      "text": "Nhớ lại rằng trong mô hình ngôn ngữ mỗi chuỗi ví dụ, hoặc là một đoạn\ncủa một câu hoặc một khoảng trên nhiều câu, có chiều dài cố định. Điều\nnày được chỉ định bởi đối số num_steps (số bước thời gian hoặc mã\nthông báo) trong Section 8.3 . Trong dịch máy, mỗi ví\ndụ là một cặp chuỗi văn bản nguồn và đích, trong đó mỗi chuỗi văn bản có\nthể có độ dài khác nhau."
+    },
+    {
+      "type": "paragraph",
+      "text": "Đối với hiệu quả tính toán, chúng ta vẫn có thể xử lý một minibatch các\nchuỗi văn bản cùng một lúc bằng cách cutcation và padding . Giả sử\nrằng mọi chuỗi trong cùng một minibatch nên có cùng chiều dài num_steps . Nếu chuỗi văn bản có ít hơn num_steps token, chúng ta\nsẽ tiếp tục nối mã thông báo “” đặc biệt vào cuối cho đến khi độ dài của\nnó đạt đến num_steps . Nếu không, chúng tôi sẽ cắt ngắn chuỗi văn bản\nbằng cách chỉ lấy mã thông báo num_steps đầu tiên của nó và loại bỏ\nphần còn lại. Bằng cách này, mỗi chuỗi văn bản sẽ có cùng độ dài để được\ntải trong các minibatches có cùng hình dạng."
+    },
+    {
+      "type": "paragraph",
+      "text": "Chức năng truncate_pad sau đây cắt ngắn hoặc miếng đệm chuỗi văn bản\nnhư mô tả trước đó."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "#@save\ndef truncate_pad(line, num_steps, padding_token):\n    \"\"\"Truncate or pad sequences.\"\"\"\n    if len(line) > num_steps:\n        return line[:num_steps]  # Truncate\n    return line + [padding_token] * (num_steps - len(line))  # Pad\n\ntruncate_pad(src_vocab[source[0]], 10, src_vocab['<pad>'])"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "[47, 4, 1, 1, 1, 1, 1, 1, 1, 1]"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "#@save\ndef truncate_pad(line, num_steps, padding_token):\n    \"\"\"Truncate or pad sequences.\"\"\"\n    if len(line) > num_steps:\n        return line[:num_steps]  # Truncate\n    return line + [padding_token] * (num_steps - len(line))  # Pad\n\ntruncate_pad(src_vocab[source[0]], 10, src_vocab['<pad>'])"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "[47, 4, 1, 1, 1, 1, 1, 1, 1, 1]"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "#@save\ndef truncate_pad(line, num_steps, padding_token):\n    \"\"\"Truncate or pad sequences.\"\"\"\n    if len(line) > num_steps:\n        return line[:num_steps]  # Truncate\n    return line + [padding_token] * (num_steps - len(line))  # Pad\n\ntruncate_pad(src_vocab[source[0]], 10, src_vocab['<pad>'])"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "[47, 4, 1, 1, 1, 1, 1, 1, 1, 1]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Bây giờ chúng ta định nghĩa một hàm để transform text sequences thành\nminibatches để đào tạo. Chúng tôi thêm token “” đặc biệt vào cuối mỗi\nchuỗi để chỉ ra kết thúc của chuỗi. Khi một mô hình dự đoán bằng cách\ntạo ra một token chuỗi sau token, việc tạo ra token “” có thể gợi ý rằng\nchuỗi đầu ra đã hoàn tất. Bên cạnh đó, chúng tôi cũng ghi lại độ dài của\nmỗi chuỗi văn bản không bao gồm các token padding. Thông tin này sẽ cần\nthiết bởi một số mô hình mà chúng tôi sẽ đề cập sau."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "#@save\ndef build_array_nmt(lines, vocab, num_steps):\n    \"\"\"Transform text sequences of machine translation into minibatches.\"\"\"\n    lines = [vocab[l] for l in lines]\n    lines = [l + [vocab['<eos>']] for l in lines]\n    array = np.array([truncate_pad(\n        l, num_steps, vocab['<pad>']) for l in lines])\n    valid_len = (array != vocab['<pad>']).astype(np.int32).sum(1)\n    return array, valid_len"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "#@save\ndef build_array_nmt(lines, vocab, num_steps):\n    \"\"\"Transform text sequences of machine translation into minibatches.\"\"\"\n    lines = [vocab[l] for l in lines]\n    lines = [l + [vocab['<eos>']] for l in lines]\n    array = torch.tensor([truncate_pad(\n        l, num_steps, vocab['<pad>']) for l in lines])\n    valid_len = (array != vocab['<pad>']).type(torch.int32).sum(1)\n    return array, valid_len"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "#@save\ndef build_array_nmt(lines, vocab, num_steps):\n    \"\"\"Transform text sequences of machine translation into minibatches.\"\"\"\n    lines = [vocab[l] for l in lines]\n    lines = [l + [vocab['<eos>']] for l in lines]\n    array = tf.constant([truncate_pad(\n        l, num_steps, vocab['<pad>']) for l in lines])\n    valid_len = tf.reduce_sum(\n        tf.cast(array != vocab['<pad>'], tf.int32), 1)\n    return array, valid_len"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "putting-all-things-together",
+      "text": "9.5.5. Putting All Things Together"
+    },
+    {
+      "type": "paragraph",
+      "text": "Cuối cùng, chúng ta định nghĩa hàm load_data_nmt để trả về bộ lặp dữ\nliệu, cùng với từ vựng cho cả ngôn ngữ nguồn và ngôn ngữ đích."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "#@save\ndef load_data_nmt(batch_size, num_steps, num_examples=600):\n    \"\"\"Return the iterator and the vocabularies of the translation dataset.\"\"\"\n    text = preprocess_nmt(read_data_nmt())\n    source, target = tokenize_nmt(text, num_examples)\n    src_vocab = d2l.Vocab(source, min_freq=2,\n                          reserved_tokens=['<pad>', '<bos>', '<eos>'])\n    tgt_vocab = d2l.Vocab(target, min_freq=2,\n                          reserved_tokens=['<pad>', '<bos>', '<eos>'])\n    src_array, src_valid_len = build_array_nmt(source, src_vocab, num_steps)\n    tgt_array, tgt_valid_len = build_array_nmt(target, tgt_vocab, num_steps)\n    data_arrays = (src_array, src_valid_len, tgt_array, tgt_valid_len)\n    data_iter = d2l.load_array(data_arrays, batch_size)\n    return data_iter, src_vocab, tgt_vocab"
+    },
+    {
+      "type": "paragraph",
+      "text": "Hãy để chúng tôi đọc minibatch đầu tiên từ dữ liệu tiếng Anh-Pháp."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "train_iter, src_vocab, tgt_vocab = load_data_nmt(batch_size=2, num_steps=8)\nfor X, X_valid_len, Y, Y_valid_len in train_iter:\n    print('X:', X.astype(np.int32))\n    print('valid lengths for X:', X_valid_len)\n    print('Y:', Y.astype(np.int32))\n    print('valid lengths for Y:', Y_valid_len)\n    break"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "X: [[ 0  5  3  1  1  1  1  1]\n [13 46 48  4  3  1  1  1]]\nvalid lengths for X: [3 5]\nY: [[ 15  29   0   4   3   1   1   1]\n [ 81  23 193   5   3   1   1   1]]\nvalid lengths for Y: [5 5]"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "train_iter, src_vocab, tgt_vocab = load_data_nmt(batch_size=2, num_steps=8)\nfor X, X_valid_len, Y, Y_valid_len in train_iter:\n    print('X:', X.type(torch.int32))\n    print('valid lengths for X:', X_valid_len)\n    print('Y:', Y.type(torch.int32))\n    print('valid lengths for Y:', Y_valid_len)\n    break"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "X: tensor([[53,  8,  4,  3,  1,  1,  1,  1],\n        [83, 15,  4,  3,  1,  1,  1,  1]], dtype=torch.int32)\nvalid lengths for X: tensor([4, 4])\nY: tensor([[192,   5,   3,   1,   1,   1,   1,   1],\n        [  0,   5,   3,   1,   1,   1,   1,   1]], dtype=torch.int32)\nvalid lengths for Y: tensor([3, 3])"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "train_iter, src_vocab, tgt_vocab = load_data_nmt(batch_size=2, num_steps=8)\nfor X, X_valid_len, Y, Y_valid_len in train_iter:\n    print('X:', tf.cast(X, tf.int32))\n    print('valid lengths for X:', X_valid_len)\n    print('Y:', tf.cast(Y, tf.int32))\n    print('valid lengths for Y:', Y_valid_len)\n    break"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "X: tf.Tensor(\n[[ 77  21   4   3   1   1   1   1]\n [167  12   4   3   1   1   1   1]], shape=(2, 8), dtype=int32)\nvalid lengths for X: tf.Tensor([4 4], shape=(2,), dtype=int32)\nY: tf.Tensor(\n[[ 76  34   5   3   1   1   1   1]\n [155 181   4   3   1   1   1   1]], shape=(2, 8), dtype=int32)\nvalid lengths for Y: tf.Tensor([4 4], shape=(2,), dtype=int32)"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tom-tat",
+      "text": "9.5.6. Tóm tắt"
+    },
+    {
+      "type": "list",
+      "ordered": false,
+      "items": [
+        "Dịch máy đề cập đến bản dịch tự động của một chuỗi từ ngôn ngữ này\nsang ngôn ngữ khác.",
+        "Sử dụng tokenization cấp từ, kích thước từ vựng sẽ lớn hơn đáng kể so\nvới việc sử dụng tokenization cấp ký tự. Để giảm bớt điều này, chúng\nta có thể coi các token không thường xuyên như cùng một mã thông báo\nkhông xác định.",
+        "Chúng ta có thể cắt ngắn và pad chuỗi văn bản để tất cả chúng sẽ có\ncùng độ dài để được tải trong minibatches."
+      ]
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bai-tap",
+      "text": "9.5.7. Bài tập"
+    },
+    {
+      "type": "list",
+      "ordered": true,
+      "items": [
+        "Hãy thử các giá trị khác nhau của đối số num_examples trong hàm load_data_nmt . Điều này ảnh hưởng đến kích thước từ vựng của ngôn\nngữ nguồn và ngôn ngữ đích như thế nào?",
+        "Văn bản trong một số ngôn ngữ như tiếng Trung và tiếng Nhật không có\nchỉ số ranh giới từ (ví dụ: khoảng cách). Token ization cấp từ vẫn là\nmột ý tưởng hay cho những trường hợp như vậy? Tại sao hoặc tại sao\nkhông?"
+      ]
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    }
+  ],
+  "images": [
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_machine-translation-and-dataset_887557_51_0.svg",
+      "local_path": "_images/output_machine-translation-and-dataset_887557_51_0.svg",
+      "alt": "../_images/output_machine-translation-and-dataset_887557_51_0.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_machine-translation-and-dataset_887557_54_0.svg",
+      "local_path": "_images/output_machine-translation-and-dataset_887557_54_0.svg",
+      "alt": "../_images/output_machine-translation-and-dataset_887557_54_0.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_machine-translation-and-dataset_887557_57_0.svg",
+      "local_path": "_images/output_machine-translation-and-dataset_887557_57_0.svg",
+      "alt": "../_images/output_machine-translation-and-dataset_887557_57_0.svg"
+    }
+  ],
+  "text": "9.5. Dịch máy và bộ dữ liệu\nChúng tôi đã sử dụng RNNs để thiết kế các mô hình ngôn ngữ, đó là chìa\nkhóa để xử lý ngôn ngữ tự nhiên. Một điểm chuẩn hàng đầu khác là * dịch\nmáy * , một miền vấn đề trung tâm cho các mô hình * chuyển đổi chuỗi\nlự* chuyển đổi chuỗi đầu vào thành chuỗi đầu ra. Đóng một vai trò quan\ntrọng trong các ứng dụng AI hiện đại khác nhau, các mô hình chuyển tải\nchuỗi sẽ tạo thành trọng tâm của phần còn lại của chương này và Section 10 . Để kết thúc này, phần này giới thiệu vấn đề\ndịch máy và tập dữ liệu của nó sẽ được sử dụng sau này.\nDịch máy đề cập đến dịch tự động của một chuỗi từ ngôn ngữ này sang\nngôn ngữ khác. Trên thực tế, lĩnh vực này có thể có niên đại từ những\nnăm 1940 ngay sau khi máy tính kỹ thuật số được phát minh, đặc biệt là\nbằng cách xem xét việc sử dụng máy tính để nứt mã ngôn ngữ trong Thế\nchiến II. Trong nhiều thập kỷ, các phương pháp thống kê đã chiếm ưu thế\ntrong lĩnh vực này [Brown et al., 1988] [Brown et al., 1990] trước khi sự gia tăng của học tập từ đầu đến cuối bằng cách sử dụng mạng\nthần kinh. Cái sau thường được gọi là dịch máy nơ-ron to distinguish\nphân biệt itself chinh no from dịch máy thống thống liên quan đến việc\nphân tích thống kê trong các thành phần như mô hình dịch thuật và mô\nhình ngôn ngữ.\nNhấn mạnh việc học từ đầu đến cuối, cuốn sách này sẽ tập trung vào các\nphương pháp dịch máy thần kinh. Khác với vấn đề mô hình ngôn ngữ của\nchúng tôi trong Section 8.3 có corpus là trong một\nngôn ngữ duy nhất, các tập dữ liệu dịch máy bao gồm các cặp chuỗi văn\nbản trong ngôn ngữ nguồn và ngôn ngữ đích, tương ứng. Do đó, thay vì sử\ndụng lại thói quen tiền xử lý để mô hình hóa ngôn ngữ, chúng ta cần một\ncách khác để xử lý trước các bộ dữ liệu dịch máy. Trong phần sau, chúng\ntôi chỉ ra cách tải dữ liệu được xử lý trước vào minibatches để đào tạo.\n9.5.1. Tải xuống và xử lý sơ bộ dữ liệu\nĐể bắt đầu, chúng tôi tải xuống một tập dữ liệu tiếng Anh-Pháp bao gồm bilingual sentence pairs from the Tatoeba\nProject . Mỗi dòng trong tập dữ liệu\nlà một cặp phân cách tab của một chuỗi văn bản tiếng Anh và chuỗi văn\nbản tiếng Pháp được dịch. Lưu ý rằng mỗi chuỗi văn bản có thể chỉ là một\ncâu hoặc một đoạn văn của nhiều câu. Trong vấn đề dịch máy này, nơi\ntiếng Anh được dịch sang tiếng Pháp, tiếng Anh là ngôn ngữ nguồn * và\ntiếng Pháp là ngôn ngữ mục tiêu *.\nSau khi tải xuống tập dữ liệu, chúng tôi tiến hành một số bước xử lý cho\ndữ liệu văn bản thô. Ví dụ, chúng ta thay thế không gian không phá vỡ\nbằng dấu cách, chuyển đổi chữ hoa thành chữ thường và chèn khoảng cách\ngiữa các từ và dấu chấm câu.\n9.5.2. Tokenization\nKhác với mã hóa cấp ký tự trong Section 8.3 , đối với\ndịch máy, chúng tôi thích mã hóa cấp từ ở đây (các mô hình hiện đại có\nthể sử dụng các kỹ thuật mã hóa tiên tiến hơn). Hàm tokenize_nmt sau\nmã hóa các cặp chuỗi văn bản num_examples đầu tiên, trong đó mỗi\ntoken là một từ hoặc dấu chấm câu. Hàm này trả về hai danh sách các danh\nsách token: source và target . Cụ thể, source[i] là danh sách\ncác mã thông báo từ chuỗi văn bản \\(i^\\mathrm{th}\\) trong ngôn ngữ\nnguồn (tiếng Anh ở đây) và target[i] là trong ngôn ngữ đích (tiếng\nPháp ở đây).\nHãy để chúng tôi vẽ biểu đồ của số lượng mã thông báo trên mỗi chuỗi văn\nbản. Trong tập dữ liệu tiếng Anh-Pháp đơn giản này, hầu hết các chuỗi\nvăn bản có ít hơn 20 mã thông báo.\n9.5.3. Từ vừ\nVì tập dữ liệu dịch máy bao gồm các cặp ngôn ngữ, chúng ta có thể xây\ndựng hai từ vựng cho cả ngôn ngữ nguồn và ngôn ngữ đích riêng biệt. Với\ntokenization cấp từ, kích thước từ vựng sẽ lớn hơn đáng kể so với việc\nsử dụng tokenization cấp ký tự. Để giảm bớt điều này, ở đây chúng tôi xử\nlý các token không thường xuyên xuất hiện ít hơn 2 lần so với cùng một\nmã thông báo chưa biết (” “). Bên cạnh đó, chúng tôi chỉ định các token\nđặc biệt bổ sung như cho các chuỗi padding (” “) với cùng độ dài trong\nminibatches và để đánh dấu đầu (” “) hoặc kết thúc (” “) của chuỗi. Các\ntoken đặc biệt như vậy thường được sử dụng trong các nhiệm vụ xử lý ngôn\nngữ tự nhiên.\n9.5.4. Đọc tập dữ liệu\nNhớ lại rằng trong mô hình ngôn ngữ mỗi chuỗi ví dụ, hoặc là một đoạn\ncủa một câu hoặc một khoảng trên nhiều câu, có chiều dài cố định. Điều\nnày được chỉ định bởi đối số num_steps (số bước thời gian hoặc mã\nthông báo) trong Section 8.3 . Trong dịch máy, mỗi ví\ndụ là một cặp chuỗi văn bản nguồn và đích, trong đó mỗi chuỗi văn bản có\nthể có độ dài khác nhau.\nĐối với hiệu quả tính toán, chúng ta vẫn có thể xử lý một minibatch các\nchuỗi văn bản cùng một lúc bằng cách cutcation và padding . Giả sử\nrằng mọi chuỗi trong cùng một minibatch nên có cùng chiều dài num_steps . Nếu chuỗi văn bản có ít hơn num_steps token, chúng ta\nsẽ tiếp tục nối mã thông báo “” đặc biệt vào cuối cho đến khi độ dài của\nnó đạt đến num_steps . Nếu không, chúng tôi sẽ cắt ngắn chuỗi văn bản\nbằng cách chỉ lấy mã thông báo num_steps đầu tiên của nó và loại bỏ\nphần còn lại. Bằng cách này, mỗi chuỗi văn bản sẽ có cùng độ dài để được\ntải trong các minibatches có cùng hình dạng.\nChức năng truncate_pad sau đây cắt ngắn hoặc miếng đệm chuỗi văn bản\nnhư mô tả trước đó.\nBây giờ chúng ta định nghĩa một hàm để transform text sequences thành\nminibatches để đào tạo. Chúng tôi thêm token “” đặc biệt vào cuối mỗi\nchuỗi để chỉ ra kết thúc của chuỗi. Khi một mô hình dự đoán bằng cách\ntạo ra một token chuỗi sau token, việc tạo ra token “” có thể gợi ý rằng\nchuỗi đầu ra đã hoàn tất. Bên cạnh đó, chúng tôi cũng ghi lại độ dài của\nmỗi chuỗi văn bản không bao gồm các token padding. Thông tin này sẽ cần\nthiết bởi một số mô hình mà chúng tôi sẽ đề cập sau.\n9.5.5. Putting All Things Together\nCuối cùng, chúng ta định nghĩa hàm load_data_nmt để trả về bộ lặp dữ\nliệu, cùng với từ vựng cho cả ngôn ngữ nguồn và ngôn ngữ đích.\nHãy để chúng tôi đọc minibatch đầu tiên từ dữ liệu tiếng Anh-Pháp.\n9.5.6. Tóm tắt\nDịch máy đề cập đến bản dịch tự động của một chuỗi từ ngôn ngữ này\nsang ngôn ngữ khác.\nSử dụng tokenization cấp từ, kích thước từ vựng sẽ lớn hơn đáng kể so\nvới việc sử dụng tokenization cấp ký tự. Để giảm bớt điều này, chúng\nta có thể coi các token không thường xuyên như cùng một mã thông báo\nkhông xác định.\nChúng ta có thể cắt ngắn và pad chuỗi văn bản để tất cả chúng sẽ có\ncùng độ dài để được tải trong minibatches.\n9.5.7. Bài tập\nHãy thử các giá trị khác nhau của đối số num_examples trong hàm load_data_nmt . Điều này ảnh hưởng đến kích thước từ vựng của ngôn\nngữ nguồn và ngôn ngữ đích như thế nào?\nVăn bản trong một số ngôn ngữ như tiếng Trung và tiếng Nhật không có\nchỉ số ranh giới từ (ví dụ: khoảng cách). Token ization cấp từ vẫn là\nmột ý tưởng hay cho những trường hợp như vậy? Tại sao hoặc tại sao\nkhông?\nDiscussions\nDiscussions"
+}

@@ -1,0 +1,489 @@
+{
+  "url": "https://vi.d2l.ai/chapter_attention-mechanisms/attention-scoring-functions.html",
+  "chapter": "chapter_attention-mechanisms",
+  "title": "10.3. Chức năng chấm điểm chú ý",
+  "crawled_at": "2026-07-20T12:40:13.044215+00:00",
+  "headings": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "chuc-nang-cham-diem-chu-y",
+      "text": "10.3. Chức năng chấm điểm chú ý"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "masked-softmax-operation",
+      "text": "10.3.1. Masked Softmax Operation"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "phu-gia-chu-y",
+      "text": "10.3.2. Phụ gia chú ý"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "quy-mo-dot-product-attention",
+      "text": "10.3.3. Quy mô Dot-Product Attention"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tom-tat",
+      "text": "10.3.4. Tóm tắt"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bai-tap",
+      "text": "10.3.5. Bài tập"
+    }
+  ],
+  "content": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "chuc-nang-cham-diem-chu-y",
+      "text": "10.3. Chức năng chấm điểm chú ý"
+    },
+    {
+      "type": "paragraph",
+      "text": "Trong Section 10.2 , chúng tôi đã sử dụng một hạt nhân\nGaussian để mô hình hóa tương tác giữa các truy vấn và khóa. Xử lý số mũ\ncủa hạt nhân Gaussian trong (10.2.6) như\nmột chức năng ghi điểm chú ý (hoặc chức năng ghi điểm ), kết quả của\nhàm này về cơ bản đã được đưa vào một hoạt động softmax. Kết quả là,\nchúng tôi thu được một phân phối xác suất (trọng lượng chú ý) so với các\ngiá trị được ghép nối với các phím. Cuối cùng, đầu ra của sự chú ý tập\nhợp chỉ đơn giản là một tổng trọng số của các giá trị dựa trên các trọng\nlượng chú ý này."
+    },
+    {
+      "type": "paragraph",
+      "text": "Ở cấp độ cao, chúng ta có thể sử dụng thuật toán trên để khởi tạo khuôn\nkhổ của các cơ chế chú ý trong Fig. 10.1.3 . Biểu thị một chức\nnăng chấm điểm chú ý bởi \\(a\\) , Fig. 10.3.1 minh họa cách đầu ra của sự chú ý pooling có thể được tính như một tổng\ntrọng số của các giá trị. Vì trọng lượng chú ý là một phân phối xác\nsuất, tổng trọng số về cơ bản là một trung bình có trọng số."
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/attention-output.svg",
+      "local_path": "_images/attention-output.svg",
+      "alt": "../_images/attention-output.svg"
+    },
+    {
+      "type": "paragraph",
+      "text": "Fig. 10.3.1 Computing the output of attention pooling as a weighted average of\nvalues. ¶"
+    },
+    {
+      "type": "paragraph",
+      "text": "Về mặt toán học, giả sử rằng chúng ta có một truy vấn \\(\\mathbf{q} \\in \\mathbb{R}^q\\) và \\(m\\) cặp giá trị khóa \\((\\mathbf{k}_1, \\mathbf{v}_1), \\ldots, (\\mathbf{k}_m, \\mathbf{v}_m)\\) ,\ntrong đó bất kỳ \\(\\mathbf{k}_i \\in \\mathbb{R}^k\\) và \\(\\mathbf{v}_i \\in \\mathbb{R}^v\\) bất kỳ \\(\\mathbf{v}_i \\in \\mathbb{R}^v\\) . Sự chú ý tập hợp \\(f\\) được\nkhởi tạo như một tổng trọng số của các giá trị:"
+    },
+    {
+      "type": "math",
+      "latex": "(10.3.1)¶\\[f(\\mathbf{q}, (\\mathbf{k}_1, \\mathbf{v}_1), \\ldots, (\\mathbf{k}_m, \\mathbf{v}_m)) = \\sum_{i=1}^m \\alpha(\\mathbf{q}, \\mathbf{k}_i) \\mathbf{v}_i \\in \\mathbb{R}^v,\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "trong đó trọng lượng chú ý (vô hướng) cho truy vấn \\(\\mathbf{q}\\) và\nkhóa \\(\\mathbf{k}_i\\) được tính bằng hoạt động softmax của một chức\nnăng ghi điểm chú ý \\(a\\) ánh xạ hai vectơ đến vô hướng:"
+    },
+    {
+      "type": "math",
+      "latex": "(10.3.2)¶\\[\\alpha(\\mathbf{q}, \\mathbf{k}_i) = \\mathrm{softmax}(a(\\mathbf{q}, \\mathbf{k}_i)) = \\frac{\\exp(a(\\mathbf{q}, \\mathbf{k}_i))}{\\sum_{j=1}^m \\exp(a(\\mathbf{q}, \\mathbf{k}_j))} \\in \\mathbb{R}.\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Như chúng ta có thể thấy, các lựa chọn khác nhau của chức năng ghi điểm\nchú ý \\(a\\) dẫn đến các hành vi khác nhau của sự chú ý chung. Trong\nphần này, chúng tôi giới thiệu hai chức năng tính điểm phổ biến mà chúng\ntôi sẽ sử dụng để phát triển các cơ chế chú ý phức tạp hơn sau này."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "import math\nfrom mxnet import np, npx\nfrom mxnet.gluon import nn\nfrom d2l import mxnet as d2l\n\nnpx.set_np()"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "import math\nimport torch\nfrom torch import nn\nfrom d2l import torch as d2l"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "import tensorflow as tf\nfrom d2l import tensorflow as d2l"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "masked-softmax-operation",
+      "text": "10.3.1. Masked Softmax Operation"
+    },
+    {
+      "type": "paragraph",
+      "text": "Như chúng tôi vừa đề cập, một hoạt động softmax được sử dụng để tạo ra\nmột phân phối xác suất như trọng lượng chú ý. Trong một số trường hợp,\nkhông phải tất cả các giá trị nên được đưa vào tập hợp chú ý. Ví dụ, để\nxử lý minibatch hiệu quả trong Section 9.5 , một\nsố chuỗi văn bản được đệm với các mã thông báo đặc biệt không mang ý\nnghĩa. Để thu hút sự chú ý chỉ có các token có ý nghĩa làm giá trị,\nchúng ta có thể chỉ định độ dài chuỗi hợp lệ (về số lượng token) để lọc\nra những mã thông báo vượt quá phạm vi quy định này khi tính toán\nsoftmax. Bằng cách này, chúng ta có thể thực hiện một operation masked\nsoftmax như vậy trong hàm masked_softmax sau, trong đó bất kỳ giá\ntrị nào vượt quá độ dài hợp lệ được che dấu là zero."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "#@save\ndef masked_softmax(X, valid_lens):\n    \"\"\"Perform softmax operation by masking elements on the last axis.\"\"\"\n    # `X`: 3D tensor, `valid_lens`: 1D or 2D tensor\n    if valid_lens is None:\n        return npx.softmax(X)\n    else:\n        shape = X.shape\n        if valid_lens.ndim == 1:\n            valid_lens = valid_lens.repeat(shape[1])\n        else:\n            valid_lens = valid_lens.reshape(-1)\n        # On the last axis, replace masked elements with a very large negative\n        # value, whose exponentiation outputs 0\n        X = npx.sequence_mask(X.reshape(-1, shape[-1]), valid_lens, True,\n                              value=-1e6, axis=1)\n        return npx.softmax(X).reshape(shape)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "#@save\ndef masked_softmax(X, valid_lens):\n    \"\"\"Perform softmax operation by masking elements on the last axis.\"\"\"\n    # `X`: 3D tensor, `valid_lens`: 1D or 2D tensor\n    if valid_lens is None:\n        return nn.functional.softmax(X, dim=-1)\n    else:\n        shape = X.shape\n        if valid_lens.dim() == 1:\n            valid_lens = torch.repeat_interleave(valid_lens, shape[1])\n        else:\n            valid_lens = valid_lens.reshape(-1)\n        # On the last axis, replace masked elements with a very large negative\n        # value, whose exponentiation outputs 0\n        X = d2l.sequence_mask(X.reshape(-1, shape[-1]), valid_lens,\n                              value=-1e6)\n        return nn.functional.softmax(X.reshape(shape), dim=-1)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "#@save\ndef masked_softmax(X, valid_lens):\n    \"\"\"Perform softmax operation by masking elements on the last axis.\"\"\"\n    # `X`: 3D tensor, `valid_lens`: 1D or 2D tensor\n    if valid_lens is None:\n        return tf.nn.softmax(X, axis=-1)\n    else:\n        shape = X.shape\n        if len(valid_lens.shape) == 1:\n            valid_lens = tf.repeat(valid_lens, repeats=shape[1])\n\n        else:\n            valid_lens = tf.reshape(valid_lens, shape=-1)\n        # On the last axis, replace masked elements with a very large negative\n        # value, whose exponentiation outputs 0\n        X = d2l.sequence_mask(tf.reshape(X, shape=(-1, shape[-1])), valid_lens, value=-1e6)\n        return tf.nn.softmax(tf.reshape(X, shape=shape), axis=-1)"
+    },
+    {
+      "type": "paragraph",
+      "text": "Để chứng minh cách thức hoạt động của hàm này, hãy xem xét một minibatch\ngồm hai ví dụ ma trận \\(2 \\times 4\\) , trong đó độ dài hợp lệ cho hai\nví dụ này là hai và ba, tương ứng. Kết quả của hoạt động softmax đeo mặt\nnạ, các giá trị vượt quá độ dài hợp lệ đều được che dấu là 0."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "masked_softmax(np.random.uniform(size=(2, 2, 4)), np.array([2, 3]))"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "array([[[0.488994  , 0.511006  , 0.        , 0.        ],\n        [0.4365484 , 0.56345165, 0.        , 0.        ]],\n\n       [[0.288171  , 0.3519408 , 0.3598882 , 0.        ],\n        [0.29034296, 0.25239873, 0.45725837, 0.        ]]])"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "masked_softmax(torch.rand(2, 2, 4), torch.tensor([2, 3]))"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "tensor([[[0.3713, 0.6287, 0.0000, 0.0000],\n         [0.3659, 0.6341, 0.0000, 0.0000]],\n\n        [[0.2812, 0.2965, 0.4223, 0.0000],\n         [0.4899, 0.2254, 0.2847, 0.0000]]])"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "masked_softmax(tf.random.uniform(shape=(2, 2, 4)), tf.constant([2, 3]))"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "<tf.Tensor: shape=(2, 2, 4), dtype=float32, numpy=\narray([[[0.48924568, 0.5107543 , 0.        , 0.        ],\n        [0.5758674 , 0.4241325 , 0.        , 0.        ]],\n\n       [[0.27705452, 0.26540172, 0.4575438 , 0.        ],\n        [0.40250963, 0.33758318, 0.25990722, 0.        ]]], dtype=float32)>"
+    },
+    {
+      "type": "paragraph",
+      "text": "Tương tự, chúng ta cũng có thể sử dụng tensor hai chiều để chỉ định độ\ndài hợp lệ cho mỗi hàng trong mỗi ví dụ ma trận."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "masked_softmax(np.random.uniform(size=(2, 2, 4)),\n               np.array([[1, 3], [2, 4]]))"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "array([[[1.        , 0.        , 0.        , 0.        ],\n        [0.35848376, 0.3658879 , 0.27562833, 0.        ]],\n\n       [[0.54370314, 0.45629686, 0.        , 0.        ],\n        [0.19598778, 0.25580427, 0.19916739, 0.3490406 ]]])"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "masked_softmax(torch.rand(2, 2, 4), torch.tensor([[1, 3], [2, 4]]))"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "tensor([[[1.0000, 0.0000, 0.0000, 0.0000],\n         [0.3866, 0.3205, 0.2930, 0.0000]],\n\n        [[0.4323, 0.5677, 0.0000, 0.0000],\n         [0.2959, 0.1760, 0.3077, 0.2204]]])"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "masked_softmax(tf.random.uniform((2, 2, 4)), tf.constant([[1, 3], [2, 4]]))"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "<tf.Tensor: shape=(2, 2, 4), dtype=float32, numpy=\narray([[[1.        , 0.        , 0.        , 0.        ],\n        [0.29982516, 0.32084045, 0.37933442, 0.        ]],\n\n       [[0.35107154, 0.64892846, 0.        , 0.        ],\n        [0.33343762, 0.17458236, 0.30231002, 0.18966997]]], dtype=float32)>"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "phu-gia-chu-y",
+      "text": "10.3.2. Phụ gia chú ý"
+    },
+    {
+      "type": "paragraph",
+      "text": "Nói chung, khi truy vấn và phím là vectơ có độ dài khác nhau, chúng ta\ncó thể sử dụng sự chú ý phụ gia làm chức năng chấm điểm. Đưa ra một truy\nvấn \\(\\mathbf{q} \\in \\mathbb{R}^q\\) và một khóa \\(\\mathbf{k} \\in \\mathbb{R}^k\\) , chức năng chấm điểm * phụ thuật*"
+    },
+    {
+      "type": "math",
+      "latex": "(10.3.3)¶\\[a(\\mathbf q, \\mathbf k) = \\mathbf w_v^\\top \\text{tanh}(\\mathbf W_q\\mathbf q + \\mathbf W_k \\mathbf k) \\in \\mathbb{R},\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "trong đó các thông số có thể học được \\(\\mathbf W_q\\in\\mathbb R^{h\\times q}\\) , \\(\\mathbf W_k\\in\\mathbb R^{h\\times k}\\) và \\(\\mathbf w_v\\in\\mathbb R^{h}\\) . Tương đương với (10.3.3) , truy vấn và khóa được nối và đưa vào một\nMLP với một lớp ẩn duy nhất có số đơn vị ẩn là \\(h\\) , một siêu tham\nsố. Bằng cách sử dụng \\(\\tanh\\) làm chức năng kích hoạt và vô hiệu\nhóa các thuật ngữ thiên vị, chúng tôi thực hiện sự chú ý phụ gia trong\nnhững điều sau đây."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "#@save\nclass AdditiveAttention(nn.Block):\n    \"\"\"Additive attention.\"\"\"\n    def __init__(self, num_hiddens, dropout, **kwargs):\n        super(AdditiveAttention, self).__init__(**kwargs)\n        # Use `flatten=False` to only transform the last axis so that the\n        # shapes for the other axes are kept the same\n        self.W_k = nn.Dense(num_hiddens, use_bias=False, flatten=False)\n        self.W_q = nn.Dense(num_hiddens, use_bias=False, flatten=False)\n        self.w_v = nn.Dense(1, use_bias=False, flatten=False)\n        self.dropout = nn.Dropout(dropout)\n\n    def forward(self, queries, keys, values, valid_lens):\n        queries, keys = self.W_q(queries), self.W_k(keys)\n        # After dimension expansion, shape of `queries`: (`batch_size`, no. of\n        # queries, 1, `num_hiddens`) and shape of `keys`: (`batch_size`, 1,\n        # no. of key-value pairs, `num_hiddens`). Sum them up with\n        # broadcasting\n        features = np.expand_dims(queries, axis=2) + np.expand_dims(\n            keys, axis=1)\n        features = np.tanh(features)\n        # There is only one output of `self.w_v`, so we remove the last\n        # one-dimensional entry from the shape. Shape of `scores`:\n        # (`batch_size`, no. of queries, no. of key-value pairs)\n        scores = np.squeeze(self.w_v(features), axis=-1)\n        self.attention_weights = masked_softmax(scores, valid_lens)\n        # Shape of `values`: (`batch_size`, no. of key-value pairs, value\n        # dimension)\n        return npx.batch_dot(self.dropout(self.attention_weights), values)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "#@save\nclass AdditiveAttention(nn.Module):\n    \"\"\"Additive attention.\"\"\"\n    def __init__(self, key_size, query_size, num_hiddens, dropout, **kwargs):\n        super(AdditiveAttention, self).__init__(**kwargs)\n        self.W_k = nn.Linear(key_size, num_hiddens, bias=False)\n        self.W_q = nn.Linear(query_size, num_hiddens, bias=False)\n        self.w_v = nn.Linear(num_hiddens, 1, bias=False)\n        self.dropout = nn.Dropout(dropout)\n\n    def forward(self, queries, keys, values, valid_lens):\n        queries, keys = self.W_q(queries), self.W_k(keys)\n        # After dimension expansion, shape of `queries`: (`batch_size`, no. of\n        # queries, 1, `num_hiddens`) and shape of `keys`: (`batch_size`, 1,\n        # no. of key-value pairs, `num_hiddens`). Sum them up with\n        # broadcasting\n        features = queries.unsqueeze(2) + keys.unsqueeze(1)\n        features = torch.tanh(features)\n        # There is only one output of `self.w_v`, so we remove the last\n        # one-dimensional entry from the shape. Shape of `scores`:\n        # (`batch_size`, no. of queries, no. of key-value pairs)\n        scores = self.w_v(features).squeeze(-1)\n        self.attention_weights = masked_softmax(scores, valid_lens)\n        # Shape of `values`: (`batch_size`, no. of key-value pairs, value\n        # dimension)\n        return torch.bmm(self.dropout(self.attention_weights), values)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "#@save\nclass AdditiveAttention(tf.keras.layers.Layer):\n    \"\"\"Additive attention.\"\"\"\n    def __init__(self, key_size, query_size, num_hiddens, dropout, **kwargs):\n        super().__init__(**kwargs)\n        self.W_k = tf.keras.layers.Dense(num_hiddens, use_bias=False)\n        self.W_q = tf.keras.layers.Dense(num_hiddens, use_bias=False)\n        self.w_v = tf.keras.layers.Dense(1, use_bias=False)\n        self.dropout = tf.keras.layers.Dropout(dropout)\n\n    def call(self, queries, keys, values, valid_lens, **kwargs):\n        queries, keys = self.W_q(queries), self.W_k(keys)\n        # After dimension expansion, shape of `queries`: (`batch_size`, no. of\n        # queries, 1, `num_hiddens`) and shape of `keys`: (`batch_size`, 1,\n        # no. of key-value pairs, `num_hiddens`). Sum them up with\n        # broadcasting\n        features = tf.expand_dims(queries, axis=2) + tf.expand_dims(\n            keys, axis=1)\n        features = tf.nn.tanh(features)\n        # There is only one output of `self.w_v`, so we remove the last\n        # one-dimensional entry from the shape. Shape of `scores`:\n        # (`batch_size`, no. of queries, no. of key-value pairs)\n        scores = tf.squeeze(self.w_v(features), axis=-1)\n        self.attention_weights = masked_softmax(scores, valid_lens)\n        # Shape of `values`: (`batch_size`, no. of key-value pairs, value\n        # dimension)\n        return tf.matmul(self.dropout(\n            self.attention_weights, **kwargs), values)"
+    },
+    {
+      "type": "paragraph",
+      "text": "Hãy để chúng tôi chứng minh lớp AdditiveAttention ở trên với một ví\ndụ đồ chơi, trong đó các hình dạng (kích thước lô, số bước hoặc độ dài\nchuỗi trong thẻ, kích thước tính năng) của truy vấn, khóa và giá trị là\n( \\(2\\) , \\(1\\) , \\(20\\) ), ( \\(2\\) , \\(2\\) ), và\n( \\(2\\) ), ( \\(2\\) , \\(10\\) , \\(4\\) ), tương ứng. Đầu ra tập\nhợp chú ý có hình dạng (kích thước lô, số bước cho truy vấn, kích thước\ntính năng cho các giá trị)."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "queries, keys = np.random.normal(0, 1, (2, 1, 20)), np.ones((2, 10, 2))\n# The two value matrices in the `values` minibatch are identical\nvalues = np.arange(40).reshape(1, 10, 4).repeat(2, axis=0)\nvalid_lens = np.array([2, 6])\n\nattention = AdditiveAttention(num_hiddens=8, dropout=0.1)\nattention.initialize()\nattention(queries, keys, values, valid_lens)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "array([[[ 2.      ,  3.      ,  4.      ,  5.      ]],\n\n       [[10.      , 11.      , 12.000001, 13.      ]]])"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "queries, keys = torch.normal(0, 1, (2, 1, 20)), torch.ones((2, 10, 2))\n# The two value matrices in the `values` minibatch are identical\nvalues = torch.arange(40, dtype=torch.float32).reshape(1, 10, 4).repeat(\n    2, 1, 1)\nvalid_lens = torch.tensor([2, 6])\n\nattention = AdditiveAttention(key_size=2, query_size=20, num_hiddens=8,\n                              dropout=0.1)\nattention.eval()\nattention(queries, keys, values, valid_lens)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "tensor([[[ 2.0000,  3.0000,  4.0000,  5.0000]],\n\n        [[10.0000, 11.0000, 12.0000, 13.0000]]], grad_fn=<BmmBackward0>)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "queries, keys = tf.random.normal(shape=(2, 1, 20)), tf.ones((2, 10, 2))\n# The two value matrices in the `values` minibatch are identical\nvalues = tf.repeat(tf.reshape(\n    tf.range(40, dtype=tf.float32), shape=(1, 10, 4)), repeats=2, axis=0)\nvalid_lens = tf.constant([2, 6])\n\nattention = AdditiveAttention(key_size=2, query_size=20, num_hiddens=8,\n                              dropout=0.1)\nattention(queries, keys, values, valid_lens, training=False)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "<tf.Tensor: shape=(2, 1, 4), dtype=float32, numpy=\narray([[[ 2.      ,  3.      ,  4.      ,  5.      ]],\n\n       [[10.      , 11.      , 12.000001, 13.      ]]], dtype=float32)>"
+    },
+    {
+      "type": "paragraph",
+      "text": "Mặc dù sự chú ý phụ gia chứa các tham số có thể học được, vì mỗi khóa\nđều giống nhau trong ví dụ này, trọng lượng chú ý đều đồng nhất, được\nxác định bởi độ dài hợp lệ được chỉ định."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "d2l.show_heatmaps(attention.attention_weights.reshape((1, 1, 2, 10)),\n                  xlabel='Keys', ylabel='Queries')"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_attention-scoring-functions_2a8fdc_75_0.svg",
+      "local_path": "_images/output_attention-scoring-functions_2a8fdc_75_0.svg",
+      "alt": "../_images/output_attention-scoring-functions_2a8fdc_75_0.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "d2l.show_heatmaps(attention.attention_weights.reshape((1, 1, 2, 10)),\n                  xlabel='Keys', ylabel='Queries')"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_attention-scoring-functions_2a8fdc_78_0.svg",
+      "local_path": "_images/output_attention-scoring-functions_2a8fdc_78_0.svg",
+      "alt": "../_images/output_attention-scoring-functions_2a8fdc_78_0.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "d2l.show_heatmaps(tf.reshape(attention.attention_weights, (1, 1, 2, 10)),\n                  xlabel='Keys', ylabel='Queries')"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_attention-scoring-functions_2a8fdc_81_0.svg",
+      "local_path": "_images/output_attention-scoring-functions_2a8fdc_81_0.svg",
+      "alt": "../_images/output_attention-scoring-functions_2a8fdc_81_0.svg"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "quy-mo-dot-product-attention",
+      "text": "10.3.3. Quy mô Dot-Product Attention"
+    },
+    {
+      "type": "paragraph",
+      "text": "Một thiết kế hiệu quả tính toán hơn cho chức năng tính điểm có thể chỉ\nđơn giản là chấm sản phẩm. Tuy nhiên, hoạt động của sản phẩm chấm đòi\nhỏi cả truy vấn và khóa đều có cùng độ dài vector, giả sử \\(d\\) . Giả\nsử rằng tất cả các yếu tố của truy vấn và khóa là các biến ngẫu nhiên\nđộc lập với không trung bình và phương sai đơn vị. Tích chấm của cả hai\nvectơ có trung bình bằng 0 và phương sai là \\(d\\) . Để đảm bảo rằng\nphương sai của sản phẩm chấm vẫn là một bất kể chiều dài vectơ, chức\nnăng chấm điểm chú ý * thu nhỏ sản phẩm điểm"
+    },
+    {
+      "type": "math",
+      "latex": "(10.3.4)¶\\[a(\\mathbf q, \\mathbf k) = \\mathbf{q}^\\top \\mathbf{k}  /\\sqrt{d}\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "chia sản phẩm chấm cho \\(\\sqrt{d}\\) . Trong thực tế, chúng ta thường\nnghĩ về minibatches cho hiệu quả, chẳng hạn như tính toán sự chú ý cho \\(n\\) truy vấn và \\(m\\) cặp giá trị khóa, trong đó các truy vấn\nvà khóa có chiều dài \\(d\\) và các giá trị có chiều dài \\(v\\) . Sự\nchú ý của sản phẩm điểm được chia tỷ lệ của truy vấn \\(\\mathbf Q\\in\\mathbb R^{n\\times d}\\) , phím \\(\\mathbf K\\in\\mathbb R^{m\\times d}\\) và các giá trị \\(\\mathbf V\\in\\mathbb R^{m\\times v}\\) là"
+    },
+    {
+      "type": "math",
+      "latex": "(10.3.5)¶\\[\\mathrm{softmax}\\left(\\frac{\\mathbf Q \\mathbf K^\\top }{\\sqrt{d}}\\right) \\mathbf V \\in \\mathbb{R}^{n\\times v}.\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Trong việc thực hiện sau đây của sự chú ý của sản phẩm chấm thu nhỏ,\nchúng tôi sử dụng dropout để điều chỉnh mô hình."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "#@save\nclass DotProductAttention(nn.Block):\n    \"\"\"Scaled dot product attention.\"\"\"\n    def __init__(self, dropout, **kwargs):\n        super(DotProductAttention, self).__init__(**kwargs)\n        self.dropout = nn.Dropout(dropout)\n\n    # Shape of `queries`: (`batch_size`, no. of queries, `d`)\n    # Shape of `keys`: (`batch_size`, no. of key-value pairs, `d`)\n    # Shape of `values`: (`batch_size`, no. of key-value pairs, value\n    # dimension)\n    # Shape of `valid_lens`: (`batch_size`,) or (`batch_size`, no. of queries)\n    def forward(self, queries, keys, values, valid_lens=None):\n        d = queries.shape[-1]\n        # Set `transpose_b=True` to swap the last two dimensions of `keys`\n        scores = npx.batch_dot(queries, keys, transpose_b=True) / math.sqrt(d)\n        self.attention_weights = masked_softmax(scores, valid_lens)\n        return npx.batch_dot(self.dropout(self.attention_weights), values)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "#@save\nclass DotProductAttention(nn.Module):\n    \"\"\"Scaled dot product attention.\"\"\"\n    def __init__(self, dropout, **kwargs):\n        super(DotProductAttention, self).__init__(**kwargs)\n        self.dropout = nn.Dropout(dropout)\n\n    # Shape of `queries`: (`batch_size`, no. of queries, `d`)\n    # Shape of `keys`: (`batch_size`, no. of key-value pairs, `d`)\n    # Shape of `values`: (`batch_size`, no. of key-value pairs, value\n    # dimension)\n    # Shape of `valid_lens`: (`batch_size`,) or (`batch_size`, no. of queries)\n    def forward(self, queries, keys, values, valid_lens=None):\n        d = queries.shape[-1]\n        # Set `transpose_b=True` to swap the last two dimensions of `keys`\n        scores = torch.bmm(queries, keys.transpose(1,2)) / math.sqrt(d)\n        self.attention_weights = masked_softmax(scores, valid_lens)\n        return torch.bmm(self.dropout(self.attention_weights), values)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "#@save\nclass DotProductAttention(tf.keras.layers.Layer):\n    \"\"\"Scaled dot product attention.\"\"\"\n    def __init__(self, dropout, **kwargs):\n        super().__init__(**kwargs)\n        self.dropout = tf.keras.layers.Dropout(dropout)\n\n    # Shape of `queries`: (`batch_size`, no. of queries, `d`)\n    # Shape of `keys`: (`batch_size`, no. of key-value pairs, `d`)\n    # Shape of `values`: (`batch_size`, no. of key-value pairs, value\n    # dimension)\n    # Shape of `valid_lens`: (`batch_size`,) or (`batch_size`, no. of queries)\n    def call(self, queries, keys, values, valid_lens, **kwargs):\n        d = queries.shape[-1]\n        scores = tf.matmul(queries, keys, transpose_b=True)/tf.math.sqrt(\n            tf.cast(d, dtype=tf.float32))\n        self.attention_weights = masked_softmax(scores, valid_lens)\n        return tf.matmul(self.dropout(self.attention_weights, **kwargs), values)"
+    },
+    {
+      "type": "paragraph",
+      "text": "Để chứng minh lớp DotProductAttention ở trên, chúng tôi sử dụng cùng\nmột phím, giá trị và độ dài hợp lệ từ ví dụ đồ chơi trước đó để chú ý\nphụ gia. Đối với hoạt động sản phẩm chấm, chúng tôi làm cho kích thước\ntính năng của các truy vấn giống như kích thước của các phím."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "queries = np.random.normal(0, 1, (2, 1, 2))\nattention = DotProductAttention(dropout=0.5)\nattention.initialize()\nattention(queries, keys, values, valid_lens)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "array([[[ 2.      ,  3.      ,  4.      ,  5.      ]],\n\n       [[10.      , 11.      , 12.000001, 13.      ]]])"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "queries = torch.normal(0, 1, (2, 1, 2))\nattention = DotProductAttention(dropout=0.5)\nattention.eval()\nattention(queries, keys, values, valid_lens)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "tensor([[[ 2.0000,  3.0000,  4.0000,  5.0000]],\n\n        [[10.0000, 11.0000, 12.0000, 13.0000]]])"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "queries = tf.random.normal(shape=(2, 1, 2))\nattention = DotProductAttention(dropout=0.5)\nattention(queries, keys, values, valid_lens, training=False)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "<tf.Tensor: shape=(2, 1, 4), dtype=float32, numpy=\narray([[[ 2.      ,  3.      ,  4.      ,  5.      ]],\n\n       [[10.      , 11.      , 12.000001, 13.      ]]], dtype=float32)>"
+    },
+    {
+      "type": "paragraph",
+      "text": "Giống như trong trình diễn chú ý phụ gia, vì keys chứa cùng một yếu\ntố không thể phân biệt bằng bất kỳ truy vấn nào, trọng lượng chú ý thống\nnhất thu được."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "d2l.show_heatmaps(attention.attention_weights.reshape((1, 1, 2, 10)),\n                  xlabel='Keys', ylabel='Queries')"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_attention-scoring-functions_2a8fdc_111_0.svg",
+      "local_path": "_images/output_attention-scoring-functions_2a8fdc_111_0.svg",
+      "alt": "../_images/output_attention-scoring-functions_2a8fdc_111_0.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "d2l.show_heatmaps(attention.attention_weights.reshape((1, 1, 2, 10)),\n                  xlabel='Keys', ylabel='Queries')"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_attention-scoring-functions_2a8fdc_114_0.svg",
+      "local_path": "_images/output_attention-scoring-functions_2a8fdc_114_0.svg",
+      "alt": "../_images/output_attention-scoring-functions_2a8fdc_114_0.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "d2l.show_heatmaps(tf.reshape(attention.attention_weights, (1, 1, 2, 10)),\n                  xlabel='Keys', ylabel='Queries')"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_attention-scoring-functions_2a8fdc_117_0.svg",
+      "local_path": "_images/output_attention-scoring-functions_2a8fdc_117_0.svg",
+      "alt": "../_images/output_attention-scoring-functions_2a8fdc_117_0.svg"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tom-tat",
+      "text": "10.3.4. Tóm tắt"
+    },
+    {
+      "type": "list",
+      "ordered": false,
+      "items": [
+        "Chúng ta có thể tính toán đầu ra của sự chú ý tập hợp như một trung\nbình trọng số của các giá trị, trong đó các lựa chọn khác nhau của\nchức năng chấm điểm chú ý dẫn đến các hành vi khác nhau của sự chú ý.",
+        "Khi truy vấn và phím là vectơ có độ dài khác nhau, chúng ta có thể sử\ndụng chức năng chấm điểm chú ý phụ gia. Khi chúng giống nhau, chức\nnăng ghi điểm chú ý dot-sản phẩm thu nhỏ sẽ hiệu quả hơn về mặt tính\ntoán."
+      ]
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bai-tap",
+      "text": "10.3.5. Bài tập"
+    },
+    {
+      "type": "list",
+      "ordered": true,
+      "items": [
+        "Sửa đổi các phím trong ví dụ đồ chơi và hình dung trọng lượng chú ý.\nDo phụ gia chú ý và thu nhỏ sự chú ý của sản phẩm điểm vẫn xuất ra\ncùng một trọng lượng chú ý? Tại sao hoặc tại sao không?",
+        "Chỉ sử dụng phép nhân ma trận, bạn có thể thiết kế một chức năng tính\nđiểm mới cho các truy vấn và các phím có độ dài vector khác nhau\nkhông?",
+        "Khi truy vấn và phím có cùng chiều dài vector, tổng kết vectơ có\nthiết kế tốt hơn so với sản phẩm chấm cho chức năng chấm điểm không?\nTại sao hoặc tại sao không?"
+      ]
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    }
+  ],
+  "images": [
+    {
+      "original_url": "https://vi.d2l.ai/_images/attention-output.svg",
+      "local_path": "_images/attention-output.svg",
+      "alt": "../_images/attention-output.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_attention-scoring-functions_2a8fdc_75_0.svg",
+      "local_path": "_images/output_attention-scoring-functions_2a8fdc_75_0.svg",
+      "alt": "../_images/output_attention-scoring-functions_2a8fdc_75_0.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_attention-scoring-functions_2a8fdc_78_0.svg",
+      "local_path": "_images/output_attention-scoring-functions_2a8fdc_78_0.svg",
+      "alt": "../_images/output_attention-scoring-functions_2a8fdc_78_0.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_attention-scoring-functions_2a8fdc_81_0.svg",
+      "local_path": "_images/output_attention-scoring-functions_2a8fdc_81_0.svg",
+      "alt": "../_images/output_attention-scoring-functions_2a8fdc_81_0.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_attention-scoring-functions_2a8fdc_111_0.svg",
+      "local_path": "_images/output_attention-scoring-functions_2a8fdc_111_0.svg",
+      "alt": "../_images/output_attention-scoring-functions_2a8fdc_111_0.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_attention-scoring-functions_2a8fdc_114_0.svg",
+      "local_path": "_images/output_attention-scoring-functions_2a8fdc_114_0.svg",
+      "alt": "../_images/output_attention-scoring-functions_2a8fdc_114_0.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_attention-scoring-functions_2a8fdc_117_0.svg",
+      "local_path": "_images/output_attention-scoring-functions_2a8fdc_117_0.svg",
+      "alt": "../_images/output_attention-scoring-functions_2a8fdc_117_0.svg"
+    }
+  ],
+  "text": "10.3. Chức năng chấm điểm chú ý\nTrong Section 10.2 , chúng tôi đã sử dụng một hạt nhân\nGaussian để mô hình hóa tương tác giữa các truy vấn và khóa. Xử lý số mũ\ncủa hạt nhân Gaussian trong (10.2.6) như\nmột chức năng ghi điểm chú ý (hoặc chức năng ghi điểm ), kết quả của\nhàm này về cơ bản đã được đưa vào một hoạt động softmax. Kết quả là,\nchúng tôi thu được một phân phối xác suất (trọng lượng chú ý) so với các\ngiá trị được ghép nối với các phím. Cuối cùng, đầu ra của sự chú ý tập\nhợp chỉ đơn giản là một tổng trọng số của các giá trị dựa trên các trọng\nlượng chú ý này.\nỞ cấp độ cao, chúng ta có thể sử dụng thuật toán trên để khởi tạo khuôn\nkhổ của các cơ chế chú ý trong Fig. 10.1.3 . Biểu thị một chức\nnăng chấm điểm chú ý bởi \\(a\\) , Fig. 10.3.1 minh họa cách đầu ra của sự chú ý pooling có thể được tính như một tổng\ntrọng số của các giá trị. Vì trọng lượng chú ý là một phân phối xác\nsuất, tổng trọng số về cơ bản là một trung bình có trọng số.\nFig. 10.3.1 Computing the output of attention pooling as a weighted average of\nvalues. ¶\nVề mặt toán học, giả sử rằng chúng ta có một truy vấn \\(\\mathbf{q} \\in \\mathbb{R}^q\\) và \\(m\\) cặp giá trị khóa \\((\\mathbf{k}_1, \\mathbf{v}_1), \\ldots, (\\mathbf{k}_m, \\mathbf{v}_m)\\) ,\ntrong đó bất kỳ \\(\\mathbf{k}_i \\in \\mathbb{R}^k\\) và \\(\\mathbf{v}_i \\in \\mathbb{R}^v\\) bất kỳ \\(\\mathbf{v}_i \\in \\mathbb{R}^v\\) . Sự chú ý tập hợp \\(f\\) được\nkhởi tạo như một tổng trọng số của các giá trị:\ntrong đó trọng lượng chú ý (vô hướng) cho truy vấn \\(\\mathbf{q}\\) và\nkhóa \\(\\mathbf{k}_i\\) được tính bằng hoạt động softmax của một chức\nnăng ghi điểm chú ý \\(a\\) ánh xạ hai vectơ đến vô hướng:\nNhư chúng ta có thể thấy, các lựa chọn khác nhau của chức năng ghi điểm\nchú ý \\(a\\) dẫn đến các hành vi khác nhau của sự chú ý chung. Trong\nphần này, chúng tôi giới thiệu hai chức năng tính điểm phổ biến mà chúng\ntôi sẽ sử dụng để phát triển các cơ chế chú ý phức tạp hơn sau này.\n10.3.1. Masked Softmax Operation\nNhư chúng tôi vừa đề cập, một hoạt động softmax được sử dụng để tạo ra\nmột phân phối xác suất như trọng lượng chú ý. Trong một số trường hợp,\nkhông phải tất cả các giá trị nên được đưa vào tập hợp chú ý. Ví dụ, để\nxử lý minibatch hiệu quả trong Section 9.5 , một\nsố chuỗi văn bản được đệm với các mã thông báo đặc biệt không mang ý\nnghĩa. Để thu hút sự chú ý chỉ có các token có ý nghĩa làm giá trị,\nchúng ta có thể chỉ định độ dài chuỗi hợp lệ (về số lượng token) để lọc\nra những mã thông báo vượt quá phạm vi quy định này khi tính toán\nsoftmax. Bằng cách này, chúng ta có thể thực hiện một operation masked\nsoftmax như vậy trong hàm masked_softmax sau, trong đó bất kỳ giá\ntrị nào vượt quá độ dài hợp lệ được che dấu là zero.\nĐể chứng minh cách thức hoạt động của hàm này, hãy xem xét một minibatch\ngồm hai ví dụ ma trận \\(2 \\times 4\\) , trong đó độ dài hợp lệ cho hai\nví dụ này là hai và ba, tương ứng. Kết quả của hoạt động softmax đeo mặt\nnạ, các giá trị vượt quá độ dài hợp lệ đều được che dấu là 0.\nTương tự, chúng ta cũng có thể sử dụng tensor hai chiều để chỉ định độ\ndài hợp lệ cho mỗi hàng trong mỗi ví dụ ma trận.\n10.3.2. Phụ gia chú ý\nNói chung, khi truy vấn và phím là vectơ có độ dài khác nhau, chúng ta\ncó thể sử dụng sự chú ý phụ gia làm chức năng chấm điểm. Đưa ra một truy\nvấn \\(\\mathbf{q} \\in \\mathbb{R}^q\\) và một khóa \\(\\mathbf{k} \\in \\mathbb{R}^k\\) , chức năng chấm điểm * phụ thuật*\ntrong đó các thông số có thể học được \\(\\mathbf W_q\\in\\mathbb R^{h\\times q}\\) , \\(\\mathbf W_k\\in\\mathbb R^{h\\times k}\\) và \\(\\mathbf w_v\\in\\mathbb R^{h}\\) . Tương đương với (10.3.3) , truy vấn và khóa được nối và đưa vào một\nMLP với một lớp ẩn duy nhất có số đơn vị ẩn là \\(h\\) , một siêu tham\nsố. Bằng cách sử dụng \\(\\tanh\\) làm chức năng kích hoạt và vô hiệu\nhóa các thuật ngữ thiên vị, chúng tôi thực hiện sự chú ý phụ gia trong\nnhững điều sau đây.\nHãy để chúng tôi chứng minh lớp AdditiveAttention ở trên với một ví\ndụ đồ chơi, trong đó các hình dạng (kích thước lô, số bước hoặc độ dài\nchuỗi trong thẻ, kích thước tính năng) của truy vấn, khóa và giá trị là\n( \\(2\\) , \\(1\\) , \\(20\\) ), ( \\(2\\) , \\(2\\) ), và\n( \\(2\\) ), ( \\(2\\) , \\(10\\) , \\(4\\) ), tương ứng. Đầu ra tập\nhợp chú ý có hình dạng (kích thước lô, số bước cho truy vấn, kích thước\ntính năng cho các giá trị).\nMặc dù sự chú ý phụ gia chứa các tham số có thể học được, vì mỗi khóa\nđều giống nhau trong ví dụ này, trọng lượng chú ý đều đồng nhất, được\nxác định bởi độ dài hợp lệ được chỉ định.\n10.3.3. Quy mô Dot-Product Attention\nMột thiết kế hiệu quả tính toán hơn cho chức năng tính điểm có thể chỉ\nđơn giản là chấm sản phẩm. Tuy nhiên, hoạt động của sản phẩm chấm đòi\nhỏi cả truy vấn và khóa đều có cùng độ dài vector, giả sử \\(d\\) . Giả\nsử rằng tất cả các yếu tố của truy vấn và khóa là các biến ngẫu nhiên\nđộc lập với không trung bình và phương sai đơn vị. Tích chấm của cả hai\nvectơ có trung bình bằng 0 và phương sai là \\(d\\) . Để đảm bảo rằng\nphương sai của sản phẩm chấm vẫn là một bất kể chiều dài vectơ, chức\nnăng chấm điểm chú ý * thu nhỏ sản phẩm điểm\nchia sản phẩm chấm cho \\(\\sqrt{d}\\) . Trong thực tế, chúng ta thường\nnghĩ về minibatches cho hiệu quả, chẳng hạn như tính toán sự chú ý cho \\(n\\) truy vấn và \\(m\\) cặp giá trị khóa, trong đó các truy vấn\nvà khóa có chiều dài \\(d\\) và các giá trị có chiều dài \\(v\\) . Sự\nchú ý của sản phẩm điểm được chia tỷ lệ của truy vấn \\(\\mathbf Q\\in\\mathbb R^{n\\times d}\\) , phím \\(\\mathbf K\\in\\mathbb R^{m\\times d}\\) và các giá trị \\(\\mathbf V\\in\\mathbb R^{m\\times v}\\) là\nTrong việc thực hiện sau đây của sự chú ý của sản phẩm chấm thu nhỏ,\nchúng tôi sử dụng dropout để điều chỉnh mô hình.\nĐể chứng minh lớp DotProductAttention ở trên, chúng tôi sử dụng cùng\nmột phím, giá trị và độ dài hợp lệ từ ví dụ đồ chơi trước đó để chú ý\nphụ gia. Đối với hoạt động sản phẩm chấm, chúng tôi làm cho kích thước\ntính năng của các truy vấn giống như kích thước của các phím.\nGiống như trong trình diễn chú ý phụ gia, vì keys chứa cùng một yếu\ntố không thể phân biệt bằng bất kỳ truy vấn nào, trọng lượng chú ý thống\nnhất thu được.\n10.3.4. Tóm tắt\nChúng ta có thể tính toán đầu ra của sự chú ý tập hợp như một trung\nbình trọng số của các giá trị, trong đó các lựa chọn khác nhau của\nchức năng chấm điểm chú ý dẫn đến các hành vi khác nhau của sự chú ý.\nKhi truy vấn và phím là vectơ có độ dài khác nhau, chúng ta có thể sử\ndụng chức năng chấm điểm chú ý phụ gia. Khi chúng giống nhau, chức\nnăng ghi điểm chú ý dot-sản phẩm thu nhỏ sẽ hiệu quả hơn về mặt tính\ntoán.\n10.3.5. Bài tập\nSửa đổi các phím trong ví dụ đồ chơi và hình dung trọng lượng chú ý.\nDo phụ gia chú ý và thu nhỏ sự chú ý của sản phẩm điểm vẫn xuất ra\ncùng một trọng lượng chú ý? Tại sao hoặc tại sao không?\nChỉ sử dụng phép nhân ma trận, bạn có thể thiết kế một chức năng tính\nđiểm mới cho các truy vấn và các phím có độ dài vector khác nhau\nkhông?\nKhi truy vấn và phím có cùng chiều dài vector, tổng kết vectơ có\nthiết kế tốt hơn so với sản phẩm chấm cho chức năng chấm điểm không?\nTại sao hoặc tại sao không?\nDiscussions\nDiscussions"
+}

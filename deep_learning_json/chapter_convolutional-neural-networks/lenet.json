@@ -1,0 +1,353 @@
+{
+  "url": "https://vi.d2l.ai/chapter_convolutional-neural-networks/lenet.html",
+  "chapter": "chapter_convolutional-neural-networks",
+  "title": "6.6. Mạng thần kinh phức tạp (LeNet)",
+  "crawled_at": "2026-07-20T12:39:46.133109+00:00",
+  "headings": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "mang-than-kinh-phuc-tap-lenet",
+      "text": "6.6. Mạng thần kinh phức tạp (LeNet)"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "lenet",
+      "text": "6.6.1. LeNet"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "dao-tao",
+      "text": "6.6.2. Đào tạo"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tom-tat",
+      "text": "6.6.3. Tóm tắt"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bai-tap",
+      "text": "6.6.4. Bài tập"
+    }
+  ],
+  "content": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "mang-than-kinh-phuc-tap-lenet",
+      "text": "6.6. Mạng thần kinh phức tạp (LeNet)"
+    },
+    {
+      "type": "paragraph",
+      "text": "Bây giờ chúng tôi có tất cả các thành phần cần thiết để lắp ráp một CNN\nđầy đủ chức năng. Trong cuộc gặp gỡ trước đó của chúng tôi với dữ liệu\nhình ảnh, chúng tôi đã áp dụng mô hình hồi quy softmax\n( Section 3.6 ) và mô hình MLP\n( Section 4.2 ) cho hình ảnh quần áo trong bộ dữ liệu\nFashion-MNIST. Để làm cho dữ liệu như vậy tuân theo hồi quy softmax và\nMLP s, trước tiên chúng ta làm phẳng mỗi hình ảnh từ một ma trận \\(28\\times28\\) thành một vector \\(784\\) chiều dài cố định, và\nsau đó xử lý chúng với các lớp được kết nối hoàn toàn. Bây giờ chúng ta\ncó một tay cầm trên các lớp phức tạp, chúng ta có thể giữ lại cấu trúc\nkhông gian trong hình ảnh của chúng ta. Là một lợi ích bổ sung của việc\nthay thế các lớp được kết nối hoàn toàn bằng các lớp kết nối, chúng ta\nsẽ tận hưởng các mô hình phân tích hơn đòi hỏi ít tham số hơn nhiều."
+    },
+    {
+      "type": "paragraph",
+      "text": "Trong phần này, chúng tôi sẽ giới thiệu LeNet , trong số các CNN được\nxuất bản đầu tiên để thu hút sự chú ý rộng rãi về hiệu suất của nó trên\ncác tác vụ thị giác máy tính. Mô hình được giới thiệu bởi (và đặt tên\ncho) Yann LeCun, sau đó là một nhà nghiên cứu tại AT&T Bell Labs, với\nmục đích nhận dạng chữ số viết tay trong hình ảnh [LeCun et al., 1998] . Công trình này đại diện cho đỉnh\ncao của một thập kỷ nghiên cứu phát triển công nghệ. Năm 1989, LeCun\ncông bố nghiên cứu đầu tiên để đào tạo thành công CNN thông qua truyền\nngược."
+    },
+    {
+      "type": "paragraph",
+      "text": "Vào thời điểm đó LeNet đạt được kết quả xuất sắc phù hợp với hiệu suất\ncủa các máy vector hỗ trợ, sau đó là một cách tiếp cận thống trị trong\nviệc học có giám sát. LeNet cuối cùng đã được điều chỉnh để nhận ra các\nchữ số để xử lý tiền gửi trong máy ATM. Cho đến ngày nay, một số máy ATM\nvẫn chạy mã mà Yann và đồng nghiệp Leon Bottou đã viết vào những năm\n1990!"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "lenet",
+      "text": "6.6.1. LeNet"
+    },
+    {
+      "type": "paragraph",
+      "text": "Ở cấp độ cao, LeNet (LeNet-5) bao gồm hai phần: (i) một bộ mã hóa phức\ntạp bao gồm hai lớp phức tạp; và (ii) một khối dày đặc bao gồm ba lớp\nkết nối đầy đủ; Kiến trúc được tóm tắt trong Fig. 6.6.1 ."
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/lenet.svg",
+      "local_path": "_images/lenet.svg",
+      "alt": "../_images/lenet.svg"
+    },
+    {
+      "type": "paragraph",
+      "text": "Fig. 6.6.1 Data flow in LeNet. The input is a handwritten digit, the output a\nprobability over 10 possible outcomes. ¶"
+    },
+    {
+      "type": "paragraph",
+      "text": "Các đơn vị cơ bản trong mỗi khối phức tạp là một lớp phức tạp, một chức\nnăng kích hoạt sigmoid, và một hoạt động tổng hợp trung bình tiếp theo.\nLưu ý rằng trong khi Relus và max-pooling hoạt động tốt hơn, những khám\nphá này vẫn chưa được thực hiện trong những năm 1990. Mỗi lớp phức hợp\nsử dụng một hạt nhân \\(5\\times 5\\) và một hàm kích hoạt sigmoid. Các\nlớp này ánh xạ các đầu vào sắp xếp không gian cho một số bản đồ tính\nnăng hai chiều, thường làm tăng số lượng kênh. Lớp phức tạp đầu tiên có\n6 kênh đầu ra, trong khi thứ hai có 16 kênh. Mỗi hoạt động tổng hợp \\(2\\times2\\) (sải chân 2) làm giảm kích thước bằng hệ số \\(4\\) thông qua lấy mẫu xuống không gian. Khối phức tạp phát ra một đầu ra với\nhình dạng được đưa ra bởi (kích thước lô, số kênh, chiều cao, chiều\nrộng)."
+    },
+    {
+      "type": "paragraph",
+      "text": "Để truyền đầu ra từ khối phức tạp đến khối dày đặc, chúng ta phải làm\nphẳng từng ví dụ trong minibatch. Nói cách khác, chúng ta lấy đầu vào\nbốn chiều này và biến nó thành đầu vào hai chiều được mong đợi bởi các\nlớp được kết nối hoàn toàn: như một lời nhắc nhở, biểu diễn hai chiều mà\nchúng ta mong muốn sử dụng kích thước đầu tiên để lập chỉ mục các ví dụ\ntrong minibatch và thứ hai để đưa ra biểu diễn vector phẳng of each mỗi\nexample thí dụ. Khối dày đặc của LeNet có ba lớp kết nối hoàn toàn,\ntương ứng với 120, 84 và 10 đầu ra. Bởi vì chúng ta vẫn đang thực hiện\nphân loại, lớp đầu ra 10 chiều tương ứng với số lượng lớp đầu ra có thể."
+    },
+    {
+      "type": "paragraph",
+      "text": "Trong khi đi đến mức bạn thực sự hiểu những gì đang xảy ra bên trong\nLeNet có thể đã thực hiện một chút công việc, hy vọng đoạn mã sau đây sẽ\nthuyết phục bạn rằng việc thực hiện các mô hình như vậy với các khuôn\nkhổ học sâu hiện đại rất đơn giản. Chúng ta chỉ cần khởi tạo một khối Sequential và chuỗi với nhau các lớp thích hợp."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "from mxnet import autograd, gluon, init, np, npx\nfrom mxnet.gluon import nn\nfrom d2l import mxnet as d2l\n\nnpx.set_np()\n\nnet = nn.Sequential()\nnet.add(nn.Conv2D(channels=6, kernel_size=5, padding=2, activation='sigmoid'),\n        nn.AvgPool2D(pool_size=2, strides=2),\n        nn.Conv2D(channels=16, kernel_size=5, activation='sigmoid'),\n        nn.AvgPool2D(pool_size=2, strides=2),\n        # `Dense` will transform an input of the shape (batch size, number of\n        # channels, height, width) into an input of the shape (batch size,\n        # number of channels * height * width) automatically by default\n        nn.Dense(120, activation='sigmoid'),\n        nn.Dense(84, activation='sigmoid'),\n        nn.Dense(10))"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "import torch\nfrom torch import nn\nfrom d2l import torch as d2l\n\nnet = nn.Sequential(\n    nn.Conv2d(1, 6, kernel_size=5, padding=2), nn.Sigmoid(),\n    nn.AvgPool2d(kernel_size=2, stride=2),\n    nn.Conv2d(6, 16, kernel_size=5), nn.Sigmoid(),\n    nn.AvgPool2d(kernel_size=2, stride=2),\n    nn.Flatten(),\n    nn.Linear(16 * 5 * 5, 120), nn.Sigmoid(),\n    nn.Linear(120, 84), nn.Sigmoid(),\n    nn.Linear(84, 10))"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "import tensorflow as tf\nfrom d2l import tensorflow as d2l\n\n\ndef net():\n    return tf.keras.models.Sequential([\n        tf.keras.layers.Conv2D(filters=6, kernel_size=5, activation='sigmoid',\n                               padding='same'),\n        tf.keras.layers.AvgPool2D(pool_size=2, strides=2),\n        tf.keras.layers.Conv2D(filters=16, kernel_size=5,\n                               activation='sigmoid'),\n        tf.keras.layers.AvgPool2D(pool_size=2, strides=2),\n        tf.keras.layers.Flatten(),\n        tf.keras.layers.Dense(120, activation='sigmoid'),\n        tf.keras.layers.Dense(84, activation='sigmoid'),\n        tf.keras.layers.Dense(10)])"
+    },
+    {
+      "type": "paragraph",
+      "text": "Chúng tôi đã có một sự tự do nhỏ với mô hình ban đầu, loại bỏ kích hoạt\nGaussian trong lớp cuối cùng. Ngoài ra, mạng này phù hợp với kiến trúc\nLeNet-5 ban đầu."
+    },
+    {
+      "type": "paragraph",
+      "text": "Bằng cách truyền một hình ảnh \\(28 \\times 28\\) một kênh (đen và\ntrắng) qua mạng và in hình dạng đầu ra ở mỗi lớp, chúng ta có thể kiểm\ntra mô hình để đảm bảo rằng các hoạt động của nó phù hợp với những gì\nchúng ta mong đợi từ Fig. 6.6.2 ."
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/lenet-vert.svg",
+      "local_path": "_images/lenet-vert.svg",
+      "alt": "../_images/lenet-vert.svg"
+    },
+    {
+      "type": "paragraph",
+      "text": "Fig. 6.6.2 Compressed notation for LeNet-5. ¶"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "X = np.random.uniform(size=(1, 1, 28, 28))\nnet.initialize()\nfor layer in net:\n    X = layer(X)\n    print(layer.name, 'output shape:\\t', X.shape)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "conv0 output shape:  (1, 6, 28, 28)\npool0 output shape:  (1, 6, 14, 14)\nconv1 output shape:  (1, 16, 10, 10)\npool1 output shape:  (1, 16, 5, 5)\ndense0 output shape:         (1, 120)\ndense1 output shape:         (1, 84)\ndense2 output shape:         (1, 10)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "X = torch.rand(size=(1, 1, 28, 28), dtype=torch.float32)\nfor layer in net:\n    X = layer(X)\n    print(layer.__class__.__name__,'output shape: \\t',X.shape)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "Conv2d output shape:         torch.Size([1, 6, 28, 28])\nSigmoid output shape:        torch.Size([1, 6, 28, 28])\nAvgPool2d output shape:      torch.Size([1, 6, 14, 14])\nConv2d output shape:         torch.Size([1, 16, 10, 10])\nSigmoid output shape:        torch.Size([1, 16, 10, 10])\nAvgPool2d output shape:      torch.Size([1, 16, 5, 5])\nFlatten output shape:        torch.Size([1, 400])\nLinear output shape:         torch.Size([1, 120])\nSigmoid output shape:        torch.Size([1, 120])\nLinear output shape:         torch.Size([1, 84])\nSigmoid output shape:        torch.Size([1, 84])\nLinear output shape:         torch.Size([1, 10])"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "X = tf.random.uniform((1, 28, 28, 1))\nfor layer in net().layers:\n    X = layer(X)\n    print(layer.__class__.__name__, 'output shape: \\t', X.shape)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "Conv2D output shape:         (1, 28, 28, 6)\nAveragePooling2D output shape:       (1, 14, 14, 6)\nConv2D output shape:         (1, 10, 10, 16)\nAveragePooling2D output shape:       (1, 5, 5, 16)\nFlatten output shape:        (1, 400)\nDense output shape:          (1, 120)\nDense output shape:          (1, 84)\nDense output shape:          (1, 10)"
+    },
+    {
+      "type": "paragraph",
+      "text": "Lưu ý rằng chiều cao và chiều rộng của biểu diễn tại mỗi lớp trong suốt\nkhối phức tạp bị giảm (so với lớp trước đó). Lớp kết hợp đầu tiên sử\ndụng 2 pixel đệm để bù đắp cho việc giảm chiều cao và chiều rộng mà nếu\nkhông sẽ là kết quả của việc sử dụng một hạt nhân \\(5 \\times 5\\) .\nNgược lại, lớp phức tạp thứ hai bỏ đệm, và do đó chiều cao và chiều rộng\nđều giảm 4 pixel. Khi chúng ta đi lên ngăn xếp các lớp, số lượng kênh\ntăng lớp trên lớp từ 1 trong đầu vào lên 6 sau lớp phức tạp đầu tiên và\n16 sau lớp phức tạp thứ hai. Tuy nhiên, mỗi lớp tổng hợp giảm một nửa\nchiều cao và chiều rộng. Cuối cùng, mỗi lớp được kết nối hoàn toàn làm\ngiảm chiều, cuối cùng phát ra một đầu ra có kích thước phù hợp với số\nlượng lớp."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "dao-tao",
+      "text": "6.6.2. Đào tạo"
+    },
+    {
+      "type": "paragraph",
+      "text": "Bây giờ chúng tôi đã triển khai mô hình, chúng ta hãy chạy một thử\nnghiệm để xem LeNet giá vé trên Fashion-MNIST như thế nào."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "batch_size = 256\ntrain_iter, test_iter = d2l.load_data_fashion_mnist(batch_size=batch_size)"
+    },
+    {
+      "type": "paragraph",
+      "text": "Trong khi CNN có ít tham số hơn, chúng vẫn có thể tốn kém hơn để tính\ntoán so với MLP sâu tương tự vì mỗi tham số tham gia vào nhiều phép nhân\nhơn. Nếu bạn có quyền truy cập vào GPU, đây có thể là thời điểm tốt để\nđưa nó vào hành động để tăng tốc độ đào tạo."
+    },
+    {
+      "type": "paragraph",
+      "text": "Để đánh giá, chúng ta cần thực hiện một sửa đổi nhỏ đối với hàm evaluate_accuracy mà chúng tôi đã mô tả trong Section 3.6 . Vì tập dữ liệu đầy đủ nằm trong bộ nhớ\nchính, chúng ta cần sao chép nó vào bộ nhớ GPU trước khi mô hình sử dụng\nGPU để tính toán với bộ dữ liệu."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def evaluate_accuracy_gpu(net, data_iter, device=None):  #@save\n    \"\"\"Compute the accuracy for a model on a dataset using a GPU.\"\"\"\n    if not device:  # Query the first device where the first parameter is on\n        device = list(net.collect_params().values())[0].list_ctx()[0]\n    # No. of correct predictions, no. of predictions\n    metric = d2l.Accumulator(2)\n    for X, y in data_iter:\n        X, y = X.as_in_ctx(device), y.as_in_ctx(device)\n        metric.add(d2l.accuracy(net(X), y), d2l.size(y))\n    return metric[0] / metric[1]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Để đánh giá, chúng ta cần thực hiện một sửa đổi nhỏ đối với hàm evaluate_accuracy mà chúng tôi đã mô tả trong Section 3.6 . Vì tập dữ liệu đầy đủ nằm trong bộ nhớ\nchính, chúng ta cần sao chép nó vào bộ nhớ GPU trước khi mô hình sử dụng\nGPU để tính toán với bộ dữ liệu."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def evaluate_accuracy_gpu(net, data_iter, device=None): #@save\n    \"\"\"Compute the accuracy for a model on a dataset using a GPU.\"\"\"\n    if isinstance(net, nn.Module):\n        net.eval()  # Set the model to evaluation mode\n        if not device:\n            device = next(iter(net.parameters())).device\n    # No. of correct predictions, no. of predictions\n    metric = d2l.Accumulator(2)\n\n    with torch.no_grad():\n        for X, y in data_iter:\n            if isinstance(X, list):\n                # Required for BERT Fine-tuning (to be covered later)\n                X = [x.to(device) for x in X]\n            else:\n                X = X.to(device)\n            y = y.to(device)\n            metric.add(d2l.accuracy(net(X), y), y.numel())\n    return metric[0] / metric[1]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Chúng tôi cũng cần cập nhật chức năng đào tạo của chúng tôi để đối phó\nvới GPU. Không giống như train_epoch_ch3 được xác định trong Section 3.6 , bây giờ chúng ta cần di chuyển từng\nminibatch dữ liệu đến thiết bị được chỉ định của chúng tôi (hy vọng là\nGPU) trước khi thực hiện tuyên truyền chuyển tiếp và lùi."
+    },
+    {
+      "type": "paragraph",
+      "text": "Chức năng huấn luyện train_ch6 cũng tương tự như train_ch3 được\nđịnh nghĩa trong Section 3.6 . Vì chúng tôi sẽ triển\nkhai các mạng với nhiều lớp trong tương lai, chúng tôi sẽ chủ yếu dựa\nvào các API cấp cao. Hàm đào tạo sau đây giả định một mô hình được tạo\ntừ API cấp cao làm đầu vào và được tối ưu hóa cho phù hợp. Chúng tôi\nkhởi tạo các tham số mô hình trên thiết bị được chỉ định bởi đối số device , sử dụng khởi tạo Xavier như được giới thiệu trong Section 4.8.2.2 . Cũng giống như với MLP, chức năng mất mát của\nchúng tôi là cross-entropy, và chúng tôi giảm thiểu nó thông qua\nminibatch stochastic gradient descent. Vì mỗi kỷ nguyên mất hàng chục\ngiây để chạy, chúng tôi hình dung sự mất mát đào tạo thường xuyên hơn."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "#@save\ndef train_ch6(net, train_iter, test_iter, num_epochs, lr, device):\n    \"\"\"Train a model with a GPU (defined in Chapter 6).\"\"\"\n    net.initialize(force_reinit=True, ctx=device, init=init.Xavier())\n    loss = gluon.loss.SoftmaxCrossEntropyLoss()\n    trainer = gluon.Trainer(net.collect_params(),\n                            'sgd', {'learning_rate': lr})\n    animator = d2l.Animator(xlabel='epoch', xlim=[1, num_epochs],\n                            legend=['train loss', 'train acc', 'test acc'])\n    timer, num_batches = d2l.Timer(), len(train_iter)\n    for epoch in range(num_epochs):\n        # Sum of training loss, sum of training accuracy, no. of examples\n        metric = d2l.Accumulator(3)\n        for i, (X, y) in enumerate(train_iter):\n            timer.start()\n            # Here is the major difference from `d2l.train_epoch_ch3`\n            X, y = X.as_in_ctx(device), y.as_in_ctx(device)\n            with autograd.record():\n                y_hat = net(X)\n                l = loss(y_hat, y)\n            l.backward()\n            trainer.step(X.shape[0])\n            metric.add(l.sum(), d2l.accuracy(y_hat, y), X.shape[0])\n            timer.stop()\n            train_l = metric[0] / metric[2]\n            train_acc = metric[1] / metric[2]\n            if (i + 1) % (num_batches // 5) == 0 or i == num_batches - 1:\n                animator.add(epoch + (i + 1) / num_batches,\n                             (train_l, train_acc, None))\n        test_acc = evaluate_accuracy_gpu(net, test_iter)\n        animator.add(epoch + 1, (None, None, test_acc))\n    print(f'loss {train_l:.3f}, train acc {train_acc:.3f}, '\n          f'test acc {test_acc:.3f}')\n    print(f'{metric[2] * num_epochs / timer.sum():.1f} examples/sec '\n          f'on {str(device)}')"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "#@save\ndef train_ch6(net, train_iter, test_iter, num_epochs, lr, device):\n    \"\"\"Train a model with a GPU (defined in Chapter 6).\"\"\"\n    def init_weights(m):\n        if type(m) == nn.Linear or type(m) == nn.Conv2d:\n            nn.init.xavier_uniform_(m.weight)\n    net.apply(init_weights)\n    print('training on', device)\n    net.to(device)\n    optimizer = torch.optim.SGD(net.parameters(), lr=lr)\n    loss = nn.CrossEntropyLoss()\n    animator = d2l.Animator(xlabel='epoch', xlim=[1, num_epochs],\n                            legend=['train loss', 'train acc', 'test acc'])\n    timer, num_batches = d2l.Timer(), len(train_iter)\n    for epoch in range(num_epochs):\n        # Sum of training loss, sum of training accuracy, no. of examples\n        metric = d2l.Accumulator(3)\n        net.train()\n        for i, (X, y) in enumerate(train_iter):\n            timer.start()\n            optimizer.zero_grad()\n            X, y = X.to(device), y.to(device)\n            y_hat = net(X)\n            l = loss(y_hat, y)\n            l.backward()\n            optimizer.step()\n            with torch.no_grad():\n                metric.add(l * X.shape[0], d2l.accuracy(y_hat, y), X.shape[0])\n            timer.stop()\n            train_l = metric[0] / metric[2]\n            train_acc = metric[1] / metric[2]\n            if (i + 1) % (num_batches // 5) == 0 or i == num_batches - 1:\n                animator.add(epoch + (i + 1) / num_batches,\n                             (train_l, train_acc, None))\n        test_acc = evaluate_accuracy_gpu(net, test_iter)\n        animator.add(epoch + 1, (None, None, test_acc))\n    print(f'loss {train_l:.3f}, train acc {train_acc:.3f}, '\n          f'test acc {test_acc:.3f}')\n    print(f'{metric[2] * num_epochs / timer.sum():.1f} examples/sec '\n          f'on {str(device)}')"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "class TrainCallback(tf.keras.callbacks.Callback):  #@save\n    \"\"\"A callback to visiualize the training progress.\"\"\"\n    def __init__(self, net, train_iter, test_iter, num_epochs, device_name):\n        self.timer = d2l.Timer()\n        self.animator = d2l.Animator(\n            xlabel='epoch', xlim=[1, num_epochs], legend=[\n                'train loss', 'train acc', 'test acc'])\n        self.net = net\n        self.train_iter = train_iter\n        self.test_iter = test_iter\n        self.num_epochs = num_epochs\n        self.device_name = device_name\n    def on_epoch_begin(self, epoch, logs=None):\n        self.timer.start()\n    def on_epoch_end(self, epoch, logs):\n        self.timer.stop()\n        test_acc = self.net.evaluate(\n            self.test_iter, verbose=0, return_dict=True)['accuracy']\n        metrics = (logs['loss'], logs['accuracy'], test_acc)\n        self.animator.add(epoch + 1, metrics)\n        if epoch == self.num_epochs - 1:\n            batch_size = next(iter(self.train_iter))[0].shape[0]\n            num_examples = batch_size * tf.data.experimental.cardinality(\n                self.train_iter).numpy()\n            print(f'loss {metrics[0]:.3f}, train acc {metrics[1]:.3f}, '\n                  f'test acc {metrics[2]:.3f}')\n            print(f'{num_examples / self.timer.avg():.1f} examples/sec on '\n                  f'{str(self.device_name)}')\n\n#@save\ndef train_ch6(net_fn, train_iter, test_iter, num_epochs, lr, device):\n    \"\"\"Train a model with a GPU (defined in Chapter 6).\"\"\"\n    device_name = device._device_name\n    strategy = tf.distribute.OneDeviceStrategy(device_name)\n    with strategy.scope():\n        optimizer = tf.keras.optimizers.SGD(learning_rate=lr)\n        loss = tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True)\n        net = net_fn()\n        net.compile(optimizer=optimizer, loss=loss, metrics=['accuracy'])\n    callback = TrainCallback(net, train_iter, test_iter, num_epochs,\n                             device_name)\n    net.fit(train_iter, epochs=num_epochs, verbose=0, callbacks=[callback])\n    return net"
+    },
+    {
+      "type": "paragraph",
+      "text": "Bây giờ chúng ta hãy đào tạo và đánh giá mô hình LeNet-5."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "lr, num_epochs = 0.9, 10\ntrain_ch6(net, train_iter, test_iter, num_epochs, lr, d2l.try_gpu())"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "loss 0.473, train acc 0.822, test acc 0.778\n42138.4 examples/sec on gpu(0)"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_lenet_4a2e9e_52_1.svg",
+      "local_path": "_images/output_lenet_4a2e9e_52_1.svg",
+      "alt": "../_images/output_lenet_4a2e9e_52_1.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "lr, num_epochs = 0.9, 10\ntrain_ch6(net, train_iter, test_iter, num_epochs, lr, d2l.try_gpu())"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "loss 0.460, train acc 0.827, test acc 0.823\n82186.3 examples/sec on cuda:0"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_lenet_4a2e9e_55_1.svg",
+      "local_path": "_images/output_lenet_4a2e9e_55_1.svg",
+      "alt": "../_images/output_lenet_4a2e9e_55_1.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "lr, num_epochs = 0.9, 10\ntrain_ch6(net, train_iter, test_iter, num_epochs, lr, d2l.try_gpu())"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "loss 0.462, train acc 0.827, test acc 0.806\n51978.1 examples/sec on /GPU:0"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "<keras.engine.sequential.Sequential at 0x7f27ac3ddeb0>"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_lenet_4a2e9e_58_2.svg",
+      "local_path": "_images/output_lenet_4a2e9e_58_2.svg",
+      "alt": "../_images/output_lenet_4a2e9e_58_2.svg"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tom-tat",
+      "text": "6.6.3. Tóm tắt"
+    },
+    {
+      "type": "list",
+      "ordered": false,
+      "items": [
+        "CNN là một mạng sử dụng các lớp phức tạp.",
+        "Trong một CNN, chúng tôi xen kẽ các phức tạp, phi tuyến tính, và\n(thường) các hoạt động tập hợp.",
+        "Trong một CNN, các lớp phức hợp thường được sắp xếp sao cho chúng\ngiảm dần độ phân giải không gian của các biểu diễn, đồng thời tăng số\nlượng kênh.",
+        "Trong CNN truyền thống, các biểu diễn được mã hóa bởi các khối phức\ntạp được xử lý bởi một hoặc nhiều lớp kết nối đầy đủ trước khi phát\nra đầu ra.",
+        "LeNet được cho là triển khai thành công đầu tiên của một mạng như\nvậy."
+      ]
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bai-tap",
+      "text": "6.6.4. Bài tập"
+    },
+    {
+      "type": "list",
+      "ordered": true,
+      "items": [
+        "Thay thế các pooling trung bình với tổng hợp tối đa. Điều gì xảy ra?",
+        "Cố gắng xây dựng một mạng phức tạp hơn dựa trên LeNet để cải thiện độ\nchính xác của nó. Điều chỉnh kích thước cửa sổ covolution. Điều chỉnh số lượng kênh đầu ra. Điều chỉnh chức năng kích hoạt (ví dụ: ReLU). Điều chỉnh số lượng lớp covolution. Điều chỉnh số lượng lớp được kết nối hoàn toàn. Điều chỉnh tỷ lệ học tập và các chi tiết đào tạo khác (ví dụ: khởi\ntạo và số kỷ nguyên.)",
+        "Điều chỉnh kích thước cửa sổ covolution.",
+        "Điều chỉnh số lượng kênh đầu ra.",
+        "Điều chỉnh chức năng kích hoạt (ví dụ: ReLU).",
+        "Điều chỉnh số lượng lớp covolution.",
+        "Điều chỉnh số lượng lớp được kết nối hoàn toàn.",
+        "Điều chỉnh tỷ lệ học tập và các chi tiết đào tạo khác (ví dụ: khởi\ntạo và số kỷ nguyên.)",
+        "Hãy thử mạng cải tiến trên tập dữ liệu MNIST ban đầu.",
+        "Hiển thị các kích hoạt của lớp đầu tiên và thứ hai của LeNet cho các\nđầu vào khác nhau (ví dụ, áo len và áo khoác)."
+      ]
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    }
+  ],
+  "images": [
+    {
+      "original_url": "https://vi.d2l.ai/_images/lenet.svg",
+      "local_path": "_images/lenet.svg",
+      "alt": "../_images/lenet.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/lenet-vert.svg",
+      "local_path": "_images/lenet-vert.svg",
+      "alt": "../_images/lenet-vert.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_lenet_4a2e9e_52_1.svg",
+      "local_path": "_images/output_lenet_4a2e9e_52_1.svg",
+      "alt": "../_images/output_lenet_4a2e9e_52_1.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_lenet_4a2e9e_55_1.svg",
+      "local_path": "_images/output_lenet_4a2e9e_55_1.svg",
+      "alt": "../_images/output_lenet_4a2e9e_55_1.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_lenet_4a2e9e_58_2.svg",
+      "local_path": "_images/output_lenet_4a2e9e_58_2.svg",
+      "alt": "../_images/output_lenet_4a2e9e_58_2.svg"
+    }
+  ],
+  "text": "6.6. Mạng thần kinh phức tạp (LeNet)\nBây giờ chúng tôi có tất cả các thành phần cần thiết để lắp ráp một CNN\nđầy đủ chức năng. Trong cuộc gặp gỡ trước đó của chúng tôi với dữ liệu\nhình ảnh, chúng tôi đã áp dụng mô hình hồi quy softmax\n( Section 3.6 ) và mô hình MLP\n( Section 4.2 ) cho hình ảnh quần áo trong bộ dữ liệu\nFashion-MNIST. Để làm cho dữ liệu như vậy tuân theo hồi quy softmax và\nMLP s, trước tiên chúng ta làm phẳng mỗi hình ảnh từ một ma trận \\(28\\times28\\) thành một vector \\(784\\) chiều dài cố định, và\nsau đó xử lý chúng với các lớp được kết nối hoàn toàn. Bây giờ chúng ta\ncó một tay cầm trên các lớp phức tạp, chúng ta có thể giữ lại cấu trúc\nkhông gian trong hình ảnh của chúng ta. Là một lợi ích bổ sung của việc\nthay thế các lớp được kết nối hoàn toàn bằng các lớp kết nối, chúng ta\nsẽ tận hưởng các mô hình phân tích hơn đòi hỏi ít tham số hơn nhiều.\nTrong phần này, chúng tôi sẽ giới thiệu LeNet , trong số các CNN được\nxuất bản đầu tiên để thu hút sự chú ý rộng rãi về hiệu suất của nó trên\ncác tác vụ thị giác máy tính. Mô hình được giới thiệu bởi (và đặt tên\ncho) Yann LeCun, sau đó là một nhà nghiên cứu tại AT&T Bell Labs, với\nmục đích nhận dạng chữ số viết tay trong hình ảnh [LeCun et al., 1998] . Công trình này đại diện cho đỉnh\ncao của một thập kỷ nghiên cứu phát triển công nghệ. Năm 1989, LeCun\ncông bố nghiên cứu đầu tiên để đào tạo thành công CNN thông qua truyền\nngược.\nVào thời điểm đó LeNet đạt được kết quả xuất sắc phù hợp với hiệu suất\ncủa các máy vector hỗ trợ, sau đó là một cách tiếp cận thống trị trong\nviệc học có giám sát. LeNet cuối cùng đã được điều chỉnh để nhận ra các\nchữ số để xử lý tiền gửi trong máy ATM. Cho đến ngày nay, một số máy ATM\nvẫn chạy mã mà Yann và đồng nghiệp Leon Bottou đã viết vào những năm\n1990!\n6.6.1. LeNet\nỞ cấp độ cao, LeNet (LeNet-5) bao gồm hai phần: (i) một bộ mã hóa phức\ntạp bao gồm hai lớp phức tạp; và (ii) một khối dày đặc bao gồm ba lớp\nkết nối đầy đủ; Kiến trúc được tóm tắt trong Fig. 6.6.1 .\nFig. 6.6.1 Data flow in LeNet. The input is a handwritten digit, the output a\nprobability over 10 possible outcomes. ¶\nCác đơn vị cơ bản trong mỗi khối phức tạp là một lớp phức tạp, một chức\nnăng kích hoạt sigmoid, và một hoạt động tổng hợp trung bình tiếp theo.\nLưu ý rằng trong khi Relus và max-pooling hoạt động tốt hơn, những khám\nphá này vẫn chưa được thực hiện trong những năm 1990. Mỗi lớp phức hợp\nsử dụng một hạt nhân \\(5\\times 5\\) và một hàm kích hoạt sigmoid. Các\nlớp này ánh xạ các đầu vào sắp xếp không gian cho một số bản đồ tính\nnăng hai chiều, thường làm tăng số lượng kênh. Lớp phức tạp đầu tiên có\n6 kênh đầu ra, trong khi thứ hai có 16 kênh. Mỗi hoạt động tổng hợp \\(2\\times2\\) (sải chân 2) làm giảm kích thước bằng hệ số \\(4\\) thông qua lấy mẫu xuống không gian. Khối phức tạp phát ra một đầu ra với\nhình dạng được đưa ra bởi (kích thước lô, số kênh, chiều cao, chiều\nrộng).\nĐể truyền đầu ra từ khối phức tạp đến khối dày đặc, chúng ta phải làm\nphẳng từng ví dụ trong minibatch. Nói cách khác, chúng ta lấy đầu vào\nbốn chiều này và biến nó thành đầu vào hai chiều được mong đợi bởi các\nlớp được kết nối hoàn toàn: như một lời nhắc nhở, biểu diễn hai chiều mà\nchúng ta mong muốn sử dụng kích thước đầu tiên để lập chỉ mục các ví dụ\ntrong minibatch và thứ hai để đưa ra biểu diễn vector phẳng of each mỗi\nexample thí dụ. Khối dày đặc của LeNet có ba lớp kết nối hoàn toàn,\ntương ứng với 120, 84 và 10 đầu ra. Bởi vì chúng ta vẫn đang thực hiện\nphân loại, lớp đầu ra 10 chiều tương ứng với số lượng lớp đầu ra có thể.\nTrong khi đi đến mức bạn thực sự hiểu những gì đang xảy ra bên trong\nLeNet có thể đã thực hiện một chút công việc, hy vọng đoạn mã sau đây sẽ\nthuyết phục bạn rằng việc thực hiện các mô hình như vậy với các khuôn\nkhổ học sâu hiện đại rất đơn giản. Chúng ta chỉ cần khởi tạo một khối Sequential và chuỗi với nhau các lớp thích hợp.\nChúng tôi đã có một sự tự do nhỏ với mô hình ban đầu, loại bỏ kích hoạt\nGaussian trong lớp cuối cùng. Ngoài ra, mạng này phù hợp với kiến trúc\nLeNet-5 ban đầu.\nBằng cách truyền một hình ảnh \\(28 \\times 28\\) một kênh (đen và\ntrắng) qua mạng và in hình dạng đầu ra ở mỗi lớp, chúng ta có thể kiểm\ntra mô hình để đảm bảo rằng các hoạt động của nó phù hợp với những gì\nchúng ta mong đợi từ Fig. 6.6.2 .\nFig. 6.6.2 Compressed notation for LeNet-5. ¶\nLưu ý rằng chiều cao và chiều rộng của biểu diễn tại mỗi lớp trong suốt\nkhối phức tạp bị giảm (so với lớp trước đó). Lớp kết hợp đầu tiên sử\ndụng 2 pixel đệm để bù đắp cho việc giảm chiều cao và chiều rộng mà nếu\nkhông sẽ là kết quả của việc sử dụng một hạt nhân \\(5 \\times 5\\) .\nNgược lại, lớp phức tạp thứ hai bỏ đệm, và do đó chiều cao và chiều rộng\nđều giảm 4 pixel. Khi chúng ta đi lên ngăn xếp các lớp, số lượng kênh\ntăng lớp trên lớp từ 1 trong đầu vào lên 6 sau lớp phức tạp đầu tiên và\n16 sau lớp phức tạp thứ hai. Tuy nhiên, mỗi lớp tổng hợp giảm một nửa\nchiều cao và chiều rộng. Cuối cùng, mỗi lớp được kết nối hoàn toàn làm\ngiảm chiều, cuối cùng phát ra một đầu ra có kích thước phù hợp với số\nlượng lớp.\n6.6.2. Đào tạo\nBây giờ chúng tôi đã triển khai mô hình, chúng ta hãy chạy một thử\nnghiệm để xem LeNet giá vé trên Fashion-MNIST như thế nào.\nTrong khi CNN có ít tham số hơn, chúng vẫn có thể tốn kém hơn để tính\ntoán so với MLP sâu tương tự vì mỗi tham số tham gia vào nhiều phép nhân\nhơn. Nếu bạn có quyền truy cập vào GPU, đây có thể là thời điểm tốt để\nđưa nó vào hành động để tăng tốc độ đào tạo.\nĐể đánh giá, chúng ta cần thực hiện một sửa đổi nhỏ đối với hàm evaluate_accuracy mà chúng tôi đã mô tả trong Section 3.6 . Vì tập dữ liệu đầy đủ nằm trong bộ nhớ\nchính, chúng ta cần sao chép nó vào bộ nhớ GPU trước khi mô hình sử dụng\nGPU để tính toán với bộ dữ liệu.\nĐể đánh giá, chúng ta cần thực hiện một sửa đổi nhỏ đối với hàm evaluate_accuracy mà chúng tôi đã mô tả trong Section 3.6 . Vì tập dữ liệu đầy đủ nằm trong bộ nhớ\nchính, chúng ta cần sao chép nó vào bộ nhớ GPU trước khi mô hình sử dụng\nGPU để tính toán với bộ dữ liệu.\nChúng tôi cũng cần cập nhật chức năng đào tạo của chúng tôi để đối phó\nvới GPU. Không giống như train_epoch_ch3 được xác định trong Section 3.6 , bây giờ chúng ta cần di chuyển từng\nminibatch dữ liệu đến thiết bị được chỉ định của chúng tôi (hy vọng là\nGPU) trước khi thực hiện tuyên truyền chuyển tiếp và lùi.\nChức năng huấn luyện train_ch6 cũng tương tự như train_ch3 được\nđịnh nghĩa trong Section 3.6 . Vì chúng tôi sẽ triển\nkhai các mạng với nhiều lớp trong tương lai, chúng tôi sẽ chủ yếu dựa\nvào các API cấp cao. Hàm đào tạo sau đây giả định một mô hình được tạo\ntừ API cấp cao làm đầu vào và được tối ưu hóa cho phù hợp. Chúng tôi\nkhởi tạo các tham số mô hình trên thiết bị được chỉ định bởi đối số device , sử dụng khởi tạo Xavier như được giới thiệu trong Section 4.8.2.2 . Cũng giống như với MLP, chức năng mất mát của\nchúng tôi là cross-entropy, và chúng tôi giảm thiểu nó thông qua\nminibatch stochastic gradient descent. Vì mỗi kỷ nguyên mất hàng chục\ngiây để chạy, chúng tôi hình dung sự mất mát đào tạo thường xuyên hơn.\nBây giờ chúng ta hãy đào tạo và đánh giá mô hình LeNet-5.\n6.6.3. Tóm tắt\nCNN là một mạng sử dụng các lớp phức tạp.\nTrong một CNN, chúng tôi xen kẽ các phức tạp, phi tuyến tính, và\n(thường) các hoạt động tập hợp.\nTrong một CNN, các lớp phức hợp thường được sắp xếp sao cho chúng\ngiảm dần độ phân giải không gian của các biểu diễn, đồng thời tăng số\nlượng kênh.\nTrong CNN truyền thống, các biểu diễn được mã hóa bởi các khối phức\ntạp được xử lý bởi một hoặc nhiều lớp kết nối đầy đủ trước khi phát\nra đầu ra.\nLeNet được cho là triển khai thành công đầu tiên của một mạng như\nvậy.\n6.6.4. Bài tập\nThay thế các pooling trung bình với tổng hợp tối đa. Điều gì xảy ra?\nCố gắng xây dựng một mạng phức tạp hơn dựa trên LeNet để cải thiện độ\nchính xác của nó. Điều chỉnh kích thước cửa sổ covolution. Điều chỉnh số lượng kênh đầu ra. Điều chỉnh chức năng kích hoạt (ví dụ: ReLU). Điều chỉnh số lượng lớp covolution. Điều chỉnh số lượng lớp được kết nối hoàn toàn. Điều chỉnh tỷ lệ học tập và các chi tiết đào tạo khác (ví dụ: khởi\ntạo và số kỷ nguyên.)\nĐiều chỉnh kích thước cửa sổ covolution.\nĐiều chỉnh số lượng kênh đầu ra.\nĐiều chỉnh chức năng kích hoạt (ví dụ: ReLU).\nĐiều chỉnh số lượng lớp covolution.\nĐiều chỉnh số lượng lớp được kết nối hoàn toàn.\nĐiều chỉnh tỷ lệ học tập và các chi tiết đào tạo khác (ví dụ: khởi\ntạo và số kỷ nguyên.)\nHãy thử mạng cải tiến trên tập dữ liệu MNIST ban đầu.\nHiển thị các kích hoạt của lớp đầu tiên và thứ hai của LeNet cho các\nđầu vào khác nhau (ví dụ, áo len và áo khoác).\nDiscussions\nDiscussions\nDiscussions"
+}

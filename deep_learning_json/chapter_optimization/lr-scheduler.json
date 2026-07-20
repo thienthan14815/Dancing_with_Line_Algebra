@@ -1,0 +1,895 @@
+{
+  "url": "https://vi.d2l.ai/chapter_optimization/lr-scheduler.html",
+  "chapter": "chapter_optimization",
+  "title": "11.11. Lập kế hoạch tỷ lệ học tập",
+  "crawled_at": "2026-07-20T12:40:29.452366+00:00",
+  "headings": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "lap-ke-hoach-ty-le-hoc-tap",
+      "text": "11.11. Lập kế hoạch tỷ lệ học tập"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "van-de-toy",
+      "text": "11.11.1. Vấn đề Toy"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "nguoi-lap-lich",
+      "text": "11.11.2. Người lập lịch"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "chinh-sach",
+      "text": "11.11.3. Chính sách"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "bo-lap-lich-yeu-to",
+      "text": "11.11.3.1. Bộ lập lịch yếu tố"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "bo-lap-lich-da-yeu-to",
+      "text": "11.11.3.2. Bộ lập lịch đa yếu tố"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "bo-lap-lich-cosine",
+      "text": "11.11.3.3. Bộ lập lịch cosine"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "khoi-dong",
+      "text": "11.11.3.4. Khởi động"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tom-tat",
+      "text": "11.11.4. Tóm tắt"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bai-tap",
+      "text": "11.11.5. Bài tập"
+    }
+  ],
+  "content": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "lap-ke-hoach-ty-le-hoc-tap",
+      "text": "11.11. Lập kế hoạch tỷ lệ học tập"
+    },
+    {
+      "type": "paragraph",
+      "text": "Cho đến nay chúng tôi chủ yếu tập trung vào tối ưu hóa các thuật toán *\nđể làm thế nào để cập nhật các vectơ trọng lượng thay vì trên * tỷ lệ*\ntại đó chúng đang được cập nhật. Tuy nhiên, việc điều chỉnh tốc độ học\ntập thường cũng quan trọng như thuật toán thực tế. Có một số khía cạnh\ncần xem xét:"
+    },
+    {
+      "type": "list",
+      "ordered": false,
+      "items": [
+        "Rõ ràng nhất là độ lượng của tỷ lệ học tập quan trọng. Nếu nó quá\nlớn, tối ưu hóa phân kỳ, nếu nó quá nhỏ, phải mất quá nhiều thời gian\nđể đào tạo hoặc chúng ta kết thúc với một kết quả tối ưu. Trước đây\nchúng tôi đã thấy rằng số điều kiện của vấn đề quan trọng (xem ví dụ, Section 11.6 để biết chi tiết). Trực giác đó là tỷ lệ\ngiữa số lượng thay đổi theo hướng ít nhạy cảm nhất so với một nhạy\ncảm nhất.",
+        "Thứ hai, tỷ lệ phân rã cũng quan trọng như vậy. Nếu tỷ lệ học tập vẫn\nlớn, chúng tôi có thể chỉ đơn giản là kết thúc nảy xung quanh mức tối\nthiểu và do đó không đạt được sự tối ưu. Section 11.5 đã thảo luận chi tiết về điều này và\nchúng tôi đã phân tích đảm bảo hiệu suất trong Section 11.4 .\nNói tóm lại, chúng tôi muốn tỷ lệ phân rã, nhưng có lẽ chậm hơn \\(\\mathcal{O}(t^{-\\frac{1}{2}})\\) , đây sẽ là một lựa chọn tốt cho\ncác vấn đề lồi.",
+        "Một khía cạnh khác quan trọng không kém là * khởi hóa * . Điều này\nliên quan đến cả cách các tham số được đặt ban đầu (xem lại Section 4.8 để biết chi tiết) và cũng như\ncách chúng phát triển ban đầu. Điều này đi theo moniker của *\nwarmup*, tức là, nhanh chóng như thế nào chúng ta bắt đầu di chuyển\nvề phía giải pháp ban đầu. Các bước lớn ngay từ đầu có thể không có\nlợi, đặc biệt là vì tập hợp các tham số ban đầu là ngẫu nhiên. Các\nhướng cập nhật ban đầu cũng có thể khá vô nghĩa.",
+        "Cuối cùng, có một số biến thể tối ưu hóa thực hiện điều chỉnh tỷ lệ\nhọc tập theo chu kỳ. Điều này nằm ngoài phạm vi của chương hiện tại.\nChúng tôi khuyên người đọc xem lại chi tiết trong [Izmailov et al., 2018] , ví dụ, làm thế nào để\ncó được các giải pháp tốt hơn bằng cách trung bình trên toàn bộ một\n* path* của các tham số."
+      ]
+    },
+    {
+      "type": "paragraph",
+      "text": "Với thực tế là có rất nhiều chi tiết cần thiết để quản lý tỷ lệ học tập,\nhầu hết các khuôn khổ học sâu đều có các công cụ để xử lý điều này một\ncách tự động. Trong chương hiện tại, chúng tôi sẽ xem xét các hiệu ứng\nmà các lịch trình khác nhau có về độ chính xác và cũng cho thấy cách\nđiều này có thể được quản lý hiệu quả thông qua một học tỷ lệ lịch\nhọc ."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "van-de-toy",
+      "text": "11.11.1. Vấn đề Toy"
+    },
+    {
+      "type": "paragraph",
+      "text": "Chúng tôi bắt đầu với một vấn đề đồ chơi đủ rẻ để tính toán dễ dàng,\nnhưng đủ không tầm thường để minh họa một số khía cạnh chính. Đối với\nđiều đó, chúng tôi chọn một phiên bản hơi hiện đại hóa của LeNet\n( relu thay vì kích hoạt sigmoid , MaxPooling thay vì\nAveragePooling), như áp dụng cho Fashion-MNIST. Hơn nữa, chúng tôi lai\nmạng để thực hiện. Vì hầu hết các mã là tiêu chuẩn, chúng tôi chỉ giới\nthiệu những điều cơ bản mà không cần thảo luận chi tiết thêm. Xin xem Section 6 để được làm mới khi cần thiết."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "%matplotlib inline\nfrom mxnet import autograd, gluon, init, lr_scheduler, np, npx\nfrom mxnet.gluon import nn\nfrom d2l import mxnet as d2l\n\nnpx.set_np()\n\nnet = nn.HybridSequential()\nnet.add(nn.Conv2D(channels=6, kernel_size=5, padding=2, activation='relu'),\n        nn.MaxPool2D(pool_size=2, strides=2),\n        nn.Conv2D(channels=16, kernel_size=5, activation='relu'),\n        nn.MaxPool2D(pool_size=2, strides=2),\n        nn.Dense(120, activation='relu'),\n        nn.Dense(84, activation='relu'),\n        nn.Dense(10))\nnet.hybridize()\nloss = gluon.loss.SoftmaxCrossEntropyLoss()\ndevice = d2l.try_gpu()\n\nbatch_size = 256\ntrain_iter, test_iter = d2l.load_data_fashion_mnist(batch_size=batch_size)\n\n# The code is almost identical to `d2l.train_ch6` defined in the\n# lenet section of chapter convolutional neural networks\ndef train(net, train_iter, test_iter, num_epochs, loss, trainer, device):\n    net.initialize(force_reinit=True, ctx=device, init=init.Xavier())\n    animator = d2l.Animator(xlabel='epoch', xlim=[0, num_epochs],\n                            legend=['train loss', 'train acc', 'test acc'])\n    for epoch in range(num_epochs):\n        metric = d2l.Accumulator(3)  # train_loss, train_acc, num_examples\n        for i, (X, y) in enumerate(train_iter):\n            X, y = X.as_in_ctx(device), y.as_in_ctx(device)\n            with autograd.record():\n                y_hat = net(X)\n                l = loss(y_hat, y)\n            l.backward()\n            trainer.step(X.shape[0])\n            metric.add(l.sum(), d2l.accuracy(y_hat, y), X.shape[0])\n            train_loss = metric[0] / metric[2]\n            train_acc = metric[1] / metric[2]\n            if (i + 1) % 50 == 0:\n                animator.add(epoch + i / len(train_iter),\n                             (train_loss, train_acc, None))\n        test_acc = d2l.evaluate_accuracy_gpu(net, test_iter)\n        animator.add(epoch + 1, (None, None, test_acc))\n    print(f'train loss {train_loss:.3f}, train acc {train_acc:.3f}, '\n          f'test acc {test_acc:.3f}')"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "%matplotlib inline\nimport math\nimport torch\nfrom torch import nn\nfrom torch.optim import lr_scheduler\nfrom d2l import torch as d2l\n\n\ndef net_fn():\n    model = nn.Sequential(\n        nn.Conv2d(1, 6, kernel_size=5, padding=2), nn.ReLU(),\n        nn.MaxPool2d(kernel_size=2, stride=2),\n        nn.Conv2d(6, 16, kernel_size=5), nn.ReLU(),\n        nn.MaxPool2d(kernel_size=2, stride=2),\n        nn.Flatten(),\n        nn.Linear(16 * 5 * 5, 120), nn.ReLU(),\n        nn.Linear(120, 84), nn.ReLU(),\n        nn.Linear(84, 10))\n\n    return model\n\nloss = nn.CrossEntropyLoss()\ndevice = d2l.try_gpu()\n\nbatch_size = 256\ntrain_iter, test_iter = d2l.load_data_fashion_mnist(batch_size=batch_size)\n\n# The code is almost identical to `d2l.train_ch6` defined in the\n# lenet section of chapter convolutional neural networks\ndef train(net, train_iter, test_iter, num_epochs, loss, trainer, device,\n          scheduler=None):\n    net.to(device)\n    animator = d2l.Animator(xlabel='epoch', xlim=[0, num_epochs],\n                            legend=['train loss', 'train acc', 'test acc'])\n\n    for epoch in range(num_epochs):\n        metric = d2l.Accumulator(3)  # train_loss, train_acc, num_examples\n        for i, (X, y) in enumerate(train_iter):\n            net.train()\n            trainer.zero_grad()\n            X, y = X.to(device), y.to(device)\n            y_hat = net(X)\n            l = loss(y_hat, y)\n            l.backward()\n            trainer.step()\n            with torch.no_grad():\n                metric.add(l * X.shape[0], d2l.accuracy(y_hat, y), X.shape[0])\n            train_loss = metric[0] / metric[2]\n            train_acc = metric[1] / metric[2]\n            if (i + 1) % 50 == 0:\n                animator.add(epoch + i / len(train_iter),\n                             (train_loss, train_acc, None))\n\n        test_acc = d2l.evaluate_accuracy_gpu(net, test_iter)\n        animator.add(epoch+1, (None, None, test_acc))\n\n        if scheduler:\n            if scheduler.__module__ == lr_scheduler.__name__:\n                # Using PyTorch In-Built scheduler\n                scheduler.step()\n            else:\n                # Using custom defined scheduler\n                for param_group in trainer.param_groups:\n                    param_group['lr'] = scheduler(epoch)\n\n    print(f'train loss {train_loss:.3f}, train acc {train_acc:.3f}, '\n          f'test acc {test_acc:.3f}')"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "%matplotlib inline\nimport math\nimport tensorflow as tf\nfrom tensorflow.keras.callbacks import LearningRateScheduler\nfrom d2l import tensorflow as d2l\n\n\ndef net():\n    return tf.keras.models.Sequential([\n        tf.keras.layers.Conv2D(filters=6, kernel_size=5, activation='relu',\n                               padding='same'),\n        tf.keras.layers.AvgPool2D(pool_size=2, strides=2),\n        tf.keras.layers.Conv2D(filters=16, kernel_size=5,\n                               activation='relu'),\n        tf.keras.layers.AvgPool2D(pool_size=2, strides=2),\n        tf.keras.layers.Flatten(),\n        tf.keras.layers.Dense(120, activation='relu'),\n        tf.keras.layers.Dense(84, activation='sigmoid'),\n        tf.keras.layers.Dense(10)])\n\n\nbatch_size = 256\ntrain_iter, test_iter = d2l.load_data_fashion_mnist(batch_size=batch_size)\n\n# The code is almost identical to `d2l.train_ch6` defined in the\n# lenet section of chapter convolutional neural networks\ndef train(net_fn, train_iter, test_iter, num_epochs, lr,\n              device=d2l.try_gpu(), custom_callback = False):\n    device_name = device._device_name\n    strategy = tf.distribute.OneDeviceStrategy(device_name)\n    with strategy.scope():\n        optimizer = tf.keras.optimizers.SGD(learning_rate=lr)\n        loss = tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True)\n        net = net_fn()\n        net.compile(optimizer=optimizer, loss=loss, metrics=['accuracy'])\n    callback = d2l.TrainCallback(net, train_iter, test_iter, num_epochs,\n                             device_name)\n    if custom_callback is False:\n        net.fit(train_iter, epochs=num_epochs, verbose=0,\n                callbacks=[callback])\n    else:\n         net.fit(train_iter, epochs=num_epochs, verbose=0,\n                 callbacks=[callback, custom_callback])\n    return net"
+    },
+    {
+      "type": "paragraph",
+      "text": "Chúng ta hãy xem những gì sẽ xảy ra nếu chúng ta gọi thuật toán này với\ncác cài đặt mặc định, chẳng hạn như tốc độ học tập \\(0.3\\) và đào\ntạo cho \\(30\\) lặp lại. Lưu ý độ chính xác của đào tạo tiếp tục tăng\nlên trong khi tiến bộ về các quầy hàng chính xác thử nghiệm vượt ra\nngoài một điểm. Khoảng cách giữa cả hai đường cong cho thấy quá mức."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "lr, num_epochs = 0.3, 30\nnet.initialize(force_reinit=True, ctx=device, init=init.Xavier())\ntrainer = gluon.Trainer(net.collect_params(), 'sgd', {'learning_rate': lr})\ntrain(net, train_iter, test_iter, num_epochs, loss, trainer, device)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "train loss 0.130, train acc 0.950, test acc 0.897"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_lr-scheduler_1dfeb6_15_1.svg",
+      "local_path": "_images/output_lr-scheduler_1dfeb6_15_1.svg",
+      "alt": "../_images/output_lr-scheduler_1dfeb6_15_1.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "lr, num_epochs = 0.3, 30\nnet = net_fn()\ntrainer = torch.optim.SGD(net.parameters(), lr=lr)\ntrain(net, train_iter, test_iter, num_epochs, loss, trainer, device)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "train loss 0.156, train acc 0.940, test acc 0.869"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_lr-scheduler_1dfeb6_18_1.svg",
+      "local_path": "_images/output_lr-scheduler_1dfeb6_18_1.svg",
+      "alt": "../_images/output_lr-scheduler_1dfeb6_18_1.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "lr, num_epochs = 0.3, 30\ntrain(net, train_iter, test_iter, num_epochs, lr)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "loss 0.212, train acc 0.920, test acc 0.895\n51676.5 examples/sec on /GPU:0"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "<keras.engine.sequential.Sequential at 0x7fb2f009ec70>"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_lr-scheduler_1dfeb6_21_2.svg",
+      "local_path": "_images/output_lr-scheduler_1dfeb6_21_2.svg",
+      "alt": "../_images/output_lr-scheduler_1dfeb6_21_2.svg"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "nguoi-lap-lich",
+      "text": "11.11.2. Người lập lịch"
+    },
+    {
+      "type": "paragraph",
+      "text": "Một cách để điều chỉnh tốc độ học tập là thiết lập nó một cách rõ ràng ở\nmỗi bước. Điều này đạt được thuận tiện bằng phương pháp set_learning_rate . Chúng ta có thể điều chỉnh nó xuống sau mỗi kỷ\nnguyên (hoặc thậm chí sau mỗi minibatch), ví dụ, một cách năng động để\nđáp ứng cách tối ưu hóa đang tiến triển."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "trainer.set_learning_rate(0.1)\nprint(f'learning rate is now {trainer.learning_rate:.2f}')"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "learning rate is now 0.10"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "lr = 0.1\ntrainer.param_groups[0][\"lr\"] = lr\nprint(f'learning rate is now {trainer.param_groups[0][\"lr\"]:.2f}')"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "learning rate is now 0.10"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "lr = 0.1\ndummy_model = tf.keras.models.Sequential([tf.keras.layers.Dense(10)])\ndummy_model.compile(tf.keras.optimizers.SGD(learning_rate=lr), loss='mse')\nprint(f'learning rate is now ,', dummy_model.optimizer.lr.numpy())"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "learning rate is now , 0.1"
+    },
+    {
+      "type": "paragraph",
+      "text": "Nói chung hơn chúng tôi muốn xác định một trình lập lịch. Khi được gọi\nvới số lượng cập nhật nó trả về giá trị thích hợp của tốc độ học tập.\nHãy để chúng tôi xác định một cái đơn giản đặt tỷ lệ học tập thành \\(\\eta = \\eta_0 (t + 1)^{-\\frac{1}{2}}\\) ."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "class SquareRootScheduler:\n    def __init__(self, lr=0.1):\n        self.lr = lr\n\n    def __call__(self, num_update):\n        return self.lr * pow(num_update + 1.0, -0.5)"
+    },
+    {
+      "type": "paragraph",
+      "text": "Hãy để chúng tôi vẽ hành vi của nó trên một loạt các giá trị."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "scheduler = SquareRootScheduler(lr=0.1)\nd2l.plot(np.arange(num_epochs), [scheduler(t) for t in range(num_epochs)])"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_lr-scheduler_1dfeb6_41_0.svg",
+      "local_path": "_images/output_lr-scheduler_1dfeb6_41_0.svg",
+      "alt": "../_images/output_lr-scheduler_1dfeb6_41_0.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "scheduler = SquareRootScheduler(lr=0.1)\nd2l.plot(torch.arange(num_epochs), [scheduler(t) for t in range(num_epochs)])"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_lr-scheduler_1dfeb6_44_0.svg",
+      "local_path": "_images/output_lr-scheduler_1dfeb6_44_0.svg",
+      "alt": "../_images/output_lr-scheduler_1dfeb6_44_0.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "scheduler = SquareRootScheduler(lr=0.1)\nd2l.plot(tf.range(num_epochs), [scheduler(t) for t in range(num_epochs)])"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_lr-scheduler_1dfeb6_47_0.svg",
+      "local_path": "_images/output_lr-scheduler_1dfeb6_47_0.svg",
+      "alt": "../_images/output_lr-scheduler_1dfeb6_47_0.svg"
+    },
+    {
+      "type": "paragraph",
+      "text": "Bây giờ chúng ta hãy xem cách điều này diễn ra để đào tạo về thời\ntrang-MNIST. Chúng tôi chỉ cần cung cấp trình lập lịch như một đối số bổ\nsung cho thuật toán đào tạo."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "trainer = gluon.Trainer(net.collect_params(), 'sgd',\n                        {'lr_scheduler': scheduler})\ntrain(net, train_iter, test_iter, num_epochs, loss, trainer, device)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "train loss 0.523, train acc 0.810, test acc 0.797"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_lr-scheduler_1dfeb6_53_1.svg",
+      "local_path": "_images/output_lr-scheduler_1dfeb6_53_1.svg",
+      "alt": "../_images/output_lr-scheduler_1dfeb6_53_1.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "net = net_fn()\ntrainer = torch.optim.SGD(net.parameters(), lr)\ntrain(net, train_iter, test_iter, num_epochs, loss, trainer, device,\n      scheduler)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "train loss 0.275, train acc 0.898, test acc 0.873"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_lr-scheduler_1dfeb6_56_1.svg",
+      "local_path": "_images/output_lr-scheduler_1dfeb6_56_1.svg",
+      "alt": "../_images/output_lr-scheduler_1dfeb6_56_1.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "train(net, train_iter, test_iter, num_epochs, lr,\n      custom_callback=LearningRateScheduler(scheduler))"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "loss 0.381, train acc 0.861, test acc 0.846\n54892.0 examples/sec on /GPU:0"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "<keras.engine.sequential.Sequential at 0x7fb2f00da8b0>"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_lr-scheduler_1dfeb6_59_2.svg",
+      "local_path": "_images/output_lr-scheduler_1dfeb6_59_2.svg",
+      "alt": "../_images/output_lr-scheduler_1dfeb6_59_2.svg"
+    },
+    {
+      "type": "paragraph",
+      "text": "Điều này làm việc khá tốt hơn một chút so với trước đây. Hai điều nổi\nbật: đường cong khá trơn tru hơn trước đây. Thứ hai, có ít quá nhiều\nhơn. Thật không may, nó không phải là một câu hỏi được giải quyết tốt về\nlý do tại sao một số chiến lược nhất định dẫn đến ít quá mức trong * lý\nđề*. Có một số lập luận rằng kích thước bước nhỏ hơn sẽ dẫn đến các\ntham số gần bằng 0 và do đó đơn giản hơn. Tuy nhiên, điều này không giải\nthích hoàn toàn hiện tượng vì chúng ta không thực sự dừng lại sớm mà chỉ\nđơn giản là giảm tốc độ học tập nhẹ nhàng."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "chinh-sach",
+      "text": "11.11.3. Chính sách"
+    },
+    {
+      "type": "paragraph",
+      "text": "Mặc dù chúng tôi không thể bao gồm toàn bộ các lập lịch trình tỷ lệ học\ntập, chúng tôi cố gắng đưa ra một cái nhìn tổng quan ngắn gọn về các\nchính sách phổ biến dưới đây. Các lựa chọn phổ biến là phân rã đa thức\nvà từng mảnh lịch trình liên tục. Ngoài ra, lịch trình học cosine đã\nđược tìm thấy để làm việc tốt theo kinh nghiệm về một số vấn đề. Cuối\ncùng, về một số vấn đề, có lợi khi làm nóng trình tối ưu hóa trước khi\nsử dụng tỷ lệ học tập lớn."
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "bo-lap-lich-yeu-to",
+      "text": "11.11.3.1. Bộ lập lịch yếu tố"
+    },
+    {
+      "type": "paragraph",
+      "text": "Một thay thế cho phân rã đa thức sẽ là một phân rã nhân, đó là \\(\\eta_{t+1} \\leftarrow \\eta_t \\cdot \\alpha\\) cho \\(\\alpha \\in (0, 1)\\) . Để ngăn chặn tỷ lệ học tập phân rã vượt quá\ngiới hạn thấp hơn hợp lý, phương trình cập nhật thường được sửa đổi\nthành \\(\\eta_{t+1} \\leftarrow \\mathop{\\mathrm{max}}(\\eta_{\\mathrm{min}}, \\eta_t \\cdot \\alpha)\\) ."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "class FactorScheduler:\n    def __init__(self, factor=1, stop_factor_lr=1e-7, base_lr=0.1):\n        self.factor = factor\n        self.stop_factor_lr = stop_factor_lr\n        self.base_lr = base_lr\n\n    def __call__(self, num_update):\n        self.base_lr = max(self.stop_factor_lr, self.base_lr * self.factor)\n        return self.base_lr\n\nscheduler = FactorScheduler(factor=0.9, stop_factor_lr=1e-2, base_lr=2.0)\nd2l.plot(np.arange(50), [scheduler(t) for t in range(50)])"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_lr-scheduler_1dfeb6_65_0.svg",
+      "local_path": "_images/output_lr-scheduler_1dfeb6_65_0.svg",
+      "alt": "../_images/output_lr-scheduler_1dfeb6_65_0.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "class FactorScheduler:\n    def __init__(self, factor=1, stop_factor_lr=1e-7, base_lr=0.1):\n        self.factor = factor\n        self.stop_factor_lr = stop_factor_lr\n        self.base_lr = base_lr\n\n    def __call__(self, num_update):\n        self.base_lr = max(self.stop_factor_lr, self.base_lr * self.factor)\n        return self.base_lr\n\nscheduler = FactorScheduler(factor=0.9, stop_factor_lr=1e-2, base_lr=2.0)\nd2l.plot(torch.arange(50), [scheduler(t) for t in range(50)])"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_lr-scheduler_1dfeb6_68_0.svg",
+      "local_path": "_images/output_lr-scheduler_1dfeb6_68_0.svg",
+      "alt": "../_images/output_lr-scheduler_1dfeb6_68_0.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "class FactorScheduler:\n    def __init__(self, factor=1, stop_factor_lr=1e-7, base_lr=0.1):\n        self.factor = factor\n        self.stop_factor_lr = stop_factor_lr\n        self.base_lr = base_lr\n\n    def __call__(self, num_update):\n        self.base_lr = max(self.stop_factor_lr, self.base_lr * self.factor)\n        return self.base_lr\n\nscheduler = FactorScheduler(factor=0.9, stop_factor_lr=1e-2, base_lr=2.0)\nd2l.plot(tf.range(50), [scheduler(t) for t in range(50)])"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_lr-scheduler_1dfeb6_71_0.svg",
+      "local_path": "_images/output_lr-scheduler_1dfeb6_71_0.svg",
+      "alt": "../_images/output_lr-scheduler_1dfeb6_71_0.svg"
+    },
+    {
+      "type": "paragraph",
+      "text": "Điều này cũng có thể được thực hiện bằng trình lập lịch tích hợp trong\nMXNet thông qua đối tượng lr_scheduler.FactorScheduler . Phải mất\nthêm một vài tham số, chẳng hạn như thời gian khởi động, chế độ khởi\nđộng (tuyến tính hoặc không đổi), số lượng cập nhật mong muốn tối đa,\nv.v.; Về phía trước, chúng tôi sẽ sử dụng các bộ lập lịch tích hợp phù\nhợp và chỉ giải thích chức năng của chúng ở đây. Như minh họa, nó là khá\nđơn giản để xây dựng lịch trình của riêng bạn nếu cần thiết."
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "bo-lap-lich-da-yeu-to",
+      "text": "11.11.3.2. Bộ lập lịch đa yếu tố"
+    },
+    {
+      "type": "paragraph",
+      "text": "Một chiến lược phổ biến để đào tạo các mạng sâu là giữ cho tỷ lệ học tập\nkhông đổi và giảm nó bằng một số tiền nhất định thường xuyên. Đó là, đưa\nra một tập hợp thời gian khi giảm tỷ lệ, chẳng hạn như \\(s = \\{5, 10, 20\\}\\) giảm \\(\\eta_{t+1} \\leftarrow \\eta_t \\cdot \\alpha\\) bất cứ khi nào \\(t \\in s\\) . Giả sử rằng các giá trị giảm một nửa ở mỗi bước chúng\nta có thể thực hiện điều này như sau."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "scheduler = lr_scheduler.MultiFactorScheduler(step=[15, 30], factor=0.5,\n                                              base_lr=0.5)\nd2l.plot(np.arange(num_epochs), [scheduler(t) for t in range(num_epochs)])"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_lr-scheduler_1dfeb6_77_0.svg",
+      "local_path": "_images/output_lr-scheduler_1dfeb6_77_0.svg",
+      "alt": "../_images/output_lr-scheduler_1dfeb6_77_0.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "net = net_fn()\ntrainer = torch.optim.SGD(net.parameters(), lr=0.5)\nscheduler = lr_scheduler.MultiStepLR(trainer, milestones=[15, 30], gamma=0.5)\n\ndef get_lr(trainer, scheduler):\n    lr = scheduler.get_last_lr()[0]\n    trainer.step()\n    scheduler.step()\n    return lr\n\nd2l.plot(torch.arange(num_epochs), [get_lr(trainer, scheduler)\n                                  for t in range(num_epochs)])"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_lr-scheduler_1dfeb6_80_0.svg",
+      "local_path": "_images/output_lr-scheduler_1dfeb6_80_0.svg",
+      "alt": "../_images/output_lr-scheduler_1dfeb6_80_0.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "class MultiFactorScheduler:\n    def __init__(self, step, factor, base_lr):\n        self.step = step\n        self.factor = factor\n        self.base_lr = base_lr\n\n    def __call__(self, epoch):\n        if epoch in self.step:\n            self.base_lr = self.base_lr * self.factor\n            return self.base_lr\n        else:\n            return self.base_lr\n\nscheduler = MultiFactorScheduler(step=[15, 30], factor=0.5, base_lr=0.5)\nd2l.plot(tf.range(num_epochs), [scheduler(t) for t in range(num_epochs)])"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_lr-scheduler_1dfeb6_83_0.svg",
+      "local_path": "_images/output_lr-scheduler_1dfeb6_83_0.svg",
+      "alt": "../_images/output_lr-scheduler_1dfeb6_83_0.svg"
+    },
+    {
+      "type": "paragraph",
+      "text": "Trực giác đằng sau lịch trình tỷ lệ học tập liên tục piecewise này là\nmột cho phép tối ưu hóa tiến hành cho đến khi đạt được một điểm cố định\nvề sự phân bố của vectơ trọng lượng. Sau đó (và chỉ sau đó) chúng ta có\ngiảm tỷ lệ như để có được một proxy chất lượng cao hơn đến mức tối thiểu\nđịa phương tốt. Ví dụ dưới đây cho thấy làm thế nào điều này có thể tạo\nra các giải pháp tốt hơn bao giờ hết."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "trainer = gluon.Trainer(net.collect_params(), 'sgd',\n                        {'lr_scheduler': scheduler})\ntrain(net, train_iter, test_iter, num_epochs, loss, trainer, device)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "train loss 0.200, train acc 0.924, test acc 0.885"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_lr-scheduler_1dfeb6_89_1.svg",
+      "local_path": "_images/output_lr-scheduler_1dfeb6_89_1.svg",
+      "alt": "../_images/output_lr-scheduler_1dfeb6_89_1.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "train(net, train_iter, test_iter, num_epochs, loss, trainer, device,\n      scheduler)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "train loss 0.180, train acc 0.932, test acc 0.891"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_lr-scheduler_1dfeb6_92_1.svg",
+      "local_path": "_images/output_lr-scheduler_1dfeb6_92_1.svg",
+      "alt": "../_images/output_lr-scheduler_1dfeb6_92_1.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "train(net, train_iter, test_iter, num_epochs, lr,\n      custom_callback=LearningRateScheduler(scheduler))"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "loss 0.234, train acc 0.913, test acc 0.882\n55093.9 examples/sec on /GPU:0"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "<keras.engine.sequential.Sequential at 0x7fb2ff6ce910>"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_lr-scheduler_1dfeb6_95_2.svg",
+      "local_path": "_images/output_lr-scheduler_1dfeb6_95_2.svg",
+      "alt": "../_images/output_lr-scheduler_1dfeb6_95_2.svg"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "bo-lap-lich-cosine",
+      "text": "11.11.3.3. Bộ lập lịch cosine"
+    },
+    {
+      "type": "paragraph",
+      "text": "Một heuristic khá bối rối đã được đề xuất bởi [Loshchilov & Hutter, 2016] . Nó dựa vào quan sát rằng chúng ta có\nthể không muốn giảm tốc độ học tập quá đáng kể ngay từ đầu và hơn nữa,\nrằng chúng ta có thể muốn “tinh chỉnh” giải pháp cuối cùng bằng cách sử\ndụng một tốc độ học tập rất nhỏ. Điều này dẫn đến một lịch trình giống\nnhư cosin với dạng chức năng sau đây cho tỷ lệ học tập trong khoảng \\(t \\in [0, T]\\) ."
+    },
+    {
+      "type": "math",
+      "latex": "(11.11.1)¶\\[\\eta_t = \\eta_T + \\frac{\\eta_0 - \\eta_T}{2} \\left(1 + \\cos(\\pi t/T)\\right)\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Ở đây \\(\\eta_0\\) là tỷ lệ học tập ban đầu, \\(\\eta_T\\) là tỷ lệ\nmục tiêu tại thời điểm \\(T\\) . Hơn nữa, đối với \\(t > T\\) , chúng\ntôi chỉ cần ghim giá trị lên \\(\\eta_T\\) mà không tăng lại. Trong ví\ndụ sau, chúng tôi đặt bước cập nhật tối đa \\(T = 20\\) ."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "scheduler = lr_scheduler.CosineScheduler(max_update=20, base_lr=0.3,\n                                         final_lr=0.01)\nd2l.plot(np.arange(num_epochs), [scheduler(t) for t in range(num_epochs)])"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_lr-scheduler_1dfeb6_101_0.svg",
+      "local_path": "_images/output_lr-scheduler_1dfeb6_101_0.svg",
+      "alt": "../_images/output_lr-scheduler_1dfeb6_101_0.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "class CosineScheduler:\n    def __init__(self, max_update, base_lr=0.01, final_lr=0,\n               warmup_steps=0, warmup_begin_lr=0):\n        self.base_lr_orig = base_lr\n        self.max_update = max_update\n        self.final_lr = final_lr\n        self.warmup_steps = warmup_steps\n        self.warmup_begin_lr = warmup_begin_lr\n        self.max_steps = self.max_update - self.warmup_steps\n\n    def get_warmup_lr(self, epoch):\n        increase = (self.base_lr_orig - self.warmup_begin_lr) \\\n                       * float(epoch) / float(self.warmup_steps)\n        return self.warmup_begin_lr + increase\n\n    def __call__(self, epoch):\n        if epoch < self.warmup_steps:\n            return self.get_warmup_lr(epoch)\n        if epoch <= self.max_update:\n            self.base_lr = self.final_lr + (\n                self.base_lr_orig - self.final_lr) * (1 + math.cos(\n                math.pi * (epoch - self.warmup_steps) / self.max_steps)) / 2\n        return self.base_lr\n\nscheduler = CosineScheduler(max_update=20, base_lr=0.3, final_lr=0.01)\nd2l.plot(torch.arange(num_epochs), [scheduler(t) for t in range(num_epochs)])"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_lr-scheduler_1dfeb6_104_0.svg",
+      "local_path": "_images/output_lr-scheduler_1dfeb6_104_0.svg",
+      "alt": "../_images/output_lr-scheduler_1dfeb6_104_0.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "class CosineScheduler:\n    def __init__(self, max_update, base_lr=0.01, final_lr=0,\n               warmup_steps=0, warmup_begin_lr=0):\n        self.base_lr_orig = base_lr\n        self.max_update = max_update\n        self.final_lr = final_lr\n        self.warmup_steps = warmup_steps\n        self.warmup_begin_lr = warmup_begin_lr\n        self.max_steps = self.max_update - self.warmup_steps\n\n    def get_warmup_lr(self, epoch):\n        increase = (self.base_lr_orig - self.warmup_begin_lr) \\\n                       * float(epoch) / float(self.warmup_steps)\n        return self.warmup_begin_lr + increase\n\n    def __call__(self, epoch):\n        if epoch < self.warmup_steps:\n            return self.get_warmup_lr(epoch)\n        if epoch <= self.max_update:\n            self.base_lr = self.final_lr + (\n                self.base_lr_orig - self.final_lr) * (1 + math.cos(\n                math.pi * (epoch - self.warmup_steps) / self.max_steps)) / 2\n        return self.base_lr\n\nscheduler = CosineScheduler(max_update=20, base_lr=0.3, final_lr=0.01)\nd2l.plot(tf.range(num_epochs), [scheduler(t) for t in range(num_epochs)])"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_lr-scheduler_1dfeb6_107_0.svg",
+      "local_path": "_images/output_lr-scheduler_1dfeb6_107_0.svg",
+      "alt": "../_images/output_lr-scheduler_1dfeb6_107_0.svg"
+    },
+    {
+      "type": "paragraph",
+      "text": "Trong bối cảnh tầm nhìn máy tính, lịch trình này * có thể* dẫn đến kết\nquả được cải thiện. Tuy nhiên, lưu ý rằng những cải tiến như vậy không\nđược đảm bảo (như có thể thấy dưới đây)."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "trainer = gluon.Trainer(net.collect_params(), 'sgd',\n                        {'lr_scheduler': scheduler})\ntrain(net, train_iter, test_iter, num_epochs, loss, trainer, device)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "train loss 0.346, train acc 0.877, test acc 0.876"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_lr-scheduler_1dfeb6_113_1.svg",
+      "local_path": "_images/output_lr-scheduler_1dfeb6_113_1.svg",
+      "alt": "../_images/output_lr-scheduler_1dfeb6_113_1.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "net = net_fn()\ntrainer = torch.optim.SGD(net.parameters(), lr=0.3)\ntrain(net, train_iter, test_iter, num_epochs, loss, trainer, device,\n      scheduler)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "train loss 0.190, train acc 0.929, test acc 0.898"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_lr-scheduler_1dfeb6_116_1.svg",
+      "local_path": "_images/output_lr-scheduler_1dfeb6_116_1.svg",
+      "alt": "../_images/output_lr-scheduler_1dfeb6_116_1.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "train(net, train_iter, test_iter, num_epochs, lr,\n      custom_callback=LearningRateScheduler(scheduler))"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "loss 0.257, train acc 0.907, test acc 0.886\n55621.9 examples/sec on /GPU:0"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "<keras.engine.sequential.Sequential at 0x7fb2ffbec3a0>"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_lr-scheduler_1dfeb6_119_2.svg",
+      "local_path": "_images/output_lr-scheduler_1dfeb6_119_2.svg",
+      "alt": "../_images/output_lr-scheduler_1dfeb6_119_2.svg"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "khoi-dong",
+      "text": "11.11.3.4. Khởi động"
+    },
+    {
+      "type": "paragraph",
+      "text": "Trong một số trường hợp khởi tạo các tham số là không đủ để đảm bảo một\ngiải pháp tốt. Điều này đặc biệt là một vấn đề đối với một số thiết kế\nmạng tiên tiến có thể dẫn đến các vấn đề tối ưu hóa không ổn định. Chúng\ntôi có thể giải quyết điều này bằng cách chọn một tốc độ học tập đủ nhỏ\nđể ngăn chặn sự phân kỳ ngay từ đầu. Thật không may, điều này có nghĩa\nlà tiến bộ chậm. Ngược lại, một tỷ lệ học tập lớn ban đầu dẫn đến sự\nphân kỳ."
+    },
+    {
+      "type": "paragraph",
+      "text": "Một khắc phục khá đơn giản cho tình huống khó xử này là sử dụng thời\ngian khởi động trong đó tốc độ học tập * tăng* lên mức tối đa ban đầu\nvà để hạ nhiệt tỷ lệ cho đến khi kết thúc quá trình tối ưu hóa. Để đơn\ngiản, người ta thường sử dụng sự gia tăng tuyến tính cho mục đích này.\nĐiều này dẫn đến một lịch trình của biểu mẫu được chỉ định dưới đây."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "scheduler = lr_scheduler.CosineScheduler(20, warmup_steps=5, base_lr=0.3,\n                                         final_lr=0.01)\nd2l.plot(np.arange(num_epochs), [scheduler(t) for t in range(num_epochs)])"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_lr-scheduler_1dfeb6_125_0.svg",
+      "local_path": "_images/output_lr-scheduler_1dfeb6_125_0.svg",
+      "alt": "../_images/output_lr-scheduler_1dfeb6_125_0.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "scheduler = CosineScheduler(20, warmup_steps=5, base_lr=0.3, final_lr=0.01)\nd2l.plot(torch.arange(num_epochs), [scheduler(t) for t in range(num_epochs)])"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_lr-scheduler_1dfeb6_128_0.svg",
+      "local_path": "_images/output_lr-scheduler_1dfeb6_128_0.svg",
+      "alt": "../_images/output_lr-scheduler_1dfeb6_128_0.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "scheduler = CosineScheduler(20, warmup_steps=5, base_lr=0.3, final_lr=0.01)\nd2l.plot(tf.range(num_epochs), [scheduler(t) for t in range(num_epochs)])"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_lr-scheduler_1dfeb6_131_0.svg",
+      "local_path": "_images/output_lr-scheduler_1dfeb6_131_0.svg",
+      "alt": "../_images/output_lr-scheduler_1dfeb6_131_0.svg"
+    },
+    {
+      "type": "paragraph",
+      "text": "Lưu ý rằng mạng hội tụ tốt hơn ban đầu (đặc biệt quan sát hiệu suất\ntrong 5 thời đại đầu tiên)."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "trainer = gluon.Trainer(net.collect_params(), 'sgd',\n                        {'lr_scheduler': scheduler})\ntrain(net, train_iter, test_iter, num_epochs, loss, trainer, device)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "train loss 0.350, train acc 0.873, test acc 0.860"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_lr-scheduler_1dfeb6_137_1.svg",
+      "local_path": "_images/output_lr-scheduler_1dfeb6_137_1.svg",
+      "alt": "../_images/output_lr-scheduler_1dfeb6_137_1.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "net = net_fn()\ntrainer = torch.optim.SGD(net.parameters(), lr=0.3)\ntrain(net, train_iter, test_iter, num_epochs, loss, trainer, device,\n      scheduler)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "train loss 0.208, train acc 0.924, test acc 0.895"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_lr-scheduler_1dfeb6_140_1.svg",
+      "local_path": "_images/output_lr-scheduler_1dfeb6_140_1.svg",
+      "alt": "../_images/output_lr-scheduler_1dfeb6_140_1.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "train(net, train_iter, test_iter, num_epochs, lr,\n      custom_callback=LearningRateScheduler(scheduler))"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "loss 0.268, train acc 0.903, test acc 0.883\n54638.2 examples/sec on /GPU:0"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "<keras.engine.sequential.Sequential at 0x7fb2ffc18070>"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_lr-scheduler_1dfeb6_143_2.svg",
+      "local_path": "_images/output_lr-scheduler_1dfeb6_143_2.svg",
+      "alt": "../_images/output_lr-scheduler_1dfeb6_143_2.svg"
+    },
+    {
+      "type": "paragraph",
+      "text": "Khởi động có thể được áp dụng cho bất kỳ bộ lập lịch nào (không chỉ\ncosine). Để có một cuộc thảo luận chi tiết hơn về lịch trình học tập và\nnhiều thí nghiệm khác xem thêm [Gotmare et al., 2018] .\nĐặc biệt, họ thấy rằng một giai đoạn khởi động giới hạn số lượng phân kỳ\ncủa các tham số trong các mạng rất sâu. Điều này có ý nghĩa trực giác vì\nchúng ta sẽ mong đợi sự phân kỳ đáng kể do khởi tạo ngẫu nhiên trong\nnhững phần của mạng mất nhiều thời gian nhất để đạt được tiến bộ ngay từ\nđầu."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tom-tat",
+      "text": "11.11.4. Tóm tắt"
+    },
+    {
+      "type": "list",
+      "ordered": false,
+      "items": [
+        "Giảm tỷ lệ học tập trong quá trình đào tạo có thể dẫn đến cải thiện\nđộ chính xác và (khó chịu nhất) giảm quá mức của mô hình.",
+        "Giảm từng phần tỷ lệ học tập bất cứ khi nào tiến bộ đã đạt được hiệu\nquả trong thực tế. Về cơ bản, điều này đảm bảo rằng chúng tôi hội tụ\nhiệu quả với một giải pháp phù hợp và chỉ sau đó giảm phương sai vốn\ncó của các tham số bằng cách giảm tỷ lệ học tập.",
+        "Cosine scheulers là phổ biến cho một số vấn đề tầm nhìn máy tính. Xem\nví dụ, GluonCV để biết chi tiết về\ntrình lập lịch như vậy.",
+        "Một thời gian khởi động trước khi tối ưu hóa có thể ngăn chặn sự phân\nkỳ.",
+        "Tối ưu hóa phục vụ nhiều mục đích trong học sâu. Bên cạnh việc giảm\nthiểu mục tiêu đào tạo, các lựa chọn khác nhau về thuật toán tối ưu\nhóa và lập kế hoạch tỷ lệ học tập có thể dẫn đến số lượng tổng quát\nhóa và quá mức khác nhau trên bộ thử nghiệm (đối với cùng một lượng\nlỗi đào tạo)."
+      ]
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bai-tap",
+      "text": "11.11.5. Bài tập"
+    },
+    {
+      "type": "list",
+      "ordered": true,
+      "items": [
+        "Thử nghiệm với hành vi tối ưu hóa cho một tỷ lệ học tập cố định nhất\nđịnh. Mô hình tốt nhất bạn có thể có được theo cách này là gì?",
+        "Làm thế nào để hội tụ thay đổi nếu bạn thay đổi số mũ của sự giảm tỷ\nlệ học tập? Sử dụng PolyScheduler để thuận tiện cho bạn trong các\nthí nghiệm.",
+        "Áp dụng bộ lập lịch cosine cho các vấn đề tầm nhìn máy tính lớn, ví\ndụ: đào tạo ImageNet. Làm thế nào để nó ảnh hưởng đến hiệu suất so\nvới các lập lịch khác?",
+        "Thời gian khởi động nên kéo dài bao lâu?",
+        "Bạn có thể kết nối tối ưu hóa và lấy mẫu? Bắt đầu bằng cách sử dụng\nkết quả từ [Welling & Teh, 2011] trên Stochastic Gradient\nLangevin Dynamics."
+      ]
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    }
+  ],
+  "images": [
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_lr-scheduler_1dfeb6_15_1.svg",
+      "local_path": "_images/output_lr-scheduler_1dfeb6_15_1.svg",
+      "alt": "../_images/output_lr-scheduler_1dfeb6_15_1.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_lr-scheduler_1dfeb6_18_1.svg",
+      "local_path": "_images/output_lr-scheduler_1dfeb6_18_1.svg",
+      "alt": "../_images/output_lr-scheduler_1dfeb6_18_1.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_lr-scheduler_1dfeb6_21_2.svg",
+      "local_path": "_images/output_lr-scheduler_1dfeb6_21_2.svg",
+      "alt": "../_images/output_lr-scheduler_1dfeb6_21_2.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_lr-scheduler_1dfeb6_41_0.svg",
+      "local_path": "_images/output_lr-scheduler_1dfeb6_41_0.svg",
+      "alt": "../_images/output_lr-scheduler_1dfeb6_41_0.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_lr-scheduler_1dfeb6_44_0.svg",
+      "local_path": "_images/output_lr-scheduler_1dfeb6_44_0.svg",
+      "alt": "../_images/output_lr-scheduler_1dfeb6_44_0.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_lr-scheduler_1dfeb6_47_0.svg",
+      "local_path": "_images/output_lr-scheduler_1dfeb6_47_0.svg",
+      "alt": "../_images/output_lr-scheduler_1dfeb6_47_0.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_lr-scheduler_1dfeb6_53_1.svg",
+      "local_path": "_images/output_lr-scheduler_1dfeb6_53_1.svg",
+      "alt": "../_images/output_lr-scheduler_1dfeb6_53_1.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_lr-scheduler_1dfeb6_56_1.svg",
+      "local_path": "_images/output_lr-scheduler_1dfeb6_56_1.svg",
+      "alt": "../_images/output_lr-scheduler_1dfeb6_56_1.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_lr-scheduler_1dfeb6_59_2.svg",
+      "local_path": "_images/output_lr-scheduler_1dfeb6_59_2.svg",
+      "alt": "../_images/output_lr-scheduler_1dfeb6_59_2.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_lr-scheduler_1dfeb6_65_0.svg",
+      "local_path": "_images/output_lr-scheduler_1dfeb6_65_0.svg",
+      "alt": "../_images/output_lr-scheduler_1dfeb6_65_0.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_lr-scheduler_1dfeb6_68_0.svg",
+      "local_path": "_images/output_lr-scheduler_1dfeb6_68_0.svg",
+      "alt": "../_images/output_lr-scheduler_1dfeb6_68_0.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_lr-scheduler_1dfeb6_71_0.svg",
+      "local_path": "_images/output_lr-scheduler_1dfeb6_71_0.svg",
+      "alt": "../_images/output_lr-scheduler_1dfeb6_71_0.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_lr-scheduler_1dfeb6_77_0.svg",
+      "local_path": "_images/output_lr-scheduler_1dfeb6_77_0.svg",
+      "alt": "../_images/output_lr-scheduler_1dfeb6_77_0.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_lr-scheduler_1dfeb6_80_0.svg",
+      "local_path": "_images/output_lr-scheduler_1dfeb6_80_0.svg",
+      "alt": "../_images/output_lr-scheduler_1dfeb6_80_0.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_lr-scheduler_1dfeb6_83_0.svg",
+      "local_path": "_images/output_lr-scheduler_1dfeb6_83_0.svg",
+      "alt": "../_images/output_lr-scheduler_1dfeb6_83_0.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_lr-scheduler_1dfeb6_89_1.svg",
+      "local_path": "_images/output_lr-scheduler_1dfeb6_89_1.svg",
+      "alt": "../_images/output_lr-scheduler_1dfeb6_89_1.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_lr-scheduler_1dfeb6_92_1.svg",
+      "local_path": "_images/output_lr-scheduler_1dfeb6_92_1.svg",
+      "alt": "../_images/output_lr-scheduler_1dfeb6_92_1.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_lr-scheduler_1dfeb6_95_2.svg",
+      "local_path": "_images/output_lr-scheduler_1dfeb6_95_2.svg",
+      "alt": "../_images/output_lr-scheduler_1dfeb6_95_2.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_lr-scheduler_1dfeb6_101_0.svg",
+      "local_path": "_images/output_lr-scheduler_1dfeb6_101_0.svg",
+      "alt": "../_images/output_lr-scheduler_1dfeb6_101_0.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_lr-scheduler_1dfeb6_104_0.svg",
+      "local_path": "_images/output_lr-scheduler_1dfeb6_104_0.svg",
+      "alt": "../_images/output_lr-scheduler_1dfeb6_104_0.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_lr-scheduler_1dfeb6_107_0.svg",
+      "local_path": "_images/output_lr-scheduler_1dfeb6_107_0.svg",
+      "alt": "../_images/output_lr-scheduler_1dfeb6_107_0.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_lr-scheduler_1dfeb6_113_1.svg",
+      "local_path": "_images/output_lr-scheduler_1dfeb6_113_1.svg",
+      "alt": "../_images/output_lr-scheduler_1dfeb6_113_1.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_lr-scheduler_1dfeb6_116_1.svg",
+      "local_path": "_images/output_lr-scheduler_1dfeb6_116_1.svg",
+      "alt": "../_images/output_lr-scheduler_1dfeb6_116_1.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_lr-scheduler_1dfeb6_119_2.svg",
+      "local_path": "_images/output_lr-scheduler_1dfeb6_119_2.svg",
+      "alt": "../_images/output_lr-scheduler_1dfeb6_119_2.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_lr-scheduler_1dfeb6_125_0.svg",
+      "local_path": "_images/output_lr-scheduler_1dfeb6_125_0.svg",
+      "alt": "../_images/output_lr-scheduler_1dfeb6_125_0.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_lr-scheduler_1dfeb6_128_0.svg",
+      "local_path": "_images/output_lr-scheduler_1dfeb6_128_0.svg",
+      "alt": "../_images/output_lr-scheduler_1dfeb6_128_0.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_lr-scheduler_1dfeb6_131_0.svg",
+      "local_path": "_images/output_lr-scheduler_1dfeb6_131_0.svg",
+      "alt": "../_images/output_lr-scheduler_1dfeb6_131_0.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_lr-scheduler_1dfeb6_137_1.svg",
+      "local_path": "_images/output_lr-scheduler_1dfeb6_137_1.svg",
+      "alt": "../_images/output_lr-scheduler_1dfeb6_137_1.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_lr-scheduler_1dfeb6_140_1.svg",
+      "local_path": "_images/output_lr-scheduler_1dfeb6_140_1.svg",
+      "alt": "../_images/output_lr-scheduler_1dfeb6_140_1.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_lr-scheduler_1dfeb6_143_2.svg",
+      "local_path": "_images/output_lr-scheduler_1dfeb6_143_2.svg",
+      "alt": "../_images/output_lr-scheduler_1dfeb6_143_2.svg"
+    }
+  ],
+  "text": "11.11. Lập kế hoạch tỷ lệ học tập\nCho đến nay chúng tôi chủ yếu tập trung vào tối ưu hóa các thuật toán *\nđể làm thế nào để cập nhật các vectơ trọng lượng thay vì trên * tỷ lệ*\ntại đó chúng đang được cập nhật. Tuy nhiên, việc điều chỉnh tốc độ học\ntập thường cũng quan trọng như thuật toán thực tế. Có một số khía cạnh\ncần xem xét:\nRõ ràng nhất là độ lượng của tỷ lệ học tập quan trọng. Nếu nó quá\nlớn, tối ưu hóa phân kỳ, nếu nó quá nhỏ, phải mất quá nhiều thời gian\nđể đào tạo hoặc chúng ta kết thúc với một kết quả tối ưu. Trước đây\nchúng tôi đã thấy rằng số điều kiện của vấn đề quan trọng (xem ví dụ, Section 11.6 để biết chi tiết). Trực giác đó là tỷ lệ\ngiữa số lượng thay đổi theo hướng ít nhạy cảm nhất so với một nhạy\ncảm nhất.\nThứ hai, tỷ lệ phân rã cũng quan trọng như vậy. Nếu tỷ lệ học tập vẫn\nlớn, chúng tôi có thể chỉ đơn giản là kết thúc nảy xung quanh mức tối\nthiểu và do đó không đạt được sự tối ưu. Section 11.5 đã thảo luận chi tiết về điều này và\nchúng tôi đã phân tích đảm bảo hiệu suất trong Section 11.4 .\nNói tóm lại, chúng tôi muốn tỷ lệ phân rã, nhưng có lẽ chậm hơn \\(\\mathcal{O}(t^{-\\frac{1}{2}})\\) , đây sẽ là một lựa chọn tốt cho\ncác vấn đề lồi.\nMột khía cạnh khác quan trọng không kém là * khởi hóa * . Điều này\nliên quan đến cả cách các tham số được đặt ban đầu (xem lại Section 4.8 để biết chi tiết) và cũng như\ncách chúng phát triển ban đầu. Điều này đi theo moniker của *\nwarmup*, tức là, nhanh chóng như thế nào chúng ta bắt đầu di chuyển\nvề phía giải pháp ban đầu. Các bước lớn ngay từ đầu có thể không có\nlợi, đặc biệt là vì tập hợp các tham số ban đầu là ngẫu nhiên. Các\nhướng cập nhật ban đầu cũng có thể khá vô nghĩa.\nCuối cùng, có một số biến thể tối ưu hóa thực hiện điều chỉnh tỷ lệ\nhọc tập theo chu kỳ. Điều này nằm ngoài phạm vi của chương hiện tại.\nChúng tôi khuyên người đọc xem lại chi tiết trong [Izmailov et al., 2018] , ví dụ, làm thế nào để\ncó được các giải pháp tốt hơn bằng cách trung bình trên toàn bộ một\n* path* của các tham số.\nVới thực tế là có rất nhiều chi tiết cần thiết để quản lý tỷ lệ học tập,\nhầu hết các khuôn khổ học sâu đều có các công cụ để xử lý điều này một\ncách tự động. Trong chương hiện tại, chúng tôi sẽ xem xét các hiệu ứng\nmà các lịch trình khác nhau có về độ chính xác và cũng cho thấy cách\nđiều này có thể được quản lý hiệu quả thông qua một học tỷ lệ lịch\nhọc .\n11.11.1. Vấn đề Toy\nChúng tôi bắt đầu với một vấn đề đồ chơi đủ rẻ để tính toán dễ dàng,\nnhưng đủ không tầm thường để minh họa một số khía cạnh chính. Đối với\nđiều đó, chúng tôi chọn một phiên bản hơi hiện đại hóa của LeNet\n( relu thay vì kích hoạt sigmoid , MaxPooling thay vì\nAveragePooling), như áp dụng cho Fashion-MNIST. Hơn nữa, chúng tôi lai\nmạng để thực hiện. Vì hầu hết các mã là tiêu chuẩn, chúng tôi chỉ giới\nthiệu những điều cơ bản mà không cần thảo luận chi tiết thêm. Xin xem Section 6 để được làm mới khi cần thiết.\nChúng ta hãy xem những gì sẽ xảy ra nếu chúng ta gọi thuật toán này với\ncác cài đặt mặc định, chẳng hạn như tốc độ học tập \\(0.3\\) và đào\ntạo cho \\(30\\) lặp lại. Lưu ý độ chính xác của đào tạo tiếp tục tăng\nlên trong khi tiến bộ về các quầy hàng chính xác thử nghiệm vượt ra\nngoài một điểm. Khoảng cách giữa cả hai đường cong cho thấy quá mức.\n11.11.2. Người lập lịch\nMột cách để điều chỉnh tốc độ học tập là thiết lập nó một cách rõ ràng ở\nmỗi bước. Điều này đạt được thuận tiện bằng phương pháp set_learning_rate . Chúng ta có thể điều chỉnh nó xuống sau mỗi kỷ\nnguyên (hoặc thậm chí sau mỗi minibatch), ví dụ, một cách năng động để\nđáp ứng cách tối ưu hóa đang tiến triển.\nNói chung hơn chúng tôi muốn xác định một trình lập lịch. Khi được gọi\nvới số lượng cập nhật nó trả về giá trị thích hợp của tốc độ học tập.\nHãy để chúng tôi xác định một cái đơn giản đặt tỷ lệ học tập thành \\(\\eta = \\eta_0 (t + 1)^{-\\frac{1}{2}}\\) .\nHãy để chúng tôi vẽ hành vi của nó trên một loạt các giá trị.\nBây giờ chúng ta hãy xem cách điều này diễn ra để đào tạo về thời\ntrang-MNIST. Chúng tôi chỉ cần cung cấp trình lập lịch như một đối số bổ\nsung cho thuật toán đào tạo.\nĐiều này làm việc khá tốt hơn một chút so với trước đây. Hai điều nổi\nbật: đường cong khá trơn tru hơn trước đây. Thứ hai, có ít quá nhiều\nhơn. Thật không may, nó không phải là một câu hỏi được giải quyết tốt về\nlý do tại sao một số chiến lược nhất định dẫn đến ít quá mức trong * lý\nđề*. Có một số lập luận rằng kích thước bước nhỏ hơn sẽ dẫn đến các\ntham số gần bằng 0 và do đó đơn giản hơn. Tuy nhiên, điều này không giải\nthích hoàn toàn hiện tượng vì chúng ta không thực sự dừng lại sớm mà chỉ\nđơn giản là giảm tốc độ học tập nhẹ nhàng.\n11.11.3. Chính sách\nMặc dù chúng tôi không thể bao gồm toàn bộ các lập lịch trình tỷ lệ học\ntập, chúng tôi cố gắng đưa ra một cái nhìn tổng quan ngắn gọn về các\nchính sách phổ biến dưới đây. Các lựa chọn phổ biến là phân rã đa thức\nvà từng mảnh lịch trình liên tục. Ngoài ra, lịch trình học cosine đã\nđược tìm thấy để làm việc tốt theo kinh nghiệm về một số vấn đề. Cuối\ncùng, về một số vấn đề, có lợi khi làm nóng trình tối ưu hóa trước khi\nsử dụng tỷ lệ học tập lớn.\n11.11.3.1. Bộ lập lịch yếu tố\nMột thay thế cho phân rã đa thức sẽ là một phân rã nhân, đó là \\(\\eta_{t+1} \\leftarrow \\eta_t \\cdot \\alpha\\) cho \\(\\alpha \\in (0, 1)\\) . Để ngăn chặn tỷ lệ học tập phân rã vượt quá\ngiới hạn thấp hơn hợp lý, phương trình cập nhật thường được sửa đổi\nthành \\(\\eta_{t+1} \\leftarrow \\mathop{\\mathrm{max}}(\\eta_{\\mathrm{min}}, \\eta_t \\cdot \\alpha)\\) .\nĐiều này cũng có thể được thực hiện bằng trình lập lịch tích hợp trong\nMXNet thông qua đối tượng lr_scheduler.FactorScheduler . Phải mất\nthêm một vài tham số, chẳng hạn như thời gian khởi động, chế độ khởi\nđộng (tuyến tính hoặc không đổi), số lượng cập nhật mong muốn tối đa,\nv.v.; Về phía trước, chúng tôi sẽ sử dụng các bộ lập lịch tích hợp phù\nhợp và chỉ giải thích chức năng của chúng ở đây. Như minh họa, nó là khá\nđơn giản để xây dựng lịch trình của riêng bạn nếu cần thiết.\n11.11.3.2. Bộ lập lịch đa yếu tố\nMột chiến lược phổ biến để đào tạo các mạng sâu là giữ cho tỷ lệ học tập\nkhông đổi và giảm nó bằng một số tiền nhất định thường xuyên. Đó là, đưa\nra một tập hợp thời gian khi giảm tỷ lệ, chẳng hạn như \\(s = \\{5, 10, 20\\}\\) giảm \\(\\eta_{t+1} \\leftarrow \\eta_t \\cdot \\alpha\\) bất cứ khi nào \\(t \\in s\\) . Giả sử rằng các giá trị giảm một nửa ở mỗi bước chúng\nta có thể thực hiện điều này như sau.\nTrực giác đằng sau lịch trình tỷ lệ học tập liên tục piecewise này là\nmột cho phép tối ưu hóa tiến hành cho đến khi đạt được một điểm cố định\nvề sự phân bố của vectơ trọng lượng. Sau đó (và chỉ sau đó) chúng ta có\ngiảm tỷ lệ như để có được một proxy chất lượng cao hơn đến mức tối thiểu\nđịa phương tốt. Ví dụ dưới đây cho thấy làm thế nào điều này có thể tạo\nra các giải pháp tốt hơn bao giờ hết.\n11.11.3.3. Bộ lập lịch cosine\nMột heuristic khá bối rối đã được đề xuất bởi [Loshchilov & Hutter, 2016] . Nó dựa vào quan sát rằng chúng ta có\nthể không muốn giảm tốc độ học tập quá đáng kể ngay từ đầu và hơn nữa,\nrằng chúng ta có thể muốn “tinh chỉnh” giải pháp cuối cùng bằng cách sử\ndụng một tốc độ học tập rất nhỏ. Điều này dẫn đến một lịch trình giống\nnhư cosin với dạng chức năng sau đây cho tỷ lệ học tập trong khoảng \\(t \\in [0, T]\\) .\nỞ đây \\(\\eta_0\\) là tỷ lệ học tập ban đầu, \\(\\eta_T\\) là tỷ lệ\nmục tiêu tại thời điểm \\(T\\) . Hơn nữa, đối với \\(t > T\\) , chúng\ntôi chỉ cần ghim giá trị lên \\(\\eta_T\\) mà không tăng lại. Trong ví\ndụ sau, chúng tôi đặt bước cập nhật tối đa \\(T = 20\\) .\nTrong bối cảnh tầm nhìn máy tính, lịch trình này * có thể* dẫn đến kết\nquả được cải thiện. Tuy nhiên, lưu ý rằng những cải tiến như vậy không\nđược đảm bảo (như có thể thấy dưới đây).\n11.11.3.4. Khởi động\nTrong một số trường hợp khởi tạo các tham số là không đủ để đảm bảo một\ngiải pháp tốt. Điều này đặc biệt là một vấn đề đối với một số thiết kế\nmạng tiên tiến có thể dẫn đến các vấn đề tối ưu hóa không ổn định. Chúng\ntôi có thể giải quyết điều này bằng cách chọn một tốc độ học tập đủ nhỏ\nđể ngăn chặn sự phân kỳ ngay từ đầu. Thật không may, điều này có nghĩa\nlà tiến bộ chậm. Ngược lại, một tỷ lệ học tập lớn ban đầu dẫn đến sự\nphân kỳ.\nMột khắc phục khá đơn giản cho tình huống khó xử này là sử dụng thời\ngian khởi động trong đó tốc độ học tập * tăng* lên mức tối đa ban đầu\nvà để hạ nhiệt tỷ lệ cho đến khi kết thúc quá trình tối ưu hóa. Để đơn\ngiản, người ta thường sử dụng sự gia tăng tuyến tính cho mục đích này.\nĐiều này dẫn đến một lịch trình của biểu mẫu được chỉ định dưới đây.\nLưu ý rằng mạng hội tụ tốt hơn ban đầu (đặc biệt quan sát hiệu suất\ntrong 5 thời đại đầu tiên).\nKhởi động có thể được áp dụng cho bất kỳ bộ lập lịch nào (không chỉ\ncosine). Để có một cuộc thảo luận chi tiết hơn về lịch trình học tập và\nnhiều thí nghiệm khác xem thêm [Gotmare et al., 2018] .\nĐặc biệt, họ thấy rằng một giai đoạn khởi động giới hạn số lượng phân kỳ\ncủa các tham số trong các mạng rất sâu. Điều này có ý nghĩa trực giác vì\nchúng ta sẽ mong đợi sự phân kỳ đáng kể do khởi tạo ngẫu nhiên trong\nnhững phần của mạng mất nhiều thời gian nhất để đạt được tiến bộ ngay từ\nđầu.\n11.11.4. Tóm tắt\nGiảm tỷ lệ học tập trong quá trình đào tạo có thể dẫn đến cải thiện\nđộ chính xác và (khó chịu nhất) giảm quá mức của mô hình.\nGiảm từng phần tỷ lệ học tập bất cứ khi nào tiến bộ đã đạt được hiệu\nquả trong thực tế. Về cơ bản, điều này đảm bảo rằng chúng tôi hội tụ\nhiệu quả với một giải pháp phù hợp và chỉ sau đó giảm phương sai vốn\ncó của các tham số bằng cách giảm tỷ lệ học tập.\nCosine scheulers là phổ biến cho một số vấn đề tầm nhìn máy tính. Xem\nví dụ, GluonCV để biết chi tiết về\ntrình lập lịch như vậy.\nMột thời gian khởi động trước khi tối ưu hóa có thể ngăn chặn sự phân\nkỳ.\nTối ưu hóa phục vụ nhiều mục đích trong học sâu. Bên cạnh việc giảm\nthiểu mục tiêu đào tạo, các lựa chọn khác nhau về thuật toán tối ưu\nhóa và lập kế hoạch tỷ lệ học tập có thể dẫn đến số lượng tổng quát\nhóa và quá mức khác nhau trên bộ thử nghiệm (đối với cùng một lượng\nlỗi đào tạo).\n11.11.5. Bài tập\nThử nghiệm với hành vi tối ưu hóa cho một tỷ lệ học tập cố định nhất\nđịnh. Mô hình tốt nhất bạn có thể có được theo cách này là gì?\nLàm thế nào để hội tụ thay đổi nếu bạn thay đổi số mũ của sự giảm tỷ\nlệ học tập? Sử dụng PolyScheduler để thuận tiện cho bạn trong các\nthí nghiệm.\nÁp dụng bộ lập lịch cosine cho các vấn đề tầm nhìn máy tính lớn, ví\ndụ: đào tạo ImageNet. Làm thế nào để nó ảnh hưởng đến hiệu suất so\nvới các lập lịch khác?\nThời gian khởi động nên kéo dài bao lâu?\nBạn có thể kết nối tối ưu hóa và lấy mẫu? Bắt đầu bằng cách sử dụng\nkết quả từ [Welling & Teh, 2011] trên Stochastic Gradient\nLangevin Dynamics.\nDiscussions\nDiscussions\nDiscussions"
+}

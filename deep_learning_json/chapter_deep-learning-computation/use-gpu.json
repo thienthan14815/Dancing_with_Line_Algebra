@@ -1,0 +1,671 @@
+{
+  "url": "https://vi.d2l.ai/chapter_deep-learning-computation/use-gpu.html",
+  "chapter": "chapter_deep-learning-computation",
+  "title": "5.6. GPU",
+  "crawled_at": "2026-07-20T12:39:39.604940+00:00",
+  "headings": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "gpu",
+      "text": "5.6. GPU"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "thiet-bi-vi-tinh",
+      "text": "5.6.1. Thiết bị vi tính"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tensors-va-gpu",
+      "text": "5.6.2. Tensors và GPU"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "luu-tru-tren-gpu",
+      "text": "5.6.2.1. Lưu trữ trên GPU"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "sao-chep",
+      "text": "5.6.2.2. Sao chép"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "ghi-chu-ben",
+      "text": "5.6.2.3. Ghi chú bên"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "mang-no-ron-va-gpu",
+      "text": "5.6.3. Mạng nơ-ron và GPU"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tom-tat",
+      "text": "5.6.4. Tóm tắt"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bai-tap",
+      "text": "5.6.5. Bài tập"
+    }
+  ],
+  "content": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "gpu",
+      "text": "5.6. GPU"
+    },
+    {
+      "type": "paragraph",
+      "text": "Năm Section 1.5 , chúng tôi đã thảo luận về sự tăng\ntrưởng nhanh chóng của tính toán trong hai thập kỷ qua. Tóm lại, hiệu\nsuất GPU đã tăng hệ số 1000 mỗi thập kỷ kể từ năm 2000. Điều này mang\nlại những cơ hội tuyệt vời nhưng nó cũng cho thấy một nhu cầu đáng kể để\ncung cấp hiệu suất như vậy."
+    },
+    {
+      "type": "paragraph",
+      "text": "Trong phần này, chúng tôi bắt đầu thảo luận về cách khai thác hiệu suất\ntính toán này cho nghiên cứu của bạn. Đầu tiên bằng cách sử dụng GPU duy\nnhất và tại một thời điểm sau đó, làm thế nào để sử dụng nhiều GPU và\nnhiều máy chủ (với nhiều GPU)."
+    },
+    {
+      "type": "paragraph",
+      "text": "Cụ thể, chúng tôi sẽ thảo luận về cách sử dụng một GPU NVIDIA duy nhất\nđể tính toán. Trước tiên, hãy chắc chắn rằng bạn đã cài đặt ít nhất một\nGPU NVIDIA. Sau đó, tải xuống NVIDIA driver and\nCUDA và làm theo lời\nnhắc để đặt đường dẫn thích hợp. Khi các chế phẩm này hoàn tất, lệnh nvidia-smi có thể được sử dụng để xem thông tin card đồ hoạ."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "!nvidia-smi"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "Tue Apr 26 10:36:17 2022\n+-----------------------------------------------------------------------------+\n| NVIDIA-SMI 460.27.04    Driver Version: 460.27.04    CUDA Version: 11.2     |\n|-------------------------------+----------------------+----------------------+\n| GPU  Name        Persistence-M| Bus-Id        Disp.A | Volatile Uncorr. ECC |\n| Fan  Temp  Perf  Pwr:Usage/Cap|         Memory-Usage | GPU-Util  Compute M. |\n|                               |                      |               MIG M. |\n|===============================+======================+======================|\n|   0  Tesla V100-SXM2...  Off  | 00000000:00:1B.0 Off |                    0 |\n| N/A   26C    P0    47W / 300W |      0MiB / 16160MiB |      0%      Default |\n|                               |                      |                  N/A |\n+-------------------------------+----------------------+----------------------+\n|   1  Tesla V100-SXM2...  Off  | 00000000:00:1C.0 Off |                    0 |\n| N/A   26C    P0    47W / 300W |      0MiB / 16160MiB |      0%      Default |\n|                               |                      |                  N/A |\n+-------------------------------+----------------------+----------------------+\n|   2  Tesla V100-SXM2...  Off  | 00000000:00:1D.0 Off |                    0 |\n| N/A   27C    P0    50W / 300W |      0MiB / 16160MiB |      0%      Default |\n|                               |                      |                  N/A |\n+-------------------------------+----------------------+----------------------+\n|   3  Tesla V100-SXM2...  Off  | 00000000:00:1E.0 Off |                    0 |\n| N/A   25C    P0    49W / 300W |      0MiB / 16160MiB |      4%      Default |\n|                               |                      |                  N/A |\n+-------------------------------+----------------------+----------------------+\n\n+-----------------------------------------------------------------------------+\n| Processes:                                                                  |\n|  GPU   GI   CI        PID   Type   Process name                  GPU Memory |\n|        ID   ID                                                   Usage      |\n|=============================================================================|\n|  No running processes found                                                 |\n+-----------------------------------------------------------------------------+"
+    },
+    {
+      "type": "paragraph",
+      "text": "Bạn có thể nhận thấy rằng tensor MXNet trông gần giống với NumPy ndarray . Nhưng có một vài sự khác biệt quan trọng. Một trong những\ntính năng chính phân biệt MXNet với NumPy là hỗ trợ cho các thiết bị\nphần cứng đa dạng."
+    },
+    {
+      "type": "paragraph",
+      "text": "Trong MXNet, mỗi mảng có một ngữ cảnh. Cho đến nay, theo mặc định, tất\ncả các biến và tính toán liên quan đã được gán cho CPU. Thông thường,\ncác ngữ cảnh khác có thể là các GPU khác nhau. Mọi thứ có thể nhận được\nthậm chí hairier khi chúng tôi triển khai công việc trên nhiều máy chủ.\nBằng cách gán mảng cho ngữ cảnh một cách thông minh, chúng ta có thể\ngiảm thiểu thời gian truyền dữ liệu giữa các thiết bị. Ví dụ: khi đào\ntạo mạng thần kinh trên máy chủ có GPU, chúng tôi thường thích các tham\nsố của mô hình sống trên GPU."
+    },
+    {
+      "type": "paragraph",
+      "text": "Tiếp theo, chúng ta cần xác nhận rằng phiên bản GPU của MXNet được cài\nđặt. Nếu phiên bản CPU của MXNet đã được cài đặt, chúng ta cần gỡ cài\nđặt nó trước. Ví dụ: sử dụng lệnh pip uninstall mxnet , sau đó cài\nđặt phiên bản MXNet tương ứng theo phiên bản CIDA của bạn. Giả sử bạn đã\ncài đặt CDA 10.0, bạn có thể cài đặt phiên bản MXNet hỗ trợ CDA 10.0 qua pip install mxnet-cu100 ."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "!nvidia-smi"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "Tue Apr 26 12:55:46 2022\n+-----------------------------------------------------------------------------+\n| NVIDIA-SMI 460.27.04    Driver Version: 460.27.04    CUDA Version: 11.2     |\n|-------------------------------+----------------------+----------------------+\n| GPU  Name        Persistence-M| Bus-Id        Disp.A | Volatile Uncorr. ECC |\n| Fan  Temp  Perf  Pwr:Usage/Cap|         Memory-Usage | GPU-Util  Compute M. |\n|                               |                      |               MIG M. |\n|===============================+======================+======================|\n|   0  Tesla V100-SXM2...  Off  | 00000000:00:1B.0 Off |                    0 |\n| N/A   39C    P0    36W / 300W |      3MiB / 16160MiB |      0%      Default |\n|                               |                      |                  N/A |\n+-------------------------------+----------------------+----------------------+\n|   1  Tesla V100-SXM2...  Off  | 00000000:00:1C.0 Off |                    0 |\n| N/A   37C    P0    48W / 300W |      0MiB / 16160MiB |      0%      Default |\n|                               |                      |                  N/A |\n+-------------------------------+----------------------+----------------------+\n|   2  Tesla V100-SXM2...  Off  | 00000000:00:1D.0 Off |                    0 |\n| N/A   40C    P0    37W / 300W |      3MiB / 16160MiB |      0%      Default |\n|                               |                      |                  N/A |\n+-------------------------------+----------------------+----------------------+\n|   3  Tesla V100-SXM2...  Off  | 00000000:00:1E.0 Off |                    0 |\n| N/A   39C    P0    52W / 300W |      0MiB / 16160MiB |      4%      Default |\n|                               |                      |                  N/A |\n+-------------------------------+----------------------+----------------------+\n\n+-----------------------------------------------------------------------------+\n| Processes:                                                                  |\n|  GPU   GI   CI        PID   Type   Process name                  GPU Memory |\n|        ID   ID                                                   Usage      |\n|=============================================================================|\n|  No running processes found                                                 |\n+-----------------------------------------------------------------------------+"
+    },
+    {
+      "type": "paragraph",
+      "text": "Trong PyTorch, mỗi mảng có một thiết bị, chúng ta thường gọi nó như là\nmột bối cảnh. Cho đến nay, theo mặc định, tất cả các biến và tính toán\nliên quan đã được gán cho CPU. Thông thường, các ngữ cảnh khác có thể là\ncác GPU khác nhau. Mọi thứ có thể nhận được thậm chí hairier khi chúng\ntôi triển khai công việc trên nhiều máy chủ. Bằng cách gán mảng cho ngữ\ncảnh một cách thông minh, chúng ta có thể giảm thiểu thời gian truyền dữ\nliệu giữa các thiết bị. Ví dụ: khi đào tạo mạng thần kinh trên máy chủ\ncó GPU, chúng tôi thường thích các tham số của mô hình sống trên GPU."
+    },
+    {
+      "type": "paragraph",
+      "text": "Tiếp theo, chúng ta cần xác nhận rằng phiên bản GPU của PyTorch được cài\nđặt. Nếu phiên bản CPU của PyTorch đã được cài đặt, chúng ta cần gỡ cài\nđặt nó trước. Ví dụ: sử dụng lệnh pip uninstall torch , sau đó cài\nđặt phiên bản PyTorch tương ứng theo phiên bản CIDA của bạn. Giả sử bạn\nđã cài đặt CDA 10.0, bạn có thể cài đặt phiên bản PyTorch hỗ trợ CDA\n10.0 qua pip install torch-cu100 ."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "!nvidia-smi"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "Tue Apr 26 13:13:20 2022\n+-----------------------------------------------------------------------------+\n| NVIDIA-SMI 460.27.04    Driver Version: 460.27.04    CUDA Version: 11.2     |\n|-------------------------------+----------------------+----------------------+\n| GPU  Name        Persistence-M| Bus-Id        Disp.A | Volatile Uncorr. ECC |\n| Fan  Temp  Perf  Pwr:Usage/Cap|         Memory-Usage | GPU-Util  Compute M. |\n|                               |                      |               MIG M. |\n|===============================+======================+======================|\n|   0  Tesla V100-SXM2...  Off  | 00000000:00:1B.0 Off |                    0 |\n| N/A   45C    P0    42W / 300W |      0MiB / 16160MiB |      0%      Default |\n|                               |                      |                  N/A |\n+-------------------------------+----------------------+----------------------+\n|   1  Tesla V100-SXM2...  Off  | 00000000:00:1C.0 Off |                    0 |\n| N/A   40C    P0    49W / 300W |   3442MiB / 16160MiB |      0%      Default |\n|                               |                      |                  N/A |\n+-------------------------------+----------------------+----------------------+\n|   2  Tesla V100-SXM2...  Off  | 00000000:00:1D.0 Off |                    0 |\n| N/A   41C    P0    57W / 300W |      0MiB / 16160MiB |      0%      Default |\n|                               |                      |                  N/A |\n+-------------------------------+----------------------+----------------------+\n|   3  Tesla V100-SXM2...  Off  | 00000000:00:1E.0 Off |                    0 |\n| N/A   38C    P0    52W / 300W |   3350MiB / 16160MiB |      0%      Default |\n|                               |                      |                  N/A |\n+-------------------------------+----------------------+----------------------+\n\n+-----------------------------------------------------------------------------+\n| Processes:                                                                  |\n|  GPU   GI   CI        PID   Type   Process name                  GPU Memory |\n|        ID   ID                                                   Usage      |\n|=============================================================================|\n|    1   N/A  N/A     14816      C   ...l-vi-release-0/bin/python     3439MiB |\n|    3   N/A  N/A     14816      C   ...l-vi-release-0/bin/python     3347MiB |\n+-----------------------------------------------------------------------------+"
+    },
+    {
+      "type": "paragraph",
+      "text": "Để chạy các chương trình trong phần này, bạn cần ít nhất hai GPU. Lưu ý\nrằng điều này có thể là xa hoa đối với hầu hết các máy tính để bàn nhưng\nnó có thể dễ dàng có sẵn trên đám mây, ví dụ, bằng cách sử dụng các\nphiên bản đa GPU AWS EC2. Hầu như tất cả các phần khác làm * không*\nyêu cầu nhiều GPU. Thay vào đó, điều này chỉ đơn giản là để minh họa\ncách dữ liệu chảy giữa các thiết bị khác nhau."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "thiet-bi-vi-tinh",
+      "text": "5.6.1. Thiết bị vi tính"
+    },
+    {
+      "type": "paragraph",
+      "text": "Chúng tôi có thể chỉ định các thiết bị, chẳng hạn như CPU và GPU, để lưu\ntrữ và tính toán. Theo mặc định, hàng chục được tạo trong bộ nhớ chính\nvà sau đó sử dụng CPU để tính toán nó."
+    },
+    {
+      "type": "paragraph",
+      "text": "Trong MXNet, CPU và GPU có thể được chỉ định bởi cpu() và gpu() .\nCần lưu ý rằng cpu() (hoặc bất kỳ số nguyên nào trong ngoặc đơn) có\nnghĩa là tất cả các CPU vật lý và bộ nhớ. Điều này có nghĩa là tính toán\ncủa MXNet sẽ cố gắng sử dụng tất cả các lõi CPU. Tuy nhiên, gpu() chỉ đại diện cho một thẻ và bộ nhớ tương ứng. Nếu có nhiều GPU, chúng\ntôi sử dụng gpu(i) để đại diện cho GPU \\(i^\\mathrm{th}\\) ( \\(i\\) bắt đầu từ 0). Ngoài ra, gpu(0) và gpu() là tương\nđương."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "from mxnet import np, npx\nfrom mxnet.gluon import nn\n\nnpx.set_np()\n\nnpx.cpu(), npx.gpu(), npx.gpu(1)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "(cpu(0), gpu(0), gpu(1))"
+    },
+    {
+      "type": "paragraph",
+      "text": "Trong PyTorch, CPU và GPU có thể được chỉ định bởi torch.device('cpu') và torch.device('cuda') . Cần lưu ý rằng\nthiết bị cpu có nghĩa là tất cả các CPU vật lý và bộ nhớ. Điều này\ncó nghĩa là các tính toán của PyTorch sẽ cố gắng sử dụng tất cả các lõi\nCPU. Tuy nhiên, một thiết bị gpu chỉ đại diện cho một thẻ và bộ nhớ\ntương ứng. Nếu có nhiều GPU, chúng tôi sử dụng torch.device(f'cuda:{i}') để đại diện cho GPU \\(i^\\mathrm{th}\\) ( \\(i\\) bắt đầu từ 0). Ngoài ra, gpu:0 và gpu là tương đương."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "import torch\nfrom torch import nn\n\ntorch.device('cpu'), torch.device('cuda'), torch.device('cuda:1')"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "(device(type='cpu'), device(type='cuda'), device(type='cuda', index=1))"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "import tensorflow as tf\n\ntf.device('/CPU:0'), tf.device('/GPU:0'), tf.device('/GPU:1')"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "(<tensorflow.python.eager.context._EagerDeviceContext at 0x7f1ae8d4c240>,\n <tensorflow.python.eager.context._EagerDeviceContext at 0x7f1ae8d4cd40>,\n <tensorflow.python.eager.context._EagerDeviceContext at 0x7f1ae5860cc0>)"
+    },
+    {
+      "type": "paragraph",
+      "text": "Chúng tôi có thể truy vấn số lượng GPU có sẵn."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "npx.num_gpus()"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "2"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "torch.cuda.device_count()"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "2"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "len(tf.config.experimental.list_physical_devices('GPU'))"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "2"
+    },
+    {
+      "type": "paragraph",
+      "text": "Bây giờ chúng ta xác định hai hàm tiện lợi cho phép chúng tôi chạy mã\nngay cả khi GPU được yêu cầu không tồn tại."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def try_gpu(i=0):  #@save\n    \"\"\"Return gpu(i) if exists, otherwise return cpu().\"\"\"\n    return npx.gpu(i) if npx.num_gpus() >= i + 1 else npx.cpu()\n\ndef try_all_gpus():  #@save\n    \"\"\"Return all available GPUs, or [cpu()] if no GPU exists.\"\"\"\n    devices = [npx.gpu(i) for i in range(npx.num_gpus())]\n    return devices if devices else [npx.cpu()]\n\ntry_gpu(), try_gpu(10), try_all_gpus()"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "(gpu(0), cpu(0), [gpu(0), gpu(1)])"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def try_gpu(i=0):  #@save\n    \"\"\"Return gpu(i) if exists, otherwise return cpu().\"\"\"\n    if torch.cuda.device_count() >= i + 1:\n        return torch.device(f'cuda:{i}')\n    return torch.device('cpu')\n\ndef try_all_gpus():  #@save\n    \"\"\"Return all available GPUs, or [cpu(),] if no GPU exists.\"\"\"\n    devices = [torch.device(f'cuda:{i}')\n             for i in range(torch.cuda.device_count())]\n    return devices if devices else [torch.device('cpu')]\n\ntry_gpu(), try_gpu(10), try_all_gpus()"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "(device(type='cuda', index=0),\n device(type='cpu'),\n [device(type='cuda', index=0), device(type='cuda', index=1)])"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def try_gpu(i=0):  #@save\n    \"\"\"Return gpu(i) if exists, otherwise return cpu().\"\"\"\n    if len(tf.config.experimental.list_physical_devices('GPU')) >= i + 1:\n        return tf.device(f'/GPU:{i}')\n    return tf.device('/CPU:0')\n\ndef try_all_gpus():  #@save\n    \"\"\"Return all available GPUs, or [cpu(),] if no GPU exists.\"\"\"\n    num_gpus = len(tf.config.experimental.list_physical_devices('GPU'))\n    devices = [tf.device(f'/GPU:{i}') for i in range(num_gpus)]\n    return devices if devices else [tf.device('/CPU:0')]\n\ntry_gpu(), try_gpu(10), try_all_gpus()"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "(<tensorflow.python.eager.context._EagerDeviceContext at 0x7f1ae587f800>,\n <tensorflow.python.eager.context._EagerDeviceContext at 0x7f1ae587fb40>,\n [<tensorflow.python.eager.context._EagerDeviceContext at 0x7f1ae587fb80>,\n  <tensorflow.python.eager.context._EagerDeviceContext at 0x7f1ae587fc00>])"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tensors-va-gpu",
+      "text": "5.6.2. Tensors và GPU"
+    },
+    {
+      "type": "paragraph",
+      "text": "Theo mặc định, hàng chục được tạo trên CPU. Chúng ta có thể truy vấn\nthiết bị nơi tensor được đặt."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "x = np.array([1, 2, 3])\nx.ctx"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "cpu(0)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "x = torch.tensor([1, 2, 3])\nx.device"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "device(type='cpu')"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "x = tf.constant([1, 2, 3])\nx.device"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "'/job:localhost/replica:0/task:0/device:GPU:0'"
+    },
+    {
+      "type": "paragraph",
+      "text": "Điều quan trọng cần lưu ý là bất cứ khi nào chúng tôi muốn hoạt động\ntheo nhiều điều khoản, chúng cần phải ở trên cùng một thiết bị. Ví dụ,\nnếu chúng ta tổng hợp hai chục, chúng ta cần đảm bảo rằng cả hai đối số\nđều sống trên cùng một thiết bị—nếu không khung sẽ không biết lưu trữ\nkết quả ở đâu hoặc thậm chí làm thế nào để quyết định nơi thực hiện tính\ntoán."
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "luu-tru-tren-gpu",
+      "text": "5.6.2.1. Lưu trữ trên GPU"
+    },
+    {
+      "type": "paragraph",
+      "text": "Có một số cách để lưu trữ một tensor trên GPU. Ví dụ: chúng ta có thể\nchỉ định một thiết bị lưu trữ khi tạo tensor. Tiếp theo, chúng ta tạo\nbiến tensor X trên gpu đầu tiên. Tensor được tạo trên GPU chỉ\ntiêu thụ bộ nhớ của GPU này. Chúng ta có thể sử dụng lệnh nvidia-smi để xem mức sử dụng bộ nhớ GPU. Nói chung, chúng ta cần đảm bảo rằng\nchúng ta không tạo dữ liệu vượt quá giới hạn bộ nhớ GPU."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "X = np.ones((2, 3), ctx=try_gpu())\nX"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "array([[1., 1., 1.],\n       [1., 1., 1.]], ctx=gpu(0))"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "X = torch.ones(2, 3, device=try_gpu())\nX"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "tensor([[1., 1., 1.],\n        [1., 1., 1.]], device='cuda:0')"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "with try_gpu():\n    X = tf.ones((2, 3))\nX"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "<tf.Tensor: shape=(2, 3), dtype=float32, numpy=\narray([[1., 1., 1.],\n       [1., 1., 1.]], dtype=float32)>"
+    },
+    {
+      "type": "paragraph",
+      "text": "Giả sử rằng bạn có ít nhất hai GPU, mã sau sẽ tạo tensor ngẫu nhiên trên\nGPU. thứ hai"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "Y = np.random.uniform(size=(2, 3), ctx=try_gpu(1))\nY"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "array([[0.67478997, 0.07540122, 0.9956977 ],\n       [0.09488854, 0.415456  , 0.11231736]], ctx=gpu(1))"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "Y = torch.rand(2, 3, device=try_gpu(1))\nY"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "tensor([[7.7027e-01, 1.6829e-01, 2.2538e-01],\n        [1.5524e-01, 5.3015e-04, 5.3232e-01]], device='cuda:1')"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "with try_gpu(1):\n    Y = tf.random.uniform((2, 3))\nY"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "<tf.Tensor: shape=(2, 3), dtype=float32, numpy=\narray([[0.04133284, 0.53609765, 0.47481763],\n       [0.0891695 , 0.267372  , 0.40674353]], dtype=float32)>"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "sao-chep",
+      "text": "5.6.2.2. Sao chép"
+    },
+    {
+      "type": "paragraph",
+      "text": "Nếu chúng ta muốn tính X + Y , chúng ta cần quyết định nơi thực hiện\nthao tác này. Ví dụ, như thể hiện trong Fig. 5.6.1 , chúng ta\ncó thể chuyển X sang GPU thứ hai và thực hiện thao tác ở đó. Làm\nkhông chỉ cần thêm X và Y , vì điều này sẽ dẫn đến một ngoại lệ.\nCông cụ thời gian chạy sẽ không biết phải làm gì: nó không thể tìm thấy\ndữ liệu trên cùng một thiết bị và nó không thành công. Vì Y sống\ntrên GPU thứ hai, chúng ta cần phải di chuyển X ở đó trước khi chúng\nta có thể thêm hai."
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/copyto.svg",
+      "local_path": "_images/copyto.svg",
+      "alt": "../_images/copyto.svg"
+    },
+    {
+      "type": "paragraph",
+      "text": "Fig. 5.6.1 Copy data to perform an operation on the same device. ¶"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "Z = X.copyto(try_gpu(1))\nprint(X)\nprint(Z)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "[[1. 1. 1.]\n [1. 1. 1.]] @gpu(0)\n[[1. 1. 1.]\n [1. 1. 1.]] @gpu(1)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "Z = X.cuda(1)\nprint(X)\nprint(Z)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "tensor([[1., 1., 1.],\n        [1., 1., 1.]], device='cuda:0')\ntensor([[1., 1., 1.],\n        [1., 1., 1.]], device='cuda:1')"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "with try_gpu(1):\n    Z = X\nprint(X)\nprint(Z)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "tf.Tensor(\n[[1. 1. 1.]\n [1. 1. 1.]], shape=(2, 3), dtype=float32)\ntf.Tensor(\n[[1. 1. 1.]\n [1. 1. 1.]], shape=(2, 3), dtype=float32)"
+    },
+    {
+      "type": "paragraph",
+      "text": "Bây giờ dữ liệu nằm trên cùng một GPU (cả Z và Y đều là), chúng\nta có thể thêm chúng lên."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "Y + Z"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "array([[1.6747899, 1.0754012, 1.9956977],\n       [1.0948886, 1.415456 , 1.1123173]], ctx=gpu(1))"
+    },
+    {
+      "type": "paragraph",
+      "text": "Hãy tưởng tượng rằng biến Z của bạn đã sống trên GPU thứ hai của\nbạn. Điều gì xảy ra nếu chúng ta vẫn gọi Z.copyto(gpu(1)) ? Nó sẽ tạo\nmột bản sao và phân bổ bộ nhớ mới, mặc dù biến đó đã sống trên thiết bị\nmong muốn. Có những lúc, tùy thuộc vào môi trường mà mã của chúng tôi\nđang chạy, hai biến có thể đã sống trên cùng một thiết bị. Vì vậy, chúng\ntôi muốn tạo một bản sao chỉ khi các biến hiện đang sống trong các thiết\nbị khác nhau. Trong những trường hợp này, chúng ta có thể gọi as_in_ctx . Nếu biến đã sống trong thiết bị được chỉ định thì đây là\nmột no-op. Trừ khi bạn đặc biệt muốn tạo một bản sao, as_in_ctx là\nphương pháp lựa chọn."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "Z.as_in_ctx(try_gpu(1)) is Z"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "True"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "Y + Z"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "tensor([[1.7703, 1.1683, 1.2254],\n        [1.1552, 1.0005, 1.5323]], device='cuda:1')"
+    },
+    {
+      "type": "paragraph",
+      "text": "Hãy tưởng tượng rằng biến Z của bạn đã sống trên GPU thứ hai của\nbạn. Điều gì sẽ xảy ra nếu chúng ta vẫn gọi Z.cuda(1) ? Nó sẽ trả về Z thay vì tạo một bản sao và phân bổ bộ nhớ mới."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "Z.cuda(1) is Z"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "True"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "Y + Z"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "<tf.Tensor: shape=(2, 3), dtype=float32, numpy=\narray([[1.0413328, 1.5360976, 1.4748176],\n       [1.0891695, 1.267372 , 1.4067435]], dtype=float32)>"
+    },
+    {
+      "type": "paragraph",
+      "text": "Hãy tưởng tượng rằng biến Z của bạn đã sống trên GPU thứ hai của\nbạn. Điều gì xảy ra nếu chúng ta vẫn gọi Z2 = Z trong cùng một phạm\nvi thiết bị? Nó sẽ trả về Z thay vì tạo một bản sao và phân bổ bộ\nnhớ mới."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "with try_gpu(1):\n    Z2 = Z\nZ2 is Z"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "True"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "ghi-chu-ben",
+      "text": "5.6.2.3. Ghi chú bên"
+    },
+    {
+      "type": "paragraph",
+      "text": "Mọi người sử dụng GPU để học máy vì họ mong đợi chúng sẽ nhanh chóng.\nNhưng chuyển các biến giữa các thiết bị chậm. Vì vậy, chúng tôi muốn bạn\nchắc chắn 100% rằng bạn muốn làm điều gì đó chậm trước khi chúng tôi cho\nphép bạn làm điều đó. Nếu khung học sâu chỉ thực hiện bản sao tự động mà\nkhông bị rơi sau đó bạn có thể không nhận ra rằng bạn đã viết một số mã\nchậm."
+    },
+    {
+      "type": "paragraph",
+      "text": "Ngoài ra, truyền dữ liệu giữa các thiết bị (CPU, GPU và các máy khác) là\nthứ chậm hơn nhiều so với tính toán. Nó cũng làm cho việc song song trở\nnên khó khăn hơn rất nhiều, vì chúng ta phải đợi dữ liệu được gửi (hay\nđúng hơn là được nhận) trước khi chúng ta có thể tiến hành nhiều thao\ntác hơn. Đây là lý do tại sao các thao tác sao chép nên được thực hiện\ncẩn thận. Theo nguyên tắc chung, nhiều hoạt động nhỏ tồi tệ hơn nhiều so\nvới một hoạt động lớn. Hơn nữa, một số hoạt động tại một thời điểm tốt\nhơn nhiều so với nhiều thao tác đơn lẻ xen kẽ trong mã trừ khi bạn biết\nnhững gì bạn đang làm. Đây là trường hợp vì các hoạt động như vậy có thể\nchặn nếu một thiết bị phải đợi thiết bị kia trước khi nó có thể làm một\ncái gì đó khác. Nó là một chút giống như đặt hàng cà phê của bạn trong\nmột hàng đợi thay vì đặt hàng trước nó qua điện thoại và phát hiện ra\nrằng nó đã sẵn sàng khi bạn đang có."
+    },
+    {
+      "type": "paragraph",
+      "text": "Cuối cùng, khi chúng ta in hàng chục hoặc chuyển đổi hàng chục sang định\ndạng NumPy, nếu dữ liệu không nằm trong bộ nhớ chính, khung sẽ sao chép\nnó vào bộ nhớ chính trước, dẫn đến chi phí truyền bổ sung. Thậm chí tệ\nhơn, bây giờ nó phải tuân theo khóa thông dịch viên toàn cầu đáng sợ\nkhiến mọi thứ chờ đợi Python hoàn thành."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "mang-no-ron-va-gpu",
+      "text": "5.6.3. Mạng nơ-ron và GPU"
+    },
+    {
+      "type": "paragraph",
+      "text": "Tương tự, một mô hình mạng thần kinh có thể chỉ định các thiết bị. Mã\nsau đặt các tham số mô hình trên GPU."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "net = nn.Sequential()\nnet.add(nn.Dense(1))\nnet.initialize(ctx=try_gpu())"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "net = nn.Sequential(nn.Linear(3, 1))\nnet = net.to(device=try_gpu())"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "strategy = tf.distribute.MirroredStrategy()\nwith strategy.scope():\n    net = tf.keras.models.Sequential([\n        tf.keras.layers.Dense(1)])"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "INFO:tensorflow:Using MirroredStrategy with devices ('/job:localhost/replica:0/task:0/device:GPU:0', '/job:localhost/replica:0/task:0/device:GPU:1')"
+    },
+    {
+      "type": "paragraph",
+      "text": "Chúng ta sẽ thấy nhiều ví dụ khác về cách chạy các mô hình trên GPU\ntrong các chương sau, đơn giản vì chúng sẽ trở nên chuyên sâu hơn về mặt\ntính toán."
+    },
+    {
+      "type": "paragraph",
+      "text": "Khi đầu vào là một tensor trên GPU, mô hình sẽ tính toán kết quả trên\ncùng một GPU."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "net(X)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "array([[0.04995865],\n       [0.04995865]], ctx=gpu(0))"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "net(X)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "tensor([[0.1271],\n        [0.1271]], device='cuda:0', grad_fn=<AddmmBackward0>)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "net(X)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "<tf.Tensor: shape=(2, 1), dtype=float32, numpy=\narray([[2.4415803],\n       [2.4415803]], dtype=float32)>"
+    },
+    {
+      "type": "paragraph",
+      "text": "Hãy để chúng tôi xác nhận rằng các tham số mô hình được lưu trữ trên\ncùng một GPU."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "net[0].weight.data().ctx"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "gpu(0)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "net[0].weight.data.device"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "device(type='cuda', index=0)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "net.layers[0].weights[0].device, net.layers[0].weights[1].device"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "('/job:localhost/replica:0/task:0/device:GPU:0',\n '/job:localhost/replica:0/task:0/device:GPU:0')"
+    },
+    {
+      "type": "paragraph",
+      "text": "Nói tóm lại, miễn là tất cả dữ liệu và tham số đều trên cùng một thiết\nbị, chúng ta có thể học các mô hình một cách hiệu quả. Trong các chương\nsau, chúng ta sẽ thấy một số ví dụ như vậy."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tom-tat",
+      "text": "5.6.4. Tóm tắt"
+    },
+    {
+      "type": "list",
+      "ordered": false,
+      "items": [
+        "Chúng tôi có thể chỉ định các thiết bị để lưu trữ và tính toán, chẳng\nhạn như CPU hoặc GPU. Theo mặc định, dữ liệu được tạo trong bộ nhớ\nchính và sau đó sử dụng CPU để tính toán.",
+        "Khung học sâu yêu cầu tất cả dữ liệu đầu vào để tính toán phải nằm\ntrên cùng một thiết bị, có thể là CPU hoặc cùng một GPU.",
+        "Bạn có thể mất hiệu suất đáng kể bằng cách di chuyển dữ liệu mà không\ncần quan tâm. Một sai lầm điển hình như sau: tính toán tổn thất cho\nmỗi minibatch trên GPU và báo cáo lại cho người dùng trên dòng lệnh\n(hoặc đăng nhập nó trong NumPy ndarray ) sẽ kích hoạt một khóa\nthông dịch viên toàn cầu ngăn chặn tất cả các GPU. Tốt hơn là phân bổ\nbộ nhớ để đăng nhập vào GPU và chỉ di chuyển các bản ghi lớn hơn."
+      ]
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bai-tap",
+      "text": "5.6.5. Bài tập"
+    },
+    {
+      "type": "list",
+      "ordered": true,
+      "items": [
+        "Hãy thử một nhiệm vụ tính toán lớn hơn, chẳng hạn như phép nhân của\nma trận lớn và xem sự khác biệt về tốc độ giữa CPU và GPU. Còn một\nnhiệm vụ với một lượng nhỏ tính toán thì sao?",
+        "Làm thế nào chúng ta nên đọc và viết các tham số mô hình trên GPU?",
+        "Đo thời gian cần thiết để tính toán 1000 phép nhân ma trận ma trận\ncủa \\(100 \\times 100\\) ma trận và ghi lại định mức Frobenius của\nma trận đầu ra một kết quả tại một thời điểm so với giữ nhật ký trên\nGPU và chỉ chuyển kết quả cuối cùng.",
+        "Đo lường thời gian cần thiết để thực hiện hai phép nhân ma trận ma\ntrận trên hai GPU cùng một lúc so với theo thứ tự trên một GPU. Gợi\ný: bạn sẽ thấy tỷ lệ gần như tuyến tính."
+      ]
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    }
+  ],
+  "images": [
+    {
+      "original_url": "https://vi.d2l.ai/_images/copyto.svg",
+      "local_path": "_images/copyto.svg",
+      "alt": "../_images/copyto.svg"
+    }
+  ],
+  "text": "5.6. GPU\nNăm Section 1.5 , chúng tôi đã thảo luận về sự tăng\ntrưởng nhanh chóng của tính toán trong hai thập kỷ qua. Tóm lại, hiệu\nsuất GPU đã tăng hệ số 1000 mỗi thập kỷ kể từ năm 2000. Điều này mang\nlại những cơ hội tuyệt vời nhưng nó cũng cho thấy một nhu cầu đáng kể để\ncung cấp hiệu suất như vậy.\nTrong phần này, chúng tôi bắt đầu thảo luận về cách khai thác hiệu suất\ntính toán này cho nghiên cứu của bạn. Đầu tiên bằng cách sử dụng GPU duy\nnhất và tại một thời điểm sau đó, làm thế nào để sử dụng nhiều GPU và\nnhiều máy chủ (với nhiều GPU).\nCụ thể, chúng tôi sẽ thảo luận về cách sử dụng một GPU NVIDIA duy nhất\nđể tính toán. Trước tiên, hãy chắc chắn rằng bạn đã cài đặt ít nhất một\nGPU NVIDIA. Sau đó, tải xuống NVIDIA driver and\nCUDA và làm theo lời\nnhắc để đặt đường dẫn thích hợp. Khi các chế phẩm này hoàn tất, lệnh nvidia-smi có thể được sử dụng để xem thông tin card đồ hoạ.\nBạn có thể nhận thấy rằng tensor MXNet trông gần giống với NumPy ndarray . Nhưng có một vài sự khác biệt quan trọng. Một trong những\ntính năng chính phân biệt MXNet với NumPy là hỗ trợ cho các thiết bị\nphần cứng đa dạng.\nTrong MXNet, mỗi mảng có một ngữ cảnh. Cho đến nay, theo mặc định, tất\ncả các biến và tính toán liên quan đã được gán cho CPU. Thông thường,\ncác ngữ cảnh khác có thể là các GPU khác nhau. Mọi thứ có thể nhận được\nthậm chí hairier khi chúng tôi triển khai công việc trên nhiều máy chủ.\nBằng cách gán mảng cho ngữ cảnh một cách thông minh, chúng ta có thể\ngiảm thiểu thời gian truyền dữ liệu giữa các thiết bị. Ví dụ: khi đào\ntạo mạng thần kinh trên máy chủ có GPU, chúng tôi thường thích các tham\nsố của mô hình sống trên GPU.\nTiếp theo, chúng ta cần xác nhận rằng phiên bản GPU của MXNet được cài\nđặt. Nếu phiên bản CPU của MXNet đã được cài đặt, chúng ta cần gỡ cài\nđặt nó trước. Ví dụ: sử dụng lệnh pip uninstall mxnet , sau đó cài\nđặt phiên bản MXNet tương ứng theo phiên bản CIDA của bạn. Giả sử bạn đã\ncài đặt CDA 10.0, bạn có thể cài đặt phiên bản MXNet hỗ trợ CDA 10.0 qua pip install mxnet-cu100 .\nTrong PyTorch, mỗi mảng có một thiết bị, chúng ta thường gọi nó như là\nmột bối cảnh. Cho đến nay, theo mặc định, tất cả các biến và tính toán\nliên quan đã được gán cho CPU. Thông thường, các ngữ cảnh khác có thể là\ncác GPU khác nhau. Mọi thứ có thể nhận được thậm chí hairier khi chúng\ntôi triển khai công việc trên nhiều máy chủ. Bằng cách gán mảng cho ngữ\ncảnh một cách thông minh, chúng ta có thể giảm thiểu thời gian truyền dữ\nliệu giữa các thiết bị. Ví dụ: khi đào tạo mạng thần kinh trên máy chủ\ncó GPU, chúng tôi thường thích các tham số của mô hình sống trên GPU.\nTiếp theo, chúng ta cần xác nhận rằng phiên bản GPU của PyTorch được cài\nđặt. Nếu phiên bản CPU của PyTorch đã được cài đặt, chúng ta cần gỡ cài\nđặt nó trước. Ví dụ: sử dụng lệnh pip uninstall torch , sau đó cài\nđặt phiên bản PyTorch tương ứng theo phiên bản CIDA của bạn. Giả sử bạn\nđã cài đặt CDA 10.0, bạn có thể cài đặt phiên bản PyTorch hỗ trợ CDA\n10.0 qua pip install torch-cu100 .\nĐể chạy các chương trình trong phần này, bạn cần ít nhất hai GPU. Lưu ý\nrằng điều này có thể là xa hoa đối với hầu hết các máy tính để bàn nhưng\nnó có thể dễ dàng có sẵn trên đám mây, ví dụ, bằng cách sử dụng các\nphiên bản đa GPU AWS EC2. Hầu như tất cả các phần khác làm * không*\nyêu cầu nhiều GPU. Thay vào đó, điều này chỉ đơn giản là để minh họa\ncách dữ liệu chảy giữa các thiết bị khác nhau.\n5.6.1. Thiết bị vi tính\nChúng tôi có thể chỉ định các thiết bị, chẳng hạn như CPU và GPU, để lưu\ntrữ và tính toán. Theo mặc định, hàng chục được tạo trong bộ nhớ chính\nvà sau đó sử dụng CPU để tính toán nó.\nTrong MXNet, CPU và GPU có thể được chỉ định bởi cpu() và gpu() .\nCần lưu ý rằng cpu() (hoặc bất kỳ số nguyên nào trong ngoặc đơn) có\nnghĩa là tất cả các CPU vật lý và bộ nhớ. Điều này có nghĩa là tính toán\ncủa MXNet sẽ cố gắng sử dụng tất cả các lõi CPU. Tuy nhiên, gpu() chỉ đại diện cho một thẻ và bộ nhớ tương ứng. Nếu có nhiều GPU, chúng\ntôi sử dụng gpu(i) để đại diện cho GPU \\(i^\\mathrm{th}\\) ( \\(i\\) bắt đầu từ 0). Ngoài ra, gpu(0) và gpu() là tương\nđương.\nTrong PyTorch, CPU và GPU có thể được chỉ định bởi torch.device('cpu') và torch.device('cuda') . Cần lưu ý rằng\nthiết bị cpu có nghĩa là tất cả các CPU vật lý và bộ nhớ. Điều này\ncó nghĩa là các tính toán của PyTorch sẽ cố gắng sử dụng tất cả các lõi\nCPU. Tuy nhiên, một thiết bị gpu chỉ đại diện cho một thẻ và bộ nhớ\ntương ứng. Nếu có nhiều GPU, chúng tôi sử dụng torch.device(f'cuda:{i}') để đại diện cho GPU \\(i^\\mathrm{th}\\) ( \\(i\\) bắt đầu từ 0). Ngoài ra, gpu:0 và gpu là tương đương.\nChúng tôi có thể truy vấn số lượng GPU có sẵn.\nBây giờ chúng ta xác định hai hàm tiện lợi cho phép chúng tôi chạy mã\nngay cả khi GPU được yêu cầu không tồn tại.\n5.6.2. Tensors và GPU\nTheo mặc định, hàng chục được tạo trên CPU. Chúng ta có thể truy vấn\nthiết bị nơi tensor được đặt.\nĐiều quan trọng cần lưu ý là bất cứ khi nào chúng tôi muốn hoạt động\ntheo nhiều điều khoản, chúng cần phải ở trên cùng một thiết bị. Ví dụ,\nnếu chúng ta tổng hợp hai chục, chúng ta cần đảm bảo rằng cả hai đối số\nđều sống trên cùng một thiết bị—nếu không khung sẽ không biết lưu trữ\nkết quả ở đâu hoặc thậm chí làm thế nào để quyết định nơi thực hiện tính\ntoán.\n5.6.2.1. Lưu trữ trên GPU\nCó một số cách để lưu trữ một tensor trên GPU. Ví dụ: chúng ta có thể\nchỉ định một thiết bị lưu trữ khi tạo tensor. Tiếp theo, chúng ta tạo\nbiến tensor X trên gpu đầu tiên. Tensor được tạo trên GPU chỉ\ntiêu thụ bộ nhớ của GPU này. Chúng ta có thể sử dụng lệnh nvidia-smi để xem mức sử dụng bộ nhớ GPU. Nói chung, chúng ta cần đảm bảo rằng\nchúng ta không tạo dữ liệu vượt quá giới hạn bộ nhớ GPU.\nGiả sử rằng bạn có ít nhất hai GPU, mã sau sẽ tạo tensor ngẫu nhiên trên\nGPU. thứ hai\n5.6.2.2. Sao chép\nNếu chúng ta muốn tính X + Y , chúng ta cần quyết định nơi thực hiện\nthao tác này. Ví dụ, như thể hiện trong Fig. 5.6.1 , chúng ta\ncó thể chuyển X sang GPU thứ hai và thực hiện thao tác ở đó. Làm\nkhông chỉ cần thêm X và Y , vì điều này sẽ dẫn đến một ngoại lệ.\nCông cụ thời gian chạy sẽ không biết phải làm gì: nó không thể tìm thấy\ndữ liệu trên cùng một thiết bị và nó không thành công. Vì Y sống\ntrên GPU thứ hai, chúng ta cần phải di chuyển X ở đó trước khi chúng\nta có thể thêm hai.\nFig. 5.6.1 Copy data to perform an operation on the same device. ¶\nBây giờ dữ liệu nằm trên cùng một GPU (cả Z và Y đều là), chúng\nta có thể thêm chúng lên.\nHãy tưởng tượng rằng biến Z của bạn đã sống trên GPU thứ hai của\nbạn. Điều gì xảy ra nếu chúng ta vẫn gọi Z.copyto(gpu(1)) ? Nó sẽ tạo\nmột bản sao và phân bổ bộ nhớ mới, mặc dù biến đó đã sống trên thiết bị\nmong muốn. Có những lúc, tùy thuộc vào môi trường mà mã của chúng tôi\nđang chạy, hai biến có thể đã sống trên cùng một thiết bị. Vì vậy, chúng\ntôi muốn tạo một bản sao chỉ khi các biến hiện đang sống trong các thiết\nbị khác nhau. Trong những trường hợp này, chúng ta có thể gọi as_in_ctx . Nếu biến đã sống trong thiết bị được chỉ định thì đây là\nmột no-op. Trừ khi bạn đặc biệt muốn tạo một bản sao, as_in_ctx là\nphương pháp lựa chọn.\nHãy tưởng tượng rằng biến Z của bạn đã sống trên GPU thứ hai của\nbạn. Điều gì sẽ xảy ra nếu chúng ta vẫn gọi Z.cuda(1) ? Nó sẽ trả về Z thay vì tạo một bản sao và phân bổ bộ nhớ mới.\nHãy tưởng tượng rằng biến Z của bạn đã sống trên GPU thứ hai của\nbạn. Điều gì xảy ra nếu chúng ta vẫn gọi Z2 = Z trong cùng một phạm\nvi thiết bị? Nó sẽ trả về Z thay vì tạo một bản sao và phân bổ bộ\nnhớ mới.\n5.6.2.3. Ghi chú bên\nMọi người sử dụng GPU để học máy vì họ mong đợi chúng sẽ nhanh chóng.\nNhưng chuyển các biến giữa các thiết bị chậm. Vì vậy, chúng tôi muốn bạn\nchắc chắn 100% rằng bạn muốn làm điều gì đó chậm trước khi chúng tôi cho\nphép bạn làm điều đó. Nếu khung học sâu chỉ thực hiện bản sao tự động mà\nkhông bị rơi sau đó bạn có thể không nhận ra rằng bạn đã viết một số mã\nchậm.\nNgoài ra, truyền dữ liệu giữa các thiết bị (CPU, GPU và các máy khác) là\nthứ chậm hơn nhiều so với tính toán. Nó cũng làm cho việc song song trở\nnên khó khăn hơn rất nhiều, vì chúng ta phải đợi dữ liệu được gửi (hay\nđúng hơn là được nhận) trước khi chúng ta có thể tiến hành nhiều thao\ntác hơn. Đây là lý do tại sao các thao tác sao chép nên được thực hiện\ncẩn thận. Theo nguyên tắc chung, nhiều hoạt động nhỏ tồi tệ hơn nhiều so\nvới một hoạt động lớn. Hơn nữa, một số hoạt động tại một thời điểm tốt\nhơn nhiều so với nhiều thao tác đơn lẻ xen kẽ trong mã trừ khi bạn biết\nnhững gì bạn đang làm. Đây là trường hợp vì các hoạt động như vậy có thể\nchặn nếu một thiết bị phải đợi thiết bị kia trước khi nó có thể làm một\ncái gì đó khác. Nó là một chút giống như đặt hàng cà phê của bạn trong\nmột hàng đợi thay vì đặt hàng trước nó qua điện thoại và phát hiện ra\nrằng nó đã sẵn sàng khi bạn đang có.\nCuối cùng, khi chúng ta in hàng chục hoặc chuyển đổi hàng chục sang định\ndạng NumPy, nếu dữ liệu không nằm trong bộ nhớ chính, khung sẽ sao chép\nnó vào bộ nhớ chính trước, dẫn đến chi phí truyền bổ sung. Thậm chí tệ\nhơn, bây giờ nó phải tuân theo khóa thông dịch viên toàn cầu đáng sợ\nkhiến mọi thứ chờ đợi Python hoàn thành.\n5.6.3. Mạng nơ-ron và GPU\nTương tự, một mô hình mạng thần kinh có thể chỉ định các thiết bị. Mã\nsau đặt các tham số mô hình trên GPU.\nChúng ta sẽ thấy nhiều ví dụ khác về cách chạy các mô hình trên GPU\ntrong các chương sau, đơn giản vì chúng sẽ trở nên chuyên sâu hơn về mặt\ntính toán.\nKhi đầu vào là một tensor trên GPU, mô hình sẽ tính toán kết quả trên\ncùng một GPU.\nHãy để chúng tôi xác nhận rằng các tham số mô hình được lưu trữ trên\ncùng một GPU.\nNói tóm lại, miễn là tất cả dữ liệu và tham số đều trên cùng một thiết\nbị, chúng ta có thể học các mô hình một cách hiệu quả. Trong các chương\nsau, chúng ta sẽ thấy một số ví dụ như vậy.\n5.6.4. Tóm tắt\nChúng tôi có thể chỉ định các thiết bị để lưu trữ và tính toán, chẳng\nhạn như CPU hoặc GPU. Theo mặc định, dữ liệu được tạo trong bộ nhớ\nchính và sau đó sử dụng CPU để tính toán.\nKhung học sâu yêu cầu tất cả dữ liệu đầu vào để tính toán phải nằm\ntrên cùng một thiết bị, có thể là CPU hoặc cùng một GPU.\nBạn có thể mất hiệu suất đáng kể bằng cách di chuyển dữ liệu mà không\ncần quan tâm. Một sai lầm điển hình như sau: tính toán tổn thất cho\nmỗi minibatch trên GPU và báo cáo lại cho người dùng trên dòng lệnh\n(hoặc đăng nhập nó trong NumPy ndarray ) sẽ kích hoạt một khóa\nthông dịch viên toàn cầu ngăn chặn tất cả các GPU. Tốt hơn là phân bổ\nbộ nhớ để đăng nhập vào GPU và chỉ di chuyển các bản ghi lớn hơn.\n5.6.5. Bài tập\nHãy thử một nhiệm vụ tính toán lớn hơn, chẳng hạn như phép nhân của\nma trận lớn và xem sự khác biệt về tốc độ giữa CPU và GPU. Còn một\nnhiệm vụ với một lượng nhỏ tính toán thì sao?\nLàm thế nào chúng ta nên đọc và viết các tham số mô hình trên GPU?\nĐo thời gian cần thiết để tính toán 1000 phép nhân ma trận ma trận\ncủa \\(100 \\times 100\\) ma trận và ghi lại định mức Frobenius của\nma trận đầu ra một kết quả tại một thời điểm so với giữ nhật ký trên\nGPU và chỉ chuyển kết quả cuối cùng.\nĐo lường thời gian cần thiết để thực hiện hai phép nhân ma trận ma\ntrận trên hai GPU cùng một lúc so với theo thứ tự trên một GPU. Gợi\ný: bạn sẽ thấy tỷ lệ gần như tuyến tính.\nDiscussions\nDiscussions\nDiscussions"
+}

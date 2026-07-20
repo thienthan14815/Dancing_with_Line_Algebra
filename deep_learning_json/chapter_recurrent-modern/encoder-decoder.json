@@ -1,0 +1,194 @@
+{
+  "url": "https://vi.d2l.ai/chapter_recurrent-modern/encoder-decoder.html",
+  "chapter": "chapter_recurrent-modern",
+  "title": "9.6. Kiến trúc mã hóa-Decoder",
+  "crawled_at": "2026-07-20T12:40:07.843707+00:00",
+  "headings": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "kien-truc-ma-hoa-decoder",
+      "text": "9.6. Kiến trúc mã hóa-Decoder"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bo-ma-hoa",
+      "text": "9.6.1. Bộ mã hóa"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "decoder",
+      "text": "9.6.2. Decoder"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "dut-bo-ma-hoa-va-bo-giai-ma-cung-nhau",
+      "text": "9.6.3. Đút bộ mã hóa và bộ giải mã cùng nhau"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tom-tat",
+      "text": "9.6.4. Tóm tắt"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bai-tap",
+      "text": "9.6.5. Bài tập"
+    }
+  ],
+  "content": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "kien-truc-ma-hoa-decoder",
+      "text": "9.6. Kiến trúc mã hóa-Decoder"
+    },
+    {
+      "type": "paragraph",
+      "text": "Như chúng ta đã thảo luận trong Section 9.5 ,\ndịch máy là một tên miền vấn đề lớn cho các mô hình chuyển tải chuỗi, có\nđầu vào và đầu ra đều là chuỗi độ dài biến đổi. Để xử lý loại đầu vào và\nđầu ra này, chúng ta có thể thiết kế một kiến trúc với hai thành phần\nchính. Thành phần đầu tiên là bộ mã hóa * : nó lấy một chuỗi có độ dài\nthay đổi làm đầu vào và biến nó thành trạng thái có hình dạng cố định.\nThành phần thứ hai là một * decoder * : nó ánh xạ trạng thái mã hóa của\nmột hình dạng cố định đến một chuỗi có chiều dài biến đổi. Đây được gọi\nlà kiến trúc * encoder-decoder*, được mô tả trong Fig. 9.6.1 ."
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/encoder-decoder.svg",
+      "local_path": "_images/encoder-decoder.svg",
+      "alt": "../_images/encoder-decoder.svg"
+    },
+    {
+      "type": "paragraph",
+      "text": "Fig. 9.6.1 The encoder-decoder architecture. ¶"
+    },
+    {
+      "type": "paragraph",
+      "text": "Hãy để chúng tôi lấy bản dịch máy từ tiếng Anh sang tiếng Pháp làm ví\ndụ. Cho một chuỗi đầu vào bằng tiếng Anh: “They”, “are”, “watching”,” .\n“, kiến trúc bộ mã hóa giải mã này đầu tiên mã hóa đầu vào có độ dài\nbiến đổi thành một trạng thái, sau đó giải mã trạng thái để tạo ra token\nchuỗi dịch bằng token làm đầu ra: “Ils”, “regardent”, “.”. Vì kiến trúc\nbộ mã hóa-giải mã tạo thành nền tảng của các mô hình chuyển đổi chuỗi\nkhác nhau trong các phần tiếp theo, phần này sẽ chuyển đổi kiến trúc này\nthành một giao diện sẽ được triển khai sau này."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bo-ma-hoa",
+      "text": "9.6.1. Bộ mã hóa"
+    },
+    {
+      "type": "paragraph",
+      "text": "Trong giao diện bộ mã hóa, chúng tôi chỉ xác định rằng bộ mã hóa lấy các\nchuỗi có độ dài thay đổi làm đầu vào X . Việc triển khai sẽ được cung\ncấp bởi bất kỳ mô hình nào kế thừa lớp cơ sở Encoder này."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "from mxnet.gluon import nn\n\n\n#@save\nclass Encoder(nn.Block):\n    \"\"\"The base encoder interface for the encoder-decoder architecture.\"\"\"\n    def __init__(self, **kwargs):\n        super(Encoder, self).__init__(**kwargs)\n\n    def forward(self, X, *args):\n        raise NotImplementedError"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "from torch import nn\n\n\n#@save\nclass Encoder(nn.Module):\n    \"\"\"The base encoder interface for the encoder-decoder architecture.\"\"\"\n    def __init__(self, **kwargs):\n        super(Encoder, self).__init__(**kwargs)\n\n    def forward(self, X, *args):\n        raise NotImplementedError"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "import tensorflow as tf\n\n\n#@save\nclass Encoder(tf.keras.layers.Layer):\n    \"\"\"The base encoder interface for the encoder-decoder architecture.\"\"\"\n    def __init__(self, **kwargs):\n        super(Encoder, self).__init__(**kwargs)\n\n    def call(self, X, *args, **kwargs):\n        raise NotImplementedError"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "decoder",
+      "text": "9.6.2. Decoder"
+    },
+    {
+      "type": "paragraph",
+      "text": "Trong giao diện giải mã sau, chúng tôi thêm một chức năng init_state bổ sung để chuyển đổi đầu ra bộ mã hóa ( enc_outputs ) vào trạng thái\nmã hóa. Lưu ý rằng bước này có thể cần thêm các đầu vào như độ dài hợp\nlệ của đầu vào, được giải thích trong Section 9.5.4 . Để tạo ra một mã thông báo chuỗi có\nđộ dài biến đổi theo mã thông báo, mỗi khi bộ giải mã có thể ánh xạ một\nđầu vào (ví dụ, mã thông báo được tạo ra ở bước thời gian trước) và\ntrạng thái mã hóa thành một mã thông báo đầu ra ở bước thời gian hiện\ntại."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "#@save\nclass Decoder(nn.Block):\n    \"\"\"The base decoder interface for the encoder-decoder architecture.\"\"\"\n    def __init__(self, **kwargs):\n        super(Decoder, self).__init__(**kwargs)\n\n    def init_state(self, enc_outputs, *args):\n        raise NotImplementedError\n\n    def forward(self, X, state):\n        raise NotImplementedError"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "#@save\nclass Decoder(nn.Module):\n    \"\"\"The base decoder interface for the encoder-decoder architecture.\"\"\"\n    def __init__(self, **kwargs):\n        super(Decoder, self).__init__(**kwargs)\n\n    def init_state(self, enc_outputs, *args):\n        raise NotImplementedError\n\n    def forward(self, X, state):\n        raise NotImplementedError"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "#@save\nclass Decoder(tf.keras.layers.Layer):\n    \"\"\"The base decoder interface for the encoder-decoder architecture.\"\"\"\n    def __init__(self, **kwargs):\n        super(Decoder, self).__init__(**kwargs)\n\n    def init_state(self, enc_outputs, *args):\n        raise NotImplementedError\n\n    def call(self, X, state, **kwargs):\n        raise NotImplementedError"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "dut-bo-ma-hoa-va-bo-giai-ma-cung-nhau",
+      "text": "9.6.3. Đút bộ mã hóa và bộ giải mã cùng nhau"
+    },
+    {
+      "type": "paragraph",
+      "text": "Cuối cùng, kiến trúc bộ mã hóa-giải mã chứa cả bộ mã hóa và bộ giải mã,\nvới các đối số bổ sung tùy chọn. Trong tuyên truyền chuyển tiếp, đầu ra\ncủa bộ mã hóa được sử dụng để tạo ra trạng thái được mã hóa và trạng\nthái này sẽ được bộ giải mã sử dụng thêm như một trong những đầu vào của\nnó."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "#@save\nclass EncoderDecoder(nn.Block):\n    \"\"\"The base class for the encoder-decoder architecture.\"\"\"\n    def __init__(self, encoder, decoder, **kwargs):\n        super(EncoderDecoder, self).__init__(**kwargs)\n        self.encoder = encoder\n        self.decoder = decoder\n\n    def forward(self, enc_X, dec_X, *args):\n        enc_outputs = self.encoder(enc_X, *args)\n        dec_state = self.decoder.init_state(enc_outputs, *args)\n        return self.decoder(dec_X, dec_state)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "#@save\nclass EncoderDecoder(nn.Module):\n    \"\"\"The base class for the encoder-decoder architecture.\"\"\"\n    def __init__(self, encoder, decoder, **kwargs):\n        super(EncoderDecoder, self).__init__(**kwargs)\n        self.encoder = encoder\n        self.decoder = decoder\n\n    def forward(self, enc_X, dec_X, *args):\n        enc_outputs = self.encoder(enc_X, *args)\n        dec_state = self.decoder.init_state(enc_outputs, *args)\n        return self.decoder(dec_X, dec_state)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "#@save\nclass EncoderDecoder(tf.keras.Model):\n    \"\"\"The base class for the encoder-decoder architecture.\"\"\"\n    def __init__(self, encoder, decoder, **kwargs):\n        super(EncoderDecoder, self).__init__(**kwargs)\n        self.encoder = encoder\n        self.decoder = decoder\n\n    def call(self, enc_X, dec_X, *args, **kwargs):\n        enc_outputs = self.encoder(enc_X, *args, **kwargs)\n        dec_state = self.decoder.init_state(enc_outputs, *args)\n        return self.decoder(dec_X, dec_state, **kwargs)"
+    },
+    {
+      "type": "paragraph",
+      "text": "Thuật ngữ “trạng thái” trong kiến trúc bộ mã hóa-giải mã có lẽ đã truyền\ncảm hứng cho bạn thực hiện kiến trúc này bằng cách sử dụng các mạng thần\nkinh với các trạng thái. Trong phần tiếp theo, chúng ta sẽ thấy cách áp\ndụng RNNs để thiết kế các mô hình chuyển tải chuỗi dựa trên kiến trúc bộ\nmã hóa-giải mã này."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tom-tat",
+      "text": "9.6.4. Tóm tắt"
+    },
+    {
+      "type": "list",
+      "ordered": false,
+      "items": [
+        "Kiến trúc bộ mã hóa-giải mã có thể xử lý các đầu vào và đầu ra vừa là\nchuỗi độ dài biến đổi, do đó phù hợp với các vấn đề chuyển tải trình\ntự như dịch máy.",
+        "Bộ mã hóa lấy một chuỗi chiều dài biến đổi làm đầu vào và biến nó\nthành trạng thái có hình dạng cố định.",
+        "Bộ giải mã ánh xạ trạng thái được mã hóa của một hình dạng cố định\nđến một chuỗi có độ dài thay đổi."
+      ]
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bai-tap",
+      "text": "9.6.5. Bài tập"
+    },
+    {
+      "type": "list",
+      "ordered": true,
+      "items": [
+        "Giả sử rằng chúng ta sử dụng mạng nơ-ron để thực hiện kiến trúc bộ mã\nhóa-giải mã. Bộ mã hóa và bộ giải mã có phải là cùng một loại mạng\nthần kinh không?",
+        "Bên cạnh dịch máy, bạn có thể nghĩ đến một ứng dụng khác mà kiến trúc\nbộ mã hóa-giải mã có thể được áp dụng không?"
+      ]
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    }
+  ],
+  "images": [
+    {
+      "original_url": "https://vi.d2l.ai/_images/encoder-decoder.svg",
+      "local_path": "_images/encoder-decoder.svg",
+      "alt": "../_images/encoder-decoder.svg"
+    }
+  ],
+  "text": "9.6. Kiến trúc mã hóa-Decoder\nNhư chúng ta đã thảo luận trong Section 9.5 ,\ndịch máy là một tên miền vấn đề lớn cho các mô hình chuyển tải chuỗi, có\nđầu vào và đầu ra đều là chuỗi độ dài biến đổi. Để xử lý loại đầu vào và\nđầu ra này, chúng ta có thể thiết kế một kiến trúc với hai thành phần\nchính. Thành phần đầu tiên là bộ mã hóa * : nó lấy một chuỗi có độ dài\nthay đổi làm đầu vào và biến nó thành trạng thái có hình dạng cố định.\nThành phần thứ hai là một * decoder * : nó ánh xạ trạng thái mã hóa của\nmột hình dạng cố định đến một chuỗi có chiều dài biến đổi. Đây được gọi\nlà kiến trúc * encoder-decoder*, được mô tả trong Fig. 9.6.1 .\nFig. 9.6.1 The encoder-decoder architecture. ¶\nHãy để chúng tôi lấy bản dịch máy từ tiếng Anh sang tiếng Pháp làm ví\ndụ. Cho một chuỗi đầu vào bằng tiếng Anh: “They”, “are”, “watching”,” .\n“, kiến trúc bộ mã hóa giải mã này đầu tiên mã hóa đầu vào có độ dài\nbiến đổi thành một trạng thái, sau đó giải mã trạng thái để tạo ra token\nchuỗi dịch bằng token làm đầu ra: “Ils”, “regardent”, “.”. Vì kiến trúc\nbộ mã hóa-giải mã tạo thành nền tảng của các mô hình chuyển đổi chuỗi\nkhác nhau trong các phần tiếp theo, phần này sẽ chuyển đổi kiến trúc này\nthành một giao diện sẽ được triển khai sau này.\n9.6.1. Bộ mã hóa\nTrong giao diện bộ mã hóa, chúng tôi chỉ xác định rằng bộ mã hóa lấy các\nchuỗi có độ dài thay đổi làm đầu vào X . Việc triển khai sẽ được cung\ncấp bởi bất kỳ mô hình nào kế thừa lớp cơ sở Encoder này.\n9.6.2. Decoder\nTrong giao diện giải mã sau, chúng tôi thêm một chức năng init_state bổ sung để chuyển đổi đầu ra bộ mã hóa ( enc_outputs ) vào trạng thái\nmã hóa. Lưu ý rằng bước này có thể cần thêm các đầu vào như độ dài hợp\nlệ của đầu vào, được giải thích trong Section 9.5.4 . Để tạo ra một mã thông báo chuỗi có\nđộ dài biến đổi theo mã thông báo, mỗi khi bộ giải mã có thể ánh xạ một\nđầu vào (ví dụ, mã thông báo được tạo ra ở bước thời gian trước) và\ntrạng thái mã hóa thành một mã thông báo đầu ra ở bước thời gian hiện\ntại.\n9.6.3. Đút bộ mã hóa và bộ giải mã cùng nhau\nCuối cùng, kiến trúc bộ mã hóa-giải mã chứa cả bộ mã hóa và bộ giải mã,\nvới các đối số bổ sung tùy chọn. Trong tuyên truyền chuyển tiếp, đầu ra\ncủa bộ mã hóa được sử dụng để tạo ra trạng thái được mã hóa và trạng\nthái này sẽ được bộ giải mã sử dụng thêm như một trong những đầu vào của\nnó.\nThuật ngữ “trạng thái” trong kiến trúc bộ mã hóa-giải mã có lẽ đã truyền\ncảm hứng cho bạn thực hiện kiến trúc này bằng cách sử dụng các mạng thần\nkinh với các trạng thái. Trong phần tiếp theo, chúng ta sẽ thấy cách áp\ndụng RNNs để thiết kế các mô hình chuyển tải chuỗi dựa trên kiến trúc bộ\nmã hóa-giải mã này.\n9.6.4. Tóm tắt\nKiến trúc bộ mã hóa-giải mã có thể xử lý các đầu vào và đầu ra vừa là\nchuỗi độ dài biến đổi, do đó phù hợp với các vấn đề chuyển tải trình\ntự như dịch máy.\nBộ mã hóa lấy một chuỗi chiều dài biến đổi làm đầu vào và biến nó\nthành trạng thái có hình dạng cố định.\nBộ giải mã ánh xạ trạng thái được mã hóa của một hình dạng cố định\nđến một chuỗi có độ dài thay đổi.\n9.6.5. Bài tập\nGiả sử rằng chúng ta sử dụng mạng nơ-ron để thực hiện kiến trúc bộ mã\nhóa-giải mã. Bộ mã hóa và bộ giải mã có phải là cùng một loại mạng\nthần kinh không?\nBên cạnh dịch máy, bạn có thể nghĩ đến một ứng dụng khác mà kiến trúc\nbộ mã hóa-giải mã có thể được áp dụng không?\nDiscussions\nDiscussions"
+}

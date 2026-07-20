@@ -1,0 +1,287 @@
+{
+  "url": "https://vi.d2l.ai/chapter_computer-vision/multiscale-object-detection.html",
+  "chapter": "chapter_computer-vision",
+  "title": "13.5. Phát hiện đối tượng đa quy mô",
+  "crawled_at": "2026-07-20T12:40:42.614599+00:00",
+  "headings": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "phat-hien-doi-tuong-da-quy-mo",
+      "text": "13.5. Phát hiện đối tượng đa quy mô"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "multiscale-neo-boxes",
+      "text": "13.5.1. Multiscale Neo Boxes"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "phat-hien-da-quy-mo",
+      "text": "13.5.2. Phát hiện đa quy mô"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tom-tat",
+      "text": "13.5.3. Tóm tắt"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bai-tap",
+      "text": "13.5.4. Bài tập"
+    }
+  ],
+  "content": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "phat-hien-doi-tuong-da-quy-mo",
+      "text": "13.5. Phát hiện đối tượng đa quy mô"
+    },
+    {
+      "type": "paragraph",
+      "text": "Trong Section 13.4 , chúng tôi tạo ra nhiều hộp neo tập trung\nvào mỗi pixel của một hình ảnh đầu vào. Về cơ bản các hộp neo này đại\ndiện cho các mẫu của các vùng khác nhau của hình ảnh. Tuy nhiên, chúng\nta có thể kết thúc với quá nhiều hộp neo để tính toán nếu chúng được tạo\ncho every pixel. Hãy nghĩ về một hình ảnh đầu vào \\(561 \\times 728\\) . Nếu năm hộp neo có hình dạng khác nhau được tạo\nra cho mỗi pixel làm trung tâm của chúng, hơn hai triệu hộp neo\n( \\(561 \\times 728 \\times 5\\) ) cần được dán nhãn và dự đoán trên hình\nảnh."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "multiscale-neo-boxes",
+      "text": "13.5.1. Multiscale Neo Boxes"
+    },
+    {
+      "type": "paragraph",
+      "text": "Bạn có thể nhận ra rằng không khó để giảm các hộp neo trên một hình ảnh.\nVí dụ, chúng ta chỉ có thể lấy mẫu một phần nhỏ pixel từ hình ảnh đầu\nvào để tạo ra các hộp neo tập trung vào chúng. Ngoài ra, ở các quy mô\nkhác nhau, chúng ta có thể tạo ra các số lượng hộp neo khác nhau có kích\nthước khác nhau. Về mặt trực giác, các đối tượng nhỏ hơn có nhiều khả\nnăng xuất hiện trên một hình ảnh hơn so với các đối tượng lớn hơn. Ví\ndụ, các đối tượng \\(1 \\times 1\\) , \\(1 \\times 2\\) và \\(2 \\times 2\\) có thể xuất hiện trên một hình ảnh \\(2 \\times 2\\) theo 4, 2 và 1 cách có thể tương ứng. Do đó, khi sử dụng các hộp neo nhỏ\nhơn để phát hiện các vật thể nhỏ hơn, chúng ta có thể lấy mẫu nhiều vùng\nhơn, trong khi đối với các vật thể lớn hơn chúng ta có thể lấy mẫu ít\nvùng hơn."
+    },
+    {
+      "type": "paragraph",
+      "text": "Để chứng minh cách tạo hộp neo ở nhiều thang đo, chúng ta hãy đọc một\nhình ảnh. Chiều cao và chiều rộng của nó lần lượt là 561 và 728 pixel."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "%matplotlib inline\nfrom mxnet import image, np, npx\nfrom d2l import mxnet as d2l\n\nnpx.set_np()\n\nimg = image.imread('../img/catdog.jpg')\nh, w = img.shape[:2]\nh, w"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "(561, 728)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "%matplotlib inline\nimport torch\nfrom d2l import torch as d2l\n\nimg = d2l.plt.imread('../img/catdog.jpg')\nh, w = img.shape[:2]\nh, w"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "(561, 728)"
+    },
+    {
+      "type": "paragraph",
+      "text": "Nhớ lại rằng trong Section 6.2 chúng ta gọi một đầu ra\nmảng hai chiều của một lớp phức tạp là một bản đồ tính năng. Bằng cách\nxác định hình dạng bản đồ tính năng, chúng ta có thể xác định các trung\ntâm của các hộp neo được lấy mẫu đồng đều trên bất kỳ hình ảnh nào."
+    },
+    {
+      "type": "paragraph",
+      "text": "Hàm display_anchors được định nghĩa dưới đây. Chúng tôi tạo các hộp\nneo ( anchors ) trên bản đồ tính năng ( fmap ) với mỗi đơn vị\n(pixel) làm trung tâm hộp neo. Kể từ khi các giá trị tọa độ trục \\((x, y)\\) trong các hộp neo ( anchors ) đã được chia cho chiều\nrộng và chiều cao của bản đồ tính năng ( fmap ), các giá trị này nằm\ngiữa 0 đến 1, cho biết vị trí tương đối của các hộp neo trong bản đồ\ntính năng."
+    },
+    {
+      "type": "paragraph",
+      "text": "Vì các trung tâm của các hộp neo ( anchors ) được trải rộng trên tất\ncả các đơn vị trên bản đồ tính năng ( fmap ), các trung tâm này phải\nđược * thống nhất* phân phối trên bất kỳ hình ảnh đầu vào nào về vị\ntrí không gian tương đối của chúng. Cụ thể hơn, với chiều rộng và chiều\ncao của bản đồ tính năng fmap_w và fmap_h , tương ứng, chức năng\nsau đây sẽ * thống nhất* pixel mẫu trong fmap_h hàng và fmap_w cột trên bất kỳ hình ảnh đầu vào nào. Tập trung vào các pixel được lấy\nmẫu đồng đều này, các hộp neo có tỷ lệ s (giả sử độ dài của danh\nsách s là 1) và các tỷ lệ khung hình khác nhau ( ratios ) sẽ được\ntạo ra."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def display_anchors(fmap_w, fmap_h, s):\n    d2l.set_figsize()\n    # Values on the first two dimensions do not affect the output\n    fmap = np.zeros((1, 10, fmap_h, fmap_w))\n    anchors = npx.multibox_prior(fmap, sizes=s, ratios=[1, 2, 0.5])\n    bbox_scale = np.array((w, h, w, h))\n    d2l.show_bboxes(d2l.plt.imshow(img.asnumpy()).axes,\n                    anchors[0] * bbox_scale)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def display_anchors(fmap_w, fmap_h, s):\n    d2l.set_figsize()\n    # Values on the first two dimensions do not affect the output\n    fmap = torch.zeros((1, 10, fmap_h, fmap_w))\n    anchors = d2l.multibox_prior(fmap, sizes=s, ratios=[1, 2, 0.5])\n    bbox_scale = torch.tensor((w, h, w, h))\n    d2l.show_bboxes(d2l.plt.imshow(img).axes,\n                    anchors[0] * bbox_scale)"
+    },
+    {
+      "type": "paragraph",
+      "text": "Đầu tiên, chúng ta hãy xem xét phát hiện các đối tượng nhỏ. Để phân biệt\ndễ dàng hơn khi được hiển thị, các hộp neo có các trung tâm khác nhau ở\nđây không chồng chéo: tỷ lệ hộp neo được đặt thành 0,15 và chiều cao và\nchiều rộng của bản đồ tính năng được đặt thành 4. Chúng ta có thể thấy\nrằng các trung tâm của các hộp neo trong 4 hàng và 4 cột trên hình ảnh\nđược phân phối đồng đều."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "display_anchors(fmap_w=4, fmap_h=4, s=[0.15])"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_multiscale-object-detection_ad7147_21_0.svg",
+      "local_path": "_images/output_multiscale-object-detection_ad7147_21_0.svg",
+      "alt": "../_images/output_multiscale-object-detection_ad7147_21_0.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "display_anchors(fmap_w=4, fmap_h=4, s=[0.15])"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "/home/d2l-worker/miniconda3/envs/d2l-vi-release-1/lib/python3.8/site-packages/torch/functional.py:568: UserWarning: torch.meshgrid: in an upcoming release, it will be required to pass the indexing argument. (Triggered internally at  ../aten/src/ATen/native/TensorShape.cpp:2228.)\n  return _VF.meshgrid(tensors, **kwargs)  # type: ignore[attr-defined]"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_multiscale-object-detection_ad7147_24_1.svg",
+      "local_path": "_images/output_multiscale-object-detection_ad7147_24_1.svg",
+      "alt": "../_images/output_multiscale-object-detection_ad7147_24_1.svg"
+    },
+    {
+      "type": "paragraph",
+      "text": "Chúng tôi chuyển sang giảm chiều cao và chiều rộng của bản đồ tính năng\nbằng một nửa và sử dụng các hộp neo lớn hơn để phát hiện các đối tượng\nlớn hơn. Khi tỷ lệ được đặt thành 0,4, một số hộp neo sẽ chồng lên nhau."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "display_anchors(fmap_w=2, fmap_h=2, s=[0.4])"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_multiscale-object-detection_ad7147_30_0.svg",
+      "local_path": "_images/output_multiscale-object-detection_ad7147_30_0.svg",
+      "alt": "../_images/output_multiscale-object-detection_ad7147_30_0.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "display_anchors(fmap_w=2, fmap_h=2, s=[0.4])"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_multiscale-object-detection_ad7147_33_0.svg",
+      "local_path": "_images/output_multiscale-object-detection_ad7147_33_0.svg",
+      "alt": "../_images/output_multiscale-object-detection_ad7147_33_0.svg"
+    },
+    {
+      "type": "paragraph",
+      "text": "Cuối cùng, chúng tôi tiếp tục giảm chiều cao và chiều rộng của bản đồ\ntính năng bằng một nửa và tăng tỷ lệ hộp neo lên 0,8. Bây giờ trung tâm\ncủa hộp neo là trung tâm của hình ảnh."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "display_anchors(fmap_w=1, fmap_h=1, s=[0.8])"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_multiscale-object-detection_ad7147_39_0.svg",
+      "local_path": "_images/output_multiscale-object-detection_ad7147_39_0.svg",
+      "alt": "../_images/output_multiscale-object-detection_ad7147_39_0.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "display_anchors(fmap_w=1, fmap_h=1, s=[0.8])"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_multiscale-object-detection_ad7147_42_0.svg",
+      "local_path": "_images/output_multiscale-object-detection_ad7147_42_0.svg",
+      "alt": "../_images/output_multiscale-object-detection_ad7147_42_0.svg"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "phat-hien-da-quy-mo",
+      "text": "13.5.2. Phát hiện đa quy mô"
+    },
+    {
+      "type": "paragraph",
+      "text": "Vì chúng tôi đã tạo ra các hộp neo đa quy mô, chúng tôi sẽ sử dụng chúng\nđể phát hiện các vật thể có kích thước khác nhau ở các quy mô khác nhau.\nSau đây, chúng tôi giới thiệu phương pháp phát hiện đối tượng đa quy mô\ndựa trên CNN mà chúng tôi sẽ triển khai trong Section 13.7 ."
+    },
+    {
+      "type": "paragraph",
+      "text": "Ở một số quy mô, nói rằng chúng tôi có \\(c\\) tính năng bản đồ hình\ndạng \\(h \\times w\\) . Sử dụng phương pháp trong Section 13.5.1 , chúng tôi tạo ra \\(hw\\) bộ hộp neo, trong đó mỗi bộ có \\(a\\) hộp neo có cùng tâm. Ví dụ, ở\nthang điểm đầu tiên trong các thí nghiệm trong Section 13.5.1 , cho mười (số kênh) bản đồ\ntính năng \\(4 \\times 4\\) , chúng tôi tạo ra 16 bộ hộp neo, trong đó\nmỗi bộ chứa 3 hộp neo với cùng một trung tâm. Tiếp theo, mỗi hộp neo\nđược dán nhãn với lớp và bù đắp dựa trên các hộp giới hạn chân lý mặt\nđất. Ở quy mô hiện tại, mô hình phát hiện đối tượng cần dự đoán các lớp\nvà bù đắp của \\(hw\\) bộ hộp neo trên ảnh đầu vào, trong đó các bộ\nkhác nhau có các trung tâm khác nhau."
+    },
+    {
+      "type": "paragraph",
+      "text": "Giả sử rằng các bản đồ tính năng \\(c\\) ở đây là các đầu ra trung\ngian thu được bởi CNN chuyển tiếp tuyên truyền dựa trên hình ảnh đầu\nvào. Vì có \\(hw\\) vị trí không gian khác nhau trên mỗi bản đồ tính\nnăng, cùng một vị trí không gian có thể được coi là có \\(c\\) đơn vị.\nTheo định nghĩa của trường tiếp nhận trong Section 6.2 ,\ncác đơn vị \\(c\\) này ở cùng vị trí không gian của các bản đồ tính\nnăng có cùng trường tiếp nhận trên hình ảnh đầu vào: chúng đại diện cho\nthông tin hình ảnh đầu vào trong cùng một trường tiếp nhận. Do đó, chúng\nta có thể biến đổi các đơn vị \\(c\\) của các bản đồ tính năng ở cùng\nmột vị trí không gian thành các lớp và bù đắp của các hộp neo \\(a\\) được tạo ra bằng cách sử dụng vị trí không gian này. Về bản chất, chúng\nta sử dụng thông tin của hình ảnh đầu vào trong một trường tiếp nhận\nnhất định để dự đoán các lớp và bù đắp của các hộp neo gần với trường\ntiếp nhận đó trên hình ảnh đầu vào."
+    },
+    {
+      "type": "paragraph",
+      "text": "Khi các bản đồ tính năng ở các lớp khác nhau có các trường tiếp nhận\nkích thước khác nhau trên hình ảnh đầu vào, chúng có thể được sử dụng để\nphát hiện các đối tượng có kích thước khác nhau. Ví dụ, chúng ta có thể\nthiết kế một mạng nơ-ron trong đó các đơn vị của các bản đồ tính năng\ngần với lớp đầu ra có các trường tiếp nhận rộng hơn, do đó chúng có thể\nphát hiện các đối tượng lớn hơn từ hình ảnh đầu vào."
+    },
+    {
+      "type": "paragraph",
+      "text": "Tóm lại, chúng ta có thể tận dụng các biểu diễn theo lớp của hình ảnh ở\nnhiều cấp độ bằng các mạng thần kinh sâu để phát hiện đối tượng đa quy\nmô. Chúng tôi sẽ chỉ ra cách điều này hoạt động thông qua một ví dụ cụ\nthể trong Section 13.7 ."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tom-tat",
+      "text": "13.5.3. Tóm tắt"
+    },
+    {
+      "type": "list",
+      "ordered": false,
+      "items": [
+        "Ở nhiều thang đo, chúng ta có thể tạo ra các hộp neo với các kích cỡ\nkhác nhau để phát hiện các vật thể có kích thước khác nhau.",
+        "Bằng cách xác định hình dạng của bản đồ tính năng, chúng ta có thể\nxác định các trung tâm của các hộp neo được lấy mẫu đồng đều trên bất\nkỳ hình ảnh nào.",
+        "Chúng tôi sử dụng thông tin của hình ảnh đầu vào trong một trường\ntiếp nhận nhất định để dự đoán các lớp và bù đắp của các hộp neo gần\nvới trường tiếp nhận đó trên hình ảnh đầu vào.",
+        "Thông qua deep learning, chúng ta có thể tận dụng các biểu diễn theo\nlớp của hình ảnh ở nhiều cấp độ để phát hiện đối tượng đa quy mô."
+      ]
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bai-tap",
+      "text": "13.5.4. Bài tập"
+    },
+    {
+      "type": "list",
+      "ordered": true,
+      "items": [
+        "Theo các cuộc thảo luận của chúng tôi trong Section 7.1 ,\ncác mạng thần kinh sâu tìm hiểu các tính năng phân cấp với mức độ\ntrừu tượng ngày càng tăng cho hình ảnh. Trong phát hiện đối tượng đa\nquy mô, các bản đồ tính năng ở các thang đo khác nhau có tương ứng\nvới các mức độ trừu tượng khác nhau không? Tại sao hoặc tại sao\nkhông?",
+        "Ở thang điểm đầu tiên ( fmap_w=4, fmap_h=4 ) trong các thí nghiệm\ntrong Section 13.5.1 , tạo ra các hộp neo\nphân bố đồng đều có thể chồng lên nhau.",
+        "Đưa ra một biến bản đồ tính năng với hình dạng \\(1 \\times c \\times h \\times w\\) , trong đó \\(c\\) , \\(h\\) và \\(w\\) là số kênh, chiều cao và chiều rộng của bản đồ tính\nnăng, tương ứng. Làm thế nào bạn có thể chuyển đổi biến này thành các\nlớp và bù đắp của hộp neo? Hình dạng của đầu ra là gì?"
+      ]
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    }
+  ],
+  "images": [
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_multiscale-object-detection_ad7147_21_0.svg",
+      "local_path": "_images/output_multiscale-object-detection_ad7147_21_0.svg",
+      "alt": "../_images/output_multiscale-object-detection_ad7147_21_0.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_multiscale-object-detection_ad7147_24_1.svg",
+      "local_path": "_images/output_multiscale-object-detection_ad7147_24_1.svg",
+      "alt": "../_images/output_multiscale-object-detection_ad7147_24_1.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_multiscale-object-detection_ad7147_30_0.svg",
+      "local_path": "_images/output_multiscale-object-detection_ad7147_30_0.svg",
+      "alt": "../_images/output_multiscale-object-detection_ad7147_30_0.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_multiscale-object-detection_ad7147_33_0.svg",
+      "local_path": "_images/output_multiscale-object-detection_ad7147_33_0.svg",
+      "alt": "../_images/output_multiscale-object-detection_ad7147_33_0.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_multiscale-object-detection_ad7147_39_0.svg",
+      "local_path": "_images/output_multiscale-object-detection_ad7147_39_0.svg",
+      "alt": "../_images/output_multiscale-object-detection_ad7147_39_0.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_multiscale-object-detection_ad7147_42_0.svg",
+      "local_path": "_images/output_multiscale-object-detection_ad7147_42_0.svg",
+      "alt": "../_images/output_multiscale-object-detection_ad7147_42_0.svg"
+    }
+  ],
+  "text": "13.5. Phát hiện đối tượng đa quy mô\nTrong Section 13.4 , chúng tôi tạo ra nhiều hộp neo tập trung\nvào mỗi pixel của một hình ảnh đầu vào. Về cơ bản các hộp neo này đại\ndiện cho các mẫu của các vùng khác nhau của hình ảnh. Tuy nhiên, chúng\nta có thể kết thúc với quá nhiều hộp neo để tính toán nếu chúng được tạo\ncho every pixel. Hãy nghĩ về một hình ảnh đầu vào \\(561 \\times 728\\) . Nếu năm hộp neo có hình dạng khác nhau được tạo\nra cho mỗi pixel làm trung tâm của chúng, hơn hai triệu hộp neo\n( \\(561 \\times 728 \\times 5\\) ) cần được dán nhãn và dự đoán trên hình\nảnh.\n13.5.1. Multiscale Neo Boxes\nBạn có thể nhận ra rằng không khó để giảm các hộp neo trên một hình ảnh.\nVí dụ, chúng ta chỉ có thể lấy mẫu một phần nhỏ pixel từ hình ảnh đầu\nvào để tạo ra các hộp neo tập trung vào chúng. Ngoài ra, ở các quy mô\nkhác nhau, chúng ta có thể tạo ra các số lượng hộp neo khác nhau có kích\nthước khác nhau. Về mặt trực giác, các đối tượng nhỏ hơn có nhiều khả\nnăng xuất hiện trên một hình ảnh hơn so với các đối tượng lớn hơn. Ví\ndụ, các đối tượng \\(1 \\times 1\\) , \\(1 \\times 2\\) và \\(2 \\times 2\\) có thể xuất hiện trên một hình ảnh \\(2 \\times 2\\) theo 4, 2 và 1 cách có thể tương ứng. Do đó, khi sử dụng các hộp neo nhỏ\nhơn để phát hiện các vật thể nhỏ hơn, chúng ta có thể lấy mẫu nhiều vùng\nhơn, trong khi đối với các vật thể lớn hơn chúng ta có thể lấy mẫu ít\nvùng hơn.\nĐể chứng minh cách tạo hộp neo ở nhiều thang đo, chúng ta hãy đọc một\nhình ảnh. Chiều cao và chiều rộng của nó lần lượt là 561 và 728 pixel.\nNhớ lại rằng trong Section 6.2 chúng ta gọi một đầu ra\nmảng hai chiều của một lớp phức tạp là một bản đồ tính năng. Bằng cách\nxác định hình dạng bản đồ tính năng, chúng ta có thể xác định các trung\ntâm của các hộp neo được lấy mẫu đồng đều trên bất kỳ hình ảnh nào.\nHàm display_anchors được định nghĩa dưới đây. Chúng tôi tạo các hộp\nneo ( anchors ) trên bản đồ tính năng ( fmap ) với mỗi đơn vị\n(pixel) làm trung tâm hộp neo. Kể từ khi các giá trị tọa độ trục \\((x, y)\\) trong các hộp neo ( anchors ) đã được chia cho chiều\nrộng và chiều cao của bản đồ tính năng ( fmap ), các giá trị này nằm\ngiữa 0 đến 1, cho biết vị trí tương đối của các hộp neo trong bản đồ\ntính năng.\nVì các trung tâm của các hộp neo ( anchors ) được trải rộng trên tất\ncả các đơn vị trên bản đồ tính năng ( fmap ), các trung tâm này phải\nđược * thống nhất* phân phối trên bất kỳ hình ảnh đầu vào nào về vị\ntrí không gian tương đối của chúng. Cụ thể hơn, với chiều rộng và chiều\ncao của bản đồ tính năng fmap_w và fmap_h , tương ứng, chức năng\nsau đây sẽ * thống nhất* pixel mẫu trong fmap_h hàng và fmap_w cột trên bất kỳ hình ảnh đầu vào nào. Tập trung vào các pixel được lấy\nmẫu đồng đều này, các hộp neo có tỷ lệ s (giả sử độ dài của danh\nsách s là 1) và các tỷ lệ khung hình khác nhau ( ratios ) sẽ được\ntạo ra.\nĐầu tiên, chúng ta hãy xem xét phát hiện các đối tượng nhỏ. Để phân biệt\ndễ dàng hơn khi được hiển thị, các hộp neo có các trung tâm khác nhau ở\nđây không chồng chéo: tỷ lệ hộp neo được đặt thành 0,15 và chiều cao và\nchiều rộng của bản đồ tính năng được đặt thành 4. Chúng ta có thể thấy\nrằng các trung tâm của các hộp neo trong 4 hàng và 4 cột trên hình ảnh\nđược phân phối đồng đều.\nChúng tôi chuyển sang giảm chiều cao và chiều rộng của bản đồ tính năng\nbằng một nửa và sử dụng các hộp neo lớn hơn để phát hiện các đối tượng\nlớn hơn. Khi tỷ lệ được đặt thành 0,4, một số hộp neo sẽ chồng lên nhau.\nCuối cùng, chúng tôi tiếp tục giảm chiều cao và chiều rộng của bản đồ\ntính năng bằng một nửa và tăng tỷ lệ hộp neo lên 0,8. Bây giờ trung tâm\ncủa hộp neo là trung tâm của hình ảnh.\n13.5.2. Phát hiện đa quy mô\nVì chúng tôi đã tạo ra các hộp neo đa quy mô, chúng tôi sẽ sử dụng chúng\nđể phát hiện các vật thể có kích thước khác nhau ở các quy mô khác nhau.\nSau đây, chúng tôi giới thiệu phương pháp phát hiện đối tượng đa quy mô\ndựa trên CNN mà chúng tôi sẽ triển khai trong Section 13.7 .\nỞ một số quy mô, nói rằng chúng tôi có \\(c\\) tính năng bản đồ hình\ndạng \\(h \\times w\\) . Sử dụng phương pháp trong Section 13.5.1 , chúng tôi tạo ra \\(hw\\) bộ hộp neo, trong đó mỗi bộ có \\(a\\) hộp neo có cùng tâm. Ví dụ, ở\nthang điểm đầu tiên trong các thí nghiệm trong Section 13.5.1 , cho mười (số kênh) bản đồ\ntính năng \\(4 \\times 4\\) , chúng tôi tạo ra 16 bộ hộp neo, trong đó\nmỗi bộ chứa 3 hộp neo với cùng một trung tâm. Tiếp theo, mỗi hộp neo\nđược dán nhãn với lớp và bù đắp dựa trên các hộp giới hạn chân lý mặt\nđất. Ở quy mô hiện tại, mô hình phát hiện đối tượng cần dự đoán các lớp\nvà bù đắp của \\(hw\\) bộ hộp neo trên ảnh đầu vào, trong đó các bộ\nkhác nhau có các trung tâm khác nhau.\nGiả sử rằng các bản đồ tính năng \\(c\\) ở đây là các đầu ra trung\ngian thu được bởi CNN chuyển tiếp tuyên truyền dựa trên hình ảnh đầu\nvào. Vì có \\(hw\\) vị trí không gian khác nhau trên mỗi bản đồ tính\nnăng, cùng một vị trí không gian có thể được coi là có \\(c\\) đơn vị.\nTheo định nghĩa của trường tiếp nhận trong Section 6.2 ,\ncác đơn vị \\(c\\) này ở cùng vị trí không gian của các bản đồ tính\nnăng có cùng trường tiếp nhận trên hình ảnh đầu vào: chúng đại diện cho\nthông tin hình ảnh đầu vào trong cùng một trường tiếp nhận. Do đó, chúng\nta có thể biến đổi các đơn vị \\(c\\) của các bản đồ tính năng ở cùng\nmột vị trí không gian thành các lớp và bù đắp của các hộp neo \\(a\\) được tạo ra bằng cách sử dụng vị trí không gian này. Về bản chất, chúng\nta sử dụng thông tin của hình ảnh đầu vào trong một trường tiếp nhận\nnhất định để dự đoán các lớp và bù đắp của các hộp neo gần với trường\ntiếp nhận đó trên hình ảnh đầu vào.\nKhi các bản đồ tính năng ở các lớp khác nhau có các trường tiếp nhận\nkích thước khác nhau trên hình ảnh đầu vào, chúng có thể được sử dụng để\nphát hiện các đối tượng có kích thước khác nhau. Ví dụ, chúng ta có thể\nthiết kế một mạng nơ-ron trong đó các đơn vị của các bản đồ tính năng\ngần với lớp đầu ra có các trường tiếp nhận rộng hơn, do đó chúng có thể\nphát hiện các đối tượng lớn hơn từ hình ảnh đầu vào.\nTóm lại, chúng ta có thể tận dụng các biểu diễn theo lớp của hình ảnh ở\nnhiều cấp độ bằng các mạng thần kinh sâu để phát hiện đối tượng đa quy\nmô. Chúng tôi sẽ chỉ ra cách điều này hoạt động thông qua một ví dụ cụ\nthể trong Section 13.7 .\n13.5.3. Tóm tắt\nỞ nhiều thang đo, chúng ta có thể tạo ra các hộp neo với các kích cỡ\nkhác nhau để phát hiện các vật thể có kích thước khác nhau.\nBằng cách xác định hình dạng của bản đồ tính năng, chúng ta có thể\nxác định các trung tâm của các hộp neo được lấy mẫu đồng đều trên bất\nkỳ hình ảnh nào.\nChúng tôi sử dụng thông tin của hình ảnh đầu vào trong một trường\ntiếp nhận nhất định để dự đoán các lớp và bù đắp của các hộp neo gần\nvới trường tiếp nhận đó trên hình ảnh đầu vào.\nThông qua deep learning, chúng ta có thể tận dụng các biểu diễn theo\nlớp của hình ảnh ở nhiều cấp độ để phát hiện đối tượng đa quy mô.\n13.5.4. Bài tập\nTheo các cuộc thảo luận của chúng tôi trong Section 7.1 ,\ncác mạng thần kinh sâu tìm hiểu các tính năng phân cấp với mức độ\ntrừu tượng ngày càng tăng cho hình ảnh. Trong phát hiện đối tượng đa\nquy mô, các bản đồ tính năng ở các thang đo khác nhau có tương ứng\nvới các mức độ trừu tượng khác nhau không? Tại sao hoặc tại sao\nkhông?\nỞ thang điểm đầu tiên ( fmap_w=4, fmap_h=4 ) trong các thí nghiệm\ntrong Section 13.5.1 , tạo ra các hộp neo\nphân bố đồng đều có thể chồng lên nhau.\nĐưa ra một biến bản đồ tính năng với hình dạng \\(1 \\times c \\times h \\times w\\) , trong đó \\(c\\) , \\(h\\) và \\(w\\) là số kênh, chiều cao và chiều rộng của bản đồ tính\nnăng, tương ứng. Làm thế nào bạn có thể chuyển đổi biến này thành các\nlớp và bù đắp của hộp neo? Hình dạng của đầu ra là gì?\nDiscussions\nDiscussions"
+}

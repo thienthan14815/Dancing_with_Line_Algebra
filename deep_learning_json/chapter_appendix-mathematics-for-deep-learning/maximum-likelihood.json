@@ -1,0 +1,408 @@
+{
+  "url": "https://vi.d2l.ai/chapter_appendix-mathematics-for-deep-learning/maximum-likelihood.html",
+  "chapter": "chapter_appendix-mathematics-for-deep-learning",
+  "title": "18.7. Khả năng tối đa",
+  "crawled_at": "2026-07-20T12:41:28.699820+00:00",
+  "headings": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "kha-nang-toi-da",
+      "text": "18.7. Khả năng tối đa"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "nguyen-tac-kha-nang-toi-da",
+      "text": "18.7.1. Nguyên tắc khả năng tối đa"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "mot-vi-du-cu-the",
+      "text": "18.7.1.1. Một ví dụ cụ thể"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "toi-uu-hoa-so-va-tieu-cuc-log-likelihood",
+      "text": "18.7.2. Tối ưu hóa số và tiêu cực Log-Likelihood"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "kha-nang-toi-da-cho-cac-bien-lien-tuc",
+      "text": "18.7.3. Khả năng tối đa cho các biến liên tục"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tom-tat-nguyen-tac-kha-nang-toi-da-cho-chung-ta-biet-rang-mo-hinh-phu-hop-nhat-cho-mot-tap-du-lieu-nhat-dinh-la-mo-hinh-tao-ra-du-lieu-co-xac-suat-cao-nhat-thuong-moi-nguoi-lam-viec-voi-kha-nang-ghi-am-thay-vi-nhieu-ly-do-on-dinh-so-chuyen-doi-san-pham-thanh-tong-va-ket-qua-don-gian-hoa-tinh-toan-gradient-va-moi-quan-he-ly-thuyet-voi-ly-thuyet-thong-tin-mac-du-don-gian-nhat-de-thuc-day-trong-cai-dat-roi-rac-no-co-the-duoc-tu-do-khai-quat-hoa-de-cai-dat-lien-tuc-cung-nhu-bang-cach-toi-da-hoa-mat-do-xac-suat-duoc-gan-cho-cac-datapoints",
+      "text": "18.7.4. Tóm tắt * Nguyên tắc khả năng tối đa cho chúng ta biết rằng mô hình phù hợp nhất cho một tập dữ liệu nhất định là mô hình tạo ra dữ liệu có xác suất cao nhất.* Thường mọi người làm việc với khả năng ghi âm thay vì nhiều lý do: ổn định số, chuyển đổi sản phẩm thành tổng (và kết quả đơn giản hóa tính toán gradient), và mối quan hệ lý thuyết với lý thuyết thông tin * Mặc dù đơn giản nhất để thúc đẩy trong cài đặt rời rạc, nó có thể được tự do khái quát hóa để cài đặt liên tục cũng như bằng cách tối đa hóa mật độ xác suất được gán cho các datapoints."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bai-tap-1-gia-su-rang-ban-biet-rang-mot-bien-ngau-nhien-co-mat-do-frac-1-alpha-e-alpha-x-cho-mot-so-gia-tri-alpha-ban-co-duoc-mot-quan-sat-duy-nhat-tu-bien-ngau-nhien-do-la-so-3-uoc-tinh-kha-nang-toi-da-cho-alpha-la-gi-2-gia-su-rang-ban-co-mot-tap-du-lieu-cua-cac-mau-x-i-i-1-n-rut-ra-tu-mot-gaussian-voi-trung-binh-khong-xac-dinh-nhung-phuong-sai-1-uoc-tinh-kha-nang-toi-da-cho-nghia-la-gi",
+      "text": "18.7.5. Bài tập 1. Giả sử rằng bạn biết rằng một biến ngẫu nhiên có mật độ \\(\\frac{1}{\\alpha}e^{-\\alpha x}\\) cho một số giá trị \\(\\alpha\\) . Bạn có được một quan sát duy nhất từ biến ngẫu nhiên đó là số \\(3\\) . Ước tính khả năng tối đa cho \\(\\alpha\\) là gì? 2. Giả sử rằng bạn có một tập dữ liệu của các mẫu \\(\\{x_i\\}_{i=1}^N\\) rút ra từ một Gaussian với trung bình không xác định, nhưng phương sai \\(1\\) . Ước tính khả năng tối đa cho nghĩa là gì?"
+    }
+  ],
+  "content": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "kha-nang-toi-da",
+      "text": "18.7. Khả năng tối đa"
+    },
+    {
+      "type": "paragraph",
+      "text": "Một trong những cách suy nghĩ phổ biến nhất trong học máy là quan điểm\nkhả năng tối đa. Đây là khái niệm rằng khi làm việc với một mô hình xác\nsuất với các tham số không xác định, các tham số làm cho dữ liệu có xác\nsuất cao nhất là những thông số có khả năng nhất."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "nguyen-tac-kha-nang-toi-da",
+      "text": "18.7.1. Nguyên tắc khả năng tối đa"
+    },
+    {
+      "type": "paragraph",
+      "text": "Điều này có một cách giải thích Bayesian có thể hữu ích để suy nghĩ về.\nGiả sử rằng chúng ta có một mô hình với các tham số \\(\\boldsymbol{\\theta}\\) và một tập hợp các ví dụ dữ liệu \\(X\\) .\nĐối với sự cụ thể, chúng ta có thể tưởng tượng rằng \\(\\boldsymbol{\\theta}\\) là một giá trị duy nhất đại diện cho xác\nsuất một đồng xu xuất hiện đầu khi lật, và \\(X\\) là một chuỗi các\nlật đồng xu độc lập. Chúng tôi sẽ xem xét ví dụ này trong chiều sâu sau."
+    },
+    {
+      "type": "paragraph",
+      "text": "Nếu chúng ta muốn tìm giá trị có khả năng nhất cho các tham số của mô\nhình của chúng ta, điều đó có nghĩa là chúng ta muốn tìm"
+    },
+    {
+      "type": "math",
+      "latex": "(18.7.1)¶\\[\\mathop{\\mathrm{argmax}} P(\\boldsymbol{\\theta}\\mid X).\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Theo quy tắc của Bayes, đây là điều tương tự như"
+    },
+    {
+      "type": "math",
+      "latex": "(18.7.2)¶\\[\\mathop{\\mathrm{argmax}} \\frac{P(X \\mid \\boldsymbol{\\theta})P(\\boldsymbol{\\theta})}{P(X)}.\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Biểu thức \\(P(X)\\) , một tham số xác suất bất khả tri của việc tạo dữ\nliệu, không phụ thuộc vào \\(\\boldsymbol{\\theta}\\) ở tất cả, và do đó\ncó thể được giảm mà không thay đổi sự lựa chọn tốt nhất của \\(\\boldsymbol{\\theta}\\) . Tương tự, bây giờ chúng ta có thể khẳng\nđịnh rằng chúng tôi không có giả định trước về tập hợp các tham số nào\ntốt hơn bất kỳ tham số nào khác, vì vậy chúng tôi có thể tuyên bố rằng \\(P(\\boldsymbol{\\theta})\\) cũng không phụ thuộc vào theta! Ví dụ,\nđiều này có ý nghĩa trong ví dụ lật đồng xu của chúng tôi, nơi xác suất\nnó xuất hiện đầu có thể là bất kỳ giá trị nào trong \\([0,1]\\) mà\nkhông có bất kỳ niềm tin nào trước đó là công bằng hay không (thường\nđược gọi là ưu tiên * không thông tin*). Do đó, chúng tôi thấy rằng\nviệc áp dụng quy tắc Bayes’ cho thấy sự lựa chọn tốt nhất của chúng tôi\nvề \\(\\boldsymbol{\\theta}\\) là ước tính khả năng tối đa cho \\(\\boldsymbol{\\theta}\\) :"
+    },
+    {
+      "type": "math",
+      "latex": "(18.7.3)¶\\[\\hat{\\boldsymbol{\\theta}} = \\mathop{\\mathrm{argmax}} _ {\\boldsymbol{\\theta}} P(X \\mid \\boldsymbol{\\theta}).\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Như một vấn đề của thuật ngữ phổ biến, xác suất của dữ liệu được đưa ra\ncác tham số ( \\(P(X \\mid \\boldsymbol{\\theta})\\) ) được gọi là likelihood ."
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "mot-vi-du-cu-the",
+      "text": "18.7.1.1. Một ví dụ cụ thể"
+    },
+    {
+      "type": "paragraph",
+      "text": "Hãy để chúng tôi xem làm thế nào điều này hoạt động trong một ví dụ cụ\nthể. Giả sử rằng chúng ta có một tham số duy nhất \\(\\theta\\) đại\ndiện cho xác suất rằng một đồng xu lật là đầu. Sau đó, xác suất nhận\nđược đuôi là \\(1-\\theta\\) , và vì vậy nếu dữ liệu quan sát của chúng\ntôi \\(X\\) là một chuỗi với \\(n_H\\) đầu và \\(n_T\\) đuôi,\nchúng ta có thể sử dụng thực tế là xác suất độc lập nhân lên để thấy\nrằng"
+    },
+    {
+      "type": "math",
+      "latex": "(18.7.4)¶\\[P(X \\mid \\theta) = \\theta^{n_H}(1-\\theta)^{n_T}.\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Nếu chúng ta lật \\(13\\) coin và nhận được chuỗi “HHHTHTTHHHHHT”, có \\(n_H = 9\\) và \\(n_T = 4\\) , chúng ta thấy rằng đây là"
+    },
+    {
+      "type": "math",
+      "latex": "(18.7.5)¶\\[P(X \\mid \\theta) = \\theta^9(1-\\theta)^4.\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Một điều hay về ví dụ này sẽ là chúng ta biết câu trả lời đang diễn ra.\nThật vậy, nếu chúng tôi nói bằng lời nói, “Tôi lật 13 đồng xu, và 9\nngười đứng đầu, đoán tốt nhất của chúng tôi cho xác suất đồng xu đến\nchúng ta đứng đầu là gì? , “mọi người sẽ đoán chính xác \\(9/13\\) .\nPhương pháp khả năng tối đa này sẽ cung cấp cho chúng ta là một cách để\ncó được con số đó từ các hiệu trưởng đầu tiên theo cách sẽ khái quát hóa\nđến các tình huống phức tạp hơn rất nhiều."
+    },
+    {
+      "type": "paragraph",
+      "text": "Đối với ví dụ của chúng tôi, cốt truyện của \\(P(X \\mid \\theta)\\) như\nsau:"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "%matplotlib inline\nfrom mxnet import autograd, np, npx\nfrom d2l import mxnet as d2l\n\nnpx.set_np()\n\ntheta = np.arange(0, 1, 0.001)\np = theta**9 * (1 - theta)**4.\n\nd2l.plot(theta, p, 'theta', 'likelihood')"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_maximum-likelihood_907113_3_0.svg",
+      "local_path": "_images/output_maximum-likelihood_907113_3_0.svg",
+      "alt": "../_images/output_maximum-likelihood_907113_3_0.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "%matplotlib inline\nimport torch\nfrom d2l import torch as d2l\n\ntheta = torch.arange(0, 1, 0.001)\np = theta**9 * (1 - theta)**4.\n\nd2l.plot(theta, p, 'theta', 'likelihood')"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_maximum-likelihood_907113_6_0.svg",
+      "local_path": "_images/output_maximum-likelihood_907113_6_0.svg",
+      "alt": "../_images/output_maximum-likelihood_907113_6_0.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "%matplotlib inline\nimport tensorflow as tf\nfrom d2l import tensorflow as d2l\n\ntheta = tf.range(0, 1, 0.001)\np = theta**9 * (1 - theta)**4.\n\nd2l.plot(theta, p, 'theta', 'likelihood')"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_maximum-likelihood_907113_9_0.svg",
+      "local_path": "_images/output_maximum-likelihood_907113_9_0.svg",
+      "alt": "../_images/output_maximum-likelihood_907113_9_0.svg"
+    },
+    {
+      "type": "paragraph",
+      "text": "Điều này có giá trị tối đa của nó ở đâu đó gần \\(9/13 \\approx 0.7\\ldots\\) dự kiến của chúng tôi. Để xem liệu nó có\nchính xác ở đó không, chúng ta có thể chuyển sang tính toán. Lưu ý rằng\nở mức tối đa, gradient của hàm là phẳng. Do đó, chúng ta có thể tìm thấy\nước tính khả năng tối đa (18.7.1) bằng cách tìm các giá\ntrị của \\(\\theta\\) trong đó đạo hàm bằng 0 và tìm giá trị cho xác\nsuất cao nhất. Chúng tôi tính toán:"
+    },
+    {
+      "type": "math",
+      "latex": "(18.7.6)¶\\[\\begin{split}\\begin{aligned}\n0 & = \\frac{d}{d\\theta} P(X \\mid \\theta) \\\\\n& = \\frac{d}{d\\theta} \\theta^9(1-\\theta)^4 \\\\\n& = 9\\theta^8(1-\\theta)^4 - 4\\theta^9(1-\\theta)^3 \\\\\n& = \\theta^8(1-\\theta)^3(9-13\\theta).\n\\end{aligned}\\end{split}\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Điều này có ba giải pháp: \\(0\\) , \\(1\\) và \\(9/13\\) . Hai đầu\ntiên rõ ràng là minima, không phải maxima như họ gán xác suất \\(0\\) cho trình tự của chúng tôi. Giá trị cuối cùng không * không* gán xác\nsuất bằng 0 cho trình tự của chúng tôi, và do đó phải là ước tính khả\nnăng tối đa \\(\\hat \\theta = 9/13\\) ."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "toi-uu-hoa-so-va-tieu-cuc-log-likelihood",
+      "text": "18.7.2. Tối ưu hóa số và tiêu cực Log-Likelihood"
+    },
+    {
+      "type": "paragraph",
+      "text": "Ví dụ trước là tốt đẹp, nhưng nếu chúng ta có hàng tỷ tham số và ví dụ\ndữ liệu thì sao?"
+    },
+    {
+      "type": "paragraph",
+      "text": "Đầu tiên, lưu ý rằng nếu chúng ta đưa ra giả định rằng tất cả các ví dụ\ndữ liệu đều độc lập, chúng ta không còn thực tế có thể xem xét khả năng\nvì nó là sản phẩm của nhiều xác suất. Thật vậy, mỗi xác suất là trong \\([0,1]\\) , nói thường có giá trị khoảng \\(1/2\\) , và sản phẩm của \\((1/2)^{1000000000}\\) thấp hơn nhiều so với độ chính xác của máy.\nChúng tôi không thể làm việc trực tiếp với điều đó."
+    },
+    {
+      "type": "paragraph",
+      "text": "Tuy nhiên, hãy nhớ lại rằng logarit biến sản phẩm thành một khoản tiền,\ntrong trường hợp đó"
+    },
+    {
+      "type": "math",
+      "latex": "(18.7.7)¶\\[\\log((1/2)^{1000000000}) = 1000000000\\cdot\\log(1/2) \\approx -301029995.6\\ldots\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Con số này phù hợp hoàn hảo ngay cả trong một độ chính xác duy nhất \\(32\\) -bit float. Vì vậy, chúng ta nên xem xét log-likelihood , đó\nlà"
+    },
+    {
+      "type": "math",
+      "latex": "(18.7.8)¶\\[\\log(P(X \\mid \\boldsymbol{\\theta})).\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Kể từ khi chức năng \\(x \\mapsto \\log(x)\\) đang tăng lên, tối đa hóa\nkhả năng là điều tương tự như tối đa hóa khả năng log. Thật vậy trong Section 18.8 , chúng ta sẽ thấy lý do này được áp dụng khi\nlàm việc với ví dụ cụ thể về phân loại Bayes ngây thơ."
+    },
+    {
+      "type": "paragraph",
+      "text": "Chúng tôi thường làm việc với các chức năng mất mát, nơi chúng tôi muốn\ngiảm thiểu tổn thất. Chúng tôi có thể biến khả năng tối đa thành việc\ngiảm thiểu tổn thất bằng cách lấy \\(-\\log(P(X \\mid \\boldsymbol{\\theta}))\\) , đó là âm log-likelihood ."
+    },
+    {
+      "type": "paragraph",
+      "text": "Để minh họa điều này, hãy xem xét vấn đề lật đồng xu từ trước, và giả vờ\nrằng chúng ta không biết giải pháp hình thức đóng. We may Tháng Năm\ncompute tính toán that"
+    },
+    {
+      "type": "math",
+      "latex": "(18.7.9)¶\\[-\\log(P(X \\mid \\boldsymbol{\\theta})) = -\\log(\\theta^{n_H}(1-\\theta)^{n_T}) = -(n_H\\log(\\theta) + n_T\\log(1-\\theta)).\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Điều này có thể được viết thành mã, và tự do tối ưu hóa ngay cả đối với\nhàng tỷ flips đồng xu."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "# Set up our data\nn_H = 8675309\nn_T = 25624\n\n# Initialize our paramteres\ntheta = np.array(0.5)\ntheta.attach_grad()\n\n# Perform gradient descent\nlr = 0.00000000001\nfor iter in range(10):\n    with autograd.record():\n        loss = -(n_H * np.log(theta) + n_T * np.log(1 - theta))\n    loss.backward()\n    theta -= lr * theta.grad\n\n# Check output\ntheta, n_H / (n_H + n_T)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "[10:36:24] src/base.cc:49: GPU context requested, but no GPUs found."
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "(array(0.50172704), 0.9970550284664874)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "# Set up our data\nn_H = 8675309\nn_T = 25624\n\n# Initialize our paramteres\ntheta = torch.tensor(0.5, requires_grad=True)\n\n# Perform gradient descent\nlr = 0.00000000001\nfor iter in range(10):\n    loss = -(n_H * torch.log(theta) + n_T * torch.log(1 - theta))\n    loss.backward()\n    with torch.no_grad():\n        theta -= lr * theta.grad\n    theta.grad.zero_()\n\n# Check output\ntheta, n_H / (n_H + n_T)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "(tensor(0.5017, requires_grad=True), 0.9970550284664874)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "# Set up our data\nn_H = 8675309\nn_T = 25624\n\n# Initialize our paramteres\ntheta = tf.Variable(tf.constant(0.5))\n\n# Perform gradient descent\nlr = 0.00000000001\nfor iter in range(10):\n    with tf.GradientTape() as t:\n        loss = -(n_H * tf.math.log(theta) + n_T * tf.math.log(1 - theta))\n    theta.assign_sub(lr * t.gradient(loss, theta))\n\n# Check output\ntheta, n_H / (n_H + n_T)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "(<tf.Variable 'Variable:0' shape=() dtype=float32, numpy=0.50172704>,\n 0.9970550284664874)"
+    },
+    {
+      "type": "paragraph",
+      "text": "Sự tiện lợi về số không phải là lý do duy nhất tại sao mọi người thích\nsử dụng tiêu cực log-likelihoods. Có một số lý do khác tại sao nó là\nthích hợp hơn."
+    },
+    {
+      "type": "paragraph",
+      "text": "Lý do thứ hai chúng tôi xem xét khả năng đăng nhập là việc áp dụng đơn\ngiản hóa các quy tắc tính toán. Như đã thảo luận ở trên, do các giả định\nđộc lập, hầu hết các xác suất chúng ta gặp phải trong học máy là sản\nphẩm của xác suất cá nhân."
+    },
+    {
+      "type": "math",
+      "latex": "(18.7.10)¶\\[P(X\\mid\\boldsymbol{\\theta}) = p(x_1\\mid\\boldsymbol{\\theta})\\cdot p(x_2\\mid\\boldsymbol{\\theta})\\cdots p(x_n\\mid\\boldsymbol{\\theta}).\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Điều này có nghĩa là nếu chúng ta trực tiếp áp dụng quy tắc sản phẩm để\ntính toán một đạo hàm, chúng ta nhận được"
+    },
+    {
+      "type": "math",
+      "latex": "(18.7.11)¶\\[\\begin{split}\\begin{aligned}\n\\frac{\\partial}{\\partial \\boldsymbol{\\theta}} P(X\\mid\\boldsymbol{\\theta}) & = \\left(\\frac{\\partial}{\\partial \\boldsymbol{\\theta}}P(x_1\\mid\\boldsymbol{\\theta})\\right)\\cdot P(x_2\\mid\\boldsymbol{\\theta})\\cdots P(x_n\\mid\\boldsymbol{\\theta}) \\\\\n& \\quad + P(x_1\\mid\\boldsymbol{\\theta})\\cdot \\left(\\frac{\\partial}{\\partial \\boldsymbol{\\theta}}P(x_2\\mid\\boldsymbol{\\theta})\\right)\\cdots P(x_n\\mid\\boldsymbol{\\theta}) \\\\\n& \\quad \\quad \\quad \\quad \\quad \\quad \\quad \\quad \\quad \\quad \\vdots \\\\\n& \\quad + P(x_1\\mid\\boldsymbol{\\theta})\\cdot P(x_2\\mid\\boldsymbol{\\theta}) \\cdots \\left(\\frac{\\partial}{\\partial \\boldsymbol{\\theta}}P(x_n\\mid\\boldsymbol{\\theta})\\right).\n\\end{aligned}\\end{split}\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Điều này đòi hỏi \\(n(n-1)\\) phép nhân, cùng với \\((n-1)\\) bổ\nsung, vì vậy nó tỷ lệ thuận với thời gian bậc hai trong các đầu vào! Đủ\nthông minh trong các thuật ngữ nhóm sẽ làm giảm điều này đến thời gian\ntuyến tính, nhưng nó đòi hỏi một số suy nghĩ. Đối với bản ghi âm khả\nnăng chúng tôi có thay vào đó"
+    },
+    {
+      "type": "math",
+      "latex": "(18.7.12)¶\\[-\\log\\left(P(X\\mid\\boldsymbol{\\theta})\\right) = -\\log(P(x_1\\mid\\boldsymbol{\\theta})) - \\log(P(x_2\\mid\\boldsymbol{\\theta})) \\cdots - \\log(P(x_n\\mid\\boldsymbol{\\theta})),\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "mà sau đó cho"
+    },
+    {
+      "type": "math",
+      "latex": "(18.7.13)¶\\[- \\frac{\\partial}{\\partial \\boldsymbol{\\theta}} \\log\\left(P(X\\mid\\boldsymbol{\\theta})\\right) = \\frac{1}{P(x_1\\mid\\boldsymbol{\\theta})}\\left(\\frac{\\partial}{\\partial \\boldsymbol{\\theta}}P(x_1\\mid\\boldsymbol{\\theta})\\right) + \\cdots + \\frac{1}{P(x_n\\mid\\boldsymbol{\\theta})}\\left(\\frac{\\partial}{\\partial \\boldsymbol{\\theta}}P(x_n\\mid\\boldsymbol{\\theta})\\right).\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Điều này chỉ đòi hỏi \\(n\\) phân chia và \\(n-1\\) tổng, và do đó\nlà thời gian tuyến tính trong các đầu vào."
+    },
+    {
+      "type": "paragraph",
+      "text": "Lý do thứ ba và cuối cùng để xem xét khả năng đăng nhập tiêu cực là mối\nquan hệ với lý thuyết thông tin, mà chúng ta sẽ thảo luận chi tiết trong Section 18.10 . Đây là một lý thuyết toán học nghiêm\nngặt mà đưa ra một cách để đo mức độ thông tin hoặc ngẫu nhiên trong một\nbiến ngẫu nhiên. Đối tượng quan trọng của nghiên cứu trong lĩnh vực đó\nlà entropy"
+    },
+    {
+      "type": "math",
+      "latex": "(18.7.14)¶\\[H(p) = -\\sum_{i} p_i \\log_2(p_i),\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "which đo the randomnessngẫu nhiên of a sourcenguồn. Lưu ý rằng đây không\ncó gì khác hơn là xác suất \\(-\\log\\) trung bình, và do đó nếu chúng\nta lấy khả năng log âm của chúng tôi và chia cho số lượng các ví dụ dữ\nliệu, chúng tôi nhận được một người họ hàng của entropy được gọi là\ncross-entropy. Việc giải thích lý thuyết này một mình sẽ đủ hấp dẫn để\nthúc đẩy báo cáo khả năng nhật ký âm trung bình trên tập dữ liệu như một\ncách đo lường hiệu suất mô hình."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "kha-nang-toi-da-cho-cac-bien-lien-tuc",
+      "text": "18.7.3. Khả năng tối đa cho các biến liên tục"
+    },
+    {
+      "type": "paragraph",
+      "text": "Tất cả mọi thứ mà chúng ta đã làm cho đến nay giả định chúng ta đang làm\nviệc với các biến ngẫu nhiên rời rạc, nhưng nếu chúng ta muốn làm việc\nvới các biến liên tục thì sao?"
+    },
+    {
+      "type": "paragraph",
+      "text": "Tóm tắt ngắn gọn là không có gì ở tất cả các thay đổi, ngoại trừ chúng\ntôi thay thế tất cả các trường hợp của xác suất với mật độ xác suất.\nNhắc lại rằng chúng tôi viết mật độ với chữ thường \\(p\\) , điều này\ncó nghĩa là ví dụ chúng tôi nói"
+    },
+    {
+      "type": "math",
+      "latex": "(18.7.15)¶\\[-\\log\\left(p(X\\mid\\boldsymbol{\\theta})\\right) = -\\log(p(x_1\\mid\\boldsymbol{\\theta})) - \\log(p(x_2\\mid\\boldsymbol{\\theta})) \\cdots - \\log(p(x_n\\mid\\boldsymbol{\\theta})) = -\\sum_i \\log(p(x_i \\mid \\theta)).\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Câu hỏi trở thành, “Tại sao điều này ổn?” Rốt cuộc, lý do chúng tôi giới\nthiệu mật độ là do xác suất nhận được kết quả cụ thể là bằng không, và\ndo đó không phải là xác suất tạo dữ liệu của chúng tôi cho bất kỳ tập\nhợp các tham số không?"
+    },
+    {
+      "type": "paragraph",
+      "text": "Thật vậy, đây là trường hợp, và hiểu lý do tại sao chúng ta có thể\nchuyển sang mật độ là một bài tập trong việc truy tìm những gì xảy ra\nvới epsilon."
+    },
+    {
+      "type": "paragraph",
+      "text": "Trước tiên chúng ta hãy xác định lại mục tiêu của chúng tôi. Giả sử rằng\nđối với các biến ngẫu nhiên liên tục, chúng ta không còn muốn tính toán\nxác suất nhận được chính xác giá trị phù hợp, mà thay vào đó phù hợp với\ntrong một số phạm vi \\(\\epsilon\\) . Để đơn giản, chúng tôi giả định\ndữ liệu của chúng tôi được lặp đi lặp lại quan sát \\(x_1, \\ldots, x_N\\) của các biến ngẫu nhiên phân phối giống hệt\nnhau \\(X_1, \\ldots, X_N\\) . Như chúng ta đã thấy trước đây, điều này\ncó thể được viết là"
+    },
+    {
+      "type": "math",
+      "latex": "(18.7.16)¶\\[\\begin{split}\\begin{aligned}\n&P(X_1 \\in [x_1, x_1+\\epsilon], X_2 \\in [x_2, x_2+\\epsilon], \\ldots, X_N \\in [x_N, x_N+\\epsilon]\\mid\\boldsymbol{\\theta}) \\\\\n\\approx &\\epsilon^Np(x_1\\mid\\boldsymbol{\\theta})\\cdot p(x_2\\mid\\boldsymbol{\\theta}) \\cdots p(x_n\\mid\\boldsymbol{\\theta}).\n\\end{aligned}\\end{split}\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Do đó, nếu chúng ta lấy logarit âm của điều này, chúng ta có được"
+    },
+    {
+      "type": "math",
+      "latex": "(18.7.17)¶\\[\\begin{split}\\begin{aligned}\n&-\\log(P(X_1 \\in [x_1, x_1+\\epsilon], X_2 \\in [x_2, x_2+\\epsilon], \\ldots, X_N \\in [x_N, x_N+\\epsilon]\\mid\\boldsymbol{\\theta})) \\\\\n\\approx & -N\\log(\\epsilon) - \\sum_{i} \\log(p(x_i\\mid\\boldsymbol{\\theta})).\n\\end{aligned}\\end{split}\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Nếu chúng ta kiểm tra biểu thức này, nơi duy nhất mà \\(\\epsilon\\) xảy ra là trong hằng số phụ gia \\(-N\\log(\\epsilon)\\) . Điều này hoàn\ntoàn không phụ thuộc vào các thông số \\(\\boldsymbol{\\theta}\\) , vì\nvậy sự lựa chọn tối ưu của \\(\\boldsymbol{\\theta}\\) không phụ thuộc\nvào sự lựa chọn của chúng tôi là \\(\\epsilon\\) ! Nếu chúng tôi yêu cầu\nbốn chữ số hoặc bốn trăm, sự lựa chọn tốt nhất của \\(\\boldsymbol{\\theta}\\) vẫn giữ nguyên, do đó chúng tôi có thể tự do\nthả epsilon để thấy rằng những gì chúng tôi muốn tối ưu hóa là"
+    },
+    {
+      "type": "math",
+      "latex": "(18.7.18)¶\\[- \\sum_{i} \\log(p(x_i\\mid\\boldsymbol{\\theta})).\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Do đó, chúng ta thấy rằng quan điểm khả năng tối đa có thể hoạt động với\ncác biến ngẫu nhiên liên tục dễ dàng như với các biến rời rạc bằng cách\nthay thế xác suất bằng mật độ xác suất."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tom-tat-nguyen-tac-kha-nang-toi-da-cho-chung-ta-biet-rang-mo-hinh-phu-hop-nhat-cho-mot-tap-du-lieu-nhat-dinh-la-mo-hinh-tao-ra-du-lieu-co-xac-suat-cao-nhat-thuong-moi-nguoi-lam-viec-voi-kha-nang-ghi-am-thay-vi-nhieu-ly-do-on-dinh-so-chuyen-doi-san-pham-thanh-tong-va-ket-qua-don-gian-hoa-tinh-toan-gradient-va-moi-quan-he-ly-thuyet-voi-ly-thuyet-thong-tin-mac-du-don-gian-nhat-de-thuc-day-trong-cai-dat-roi-rac-no-co-the-duoc-tu-do-khai-quat-hoa-de-cai-dat-lien-tuc-cung-nhu-bang-cach-toi-da-hoa-mat-do-xac-suat-duoc-gan-cho-cac-datapoints",
+      "text": "18.7.4. Tóm tắt * Nguyên tắc khả năng tối đa cho chúng ta biết rằng mô hình phù hợp nhất cho một tập dữ liệu nhất định là mô hình tạo ra dữ liệu có xác suất cao nhất.* Thường mọi người làm việc với khả năng ghi âm thay vì nhiều lý do: ổn định số, chuyển đổi sản phẩm thành tổng (và kết quả đơn giản hóa tính toán gradient), và mối quan hệ lý thuyết với lý thuyết thông tin * Mặc dù đơn giản nhất để thúc đẩy trong cài đặt rời rạc, nó có thể được tự do khái quát hóa để cài đặt liên tục cũng như bằng cách tối đa hóa mật độ xác suất được gán cho các datapoints."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bai-tap-1-gia-su-rang-ban-biet-rang-mot-bien-ngau-nhien-co-mat-do-frac-1-alpha-e-alpha-x-cho-mot-so-gia-tri-alpha-ban-co-duoc-mot-quan-sat-duy-nhat-tu-bien-ngau-nhien-do-la-so-3-uoc-tinh-kha-nang-toi-da-cho-alpha-la-gi-2-gia-su-rang-ban-co-mot-tap-du-lieu-cua-cac-mau-x-i-i-1-n-rut-ra-tu-mot-gaussian-voi-trung-binh-khong-xac-dinh-nhung-phuong-sai-1-uoc-tinh-kha-nang-toi-da-cho-nghia-la-gi",
+      "text": "18.7.5. Bài tập 1. Giả sử rằng bạn biết rằng một biến ngẫu nhiên có mật độ \\(\\frac{1}{\\alpha}e^{-\\alpha x}\\) cho một số giá trị \\(\\alpha\\) . Bạn có được một quan sát duy nhất từ biến ngẫu nhiên đó là số \\(3\\) . Ước tính khả năng tối đa cho \\(\\alpha\\) là gì? 2. Giả sử rằng bạn có một tập dữ liệu của các mẫu \\(\\{x_i\\}_{i=1}^N\\) rút ra từ một Gaussian với trung bình không xác định, nhưng phương sai \\(1\\) . Ước tính khả năng tối đa cho nghĩa là gì?"
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    }
+  ],
+  "images": [
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_maximum-likelihood_907113_3_0.svg",
+      "local_path": "_images/output_maximum-likelihood_907113_3_0.svg",
+      "alt": "../_images/output_maximum-likelihood_907113_3_0.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_maximum-likelihood_907113_6_0.svg",
+      "local_path": "_images/output_maximum-likelihood_907113_6_0.svg",
+      "alt": "../_images/output_maximum-likelihood_907113_6_0.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_maximum-likelihood_907113_9_0.svg",
+      "local_path": "_images/output_maximum-likelihood_907113_9_0.svg",
+      "alt": "../_images/output_maximum-likelihood_907113_9_0.svg"
+    }
+  ],
+  "text": "18.7. Khả năng tối đa\nMột trong những cách suy nghĩ phổ biến nhất trong học máy là quan điểm\nkhả năng tối đa. Đây là khái niệm rằng khi làm việc với một mô hình xác\nsuất với các tham số không xác định, các tham số làm cho dữ liệu có xác\nsuất cao nhất là những thông số có khả năng nhất.\n18.7.1. Nguyên tắc khả năng tối đa\nĐiều này có một cách giải thích Bayesian có thể hữu ích để suy nghĩ về.\nGiả sử rằng chúng ta có một mô hình với các tham số \\(\\boldsymbol{\\theta}\\) và một tập hợp các ví dụ dữ liệu \\(X\\) .\nĐối với sự cụ thể, chúng ta có thể tưởng tượng rằng \\(\\boldsymbol{\\theta}\\) là một giá trị duy nhất đại diện cho xác\nsuất một đồng xu xuất hiện đầu khi lật, và \\(X\\) là một chuỗi các\nlật đồng xu độc lập. Chúng tôi sẽ xem xét ví dụ này trong chiều sâu sau.\nNếu chúng ta muốn tìm giá trị có khả năng nhất cho các tham số của mô\nhình của chúng ta, điều đó có nghĩa là chúng ta muốn tìm\nTheo quy tắc của Bayes, đây là điều tương tự như\nBiểu thức \\(P(X)\\) , một tham số xác suất bất khả tri của việc tạo dữ\nliệu, không phụ thuộc vào \\(\\boldsymbol{\\theta}\\) ở tất cả, và do đó\ncó thể được giảm mà không thay đổi sự lựa chọn tốt nhất của \\(\\boldsymbol{\\theta}\\) . Tương tự, bây giờ chúng ta có thể khẳng\nđịnh rằng chúng tôi không có giả định trước về tập hợp các tham số nào\ntốt hơn bất kỳ tham số nào khác, vì vậy chúng tôi có thể tuyên bố rằng \\(P(\\boldsymbol{\\theta})\\) cũng không phụ thuộc vào theta! Ví dụ,\nđiều này có ý nghĩa trong ví dụ lật đồng xu của chúng tôi, nơi xác suất\nnó xuất hiện đầu có thể là bất kỳ giá trị nào trong \\([0,1]\\) mà\nkhông có bất kỳ niềm tin nào trước đó là công bằng hay không (thường\nđược gọi là ưu tiên * không thông tin*). Do đó, chúng tôi thấy rằng\nviệc áp dụng quy tắc Bayes’ cho thấy sự lựa chọn tốt nhất của chúng tôi\nvề \\(\\boldsymbol{\\theta}\\) là ước tính khả năng tối đa cho \\(\\boldsymbol{\\theta}\\) :\nNhư một vấn đề của thuật ngữ phổ biến, xác suất của dữ liệu được đưa ra\ncác tham số ( \\(P(X \\mid \\boldsymbol{\\theta})\\) ) được gọi là likelihood .\n18.7.1.1. Một ví dụ cụ thể\nHãy để chúng tôi xem làm thế nào điều này hoạt động trong một ví dụ cụ\nthể. Giả sử rằng chúng ta có một tham số duy nhất \\(\\theta\\) đại\ndiện cho xác suất rằng một đồng xu lật là đầu. Sau đó, xác suất nhận\nđược đuôi là \\(1-\\theta\\) , và vì vậy nếu dữ liệu quan sát của chúng\ntôi \\(X\\) là một chuỗi với \\(n_H\\) đầu và \\(n_T\\) đuôi,\nchúng ta có thể sử dụng thực tế là xác suất độc lập nhân lên để thấy\nrằng\nNếu chúng ta lật \\(13\\) coin và nhận được chuỗi “HHHTHTTHHHHHT”, có \\(n_H = 9\\) và \\(n_T = 4\\) , chúng ta thấy rằng đây là\nMột điều hay về ví dụ này sẽ là chúng ta biết câu trả lời đang diễn ra.\nThật vậy, nếu chúng tôi nói bằng lời nói, “Tôi lật 13 đồng xu, và 9\nngười đứng đầu, đoán tốt nhất của chúng tôi cho xác suất đồng xu đến\nchúng ta đứng đầu là gì? , “mọi người sẽ đoán chính xác \\(9/13\\) .\nPhương pháp khả năng tối đa này sẽ cung cấp cho chúng ta là một cách để\ncó được con số đó từ các hiệu trưởng đầu tiên theo cách sẽ khái quát hóa\nđến các tình huống phức tạp hơn rất nhiều.\nĐối với ví dụ của chúng tôi, cốt truyện của \\(P(X \\mid \\theta)\\) như\nsau:\nĐiều này có giá trị tối đa của nó ở đâu đó gần \\(9/13 \\approx 0.7\\ldots\\) dự kiến của chúng tôi. Để xem liệu nó có\nchính xác ở đó không, chúng ta có thể chuyển sang tính toán. Lưu ý rằng\nở mức tối đa, gradient của hàm là phẳng. Do đó, chúng ta có thể tìm thấy\nước tính khả năng tối đa (18.7.1) bằng cách tìm các giá\ntrị của \\(\\theta\\) trong đó đạo hàm bằng 0 và tìm giá trị cho xác\nsuất cao nhất. Chúng tôi tính toán:\nĐiều này có ba giải pháp: \\(0\\) , \\(1\\) và \\(9/13\\) . Hai đầu\ntiên rõ ràng là minima, không phải maxima như họ gán xác suất \\(0\\) cho trình tự của chúng tôi. Giá trị cuối cùng không * không* gán xác\nsuất bằng 0 cho trình tự của chúng tôi, và do đó phải là ước tính khả\nnăng tối đa \\(\\hat \\theta = 9/13\\) .\n18.7.2. Tối ưu hóa số và tiêu cực Log-Likelihood\nVí dụ trước là tốt đẹp, nhưng nếu chúng ta có hàng tỷ tham số và ví dụ\ndữ liệu thì sao?\nĐầu tiên, lưu ý rằng nếu chúng ta đưa ra giả định rằng tất cả các ví dụ\ndữ liệu đều độc lập, chúng ta không còn thực tế có thể xem xét khả năng\nvì nó là sản phẩm của nhiều xác suất. Thật vậy, mỗi xác suất là trong \\([0,1]\\) , nói thường có giá trị khoảng \\(1/2\\) , và sản phẩm của \\((1/2)^{1000000000}\\) thấp hơn nhiều so với độ chính xác của máy.\nChúng tôi không thể làm việc trực tiếp với điều đó.\nTuy nhiên, hãy nhớ lại rằng logarit biến sản phẩm thành một khoản tiền,\ntrong trường hợp đó\nCon số này phù hợp hoàn hảo ngay cả trong một độ chính xác duy nhất \\(32\\) -bit float. Vì vậy, chúng ta nên xem xét log-likelihood , đó\nlà\nKể từ khi chức năng \\(x \\mapsto \\log(x)\\) đang tăng lên, tối đa hóa\nkhả năng là điều tương tự như tối đa hóa khả năng log. Thật vậy trong Section 18.8 , chúng ta sẽ thấy lý do này được áp dụng khi\nlàm việc với ví dụ cụ thể về phân loại Bayes ngây thơ.\nChúng tôi thường làm việc với các chức năng mất mát, nơi chúng tôi muốn\ngiảm thiểu tổn thất. Chúng tôi có thể biến khả năng tối đa thành việc\ngiảm thiểu tổn thất bằng cách lấy \\(-\\log(P(X \\mid \\boldsymbol{\\theta}))\\) , đó là âm log-likelihood .\nĐể minh họa điều này, hãy xem xét vấn đề lật đồng xu từ trước, và giả vờ\nrằng chúng ta không biết giải pháp hình thức đóng. We may Tháng Năm\ncompute tính toán that\nĐiều này có thể được viết thành mã, và tự do tối ưu hóa ngay cả đối với\nhàng tỷ flips đồng xu.\nSự tiện lợi về số không phải là lý do duy nhất tại sao mọi người thích\nsử dụng tiêu cực log-likelihoods. Có một số lý do khác tại sao nó là\nthích hợp hơn.\nLý do thứ hai chúng tôi xem xét khả năng đăng nhập là việc áp dụng đơn\ngiản hóa các quy tắc tính toán. Như đã thảo luận ở trên, do các giả định\nđộc lập, hầu hết các xác suất chúng ta gặp phải trong học máy là sản\nphẩm của xác suất cá nhân.\nĐiều này có nghĩa là nếu chúng ta trực tiếp áp dụng quy tắc sản phẩm để\ntính toán một đạo hàm, chúng ta nhận được\nĐiều này đòi hỏi \\(n(n-1)\\) phép nhân, cùng với \\((n-1)\\) bổ\nsung, vì vậy nó tỷ lệ thuận với thời gian bậc hai trong các đầu vào! Đủ\nthông minh trong các thuật ngữ nhóm sẽ làm giảm điều này đến thời gian\ntuyến tính, nhưng nó đòi hỏi một số suy nghĩ. Đối với bản ghi âm khả\nnăng chúng tôi có thay vào đó\nmà sau đó cho\nĐiều này chỉ đòi hỏi \\(n\\) phân chia và \\(n-1\\) tổng, và do đó\nlà thời gian tuyến tính trong các đầu vào.\nLý do thứ ba và cuối cùng để xem xét khả năng đăng nhập tiêu cực là mối\nquan hệ với lý thuyết thông tin, mà chúng ta sẽ thảo luận chi tiết trong Section 18.10 . Đây là một lý thuyết toán học nghiêm\nngặt mà đưa ra một cách để đo mức độ thông tin hoặc ngẫu nhiên trong một\nbiến ngẫu nhiên. Đối tượng quan trọng của nghiên cứu trong lĩnh vực đó\nlà entropy\nwhich đo the randomnessngẫu nhiên of a sourcenguồn. Lưu ý rằng đây không\ncó gì khác hơn là xác suất \\(-\\log\\) trung bình, và do đó nếu chúng\nta lấy khả năng log âm của chúng tôi và chia cho số lượng các ví dụ dữ\nliệu, chúng tôi nhận được một người họ hàng của entropy được gọi là\ncross-entropy. Việc giải thích lý thuyết này một mình sẽ đủ hấp dẫn để\nthúc đẩy báo cáo khả năng nhật ký âm trung bình trên tập dữ liệu như một\ncách đo lường hiệu suất mô hình.\n18.7.3. Khả năng tối đa cho các biến liên tục\nTất cả mọi thứ mà chúng ta đã làm cho đến nay giả định chúng ta đang làm\nviệc với các biến ngẫu nhiên rời rạc, nhưng nếu chúng ta muốn làm việc\nvới các biến liên tục thì sao?\nTóm tắt ngắn gọn là không có gì ở tất cả các thay đổi, ngoại trừ chúng\ntôi thay thế tất cả các trường hợp của xác suất với mật độ xác suất.\nNhắc lại rằng chúng tôi viết mật độ với chữ thường \\(p\\) , điều này\ncó nghĩa là ví dụ chúng tôi nói\nCâu hỏi trở thành, “Tại sao điều này ổn?” Rốt cuộc, lý do chúng tôi giới\nthiệu mật độ là do xác suất nhận được kết quả cụ thể là bằng không, và\ndo đó không phải là xác suất tạo dữ liệu của chúng tôi cho bất kỳ tập\nhợp các tham số không?\nThật vậy, đây là trường hợp, và hiểu lý do tại sao chúng ta có thể\nchuyển sang mật độ là một bài tập trong việc truy tìm những gì xảy ra\nvới epsilon.\nTrước tiên chúng ta hãy xác định lại mục tiêu của chúng tôi. Giả sử rằng\nđối với các biến ngẫu nhiên liên tục, chúng ta không còn muốn tính toán\nxác suất nhận được chính xác giá trị phù hợp, mà thay vào đó phù hợp với\ntrong một số phạm vi \\(\\epsilon\\) . Để đơn giản, chúng tôi giả định\ndữ liệu của chúng tôi được lặp đi lặp lại quan sát \\(x_1, \\ldots, x_N\\) của các biến ngẫu nhiên phân phối giống hệt\nnhau \\(X_1, \\ldots, X_N\\) . Như chúng ta đã thấy trước đây, điều này\ncó thể được viết là\nDo đó, nếu chúng ta lấy logarit âm của điều này, chúng ta có được\nNếu chúng ta kiểm tra biểu thức này, nơi duy nhất mà \\(\\epsilon\\) xảy ra là trong hằng số phụ gia \\(-N\\log(\\epsilon)\\) . Điều này hoàn\ntoàn không phụ thuộc vào các thông số \\(\\boldsymbol{\\theta}\\) , vì\nvậy sự lựa chọn tối ưu của \\(\\boldsymbol{\\theta}\\) không phụ thuộc\nvào sự lựa chọn của chúng tôi là \\(\\epsilon\\) ! Nếu chúng tôi yêu cầu\nbốn chữ số hoặc bốn trăm, sự lựa chọn tốt nhất của \\(\\boldsymbol{\\theta}\\) vẫn giữ nguyên, do đó chúng tôi có thể tự do\nthả epsilon để thấy rằng những gì chúng tôi muốn tối ưu hóa là\nDo đó, chúng ta thấy rằng quan điểm khả năng tối đa có thể hoạt động với\ncác biến ngẫu nhiên liên tục dễ dàng như với các biến rời rạc bằng cách\nthay thế xác suất bằng mật độ xác suất.\n18.7.4. Tóm tắt * Nguyên tắc khả năng tối đa cho chúng ta biết rằng mô hình phù hợp nhất cho một tập dữ liệu nhất định là mô hình tạo ra dữ liệu có xác suất cao nhất.* Thường mọi người làm việc với khả năng ghi âm thay vì nhiều lý do: ổn định số, chuyển đổi sản phẩm thành tổng (và kết quả đơn giản hóa tính toán gradient), và mối quan hệ lý thuyết với lý thuyết thông tin * Mặc dù đơn giản nhất để thúc đẩy trong cài đặt rời rạc, nó có thể được tự do khái quát hóa để cài đặt liên tục cũng như bằng cách tối đa hóa mật độ xác suất được gán cho các datapoints.\n18.7.5. Bài tập 1. Giả sử rằng bạn biết rằng một biến ngẫu nhiên có mật độ \\(\\frac{1}{\\alpha}e^{-\\alpha x}\\) cho một số giá trị \\(\\alpha\\) . Bạn có được một quan sát duy nhất từ biến ngẫu nhiên đó là số \\(3\\) . Ước tính khả năng tối đa cho \\(\\alpha\\) là gì? 2. Giả sử rằng bạn có một tập dữ liệu của các mẫu \\(\\{x_i\\}_{i=1}^N\\) rút ra từ một Gaussian với trung bình không xác định, nhưng phương sai \\(1\\) . Ước tính khả năng tối đa cho nghĩa là gì?\nDiscussions\nDiscussions\nDiscussions"
+}

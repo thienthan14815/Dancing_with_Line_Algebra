@@ -1,0 +1,71 @@
+{
+  "url": "https://vi.d2l.ai/chapter_deep-learning-computation/index.html",
+  "chapter": "chapter_deep-learning-computation",
+  "title": "5. Tính toán học sâu",
+  "crawled_at": "2026-07-20T12:39:34.049871+00:00",
+  "headings": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "tinh-toan-hoc-sau",
+      "text": "5. Tính toán học sâu"
+    }
+  ],
+  "content": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "tinh-toan-hoc-sau",
+      "text": "5. Tính toán học sâu"
+    },
+    {
+      "type": "paragraph",
+      "text": "Bên cạnh các bộ dữ liệu khổng lồ và phần cứng mạnh mẽ, các công cụ phần\nmềm tuyệt vời đã đóng một vai trò không thể thiếu trong tiến bộ nhanh\nchóng của học sâu. Bắt đầu với thư viện Theano phá vỡ được phát hành vào\nnăm 2007, các công cụ mã nguồn mở linh hoạt đã cho phép các nhà nghiên\ncứu nhanh chóng các mô hình nguyên mẫu, tránh làm việc lặp đi lặp lại\nkhi tái chế các thành phần tiêu chuẩn trong khi vẫn duy trì khả năng\nthực hiện các sửa đổi cấp thấp. Theo thời gian, các thư viện của deep\nlearning đã phát triển để cung cấp các trừu tượng ngày càng thô. Cũng\ngiống như các nhà thiết kế bán dẫn đã đi từ chỉ định bóng bán dẫn đến\ncác mạch logic sang viết mã, các nhà nghiên cứu mạng thần kinh đã chuyển\ntừ suy nghĩ về hành vi của các tế bào thần kinh nhân tạo riêng lẻ sang\nhình thành mạng về toàn bộ lớp, và bây giờ thường thiết kế kiến trúc với\nthô hơn xa * khối* trong tâm trí."
+    },
+    {
+      "type": "paragraph",
+      "text": "Cho đến nay, chúng tôi đã giới thiệu một số khái niệm máy học cơ bản,\ntăng cường các mô hình học sâu đầy đủ chức năng. Trong chương cuối,\nchúng tôi đã triển khai từng thành phần của MLP từ đầu và thậm chí cho\nthấy cách tận dụng các API cấp cao để triển khai các mô hình tương tự\nmột cách dễ dàng. Để giúp bạn có được đến mức nhanh như vậy, chúng tôi\n* gọi lên* các thư viện, nhưng bỏ qua các chi tiết nâng cao hơn về *\ncách chúng hoạt động . Trong chương này, chúng ta sẽ bóc lại bức màn,\nđào sâu hơn vào các thành phần chính của tính toán học sâu, cụ thể là\nxây dựng mô hình, truy cập và khởi tạo tham số, thiết kế các lớp và khối\ntùy chỉnh, đọc và ghi các mô hình vào đĩa và tận dụng GPU để đạt được\ntốc độ ấn tượng. Những thông tin chi tiết này sẽ chuyển bạn từ * người\ndùng cùng* sang *power user , cung cấp cho bạn các công cụ cần thiết để\ngặt hái những lợi ích của thư viện deep learning trưởng thành trong khi\nvẫn giữ được sự linh hoạt để triển khai các mô hình phức tạp hơn, bao\ngồm cả những người bạn tự phát minh ra! Mặc dù chương này không giới\nthiệu bất kỳ mô hình hoặc bộ dữ liệu mới nào, nhưng các chương mô hình\nnâng cao theo sau phụ thuộc rất nhiều vào các kỹ thuật này."
+    },
+    {
+      "type": "list",
+      "ordered": false,
+      "items": [
+        "5.1. Lớp và khối 5.1.1. Một khối tùy chỉnh 5.1.2. The Sequential Block 5.1.3. Thihành mã trong chức năng tuyên truyền chuyển tiếp 5.1.4. Hiệu quả 5.1.5. Tóm tắt 5.1.6. Bài tập",
+        "5.1.1. Một khối tùy chỉnh",
+        "5.1.2. The Sequential Block",
+        "5.1.3. Thihành mã trong chức năng tuyên truyền chuyển tiếp",
+        "5.1.4. Hiệu quả",
+        "5.1.5. Tóm tắt",
+        "5.1.6. Bài tập",
+        "5.2. Quản lý tham số 5.2.1. Truy cập tham số 5.2.2. Khởi tạo tham số 5.2.3. Tham số Tied 5.2.4. Tóm tắt 5.2.5. Bài tập",
+        "5.2.1. Truy cập tham số",
+        "5.2.2. Khởi tạo tham số",
+        "5.2.3. Tham số Tied",
+        "5.2.4. Tóm tắt",
+        "5.2.5. Bài tập",
+        "5.3. Khởi tạo hoãn lại 5.3.1. Khởi tạo một mạng 5.3.2. Tóm tắt 5.3.3. Bài tập",
+        "5.3.1. Khởi tạo một mạng",
+        "5.3.2. Tóm tắt",
+        "5.3.3. Bài tập",
+        "5.4. Layers tùy chỉnh 5.4.1. Các lớp không có tham số 5.4.2. Các lớp có tham số 5.4.3. Tóm tắt 5.4.4. Bài tập",
+        "5.4.1. Các lớp không có tham số",
+        "5.4.2. Các lớp có tham số",
+        "5.4.3. Tóm tắt",
+        "5.4.4. Bài tập",
+        "5.5. Tệp I/O 5.5.1. Tải và tiết kiệm Tensors 5.5.2. Tải và lưu thông số mô hình 5.5.3. Tóm tắt 5.5.4. Bài tập",
+        "5.5.1. Tải và tiết kiệm Tensors",
+        "5.5.2. Tải và lưu thông số mô hình",
+        "5.5.3. Tóm tắt",
+        "5.5.4. Bài tập",
+        "5.6. GPU 5.6.1. Thiết bị vi tính 5.6.2. Tensors và GPU 5.6.3. Mạng nơ-ron và GPU 5.6.4. Tóm tắt 5.6.5. Bài tập",
+        "5.6.1. Thiết bị vi tính",
+        "5.6.2. Tensors và GPU",
+        "5.6.3. Mạng nơ-ron và GPU",
+        "5.6.4. Tóm tắt",
+        "5.6.5. Bài tập"
+      ]
+    }
+  ],
+  "images": [],
+  "text": "5. Tính toán học sâu\nBên cạnh các bộ dữ liệu khổng lồ và phần cứng mạnh mẽ, các công cụ phần\nmềm tuyệt vời đã đóng một vai trò không thể thiếu trong tiến bộ nhanh\nchóng của học sâu. Bắt đầu với thư viện Theano phá vỡ được phát hành vào\nnăm 2007, các công cụ mã nguồn mở linh hoạt đã cho phép các nhà nghiên\ncứu nhanh chóng các mô hình nguyên mẫu, tránh làm việc lặp đi lặp lại\nkhi tái chế các thành phần tiêu chuẩn trong khi vẫn duy trì khả năng\nthực hiện các sửa đổi cấp thấp. Theo thời gian, các thư viện của deep\nlearning đã phát triển để cung cấp các trừu tượng ngày càng thô. Cũng\ngiống như các nhà thiết kế bán dẫn đã đi từ chỉ định bóng bán dẫn đến\ncác mạch logic sang viết mã, các nhà nghiên cứu mạng thần kinh đã chuyển\ntừ suy nghĩ về hành vi của các tế bào thần kinh nhân tạo riêng lẻ sang\nhình thành mạng về toàn bộ lớp, và bây giờ thường thiết kế kiến trúc với\nthô hơn xa * khối* trong tâm trí.\nCho đến nay, chúng tôi đã giới thiệu một số khái niệm máy học cơ bản,\ntăng cường các mô hình học sâu đầy đủ chức năng. Trong chương cuối,\nchúng tôi đã triển khai từng thành phần của MLP từ đầu và thậm chí cho\nthấy cách tận dụng các API cấp cao để triển khai các mô hình tương tự\nmột cách dễ dàng. Để giúp bạn có được đến mức nhanh như vậy, chúng tôi\n* gọi lên* các thư viện, nhưng bỏ qua các chi tiết nâng cao hơn về *\ncách chúng hoạt động . Trong chương này, chúng ta sẽ bóc lại bức màn,\nđào sâu hơn vào các thành phần chính của tính toán học sâu, cụ thể là\nxây dựng mô hình, truy cập và khởi tạo tham số, thiết kế các lớp và khối\ntùy chỉnh, đọc và ghi các mô hình vào đĩa và tận dụng GPU để đạt được\ntốc độ ấn tượng. Những thông tin chi tiết này sẽ chuyển bạn từ * người\ndùng cùng* sang *power user , cung cấp cho bạn các công cụ cần thiết để\ngặt hái những lợi ích của thư viện deep learning trưởng thành trong khi\nvẫn giữ được sự linh hoạt để triển khai các mô hình phức tạp hơn, bao\ngồm cả những người bạn tự phát minh ra! Mặc dù chương này không giới\nthiệu bất kỳ mô hình hoặc bộ dữ liệu mới nào, nhưng các chương mô hình\nnâng cao theo sau phụ thuộc rất nhiều vào các kỹ thuật này.\n5.1. Lớp và khối 5.1.1. Một khối tùy chỉnh 5.1.2. The Sequential Block 5.1.3. Thihành mã trong chức năng tuyên truyền chuyển tiếp 5.1.4. Hiệu quả 5.1.5. Tóm tắt 5.1.6. Bài tập\n5.1.1. Một khối tùy chỉnh\n5.1.2. The Sequential Block\n5.1.3. Thihành mã trong chức năng tuyên truyền chuyển tiếp\n5.1.4. Hiệu quả\n5.1.5. Tóm tắt\n5.1.6. Bài tập\n5.2. Quản lý tham số 5.2.1. Truy cập tham số 5.2.2. Khởi tạo tham số 5.2.3. Tham số Tied 5.2.4. Tóm tắt 5.2.5. Bài tập\n5.2.1. Truy cập tham số\n5.2.2. Khởi tạo tham số\n5.2.3. Tham số Tied\n5.2.4. Tóm tắt\n5.2.5. Bài tập\n5.3. Khởi tạo hoãn lại 5.3.1. Khởi tạo một mạng 5.3.2. Tóm tắt 5.3.3. Bài tập\n5.3.1. Khởi tạo một mạng\n5.3.2. Tóm tắt\n5.3.3. Bài tập\n5.4. Layers tùy chỉnh 5.4.1. Các lớp không có tham số 5.4.2. Các lớp có tham số 5.4.3. Tóm tắt 5.4.4. Bài tập\n5.4.1. Các lớp không có tham số\n5.4.2. Các lớp có tham số\n5.4.3. Tóm tắt\n5.4.4. Bài tập\n5.5. Tệp I/O 5.5.1. Tải và tiết kiệm Tensors 5.5.2. Tải và lưu thông số mô hình 5.5.3. Tóm tắt 5.5.4. Bài tập\n5.5.1. Tải và tiết kiệm Tensors\n5.5.2. Tải và lưu thông số mô hình\n5.5.3. Tóm tắt\n5.5.4. Bài tập\n5.6. GPU 5.6.1. Thiết bị vi tính 5.6.2. Tensors và GPU 5.6.3. Mạng nơ-ron và GPU 5.6.4. Tóm tắt 5.6.5. Bài tập\n5.6.1. Thiết bị vi tính\n5.6.2. Tensors và GPU\n5.6.3. Mạng nơ-ron và GPU\n5.6.4. Tóm tắt\n5.6.5. Bài tập"
+}

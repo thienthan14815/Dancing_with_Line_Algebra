@@ -207,7 +207,10 @@ export function parseAngles(text: string): number[] {
  */
 export function parseScalarTimes(text: string, varName: string): number | null {
   const s = normalizeMath(text);
-  const re = new RegExp(`(-?\\d+(?:\\.\\d+)?)\\s*${varName}\\b`);
+  // Số ngay trước biến (vd 3v, -2v). Lookahead (?!\p{L}) chặn khớp nhầm 'v' nằm
+  // trong từ tiếng Việt như "với", "vector", "viết" (dấu \b không đủ vì chữ có
+  // dấu bị coi là ranh giới từ). Cần cờ 'u' để dùng \p{L}.
+  const re = new RegExp(`(-?\\d+(?:\\.\\d+)?)\\s*${varName}(?!\\p{L})`, 'u');
   const m = re.exec(s);
   return m ? parseFloat(m[1]) : null;
 }

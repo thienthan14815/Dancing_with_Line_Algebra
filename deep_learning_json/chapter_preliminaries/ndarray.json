@@ -1,0 +1,1068 @@
+{
+  "url": "https://vi.d2l.ai/chapter_preliminaries/ndarray.html",
+  "chapter": "chapter_preliminaries",
+  "title": "2.1. Thao tác dữ liệu",
+  "crawled_at": "2026-07-20T12:39:11.456716+00:00",
+  "headings": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "thao-tac-du-lieu",
+      "text": "2.1. Thao tác dữ liệu"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bat-dau",
+      "text": "2.1.1. Bắt đầu"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "hoat-dong",
+      "text": "2.1.2. Hoạt động"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "id5",
+      "text": "2.1.2.1. Hoạt động"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "co-che-phat-song",
+      "text": "2.1.3. Cơ chế phát sóng"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "lap-chi-muc-va-cat",
+      "text": "2.1.4. Lập chỉ mục và cắt"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tiet-kiem-bo-nho",
+      "text": "2.1.5. Tiết kiệm bộ nhớ"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "chuyen-doi-sang-cac-doi-tuong-python-khac",
+      "text": "2.1.6. Chuyển đổi sang các đối tượng Python khác"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tom-tat",
+      "text": "2.1.7. Tóm tắt"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bai-tap",
+      "text": "2.1.8. Bài tập"
+    }
+  ],
+  "content": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "thao-tac-du-lieu",
+      "text": "2.1. Thao tác dữ liệu"
+    },
+    {
+      "type": "paragraph",
+      "text": "Để hoàn thành bất cứ điều gì, chúng ta cần một số cách để lưu trữ và\nthao tác dữ liệu. Nói chung, có hai điều quan trọng chúng ta cần làm với\ndữ liệu: (i) có được chúng; và (ii) xử lý chúng một khi chúng ở trong\nmáy tính. Không có điểm nào trong việc thu thập dữ liệu mà không cần một\ncách nào đó để lưu trữ nó, vì vậy hãy để chúng tôi làm bẩn tay trước\nbằng cách chơi với dữ liệu tổng hợp. Để bắt đầu, chúng tôi giới thiệu\nmảng \\(n\\) chiều, còn được gọi là * tensor*."
+    },
+    {
+      "type": "paragraph",
+      "text": "Nếu bạn đã làm việc với NumPy, gói máy tính khoa học được sử dụng rộng\nrãi nhất trong Python, thì bạn sẽ thấy phần này quen thuộc. Cho dù bạn\nsử dụng khung nào, lớp tensor* của nó* ( ndarray trong MXNet, Tensor trong cả PyTorch và TensorFlow) tương tự như ndarray của\nNumPy với một vài tính năng giết người. Đầu tiên, GPU được hỗ trợ tốt để\ntăng tốc tính toán trong khi NumPy chỉ hỗ trợ tính toán CPU. Thứ hai,\nlớp tensor hỗ trợ sự khác biệt tự động. Những tính chất này làm cho lớp\ntensor phù hợp với học sâu. Trong suốt cuốn sách, khi chúng tôi nói hàng\nchục, chúng tôi đang đề cập đến các trường hợp của lớp tensor trừ khi có\nquy định khác."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bat-dau",
+      "text": "2.1.1. Bắt đầu"
+    },
+    {
+      "type": "paragraph",
+      "text": "Trong phần này, chúng tôi mong muốn giúp bạn hoạt động, trang bị cho bạn\ncác công cụ toán học và tính toán số cơ bản mà bạn sẽ xây dựng khi bạn\ntiến bộ qua cuốn sách. Đừng lo lắng nếu bạn đấu tranh để grok một số\nkhái niệm toán học hoặc chức năng thư viện. Các phần sau đây sẽ xem xét\nlại tài liệu này trong bối cảnh các ví dụ thực tế và nó sẽ chìm vào. Mặt\nkhác, nếu bạn đã có một số nền tảng và muốn đi sâu hơn vào nội dung toán\nhọc, chỉ cần bỏ qua phần này."
+    },
+    {
+      "type": "paragraph",
+      "text": "Để bắt đầu, chúng tôi nhập các mô-đun np ( numpy ) và npx ( numpy_extension ) từ MXNet. Ở đây, mô-đun np bao gồm các chức\nnăng được hỗ trợ bởi NumPy, trong khi mô-đun npx chứa một tập hợp\ncác phần mở rộng được phát triển để trao quyền cho việc học sâu trong\nmột môi trường giống như NumPy-like. Khi sử dụng hàng chục, chúng tôi\nhầu như luôn gọi hàm set_np : đây là để tương thích xử lý tensor bởi\ncác thành phần khác của MXNet."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "from mxnet import np, npx\n\nnpx.set_np()"
+    },
+    {
+      "type": "paragraph",
+      "text": "Để bắt đầu, chúng tôi nhập torch . Lưu ý rằng mặc dù nó được gọi là\nPyTorch, chúng ta nên nhập torch thay vì pytorch ."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "import torch"
+    },
+    {
+      "type": "paragraph",
+      "text": "Để bắt đầu, chúng tôi nhập tensorflow . Vì tên dài một chút, chúng ta\nthường nhập nó với một bí danh ngắn tf ."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "import tensorflow as tf"
+    },
+    {
+      "type": "paragraph",
+      "text": "A tensor đại diện cho một mảng (có thể đa chiều) của các giá trị số. Với\nmột trục, một tensor được gọi là vector . Với hai trục, một tensor được\ngọi là matri . Với \\(k > 2\\) trục, chúng tôi thả các tên chuyên\nbiệt và chỉ cần tham khảo đối tượng dưới dạng \\(k^\\mathrm{th}\\) căng đơn hàng ."
+    },
+    {
+      "type": "paragraph",
+      "text": "MXNet cung cấp một loạt các chức năng để tạo ra các hàng chục mới\nprepopulated với các giá trị. Ví dụ, bằng cách gọi arange(n) , chúng\nta có thể tạo một vectơ có giá trị cách đều nhau, bắt đầu từ 0 (bao gồm)\nvà kết thúc ở n (không bao gồm). Theo mặc định, kích thước khoảng\nthời gian là \\(1\\) . Trừ khi có quy định khác, hàng chục mới được lưu\ntrữ trong bộ nhớ chính và được chỉ định cho tính toán dựa trên CPU."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "x = np.arange(12)\nx"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "array([ 0.,  1.,  2.,  3.,  4.,  5.,  6.,  7.,  8.,  9., 10., 11.])"
+    },
+    {
+      "type": "paragraph",
+      "text": "PyTorch cung cấp một loạt các chức năng để tạo ra các hàng chục mới\nprepopulated với các giá trị. Ví dụ, bằng cách gọi arange(n) , chúng\nta có thể tạo một vectơ có giá trị cách đều nhau, bắt đầu từ 0 (bao gồm)\nvà kết thúc ở n (không bao gồm). Theo mặc định, kích thước khoảng\nthời gian là \\(1\\) . Trừ khi có quy định khác, hàng chục mới được lưu\ntrữ trong bộ nhớ chính và được chỉ định cho tính toán dựa trên CPU."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "x = torch.arange(12, dtype=torch.float32)\nx"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "tensor([ 0.,  1.,  2.,  3.,  4.,  5.,  6.,  7.,  8.,  9., 10., 11.])"
+    },
+    {
+      "type": "paragraph",
+      "text": "TensorFlow cung cấp một loạt các chức năng để tạo ra các hàng chục mới\nprepopulated với các giá trị. Ví dụ, bằng cách gọi range(n) , chúng\nta có thể tạo một vectơ có giá trị cách đều nhau, bắt đầu từ 0 (bao gồm)\nvà kết thúc ở n (không bao gồm). Theo mặc định, kích thước khoảng\nthời gian là \\(1\\) . Trừ khi có quy định khác, hàng chục mới được lưu\ntrữ trong bộ nhớ chính và được chỉ định cho tính toán dựa trên CPU."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "x = tf.range(12, dtype=tf.float32)\nx"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "<tf.Tensor: shape=(12,), dtype=float32, numpy=\narray([ 0.,  1.,  2.,  3.,  4.,  5.,  6.,  7.,  8.,  9., 10., 11.],\n      dtype=float32)>"
+    },
+    {
+      "type": "paragraph",
+      "text": "Chúng tôi có thể truy cập một tensor shape (chiều dài dọc theo mỗi\ntrục) bằng cách kiểm tra thuộc tính shape của nó."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "x.shape"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "(12,)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "x.shape"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "torch.Size([12])"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "x.shape"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "TensorShape([12])"
+    },
+    {
+      "type": "paragraph",
+      "text": "Nếu chúng ta chỉ muốn biết tổng số phần tử trong một tensor, tức là, sản\nphẩm của tất cả các yếu tố hình dạng, chúng ta có thể kiểm tra kích\nthước của nó. Bởi vì chúng ta đang xử lý một vector ở đây, phần tử duy\nnhất của shape của nó giống hệt với kích thước của nó."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "x.size"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "12"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "x.numel()"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "12"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "tf.size(x)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "<tf.Tensor: shape=(), dtype=int32, numpy=12>"
+    },
+    {
+      "type": "paragraph",
+      "text": "Để thay đổi hình dạng của tensor mà không thay đổi số phần tử hoặc giá\ntrị của chúng , chúng ta có thể gọi hàm reshape . Ví dụ, chúng ta có\nthể biến đổi tensor của mình, x , từ một vectơ hàng có hình dạng\n(12,) thành ma trận có hình dạng (3, 4). Tensor mới này chứa các giá trị\nchính xác giống nhau, nhưng xem chúng như một ma trận được tổ chức thành\n3 hàng và 4 cột. Để nhắc lại, mặc dù hình dạng đã thay đổi, các yếu tố\nkhông có. Lưu ý rằng kích thước không bị thay đổi bằng cách định hình\nlại."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "X = x.reshape(3, 4)\nX"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "array([[ 0.,  1.,  2.,  3.],\n       [ 4.,  5.,  6.,  7.],\n       [ 8.,  9., 10., 11.]])"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "X = x.reshape(3, 4)\nX"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "tensor([[ 0.,  1.,  2.,  3.],\n        [ 4.,  5.,  6.,  7.],\n        [ 8.,  9., 10., 11.]])"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "X = tf.reshape(x, (3, 4))\nX"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "<tf.Tensor: shape=(3, 4), dtype=float32, numpy=\narray([[ 0.,  1.,  2.,  3.],\n       [ 4.,  5.,  6.,  7.],\n       [ 8.,  9., 10., 11.]], dtype=float32)>"
+    },
+    {
+      "type": "paragraph",
+      "text": "Định hình lại bằng cách chỉ định thủ công mọi chiều là không cần thiết.\nNếu hình dạng mục tiêu của chúng ta là một ma trận có hình dạng (chiều\ncao, chiều rộng), thì sau khi chúng ta biết chiều rộng, chiều cao được\nđưa ra ngầm. Tại sao chúng ta phải tự thực hiện việc phân chia? Trong ví\ndụ trên, để có được một ma trận với 3 hàng, chúng tôi đã chỉ định cả hai\nrằng nó phải có 3 hàng và 4 cột. May mắn thay, hàng chục có thể tự động\nlàm việc ra một chiều cho phần còn lại. Chúng tôi gọi khả năng này bằng\ncách đặt -1 cho kích thước mà chúng tôi muốn hàng chục tự động suy\nra. Trong trường hợp của chúng tôi, thay vì gọi x.reshape(3, 4) ,\nchúng tôi có thể gọi tương đương x.reshape(-1, 4) hoặc x.reshape(3, -1) ."
+    },
+    {
+      "type": "paragraph",
+      "text": "Thông thường, chúng ta sẽ muốn ma trận của chúng tôi khởi tạo hoặc với\nsố không, một số hằng số khác, hoặc số được lấy mẫu ngẫu nhiên từ một\nphân phối cụ thể. [ Chúng ta có thể tạo một tensor đại diện cho một\ntensor với tất cả các phần tử được đặt là 0 ] và một hình dạng của (2,\n3, 4) như sau:"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "np.zeros((2, 3, 4))"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "array([[[0., 0., 0., 0.],\n        [0., 0., 0., 0.],\n        [0., 0., 0., 0.]],\n\n       [[0., 0., 0., 0.],\n        [0., 0., 0., 0.],\n        [0., 0., 0., 0.]]])"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "torch.zeros((2, 3, 4))"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "tensor([[[0., 0., 0., 0.],\n         [0., 0., 0., 0.],\n         [0., 0., 0., 0.]],\n\n        [[0., 0., 0., 0.],\n         [0., 0., 0., 0.],\n         [0., 0., 0., 0.]]])"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "tf.zeros((2, 3, 4))"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "<tf.Tensor: shape=(2, 3, 4), dtype=float32, numpy=\narray([[[0., 0., 0., 0.],\n        [0., 0., 0., 0.],\n        [0., 0., 0., 0.]],\n\n       [[0., 0., 0., 0.],\n        [0., 0., 0., 0.],\n        [0., 0., 0., 0.]]], dtype=float32)>"
+    },
+    {
+      "type": "paragraph",
+      "text": "Tương tự, ta có thể tạo tenors với mỗi phần tử đặt thành 1 như sau:"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "np.ones((2, 3, 4))"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "array([[[1., 1., 1., 1.],\n        [1., 1., 1., 1.],\n        [1., 1., 1., 1.]],\n\n       [[1., 1., 1., 1.],\n        [1., 1., 1., 1.],\n        [1., 1., 1., 1.]]])"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "torch.ones((2, 3, 4))"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "tensor([[[1., 1., 1., 1.],\n         [1., 1., 1., 1.],\n         [1., 1., 1., 1.]],\n\n        [[1., 1., 1., 1.],\n         [1., 1., 1., 1.],\n         [1., 1., 1., 1.]]])"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "tf.ones((2, 3, 4))"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "<tf.Tensor: shape=(2, 3, 4), dtype=float32, numpy=\narray([[[1., 1., 1., 1.],\n        [1., 1., 1., 1.],\n        [1., 1., 1., 1.]],\n\n       [[1., 1., 1., 1.],\n        [1., 1., 1., 1.],\n        [1., 1., 1., 1.]]], dtype=float32)>"
+    },
+    {
+      "type": "paragraph",
+      "text": "Thông thường, chúng ta muốn lấy mẫu ngẫu nhiên các giá trị cho mỗi phần\ntử trong một tensor từ một số phân phối xác suất. Ví dụ, khi chúng ta\nxây dựng mảng để đóng vai trò là tham số trong mạng thần kinh, chúng ta\nthường sẽ khởi tạo các giá trị của chúng một cách ngẫu nhiên. Đoạn mã\nsau đây tạo ra một tensor với hình dạng (3, 4). Mỗi phần tử của nó được\nlấy mẫu ngẫu nhiên từ một phân bố Gaussian (bình thường) chuẩn với trung\nbình 0 và độ lệch chuẩn là 1."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "np.random.normal(0, 1, size=(3, 4))"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "array([[ 2.2122064 ,  1.1630787 ,  0.7740038 ,  0.4838046 ],\n       [ 1.0434403 ,  0.29956347,  1.1839255 ,  0.15302546],\n       [ 1.8917114 , -1.1688148 , -1.2347414 ,  1.5580711 ]])"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "torch.randn(3, 4)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "tensor([[-0.6519,  0.2903,  1.9321, -0.7751],\n        [ 1.2866, -0.1815,  1.2278,  1.9197],\n        [-0.1778,  0.3601,  0.6502, -0.0875]])"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "tf.random.normal(shape=[3, 4])"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "<tf.Tensor: shape=(3, 4), dtype=float32, numpy=\narray([[ 0.9937515 , -0.84894556, -0.11551687,  0.1672972 ],\n       [-1.2016383 ,  0.11555707,  0.6372888 , -0.15725344],\n       [ 1.9209824 ,  1.0607908 ,  0.09549314,  0.3686038 ]],\n      dtype=float32)>"
+    },
+    {
+      "type": "paragraph",
+      "text": "Chúng ta cũng có thể chỉ định các giá trị chính xác cho mỗi element\ntrong tensor mong muốn bằng cách cung cấp một danh sách Python (hoặc\ndanh sách các danh sách) chứa các giá trị số. Ở đây, danh sách ngoài\ncùng tương ứng với trục 0 và danh sách bên trong đến trục 1."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "np.array([[2, 1, 4, 3], [1, 2, 3, 4], [4, 3, 2, 1]])"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "array([[2., 1., 4., 3.],\n       [1., 2., 3., 4.],\n       [4., 3., 2., 1.]])"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "torch.tensor([[2, 1, 4, 3], [1, 2, 3, 4], [4, 3, 2, 1]])"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "tensor([[2, 1, 4, 3],\n        [1, 2, 3, 4],\n        [4, 3, 2, 1]])"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "tf.constant([[2, 1, 4, 3], [1, 2, 3, 4], [4, 3, 2, 1]])"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "<tf.Tensor: shape=(3, 4), dtype=int32, numpy=\narray([[2, 1, 4, 3],\n       [1, 2, 3, 4],\n       [4, 3, 2, 1]], dtype=int32)>"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "hoat-dong",
+      "text": "2.1.2. Hoạt động"
+    },
+    {
+      "type": "paragraph",
+      "text": "Cuốn sách này không phải là về kỹ thuật phần mềm. Sở thích của chúng tôi\nkhông giới hạn chỉ đơn giản là đọc và viết dữ liệu từ/đến mảng. Chúng\ntôi muốn thực hiện các hoạt động toán học trên những mảng. Một số thao\ntác đơn giản và hữu ích nhất là các hoạt động elementwise . Chúng áp\ndụng một phép toán vô hướng tiêu chuẩn cho mỗi phần tử của một mảng. Đối\nvới các hàm lấy hai mảng làm đầu vào, các phép toán elementwise áp dụng\nmột số toán tử nhị phân chuẩn trên mỗi cặp phần tử tương ứng từ hai\nmảng. Chúng ta có thể tạo ra một hàm elementwise từ bất kỳ hàm nào mà\nbản đồ từ vô hướng đến vô hướng."
+    },
+    {
+      "type": "paragraph",
+      "text": "Trong ký hiệu toán học, chúng ta sẽ biểu thị một toán tử vô hướng *\nunary* như vậy (lấy một đầu vào) bằng chữ ký \\(f: \\mathbb{R} \\rightarrow \\mathbb{R}\\) . Điều này chỉ có nghĩa là\nchức năng đang ánh xạ từ bất kỳ số thực nào ( \\(\\mathbb{R}\\) ) lên một\nsố khác. Tương tự như vậy, chúng tôi biểu thị một toán tử vô hướng *\nbinary* (lấy hai đầu vào thực và mang lại một đầu ra) bằng chữ ký \\(f: \\mathbb{R}, \\mathbb{R} \\rightarrow \\mathbb{R}\\) . Với bất kỳ hai\nvectơ \\(\\mathbf{u}\\) và \\(\\mathbf{v}\\) * có cùng hình dạng * ,\nvà một toán tử nhị phân \\(f\\) , chúng ta có thể tạo ra một vector \\(\\mathbf{c} = F(\\mathbf{u},\\mathbf{v})\\) bằng cách đặt \\(c_i \\gets f(u_i, v_i)\\) cho tất cả \\(i\\) , trong đó \\(c_i, u_i\\) , và \\(v_i\\) là các yếu tố \\(i^\\mathrm{th}\\) của\nvectơ \\(\\mathbf{c}, \\mathbf{u}\\) , và \\(v_i\\) 25. Ở đây, chúng\ntôi đã tạo ra các vectơ có giá trị \\(F: \\mathbb{R}^d, \\mathbb{R}^d \\rightarrow \\mathbb{R}^d\\) bằng * lifting* hàm vô hướng cho một hoạt động vectơ elementwise."
+    },
+    {
+      "type": "paragraph",
+      "text": "Các toán tử số học tiêu chuẩn phổ biến ( + , - , * , / và ** ) đều được nâng lên * để hoạt động yếu tố cho bất kỳ hàng chục\nhình dạng giống hệt nhau nào có hình dạng tùy ý. Chúng ta có thể gọi các\nhoạt động elementwise trên bất kỳ hai hàng chục có cùng hình dạng. Trong\nví dụ sau, chúng ta sử dụng dấu phẩy để xây dựng một tuple 5 phần tử,\ntrong đó mỗi phần tử là kết quả của một phép toán elementwise."
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "id5",
+      "text": "2.1.2.1. Hoạt động"
+    },
+    {
+      "type": "paragraph",
+      "text": "Các toán tử số học tiêu chuẩn phổ biến ( + , - , * , / và ** ) đều đã được nâng lên * thành các hoạt động elementwise"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "x = np.array([1, 2, 4, 8])\ny = np.array([2, 2, 2, 2])\nx + y, x - y, x * y, x / y, x ** y  # The ** operator is exponentiation"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "(array([ 3.,  4.,  6., 10.]),\n array([-1.,  0.,  2.,  6.]),\n array([ 2.,  4.,  8., 16.]),\n array([0.5, 1. , 2. , 4. ]),\n array([ 1.,  4., 16., 64.]))"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "x = torch.tensor([1.0, 2, 4, 8])\ny = torch.tensor([2, 2, 2, 2])\nx + y, x - y, x * y, x / y, x ** y  # The ** operator is exponentiation"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "(tensor([ 3.,  4.,  6., 10.]),\n tensor([-1.,  0.,  2.,  6.]),\n tensor([ 2.,  4.,  8., 16.]),\n tensor([0.5000, 1.0000, 2.0000, 4.0000]),\n tensor([ 1.,  4., 16., 64.]))"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "x = tf.constant([1.0, 2, 4, 8])\ny = tf.constant([2.0, 2, 2, 2])\nx + y, x - y, x * y, x / y, x ** y  # The ** operator is exponentiation"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "(<tf.Tensor: shape=(4,), dtype=float32, numpy=array([ 3.,  4.,  6., 10.], dtype=float32)>,\n <tf.Tensor: shape=(4,), dtype=float32, numpy=array([-1.,  0.,  2.,  6.], dtype=float32)>,\n <tf.Tensor: shape=(4,), dtype=float32, numpy=array([ 2.,  4.,  8., 16.], dtype=float32)>,\n <tf.Tensor: shape=(4,), dtype=float32, numpy=array([0.5, 1. , 2. , 4. ], dtype=float32)>,\n <tf.Tensor: shape=(4,), dtype=float32, numpy=array([ 1.,  4., 16., 64.], dtype=float32)>)"
+    },
+    {
+      "type": "paragraph",
+      "text": "Nhiều nhiều thao tác hơn có thể được áp dụng elementwise, bao gồm các\ntoán tử đơn nguyên như hàm mũ."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "np.exp(x)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "array([2.7182817e+00, 7.3890562e+00, 5.4598148e+01, 2.9809580e+03])"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "torch.exp(x)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "tensor([2.7183e+00, 7.3891e+00, 5.4598e+01, 2.9810e+03])"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "tf.exp(x)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "<tf.Tensor: shape=(4,), dtype=float32, numpy=\narray([2.7182817e+00, 7.3890562e+00, 5.4598148e+01, 2.9809580e+03],\n      dtype=float32)>"
+    },
+    {
+      "type": "paragraph",
+      "text": "Ngoài tính toán elementwise, chúng ta cũng có thể thực hiện các phép\ntoán đại số tuyến tính, bao gồm các sản phẩm chấm vector và phép nhân ma\ntrận. Chúng tôi sẽ giải thích các bit quan trọng của đại số tuyến tính\n(không có kiến thức nào được giả định trước) trong Section 2.3 ."
+    },
+    {
+      "type": "paragraph",
+      "text": "Chúng ta cũng có thể * nối nhiều chục với nhau, xếp chúng từ đầu đến\ncuối để tạo thành một tensor lớn hơn. Chúng ta chỉ cần cung cấp một danh\nsách các hàng chục và nói với hệ thống dọc theo trục nào để nối. Ví dụ\ndưới đây cho thấy những gì xảy ra khi chúng ta nối hai ma trận dọc theo\ncác hàng (trục 0, phần tử đầu tiên của hình dạng) so với các cột (trục\n1, phần tử thứ hai của hình dạng). Chúng ta có thể thấy rằng độ dài trục\n0 của tensor đầu ra đầu tiên ( \\(6\\) ) là tổng của chiều dài trục 0\ncủa hai căng đầu vào ( \\(3 + 3\\) ); trong khi độ dài trục của bộ căng\nđầu ra thứ hai ( \\(8\\) ) là tổng của chiều dài trục 1 của hai căng đầu\nvào ( \\(4 + 4\\) )."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "X = np.arange(12).reshape(3, 4)\nY = np.array([[2, 1, 4, 3], [1, 2, 3, 4], [4, 3, 2, 1]])\nnp.concatenate([X, Y], axis=0), np.concatenate([X, Y], axis=1)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "(array([[ 0.,  1.,  2.,  3.],\n        [ 4.,  5.,  6.,  7.],\n        [ 8.,  9., 10., 11.],\n        [ 2.,  1.,  4.,  3.],\n        [ 1.,  2.,  3.,  4.],\n        [ 4.,  3.,  2.,  1.]]),\n array([[ 0.,  1.,  2.,  3.,  2.,  1.,  4.,  3.],\n        [ 4.,  5.,  6.,  7.,  1.,  2.,  3.,  4.],\n        [ 8.,  9., 10., 11.,  4.,  3.,  2.,  1.]]))"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "X = torch.arange(12, dtype=torch.float32).reshape((3,4))\nY = torch.tensor([[2.0, 1, 4, 3], [1, 2, 3, 4], [4, 3, 2, 1]])\ntorch.cat((X, Y), dim=0), torch.cat((X, Y), dim=1)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "(tensor([[ 0.,  1.,  2.,  3.],\n         [ 4.,  5.,  6.,  7.],\n         [ 8.,  9., 10., 11.],\n         [ 2.,  1.,  4.,  3.],\n         [ 1.,  2.,  3.,  4.],\n         [ 4.,  3.,  2.,  1.]]),\n tensor([[ 0.,  1.,  2.,  3.,  2.,  1.,  4.,  3.],\n         [ 4.,  5.,  6.,  7.,  1.,  2.,  3.,  4.],\n         [ 8.,  9., 10., 11.,  4.,  3.,  2.,  1.]]))"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "X = tf.reshape(tf.range(12, dtype=tf.float32), (3, 4))\nY = tf.constant([[2.0, 1, 4, 3], [1, 2, 3, 4], [4, 3, 2, 1]])\ntf.concat([X, Y], axis=0), tf.concat([X, Y], axis=1)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "(<tf.Tensor: shape=(6, 4), dtype=float32, numpy=\n array([[ 0.,  1.,  2.,  3.],\n        [ 4.,  5.,  6.,  7.],\n        [ 8.,  9., 10., 11.],\n        [ 2.,  1.,  4.,  3.],\n        [ 1.,  2.,  3.,  4.],\n        [ 4.,  3.,  2.,  1.]], dtype=float32)>,\n <tf.Tensor: shape=(3, 8), dtype=float32, numpy=\n array([[ 0.,  1.,  2.,  3.,  2.,  1.,  4.,  3.],\n        [ 4.,  5.,  6.,  7.,  1.,  2.,  3.,  4.],\n        [ 8.,  9., 10., 11.,  4.,  3.,  2.,  1.]], dtype=float32)>)"
+    },
+    {
+      "type": "paragraph",
+      "text": "Đôi khi, chúng ta muốn xây dựng một tensor nhị phân thông qua * trạng\nthái logic * . Lấy X == Y làm ví dụ. Đối với mỗi vị trí, nếu X và Y bằng nhau tại vị trí đó thì mục nhập tương ứng trong tensor mới\nlấy giá trị là 1, nghĩa là câu lệnh logic X == Y đúng tại vị trí đó;\nnếu không vị trí đó mất 0."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "X == Y"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "array([[False,  True, False,  True],\n       [False, False, False, False],\n       [False, False, False, False]])"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "X == Y"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "tensor([[False,  True, False,  True],\n        [False, False, False, False],\n        [False, False, False, False]])"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "X == Y"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "<tf.Tensor: shape=(3, 4), dtype=bool, numpy=\narray([[False,  True, False,  True],\n       [False, False, False, False],\n       [False, False, False, False]])>"
+    },
+    {
+      "type": "paragraph",
+      "text": "Tổng hợp tất cả các yếu tố trong tensor mang lại một tensor chỉ với một\nphần tử."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "X.sum()"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "array(66.)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "X.sum()"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "tensor(66.)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "tf.reduce_sum(X)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "<tf.Tensor: shape=(), dtype=float32, numpy=66.0>"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "co-che-phat-song",
+      "text": "2.1.3. Cơ chế phát sóng"
+    },
+    {
+      "type": "paragraph",
+      "text": "Trong phần trên, chúng ta đã thấy cách thực hiện các hoạt động\nelementwise trên hai hàng chục có cùng hình dạng. Trong một số điều kiện\nnhất định, ngay cả khi hình dạng khác nhau, chúng ta vẫn có thể thực\nhiện các hoạt động elementwise bằng cách gọi cơ chế phát sóng *. Cơ chế\nnày hoạt động theo cách sau: Đầu tiên, mở rộng một hoặc cả hai mảng bằng\ncách sao chép các phần tử một cách thích hợp để sau khi chuyển đổi này,\nhai hàng chục có cùng một hình dạng. Thứ hai, thực hiện các hoạt động\nelementwise trên các mảng kết quả."
+    },
+    {
+      "type": "paragraph",
+      "text": "Trong hầu hết các trường hợp, chúng tôi phát dọc theo một trục mà một\nmảng ban đầu chỉ có chiều dài 1, chẳng hạn như trong ví dụ sau:"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "a = np.arange(3).reshape(3, 1)\nb = np.arange(2).reshape(1, 2)\na, b"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "(array([[0.],\n        [1.],\n        [2.]]),\n array([[0., 1.]]))"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "a = torch.arange(3).reshape((3, 1))\nb = torch.arange(2).reshape((1, 2))\na, b"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "(tensor([[0],\n         [1],\n         [2]]),\n tensor([[0, 1]]))"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "a = tf.reshape(tf.range(3), (3, 1))\nb = tf.reshape(tf.range(2), (1, 2))\na, b"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "(<tf.Tensor: shape=(3, 1), dtype=int32, numpy=\n array([[0],\n        [1],\n        [2]], dtype=int32)>,\n <tf.Tensor: shape=(1, 2), dtype=int32, numpy=array([[0, 1]], dtype=int32)>)"
+    },
+    {
+      "type": "paragraph",
+      "text": "Vì a và b tương ứng là \\(3\\times1\\) và \\(1\\times2\\) ma\ntrận, hình dạng của chúng không khớp nếu chúng ta muốn thêm chúng. Chúng\ntôi * phát sóng * các mục của cả hai ma trận thành ma trận \\(3\\times2\\) lớn hơn như sau: đối với ma trận a , nó sao chép các\ncột và cho ma trận b nó sao chép các hàng trước khi thêm cả hai\nelementwise."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "a + b"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "array([[0., 1.],\n       [1., 2.],\n       [2., 3.]])"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "a + b"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "tensor([[0, 1],\n        [1, 2],\n        [2, 3]])"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "a + b"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "<tf.Tensor: shape=(3, 2), dtype=int32, numpy=\narray([[0, 1],\n       [1, 2],\n       [2, 3]], dtype=int32)>"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "lap-chi-muc-va-cat",
+      "text": "2.1.4. Lập chỉ mục và cắt"
+    },
+    {
+      "type": "paragraph",
+      "text": "Cũng giống như trong bất kỳ mảng Python nào khác, các phần tử trong một\ntensor có thể được truy cập bằng chỉ mục. Như trong bất kỳ mảng Python\nnào, phần tử đầu tiên có chỉ số 0 và phạm vi được chỉ định để bao gồm\nphần tử đầu tiên nhưng * trước* phần tử cuối cùng. Như trong danh sách\nPython tiêu chuẩn, chúng ta có thể truy cập các phần tử theo vị trí\ntương đối của chúng đến cuối danh sách bằng cách sử dụng các chỉ số âm."
+    },
+    {
+      "type": "paragraph",
+      "text": "Do đó, [-1] chọn phần tử cuối cùng và [1:3] chọn phần tử thứ hai\nvà thứ ba như sau:"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "X[-1], X[1:3]"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "(array([ 8.,  9., 10., 11.]),\n array([[ 4.,  5.,  6.,  7.],\n        [ 8.,  9., 10., 11.]]))"
+    },
+    {
+      "type": "paragraph",
+      "text": "Ngoài việc đọc, chúng ta cũng có thể viết các phần tử của ma trận bằng\ncách chỉ định các chỉ số."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "X[1, 2] = 9\nX"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "array([[ 0.,  1.,  2.,  3.],\n       [ 4.,  5.,  9.,  7.],\n       [ 8.,  9., 10., 11.]])"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "X[-1], X[1:3]"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "(tensor([ 8.,  9., 10., 11.]),\n tensor([[ 4.,  5.,  6.,  7.],\n         [ 8.,  9., 10., 11.]]))"
+    },
+    {
+      "type": "paragraph",
+      "text": "Ngoài việc đọc, chúng ta cũng có thể viết các phần tử của ma trận bằng\ncách chỉ định các chỉ số."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "X[1, 2] = 9\nX"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "tensor([[ 0.,  1.,  2.,  3.],\n        [ 4.,  5.,  9.,  7.],\n        [ 8.,  9., 10., 11.]])"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "X[-1], X[1:3]"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "(<tf.Tensor: shape=(4,), dtype=float32, numpy=array([ 8.,  9., 10., 11.], dtype=float32)>,\n <tf.Tensor: shape=(2, 4), dtype=float32, numpy=\n array([[ 4.,  5.,  6.,  7.],\n        [ 8.,  9., 10., 11.]], dtype=float32)>)"
+    },
+    {
+      "type": "paragraph",
+      "text": "Tensors trong TensorFlow là bất biến và không thể được gán cho. Variables trong TensorFlow là các thùng chứa có thể thay đổi của\ntrạng thái hỗ trợ các bài tập. Hãy nhớ rằng độ dốc trong TensorFlow\nkhông chảy ngược qua các bài tập Variable ."
+    },
+    {
+      "type": "paragraph",
+      "text": "Ngoài việc gán một giá trị cho toàn bộ Variable , chúng ta có thể\nviết các phần tử của Variable bằng cách chỉ định các chỉ số."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "X_var = tf.Variable(X)\nX_var[1, 2].assign(9)\nX_var"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "<tf.Variable 'Variable:0' shape=(3, 4) dtype=float32, numpy=\narray([[ 0.,  1.,  2.,  3.],\n       [ 4.,  5.,  9.,  7.],\n       [ 8.,  9., 10., 11.]], dtype=float32)>"
+    },
+    {
+      "type": "paragraph",
+      "text": "Nếu chúng ta muốn để gán nhiều phần tử cùng một giá trị, chúng ta chỉ\ncần lập chỉ mục tất cả chúng và sau đó gán cho họ giá trị. Ví dụ, [0:2, :] truy cập các hàng đầu tiên và thứ hai, trong đó : lấy\ntất cả các phần tử dọc theo trục 1 (cột). Trong khi chúng tôi thảo luận\nvề lập chỉ mục cho ma trận, điều này rõ ràng cũng hoạt động cho vectơ và\ncho hàng chục hơn 2 chiều."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "X[0:2, :] = 12\nX"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "array([[12., 12., 12., 12.],\n       [12., 12., 12., 12.],\n       [ 8.,  9., 10., 11.]])"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "X[0:2, :] = 12\nX"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "tensor([[12., 12., 12., 12.],\n        [12., 12., 12., 12.],\n        [ 8.,  9., 10., 11.]])"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "X_var = tf.Variable(X)\nX_var[0:2, :].assign(tf.ones(X_var[0:2,:].shape, dtype = tf.float32) * 12)\nX_var"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "<tf.Variable 'Variable:0' shape=(3, 4) dtype=float32, numpy=\narray([[12., 12., 12., 12.],\n       [12., 12., 12., 12.],\n       [ 8.,  9., 10., 11.]], dtype=float32)>"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tiet-kiem-bo-nho",
+      "text": "2.1.5. Tiết kiệm bộ nhớ"
+    },
+    {
+      "type": "paragraph",
+      "text": "Các thao tác chạy có thể khiến bộ nhớ mới được phân bổ cho kết quả máy\nchủ Ví dụ, nếu chúng ta viết Y = X + Y , chúng ta sẽ hủy bỏ tensor mà Y dùng để trỏ đến và thay vào đó chỉ Y vào bộ nhớ mới được phân\nbổ. Trong ví dụ sau, chúng ta chứng minh điều này với hàm id() của\nPython, cung cấp cho chúng ta địa chỉ chính xác của đối tượng tham chiếu\ntrong bộ nhớ. Sau khi chạy Y = Y + X , chúng tôi sẽ thấy rằng id(Y) chỉ đến một vị trí khác. Đó là do Python lần đầu tiên đánh giá Y + X , phân bổ bộ nhớ mới cho kết quả và sau đó làm cho Y trỏ\nđến vị trí mới này trong bộ nhớ."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "before = id(Y)\nY = Y + X\nid(Y) == before"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "False"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "before = id(Y)\nY = Y + X\nid(Y) == before"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "False"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "before = id(Y)\nY = Y + X\nid(Y) == before"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "False"
+    },
+    {
+      "type": "paragraph",
+      "text": "Điều này có thể là không mong muốn vì hai lý do. Đầu tiên, chúng tôi\nkhông muốn chạy xung quanh phân bổ bộ nhớ một cách không cần thiết tất\ncả các thời gian. Trong machine learning, chúng ta có thể có hàng trăm\nmegabyte tham số và cập nhật tất cả chúng nhiều lần mỗi giây. Thông\nthường, chúng tôi sẽ muốn thực hiện các bản cập nhật này * tại chỗ *.\nThứ hai, chúng ta có thể chỉ vào các tham số tương tự từ nhiều biến. Nếu\nchúng ta không cập nhật tại chỗ, các tham chiếu khác vẫn sẽ trỏ đến vị\ntrí bộ nhớ cũ, làm cho nó có thể cho các phần của mã của chúng ta vô\ntình tham chiếu các tham số cũ."
+    },
+    {
+      "type": "paragraph",
+      "text": "May mắn thay, thực hiện hoạt động tại chỗ rất dễ dàng. Chúng ta có thể\ngán kết quả của một hoạt động cho một mảng được phân bổ trước đó với ký\nhiệu slice, ví dụ, Y[:] = <expression> . Để minh họa khái niệm này,\ntrước tiên chúng ta tạo ra một ma trận mới Z với hình dạng tương tự\nnhư Y khác, sử dụng zeros_like để phân bổ một khối \\(0\\) mục\nnhập."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "Z = np.zeros_like(Y)\nprint('id(Z):', id(Z))\nZ[:] = X + Y\nprint('id(Z):', id(Z))"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "id(Z): 139999247991872\nid(Z): 139999247991872"
+    },
+    {
+      "type": "paragraph",
+      "text": "Nếu giá trị của X không được sử dụng lại trong các tính toán tiếp\ntheo, chúng ta cũng có thể sử dụng X[:] = X + Y hoặc X += Y để\ngiảm chi phí bộ nhớ của hoạt động."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "before = id(X)\nX += Y\nid(X) == before"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "True"
+    },
+    {
+      "type": "paragraph",
+      "text": "May mắn thay, thực hiện hoạt động tại chỗ rất dễ dàng. Chúng ta có thể\ngán kết quả của một hoạt động cho một mảng được phân bổ trước đó với ký\nhiệu slice, ví dụ, Y[:] = <expression> . Để minh họa khái niệm này,\ntrước tiên chúng ta tạo ra một ma trận mới Z với hình dạng tương tự\nnhư Y khác, sử dụng zeros_like để phân bổ một khối \\(0\\) mục\nnhập."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "Z = torch.zeros_like(Y)\nprint('id(Z):', id(Z))\nZ[:] = X + Y\nprint('id(Z):', id(Z))"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "id(Z): 140201478059168\nid(Z): 140201478059168"
+    },
+    {
+      "type": "paragraph",
+      "text": "Nếu giá trị của X không được sử dụng lại trong các tính toán tiếp\ntheo, chúng ta cũng có thể sử dụng X[:] = X + Y hoặc X += Y để\ngiảm chi phí bộ nhớ của hoạt động."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "before = id(X)\nX += Y\nid(X) == before"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "True"
+    },
+    {
+      "type": "paragraph",
+      "text": "Variables là các thùng chứa có thể thay đổi trạng thái trong\nTensorFlow. Họ cung cấp một cách để lưu trữ các thông số mô hình của\nbạn. Chúng ta có thể gán kết quả của một hoạt động cho một Variable với assign . Để minh họa khái niệm này, chúng tôi tạo ra một Variable Z với hình dạng tương tự như một tensor Y , sử dụng zeros_like để phân bổ một khối \\(0\\) mục nhập."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "Z = tf.Variable(tf.zeros_like(Y))\nprint('id(Z):', id(Z))\nZ.assign(X + Y)\nprint('id(Z):', id(Z))"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "id(Z): 139638297808960\nid(Z): 139638297808960"
+    },
+    {
+      "type": "paragraph",
+      "text": "Ngay cả khi bạn lưu trữ trạng thái liên tục trong Variable , bạn có\nthể muốn giảm mức sử dụng bộ nhớ của mình hơn nữa bằng cách tránh phân\nbổ dư thừa cho hàng chục không phải là tham số mô hình của bạn."
+    },
+    {
+      "type": "paragraph",
+      "text": "Bởi vì TensorFlow Tensors là bất biến và gradient không chảy qua các\nbài tập Variable , TensorFlow không cung cấp một cách rõ ràng để chạy\nmột hoạt động riêng lẻ tại chỗ."
+    },
+    {
+      "type": "paragraph",
+      "text": "Tuy nhiên, TensorFlow cung cấp trình trang trí tf.function để gói\ntính toán bên trong đồ thị TensorFlow được biên dịch và tối ưu hóa trước\nkhi chạy. Điều này cho phép TensorFlow cắt tỉa các giá trị chưa sử dụng\nvà sử dụng lại các phân bổ trước đó không còn cần thiết nữa. Điều này\ngiảm thiểu chi phí bộ nhớ của tính toán TensorFlow."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "@tf.function\ndef computation(X, Y):\n    Z = tf.zeros_like(Y)  # This unused value will be pruned out\n    A = X + Y  # Allocations will be re-used when no longer needed\n    B = A + Y\n    C = B + Y\n    return C + Y\n\ncomputation(X, Y)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "<tf.Tensor: shape=(3, 4), dtype=float32, numpy=\narray([[ 8.,  9., 26., 27.],\n       [24., 33., 42., 51.],\n       [56., 57., 58., 59.]], dtype=float32)>"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "chuyen-doi-sang-cac-doi-tuong-python-khac",
+      "text": "2.1.6. Chuyển đổi sang các đối tượng Python khác"
+    },
+    {
+      "type": "paragraph",
+      "text": "Chuyển đổi sang tensor NumPy ( ndarray ) , hoặc ngược lại, rất dễ\ndàng. Kết quả được chuyển đổi không chia sẻ bộ nhớ. Sự bất tiện nhỏ này\nthực sự khá quan trọng: khi bạn thực hiện các thao tác trên CPU hoặc\ntrên GPU, bạn không muốn tạm dừng tính toán, chờ xem liệu gói NumPy của\nPython có thể muốn làm một cái gì đó khác với cùng một đoạn bộ nhớ hay\nkhông."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "A = X.asnumpy()\nB = np.array(A)\ntype(A), type(B)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "(numpy.ndarray, mxnet.numpy.ndarray)"
+    },
+    {
+      "type": "paragraph",
+      "text": "Chuyển đổi sang tensor NumPy ( ndarray ) , hoặc ngược lại, rất dễ\ndàng. Ngọn đuốc Tensor và mảng numpy sẽ chia sẻ vị trí bộ nhớ cơ bản của\nchúng, và thay đổi một thông qua một hoạt động tại chỗ cũng sẽ thay đổi\nvị trí khác."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "A = X.numpy()\nB = torch.from_numpy(A)\ntype(A), type(B)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "(numpy.ndarray, torch.Tensor)"
+    },
+    {
+      "type": "paragraph",
+      "text": "Chuyển đổi sang tensor NumPy ( ndarray ) , hoặc ngược lại, rất dễ\ndàng. Kết quả được chuyển đổi không chia sẻ bộ nhớ. Sự bất tiện nhỏ này\nthực sự khá quan trọng: khi bạn thực hiện các thao tác trên CPU hoặc\ntrên GPU, bạn không muốn tạm dừng tính toán, chờ xem liệu gói NumPy của\nPython có thể muốn làm một cái gì đó khác với cùng một đoạn bộ nhớ hay\nkhông."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "A = X.numpy()\nB = tf.constant(A)\ntype(A), type(B)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "(numpy.ndarray, tensorflow.python.framework.ops.EagerTensor)"
+    },
+    {
+      "type": "paragraph",
+      "text": "Để chuyển đổi một tensor size-1 thành một scalar Python , chúng ta có\nthể gọi hàm item hoặc các hàm tích hợp sẵn của Python."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "a = np.array([3.5])\na, a.item(), float(a), int(a)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "(array([3.5]), 3.5, 3.5, 3)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "a = torch.tensor([3.5])\na, a.item(), float(a), int(a)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "(tensor([3.5000]), 3.5, 3.5, 3)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "a = tf.constant([3.5]).numpy()\na, a.item(), float(a), int(a)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "(array([3.5], dtype=float32), 3.5, 3.5, 3)"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tom-tat",
+      "text": "2.1.7. Tóm tắt"
+    },
+    {
+      "type": "list",
+      "ordered": false,
+      "items": [
+        "Giao diện chính để lưu trữ và thao tác dữ liệu cho học sâu là tensor\n(mảng \\(n\\) chiều). Nó cung cấp một loạt các chức năng bao gồm\ncác hoạt động toán học cơ bản, phát sóng, lập chỉ mục, cắt lát, tiết\nkiệm bộ nhớ và chuyển đổi sang các đối tượng Python khác."
+      ]
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bai-tap",
+      "text": "2.1.8. Bài tập"
+    },
+    {
+      "type": "list",
+      "ordered": true,
+      "items": [
+        "Chạy mã trong phần này. Thay đổi câu lệnh có điều kiện X == Y trong phần này thành X < Y hoặc X > Y , và sau đó xem loại\ntensor bạn có thể nhận được.",
+        "Thay thế hai hàng chục hoạt động theo phần tử trong cơ chế phát sóng\nbằng các hình dạng khác, ví dụ, các dụng cụ 3 chiều. Kết quả có giống\nnhư mong đợi không?"
+      ]
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    }
+  ],
+  "images": [],
+  "text": "2.1. Thao tác dữ liệu\nĐể hoàn thành bất cứ điều gì, chúng ta cần một số cách để lưu trữ và\nthao tác dữ liệu. Nói chung, có hai điều quan trọng chúng ta cần làm với\ndữ liệu: (i) có được chúng; và (ii) xử lý chúng một khi chúng ở trong\nmáy tính. Không có điểm nào trong việc thu thập dữ liệu mà không cần một\ncách nào đó để lưu trữ nó, vì vậy hãy để chúng tôi làm bẩn tay trước\nbằng cách chơi với dữ liệu tổng hợp. Để bắt đầu, chúng tôi giới thiệu\nmảng \\(n\\) chiều, còn được gọi là * tensor*.\nNếu bạn đã làm việc với NumPy, gói máy tính khoa học được sử dụng rộng\nrãi nhất trong Python, thì bạn sẽ thấy phần này quen thuộc. Cho dù bạn\nsử dụng khung nào, lớp tensor* của nó* ( ndarray trong MXNet, Tensor trong cả PyTorch và TensorFlow) tương tự như ndarray của\nNumPy với một vài tính năng giết người. Đầu tiên, GPU được hỗ trợ tốt để\ntăng tốc tính toán trong khi NumPy chỉ hỗ trợ tính toán CPU. Thứ hai,\nlớp tensor hỗ trợ sự khác biệt tự động. Những tính chất này làm cho lớp\ntensor phù hợp với học sâu. Trong suốt cuốn sách, khi chúng tôi nói hàng\nchục, chúng tôi đang đề cập đến các trường hợp của lớp tensor trừ khi có\nquy định khác.\n2.1.1. Bắt đầu\nTrong phần này, chúng tôi mong muốn giúp bạn hoạt động, trang bị cho bạn\ncác công cụ toán học và tính toán số cơ bản mà bạn sẽ xây dựng khi bạn\ntiến bộ qua cuốn sách. Đừng lo lắng nếu bạn đấu tranh để grok một số\nkhái niệm toán học hoặc chức năng thư viện. Các phần sau đây sẽ xem xét\nlại tài liệu này trong bối cảnh các ví dụ thực tế và nó sẽ chìm vào. Mặt\nkhác, nếu bạn đã có một số nền tảng và muốn đi sâu hơn vào nội dung toán\nhọc, chỉ cần bỏ qua phần này.\nĐể bắt đầu, chúng tôi nhập các mô-đun np ( numpy ) và npx ( numpy_extension ) từ MXNet. Ở đây, mô-đun np bao gồm các chức\nnăng được hỗ trợ bởi NumPy, trong khi mô-đun npx chứa một tập hợp\ncác phần mở rộng được phát triển để trao quyền cho việc học sâu trong\nmột môi trường giống như NumPy-like. Khi sử dụng hàng chục, chúng tôi\nhầu như luôn gọi hàm set_np : đây là để tương thích xử lý tensor bởi\ncác thành phần khác của MXNet.\nĐể bắt đầu, chúng tôi nhập torch . Lưu ý rằng mặc dù nó được gọi là\nPyTorch, chúng ta nên nhập torch thay vì pytorch .\nĐể bắt đầu, chúng tôi nhập tensorflow . Vì tên dài một chút, chúng ta\nthường nhập nó với một bí danh ngắn tf .\nA tensor đại diện cho một mảng (có thể đa chiều) của các giá trị số. Với\nmột trục, một tensor được gọi là vector . Với hai trục, một tensor được\ngọi là matri . Với \\(k > 2\\) trục, chúng tôi thả các tên chuyên\nbiệt và chỉ cần tham khảo đối tượng dưới dạng \\(k^\\mathrm{th}\\) căng đơn hàng .\nMXNet cung cấp một loạt các chức năng để tạo ra các hàng chục mới\nprepopulated với các giá trị. Ví dụ, bằng cách gọi arange(n) , chúng\nta có thể tạo một vectơ có giá trị cách đều nhau, bắt đầu từ 0 (bao gồm)\nvà kết thúc ở n (không bao gồm). Theo mặc định, kích thước khoảng\nthời gian là \\(1\\) . Trừ khi có quy định khác, hàng chục mới được lưu\ntrữ trong bộ nhớ chính và được chỉ định cho tính toán dựa trên CPU.\nPyTorch cung cấp một loạt các chức năng để tạo ra các hàng chục mới\nprepopulated với các giá trị. Ví dụ, bằng cách gọi arange(n) , chúng\nta có thể tạo một vectơ có giá trị cách đều nhau, bắt đầu từ 0 (bao gồm)\nvà kết thúc ở n (không bao gồm). Theo mặc định, kích thước khoảng\nthời gian là \\(1\\) . Trừ khi có quy định khác, hàng chục mới được lưu\ntrữ trong bộ nhớ chính và được chỉ định cho tính toán dựa trên CPU.\nTensorFlow cung cấp một loạt các chức năng để tạo ra các hàng chục mới\nprepopulated với các giá trị. Ví dụ, bằng cách gọi range(n) , chúng\nta có thể tạo một vectơ có giá trị cách đều nhau, bắt đầu từ 0 (bao gồm)\nvà kết thúc ở n (không bao gồm). Theo mặc định, kích thước khoảng\nthời gian là \\(1\\) . Trừ khi có quy định khác, hàng chục mới được lưu\ntrữ trong bộ nhớ chính và được chỉ định cho tính toán dựa trên CPU.\nChúng tôi có thể truy cập một tensor shape (chiều dài dọc theo mỗi\ntrục) bằng cách kiểm tra thuộc tính shape của nó.\nNếu chúng ta chỉ muốn biết tổng số phần tử trong một tensor, tức là, sản\nphẩm của tất cả các yếu tố hình dạng, chúng ta có thể kiểm tra kích\nthước của nó. Bởi vì chúng ta đang xử lý một vector ở đây, phần tử duy\nnhất của shape của nó giống hệt với kích thước của nó.\nĐể thay đổi hình dạng của tensor mà không thay đổi số phần tử hoặc giá\ntrị của chúng , chúng ta có thể gọi hàm reshape . Ví dụ, chúng ta có\nthể biến đổi tensor của mình, x , từ một vectơ hàng có hình dạng\n(12,) thành ma trận có hình dạng (3, 4). Tensor mới này chứa các giá trị\nchính xác giống nhau, nhưng xem chúng như một ma trận được tổ chức thành\n3 hàng và 4 cột. Để nhắc lại, mặc dù hình dạng đã thay đổi, các yếu tố\nkhông có. Lưu ý rằng kích thước không bị thay đổi bằng cách định hình\nlại.\nĐịnh hình lại bằng cách chỉ định thủ công mọi chiều là không cần thiết.\nNếu hình dạng mục tiêu của chúng ta là một ma trận có hình dạng (chiều\ncao, chiều rộng), thì sau khi chúng ta biết chiều rộng, chiều cao được\nđưa ra ngầm. Tại sao chúng ta phải tự thực hiện việc phân chia? Trong ví\ndụ trên, để có được một ma trận với 3 hàng, chúng tôi đã chỉ định cả hai\nrằng nó phải có 3 hàng và 4 cột. May mắn thay, hàng chục có thể tự động\nlàm việc ra một chiều cho phần còn lại. Chúng tôi gọi khả năng này bằng\ncách đặt -1 cho kích thước mà chúng tôi muốn hàng chục tự động suy\nra. Trong trường hợp của chúng tôi, thay vì gọi x.reshape(3, 4) ,\nchúng tôi có thể gọi tương đương x.reshape(-1, 4) hoặc x.reshape(3, -1) .\nThông thường, chúng ta sẽ muốn ma trận của chúng tôi khởi tạo hoặc với\nsố không, một số hằng số khác, hoặc số được lấy mẫu ngẫu nhiên từ một\nphân phối cụ thể. [ Chúng ta có thể tạo một tensor đại diện cho một\ntensor với tất cả các phần tử được đặt là 0 ] và một hình dạng của (2,\n3, 4) như sau:\nTương tự, ta có thể tạo tenors với mỗi phần tử đặt thành 1 như sau:\nThông thường, chúng ta muốn lấy mẫu ngẫu nhiên các giá trị cho mỗi phần\ntử trong một tensor từ một số phân phối xác suất. Ví dụ, khi chúng ta\nxây dựng mảng để đóng vai trò là tham số trong mạng thần kinh, chúng ta\nthường sẽ khởi tạo các giá trị của chúng một cách ngẫu nhiên. Đoạn mã\nsau đây tạo ra một tensor với hình dạng (3, 4). Mỗi phần tử của nó được\nlấy mẫu ngẫu nhiên từ một phân bố Gaussian (bình thường) chuẩn với trung\nbình 0 và độ lệch chuẩn là 1.\nChúng ta cũng có thể chỉ định các giá trị chính xác cho mỗi element\ntrong tensor mong muốn bằng cách cung cấp một danh sách Python (hoặc\ndanh sách các danh sách) chứa các giá trị số. Ở đây, danh sách ngoài\ncùng tương ứng với trục 0 và danh sách bên trong đến trục 1.\n2.1.2. Hoạt động\nCuốn sách này không phải là về kỹ thuật phần mềm. Sở thích của chúng tôi\nkhông giới hạn chỉ đơn giản là đọc và viết dữ liệu từ/đến mảng. Chúng\ntôi muốn thực hiện các hoạt động toán học trên những mảng. Một số thao\ntác đơn giản và hữu ích nhất là các hoạt động elementwise . Chúng áp\ndụng một phép toán vô hướng tiêu chuẩn cho mỗi phần tử của một mảng. Đối\nvới các hàm lấy hai mảng làm đầu vào, các phép toán elementwise áp dụng\nmột số toán tử nhị phân chuẩn trên mỗi cặp phần tử tương ứng từ hai\nmảng. Chúng ta có thể tạo ra một hàm elementwise từ bất kỳ hàm nào mà\nbản đồ từ vô hướng đến vô hướng.\nTrong ký hiệu toán học, chúng ta sẽ biểu thị một toán tử vô hướng *\nunary* như vậy (lấy một đầu vào) bằng chữ ký \\(f: \\mathbb{R} \\rightarrow \\mathbb{R}\\) . Điều này chỉ có nghĩa là\nchức năng đang ánh xạ từ bất kỳ số thực nào ( \\(\\mathbb{R}\\) ) lên một\nsố khác. Tương tự như vậy, chúng tôi biểu thị một toán tử vô hướng *\nbinary* (lấy hai đầu vào thực và mang lại một đầu ra) bằng chữ ký \\(f: \\mathbb{R}, \\mathbb{R} \\rightarrow \\mathbb{R}\\) . Với bất kỳ hai\nvectơ \\(\\mathbf{u}\\) và \\(\\mathbf{v}\\) * có cùng hình dạng * ,\nvà một toán tử nhị phân \\(f\\) , chúng ta có thể tạo ra một vector \\(\\mathbf{c} = F(\\mathbf{u},\\mathbf{v})\\) bằng cách đặt \\(c_i \\gets f(u_i, v_i)\\) cho tất cả \\(i\\) , trong đó \\(c_i, u_i\\) , và \\(v_i\\) là các yếu tố \\(i^\\mathrm{th}\\) của\nvectơ \\(\\mathbf{c}, \\mathbf{u}\\) , và \\(v_i\\) 25. Ở đây, chúng\ntôi đã tạo ra các vectơ có giá trị \\(F: \\mathbb{R}^d, \\mathbb{R}^d \\rightarrow \\mathbb{R}^d\\) bằng * lifting* hàm vô hướng cho một hoạt động vectơ elementwise.\nCác toán tử số học tiêu chuẩn phổ biến ( + , - , * , / và ** ) đều được nâng lên * để hoạt động yếu tố cho bất kỳ hàng chục\nhình dạng giống hệt nhau nào có hình dạng tùy ý. Chúng ta có thể gọi các\nhoạt động elementwise trên bất kỳ hai hàng chục có cùng hình dạng. Trong\nví dụ sau, chúng ta sử dụng dấu phẩy để xây dựng một tuple 5 phần tử,\ntrong đó mỗi phần tử là kết quả của một phép toán elementwise.\n2.1.2.1. Hoạt động\nCác toán tử số học tiêu chuẩn phổ biến ( + , - , * , / và ** ) đều đã được nâng lên * thành các hoạt động elementwise\nNhiều nhiều thao tác hơn có thể được áp dụng elementwise, bao gồm các\ntoán tử đơn nguyên như hàm mũ.\nNgoài tính toán elementwise, chúng ta cũng có thể thực hiện các phép\ntoán đại số tuyến tính, bao gồm các sản phẩm chấm vector và phép nhân ma\ntrận. Chúng tôi sẽ giải thích các bit quan trọng của đại số tuyến tính\n(không có kiến thức nào được giả định trước) trong Section 2.3 .\nChúng ta cũng có thể * nối nhiều chục với nhau, xếp chúng từ đầu đến\ncuối để tạo thành một tensor lớn hơn. Chúng ta chỉ cần cung cấp một danh\nsách các hàng chục và nói với hệ thống dọc theo trục nào để nối. Ví dụ\ndưới đây cho thấy những gì xảy ra khi chúng ta nối hai ma trận dọc theo\ncác hàng (trục 0, phần tử đầu tiên của hình dạng) so với các cột (trục\n1, phần tử thứ hai của hình dạng). Chúng ta có thể thấy rằng độ dài trục\n0 của tensor đầu ra đầu tiên ( \\(6\\) ) là tổng của chiều dài trục 0\ncủa hai căng đầu vào ( \\(3 + 3\\) ); trong khi độ dài trục của bộ căng\nđầu ra thứ hai ( \\(8\\) ) là tổng của chiều dài trục 1 của hai căng đầu\nvào ( \\(4 + 4\\) ).\nĐôi khi, chúng ta muốn xây dựng một tensor nhị phân thông qua * trạng\nthái logic * . Lấy X == Y làm ví dụ. Đối với mỗi vị trí, nếu X và Y bằng nhau tại vị trí đó thì mục nhập tương ứng trong tensor mới\nlấy giá trị là 1, nghĩa là câu lệnh logic X == Y đúng tại vị trí đó;\nnếu không vị trí đó mất 0.\nTổng hợp tất cả các yếu tố trong tensor mang lại một tensor chỉ với một\nphần tử.\n2.1.3. Cơ chế phát sóng\nTrong phần trên, chúng ta đã thấy cách thực hiện các hoạt động\nelementwise trên hai hàng chục có cùng hình dạng. Trong một số điều kiện\nnhất định, ngay cả khi hình dạng khác nhau, chúng ta vẫn có thể thực\nhiện các hoạt động elementwise bằng cách gọi cơ chế phát sóng *. Cơ chế\nnày hoạt động theo cách sau: Đầu tiên, mở rộng một hoặc cả hai mảng bằng\ncách sao chép các phần tử một cách thích hợp để sau khi chuyển đổi này,\nhai hàng chục có cùng một hình dạng. Thứ hai, thực hiện các hoạt động\nelementwise trên các mảng kết quả.\nTrong hầu hết các trường hợp, chúng tôi phát dọc theo một trục mà một\nmảng ban đầu chỉ có chiều dài 1, chẳng hạn như trong ví dụ sau:\nVì a và b tương ứng là \\(3\\times1\\) và \\(1\\times2\\) ma\ntrận, hình dạng của chúng không khớp nếu chúng ta muốn thêm chúng. Chúng\ntôi * phát sóng * các mục của cả hai ma trận thành ma trận \\(3\\times2\\) lớn hơn như sau: đối với ma trận a , nó sao chép các\ncột và cho ma trận b nó sao chép các hàng trước khi thêm cả hai\nelementwise.\n2.1.4. Lập chỉ mục và cắt\nCũng giống như trong bất kỳ mảng Python nào khác, các phần tử trong một\ntensor có thể được truy cập bằng chỉ mục. Như trong bất kỳ mảng Python\nnào, phần tử đầu tiên có chỉ số 0 và phạm vi được chỉ định để bao gồm\nphần tử đầu tiên nhưng * trước* phần tử cuối cùng. Như trong danh sách\nPython tiêu chuẩn, chúng ta có thể truy cập các phần tử theo vị trí\ntương đối của chúng đến cuối danh sách bằng cách sử dụng các chỉ số âm.\nDo đó, [-1] chọn phần tử cuối cùng và [1:3] chọn phần tử thứ hai\nvà thứ ba như sau:\nNgoài việc đọc, chúng ta cũng có thể viết các phần tử của ma trận bằng\ncách chỉ định các chỉ số.\nNgoài việc đọc, chúng ta cũng có thể viết các phần tử của ma trận bằng\ncách chỉ định các chỉ số.\nTensors trong TensorFlow là bất biến và không thể được gán cho. Variables trong TensorFlow là các thùng chứa có thể thay đổi của\ntrạng thái hỗ trợ các bài tập. Hãy nhớ rằng độ dốc trong TensorFlow\nkhông chảy ngược qua các bài tập Variable .\nNgoài việc gán một giá trị cho toàn bộ Variable , chúng ta có thể\nviết các phần tử của Variable bằng cách chỉ định các chỉ số.\nNếu chúng ta muốn để gán nhiều phần tử cùng một giá trị, chúng ta chỉ\ncần lập chỉ mục tất cả chúng và sau đó gán cho họ giá trị. Ví dụ, [0:2, :] truy cập các hàng đầu tiên và thứ hai, trong đó : lấy\ntất cả các phần tử dọc theo trục 1 (cột). Trong khi chúng tôi thảo luận\nvề lập chỉ mục cho ma trận, điều này rõ ràng cũng hoạt động cho vectơ và\ncho hàng chục hơn 2 chiều.\n2.1.5. Tiết kiệm bộ nhớ\nCác thao tác chạy có thể khiến bộ nhớ mới được phân bổ cho kết quả máy\nchủ Ví dụ, nếu chúng ta viết Y = X + Y , chúng ta sẽ hủy bỏ tensor mà Y dùng để trỏ đến và thay vào đó chỉ Y vào bộ nhớ mới được phân\nbổ. Trong ví dụ sau, chúng ta chứng minh điều này với hàm id() của\nPython, cung cấp cho chúng ta địa chỉ chính xác của đối tượng tham chiếu\ntrong bộ nhớ. Sau khi chạy Y = Y + X , chúng tôi sẽ thấy rằng id(Y) chỉ đến một vị trí khác. Đó là do Python lần đầu tiên đánh giá Y + X , phân bổ bộ nhớ mới cho kết quả và sau đó làm cho Y trỏ\nđến vị trí mới này trong bộ nhớ.\nĐiều này có thể là không mong muốn vì hai lý do. Đầu tiên, chúng tôi\nkhông muốn chạy xung quanh phân bổ bộ nhớ một cách không cần thiết tất\ncả các thời gian. Trong machine learning, chúng ta có thể có hàng trăm\nmegabyte tham số và cập nhật tất cả chúng nhiều lần mỗi giây. Thông\nthường, chúng tôi sẽ muốn thực hiện các bản cập nhật này * tại chỗ *.\nThứ hai, chúng ta có thể chỉ vào các tham số tương tự từ nhiều biến. Nếu\nchúng ta không cập nhật tại chỗ, các tham chiếu khác vẫn sẽ trỏ đến vị\ntrí bộ nhớ cũ, làm cho nó có thể cho các phần của mã của chúng ta vô\ntình tham chiếu các tham số cũ.\nMay mắn thay, thực hiện hoạt động tại chỗ rất dễ dàng. Chúng ta có thể\ngán kết quả của một hoạt động cho một mảng được phân bổ trước đó với ký\nhiệu slice, ví dụ, Y[:] = <expression> . Để minh họa khái niệm này,\ntrước tiên chúng ta tạo ra một ma trận mới Z với hình dạng tương tự\nnhư Y khác, sử dụng zeros_like để phân bổ một khối \\(0\\) mục\nnhập.\nNếu giá trị của X không được sử dụng lại trong các tính toán tiếp\ntheo, chúng ta cũng có thể sử dụng X[:] = X + Y hoặc X += Y để\ngiảm chi phí bộ nhớ của hoạt động.\nMay mắn thay, thực hiện hoạt động tại chỗ rất dễ dàng. Chúng ta có thể\ngán kết quả của một hoạt động cho một mảng được phân bổ trước đó với ký\nhiệu slice, ví dụ, Y[:] = <expression> . Để minh họa khái niệm này,\ntrước tiên chúng ta tạo ra một ma trận mới Z với hình dạng tương tự\nnhư Y khác, sử dụng zeros_like để phân bổ một khối \\(0\\) mục\nnhập.\nNếu giá trị của X không được sử dụng lại trong các tính toán tiếp\ntheo, chúng ta cũng có thể sử dụng X[:] = X + Y hoặc X += Y để\ngiảm chi phí bộ nhớ của hoạt động.\nVariables là các thùng chứa có thể thay đổi trạng thái trong\nTensorFlow. Họ cung cấp một cách để lưu trữ các thông số mô hình của\nbạn. Chúng ta có thể gán kết quả của một hoạt động cho một Variable với assign . Để minh họa khái niệm này, chúng tôi tạo ra một Variable Z với hình dạng tương tự như một tensor Y , sử dụng zeros_like để phân bổ một khối \\(0\\) mục nhập.\nNgay cả khi bạn lưu trữ trạng thái liên tục trong Variable , bạn có\nthể muốn giảm mức sử dụng bộ nhớ của mình hơn nữa bằng cách tránh phân\nbổ dư thừa cho hàng chục không phải là tham số mô hình của bạn.\nBởi vì TensorFlow Tensors là bất biến và gradient không chảy qua các\nbài tập Variable , TensorFlow không cung cấp một cách rõ ràng để chạy\nmột hoạt động riêng lẻ tại chỗ.\nTuy nhiên, TensorFlow cung cấp trình trang trí tf.function để gói\ntính toán bên trong đồ thị TensorFlow được biên dịch và tối ưu hóa trước\nkhi chạy. Điều này cho phép TensorFlow cắt tỉa các giá trị chưa sử dụng\nvà sử dụng lại các phân bổ trước đó không còn cần thiết nữa. Điều này\ngiảm thiểu chi phí bộ nhớ của tính toán TensorFlow.\n2.1.6. Chuyển đổi sang các đối tượng Python khác\nChuyển đổi sang tensor NumPy ( ndarray ) , hoặc ngược lại, rất dễ\ndàng. Kết quả được chuyển đổi không chia sẻ bộ nhớ. Sự bất tiện nhỏ này\nthực sự khá quan trọng: khi bạn thực hiện các thao tác trên CPU hoặc\ntrên GPU, bạn không muốn tạm dừng tính toán, chờ xem liệu gói NumPy của\nPython có thể muốn làm một cái gì đó khác với cùng một đoạn bộ nhớ hay\nkhông.\nChuyển đổi sang tensor NumPy ( ndarray ) , hoặc ngược lại, rất dễ\ndàng. Ngọn đuốc Tensor và mảng numpy sẽ chia sẻ vị trí bộ nhớ cơ bản của\nchúng, và thay đổi một thông qua một hoạt động tại chỗ cũng sẽ thay đổi\nvị trí khác.\nChuyển đổi sang tensor NumPy ( ndarray ) , hoặc ngược lại, rất dễ\ndàng. Kết quả được chuyển đổi không chia sẻ bộ nhớ. Sự bất tiện nhỏ này\nthực sự khá quan trọng: khi bạn thực hiện các thao tác trên CPU hoặc\ntrên GPU, bạn không muốn tạm dừng tính toán, chờ xem liệu gói NumPy của\nPython có thể muốn làm một cái gì đó khác với cùng một đoạn bộ nhớ hay\nkhông.\nĐể chuyển đổi một tensor size-1 thành một scalar Python , chúng ta có\nthể gọi hàm item hoặc các hàm tích hợp sẵn của Python.\n2.1.7. Tóm tắt\nGiao diện chính để lưu trữ và thao tác dữ liệu cho học sâu là tensor\n(mảng \\(n\\) chiều). Nó cung cấp một loạt các chức năng bao gồm\ncác hoạt động toán học cơ bản, phát sóng, lập chỉ mục, cắt lát, tiết\nkiệm bộ nhớ và chuyển đổi sang các đối tượng Python khác.\n2.1.8. Bài tập\nChạy mã trong phần này. Thay đổi câu lệnh có điều kiện X == Y trong phần này thành X < Y hoặc X > Y , và sau đó xem loại\ntensor bạn có thể nhận được.\nThay thế hai hàng chục hoạt động theo phần tử trong cơ chế phát sóng\nbằng các hình dạng khác, ví dụ, các dụng cụ 3 chiều. Kết quả có giống\nnhư mong đợi không?\nDiscussions\nDiscussions\nDiscussions"
+}

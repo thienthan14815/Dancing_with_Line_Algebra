@@ -1,0 +1,461 @@
+{
+  "url": "https://vi.d2l.ai/chapter_convolutional-modern/alexnet.html",
+  "chapter": "chapter_convolutional-modern",
+  "title": "7.1. Mạng thần kinh phức tạp sâu (AlexNet)",
+  "crawled_at": "2026-07-20T12:39:47.881324+00:00",
+  "headings": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "mang-than-kinh-phuc-tap-sau-alexnet",
+      "text": "7.1. Mạng thần kinh phức tạp sâu (AlexNet)"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "dai-dien-hoc-tap",
+      "text": "7.1.1. Đại diện học tập"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "thieu-thanh-phan-du-lieu",
+      "text": "7.1.1.1. Thiếu thành phần: Dữ liệu"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "thieu-thanh-phan-phan-cung",
+      "text": "7.1.1.2. Thiếu thành phần: Phần cứng"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "alexnet",
+      "text": "7.1.2. AlexNet"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "architecture",
+      "text": "7.1.2.1. Architecture"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "chuc-nang-kich-hoat",
+      "text": "7.1.2.2. Chức năng kích hoạt"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "kiem-soat-cong-suat-va-tien-xu-ly",
+      "text": "7.1.2.3. Kiểm soát công suất và tiền xử lý"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "doc-tap-du-lieu",
+      "text": "7.1.3. Đọc tập dữ liệu"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "dao-tao",
+      "text": "7.1.4. Đào tạo"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tom-tat",
+      "text": "7.1.5. Tóm tắt"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bai-tap",
+      "text": "7.1.6. Bài tập"
+    }
+  ],
+  "content": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "mang-than-kinh-phuc-tap-sau-alexnet",
+      "text": "7.1. Mạng thần kinh phức tạp sâu (AlexNet)"
+    },
+    {
+      "type": "paragraph",
+      "text": "Mặc dù CNN nổi tiếng trong thị giác máy tính và cộng đồng học máy sau\nkhi giới thiệu LeNet, họ đã không thống trị ngay lập tức lĩnh vực này.\nMặc dù LeNet đạt được kết quả tốt trên các tập dữ liệu nhỏ ban đầu,\nnhưng hiệu suất và tính khả thi của việc đào tạo CNN trên các tập dữ\nliệu lớn hơn, thực tế hơn vẫn chưa được thiết lập. Trên thực tế, trong\nphần lớn thời gian can thiệp giữa đầu thập niên 1990 và kết quả đầu\nnguồn của năm 2012, các mạng thần kinh thường bị vượt qua bởi các phương\npháp học máy khác, chẳng hạn như các máy vector hỗ trợ."
+    },
+    {
+      "type": "paragraph",
+      "text": "Đối với tầm nhìn máy tính, so sánh này có lẽ không công bằng. Đó là mặc\ndù các đầu vào cho các mạng tích hợp bao gồm các giá trị pixel thô hoặc\nđược xử lý nhẹ (ví dụ: bằng cách định tâm), các học viên sẽ không bao\ngiờ cung cấp các pixel thô vào các mô hình truyền thống. Thay vào đó,\nđường ống tầm nhìn máy tính điển hình bao gồm các đường ống trích xuất\ntính năng kỹ thuật thủ công. Thay vì * tìm hiểu các tính năng * , các\ntính năng là * crafted*. Hầu hết các tiến bộ đến từ việc có nhiều ý\ntưởng thông minh hơn cho các tính năng, và thuật toán học tập thường\nđược chuyển xuống một suy nghĩ sau."
+    },
+    {
+      "type": "paragraph",
+      "text": "Mặc dù một số máy gia tốc mạng thần kinh đã có sẵn trong những năm 1990,\nnhưng chúng chưa đủ mạnh để tạo ra các CNN đa kênh sâu, đa lớp với một\nsố lượng lớn các tham số. Hơn nữa, các bộ dữ liệu vẫn còn tương đối nhỏ.\nThêm vào những trở ngại này, các thủ thuật chính để đào tạo các mạng\nthần kinh bao gồm heuristics khởi tạo tham số, các biến thể thông minh\ncủa gốc gradient ngẫu nhiên, chức năng kích hoạt không squashing, và các\nkỹ thuật chính quy hóa hiệu quả vẫn còn thiếu."
+    },
+    {
+      "type": "paragraph",
+      "text": "Do đó, thay vì đào tạo hệ thống * end-to-end* (pixel để phân loại),\ncác đường ống cổ điển trông như thế này hơn:"
+    },
+    {
+      "type": "list",
+      "ordered": true,
+      "items": [
+        "Lấy một bộ dữ liệu thú vị. Trong những ngày đầu, các bộ dữ liệu này\nyêu cầu các cảm biến đắt tiền (vào thời điểm đó, hình ảnh 1 megapixel\nlà hiện đại).",
+        "Xử lý trước bộ dữ liệu với các tính năng thủ công dựa trên một số\nkiến thức về quang học, hình học, các công cụ phân tích khác và thỉnh\nthoảng trên những khám phá ngẫu nhiên của sinh viên tốt nghiệp may\nmắn.",
+        "Cung cấp dữ liệu thông qua một bộ trích xuất tính năng tiêu chuẩn như\nSIFT (biến đổi tính năng bất biến quy mô) [Lowe, 2004] , SURF\n(tăng tốc các tính năng mạnh mẽ) [Bay et al., 2006] hoặc bất kỳ số lượng đường ống\nđiều chỉnh bằng tay nào khác.",
+        "Dump các biểu diễn kết quả vào phân loại yêu thích của bạn, có thể là\nmột mô hình tuyến tính hoặc phương pháp hạt nhân, để đào tạo một phân\nloại."
+      ]
+    },
+    {
+      "type": "paragraph",
+      "text": "Nếu bạn nói chuyện với các nhà nghiên cứu machine learning, họ tin rằng\nmachine learning vừa quan trọng vừa đẹp. Các lý thuyết thanh lịch đã\nchứng minh các tính chất của các nhà phân loại khác nhau. Lĩnh vực máy\nhọc rất phát triển mạnh, nghiêm ngặt và hữu ích. Tuy nhiên, nếu bạn nói\nchuyện với một nhà nghiên cứu thị giác máy tính, bạn sẽ nghe một câu\nchuyện rất khác. Sự thật bẩn thỉu của nhận dạng hình ảnh, họ sẽ nói với\nbạn, đó là các tính năng, không phải học thuật toán, đã thúc đẩy tiến\nbộ. Các nhà nghiên cứu thị giác máy tính tin một cách hợp lý rằng một bộ\ndữ liệu lớn hơn hoặc sạch hơn một chút hoặc một đường ống trích xuất\ntính năng được cải thiện một chút quan trọng hơn nhiều so với độ chính\nxác cuối cùng so với bất kỳ thuật toán học tập nào."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "dai-dien-hoc-tap",
+      "text": "7.1.1. Đại diện học tập"
+    },
+    {
+      "type": "paragraph",
+      "text": "Một cách khác để đúc tình trạng của các vấn đề là phần quan trọng nhất\ncủa đường ống là đại diện. Và cho đến năm 2012, đại diện đã được tính\ntoán bằng máy móc. Trong thực tế, kỹ thuật một bộ mới của chức năng tính\nnăng, cải thiện kết quả, và viết lên phương pháp là một thể loại giấy\nnổi bật. SIFT [Lowe, 2004] , SURF [Bay et al., 2006] , HOG (biểu đồ của gradient định\nhướng) [Dalal & Triggs, 2005] , bags of visual\nwords và các máy chiết xuất tính năng tương tự cai trị roost."
+    },
+    {
+      "type": "paragraph",
+      "text": "Một nhóm các nhà nghiên cứu khác, bao gồm Yann LeCun, Geoff Hinton,\nYoshua Bengio, Andrew Ng, Shun-ichi Amari, và Juergen Schmidhuber, có\nnhững kế hoạch khác nhau. Họ tin rằng bản thân các tính năng nên được\nhọc. Hơn nữa, họ tin rằng để phức tạp một cách hợp lý, các tính năng\nphải được cấu tạo theo thứ bậc với nhiều lớp học chung, mỗi lớp có các\ntham số có thể học được. Trong trường hợp của một hình ảnh, các lớp thấp\nnhất có thể đến để phát hiện các cạnh, màu sắc và kết cấu. Thật vậy,\nAlex Krizhevsky, Ilya Sutkever và Geoff Hinton đã đề xuất một biến thể\nmới của CNN, AlexNet , đạt được hiệu suất xuất sắc trong thử thách\nImageNet 2012. AlexNet được đặt theo tên Alex Krizhevsky, tác giả đầu\ntiên của bài phân loại ImageNet đột phá [Krizhevsky et al., 2012] ."
+    },
+    {
+      "type": "paragraph",
+      "text": "Điều thú vị là ở các lớp thấp nhất của mạng, mô hình đã học được tính\nnăng trích xuất giống như một số bộ lọc truyền thống. Fig. 7.1.1 được sao chép từ giấy AlexNet [Krizhevsky et al., 2012] và mô tả mô tả hình ảnh cấp\nthấp hơn."
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/filters.png",
+      "local_path": "_images/filters.png",
+      "alt": "../_images/filters.png"
+    },
+    {
+      "type": "paragraph",
+      "text": "Fig. 7.1.1 Image filters learned by the first layer of AlexNet. ¶"
+    },
+    {
+      "type": "paragraph",
+      "text": "Các lớp cao hơn trong mạng có thể xây dựng dựa trên các biểu diễn này để\nđại diện cho các cấu trúc lớn hơn, như mắt, mũi, lưỡi cỏ, v.v. Thậm chí\ncác lớp cao hơn có thể đại diện cho toàn bộ các đối tượng như người, máy\nbay, chó, hoặc frisbees. Cuối cùng, trạng thái ẩn cuối cùng học được một\nbiểu diễn nhỏ gọn của hình ảnh tóm tắt nội dung của nó sao cho dữ liệu\nthuộc các danh mục khác nhau có thể dễ dàng tách ra."
+    },
+    {
+      "type": "paragraph",
+      "text": "Trong khi bước đột phá cuối cùng cho các CNN nhiều lớp đến vào năm 2012,\nmột nhóm các nhà nghiên cứu cốt lõi đã cống hiến hết mình cho ý tưởng\nnày, cố gắng tìm hiểu các đại diện phân cấp của dữ liệu trực quan trong\nnhiều năm. Bước đột phá cuối cùng vào năm 2012 có thể được quy cho hai\nyếu tố chính."
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "thieu-thanh-phan-du-lieu",
+      "text": "7.1.1.1. Thiếu thành phần: Dữ liệu"
+    },
+    {
+      "type": "paragraph",
+      "text": "Các mô hình sâu với nhiều lớp đòi hỏi một lượng lớn dữ liệu để vào chế\nđộ mà chúng vượt trội hơn đáng kể các phương pháp truyền thống dựa trên\ntối ưu hóa lồi (ví dụ, phương pháp tuyến tính và hạt nhân). Tuy nhiên,\nvới khả năng lưu trữ hạn chế của máy tính, chi phí tương đối của các cảm\nbiến, và ngân sách nghiên cứu tương đối chặt chẽ hơn trong những năm\n1990, hầu hết các nghiên cứu đều dựa vào các tập dữ liệu nhỏ. Nhiều giấy\ntờ đề cập đến bộ sưu tập dữ liệu UCI, nhiều trong số đó chỉ chứa hàng\ntrăm hoặc (một vài) hàng ngàn hình ảnh được chụp trong các cài đặt không\ntự nhiên với độ phân giải thấp."
+    },
+    {
+      "type": "paragraph",
+      "text": "Năm 2009, tập dữ liệu ImageNet được phát hành, thách thức các nhà nghiên\ncứu tìm hiểu các mô hình từ 1 triệu ví dụ, 1000 mỗi loại từ 1000 loại\nđối tượng riêng biệt. Các nhà nghiên cứu, dẫn đầu bởi Fei-Fei Li, người\nđã giới thiệu tập dữ liệu này đã tận dụng Google Image Search để lọc\ntrước các bộ ứng cử viên lớn cho từng danh mục và sử dụng đường ống cộng\nđồng Amazon Mechanical Turk để xác nhận cho mỗi hình ảnh xem nó có thuộc\nvề danh mục liên quan hay không. Quy mô này là chưa từng có. Cuộc cạnh\ntranh liên quan, được mệnh danh là ImageNet Challenge đã đẩy tầm nhìn\nmáy tính và nghiên cứu máy học tiến lên phía trước, thách thức các nhà\nnghiên cứu để xác định mô hình nào hoạt động tốt nhất ở quy mô lớn hơn\nso với các học giả trước đây đã xem xét."
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "thieu-thanh-phan-phan-cung",
+      "text": "7.1.1.2. Thiếu thành phần: Phần cứng"
+    },
+    {
+      "type": "paragraph",
+      "text": "Mô hình học sâu là những người tiêu dùng phàm ăn của chu kỳ tính toán.\nĐào tạo có thể mất hàng trăm kỷ nguyên, và mỗi lần lặp lại yêu cầu\ntruyền dữ liệu qua nhiều lớp hoạt động đại số tuyến tính đắt tiền tính\ntoán. Đây là một trong những lý do chính khiến vào những năm 1990 và đầu\nnhững năm 2000, các thuật toán đơn giản dựa trên các mục tiêu lồi được\ntối ưu hóa hiệu quả hơn được ưu tiên."
+    },
+    {
+      "type": "paragraph",
+      "text": "Các đơn vị xử lý đồ học (GPU) được chứng minh là một người thay đổi\ntrò chơi in making chế tạo deep sâu learning học tập feasible khả thi.\nNhững chip này từ lâu đã được phát triển để tăng tốc xử lý đồ họa để\nmang lại lợi ích cho các trò chơi máy tính. Đặc biệt, chúng đã được tối\nưu hóa cho các sản phẩm ma thuật-vector \\(4 \\times 4\\) thông lượng\ncao, cần thiết cho nhiều tác vụ đồ họa máy tính. May mắn thay, toán học\nnày rất giống với điều cần thiết để tính toán các lớp phức tạp. Khoảng\nthời gian đó, NVIDIA và ATI đã bắt đầu tối ưu hóa GPU cho các hoạt động\nđiện toán chung, đi xa đến mức tiếp thị chúng như * GPU đa năng\n(GPGPU)."
+    },
+    {
+      "type": "paragraph",
+      "text": "Để cung cấp một số trực giác, hãy xem xét các lõi của bộ vi xử lý hiện\nđại (CPU). Mỗi lõi là khá mạnh mẽ chạy ở tần số đồng hồ cao và thể thao\nbộ nhớ cache lớn (lên đến vài megabyte L3). Mỗi lõi rất phù hợp để thực\nhiện một loạt các hướng dẫn, với các dự báo nhánh, một đường ống sâu, và\ncác chuông và còi khác cho phép nó chạy một loạt các chương trình. Tuy\nnhiên, sức mạnh rõ ràng này cũng là gót chân Achilles của nó: lõi mục\nđích chung rất tốn kém để xây dựng. Chúng yêu cầu nhiều khu vực chip,\ncấu trúc hỗ trợ tinh vi (giao diện bộ nhớ, logic bộ nhớ đệm giữa các\nlõi, kết nối tốc độ cao, v.v.) và chúng tương đối xấu ở bất kỳ tác vụ\nduy nhất nào. Máy tính xách tay hiện đại có tới 4 lõi và thậm chí các\nmáy chủ cao cấp hiếm khi vượt quá 64 lõi, đơn giản vì nó không hiệu quả\nvề chi phí."
+    },
+    {
+      "type": "paragraph",
+      "text": "Bằng cách so sánh, GPU bao gồm \\(100 \\sim 1000\\) các yếu tố xử lý\nnhỏ (các chi tiết khác nhau phần nào giữa NVIDIA, ATI, ARM và các nhà\ncung cấp chip khác), thường được nhóm thành các nhóm lớn hơn (NVIDIA gọi\nchúng là cong vênh). Trong khi mỗi lõi tương đối yếu, đôi khi thậm chí\nchạy ở tần số xung nhịp dưới 1GHz, đó là tổng số lõi như vậy làm cho các\nđơn đặt hàng GPU có độ lớn nhanh hơn CPU. Ví dụ, thế hệ Volta gần đây\ncủa NVIDIA cung cấp lên đến 120 TFlops mỗi chip cho các hướng dẫn chuyên\nngành (và lên đến 24 TFlops cho các mục đích chung hơn), trong khi hiệu\nsuất điểm nổi của CPU không vượt quá 1 TFlop cho đến nay. Lý do tại sao\nđiều này là có thể thực sự khá đơn giản: đầu tiên, tiêu thụ điện năng có\nxu hướng tăng * quadratically* với tần số xung nhịp. Do đó, đối với\nngân sách năng lượng của lõi CPU chạy nhanh hơn 4 lần (một số điển\nhình), bạn có thể sử dụng 16 lõi GPU ở tốc độ \\(1/4\\) , mang lại hiệu\nsuất \\(16 \\times 1/4 = 4\\) lần. Hơn nữa, các lõi GPU đơn giản hơn\nnhiều (trên thực tế, trong một thời gian dài, chúng thậm chí không thể\n* để thực thi mã mục đích chung), điều này làm cho chúng tiết kiệm năng\nlượng hơn. Cuối cùng, nhiều hoạt động trong deep learning yêu cầu băng\nthông bộ nhớ cao. Một lần nữa, GPU tỏa sáng ở đây với các xe buýt có độ\nrộng ít nhất 10 lần so với nhiều CPU."
+    },
+    {
+      "type": "paragraph",
+      "text": "Quay lại năm 2012. Một bước đột phá lớn đến khi Alex Krizhevsky và Ilya\nSutkever triển khai một CNN sâu có thể chạy trên phần cứng GPU. Họ nhận\nra rằng các tắc nghẽn tính toán trong CNN s, sự phức tạp và nhân ma\ntrận, là tất cả các hoạt động có thể được song song trong phần cứng. Sử\ndụng hai NVIDIA GTX 580s với 3GB bộ nhớ, họ đã thực hiện các kết hợp\nnhanh. Mã cuda-convnet đủ\ntốt để trong nhiều năm, đó là tiêu chuẩn ngành và cung cấp cho vài năm\nđầu tiên của sự bùng nổ học tập sâu."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "alexnet",
+      "text": "7.1.2. AlexNet"
+    },
+    {
+      "type": "paragraph",
+      "text": "AlexNet, sử dụng CNN 8 lớp, đã giành chiến thắng trong ImageNet Large\nScale Visual Recognition Challenge 2012 bởi một biên độ lớn phi thường.\nMạng này lần đầu tiên cho thấy rằng các tính năng thu được bằng cách học\ntập có thể vượt qua các tính năng được thiết kế thủ công, phá vỡ mô hình\ntrước đó trong tầm nhìn máy tính."
+    },
+    {
+      "type": "paragraph",
+      "text": "Các kiến trúc của AlexNet và LeNet rất giống nhau, như Fig. 7.1.2 minh họa. Lưu ý rằng chúng tôi cung cấp một\nphiên bản hơi hợp lý của AlexNet loại bỏ một số điều kỳ lạ thiết kế cần\nthiết trong năm 2012 để làm cho mô hình phù hợp với hai GPU nhỏ."
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/alexnet.svg",
+      "local_path": "_images/alexnet.svg",
+      "alt": "../_images/alexnet.svg"
+    },
+    {
+      "type": "paragraph",
+      "text": "Fig. 7.1.2 From LeNet (left) to AlexNet (right). ¶"
+    },
+    {
+      "type": "paragraph",
+      "text": "Các triết lý thiết kế của AlexNet và LeNet rất giống nhau, nhưng cũng có\nsự khác biệt đáng kể. Đầu tiên, AlexNet sâu hơn nhiều so với LeNet5\ntương đối nhỏ. AlexNet bao gồm tám lớp: năm lớp phức tạp, hai lớp ẩn\nđược kết nối hoàn toàn và một lớp đầu ra được kết nối hoàn toàn. Thứ\nhai, AlexNet sử dụng ReLU thay vì sigmoid làm chức năng kích hoạt của\nnó. Hãy để chúng tôi đi sâu vào các chi tiết dưới đây."
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "architecture",
+      "text": "7.1.2.1. Architecture"
+    },
+    {
+      "type": "paragraph",
+      "text": "Trong lớp đầu tiên của AlexNet, hình dạng cửa sổ phức tạp là \\(11\\times11\\) . Vì hầu hết các hình ảnh trong ImageNet cao hơn mười\nlần và rộng hơn hình ảnh MNIST, các đối tượng trong dữ liệu ImageNet có\nxu hướng chiếm nhiều pixel hơn. Do đó, một cửa sổ phức tạp lớn hơn là\ncần thiết để chụp đối tượng. Hình dạng cửa sổ phức tạp trong lớp thứ hai\nđược giảm xuống còn \\(5\\times5\\) , tiếp theo là \\(3\\times3\\) .\nNgoài ra, sau các lớp phức tạp thứ nhất, thứ hai và thứ năm, mạng thêm\ncác lớp tổng hợp tối đa với hình dạng cửa sổ là \\(3\\times3\\) và một\nsải chân là 2. Hơn nữa, AlexNet có kênh phức tạp gấp mười lần so với\nLeNet."
+    },
+    {
+      "type": "paragraph",
+      "text": "Sau lớp phức tạp cuối cùng có hai lớp kết nối hoàn toàn với 4096 đầu ra.\nHai lớp được kết nối hoàn toàn khổng lồ này tạo ra các thông số mô hình\ngần 1 GB. Do bộ nhớ hạn chế trong các GPU đầu tiên, AlexNet ban đầu đã\nsử dụng một thiết kế luồng dữ liệu kép, để mỗi trong hai GPU của họ có\nthể chịu trách nhiệm lưu trữ và tính toán chỉ một nửa mô hình của nó.\nMay mắn thay, bộ nhớ GPU hiện nay tương đối phong phú, vì vậy chúng ta\nhiếm khi cần chia tay các mô hình trên GPU trong những ngày này (phiên\nbản của mô hình AlexNet của chúng tôi lệch khỏi giấy gốc ở khía cạnh\nnày)."
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "chuc-nang-kich-hoat",
+      "text": "7.1.2.2. Chức năng kích hoạt"
+    },
+    {
+      "type": "paragraph",
+      "text": "Bên cạnh đó, AlexNet đã thay đổi chức năng kích hoạt sigmoid thành chức\nnăng kích hoạt ReLU đơn giản hơn. Một mặt, việc tính toán chức năng kích\nhoạt ReLU đơn giản hơn. Ví dụ, nó không có hoạt động số mũ được tìm thấy\ntrong chức năng kích hoạt sigmoid. Mặt khác, chức năng kích hoạt ReLU\ngiúp đào tạo mô hình dễ dàng hơn khi sử dụng các phương pháp khởi tạo\ntham số khác nhau. Điều này là do, khi đầu ra của chức năng kích hoạt\nsigmoid rất gần 0 hoặc 1, gradient của các vùng này gần như là 0, do đó\nsự lan truyền ngược không thể tiếp tục cập nhật một số tham số mô hình.\nNgược lại, gradient của hàm kích hoạt ReLU trong khoảng dương luôn là 1.\nDo đó, nếu các tham số mô hình không được khởi tạo đúng cách, hàm\nsigmoid có thể thu được một gradient gần 0 trong khoảng dương, do đó mô\nhình không thể được đào tạo hiệu quả."
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "kiem-soat-cong-suat-va-tien-xu-ly",
+      "text": "7.1.2.3. Kiểm soát công suất và tiền xử lý"
+    },
+    {
+      "type": "paragraph",
+      "text": "AlexNet kiểm soát độ phức tạp mô hình của lớp kết nối hoàn toàn bằng\ncách bỏ học ( Section 4.6 ), trong khi LeNet chỉ sử dụng trọng\nlượng phân rã. Để tăng cường dữ liệu hơn nữa, vòng đào tạo của AlexNet\nđã thêm rất nhiều nâng hình ảnh, chẳng hạn như lật, cắt và thay đổi màu\nsắc. Điều này làm cho mô hình mạnh mẽ hơn và kích thước mẫu lớn hơn làm\ngiảm hiệu quả overfitting. Chúng tôi sẽ thảo luận về việc tăng dữ liệu\nchi tiết hơn trong Section 13.1 ."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "from mxnet import np, npx\nfrom mxnet.gluon import nn\nfrom d2l import mxnet as d2l\n\nnpx.set_np()\n\nnet = nn.Sequential()\n# Here, we use a larger 11 x 11 window to capture objects. At the same time,\n# we use a stride of 4 to greatly reduce the height and width of the output.\n# Here, the number of output channels is much larger than that in LeNet\nnet.add(nn.Conv2D(96, kernel_size=11, strides=4, activation='relu'),\n        nn.MaxPool2D(pool_size=3, strides=2),\n        # Make the convolution window smaller, set padding to 2 for consistent\n        # height and width across the input and output, and increase the\n        # number of output channels\n        nn.Conv2D(256, kernel_size=5, padding=2, activation='relu'),\n        nn.MaxPool2D(pool_size=3, strides=2),\n        # Use three successive convolutional layers and a smaller convolution\n        # window. Except for the final convolutional layer, the number of\n        # output channels is further increased. Pooling layers are not used to\n        # reduce the height and width of input after the first two\n        # convolutional layers\n        nn.Conv2D(384, kernel_size=3, padding=1, activation='relu'),\n        nn.Conv2D(384, kernel_size=3, padding=1, activation='relu'),\n        nn.Conv2D(256, kernel_size=3, padding=1, activation='relu'),\n        nn.MaxPool2D(pool_size=3, strides=2),\n        # Here, the number of outputs of the fully-connected layer is several\n        # times larger than that in LeNet. Use the dropout layer to mitigate\n        # overfitting\n        nn.Dense(4096, activation='relu'), nn.Dropout(0.5),\n        nn.Dense(4096, activation='relu'), nn.Dropout(0.5),\n        # Output layer. Since we are using Fashion-MNIST, the number of\n        # classes is 10, instead of 1000 as in the paper\n        nn.Dense(10))"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "import torch\nfrom torch import nn\nfrom d2l import torch as d2l\n\nnet = nn.Sequential(\n    # Here, we use a larger 11 x 11 window to capture objects. At the same\n    # time, we use a stride of 4 to greatly reduce the height and width of the\n    # output. Here, the number of output channels is much larger than that in\n    # LeNet\n    nn.Conv2d(1, 96, kernel_size=11, stride=4, padding=1), nn.ReLU(),\n    nn.MaxPool2d(kernel_size=3, stride=2),\n    # Make the convolution window smaller, set padding to 2 for consistent\n    # height and width across the input and output, and increase the number of\n    # output channels\n    nn.Conv2d(96, 256, kernel_size=5, padding=2), nn.ReLU(),\n    nn.MaxPool2d(kernel_size=3, stride=2),\n    # Use three successive convolutional layers and a smaller convolution\n    # window. Except for the final convolutional layer, the number of output\n    # channels is further increased. Pooling layers are not used to reduce the\n    # height and width of input after the first two convolutional layers\n    nn.Conv2d(256, 384, kernel_size=3, padding=1), nn.ReLU(),\n    nn.Conv2d(384, 384, kernel_size=3, padding=1), nn.ReLU(),\n    nn.Conv2d(384, 256, kernel_size=3, padding=1), nn.ReLU(),\n    nn.MaxPool2d(kernel_size=3, stride=2),\n    nn.Flatten(),\n    # Here, the number of outputs of the fully-connected layer is several\n    # times larger than that in LeNet. Use the dropout layer to mitigate\n    # overfitting\n    nn.Linear(6400, 4096), nn.ReLU(),\n    nn.Dropout(p=0.5),\n    nn.Linear(4096, 4096), nn.ReLU(),\n    nn.Dropout(p=0.5),\n    # Output layer. Since we are using Fashion-MNIST, the number of classes is\n    # 10, instead of 1000 as in the paper\n    nn.Linear(4096, 10))"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "import tensorflow as tf\nfrom d2l import tensorflow as d2l\n\n\ndef net():\n    return tf.keras.models.Sequential([\n        # Here, we use a larger 11 x 11 window to capture objects. At the same\n        # time, we use a stride of 4 to greatly reduce the height and width of\n        # the output. Here, the number of output channels is much larger than\n        # that in LeNet\n        tf.keras.layers.Conv2D(filters=96, kernel_size=11, strides=4,\n                               activation='relu'),\n        tf.keras.layers.MaxPool2D(pool_size=3, strides=2),\n        # Make the convolution window smaller, set padding to 2 for consistent\n        # height and width across the input and output, and increase the\n        # number of output channels\n        tf.keras.layers.Conv2D(filters=256, kernel_size=5, padding='same',\n                               activation='relu'),\n        tf.keras.layers.MaxPool2D(pool_size=3, strides=2),\n        # Use three successive convolutional layers and a smaller convolution\n        # window. Except for the final convolutional layer, the number of\n        # output channels is further increased. Pooling layers are not used to\n        # reduce the height and width of input after the first two\n        # convolutional layers\n        tf.keras.layers.Conv2D(filters=384, kernel_size=3, padding='same',\n                               activation='relu'),\n        tf.keras.layers.Conv2D(filters=384, kernel_size=3, padding='same',\n                               activation='relu'),\n        tf.keras.layers.Conv2D(filters=256, kernel_size=3, padding='same',\n                               activation='relu'),\n        tf.keras.layers.MaxPool2D(pool_size=3, strides=2),\n        tf.keras.layers.Flatten(),\n        # Here, the number of outputs of the fully-connected layer is several\n        # times larger than that in LeNet. Use the dropout layer to mitigate\n        # overfitting\n        tf.keras.layers.Dense(4096, activation='relu'),\n        tf.keras.layers.Dropout(0.5),\n        tf.keras.layers.Dense(4096, activation='relu'),\n        tf.keras.layers.Dropout(0.5),\n        # Output layer. Since we are using Fashion-MNIST, the number of\n        # classes is 10, instead of 1000 as in the paper\n        tf.keras.layers.Dense(10)\n    ])"
+    },
+    {
+      "type": "paragraph",
+      "text": "Chúng tôi xây dựng một ví dụ dữ liệu một kênh với cả chiều cao và chiều\nrộng là 224 để quan sát hình dạng đầu ra của mỗi lớp. Nó phù hợp với\nkiến trúc AlexNet vào năm Fig. 7.1.2 ."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "X = np.random.uniform(size=(1, 1, 224, 224))\nnet.initialize()\nfor layer in net:\n    X = layer(X)\n    print(layer.name, 'output shape:\\t', X.shape)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "conv0 output shape:  (1, 96, 54, 54)\npool0 output shape:  (1, 96, 26, 26)\nconv1 output shape:  (1, 256, 26, 26)\npool1 output shape:  (1, 256, 12, 12)\nconv2 output shape:  (1, 384, 12, 12)\nconv3 output shape:  (1, 384, 12, 12)\nconv4 output shape:  (1, 256, 12, 12)\npool2 output shape:  (1, 256, 5, 5)\ndense0 output shape:         (1, 4096)\ndropout0 output shape:       (1, 4096)\ndense1 output shape:         (1, 4096)\ndropout1 output shape:       (1, 4096)\ndense2 output shape:         (1, 10)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "X = torch.randn(1, 1, 224, 224)\nfor layer in net:\n    X=layer(X)\n    print(layer.__class__.__name__,'output shape:\\t',X.shape)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "Conv2d output shape:         torch.Size([1, 96, 54, 54])\nReLU output shape:   torch.Size([1, 96, 54, 54])\nMaxPool2d output shape:      torch.Size([1, 96, 26, 26])\nConv2d output shape:         torch.Size([1, 256, 26, 26])\nReLU output shape:   torch.Size([1, 256, 26, 26])\nMaxPool2d output shape:      torch.Size([1, 256, 12, 12])\nConv2d output shape:         torch.Size([1, 384, 12, 12])\nReLU output shape:   torch.Size([1, 384, 12, 12])\nConv2d output shape:         torch.Size([1, 384, 12, 12])\nReLU output shape:   torch.Size([1, 384, 12, 12])\nConv2d output shape:         torch.Size([1, 256, 12, 12])\nReLU output shape:   torch.Size([1, 256, 12, 12])\nMaxPool2d output shape:      torch.Size([1, 256, 5, 5])\nFlatten output shape:        torch.Size([1, 6400])\nLinear output shape:         torch.Size([1, 4096])\nReLU output shape:   torch.Size([1, 4096])\nDropout output shape:        torch.Size([1, 4096])\nLinear output shape:         torch.Size([1, 4096])\nReLU output shape:   torch.Size([1, 4096])\nDropout output shape:        torch.Size([1, 4096])\nLinear output shape:         torch.Size([1, 10])"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "X = tf.random.uniform((1, 224, 224, 1))\nfor layer in net().layers:\n    X = layer(X)\n    print(layer.__class__.__name__, 'output shape:\\t', X.shape)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "Conv2D output shape:         (1, 54, 54, 96)\nMaxPooling2D output shape:   (1, 26, 26, 96)\nConv2D output shape:         (1, 26, 26, 256)\nMaxPooling2D output shape:   (1, 12, 12, 256)\nConv2D output shape:         (1, 12, 12, 384)\nConv2D output shape:         (1, 12, 12, 384)\nConv2D output shape:         (1, 12, 12, 256)\nMaxPooling2D output shape:   (1, 5, 5, 256)\nFlatten output shape:        (1, 6400)\nDense output shape:  (1, 4096)\nDropout output shape:        (1, 4096)\nDense output shape:  (1, 4096)\nDropout output shape:        (1, 4096)\nDense output shape:  (1, 10)"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "doc-tap-du-lieu",
+      "text": "7.1.3. Đọc tập dữ liệu"
+    },
+    {
+      "type": "paragraph",
+      "text": "Mặc dù AlexNet được đào tạo trên ImageNet trong giấy, chúng tôi sử dụng\nFashion-MNIST ở đây vì đào tạo mô hình ImageNet để hội tụ có thể mất\nhàng giờ hoặc vài ngày ngay cả trên GPU hiện đại. Một trong những vấn đề\nvới việc áp dụng AlexNet trực tiếp trên Fashion-MNIST là nó hình ảnh có\nđộ phân giải thấp hơn ( \\(28 \\times 28\\) pixel) hơn ImageNet images.\nĐể làm cho mọi thứ hoạt động, chúng tôi upsample chúng lên \\(224 \\times 224\\) (nói chung không phải là một thực hành thông\nminh, nhưng chúng tôi làm điều đó ở đây để trung thành với AlexNet kiến\ntrúc). Chúng tôi thực hiện thay đổi kích thước này với đối số resize trong hàm d2l.load_data_fashion_mnist ."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "batch_size = 128\ntrain_iter, test_iter = d2l.load_data_fashion_mnist(batch_size, resize=224)"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "dao-tao",
+      "text": "7.1.4. Đào tạo"
+    },
+    {
+      "type": "paragraph",
+      "text": "Bây giờ, chúng ta có thể bắt đầu đào tạo AlexNet. So với LeNet năm Section 6.6 , thay đổi chính ở đây là việc sử dụng tốc độ học\ntập nhỏ hơn và đào tạo chậm hơn nhiều do mạng sâu hơn và rộng hơn, độ\nphân giải hình ảnh cao hơn và các phức tạp tốn kém hơn."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "lr, num_epochs = 0.01, 10\nd2l.train_ch6(net, train_iter, test_iter, num_epochs, lr, d2l.try_gpu())"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "loss 0.333, train acc 0.878, test acc 0.887\n3956.7 examples/sec on gpu(0)"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_alexnet_180871_29_1.svg",
+      "local_path": "_images/output_alexnet_180871_29_1.svg",
+      "alt": "../_images/output_alexnet_180871_29_1.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "lr, num_epochs = 0.01, 10\nd2l.train_ch6(net, train_iter, test_iter, num_epochs, lr, d2l.try_gpu())"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "loss 0.328, train acc 0.880, test acc 0.885\n4047.8 examples/sec on cuda:0"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_alexnet_180871_32_1.svg",
+      "local_path": "_images/output_alexnet_180871_32_1.svg",
+      "alt": "../_images/output_alexnet_180871_32_1.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "lr, num_epochs = 0.01, 10\nd2l.train_ch6(net, train_iter, test_iter, num_epochs, lr, d2l.try_gpu())"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "loss 0.330, train acc 0.881, test acc 0.879\n4421.5 examples/sec on /GPU:0"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "<keras.engine.sequential.Sequential at 0x7fb95c5bf160>"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_alexnet_180871_35_2.svg",
+      "local_path": "_images/output_alexnet_180871_35_2.svg",
+      "alt": "../_images/output_alexnet_180871_35_2.svg"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tom-tat",
+      "text": "7.1.5. Tóm tắt"
+    },
+    {
+      "type": "list",
+      "ordered": false,
+      "items": [
+        "AlexNet có cấu trúc tương tự như của LeNet, nhưng sử dụng nhiều lớp\nphức tạp hơn và một không gian tham số lớn hơn để phù hợp với tập dữ\nliệu ImageNet quy mô lớn.",
+        "Ngày nay AlexNet đã bị vượt qua bởi các kiến trúc hiệu quả hơn nhiều\nnhưng đó là một bước quan trọng từ nông đến mạng sâu được sử dụng\nngày nay.",
+        "Mặc dù có vẻ như chỉ có một vài dòng nữa trong việc thực hiện AlexNet\nso với LeNet, cộng đồng học thuật phải mất nhiều năm để nắm lấy sự\nthay đổi khái niệm này và tận dụng kết quả thử nghiệm tuyệt vời của\nnó. Điều này cũng là do thiếu các công cụ tính toán hiệu quả.",
+        "Bỏ học, ReLU và tiền xử lý là những bước quan trọng khác trong việc\nđạt được hiệu suất tuyệt vời trong các tác vụ thị giác máy tính."
+      ]
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bai-tap",
+      "text": "7.1.6. Bài tập"
+    },
+    {
+      "type": "list",
+      "ordered": true,
+      "items": [
+        "Hãy thử tăng số lượng thời đại. So với LeNet, kết quả khác nhau như\nthế nào? Tại sao?",
+        "AlexNet có thể quá phức tạp đối với tập dữ liệu Fashion-MNIST. Hãy thử đơn giản hóa mô hình để đào tạo nhanh hơn, đồng thời đảm\nbảo rằng độ chính xác không giảm đáng kể. Thiết kế một mô hình tốt hơn hoạt động trực tiếp trên \\(28 \\times 28\\) hình ảnh.",
+        "Hãy thử đơn giản hóa mô hình để đào tạo nhanh hơn, đồng thời đảm\nbảo rằng độ chính xác không giảm đáng kể.",
+        "Thiết kế một mô hình tốt hơn hoạt động trực tiếp trên \\(28 \\times 28\\) hình ảnh.",
+        "Sửa đổi kích thước lô, và quan sát những thay đổi về độ chính xác và\nbộ nhớ GPU.",
+        "Phân tích hiệu suất tính toán của AlexNet. Phần chiếm ưu thế cho dấu chân bộ nhớ của AlexNet là gì? Phần chi phối cho tính toán trong AlexNet là gì? Làm thế nào về băng thông bộ nhớ khi tính toán kết quả?",
+        "Phần chiếm ưu thế cho dấu chân bộ nhớ của AlexNet là gì?",
+        "Phần chi phối cho tính toán trong AlexNet là gì?",
+        "Làm thế nào về băng thông bộ nhớ khi tính toán kết quả?",
+        "Áp dụng dropout và ReLU cho LeNet-5. Nó có cải thiện không? Làm thế\nnào về tiền xử lý?"
+      ]
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    }
+  ],
+  "images": [
+    {
+      "original_url": "https://vi.d2l.ai/_images/filters.png",
+      "local_path": "_images/filters.png",
+      "alt": "../_images/filters.png"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/alexnet.svg",
+      "local_path": "_images/alexnet.svg",
+      "alt": "../_images/alexnet.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_alexnet_180871_29_1.svg",
+      "local_path": "_images/output_alexnet_180871_29_1.svg",
+      "alt": "../_images/output_alexnet_180871_29_1.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_alexnet_180871_32_1.svg",
+      "local_path": "_images/output_alexnet_180871_32_1.svg",
+      "alt": "../_images/output_alexnet_180871_32_1.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_alexnet_180871_35_2.svg",
+      "local_path": "_images/output_alexnet_180871_35_2.svg",
+      "alt": "../_images/output_alexnet_180871_35_2.svg"
+    }
+  ],
+  "text": "7.1. Mạng thần kinh phức tạp sâu (AlexNet)\nMặc dù CNN nổi tiếng trong thị giác máy tính và cộng đồng học máy sau\nkhi giới thiệu LeNet, họ đã không thống trị ngay lập tức lĩnh vực này.\nMặc dù LeNet đạt được kết quả tốt trên các tập dữ liệu nhỏ ban đầu,\nnhưng hiệu suất và tính khả thi của việc đào tạo CNN trên các tập dữ\nliệu lớn hơn, thực tế hơn vẫn chưa được thiết lập. Trên thực tế, trong\nphần lớn thời gian can thiệp giữa đầu thập niên 1990 và kết quả đầu\nnguồn của năm 2012, các mạng thần kinh thường bị vượt qua bởi các phương\npháp học máy khác, chẳng hạn như các máy vector hỗ trợ.\nĐối với tầm nhìn máy tính, so sánh này có lẽ không công bằng. Đó là mặc\ndù các đầu vào cho các mạng tích hợp bao gồm các giá trị pixel thô hoặc\nđược xử lý nhẹ (ví dụ: bằng cách định tâm), các học viên sẽ không bao\ngiờ cung cấp các pixel thô vào các mô hình truyền thống. Thay vào đó,\nđường ống tầm nhìn máy tính điển hình bao gồm các đường ống trích xuất\ntính năng kỹ thuật thủ công. Thay vì * tìm hiểu các tính năng * , các\ntính năng là * crafted*. Hầu hết các tiến bộ đến từ việc có nhiều ý\ntưởng thông minh hơn cho các tính năng, và thuật toán học tập thường\nđược chuyển xuống một suy nghĩ sau.\nMặc dù một số máy gia tốc mạng thần kinh đã có sẵn trong những năm 1990,\nnhưng chúng chưa đủ mạnh để tạo ra các CNN đa kênh sâu, đa lớp với một\nsố lượng lớn các tham số. Hơn nữa, các bộ dữ liệu vẫn còn tương đối nhỏ.\nThêm vào những trở ngại này, các thủ thuật chính để đào tạo các mạng\nthần kinh bao gồm heuristics khởi tạo tham số, các biến thể thông minh\ncủa gốc gradient ngẫu nhiên, chức năng kích hoạt không squashing, và các\nkỹ thuật chính quy hóa hiệu quả vẫn còn thiếu.\nDo đó, thay vì đào tạo hệ thống * end-to-end* (pixel để phân loại),\ncác đường ống cổ điển trông như thế này hơn:\nLấy một bộ dữ liệu thú vị. Trong những ngày đầu, các bộ dữ liệu này\nyêu cầu các cảm biến đắt tiền (vào thời điểm đó, hình ảnh 1 megapixel\nlà hiện đại).\nXử lý trước bộ dữ liệu với các tính năng thủ công dựa trên một số\nkiến thức về quang học, hình học, các công cụ phân tích khác và thỉnh\nthoảng trên những khám phá ngẫu nhiên của sinh viên tốt nghiệp may\nmắn.\nCung cấp dữ liệu thông qua một bộ trích xuất tính năng tiêu chuẩn như\nSIFT (biến đổi tính năng bất biến quy mô) [Lowe, 2004] , SURF\n(tăng tốc các tính năng mạnh mẽ) [Bay et al., 2006] hoặc bất kỳ số lượng đường ống\nđiều chỉnh bằng tay nào khác.\nDump các biểu diễn kết quả vào phân loại yêu thích của bạn, có thể là\nmột mô hình tuyến tính hoặc phương pháp hạt nhân, để đào tạo một phân\nloại.\nNếu bạn nói chuyện với các nhà nghiên cứu machine learning, họ tin rằng\nmachine learning vừa quan trọng vừa đẹp. Các lý thuyết thanh lịch đã\nchứng minh các tính chất của các nhà phân loại khác nhau. Lĩnh vực máy\nhọc rất phát triển mạnh, nghiêm ngặt và hữu ích. Tuy nhiên, nếu bạn nói\nchuyện với một nhà nghiên cứu thị giác máy tính, bạn sẽ nghe một câu\nchuyện rất khác. Sự thật bẩn thỉu của nhận dạng hình ảnh, họ sẽ nói với\nbạn, đó là các tính năng, không phải học thuật toán, đã thúc đẩy tiến\nbộ. Các nhà nghiên cứu thị giác máy tính tin một cách hợp lý rằng một bộ\ndữ liệu lớn hơn hoặc sạch hơn một chút hoặc một đường ống trích xuất\ntính năng được cải thiện một chút quan trọng hơn nhiều so với độ chính\nxác cuối cùng so với bất kỳ thuật toán học tập nào.\n7.1.1. Đại diện học tập\nMột cách khác để đúc tình trạng của các vấn đề là phần quan trọng nhất\ncủa đường ống là đại diện. Và cho đến năm 2012, đại diện đã được tính\ntoán bằng máy móc. Trong thực tế, kỹ thuật một bộ mới của chức năng tính\nnăng, cải thiện kết quả, và viết lên phương pháp là một thể loại giấy\nnổi bật. SIFT [Lowe, 2004] , SURF [Bay et al., 2006] , HOG (biểu đồ của gradient định\nhướng) [Dalal & Triggs, 2005] , bags of visual\nwords và các máy chiết xuất tính năng tương tự cai trị roost.\nMột nhóm các nhà nghiên cứu khác, bao gồm Yann LeCun, Geoff Hinton,\nYoshua Bengio, Andrew Ng, Shun-ichi Amari, và Juergen Schmidhuber, có\nnhững kế hoạch khác nhau. Họ tin rằng bản thân các tính năng nên được\nhọc. Hơn nữa, họ tin rằng để phức tạp một cách hợp lý, các tính năng\nphải được cấu tạo theo thứ bậc với nhiều lớp học chung, mỗi lớp có các\ntham số có thể học được. Trong trường hợp của một hình ảnh, các lớp thấp\nnhất có thể đến để phát hiện các cạnh, màu sắc và kết cấu. Thật vậy,\nAlex Krizhevsky, Ilya Sutkever và Geoff Hinton đã đề xuất một biến thể\nmới của CNN, AlexNet , đạt được hiệu suất xuất sắc trong thử thách\nImageNet 2012. AlexNet được đặt theo tên Alex Krizhevsky, tác giả đầu\ntiên của bài phân loại ImageNet đột phá [Krizhevsky et al., 2012] .\nĐiều thú vị là ở các lớp thấp nhất của mạng, mô hình đã học được tính\nnăng trích xuất giống như một số bộ lọc truyền thống. Fig. 7.1.1 được sao chép từ giấy AlexNet [Krizhevsky et al., 2012] và mô tả mô tả hình ảnh cấp\nthấp hơn.\nFig. 7.1.1 Image filters learned by the first layer of AlexNet. ¶\nCác lớp cao hơn trong mạng có thể xây dựng dựa trên các biểu diễn này để\nđại diện cho các cấu trúc lớn hơn, như mắt, mũi, lưỡi cỏ, v.v. Thậm chí\ncác lớp cao hơn có thể đại diện cho toàn bộ các đối tượng như người, máy\nbay, chó, hoặc frisbees. Cuối cùng, trạng thái ẩn cuối cùng học được một\nbiểu diễn nhỏ gọn của hình ảnh tóm tắt nội dung của nó sao cho dữ liệu\nthuộc các danh mục khác nhau có thể dễ dàng tách ra.\nTrong khi bước đột phá cuối cùng cho các CNN nhiều lớp đến vào năm 2012,\nmột nhóm các nhà nghiên cứu cốt lõi đã cống hiến hết mình cho ý tưởng\nnày, cố gắng tìm hiểu các đại diện phân cấp của dữ liệu trực quan trong\nnhiều năm. Bước đột phá cuối cùng vào năm 2012 có thể được quy cho hai\nyếu tố chính.\n7.1.1.1. Thiếu thành phần: Dữ liệu\nCác mô hình sâu với nhiều lớp đòi hỏi một lượng lớn dữ liệu để vào chế\nđộ mà chúng vượt trội hơn đáng kể các phương pháp truyền thống dựa trên\ntối ưu hóa lồi (ví dụ, phương pháp tuyến tính và hạt nhân). Tuy nhiên,\nvới khả năng lưu trữ hạn chế của máy tính, chi phí tương đối của các cảm\nbiến, và ngân sách nghiên cứu tương đối chặt chẽ hơn trong những năm\n1990, hầu hết các nghiên cứu đều dựa vào các tập dữ liệu nhỏ. Nhiều giấy\ntờ đề cập đến bộ sưu tập dữ liệu UCI, nhiều trong số đó chỉ chứa hàng\ntrăm hoặc (một vài) hàng ngàn hình ảnh được chụp trong các cài đặt không\ntự nhiên với độ phân giải thấp.\nNăm 2009, tập dữ liệu ImageNet được phát hành, thách thức các nhà nghiên\ncứu tìm hiểu các mô hình từ 1 triệu ví dụ, 1000 mỗi loại từ 1000 loại\nđối tượng riêng biệt. Các nhà nghiên cứu, dẫn đầu bởi Fei-Fei Li, người\nđã giới thiệu tập dữ liệu này đã tận dụng Google Image Search để lọc\ntrước các bộ ứng cử viên lớn cho từng danh mục và sử dụng đường ống cộng\nđồng Amazon Mechanical Turk để xác nhận cho mỗi hình ảnh xem nó có thuộc\nvề danh mục liên quan hay không. Quy mô này là chưa từng có. Cuộc cạnh\ntranh liên quan, được mệnh danh là ImageNet Challenge đã đẩy tầm nhìn\nmáy tính và nghiên cứu máy học tiến lên phía trước, thách thức các nhà\nnghiên cứu để xác định mô hình nào hoạt động tốt nhất ở quy mô lớn hơn\nso với các học giả trước đây đã xem xét.\n7.1.1.2. Thiếu thành phần: Phần cứng\nMô hình học sâu là những người tiêu dùng phàm ăn của chu kỳ tính toán.\nĐào tạo có thể mất hàng trăm kỷ nguyên, và mỗi lần lặp lại yêu cầu\ntruyền dữ liệu qua nhiều lớp hoạt động đại số tuyến tính đắt tiền tính\ntoán. Đây là một trong những lý do chính khiến vào những năm 1990 và đầu\nnhững năm 2000, các thuật toán đơn giản dựa trên các mục tiêu lồi được\ntối ưu hóa hiệu quả hơn được ưu tiên.\nCác đơn vị xử lý đồ học (GPU) được chứng minh là một người thay đổi\ntrò chơi in making chế tạo deep sâu learning học tập feasible khả thi.\nNhững chip này từ lâu đã được phát triển để tăng tốc xử lý đồ họa để\nmang lại lợi ích cho các trò chơi máy tính. Đặc biệt, chúng đã được tối\nưu hóa cho các sản phẩm ma thuật-vector \\(4 \\times 4\\) thông lượng\ncao, cần thiết cho nhiều tác vụ đồ họa máy tính. May mắn thay, toán học\nnày rất giống với điều cần thiết để tính toán các lớp phức tạp. Khoảng\nthời gian đó, NVIDIA và ATI đã bắt đầu tối ưu hóa GPU cho các hoạt động\nđiện toán chung, đi xa đến mức tiếp thị chúng như * GPU đa năng\n(GPGPU).\nĐể cung cấp một số trực giác, hãy xem xét các lõi của bộ vi xử lý hiện\nđại (CPU). Mỗi lõi là khá mạnh mẽ chạy ở tần số đồng hồ cao và thể thao\nbộ nhớ cache lớn (lên đến vài megabyte L3). Mỗi lõi rất phù hợp để thực\nhiện một loạt các hướng dẫn, với các dự báo nhánh, một đường ống sâu, và\ncác chuông và còi khác cho phép nó chạy một loạt các chương trình. Tuy\nnhiên, sức mạnh rõ ràng này cũng là gót chân Achilles của nó: lõi mục\nđích chung rất tốn kém để xây dựng. Chúng yêu cầu nhiều khu vực chip,\ncấu trúc hỗ trợ tinh vi (giao diện bộ nhớ, logic bộ nhớ đệm giữa các\nlõi, kết nối tốc độ cao, v.v.) và chúng tương đối xấu ở bất kỳ tác vụ\nduy nhất nào. Máy tính xách tay hiện đại có tới 4 lõi và thậm chí các\nmáy chủ cao cấp hiếm khi vượt quá 64 lõi, đơn giản vì nó không hiệu quả\nvề chi phí.\nBằng cách so sánh, GPU bao gồm \\(100 \\sim 1000\\) các yếu tố xử lý\nnhỏ (các chi tiết khác nhau phần nào giữa NVIDIA, ATI, ARM và các nhà\ncung cấp chip khác), thường được nhóm thành các nhóm lớn hơn (NVIDIA gọi\nchúng là cong vênh). Trong khi mỗi lõi tương đối yếu, đôi khi thậm chí\nchạy ở tần số xung nhịp dưới 1GHz, đó là tổng số lõi như vậy làm cho các\nđơn đặt hàng GPU có độ lớn nhanh hơn CPU. Ví dụ, thế hệ Volta gần đây\ncủa NVIDIA cung cấp lên đến 120 TFlops mỗi chip cho các hướng dẫn chuyên\nngành (và lên đến 24 TFlops cho các mục đích chung hơn), trong khi hiệu\nsuất điểm nổi của CPU không vượt quá 1 TFlop cho đến nay. Lý do tại sao\nđiều này là có thể thực sự khá đơn giản: đầu tiên, tiêu thụ điện năng có\nxu hướng tăng * quadratically* với tần số xung nhịp. Do đó, đối với\nngân sách năng lượng của lõi CPU chạy nhanh hơn 4 lần (một số điển\nhình), bạn có thể sử dụng 16 lõi GPU ở tốc độ \\(1/4\\) , mang lại hiệu\nsuất \\(16 \\times 1/4 = 4\\) lần. Hơn nữa, các lõi GPU đơn giản hơn\nnhiều (trên thực tế, trong một thời gian dài, chúng thậm chí không thể\n* để thực thi mã mục đích chung), điều này làm cho chúng tiết kiệm năng\nlượng hơn. Cuối cùng, nhiều hoạt động trong deep learning yêu cầu băng\nthông bộ nhớ cao. Một lần nữa, GPU tỏa sáng ở đây với các xe buýt có độ\nrộng ít nhất 10 lần so với nhiều CPU.\nQuay lại năm 2012. Một bước đột phá lớn đến khi Alex Krizhevsky và Ilya\nSutkever triển khai một CNN sâu có thể chạy trên phần cứng GPU. Họ nhận\nra rằng các tắc nghẽn tính toán trong CNN s, sự phức tạp và nhân ma\ntrận, là tất cả các hoạt động có thể được song song trong phần cứng. Sử\ndụng hai NVIDIA GTX 580s với 3GB bộ nhớ, họ đã thực hiện các kết hợp\nnhanh. Mã cuda-convnet đủ\ntốt để trong nhiều năm, đó là tiêu chuẩn ngành và cung cấp cho vài năm\nđầu tiên của sự bùng nổ học tập sâu.\n7.1.2. AlexNet\nAlexNet, sử dụng CNN 8 lớp, đã giành chiến thắng trong ImageNet Large\nScale Visual Recognition Challenge 2012 bởi một biên độ lớn phi thường.\nMạng này lần đầu tiên cho thấy rằng các tính năng thu được bằng cách học\ntập có thể vượt qua các tính năng được thiết kế thủ công, phá vỡ mô hình\ntrước đó trong tầm nhìn máy tính.\nCác kiến trúc của AlexNet và LeNet rất giống nhau, như Fig. 7.1.2 minh họa. Lưu ý rằng chúng tôi cung cấp một\nphiên bản hơi hợp lý của AlexNet loại bỏ một số điều kỳ lạ thiết kế cần\nthiết trong năm 2012 để làm cho mô hình phù hợp với hai GPU nhỏ.\nFig. 7.1.2 From LeNet (left) to AlexNet (right). ¶\nCác triết lý thiết kế của AlexNet và LeNet rất giống nhau, nhưng cũng có\nsự khác biệt đáng kể. Đầu tiên, AlexNet sâu hơn nhiều so với LeNet5\ntương đối nhỏ. AlexNet bao gồm tám lớp: năm lớp phức tạp, hai lớp ẩn\nđược kết nối hoàn toàn và một lớp đầu ra được kết nối hoàn toàn. Thứ\nhai, AlexNet sử dụng ReLU thay vì sigmoid làm chức năng kích hoạt của\nnó. Hãy để chúng tôi đi sâu vào các chi tiết dưới đây.\n7.1.2.1. Architecture\nTrong lớp đầu tiên của AlexNet, hình dạng cửa sổ phức tạp là \\(11\\times11\\) . Vì hầu hết các hình ảnh trong ImageNet cao hơn mười\nlần và rộng hơn hình ảnh MNIST, các đối tượng trong dữ liệu ImageNet có\nxu hướng chiếm nhiều pixel hơn. Do đó, một cửa sổ phức tạp lớn hơn là\ncần thiết để chụp đối tượng. Hình dạng cửa sổ phức tạp trong lớp thứ hai\nđược giảm xuống còn \\(5\\times5\\) , tiếp theo là \\(3\\times3\\) .\nNgoài ra, sau các lớp phức tạp thứ nhất, thứ hai và thứ năm, mạng thêm\ncác lớp tổng hợp tối đa với hình dạng cửa sổ là \\(3\\times3\\) và một\nsải chân là 2. Hơn nữa, AlexNet có kênh phức tạp gấp mười lần so với\nLeNet.\nSau lớp phức tạp cuối cùng có hai lớp kết nối hoàn toàn với 4096 đầu ra.\nHai lớp được kết nối hoàn toàn khổng lồ này tạo ra các thông số mô hình\ngần 1 GB. Do bộ nhớ hạn chế trong các GPU đầu tiên, AlexNet ban đầu đã\nsử dụng một thiết kế luồng dữ liệu kép, để mỗi trong hai GPU của họ có\nthể chịu trách nhiệm lưu trữ và tính toán chỉ một nửa mô hình của nó.\nMay mắn thay, bộ nhớ GPU hiện nay tương đối phong phú, vì vậy chúng ta\nhiếm khi cần chia tay các mô hình trên GPU trong những ngày này (phiên\nbản của mô hình AlexNet của chúng tôi lệch khỏi giấy gốc ở khía cạnh\nnày).\n7.1.2.2. Chức năng kích hoạt\nBên cạnh đó, AlexNet đã thay đổi chức năng kích hoạt sigmoid thành chức\nnăng kích hoạt ReLU đơn giản hơn. Một mặt, việc tính toán chức năng kích\nhoạt ReLU đơn giản hơn. Ví dụ, nó không có hoạt động số mũ được tìm thấy\ntrong chức năng kích hoạt sigmoid. Mặt khác, chức năng kích hoạt ReLU\ngiúp đào tạo mô hình dễ dàng hơn khi sử dụng các phương pháp khởi tạo\ntham số khác nhau. Điều này là do, khi đầu ra của chức năng kích hoạt\nsigmoid rất gần 0 hoặc 1, gradient của các vùng này gần như là 0, do đó\nsự lan truyền ngược không thể tiếp tục cập nhật một số tham số mô hình.\nNgược lại, gradient của hàm kích hoạt ReLU trong khoảng dương luôn là 1.\nDo đó, nếu các tham số mô hình không được khởi tạo đúng cách, hàm\nsigmoid có thể thu được một gradient gần 0 trong khoảng dương, do đó mô\nhình không thể được đào tạo hiệu quả.\n7.1.2.3. Kiểm soát công suất và tiền xử lý\nAlexNet kiểm soát độ phức tạp mô hình của lớp kết nối hoàn toàn bằng\ncách bỏ học ( Section 4.6 ), trong khi LeNet chỉ sử dụng trọng\nlượng phân rã. Để tăng cường dữ liệu hơn nữa, vòng đào tạo của AlexNet\nđã thêm rất nhiều nâng hình ảnh, chẳng hạn như lật, cắt và thay đổi màu\nsắc. Điều này làm cho mô hình mạnh mẽ hơn và kích thước mẫu lớn hơn làm\ngiảm hiệu quả overfitting. Chúng tôi sẽ thảo luận về việc tăng dữ liệu\nchi tiết hơn trong Section 13.1 .\nChúng tôi xây dựng một ví dụ dữ liệu một kênh với cả chiều cao và chiều\nrộng là 224 để quan sát hình dạng đầu ra của mỗi lớp. Nó phù hợp với\nkiến trúc AlexNet vào năm Fig. 7.1.2 .\n7.1.3. Đọc tập dữ liệu\nMặc dù AlexNet được đào tạo trên ImageNet trong giấy, chúng tôi sử dụng\nFashion-MNIST ở đây vì đào tạo mô hình ImageNet để hội tụ có thể mất\nhàng giờ hoặc vài ngày ngay cả trên GPU hiện đại. Một trong những vấn đề\nvới việc áp dụng AlexNet trực tiếp trên Fashion-MNIST là nó hình ảnh có\nđộ phân giải thấp hơn ( \\(28 \\times 28\\) pixel) hơn ImageNet images.\nĐể làm cho mọi thứ hoạt động, chúng tôi upsample chúng lên \\(224 \\times 224\\) (nói chung không phải là một thực hành thông\nminh, nhưng chúng tôi làm điều đó ở đây để trung thành với AlexNet kiến\ntrúc). Chúng tôi thực hiện thay đổi kích thước này với đối số resize trong hàm d2l.load_data_fashion_mnist .\n7.1.4. Đào tạo\nBây giờ, chúng ta có thể bắt đầu đào tạo AlexNet. So với LeNet năm Section 6.6 , thay đổi chính ở đây là việc sử dụng tốc độ học\ntập nhỏ hơn và đào tạo chậm hơn nhiều do mạng sâu hơn và rộng hơn, độ\nphân giải hình ảnh cao hơn và các phức tạp tốn kém hơn.\n7.1.5. Tóm tắt\nAlexNet có cấu trúc tương tự như của LeNet, nhưng sử dụng nhiều lớp\nphức tạp hơn và một không gian tham số lớn hơn để phù hợp với tập dữ\nliệu ImageNet quy mô lớn.\nNgày nay AlexNet đã bị vượt qua bởi các kiến trúc hiệu quả hơn nhiều\nnhưng đó là một bước quan trọng từ nông đến mạng sâu được sử dụng\nngày nay.\nMặc dù có vẻ như chỉ có một vài dòng nữa trong việc thực hiện AlexNet\nso với LeNet, cộng đồng học thuật phải mất nhiều năm để nắm lấy sự\nthay đổi khái niệm này và tận dụng kết quả thử nghiệm tuyệt vời của\nnó. Điều này cũng là do thiếu các công cụ tính toán hiệu quả.\nBỏ học, ReLU và tiền xử lý là những bước quan trọng khác trong việc\nđạt được hiệu suất tuyệt vời trong các tác vụ thị giác máy tính.\n7.1.6. Bài tập\nHãy thử tăng số lượng thời đại. So với LeNet, kết quả khác nhau như\nthế nào? Tại sao?\nAlexNet có thể quá phức tạp đối với tập dữ liệu Fashion-MNIST. Hãy thử đơn giản hóa mô hình để đào tạo nhanh hơn, đồng thời đảm\nbảo rằng độ chính xác không giảm đáng kể. Thiết kế một mô hình tốt hơn hoạt động trực tiếp trên \\(28 \\times 28\\) hình ảnh.\nHãy thử đơn giản hóa mô hình để đào tạo nhanh hơn, đồng thời đảm\nbảo rằng độ chính xác không giảm đáng kể.\nThiết kế một mô hình tốt hơn hoạt động trực tiếp trên \\(28 \\times 28\\) hình ảnh.\nSửa đổi kích thước lô, và quan sát những thay đổi về độ chính xác và\nbộ nhớ GPU.\nPhân tích hiệu suất tính toán của AlexNet. Phần chiếm ưu thế cho dấu chân bộ nhớ của AlexNet là gì? Phần chi phối cho tính toán trong AlexNet là gì? Làm thế nào về băng thông bộ nhớ khi tính toán kết quả?\nPhần chiếm ưu thế cho dấu chân bộ nhớ của AlexNet là gì?\nPhần chi phối cho tính toán trong AlexNet là gì?\nLàm thế nào về băng thông bộ nhớ khi tính toán kết quả?\nÁp dụng dropout và ReLU cho LeNet-5. Nó có cải thiện không? Làm thế\nnào về tiền xử lý?\nDiscussions\nDiscussions\nDiscussions"
+}

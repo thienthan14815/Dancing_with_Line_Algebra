@@ -1,0 +1,291 @@
+{
+  "url": "https://vi.d2l.ai/chapter_computer-vision/bounding-box.html",
+  "chapter": "chapter_computer-vision",
+  "title": "13.3. Hộp phát hiện và giới hạn đối tượng",
+  "crawled_at": "2026-07-20T12:40:40.526826+00:00",
+  "headings": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "hop-phat-hien-va-gioi-han-doi-tuong",
+      "text": "13.3. Hộp phát hiện và giới hạn đối tượng"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "hop-gioi-han",
+      "text": "13.3.1. Hộp giới hạn"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tom-tat",
+      "text": "13.3.2. Tóm tắt"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bai-tap",
+      "text": "13.3.3. Bài tập"
+    }
+  ],
+  "content": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "hop-phat-hien-va-gioi-han-doi-tuong",
+      "text": "13.3. Hộp phát hiện và giới hạn đối tượng"
+    },
+    {
+      "type": "paragraph",
+      "text": "Trong các phần trước (ví dụ: Section 7.1 — Section 7.4 ), chúng tôi đã giới\nthiệu các mô hình khác nhau để phân loại hình ảnh. Trong các tác vụ phân\nloại hình ảnh, chúng tôi giả định rằng chỉ có * một* đối tượng chính\ntrong hình ảnh và chúng tôi chỉ tập trung vào cách nhận dạng danh mục\ncủa nó. Tuy nhiên, thường có các đối tượng * nhiều* trong hình ảnh\nquan tâm. Chúng tôi không chỉ muốn biết danh mục của họ, mà còn là vị\ntrí cụ thể của họ trong hình ảnh. Trong tầm nhìn máy tính, chúng tôi đề\ncập đến các tác vụ như phát hiện đối tượng (hoặc nhận dạng đối\ntượng )."
+    },
+    {
+      "type": "paragraph",
+      "text": "Phát hiện đối tượng đã được ứng dụng rộng rãi trong nhiều lĩnh vực. Ví\ndụ, tự lái cần lên kế hoạch cho các tuyến đường di chuyển bằng cách phát\nhiện vị trí của phương tiện, người đi bộ, đường xá và chướng ngại vật\ntrong các hình ảnh video đã chụp. Bên cạnh đó, robot có thể sử dụng kỹ\nthuật này để phát hiện và bản địa hóa các đối tượng quan tâm trong suốt\nquá trình điều hướng môi trường. Hơn nữa, các hệ thống an ninh có thể\ncần phải phát hiện các vật bất thường, chẳng hạn như kẻ xâm nhập hoặc\nbom."
+    },
+    {
+      "type": "paragraph",
+      "text": "Trong vài phần tiếp theo, chúng tôi sẽ giới thiệu một số phương pháp học\nsâu để phát hiện đối tượng. Chúng tôi sẽ bắt đầu với phần giới thiệu về vị trí (hoặc locations ) của các đối tượng."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "%matplotlib inline\nfrom mxnet import image, np, npx\nfrom d2l import mxnet as d2l\n\nnpx.set_np()"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "%matplotlib inline\nimport torch\nfrom d2l import torch as d2l"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "%matplotlib inline\nimport tensorflow as tf\nfrom d2l import tensorflow as d2l"
+    },
+    {
+      "type": "paragraph",
+      "text": "Chúng tôi sẽ tải hình ảnh mẫu được sử dụng trong phần này. Chúng ta có\nthể thấy rằng có một chú chó ở phía bên trái của hình ảnh và một con mèo\nbên phải. Chúng là hai đối tượng chính trong hình ảnh này."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "d2l.set_figsize()\nimg = image.imread('../img/catdog.jpg').asnumpy()\nd2l.plt.imshow(img);"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_bounding-box_d6b70e_15_0.svg",
+      "local_path": "_images/output_bounding-box_d6b70e_15_0.svg",
+      "alt": "../_images/output_bounding-box_d6b70e_15_0.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "d2l.set_figsize()\nimg = d2l.plt.imread('../img/catdog.jpg')\nd2l.plt.imshow(img);"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_bounding-box_d6b70e_18_0.svg",
+      "local_path": "_images/output_bounding-box_d6b70e_18_0.svg",
+      "alt": "../_images/output_bounding-box_d6b70e_18_0.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "d2l.set_figsize()\nimg = d2l.plt.imread('../img/catdog.jpg')\nd2l.plt.imshow(img);"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_bounding-box_d6b70e_21_0.svg",
+      "local_path": "_images/output_bounding-box_d6b70e_21_0.svg",
+      "alt": "../_images/output_bounding-box_d6b70e_21_0.svg"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "hop-gioi-han",
+      "text": "13.3.1. Hộp giới hạn"
+    },
+    {
+      "type": "paragraph",
+      "text": "Trong phát hiện đối tượng, chúng ta thường sử dụng một hộp giới hạn *\nđể mô tả vị trí không gian của một đối tượng. Hộp giới hạn là hình chữ\nnhật, được xác định bởi tọa độ \\(x\\) và \\(y\\) của góc trên bên\ntrái của hình chữ nhật và tọa độ như vậy của góc dưới bên phải. Một biểu\ndiễn hộp giới hạn thường được sử dụng khác là tọa độ \\((x, y)\\) -trục\ncủa trung tâm hộp giới hạn, và chiều rộng và chiều cao của hộp."
+    },
+    {
+      "type": "paragraph",
+      "text": "Ở đây chúng ta định nghĩa các hàm để chuyển đổi giữa hai các hàm này hai\nđại diện : box_corner_to_center chuyển đổi từ biểu diễn hai góc sang\ntrình bày chiều rộng trung tâm và box_center_to_corner ngược lại.\nĐối số đầu vào boxes phải là một tensor hai chiều của hình dạng\n( \\(n\\) , 4), trong đó \\(n\\) là số hộp giới hạn."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "#@save\ndef box_corner_to_center(boxes):\n    \"\"\"Convert from (upper-left, lower-right) to (center, width, height).\"\"\"\n    x1, y1, x2, y2 = boxes[:, 0], boxes[:, 1], boxes[:, 2], boxes[:, 3]\n    cx = (x1 + x2) / 2\n    cy = (y1 + y2) / 2\n    w = x2 - x1\n    h = y2 - y1\n    boxes = np.stack((cx, cy, w, h), axis=-1)\n    return boxes\n\n#@save\ndef box_center_to_corner(boxes):\n    \"\"\"Convert from (center, width, height) to (upper-left, lower-right).\"\"\"\n    cx, cy, w, h = boxes[:, 0], boxes[:, 1], boxes[:, 2], boxes[:, 3]\n    x1 = cx - 0.5 * w\n    y1 = cy - 0.5 * h\n    x2 = cx + 0.5 * w\n    y2 = cy + 0.5 * h\n    boxes = np.stack((x1, y1, x2, y2), axis=-1)\n    return boxes"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "#@save\ndef box_corner_to_center(boxes):\n    \"\"\"Convert from (upper-left, lower-right) to (center, width, height).\"\"\"\n    x1, y1, x2, y2 = boxes[:, 0], boxes[:, 1], boxes[:, 2], boxes[:, 3]\n    cx = (x1 + x2) / 2\n    cy = (y1 + y2) / 2\n    w = x2 - x1\n    h = y2 - y1\n    boxes = torch.stack((cx, cy, w, h), axis=-1)\n    return boxes\n\n#@save\ndef box_center_to_corner(boxes):\n    \"\"\"Convert from (center, width, height) to (upper-left, lower-right).\"\"\"\n    cx, cy, w, h = boxes[:, 0], boxes[:, 1], boxes[:, 2], boxes[:, 3]\n    x1 = cx - 0.5 * w\n    y1 = cy - 0.5 * h\n    x2 = cx + 0.5 * w\n    y2 = cy + 0.5 * h\n    boxes = torch.stack((x1, y1, x2, y2), axis=-1)\n    return boxes"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "#@save\ndef box_corner_to_center(boxes):\n    \"\"\"Convert from (upper-left, lower-right) to (center, width, height).\"\"\"\n    x1, y1, x2, y2 = boxes[:, 0], boxes[:, 1], boxes[:, 2], boxes[:, 3]\n    cx = (x1 + x2) / 2\n    cy = (y1 + y2) / 2\n    w = x2 - x1\n    h = y2 - y1\n    boxes = tf.stack((cx, cy, w, h), axis=-1)\n    return boxes\n\n#@save\ndef box_center_to_corner(boxes):\n    \"\"\"Convert from (center, width, height) to (upper-left, lower-right).\"\"\"\n    cx, cy, w, h = boxes[:, 0], boxes[:, 1], boxes[:, 2], boxes[:, 3]\n    x1 = cx - 0.5 * w\n    y1 = cy - 0.5 * h\n    x2 = cx + 0.5 * w\n    y2 = cy + 0.5 * h\n    boxes = tf.stack((x1, y1, x2, y2), axis=-1)\n    return boxes"
+    },
+    {
+      "type": "paragraph",
+      "text": "Chúng tôi sẽ xác định các hộp giới hạn của chó và con mèo trong hình ảnh\ndựa trên thông tin tọa độ. Nguồn gốc của tọa độ trong hình ảnh là góc\ntrên bên trái của hình ảnh, và bên phải và xuống là các hướng dương của\ncác trục \\(x\\) và \\(y\\) , tương ứng."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "# Here `bbox` is the abbreviation for bounding box\ndog_bbox, cat_bbox = [60.0, 45.0, 378.0, 516.0], [400.0, 112.0, 655.0, 493.0]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Chúng tôi có thể xác minh tính chính xác của hai chức năng chuyển đổi\nhộp giới hạn bằng cách chuyển đổi hai lần."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "boxes = np.array((dog_bbox, cat_bbox))\nbox_center_to_corner(box_corner_to_center(boxes)) == boxes"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "array([[ True,  True,  True,  True],\n       [ True,  True,  True,  True]])"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "boxes = torch.tensor((dog_bbox, cat_bbox))\nbox_center_to_corner(box_corner_to_center(boxes)) == boxes"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "tensor([[True, True, True, True],\n        [True, True, True, True]])"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "boxes = tf.constant((dog_bbox, cat_bbox))\nbox_center_to_corner(box_corner_to_center(boxes)) == boxes"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "<tf.Tensor: shape=(2, 4), dtype=bool, numpy=\narray([[ True,  True,  True,  True],\n       [ True,  True,  True,  True]])>"
+    },
+    {
+      "type": "paragraph",
+      "text": "Hãy để chúng tôi vẽ các hộp giới hạn trong hình ảnh để kiểm tra xem\nchúng có chính xác không. Trước khi vẽ, chúng ta sẽ xác định một hàm\nhelper bbox_to_rect . Nó đại diện cho hộp giới hạn ở định dạng hộp\ngiới hạn của gói matplotlib ."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "#@save\ndef bbox_to_rect(bbox, color):\n    \"\"\"Convert bounding box to matplotlib format.\"\"\"\n    # Convert the bounding box (upper-left x, upper-left y, lower-right x,\n    # lower-right y) format to the matplotlib format: ((upper-left x,\n    # upper-left y), width, height)\n    return d2l.plt.Rectangle(\n        xy=(bbox[0], bbox[1]), width=bbox[2]-bbox[0], height=bbox[3]-bbox[1],\n        fill=False, edgecolor=color, linewidth=2)"
+    },
+    {
+      "type": "paragraph",
+      "text": "Sau khi thêm các hộp giới hạn trên hình ảnh, chúng ta có thể thấy rằng\nđường viền chính của hai đối tượng về cơ bản nằm trong hai hộp."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "fig = d2l.plt.imshow(img)\nfig.axes.add_patch(bbox_to_rect(dog_bbox, 'blue'))\nfig.axes.add_patch(bbox_to_rect(cat_bbox, 'red'));"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_bounding-box_d6b70e_55_0.svg",
+      "local_path": "_images/output_bounding-box_d6b70e_55_0.svg",
+      "alt": "../_images/output_bounding-box_d6b70e_55_0.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "fig = d2l.plt.imshow(img)\nfig.axes.add_patch(bbox_to_rect(dog_bbox, 'blue'))\nfig.axes.add_patch(bbox_to_rect(cat_bbox, 'red'));"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_bounding-box_d6b70e_58_0.svg",
+      "local_path": "_images/output_bounding-box_d6b70e_58_0.svg",
+      "alt": "../_images/output_bounding-box_d6b70e_58_0.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "fig = d2l.plt.imshow(img)\nfig.axes.add_patch(bbox_to_rect(dog_bbox, 'blue'))\nfig.axes.add_patch(bbox_to_rect(cat_bbox, 'red'));"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_bounding-box_d6b70e_61_0.svg",
+      "local_path": "_images/output_bounding-box_d6b70e_61_0.svg",
+      "alt": "../_images/output_bounding-box_d6b70e_61_0.svg"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tom-tat",
+      "text": "13.3.2. Tóm tắt"
+    },
+    {
+      "type": "list",
+      "ordered": false,
+      "items": [
+        "Phát hiện đối tượng không chỉ nhận ra tất cả các đối tượng quan tâm\ntrong hình ảnh, mà còn cả vị trí của chúng. Vị trí thường được biểu\ndiễn bằng một hộp giới hạn hình chữ nhật.",
+        "Chúng ta có thể chuyển đổi giữa hai biểu diễn hộp giới hạn thường\nđược sử dụng."
+      ]
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bai-tap",
+      "text": "13.3.3. Bài tập"
+    },
+    {
+      "type": "list",
+      "ordered": true,
+      "items": [
+        "Tìm một hình ảnh khác và cố gắng gắn nhãn một hộp giới hạn chứa đối\ntượng. So sánh các hộp và danh mục giới hạn ghi nhãn: thường mất\nnhiều thời gian hơn?",
+        "Tại sao chiều trong cùng của đối số đầu vào boxes của box_corner_to_center và box_center_to_corner luôn là 4?"
+      ]
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    }
+  ],
+  "images": [
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_bounding-box_d6b70e_15_0.svg",
+      "local_path": "_images/output_bounding-box_d6b70e_15_0.svg",
+      "alt": "../_images/output_bounding-box_d6b70e_15_0.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_bounding-box_d6b70e_18_0.svg",
+      "local_path": "_images/output_bounding-box_d6b70e_18_0.svg",
+      "alt": "../_images/output_bounding-box_d6b70e_18_0.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_bounding-box_d6b70e_21_0.svg",
+      "local_path": "_images/output_bounding-box_d6b70e_21_0.svg",
+      "alt": "../_images/output_bounding-box_d6b70e_21_0.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_bounding-box_d6b70e_55_0.svg",
+      "local_path": "_images/output_bounding-box_d6b70e_55_0.svg",
+      "alt": "../_images/output_bounding-box_d6b70e_55_0.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_bounding-box_d6b70e_58_0.svg",
+      "local_path": "_images/output_bounding-box_d6b70e_58_0.svg",
+      "alt": "../_images/output_bounding-box_d6b70e_58_0.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_bounding-box_d6b70e_61_0.svg",
+      "local_path": "_images/output_bounding-box_d6b70e_61_0.svg",
+      "alt": "../_images/output_bounding-box_d6b70e_61_0.svg"
+    }
+  ],
+  "text": "13.3. Hộp phát hiện và giới hạn đối tượng\nTrong các phần trước (ví dụ: Section 7.1 — Section 7.4 ), chúng tôi đã giới\nthiệu các mô hình khác nhau để phân loại hình ảnh. Trong các tác vụ phân\nloại hình ảnh, chúng tôi giả định rằng chỉ có * một* đối tượng chính\ntrong hình ảnh và chúng tôi chỉ tập trung vào cách nhận dạng danh mục\ncủa nó. Tuy nhiên, thường có các đối tượng * nhiều* trong hình ảnh\nquan tâm. Chúng tôi không chỉ muốn biết danh mục của họ, mà còn là vị\ntrí cụ thể của họ trong hình ảnh. Trong tầm nhìn máy tính, chúng tôi đề\ncập đến các tác vụ như phát hiện đối tượng (hoặc nhận dạng đối\ntượng ).\nPhát hiện đối tượng đã được ứng dụng rộng rãi trong nhiều lĩnh vực. Ví\ndụ, tự lái cần lên kế hoạch cho các tuyến đường di chuyển bằng cách phát\nhiện vị trí của phương tiện, người đi bộ, đường xá và chướng ngại vật\ntrong các hình ảnh video đã chụp. Bên cạnh đó, robot có thể sử dụng kỹ\nthuật này để phát hiện và bản địa hóa các đối tượng quan tâm trong suốt\nquá trình điều hướng môi trường. Hơn nữa, các hệ thống an ninh có thể\ncần phải phát hiện các vật bất thường, chẳng hạn như kẻ xâm nhập hoặc\nbom.\nTrong vài phần tiếp theo, chúng tôi sẽ giới thiệu một số phương pháp học\nsâu để phát hiện đối tượng. Chúng tôi sẽ bắt đầu với phần giới thiệu về vị trí (hoặc locations ) của các đối tượng.\nChúng tôi sẽ tải hình ảnh mẫu được sử dụng trong phần này. Chúng ta có\nthể thấy rằng có một chú chó ở phía bên trái của hình ảnh và một con mèo\nbên phải. Chúng là hai đối tượng chính trong hình ảnh này.\n13.3.1. Hộp giới hạn\nTrong phát hiện đối tượng, chúng ta thường sử dụng một hộp giới hạn *\nđể mô tả vị trí không gian của một đối tượng. Hộp giới hạn là hình chữ\nnhật, được xác định bởi tọa độ \\(x\\) và \\(y\\) của góc trên bên\ntrái của hình chữ nhật và tọa độ như vậy của góc dưới bên phải. Một biểu\ndiễn hộp giới hạn thường được sử dụng khác là tọa độ \\((x, y)\\) -trục\ncủa trung tâm hộp giới hạn, và chiều rộng và chiều cao của hộp.\nỞ đây chúng ta định nghĩa các hàm để chuyển đổi giữa hai các hàm này hai\nđại diện : box_corner_to_center chuyển đổi từ biểu diễn hai góc sang\ntrình bày chiều rộng trung tâm và box_center_to_corner ngược lại.\nĐối số đầu vào boxes phải là một tensor hai chiều của hình dạng\n( \\(n\\) , 4), trong đó \\(n\\) là số hộp giới hạn.\nChúng tôi sẽ xác định các hộp giới hạn của chó và con mèo trong hình ảnh\ndựa trên thông tin tọa độ. Nguồn gốc của tọa độ trong hình ảnh là góc\ntrên bên trái của hình ảnh, và bên phải và xuống là các hướng dương của\ncác trục \\(x\\) và \\(y\\) , tương ứng.\nChúng tôi có thể xác minh tính chính xác của hai chức năng chuyển đổi\nhộp giới hạn bằng cách chuyển đổi hai lần.\nHãy để chúng tôi vẽ các hộp giới hạn trong hình ảnh để kiểm tra xem\nchúng có chính xác không. Trước khi vẽ, chúng ta sẽ xác định một hàm\nhelper bbox_to_rect . Nó đại diện cho hộp giới hạn ở định dạng hộp\ngiới hạn của gói matplotlib .\nSau khi thêm các hộp giới hạn trên hình ảnh, chúng ta có thể thấy rằng\nđường viền chính của hai đối tượng về cơ bản nằm trong hai hộp.\n13.3.2. Tóm tắt\nPhát hiện đối tượng không chỉ nhận ra tất cả các đối tượng quan tâm\ntrong hình ảnh, mà còn cả vị trí của chúng. Vị trí thường được biểu\ndiễn bằng một hộp giới hạn hình chữ nhật.\nChúng ta có thể chuyển đổi giữa hai biểu diễn hộp giới hạn thường\nđược sử dụng.\n13.3.3. Bài tập\nTìm một hình ảnh khác và cố gắng gắn nhãn một hộp giới hạn chứa đối\ntượng. So sánh các hộp và danh mục giới hạn ghi nhãn: thường mất\nnhiều thời gian hơn?\nTại sao chiều trong cùng của đối số đầu vào boxes của box_corner_to_center và box_center_to_corner luôn là 4?\nDiscussions\nDiscussions"
+}

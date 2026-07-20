@@ -1,0 +1,235 @@
+{
+  "url": "https://vi.d2l.ai/chapter_natural-language-processing-applications/finetuning-bert.html",
+  "chapter": "chapter_natural-language-processing-applications",
+  "title": "15.6. Tinh chỉnh BERT cho các ứng dụng cấp Sequence-Level và Token-Level",
+  "crawled_at": "2026-07-20T12:41:08.482606+00:00",
+  "headings": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "tinh-chinh-bert-cho-cac-ung-dung-cap-sequence-level-va-token-level",
+      "text": "15.6. Tinh chỉnh BERT cho các ứng dụng cấp Sequence-Level và Token-Level"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "phan-loai-van-ban-don",
+      "text": "15.6.1. Phân loại văn bản đơn"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "phan-loai-cap-van-ban-hoac-hoi-quy",
+      "text": "15.6.2. Phân loại cặp văn bản hoặc hồi quy"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "gan-the-van-ban",
+      "text": "15.6.3. Gắn thẻ văn bản"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "cau-hoi-tra-loi",
+      "text": "15.6.4. Câu hỏi trả lời"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tom-tat",
+      "text": "15.6.5. Tóm tắt"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bai-tap",
+      "text": "15.6.6. Bài tập"
+    }
+  ],
+  "content": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "tinh-chinh-bert-cho-cac-ung-dung-cap-sequence-level-va-token-level",
+      "text": "15.6. Tinh chỉnh BERT cho các ứng dụng cấp Sequence-Level và Token-Level"
+    },
+    {
+      "type": "paragraph",
+      "text": "Trong các phần trước của chương này, chúng tôi đã thiết kế các mô hình\nkhác nhau cho các ứng dụng xử lý ngôn ngữ tự nhiên, chẳng hạn như dựa\ntrên RNN, CNN, sự chú ý và MLP. Các mô hình này rất hữu ích khi có không\ngian hoặc thời gian hạn chế, tuy nhiên, việc tạo ra một mô hình cụ thể\ncho mọi nhiệm vụ xử lý ngôn ngữ tự nhiên thực tế là không khả thi. Trong Section 14.8 , chúng tôi giới thiệu một mô hình pretraining,\nBERT, đòi hỏi những thay đổi kiến trúc tối thiểu cho một loạt các nhiệm\nvụ xử lý ngôn ngữ tự nhiên. Một mặt, tại thời điểm đề xuất của mình,\nBERT đã cải thiện trạng thái của nghệ thuật về các nhiệm vụ xử lý ngôn\nngữ tự nhiên khác nhau. Mặt khác, như đã lưu ý trong Section 14.10 , hai phiên bản của mô hình BERT ban đầu\nđi kèm với 110 triệu và 340 triệu thông số. Do đó, khi có đủ tài nguyên\ntính toán, chúng ta có thể xem xét BERT tinh chỉnh cho các ứng dụng xử\nlý ngôn ngữ tự nhiên ở hạ nguồn."
+    },
+    {
+      "type": "paragraph",
+      "text": "Sau đây, chúng tôi khái quát hóa một tập hợp con của các ứng dụng xử lý\nngôn ngữ tự nhiên dưới dạng cấp trình tự và cấp token. Ở cấp độ trình\ntự, chúng tôi giới thiệu cách chuyển đổi biểu diễn BERT của đầu vào văn\nbản thành nhãn đầu ra trong phân loại văn bản đơn và phân loại cặp văn\nbản hoặc hồi quy. Ở cấp độ token, chúng tôi sẽ giới thiệu ngắn gọn các\nứng dụng mới như gắn thẻ văn bản và trả lời câu hỏi và làm sáng tỏ cách\nBERT có thể đại diện cho đầu vào của chúng và được chuyển đổi thành nhãn\nđầu ra. Trong quá trình tinh chỉnh, “những thay đổi kiến trúc tối thiểu”\ntheo yêu cầu của BERT trên các ứng dụng khác nhau là các lớp được kết\nnối đầy đủ bổ sung. Trong quá trình học được giám sát về một ứng dụng hạ\nlưu, các tham số của các lớp bổ sung được học từ đầu trong khi tất cả\ncác tham số trong mô hình BERT được đào tạo trước đều được tinh chỉnh."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "phan-loai-van-ban-don",
+      "text": "15.6.1. Phân loại văn bản đơn"
+    },
+    {
+      "type": "paragraph",
+      "text": "Phân loại văn bản đơn lấy một chuỗi văn bản duy nhất làm đầu vào và\nxuất kết quả phân loại của nó. Bên cạnh phân tích tình cảm mà chúng ta\nđã nghiên cứu trong chương này, Corpus of Linguistic Acceptability\n(cola) cũng là một tập dữ liệu để phân loại văn bản đơn lẻ, đánh giá\nliệu một câu cho trước có được chấp nhận về mặt ngữ pháp hay không [Warstadt et al., 2019] . Ví dụ, “Tôi nên học.” là chấp nhận\nđược nhưng “Tôi nên học.” thì không."
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/bert-one-seq.svg",
+      "local_path": "_images/bert-one-seq.svg",
+      "alt": "../_images/bert-one-seq.svg"
+    },
+    {
+      "type": "paragraph",
+      "text": "Fig. 15.6.1 Fine-tuning BERT for single text classification applications, such as\nsentiment analysis and testing linguistic acceptability. Suppose that\nthe input single text has six tokens. ¶"
+    },
+    {
+      "type": "paragraph",
+      "text": "Section 14.8 mô tả biểu diễn đầu vào của BERT. Dãy đầu vào BERT\nthể hiện rõ ràng cả hai cặp văn bản và văn bản đơn lẻ, trong đó mã thông\nbáo phân loại đặc biệt “” được sử dụng để phân loại trình tự và mã thông\nbáo phân loại đặc biệt “” đánh dấu phần cuối của văn bản đơn hoặc tách\nmột cặp văn bản. Như thể hiện trong Fig. 15.6.1 , trong\ncác ứng dụng phân loại văn bản đơn lẻ, đại diện BERT của mã thông báo\nphân loại đặc biệt “” mã hóa thông tin của toàn bộ chuỗi văn bản đầu\nvào. Là biểu diễn của văn bản đơn đầu vào, nó sẽ được đưa vào một MLP\nnhỏ bao gồm các lớp được kết nối hoàn toàn (dày đặc) để xuất ra sự phân\nbố của tất cả các giá trị nhãn rời rạc."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "phan-loai-cap-van-ban-hoac-hoi-quy",
+      "text": "15.6.2. Phân loại cặp văn bản hoặc hồi quy"
+    },
+    {
+      "type": "paragraph",
+      "text": "Chúng tôi cũng đã kiểm tra suy luận ngôn ngữ tự nhiên trong chương này.\nNó thuộc về phân loại cặp văn bản*, một loại ứng dụng phân loại một cặp\nvăn bản."
+    },
+    {
+      "type": "paragraph",
+      "text": "Lấy một cặp văn bản làm đầu vào nhưng xuất ra một giá trị liên tục, ngữ\nnghĩa tương tự văn bản là một tác vụ hồi quy cặp văn bản* phổ biến.\nNhiệm vụ này đo lường sự giống nhau ngữ nghĩa của câu. Ví dụ, trong tập\ndữ liệu Điểm chuẩn tương tự ngữ nghĩa văn bản, điểm tương đồng của một\ncặp câu là một thang thứ tự khác nhau, từ 0 (không có nghĩa là chồng lên\nnhau) đến 5 (có nghĩa là tương đương) [Cer et al., 2017] .\nMục tiêu là để dự đoán những điểm số này. Các ví dụ từ tập dữ liệu điểm\nchuẩn tương tự ngữ nghĩa văn bản bao gồm (câu 1, câu 2, điểm tương\nđồng):"
+    },
+    {
+      "type": "list",
+      "ordered": false,
+      "items": [
+        "“Một chiếc máy bay đang cất cánh. “, “Một chiếc máy bay đang cất\ncánh. “, 5.000;",
+        "“Một người phụ nữ đang ăn một cái gì đó. “, “Một người phụ nữ đang ăn\nthịt. “, 3.000;",
+        "“Một người phụ nữ đang nhảy múa. “, “Một người đàn ông đang nói\nchuyện. “, 0.000."
+      ]
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/bert-two-seqs.svg",
+      "local_path": "_images/bert-two-seqs.svg",
+      "alt": "../_images/bert-two-seqs.svg"
+    },
+    {
+      "type": "paragraph",
+      "text": "Fig. 15.6.2 Fine-tuning BERT for text pair classification or regression\napplications, such as natural language inference and semantic textual\nsimilarity. Suppose that the input text pair has two and three\ntokens. ¶"
+    },
+    {
+      "type": "paragraph",
+      "text": "So sánh với phân loại văn bản đơn trong Fig. 15.6.1 ,\ntinh chỉnh BERT cho phân loại cặp văn bản trong Fig. 15.6.2 là khác nhau trong biểu diễn đầu vào. Đối\nvới các tác vụ hồi quy cặp văn bản như tương tự văn bản ngữ nghĩa, những\nthay đổi tầm thường có thể được áp dụng như xuất ra giá trị nhãn liên\ntục và sử dụng tổn thất bình phương trung bình: chúng phổ biến cho hồi\nquy."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "gan-the-van-ban",
+      "text": "15.6.3. Gắn thẻ văn bản"
+    },
+    {
+      "type": "paragraph",
+      "text": "Bây giờ chúng ta hãy xem xét các tác vụ cấp token, chẳng hạn như text\ntagging , trong đó mỗi token được gán một nhãn. Trong số các tác vụ gắn\nthẻ văn bản, một phần của lời nói tagging gán cho mỗi từ một phần của\nthẻ phát biểu (ví dụ, tính từ và xác định) theo vai trò của từ trong\ncâu. Ví dụ, theo bộ thẻ Penn Treebank II, câu “xe của John Smith là mới”\nnên được gắn thẻ là “NNP (danh từ, số ít thích hợp) NNP POS (sở hữu kết\nthúc) NN (danh từ, số ít hoặc khối lượng) VB (động từ, dạng cơ sở) JJ\n(tính từ)”."
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/bert-tagging.svg",
+      "local_path": "_images/bert-tagging.svg",
+      "alt": "../_images/bert-tagging.svg"
+    },
+    {
+      "type": "paragraph",
+      "text": "Fig. 15.6.3 Fine-tuning BERT for text tagging applications, such as\npart-of-speech tagging. Suppose that the input single text has six\ntokens. ¶"
+    },
+    {
+      "type": "paragraph",
+      "text": "Tinh chỉnh BERT cho các ứng dụng gắn thẻ văn bản được minh họa trong Fig. 15.6.3 . So với Fig. 15.6.1 , sự\nkhác biệt duy nhất nằm ở chỗ gắn thẻ văn bản, biểu diễn BERT của * mỗi\ntoken* của văn bản đầu vào được đưa vào cùng một lớp được kết nối đầy\nđủ để xuất nhãn của mã thông báo, chẳng hạn như thẻ một phần lời nói."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "cau-hoi-tra-loi",
+      "text": "15.6.4. Câu hỏi trả lời"
+    },
+    {
+      "type": "paragraph",
+      "text": "As another khác token-level cấp application ứng dụng, câu trả lời câu\nhỏi phản ánh khả năng đọc hiểu. Ví dụ, tập dữ liệu trả lời câu hỏi\nStanford (Squad v1.1) bao gồm đọc đoạn và câu hỏi, trong đó câu trả lời\ncho mọi câu hỏi chỉ là một đoạn văn bản (khoảng văn bản) từ đoạn văn mà\ncâu hỏi là khoảng [Rajpurkar et al., 2016] . Để giải\nthích, hãy xem xét một đoạn văn “Một số chuyên gia báo cáo rằng hiệu quả\ncủa mặt nạ là không kết luận. Tuy nhiên, các nhà sản xuất mặt nạ nhấn\nmạnh rằng các sản phẩm của họ, chẳng hạn như mặt nạ phòng độc N95, có\nthể bảo vệ chống lại virus.” và một câu hỏi “Ai nói rằng mặt nạ phòng\nđộc N95 có thể bảo vệ chống lại virus?”. Câu trả lời nên là khoảng văn\nbản “nhà sản xuất mặt nạ” trong đoạn văn. Do đó, mục tiêu trong Squad\nv1.1 là dự đoán bắt đầu và kết thúc của khoảng văn bản trong đoạn văn\nđược đưa ra một cặp câu hỏi và đoạn văn."
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/bert-qa.svg",
+      "local_path": "_images/bert-qa.svg",
+      "alt": "../_images/bert-qa.svg"
+    },
+    {
+      "type": "paragraph",
+      "text": "Fig. 15.6.4 Fine-tuning BERT for question answering. Suppose that the input text\npair has two and three tokens. ¶"
+    },
+    {
+      "type": "paragraph",
+      "text": "Để tinh chỉnh BERT để trả lời câu hỏi, câu hỏi và đoạn văn được đóng gói\nnhư chuỗi văn bản đầu tiên và thứ hai, tương ứng, trong đầu vào của\nBERT. Để dự đoán vị trí bắt đầu của khoảng văn bản, cùng một lớp kết nối\nđầy đủ bổ sung sẽ biến đổi biểu diễn BERT của bất kỳ mã thông báo nào từ\nviệc thông qua vị trí \\(i\\) thành một điểm vô hướng \\(s_i\\) .\nĐiểm số như vậy của tất cả các mã thông qua được chuyển đổi thêm bởi\nhoạt động softmax thành một phân phối xác suất, do đó mỗi vị trí mã\nthông báo \\(i\\) trong đoạn văn được gán một xác suất \\(p_i\\) là\nsự bắt đầu của khoảng văn bản. Dự đoán kết thúc khoảng văn bản giống như\ntrên, ngoại trừ các tham số trong lớp được kết nối hoàn toàn bổ sung của\nnó độc lập với các tham số để dự đoán bắt đầu. Khi dự đoán kết thúc, bất\nkỳ mã thông báo đoạn văn nào của vị trí \\(i\\) được chuyển đổi bởi\ncùng một lớp kết nối hoàn toàn thành một điểm vô hướng \\(e_i\\) . Fig. 15.6.4 mô tả BERT tinh chỉnh để trả lời câu hỏi."
+    },
+    {
+      "type": "paragraph",
+      "text": "Đối với câu trả lời câu hỏi, mục tiêu đào tạo của học tập được giám sát\nlà đơn giản như tối đa hóa các log-likelihoods của các vị trí bắt đầu và\nkết thúc nền đất-chân lý. Khi dự đoán khoảng, chúng ta có thể tính điểm\nsố \\(s_i + e_j\\) cho một khoảng hợp lệ từ vị trí \\(i\\) đến vị\ntrí \\(j\\) ( \\(i \\leq j\\) ) và xuất nhịp với điểm cao nhất."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tom-tat",
+      "text": "15.6.5. Tóm tắt"
+    },
+    {
+      "type": "list",
+      "ordered": false,
+      "items": [
+        "BERT yêu cầu các thay đổi kiến trúc tối thiểu (các lớp kết nối đầy\nđủ) cho các ứng dụng xử lý ngôn ngữ tự nhiên cấp trình tự và cấp\ntoken, chẳng hạn như phân loại văn bản đơn (ví dụ: phân tích tình cảm\nvà khả năng chấp nhận ngôn ngữ kiểm tra), phân loại cặp văn bản hoặc\nhồi quy (ví dụ: ngôn ngữ tự nhiên suy luận và tương tự văn bản ngữ\nnghĩa), gắn thẻ văn bản (ví dụ, gắn thẻ một phần lời nói) và trả lời\ncâu hỏi.",
+        "Trong quá trình học được giám sát về một ứng dụng hạ lưu, các tham số\ncủa các lớp bổ sung được học từ đầu trong khi tất cả các tham số\ntrong mô hình BERT được đào tạo trước đều được tinh chỉnh."
+      ]
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bai-tap",
+      "text": "15.6.6. Bài tập"
+    },
+    {
+      "type": "list",
+      "ordered": true,
+      "items": [
+        "Hãy để chúng tôi thiết kế một thuật toán công cụ tìm kiếm cho các bài\nbáo tin tức. Khi hệ thống nhận được một truy vấn (ví dụ: “ngành công\nnghiệp dầu khí trong đợt bùng phát coronavirus”), nó sẽ trả lại một\ndanh sách xếp hạng các bài báo có liên quan nhất đến truy vấn. Giả sử\nrằng chúng ta có một nhóm lớn các bài báo tin tức và một số lượng lớn\ncác truy vấn. Để đơn giản hóa vấn đề, giả sử rằng bài viết có liên\nquan nhất đã được dán nhãn cho mỗi truy vấn. Làm thế nào chúng ta có\nthể áp dụng lấy mẫu âm (xem Section 14.2.1 ) và\nBERT trong thiết kế thuật toán?",
+        "Làm thế nào chúng ta có thể tận dụng BERT trong các mô hình ngôn ngữ\nđào tạo?",
+        "Chúng ta có thể tận dụng BERT trong dịch máy không?"
+      ]
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    }
+  ],
+  "images": [
+    {
+      "original_url": "https://vi.d2l.ai/_images/bert-one-seq.svg",
+      "local_path": "_images/bert-one-seq.svg",
+      "alt": "../_images/bert-one-seq.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/bert-two-seqs.svg",
+      "local_path": "_images/bert-two-seqs.svg",
+      "alt": "../_images/bert-two-seqs.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/bert-tagging.svg",
+      "local_path": "_images/bert-tagging.svg",
+      "alt": "../_images/bert-tagging.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/bert-qa.svg",
+      "local_path": "_images/bert-qa.svg",
+      "alt": "../_images/bert-qa.svg"
+    }
+  ],
+  "text": "15.6. Tinh chỉnh BERT cho các ứng dụng cấp Sequence-Level và Token-Level\nTrong các phần trước của chương này, chúng tôi đã thiết kế các mô hình\nkhác nhau cho các ứng dụng xử lý ngôn ngữ tự nhiên, chẳng hạn như dựa\ntrên RNN, CNN, sự chú ý và MLP. Các mô hình này rất hữu ích khi có không\ngian hoặc thời gian hạn chế, tuy nhiên, việc tạo ra một mô hình cụ thể\ncho mọi nhiệm vụ xử lý ngôn ngữ tự nhiên thực tế là không khả thi. Trong Section 14.8 , chúng tôi giới thiệu một mô hình pretraining,\nBERT, đòi hỏi những thay đổi kiến trúc tối thiểu cho một loạt các nhiệm\nvụ xử lý ngôn ngữ tự nhiên. Một mặt, tại thời điểm đề xuất của mình,\nBERT đã cải thiện trạng thái của nghệ thuật về các nhiệm vụ xử lý ngôn\nngữ tự nhiên khác nhau. Mặt khác, như đã lưu ý trong Section 14.10 , hai phiên bản của mô hình BERT ban đầu\nđi kèm với 110 triệu và 340 triệu thông số. Do đó, khi có đủ tài nguyên\ntính toán, chúng ta có thể xem xét BERT tinh chỉnh cho các ứng dụng xử\nlý ngôn ngữ tự nhiên ở hạ nguồn.\nSau đây, chúng tôi khái quát hóa một tập hợp con của các ứng dụng xử lý\nngôn ngữ tự nhiên dưới dạng cấp trình tự và cấp token. Ở cấp độ trình\ntự, chúng tôi giới thiệu cách chuyển đổi biểu diễn BERT của đầu vào văn\nbản thành nhãn đầu ra trong phân loại văn bản đơn và phân loại cặp văn\nbản hoặc hồi quy. Ở cấp độ token, chúng tôi sẽ giới thiệu ngắn gọn các\nứng dụng mới như gắn thẻ văn bản và trả lời câu hỏi và làm sáng tỏ cách\nBERT có thể đại diện cho đầu vào của chúng và được chuyển đổi thành nhãn\nđầu ra. Trong quá trình tinh chỉnh, “những thay đổi kiến trúc tối thiểu”\ntheo yêu cầu của BERT trên các ứng dụng khác nhau là các lớp được kết\nnối đầy đủ bổ sung. Trong quá trình học được giám sát về một ứng dụng hạ\nlưu, các tham số của các lớp bổ sung được học từ đầu trong khi tất cả\ncác tham số trong mô hình BERT được đào tạo trước đều được tinh chỉnh.\n15.6.1. Phân loại văn bản đơn\nPhân loại văn bản đơn lấy một chuỗi văn bản duy nhất làm đầu vào và\nxuất kết quả phân loại của nó. Bên cạnh phân tích tình cảm mà chúng ta\nđã nghiên cứu trong chương này, Corpus of Linguistic Acceptability\n(cola) cũng là một tập dữ liệu để phân loại văn bản đơn lẻ, đánh giá\nliệu một câu cho trước có được chấp nhận về mặt ngữ pháp hay không [Warstadt et al., 2019] . Ví dụ, “Tôi nên học.” là chấp nhận\nđược nhưng “Tôi nên học.” thì không.\nFig. 15.6.1 Fine-tuning BERT for single text classification applications, such as\nsentiment analysis and testing linguistic acceptability. Suppose that\nthe input single text has six tokens. ¶\nSection 14.8 mô tả biểu diễn đầu vào của BERT. Dãy đầu vào BERT\nthể hiện rõ ràng cả hai cặp văn bản và văn bản đơn lẻ, trong đó mã thông\nbáo phân loại đặc biệt “” được sử dụng để phân loại trình tự và mã thông\nbáo phân loại đặc biệt “” đánh dấu phần cuối của văn bản đơn hoặc tách\nmột cặp văn bản. Như thể hiện trong Fig. 15.6.1 , trong\ncác ứng dụng phân loại văn bản đơn lẻ, đại diện BERT của mã thông báo\nphân loại đặc biệt “” mã hóa thông tin của toàn bộ chuỗi văn bản đầu\nvào. Là biểu diễn của văn bản đơn đầu vào, nó sẽ được đưa vào một MLP\nnhỏ bao gồm các lớp được kết nối hoàn toàn (dày đặc) để xuất ra sự phân\nbố của tất cả các giá trị nhãn rời rạc.\n15.6.2. Phân loại cặp văn bản hoặc hồi quy\nChúng tôi cũng đã kiểm tra suy luận ngôn ngữ tự nhiên trong chương này.\nNó thuộc về phân loại cặp văn bản*, một loại ứng dụng phân loại một cặp\nvăn bản.\nLấy một cặp văn bản làm đầu vào nhưng xuất ra một giá trị liên tục, ngữ\nnghĩa tương tự văn bản là một tác vụ hồi quy cặp văn bản* phổ biến.\nNhiệm vụ này đo lường sự giống nhau ngữ nghĩa của câu. Ví dụ, trong tập\ndữ liệu Điểm chuẩn tương tự ngữ nghĩa văn bản, điểm tương đồng của một\ncặp câu là một thang thứ tự khác nhau, từ 0 (không có nghĩa là chồng lên\nnhau) đến 5 (có nghĩa là tương đương) [Cer et al., 2017] .\nMục tiêu là để dự đoán những điểm số này. Các ví dụ từ tập dữ liệu điểm\nchuẩn tương tự ngữ nghĩa văn bản bao gồm (câu 1, câu 2, điểm tương\nđồng):\n“Một chiếc máy bay đang cất cánh. “, “Một chiếc máy bay đang cất\ncánh. “, 5.000;\n“Một người phụ nữ đang ăn một cái gì đó. “, “Một người phụ nữ đang ăn\nthịt. “, 3.000;\n“Một người phụ nữ đang nhảy múa. “, “Một người đàn ông đang nói\nchuyện. “, 0.000.\nFig. 15.6.2 Fine-tuning BERT for text pair classification or regression\napplications, such as natural language inference and semantic textual\nsimilarity. Suppose that the input text pair has two and three\ntokens. ¶\nSo sánh với phân loại văn bản đơn trong Fig. 15.6.1 ,\ntinh chỉnh BERT cho phân loại cặp văn bản trong Fig. 15.6.2 là khác nhau trong biểu diễn đầu vào. Đối\nvới các tác vụ hồi quy cặp văn bản như tương tự văn bản ngữ nghĩa, những\nthay đổi tầm thường có thể được áp dụng như xuất ra giá trị nhãn liên\ntục và sử dụng tổn thất bình phương trung bình: chúng phổ biến cho hồi\nquy.\n15.6.3. Gắn thẻ văn bản\nBây giờ chúng ta hãy xem xét các tác vụ cấp token, chẳng hạn như text\ntagging , trong đó mỗi token được gán một nhãn. Trong số các tác vụ gắn\nthẻ văn bản, một phần của lời nói tagging gán cho mỗi từ một phần của\nthẻ phát biểu (ví dụ, tính từ và xác định) theo vai trò của từ trong\ncâu. Ví dụ, theo bộ thẻ Penn Treebank II, câu “xe của John Smith là mới”\nnên được gắn thẻ là “NNP (danh từ, số ít thích hợp) NNP POS (sở hữu kết\nthúc) NN (danh từ, số ít hoặc khối lượng) VB (động từ, dạng cơ sở) JJ\n(tính từ)”.\nFig. 15.6.3 Fine-tuning BERT for text tagging applications, such as\npart-of-speech tagging. Suppose that the input single text has six\ntokens. ¶\nTinh chỉnh BERT cho các ứng dụng gắn thẻ văn bản được minh họa trong Fig. 15.6.3 . So với Fig. 15.6.1 , sự\nkhác biệt duy nhất nằm ở chỗ gắn thẻ văn bản, biểu diễn BERT của * mỗi\ntoken* của văn bản đầu vào được đưa vào cùng một lớp được kết nối đầy\nđủ để xuất nhãn của mã thông báo, chẳng hạn như thẻ một phần lời nói.\n15.6.4. Câu hỏi trả lời\nAs another khác token-level cấp application ứng dụng, câu trả lời câu\nhỏi phản ánh khả năng đọc hiểu. Ví dụ, tập dữ liệu trả lời câu hỏi\nStanford (Squad v1.1) bao gồm đọc đoạn và câu hỏi, trong đó câu trả lời\ncho mọi câu hỏi chỉ là một đoạn văn bản (khoảng văn bản) từ đoạn văn mà\ncâu hỏi là khoảng [Rajpurkar et al., 2016] . Để giải\nthích, hãy xem xét một đoạn văn “Một số chuyên gia báo cáo rằng hiệu quả\ncủa mặt nạ là không kết luận. Tuy nhiên, các nhà sản xuất mặt nạ nhấn\nmạnh rằng các sản phẩm của họ, chẳng hạn như mặt nạ phòng độc N95, có\nthể bảo vệ chống lại virus.” và một câu hỏi “Ai nói rằng mặt nạ phòng\nđộc N95 có thể bảo vệ chống lại virus?”. Câu trả lời nên là khoảng văn\nbản “nhà sản xuất mặt nạ” trong đoạn văn. Do đó, mục tiêu trong Squad\nv1.1 là dự đoán bắt đầu và kết thúc của khoảng văn bản trong đoạn văn\nđược đưa ra một cặp câu hỏi và đoạn văn.\nFig. 15.6.4 Fine-tuning BERT for question answering. Suppose that the input text\npair has two and three tokens. ¶\nĐể tinh chỉnh BERT để trả lời câu hỏi, câu hỏi và đoạn văn được đóng gói\nnhư chuỗi văn bản đầu tiên và thứ hai, tương ứng, trong đầu vào của\nBERT. Để dự đoán vị trí bắt đầu của khoảng văn bản, cùng một lớp kết nối\nđầy đủ bổ sung sẽ biến đổi biểu diễn BERT của bất kỳ mã thông báo nào từ\nviệc thông qua vị trí \\(i\\) thành một điểm vô hướng \\(s_i\\) .\nĐiểm số như vậy của tất cả các mã thông qua được chuyển đổi thêm bởi\nhoạt động softmax thành một phân phối xác suất, do đó mỗi vị trí mã\nthông báo \\(i\\) trong đoạn văn được gán một xác suất \\(p_i\\) là\nsự bắt đầu của khoảng văn bản. Dự đoán kết thúc khoảng văn bản giống như\ntrên, ngoại trừ các tham số trong lớp được kết nối hoàn toàn bổ sung của\nnó độc lập với các tham số để dự đoán bắt đầu. Khi dự đoán kết thúc, bất\nkỳ mã thông báo đoạn văn nào của vị trí \\(i\\) được chuyển đổi bởi\ncùng một lớp kết nối hoàn toàn thành một điểm vô hướng \\(e_i\\) . Fig. 15.6.4 mô tả BERT tinh chỉnh để trả lời câu hỏi.\nĐối với câu trả lời câu hỏi, mục tiêu đào tạo của học tập được giám sát\nlà đơn giản như tối đa hóa các log-likelihoods của các vị trí bắt đầu và\nkết thúc nền đất-chân lý. Khi dự đoán khoảng, chúng ta có thể tính điểm\nsố \\(s_i + e_j\\) cho một khoảng hợp lệ từ vị trí \\(i\\) đến vị\ntrí \\(j\\) ( \\(i \\leq j\\) ) và xuất nhịp với điểm cao nhất.\n15.6.5. Tóm tắt\nBERT yêu cầu các thay đổi kiến trúc tối thiểu (các lớp kết nối đầy\nđủ) cho các ứng dụng xử lý ngôn ngữ tự nhiên cấp trình tự và cấp\ntoken, chẳng hạn như phân loại văn bản đơn (ví dụ: phân tích tình cảm\nvà khả năng chấp nhận ngôn ngữ kiểm tra), phân loại cặp văn bản hoặc\nhồi quy (ví dụ: ngôn ngữ tự nhiên suy luận và tương tự văn bản ngữ\nnghĩa), gắn thẻ văn bản (ví dụ, gắn thẻ một phần lời nói) và trả lời\ncâu hỏi.\nTrong quá trình học được giám sát về một ứng dụng hạ lưu, các tham số\ncủa các lớp bổ sung được học từ đầu trong khi tất cả các tham số\ntrong mô hình BERT được đào tạo trước đều được tinh chỉnh.\n15.6.6. Bài tập\nHãy để chúng tôi thiết kế một thuật toán công cụ tìm kiếm cho các bài\nbáo tin tức. Khi hệ thống nhận được một truy vấn (ví dụ: “ngành công\nnghiệp dầu khí trong đợt bùng phát coronavirus”), nó sẽ trả lại một\ndanh sách xếp hạng các bài báo có liên quan nhất đến truy vấn. Giả sử\nrằng chúng ta có một nhóm lớn các bài báo tin tức và một số lượng lớn\ncác truy vấn. Để đơn giản hóa vấn đề, giả sử rằng bài viết có liên\nquan nhất đã được dán nhãn cho mỗi truy vấn. Làm thế nào chúng ta có\nthể áp dụng lấy mẫu âm (xem Section 14.2.1 ) và\nBERT trong thiết kế thuật toán?\nLàm thế nào chúng ta có thể tận dụng BERT trong các mô hình ngôn ngữ\nđào tạo?\nChúng ta có thể tận dụng BERT trong dịch máy không?\nDiscussions"
+}

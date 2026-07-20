@@ -1,0 +1,474 @@
+{
+  "url": "https://vi.d2l.ai/chapter_generative-adversarial-networks/gan.html",
+  "chapter": "chapter_generative-adversarial-networks",
+  "title": "17.1. Mạng đối thủ thế hệ",
+  "crawled_at": "2026-07-20T12:41:19.548042+00:00",
+  "headings": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "mang-doi-thu-the-he",
+      "text": "17.1. Mạng đối thủ thế hệ"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tao-ra-mot-so-du-lieu-thuc",
+      "text": "17.1.1. Tạo ra một số dữ liệu “thực”"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "may-phat-dien",
+      "text": "17.1.2. Máy phát điện"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "phan-biet-doi-xu",
+      "text": "17.1.3. Phân biệt đối xử"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "dao-tao",
+      "text": "17.1.4. Đào tạo"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tom-tat",
+      "text": "17.1.5. Tóm tắt"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bai-tap",
+      "text": "17.1.6. Bài tập"
+    }
+  ],
+  "content": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "mang-doi-thu-the-he",
+      "text": "17.1. Mạng đối thủ thế hệ"
+    },
+    {
+      "type": "paragraph",
+      "text": "Trong suốt hầu hết cuốn sách này, chúng tôi đã nói về cách đưa ra dự\nđoán. Ở dạng nào đó hay hình thức khác, chúng tôi đã sử dụng các mạng\nthần kinh sâu đã học được ánh xạ từ các ví dụ dữ liệu đến nhãn. Loại\nhình học tập này được gọi là học phân biệt đối xử, như trong, chúng tôi\nmuốn có thể phân biệt đối xử giữa những bức ảnh mèo và hình ảnh của chó.\nPhân loại và bộ hồi quy đều là ví dụ về việc học phân biệt đối xử. Và\nmạng lưới thần kinh được đào tạo bởi sự lan truyền ngược đã upended tất\ncả mọi thứ chúng tôi nghĩ rằng chúng tôi biết về việc học phân biệt đối\nxử trên các tập dữ liệu phức tạp lớn. Độ chính xác phân loại trên hình\nảnh có độ phân giải cao đã đi từ vô dụng đến cấp độ con người (với một\nsố cảnh báo) chỉ trong 5-6 năm. Chúng tôi sẽ dành cho bạn một trò chơi\nkhác về tất cả các nhiệm vụ phân biệt đối xử khác, nơi các mạng thần\nkinh sâu làm tốt đáng kinh ngạc."
+    },
+    {
+      "type": "paragraph",
+      "text": "Nhưng có nhiều hơn để học máy hơn là chỉ giải quyết các nhiệm vụ phân\nbiệt đối xử. Ví dụ, với một tập dữ liệu lớn, không có bất kỳ nhãn nào,\nchúng ta có thể muốn tìm hiểu một mô hình nắm bắt chính xác các đặc điểm\ncủa dữ liệu này. Với một mô hình như vậy, chúng tôi có thể lấy mẫu các\nví dụ dữ liệu tổng hợp giống với việc phân phối dữ liệu đào tạo. Ví dụ,\nvới một lượng lớn các bức ảnh khuôn mặt, chúng ta có thể muốn có thể tạo\nra một hình ảnh thực tế mới trông giống như nó có thể hợp lý đến từ cùng\nmột tập dữ liệu. Loại học này được gọi là mô hình thế hệ."
+    },
+    {
+      "type": "paragraph",
+      "text": "Cho đến gần đây, chúng tôi không có phương pháp nào có thể tổng hợp các\nhình ảnh photorealistic mới lạ. Nhưng sự thành công của các mạng thần\nkinh sâu cho việc học phân biệt đối xử đã mở ra những khả năng mới. Một\nxu hướng lớn trong ba năm qua là việc áp dụng các mạng lưới sâu phân\nbiệt đối xử để vượt qua những thách thức trong các vấn đề mà chúng ta\nthường không nghĩ là vấn đề học tập được giám sát. Các mô hình ngôn ngữ\nmạng thần kinh tái phát là một ví dụ về việc sử dụng một mạng phân biệt\nđối xử (được đào tạo để dự đoán ký tự tiếp theo) mà một khi được đào tạo\ncó thể hoạt động như một mô hình thế hệ."
+    },
+    {
+      "type": "paragraph",
+      "text": "Năm 2014, một bài báo đột phá đã giới thiệu mạng đối thủ thế hệ (GAN) [Goodfellow et al., 2014] , một cách thông minh\nmới để tận dụng sức mạnh của các mô hình phân biệt đối xử để có được các\nmô hình thế hệ tốt. Tại trái tim của họ, GAN dựa vào ý tưởng rằng một\ntrình tạo dữ liệu là tốt nếu chúng ta không thể nói dữ liệu giả mạo\nngoài dữ liệu thực. Trong thống kê, đây được gọi là thử nghiệm hai mẫu -\nmột bài kiểm tra để trả lời câu hỏi liệu các bộ dữ liệu \\(X=\\{x_1,\\ldots, x_n\\}\\) và \\(X'=\\{x'_1,\\ldots, x'_n\\}\\) có\nđược rút ra từ cùng một phân phối hay không. Sự khác biệt chính giữa hầu\nhết các giấy tờ thống kê và GAN là sau này sử dụng ý tưởng này một cách\nmang tính xây dựng. Nói cách khác, thay vì chỉ đào tạo một mô hình để\nnói “này, hai bộ dữ liệu này trông không giống như chúng đến từ cùng một\nphân phối”, họ sử dụng two-sample\ntest để\ncung cấp tín hiệu đào tạo cho một mô hình thế hệ. Điều này cho phép\nchúng tôi cải thiện trình tạo dữ liệu cho đến khi nó tạo ra một cái gì\nđó giống với dữ liệu thực. Ít nhất, nó cần phải đánh lừa phân loại. Ngay\ncả khi phân loại của chúng tôi là một nhà nước của mạng thần kinh sâu\nsắc nghệ thuật."
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/gan.svg",
+      "local_path": "_images/gan.svg",
+      "alt": "../_images/gan.svg"
+    },
+    {
+      "type": "paragraph",
+      "text": "Fig. 17.1.1 Generative Adversarial Networks ¶"
+    },
+    {
+      "type": "paragraph",
+      "text": "Kiến trúc GAN được minh họa vào năm Fig. 17.1.1 . Như bạn có thể\nthấy, có hai phần trong kiến trúc GAN - trước hết, chúng ta cần một\nthiết bị (giả sử, một mạng sâu nhưng nó thực sự có thể là bất cứ điều\ngì, chẳng hạn như một công cụ kết xuất trò chơi) có khả năng có thể tạo\nra dữ liệu trông giống như thực tế. Nếu chúng ta đang đối phó với hình\nảnh, điều này cần phải tạo ra hình ảnh. Nếu chúng ta đang đối phó với\nlời nói, nó cần phải tạo ra các chuỗi âm thanh, v.v. Chúng tôi gọi đây\nlà mạng máy phát điện. Thành phần thứ hai là mạng phân biệt đối xử. Nó\ncố gắng phân biệt dữ liệu giả và thực với nhau. Cả hai mạng đang cạnh\ntranh với nhau. Mạng máy phát cố gắng đánh lừa mạng phân biệt đối xử.\nTại thời điểm đó, mạng phân biệt đối xử thích ứng với dữ liệu giả mới.\nThông tin này, lần lượt được sử dụng để cải thiện mạng máy phát điện,\nv.v."
+    },
+    {
+      "type": "paragraph",
+      "text": "Phân biệt đối xử là một phân loại nhị phân để phân biệt nếu đầu vào \\(x\\) là thực (từ dữ liệu thực) hay giả (từ máy phát điện). Thông\nthường, phân biệt đối xử đầu ra một dự đoán vô hướng \\(o\\in\\mathbb R\\) cho đầu vào \\(\\mathbf x\\) , chẳng hạn như sử\ndụng một lớp dày đặc với kích thước ẩn 1, và sau đó áp dụng hàm sigmoid\nđể có được xác suất dự đoán \\(D(\\mathbf x) = 1/(1+e^{-o})\\) . Giả sử\nnhãn \\(y\\) cho dữ liệu thật là \\(1\\) và \\(0\\) cho dữ liệu\ngiả mạo. Chúng tôi đào tạo người phân biệt đối xử để giảm thiểu tổn thất\nchéo entropy, * tức là *,"
+    },
+    {
+      "type": "math",
+      "latex": "(17.1.1)¶\\[\\min_D \\{ - y \\log D(\\mathbf x) - (1-y)\\log(1-D(\\mathbf x)) \\},\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Đối với máy phát điện, đầu tiên nó rút ra một số tham số \\(\\mathbf z\\in\\mathbb R^d\\) từ một nguồn ngẫu nhiên, ví dụ , một\nphân phối bình thường \\(\\mathbf z \\sim \\mathcal{N} (0, 1)\\) . Chúng\nta thường gọi \\(\\mathbf z\\) là biến tiềm ẩn. Sau đó, nó áp dụng một\nchức năng để tạo ra \\(\\mathbf x'=G(\\mathbf z)\\) . Mục tiêu của trình\ntạo là đánh lừa người phân biệt đối xử để phân loại \\(\\mathbf x'=G(\\mathbf z)\\) là dữ liệu thật, * tức là * , chúng tôi\nmuốn \\(D( G(\\mathbf z)) \\approx 1\\) . Nói cách khác, đối với một phân\nbiệt đối xử nhất định \\(D\\) , chúng tôi cập nhật các thông số của máy\nphát \\(G\\) để tối đa hóa tổn thất ngẫu nhiên chéo khi \\(y=0\\) , *\ni.e.*,"
+    },
+    {
+      "type": "math",
+      "latex": "(17.1.2)¶\\[\\max_G \\{ - (1-y) \\log(1-D(G(\\mathbf z))) \\} = \\max_G \\{ - \\log(1-D(G(\\mathbf z))) \\}.\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Nếu máy phát điện thực hiện một công việc hoàn hảo, thì \\(D(\\mathbf x')\\approx 1\\) do đó, tổn thất trên gần 0, dẫn đến độ\ndốc quá nhỏ để đạt được tiến bộ tốt cho người phân biệt đối xử. Vì vậy,\nthông thường chúng ta giảm thiểu những tổn thất sau:"
+    },
+    {
+      "type": "math",
+      "latex": "(17.1.3)¶\\[\\min_G \\{ - y \\log(D(G(\\mathbf z))) \\} = \\min_G \\{ - \\log(D(G(\\mathbf z))) \\},\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "mà chỉ là thức ăn \\(\\mathbf x'=G(\\mathbf z)\\) vào phân biệt đối xử\nnhưng đưa ra nhãn \\(y=1\\) ."
+    },
+    {
+      "type": "paragraph",
+      "text": "Tóm lại, \\(D\\) và \\(G\\) đang chơi một trò chơi “minimax” với\nchức năng mục tiêu toàn diện:"
+    },
+    {
+      "type": "math",
+      "latex": "(17.1.4)¶\\[min_D max_G \\{ -E_{x \\sim \\text{Data}} log D(\\mathbf x) - E_{z \\sim \\text{Noise}} log(1 - D(G(\\mathbf z))) \\}.\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Nhiều ứng dụng GAN nằm trong bối cảnh hình ảnh. Là một mục đích trình\ndiễn, chúng ta sẽ tự nội dung với việc lắp một bản phân phối đơn giản\nhơn nhiều trước tiên. Chúng tôi sẽ minh họa những gì xảy ra nếu chúng ta\nsử dụng GAN để xây dựng ước tính không hiệu quả nhất thế giới của các\ntham số cho một Gaussian. Hãy để chúng tôi bắt đầu."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "%matplotlib inline\nfrom mxnet import autograd, gluon, init, np, npx\nfrom mxnet.gluon import nn\nfrom d2l import mxnet as d2l\n\nnpx.set_np()"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "%matplotlib inline\nimport torch\nfrom torch import nn\nfrom d2l import torch as d2l"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "import tensorflow as tf\nfrom d2l import tensorflow as d2l"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tao-ra-mot-so-du-lieu-thuc",
+      "text": "17.1.1. Tạo ra một số dữ liệu “thực”"
+    },
+    {
+      "type": "paragraph",
+      "text": "Vì đây sẽ là ví dụ đáng sợ nhất thế giới, chúng tôi chỉ đơn giản là tạo\nra dữ liệu được rút ra từ Gaussian."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "X = np.random.normal(0.0, 1, (1000, 2))\nA = np.array([[1, 2], [-0.1, 0.5]])\nb = np.array([1, 2])\ndata = np.dot(X, A) + b"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "X = torch.normal(0.0, 1, (1000, 2))\nA = torch.tensor([[1, 2], [-0.1, 0.5]])\nb = torch.tensor([1, 2])\ndata = torch.matmul(X, A) + b"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "X = tf.random.normal((1000, 2), 0.0, 1)\nA = tf.constant([[1, 2], [-0.1, 0.5]])\nb = tf.constant([1, 2], tf.float32)\ndata = tf.matmul(X, A) + b"
+    },
+    {
+      "type": "paragraph",
+      "text": "Hãy để chúng tôi xem những gì chúng tôi có. Đây phải là một Gaussian\ndịch chuyển theo một cách khá tùy ý với trung bình \\(b\\) và ma trận\nhiệp phương sai \\(A^TA\\) ."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "d2l.set_figsize()\nd2l.plt.scatter(data[:100, (0)].asnumpy(), data[:100, (1)].asnumpy());\nprint(f'The covariance matrix is\\n{np.dot(A.T, A)}')"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "The covariance matrix is\n[[1.01 1.95]\n [1.95 4.25]]"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_gan_bc32f8_27_1.svg",
+      "local_path": "_images/output_gan_bc32f8_27_1.svg",
+      "alt": "../_images/output_gan_bc32f8_27_1.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "batch_size = 8\ndata_iter = d2l.load_array((data,), batch_size)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "d2l.set_figsize()\nd2l.plt.scatter(data[:100, (0)].detach().numpy(), data[:100, (1)].detach().numpy());\nprint(f'The covariance matrix is\\n{torch.matmul(A.T, A)}')"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "The covariance matrix is\ntensor([[1.0100, 1.9500],\n        [1.9500, 4.2500]])"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_gan_bc32f8_31_1.svg",
+      "local_path": "_images/output_gan_bc32f8_31_1.svg",
+      "alt": "../_images/output_gan_bc32f8_31_1.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "batch_size = 8\ndata_iter = d2l.load_array((data,), batch_size)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "d2l.set_figsize()\nd2l.plt.scatter(data[:100, (0)].numpy(), data[:100, (1)].numpy());\nprint(f'The covariance matrix is\\n{tf.matmul(A, A, transpose_a=True)}')"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "The covariance matrix is\n[[1.01 1.95]\n [1.95 4.25]]"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_gan_bc32f8_35_1.svg",
+      "local_path": "_images/output_gan_bc32f8_35_1.svg",
+      "alt": "../_images/output_gan_bc32f8_35_1.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "batch_size = 8\ndata_iter = d2l.load_array((data,), batch_size)"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "may-phat-dien",
+      "text": "17.1.2. Máy phát điện"
+    },
+    {
+      "type": "paragraph",
+      "text": "Mạng máy phát của chúng tôi sẽ là mạng đơn giản nhất có thể - một mô\nhình tuyến tính lớp duy nhất. Điều này là vì chúng tôi sẽ lái mạng tuyến\ntính đó với trình tạo dữ liệu Gaussian. Do đó, nó theo nghĩa đen chỉ cần\ntìm hiểu các thông số để giả mạo mọi thứ một cách hoàn hảo."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "net_G = nn.Sequential()\nnet_G.add(nn.Dense(2))"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "net_G = nn.Sequential(nn.Linear(2, 2))"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "net_G = tf.keras.layers.Dense(2)"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "phan-biet-doi-xu",
+      "text": "17.1.3. Phân biệt đối xử"
+    },
+    {
+      "type": "paragraph",
+      "text": "Đối với người phân biệt đối xử, chúng ta sẽ phân biệt hơn một chút:\nchúng ta sẽ sử dụng MLP với 3 lớp để làm cho mọi thứ thú vị hơn một\nchút."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "net_D = nn.Sequential()\nnet_D.add(nn.Dense(5, activation='tanh'),\n          nn.Dense(3, activation='tanh'),\n          nn.Dense(1))"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "net_D = nn.Sequential(\n    nn.Linear(2, 5), nn.Tanh(),\n    nn.Linear(5, 3), nn.Tanh(),\n    nn.Linear(3, 1))"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "net_D = tf.keras.models.Sequential([\n    tf.keras.layers.Dense(5, activation=\"tanh\", input_shape=(2,)),\n    tf.keras.layers.Dense(3, activation=\"tanh\"),\n    tf.keras.layers.Dense(1)\n])"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "dao-tao",
+      "text": "17.1.4. Đào tạo"
+    },
+    {
+      "type": "paragraph",
+      "text": "Đầu tiên chúng ta định nghĩa một hàm để cập nhật sự phân biệt đối xử."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "#@save\ndef update_D(X, Z, net_D, net_G, loss, trainer_D):\n    \"\"\"Update discriminator.\"\"\"\n    batch_size = X.shape[0]\n    ones = np.ones((batch_size,), ctx=X.ctx)\n    zeros = np.zeros((batch_size,), ctx=X.ctx)\n    with autograd.record():\n        real_Y = net_D(X)\n        fake_X = net_G(Z)\n        # Do not need to compute gradient for `net_G`, detach it from\n        # computing gradients.\n        fake_Y = net_D(fake_X.detach())\n        loss_D = (loss(real_Y, ones) + loss(fake_Y, zeros)) / 2\n    loss_D.backward()\n    trainer_D.step(batch_size)\n    return float(loss_D.sum())"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "#@save\ndef update_D(X, Z, net_D, net_G, loss, trainer_D):\n    \"\"\"Update discriminator.\"\"\"\n    batch_size = X.shape[0]\n    ones = torch.ones((batch_size,), device=X.device)\n    zeros = torch.zeros((batch_size,), device=X.device)\n    trainer_D.zero_grad()\n    real_Y = net_D(X)\n    fake_X = net_G(Z)\n    # Do not need to compute gradient for `net_G`, detach it from\n    # computing gradients.\n    fake_Y = net_D(fake_X.detach())\n    loss_D = (loss(real_Y, ones.reshape(real_Y.shape)) +\n              loss(fake_Y, zeros.reshape(fake_Y.shape))) / 2\n    loss_D.backward()\n    trainer_D.step()\n    return loss_D"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "#@save\ndef update_D(X, Z, net_D, net_G, loss, optimizer_D):\n    \"\"\"Update discriminator.\"\"\"\n    batch_size = X.shape[0]\n    ones = tf.ones((batch_size,)) # Labels corresponding to real data\n    zeros = tf.zeros((batch_size,)) # Labels corresponding to fake data\n    # Do not need to compute gradient for `net_G`, so it's outside GradientTape\n    fake_X = net_G(Z)\n    with tf.GradientTape() as tape:\n        real_Y = net_D(X)\n        fake_Y = net_D(fake_X)\n        # We multiply the loss by batch_size to match PyTorch's BCEWithLogitsLoss\n        loss_D = (loss(ones, tf.squeeze(real_Y)) + loss(\n            zeros, tf.squeeze(fake_Y))) * batch_size / 2\n    grads_D = tape.gradient(loss_D, net_D.trainable_variables)\n    optimizer_D.apply_gradients(zip(grads_D, net_D.trainable_variables))\n    return loss_D"
+    },
+    {
+      "type": "paragraph",
+      "text": "Máy phát điện được cập nhật tương tự. Ở đây chúng tôi sử dụng lại tổn\nthất chéo entropy nhưng thay đổi nhãn của dữ liệu giả từ \\(0\\) thành \\(1\\) ."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "#@save\ndef update_G(Z, net_D, net_G, loss, trainer_G):\n    \"\"\"Update generator.\"\"\"\n    batch_size = Z.shape[0]\n    ones = np.ones((batch_size,), ctx=Z.ctx)\n    with autograd.record():\n        # We could reuse `fake_X` from `update_D` to save computation\n        fake_X = net_G(Z)\n        # Recomputing `fake_Y` is needed since `net_D` is changed\n        fake_Y = net_D(fake_X)\n        loss_G = loss(fake_Y, ones)\n    loss_G.backward()\n    trainer_G.step(batch_size)\n    return float(loss_G.sum())"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "#@save\ndef update_G(Z, net_D, net_G, loss, trainer_G):\n    \"\"\"Update generator.\"\"\"\n    batch_size = Z.shape[0]\n    ones = torch.ones((batch_size,), device=Z.device)\n    trainer_G.zero_grad()\n    # We could reuse `fake_X` from `update_D` to save computation\n    fake_X = net_G(Z)\n    # Recomputing `fake_Y` is needed since `net_D` is changed\n    fake_Y = net_D(fake_X)\n    loss_G = loss(fake_Y, ones.reshape(fake_Y.shape))\n    loss_G.backward()\n    trainer_G.step()\n    return loss_G"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "#@save\ndef update_G(Z, net_D, net_G, loss, optimizer_G):\n    \"\"\"Update generator.\"\"\"\n    batch_size = Z.shape[0]\n    ones = tf.ones((batch_size,))\n    with tf.GradientTape() as tape:\n        # We could reuse `fake_X` from `update_D` to save computation\n        fake_X = net_G(Z)\n        # Recomputing `fake_Y` is needed since `net_D` is changed\n        fake_Y = net_D(fake_X)\n        # We multiply the loss by batch_size to match PyTorch's BCEWithLogits loss\n        loss_G = loss(ones, tf.squeeze(fake_Y)) * batch_size\n    grads_G = tape.gradient(loss_G, net_G.trainable_variables)\n    optimizer_G.apply_gradients(zip(grads_G, net_G.trainable_variables))\n    return loss_G"
+    },
+    {
+      "type": "paragraph",
+      "text": "Cả phân biệt đối xử và máy phát điện đều thực hiện hồi quy hậu cần nhị\nphân với tổn thất chéo entropy. Chúng tôi sử dụng Adam để làm mịn quá\ntrình đào tạo. Trong mỗi lần lặp lại, lần đầu tiên chúng ta cập nhật\ntrình phân biệt đối xử và sau đó là trình tạo. Chúng tôi hình dung cả\ntổn thất và các ví dụ được tạo ra."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def train(net_D, net_G, data_iter, num_epochs, lr_D, lr_G, latent_dim, data):\n    loss = gluon.loss.SigmoidBCELoss()\n    net_D.initialize(init=init.Normal(0.02), force_reinit=True)\n    net_G.initialize(init=init.Normal(0.02), force_reinit=True)\n    trainer_D = gluon.Trainer(net_D.collect_params(),\n                              'adam', {'learning_rate': lr_D})\n    trainer_G = gluon.Trainer(net_G.collect_params(),\n                              'adam', {'learning_rate': lr_G})\n    animator = d2l.Animator(xlabel='epoch', ylabel='loss',\n                            xlim=[1, num_epochs], nrows=2, figsize=(5, 5),\n                            legend=['discriminator', 'generator'])\n    animator.fig.subplots_adjust(hspace=0.3)\n    for epoch in range(num_epochs):\n        # Train one epoch\n        timer = d2l.Timer()\n        metric = d2l.Accumulator(3)  # loss_D, loss_G, num_examples\n        for X in data_iter:\n            batch_size = X.shape[0]\n            Z = np.random.normal(0, 1, size=(batch_size, latent_dim))\n            metric.add(update_D(X, Z, net_D, net_G, loss, trainer_D),\n                       update_G(Z, net_D, net_G, loss, trainer_G),\n                       batch_size)\n        # Visualize generated examples\n        Z = np.random.normal(0, 1, size=(100, latent_dim))\n        fake_X = net_G(Z).asnumpy()\n        animator.axes[1].cla()\n        animator.axes[1].scatter(data[:, 0], data[:, 1])\n        animator.axes[1].scatter(fake_X[:, 0], fake_X[:, 1])\n        animator.axes[1].legend(['real', 'generated'])\n        # Show the losses\n        loss_D, loss_G = metric[0]/metric[2], metric[1]/metric[2]\n        animator.add(epoch + 1, (loss_D, loss_G))\n    print(f'loss_D {loss_D:.3f}, loss_G {loss_G:.3f}, '\n          f'{metric[2] / timer.stop():.1f} examples/sec')"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def train(net_D, net_G, data_iter, num_epochs, lr_D, lr_G, latent_dim, data):\n    loss = nn.BCEWithLogitsLoss(reduction='sum')\n    for w in net_D.parameters():\n        nn.init.normal_(w, 0, 0.02)\n    for w in net_G.parameters():\n        nn.init.normal_(w, 0, 0.02)\n    trainer_D = torch.optim.Adam(net_D.parameters(), lr=lr_D)\n    trainer_G = torch.optim.Adam(net_G.parameters(), lr=lr_G)\n    animator = d2l.Animator(xlabel='epoch', ylabel='loss',\n                            xlim=[1, num_epochs], nrows=2, figsize=(5, 5),\n                            legend=['discriminator', 'generator'])\n    animator.fig.subplots_adjust(hspace=0.3)\n    for epoch in range(num_epochs):\n        # Train one epoch\n        timer = d2l.Timer()\n        metric = d2l.Accumulator(3)  # loss_D, loss_G, num_examples\n        for (X,) in data_iter:\n            batch_size = X.shape[0]\n            Z = torch.normal(0, 1, size=(batch_size, latent_dim))\n            metric.add(update_D(X, Z, net_D, net_G, loss, trainer_D),\n                       update_G(Z, net_D, net_G, loss, trainer_G),\n                       batch_size)\n        # Visualize generated examples\n        Z = torch.normal(0, 1, size=(100, latent_dim))\n        fake_X = net_G(Z).detach().numpy()\n        animator.axes[1].cla()\n        animator.axes[1].scatter(data[:, 0], data[:, 1])\n        animator.axes[1].scatter(fake_X[:, 0], fake_X[:, 1])\n        animator.axes[1].legend(['real', 'generated'])\n        # Show the losses\n        loss_D, loss_G = metric[0]/metric[2], metric[1]/metric[2]\n        animator.add(epoch + 1, (loss_D, loss_G))\n    print(f'loss_D {loss_D:.3f}, loss_G {loss_G:.3f}, '\n          f'{metric[2] / timer.stop():.1f} examples/sec')"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def train(net_D, net_G, data_iter, num_epochs, lr_D, lr_G, latent_dim, data):\n    loss = tf.keras.losses.BinaryCrossentropy(\n        from_logits=True, reduction=tf.keras.losses.Reduction.SUM)\n    for w in net_D.trainable_variables:\n        w.assign(tf.random.normal(mean=0, stddev=0.02, shape=w.shape))\n    for w in net_G.trainable_variables:\n        w.assign(tf.random.normal(mean=0, stddev=0.02, shape=w.shape))\n    optimizer_D = tf.keras.optimizers.Adam(learning_rate=lr_D)\n    optimizer_G = tf.keras.optimizers.Adam(learning_rate=lr_G)\n    animator = d2l.Animator(\n        xlabel=\"epoch\", ylabel=\"loss\", xlim=[1, num_epochs], nrows=2,\n        figsize=(5, 5), legend=[\"discriminator\", \"generator\"])\n    animator.fig.subplots_adjust(hspace=0.3)\n    for epoch in range(num_epochs):\n        # Train one epoch\n        timer = d2l.Timer()\n        metric = d2l.Accumulator(3)  # loss_D, loss_G, num_examples\n        for (X,) in data_iter:\n            batch_size = X.shape[0]\n            Z = tf.random.normal(\n                mean=0, stddev=1, shape=(batch_size, latent_dim))\n            metric.add(update_D(X, Z, net_D, net_G, loss, optimizer_D),\n                       update_G(Z, net_D, net_G, loss, optimizer_G),\n                       batch_size)\n        # Visualize generated examples\n        Z = tf.random.normal(mean=0, stddev=1, shape=(100, latent_dim))\n        fake_X = net_G(Z)\n        animator.axes[1].cla()\n        animator.axes[1].scatter(data[:, 0], data[:, 1])\n        animator.axes[1].scatter(fake_X[:, 0], fake_X[:, 1])\n        animator.axes[1].legend([\"real\", \"generated\"])\n\n        # Show the losses\n        loss_D, loss_G = metric[0] / metric[2], metric[1] / metric[2]\n        animator.add(epoch + 1, (loss_D, loss_G))\n\n    print(f'loss_D {loss_D:.3f}, loss_G {loss_G:.3f}, '\n          f'{metric[2] / timer.stop():.1f} examples/sec')"
+    },
+    {
+      "type": "paragraph",
+      "text": "Bây giờ chúng tôi chỉ định các siêu tham số để phù hợp với phân phối\nGaussian."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "lr_D, lr_G, latent_dim, num_epochs = 0.05, 0.005, 2, 20\ntrain(net_D, net_G, data_iter, num_epochs, lr_D, lr_G,\n      latent_dim, data[:100].asnumpy())"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "loss_D 0.693, loss_G 0.693, 457.5 examples/sec"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_gan_bc32f8_102_1.svg",
+      "local_path": "_images/output_gan_bc32f8_102_1.svg",
+      "alt": "../_images/output_gan_bc32f8_102_1.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "lr_D, lr_G, latent_dim, num_epochs = 0.05, 0.005, 2, 20\ntrain(net_D, net_G, data_iter, num_epochs, lr_D, lr_G,\n      latent_dim, data[:100].detach().numpy())"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "loss_D 0.693, loss_G 0.693, 1609.6 examples/sec"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_gan_bc32f8_105_1.svg",
+      "local_path": "_images/output_gan_bc32f8_105_1.svg",
+      "alt": "../_images/output_gan_bc32f8_105_1.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "lr_D, lr_G, latent_dim, num_epochs = 0.05, 0.005, 2, 20\ntrain(net_D, net_G, data_iter, num_epochs, lr_D, lr_G,\n      latent_dim, data[:100].numpy())"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "loss_D 0.693, loss_G 0.693, 333.0 examples/sec"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_gan_bc32f8_108_1.svg",
+      "local_path": "_images/output_gan_bc32f8_108_1.svg",
+      "alt": "../_images/output_gan_bc32f8_108_1.svg"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tom-tat",
+      "text": "17.1.5. Tóm tắt"
+    },
+    {
+      "type": "list",
+      "ordered": false,
+      "items": [
+        "Các mạng đối thủ thế hệ (GAN) bao gồm hai mạng sâu, máy phát điện và\nngười phân biệt đối xử.",
+        "Trình tạo tạo ra hình ảnh càng gần với hình ảnh thật càng tốt để đánh\nlừa sự phân biệt đối xử, thông qua việc tối đa hóa tổn thất chéo\nentropy, * tức là *, \\(\\max \\log(D(\\mathbf{x'}))\\) .",
+        "Người phân biệt đối xử cố gắng phân biệt các hình ảnh được tạo ra với\nhình ảnh thật, thông qua việc giảm thiểu tổn thất chéo entropy, *\ntức là *, \\(\\min - y \\log D(\\mathbf{x}) - (1-y)\\log(1-D(\\mathbf{x}))\\) ."
+      ]
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bai-tap",
+      "text": "17.1.6. Bài tập"
+    },
+    {
+      "type": "list",
+      "ordered": false,
+      "items": [
+        "Liệu một trạng thái cân bằng tồn tại nơi máy phát chiến thắng, * tức\nlà * người phân biệt đối xử cuối cùng không thể phân biệt hai phân\nphối trên các mẫu hữu hạn?"
+      ]
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    }
+  ],
+  "images": [
+    {
+      "original_url": "https://vi.d2l.ai/_images/gan.svg",
+      "local_path": "_images/gan.svg",
+      "alt": "../_images/gan.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_gan_bc32f8_27_1.svg",
+      "local_path": "_images/output_gan_bc32f8_27_1.svg",
+      "alt": "../_images/output_gan_bc32f8_27_1.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_gan_bc32f8_31_1.svg",
+      "local_path": "_images/output_gan_bc32f8_31_1.svg",
+      "alt": "../_images/output_gan_bc32f8_31_1.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_gan_bc32f8_35_1.svg",
+      "local_path": "_images/output_gan_bc32f8_35_1.svg",
+      "alt": "../_images/output_gan_bc32f8_35_1.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_gan_bc32f8_102_1.svg",
+      "local_path": "_images/output_gan_bc32f8_102_1.svg",
+      "alt": "../_images/output_gan_bc32f8_102_1.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_gan_bc32f8_105_1.svg",
+      "local_path": "_images/output_gan_bc32f8_105_1.svg",
+      "alt": "../_images/output_gan_bc32f8_105_1.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_gan_bc32f8_108_1.svg",
+      "local_path": "_images/output_gan_bc32f8_108_1.svg",
+      "alt": "../_images/output_gan_bc32f8_108_1.svg"
+    }
+  ],
+  "text": "17.1. Mạng đối thủ thế hệ\nTrong suốt hầu hết cuốn sách này, chúng tôi đã nói về cách đưa ra dự\nđoán. Ở dạng nào đó hay hình thức khác, chúng tôi đã sử dụng các mạng\nthần kinh sâu đã học được ánh xạ từ các ví dụ dữ liệu đến nhãn. Loại\nhình học tập này được gọi là học phân biệt đối xử, như trong, chúng tôi\nmuốn có thể phân biệt đối xử giữa những bức ảnh mèo và hình ảnh của chó.\nPhân loại và bộ hồi quy đều là ví dụ về việc học phân biệt đối xử. Và\nmạng lưới thần kinh được đào tạo bởi sự lan truyền ngược đã upended tất\ncả mọi thứ chúng tôi nghĩ rằng chúng tôi biết về việc học phân biệt đối\nxử trên các tập dữ liệu phức tạp lớn. Độ chính xác phân loại trên hình\nảnh có độ phân giải cao đã đi từ vô dụng đến cấp độ con người (với một\nsố cảnh báo) chỉ trong 5-6 năm. Chúng tôi sẽ dành cho bạn một trò chơi\nkhác về tất cả các nhiệm vụ phân biệt đối xử khác, nơi các mạng thần\nkinh sâu làm tốt đáng kinh ngạc.\nNhưng có nhiều hơn để học máy hơn là chỉ giải quyết các nhiệm vụ phân\nbiệt đối xử. Ví dụ, với một tập dữ liệu lớn, không có bất kỳ nhãn nào,\nchúng ta có thể muốn tìm hiểu một mô hình nắm bắt chính xác các đặc điểm\ncủa dữ liệu này. Với một mô hình như vậy, chúng tôi có thể lấy mẫu các\nví dụ dữ liệu tổng hợp giống với việc phân phối dữ liệu đào tạo. Ví dụ,\nvới một lượng lớn các bức ảnh khuôn mặt, chúng ta có thể muốn có thể tạo\nra một hình ảnh thực tế mới trông giống như nó có thể hợp lý đến từ cùng\nmột tập dữ liệu. Loại học này được gọi là mô hình thế hệ.\nCho đến gần đây, chúng tôi không có phương pháp nào có thể tổng hợp các\nhình ảnh photorealistic mới lạ. Nhưng sự thành công của các mạng thần\nkinh sâu cho việc học phân biệt đối xử đã mở ra những khả năng mới. Một\nxu hướng lớn trong ba năm qua là việc áp dụng các mạng lưới sâu phân\nbiệt đối xử để vượt qua những thách thức trong các vấn đề mà chúng ta\nthường không nghĩ là vấn đề học tập được giám sát. Các mô hình ngôn ngữ\nmạng thần kinh tái phát là một ví dụ về việc sử dụng một mạng phân biệt\nđối xử (được đào tạo để dự đoán ký tự tiếp theo) mà một khi được đào tạo\ncó thể hoạt động như một mô hình thế hệ.\nNăm 2014, một bài báo đột phá đã giới thiệu mạng đối thủ thế hệ (GAN) [Goodfellow et al., 2014] , một cách thông minh\nmới để tận dụng sức mạnh của các mô hình phân biệt đối xử để có được các\nmô hình thế hệ tốt. Tại trái tim của họ, GAN dựa vào ý tưởng rằng một\ntrình tạo dữ liệu là tốt nếu chúng ta không thể nói dữ liệu giả mạo\nngoài dữ liệu thực. Trong thống kê, đây được gọi là thử nghiệm hai mẫu -\nmột bài kiểm tra để trả lời câu hỏi liệu các bộ dữ liệu \\(X=\\{x_1,\\ldots, x_n\\}\\) và \\(X'=\\{x'_1,\\ldots, x'_n\\}\\) có\nđược rút ra từ cùng một phân phối hay không. Sự khác biệt chính giữa hầu\nhết các giấy tờ thống kê và GAN là sau này sử dụng ý tưởng này một cách\nmang tính xây dựng. Nói cách khác, thay vì chỉ đào tạo một mô hình để\nnói “này, hai bộ dữ liệu này trông không giống như chúng đến từ cùng một\nphân phối”, họ sử dụng two-sample\ntest để\ncung cấp tín hiệu đào tạo cho một mô hình thế hệ. Điều này cho phép\nchúng tôi cải thiện trình tạo dữ liệu cho đến khi nó tạo ra một cái gì\nđó giống với dữ liệu thực. Ít nhất, nó cần phải đánh lừa phân loại. Ngay\ncả khi phân loại của chúng tôi là một nhà nước của mạng thần kinh sâu\nsắc nghệ thuật.\nFig. 17.1.1 Generative Adversarial Networks ¶\nKiến trúc GAN được minh họa vào năm Fig. 17.1.1 . Như bạn có thể\nthấy, có hai phần trong kiến trúc GAN - trước hết, chúng ta cần một\nthiết bị (giả sử, một mạng sâu nhưng nó thực sự có thể là bất cứ điều\ngì, chẳng hạn như một công cụ kết xuất trò chơi) có khả năng có thể tạo\nra dữ liệu trông giống như thực tế. Nếu chúng ta đang đối phó với hình\nảnh, điều này cần phải tạo ra hình ảnh. Nếu chúng ta đang đối phó với\nlời nói, nó cần phải tạo ra các chuỗi âm thanh, v.v. Chúng tôi gọi đây\nlà mạng máy phát điện. Thành phần thứ hai là mạng phân biệt đối xử. Nó\ncố gắng phân biệt dữ liệu giả và thực với nhau. Cả hai mạng đang cạnh\ntranh với nhau. Mạng máy phát cố gắng đánh lừa mạng phân biệt đối xử.\nTại thời điểm đó, mạng phân biệt đối xử thích ứng với dữ liệu giả mới.\nThông tin này, lần lượt được sử dụng để cải thiện mạng máy phát điện,\nv.v.\nPhân biệt đối xử là một phân loại nhị phân để phân biệt nếu đầu vào \\(x\\) là thực (từ dữ liệu thực) hay giả (từ máy phát điện). Thông\nthường, phân biệt đối xử đầu ra một dự đoán vô hướng \\(o\\in\\mathbb R\\) cho đầu vào \\(\\mathbf x\\) , chẳng hạn như sử\ndụng một lớp dày đặc với kích thước ẩn 1, và sau đó áp dụng hàm sigmoid\nđể có được xác suất dự đoán \\(D(\\mathbf x) = 1/(1+e^{-o})\\) . Giả sử\nnhãn \\(y\\) cho dữ liệu thật là \\(1\\) và \\(0\\) cho dữ liệu\ngiả mạo. Chúng tôi đào tạo người phân biệt đối xử để giảm thiểu tổn thất\nchéo entropy, * tức là *,\nĐối với máy phát điện, đầu tiên nó rút ra một số tham số \\(\\mathbf z\\in\\mathbb R^d\\) từ một nguồn ngẫu nhiên, ví dụ , một\nphân phối bình thường \\(\\mathbf z \\sim \\mathcal{N} (0, 1)\\) . Chúng\nta thường gọi \\(\\mathbf z\\) là biến tiềm ẩn. Sau đó, nó áp dụng một\nchức năng để tạo ra \\(\\mathbf x'=G(\\mathbf z)\\) . Mục tiêu của trình\ntạo là đánh lừa người phân biệt đối xử để phân loại \\(\\mathbf x'=G(\\mathbf z)\\) là dữ liệu thật, * tức là * , chúng tôi\nmuốn \\(D( G(\\mathbf z)) \\approx 1\\) . Nói cách khác, đối với một phân\nbiệt đối xử nhất định \\(D\\) , chúng tôi cập nhật các thông số của máy\nphát \\(G\\) để tối đa hóa tổn thất ngẫu nhiên chéo khi \\(y=0\\) , *\ni.e.*,\nNếu máy phát điện thực hiện một công việc hoàn hảo, thì \\(D(\\mathbf x')\\approx 1\\) do đó, tổn thất trên gần 0, dẫn đến độ\ndốc quá nhỏ để đạt được tiến bộ tốt cho người phân biệt đối xử. Vì vậy,\nthông thường chúng ta giảm thiểu những tổn thất sau:\nmà chỉ là thức ăn \\(\\mathbf x'=G(\\mathbf z)\\) vào phân biệt đối xử\nnhưng đưa ra nhãn \\(y=1\\) .\nTóm lại, \\(D\\) và \\(G\\) đang chơi một trò chơi “minimax” với\nchức năng mục tiêu toàn diện:\nNhiều ứng dụng GAN nằm trong bối cảnh hình ảnh. Là một mục đích trình\ndiễn, chúng ta sẽ tự nội dung với việc lắp một bản phân phối đơn giản\nhơn nhiều trước tiên. Chúng tôi sẽ minh họa những gì xảy ra nếu chúng ta\nsử dụng GAN để xây dựng ước tính không hiệu quả nhất thế giới của các\ntham số cho một Gaussian. Hãy để chúng tôi bắt đầu.\n17.1.1. Tạo ra một số dữ liệu “thực”\nVì đây sẽ là ví dụ đáng sợ nhất thế giới, chúng tôi chỉ đơn giản là tạo\nra dữ liệu được rút ra từ Gaussian.\nHãy để chúng tôi xem những gì chúng tôi có. Đây phải là một Gaussian\ndịch chuyển theo một cách khá tùy ý với trung bình \\(b\\) và ma trận\nhiệp phương sai \\(A^TA\\) .\n17.1.2. Máy phát điện\nMạng máy phát của chúng tôi sẽ là mạng đơn giản nhất có thể - một mô\nhình tuyến tính lớp duy nhất. Điều này là vì chúng tôi sẽ lái mạng tuyến\ntính đó với trình tạo dữ liệu Gaussian. Do đó, nó theo nghĩa đen chỉ cần\ntìm hiểu các thông số để giả mạo mọi thứ một cách hoàn hảo.\n17.1.3. Phân biệt đối xử\nĐối với người phân biệt đối xử, chúng ta sẽ phân biệt hơn một chút:\nchúng ta sẽ sử dụng MLP với 3 lớp để làm cho mọi thứ thú vị hơn một\nchút.\n17.1.4. Đào tạo\nĐầu tiên chúng ta định nghĩa một hàm để cập nhật sự phân biệt đối xử.\nMáy phát điện được cập nhật tương tự. Ở đây chúng tôi sử dụng lại tổn\nthất chéo entropy nhưng thay đổi nhãn của dữ liệu giả từ \\(0\\) thành \\(1\\) .\nCả phân biệt đối xử và máy phát điện đều thực hiện hồi quy hậu cần nhị\nphân với tổn thất chéo entropy. Chúng tôi sử dụng Adam để làm mịn quá\ntrình đào tạo. Trong mỗi lần lặp lại, lần đầu tiên chúng ta cập nhật\ntrình phân biệt đối xử và sau đó là trình tạo. Chúng tôi hình dung cả\ntổn thất và các ví dụ được tạo ra.\nBây giờ chúng tôi chỉ định các siêu tham số để phù hợp với phân phối\nGaussian.\n17.1.5. Tóm tắt\nCác mạng đối thủ thế hệ (GAN) bao gồm hai mạng sâu, máy phát điện và\nngười phân biệt đối xử.\nTrình tạo tạo ra hình ảnh càng gần với hình ảnh thật càng tốt để đánh\nlừa sự phân biệt đối xử, thông qua việc tối đa hóa tổn thất chéo\nentropy, * tức là *, \\(\\max \\log(D(\\mathbf{x'}))\\) .\nNgười phân biệt đối xử cố gắng phân biệt các hình ảnh được tạo ra với\nhình ảnh thật, thông qua việc giảm thiểu tổn thất chéo entropy, *\ntức là *, \\(\\min - y \\log D(\\mathbf{x}) - (1-y)\\log(1-D(\\mathbf{x}))\\) .\n17.1.6. Bài tập\nLiệu một trạng thái cân bằng tồn tại nơi máy phát chiến thắng, * tức\nlà * người phân biệt đối xử cuối cùng không thể phân biệt hai phân\nphối trên các mẫu hữu hạn?\nDiscussions\nDiscussions"
+}

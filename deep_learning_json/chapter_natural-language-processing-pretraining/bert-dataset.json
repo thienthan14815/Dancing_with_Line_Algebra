@@ -1,0 +1,306 @@
+{
+  "url": "https://vi.d2l.ai/chapter_natural-language-processing-pretraining/bert-dataset.html",
+  "chapter": "chapter_natural-language-processing-pretraining",
+  "title": "14.9. Tập dữ liệu cho Pretraining BERT",
+  "crawled_at": "2026-07-20T12:41:00.761641+00:00",
+  "headings": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "tap-du-lieu-cho-pretraining-bert",
+      "text": "14.9. Tập dữ liệu cho Pretraining BERT"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "xac-dinh-ham-tro-giup-cho-cac-nhiem-vu-pretraining",
+      "text": "14.9.1. Xác định hàm trợ giúp cho các nhiệm vụ Pretraining"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "tao-nhiem-vu-du-doan-cau-tiep-theo",
+      "text": "14.9.1.1. Tạo nhiệm vụ dự đoán câu tiếp theo"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "tao-tac-vu-mo-hinh-hoa-ngon-ngu-deo-mat-na",
+      "text": "14.9.1.2. Tạo tác vụ mô hình hóa ngôn ngữ đeo mặt nạ"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "chuyen-van-ban-thanh-tap-du-lieu-pretraining",
+      "text": "14.9.2. Chuyển văn bản thành tập dữ liệu Pretraining"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tom-tat",
+      "text": "14.9.3. Tóm tắt"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bai-tap",
+      "text": "14.9.4. Bài tập"
+    }
+  ],
+  "content": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "tap-du-lieu-cho-pretraining-bert",
+      "text": "14.9. Tập dữ liệu cho Pretraining BERT"
+    },
+    {
+      "type": "paragraph",
+      "text": "Để chuẩn bị mô hình BERT như được triển khai trong Section 14.8 ,\nchúng ta cần tạo bộ dữ liệu ở định dạng lý tưởng để tạo điều kiện thuận\nlợi cho hai nhiệm vụ đào tạo trước: mô hình hóa ngôn ngữ đeo mặt nạ và\ndự đoán câu tiếp theo. Một mặt, mô hình BERT ban đầu được đào tạo sơ bộ\nvề việc nối hai corpora BookCorpus khổng lồ và Wikipedia tiếng Anh (xem Section 14.8.5 ), khiến hầu hết độc giả của\ncuốn sách này khó chạy. Mặt khác, mô hình BERT được đào tạo sẵn sẵn có\nthể không phù hợp với các ứng dụng từ các lĩnh vực cụ thể như y học. Do\nđó, nó đang trở nên phổ biến để pretrain BERT trên một tập dữ liệu tùy\nchỉnh. Để tạo điều kiện cho việc trình diễn pretraining BERT, chúng tôi\nsử dụng một cơ thể nhỏ hơn WikiText-2 [Merity et al., 2016] ."
+    },
+    {
+      "type": "paragraph",
+      "text": "So sánh với tập dữ liệu PTB được sử dụng để đào tạo trước word2vec trong Section 14.3 , WikiText-2 (i) giữ lại dấu câu ban đầu,\nlàm cho nó phù hợp với dự đoán câu tiếp theo; (ii) giữ lại trường hợp và\nsố gốc; (iii) lớn hơn hai lần."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "import os\nimport random\nfrom mxnet import gluon, np, npx\nfrom d2l import mxnet as d2l\n\nnpx.set_np()"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "import os\nimport random\nimport torch\nfrom d2l import torch as d2l"
+    },
+    {
+      "type": "paragraph",
+      "text": "Trong tập dữ liệu WikiText-2, mỗi dòng đại diện cho một đoạn văn mà\nkhông gian được chèn giữa bất kỳ dấu chấm câu nào và mã thông báo trước\nđó. Các đoạn có ít nhất hai câu được giữ lại. Để chia câu, chúng ta chỉ\nsử dụng dấu chấm làm dấu phân cách để đơn giản. Chúng tôi để lại các\ncuộc thảo luận về các kỹ thuật tách câu phức tạp hơn trong các bài tập ở\ncuối phần này."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "#@save\nd2l.DATA_HUB['wikitext-2'] = (\n    'https://s3.amazonaws.com/research.metamind.io/wikitext/'\n    'wikitext-2-v1.zip', '3c914d17d80b1459be871a5039ac23e752a53cbe')\n\n#@save\ndef _read_wiki(data_dir):\n    file_name = os.path.join(data_dir, 'wiki.train.tokens')\n    with open(file_name, 'r') as f:\n        lines = f.readlines()\n    # Uppercase letters are converted to lowercase ones\n    paragraphs = [line.strip().lower().split(' . ')\n                  for line in lines if len(line.split(' . ')) >= 2]\n    random.shuffle(paragraphs)\n    return paragraphs"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "#@save\nd2l.DATA_HUB['wikitext-2'] = (\n    'https://s3.amazonaws.com/research.metamind.io/wikitext/'\n    'wikitext-2-v1.zip', '3c914d17d80b1459be871a5039ac23e752a53cbe')\n\n#@save\ndef _read_wiki(data_dir):\n    file_name = os.path.join(data_dir, 'wiki.train.tokens')\n    with open(file_name, 'r') as f:\n        lines = f.readlines()\n    # Uppercase letters are converted to lowercase ones\n    paragraphs = [line.strip().lower().split(' . ')\n                  for line in lines if len(line.split(' . ')) >= 2]\n    random.shuffle(paragraphs)\n    return paragraphs"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "xac-dinh-ham-tro-giup-cho-cac-nhiem-vu-pretraining",
+      "text": "14.9.1. Xác định hàm trợ giúp cho các nhiệm vụ Pretraining"
+    },
+    {
+      "type": "paragraph",
+      "text": "Sau đây, chúng ta bắt đầu bằng cách thực hiện các hàm trợ giúp cho hai\nnhiệm vụ pretraining BERT: dự đoán câu tiếp theo và mô hình ngôn ngữ đeo\nmặt nạ. Các chức năng trợ giúp này sẽ được gọi sau khi chuyển đổi cơ thể\nvăn bản thô thành tập dữ liệu của định dạng lý tưởng để pretrain BERT."
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "tao-nhiem-vu-du-doan-cau-tiep-theo",
+      "text": "14.9.1.1. Tạo nhiệm vụ dự đoán câu tiếp theo"
+    },
+    {
+      "type": "paragraph",
+      "text": "Theo mô tả của Section 14.8.5.2 , hàm _get_next_sentence tạo ra\nmột ví dụ đào tạo cho nhiệm vụ phân loại nhị phân."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "#@save\ndef _get_next_sentence(sentence, next_sentence, paragraphs):\n    if random.random() < 0.5:\n        is_next = True\n    else:\n        # `paragraphs` is a list of lists of lists\n        next_sentence = random.choice(random.choice(paragraphs))\n        is_next = False\n    return sentence, next_sentence, is_next"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "#@save\ndef _get_next_sentence(sentence, next_sentence, paragraphs):\n    if random.random() < 0.5:\n        is_next = True\n    else:\n        # `paragraphs` is a list of lists of lists\n        next_sentence = random.choice(random.choice(paragraphs))\n        is_next = False\n    return sentence, next_sentence, is_next"
+    },
+    {
+      "type": "paragraph",
+      "text": "Hàm sau tạo ra các ví dụ đào tạo cho dự đoán câu tiếp theo từ đầu vào paragraph bằng cách gọi hàm _get_next_sentence . Ở đây paragraph là danh sách các câu, trong đó mỗi câu là danh sách các\ntoken. Đối số max_len chỉ định độ dài tối đa của một chuỗi đầu vào\nBERT trong quá trình đào tạo trước."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "#@save\ndef _get_nsp_data_from_paragraph(paragraph, paragraphs, vocab, max_len):\n    nsp_data_from_paragraph = []\n    for i in range(len(paragraph) - 1):\n        tokens_a, tokens_b, is_next = _get_next_sentence(\n            paragraph[i], paragraph[i + 1], paragraphs)\n        # Consider 1 '<cls>' token and 2 '<sep>' tokens\n        if len(tokens_a) + len(tokens_b) + 3 > max_len:\n            continue\n        tokens, segments = d2l.get_tokens_and_segments(tokens_a, tokens_b)\n        nsp_data_from_paragraph.append((tokens, segments, is_next))\n    return nsp_data_from_paragraph"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "#@save\ndef _get_nsp_data_from_paragraph(paragraph, paragraphs, vocab, max_len):\n    nsp_data_from_paragraph = []\n    for i in range(len(paragraph) - 1):\n        tokens_a, tokens_b, is_next = _get_next_sentence(\n            paragraph[i], paragraph[i + 1], paragraphs)\n        # Consider 1 '<cls>' token and 2 '<sep>' tokens\n        if len(tokens_a) + len(tokens_b) + 3 > max_len:\n            continue\n        tokens, segments = d2l.get_tokens_and_segments(tokens_a, tokens_b)\n        nsp_data_from_paragraph.append((tokens, segments, is_next))\n    return nsp_data_from_paragraph"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "tao-tac-vu-mo-hinh-hoa-ngon-ngu-deo-mat-na",
+      "text": "14.9.1.2. Tạo tác vụ mô hình hóa ngôn ngữ đeo mặt nạ"
+    },
+    {
+      "type": "paragraph",
+      "text": "Để tạo ra các ví dụ đào tạo cho tác vụ mô hình hóa ngôn ngữ được đeo mặt\nnạ từ một chuỗi đầu vào BERT, chúng tôi xác định hàm _replace_mlm_tokens sau. Trong đầu vào của nó, tokens là danh\nsách các mã thông báo đại diện cho chuỗi đầu vào BERT, candidate_pred_positions là danh sách các chỉ số mã thông báo của\nchuỗi đầu vào BERT không bao gồm các mã thông báo đặc biệt (mã thông báo\nđặc biệt không được dự đoán trong nhiệm vụ mô hình hóa ngôn ngữ đeo mặt\nnạ) và num_mlm_preds chỉ ra số dự đoán (thu hồi 15% mã thông báo\nngẫu nhiên để dự đoán). Theo định nghĩa của nhiệm vụ mô hình hóa ngôn\nngữ đeo mặt nạ trong Section 14.8.5.1 , tại mỗi vị trí dự đoán, đầu\nvào có thể được thay thế bằng một mã thông báo “” đặc biệt hoặc một mã\nthông báo ngẫu nhiên, hoặc vẫn không thay đổi. Cuối cùng, hàm trả về các\ntoken đầu vào sau khi có thể thay thế, các chỉ số mã thông báo nơi dự\nđoán diễn ra và dán nhãn cho các dự đoán này."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "#@save\ndef _replace_mlm_tokens(tokens, candidate_pred_positions, num_mlm_preds,\n                        vocab):\n    # Make a new copy of tokens for the input of a masked language model,\n    # where the input may contain replaced '<mask>' or random tokens\n    mlm_input_tokens = [token for token in tokens]\n    pred_positions_and_labels = []\n    # Shuffle for getting 15% random tokens for prediction in the masked\n    # language modeling task\n    random.shuffle(candidate_pred_positions)\n    for mlm_pred_position in candidate_pred_positions:\n        if len(pred_positions_and_labels) >= num_mlm_preds:\n            break\n        masked_token = None\n        # 80% of the time: replace the word with the '<mask>' token\n        if random.random() < 0.8:\n            masked_token = '<mask>'\n        else:\n            # 10% of the time: keep the word unchanged\n            if random.random() < 0.5:\n                masked_token = tokens[mlm_pred_position]\n            # 10% of the time: replace the word with a random word\n            else:\n                masked_token = random.choice(vocab.idx_to_token)\n        mlm_input_tokens[mlm_pred_position] = masked_token\n        pred_positions_and_labels.append(\n            (mlm_pred_position, tokens[mlm_pred_position]))\n    return mlm_input_tokens, pred_positions_and_labels"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "#@save\ndef _replace_mlm_tokens(tokens, candidate_pred_positions, num_mlm_preds,\n                        vocab):\n    # Make a new copy of tokens for the input of a masked language model,\n    # where the input may contain replaced '<mask>' or random tokens\n    mlm_input_tokens = [token for token in tokens]\n    pred_positions_and_labels = []\n    # Shuffle for getting 15% random tokens for prediction in the masked\n    # language modeling task\n    random.shuffle(candidate_pred_positions)\n    for mlm_pred_position in candidate_pred_positions:\n        if len(pred_positions_and_labels) >= num_mlm_preds:\n            break\n        masked_token = None\n        # 80% of the time: replace the word with the '<mask>' token\n        if random.random() < 0.8:\n            masked_token = '<mask>'\n        else:\n            # 10% of the time: keep the word unchanged\n            if random.random() < 0.5:\n                masked_token = tokens[mlm_pred_position]\n            # 10% of the time: replace the word with a random word\n            else:\n                masked_token = random.choice(vocab.idx_to_token)\n        mlm_input_tokens[mlm_pred_position] = masked_token\n        pred_positions_and_labels.append(\n            (mlm_pred_position, tokens[mlm_pred_position]))\n    return mlm_input_tokens, pred_positions_and_labels"
+    },
+    {
+      "type": "paragraph",
+      "text": "Bằng cách gọi hàm _replace_mlm_tokens đã nói ở trên, hàm sau lấy\nchuỗi đầu vào BERT ( tokens ) làm đầu vào và trả về các chỉ số của mã\nthông báo đầu vào (sau khi thay thế token có thể như được mô tả trong Section 14.8.5.1 ), các chỉ số mã thông báo nơi dự đoán diễn ra và\ncác chỉ số nhãn cho những dự đoán."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "#@save\ndef _get_mlm_data_from_tokens(tokens, vocab):\n    candidate_pred_positions = []\n    # `tokens` is a list of strings\n    for i, token in enumerate(tokens):\n        # Special tokens are not predicted in the masked language modeling\n        # task\n        if token in ['<cls>', '<sep>']:\n            continue\n        candidate_pred_positions.append(i)\n    # 15% of random tokens are predicted in the masked language modeling task\n    num_mlm_preds = max(1, round(len(tokens) * 0.15))\n    mlm_input_tokens, pred_positions_and_labels = _replace_mlm_tokens(\n        tokens, candidate_pred_positions, num_mlm_preds, vocab)\n    pred_positions_and_labels = sorted(pred_positions_and_labels,\n                                       key=lambda x: x[0])\n    pred_positions = [v[0] for v in pred_positions_and_labels]\n    mlm_pred_labels = [v[1] for v in pred_positions_and_labels]\n    return vocab[mlm_input_tokens], pred_positions, vocab[mlm_pred_labels]"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "#@save\ndef _get_mlm_data_from_tokens(tokens, vocab):\n    candidate_pred_positions = []\n    # `tokens` is a list of strings\n    for i, token in enumerate(tokens):\n        # Special tokens are not predicted in the masked language modeling\n        # task\n        if token in ['<cls>', '<sep>']:\n            continue\n        candidate_pred_positions.append(i)\n    # 15% of random tokens are predicted in the masked language modeling task\n    num_mlm_preds = max(1, round(len(tokens) * 0.15))\n    mlm_input_tokens, pred_positions_and_labels = _replace_mlm_tokens(\n        tokens, candidate_pred_positions, num_mlm_preds, vocab)\n    pred_positions_and_labels = sorted(pred_positions_and_labels,\n                                       key=lambda x: x[0])\n    pred_positions = [v[0] for v in pred_positions_and_labels]\n    mlm_pred_labels = [v[1] for v in pred_positions_and_labels]\n    return vocab[mlm_input_tokens], pred_positions, vocab[mlm_pred_labels]"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "chuyen-van-ban-thanh-tap-du-lieu-pretraining",
+      "text": "14.9.2. Chuyển văn bản thành tập dữ liệu Pretraining"
+    },
+    {
+      "type": "paragraph",
+      "text": "Bây giờ chúng tôi gần như đã sẵn sàng để tùy chỉnh một lớp Dataset cho BERT pretraining. Trước đó, chúng ta vẫn cần định nghĩa một hàm\nhelper _pad_bert_inputs để thêm các token “” đặc biệt vào các đầu\nvào. Lập luận của nó examples chứa các đầu ra từ các chức năng trợ\ngiúp _get_nsp_data_from_paragraph và _get_mlm_data_from_tokens cho hai nhiệm vụ pretraining."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "#@save\ndef _pad_bert_inputs(examples, max_len, vocab):\n    max_num_mlm_preds = round(max_len * 0.15)\n    all_token_ids, all_segments, valid_lens,  = [], [], []\n    all_pred_positions, all_mlm_weights, all_mlm_labels = [], [], []\n    nsp_labels = []\n    for (token_ids, pred_positions, mlm_pred_label_ids, segments,\n         is_next) in examples:\n        all_token_ids.append(np.array(token_ids + [vocab['<pad>']] * (\n            max_len - len(token_ids)), dtype='int32'))\n        all_segments.append(np.array(segments + [0] * (\n            max_len - len(segments)), dtype='int32'))\n        # `valid_lens` excludes count of '<pad>' tokens\n        valid_lens.append(np.array(len(token_ids), dtype='float32'))\n        all_pred_positions.append(np.array(pred_positions + [0] * (\n            max_num_mlm_preds - len(pred_positions)), dtype='int32'))\n        # Predictions of padded tokens will be filtered out in the loss via\n        # multiplication of 0 weights\n        all_mlm_weights.append(\n            np.array([1.0] * len(mlm_pred_label_ids) + [0.0] * (\n                max_num_mlm_preds - len(pred_positions)), dtype='float32'))\n        all_mlm_labels.append(np.array(mlm_pred_label_ids + [0] * (\n            max_num_mlm_preds - len(mlm_pred_label_ids)), dtype='int32'))\n        nsp_labels.append(np.array(is_next))\n    return (all_token_ids, all_segments, valid_lens, all_pred_positions,\n            all_mlm_weights, all_mlm_labels, nsp_labels)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "#@save\ndef _pad_bert_inputs(examples, max_len, vocab):\n    max_num_mlm_preds = round(max_len * 0.15)\n    all_token_ids, all_segments, valid_lens,  = [], [], []\n    all_pred_positions, all_mlm_weights, all_mlm_labels = [], [], []\n    nsp_labels = []\n    for (token_ids, pred_positions, mlm_pred_label_ids, segments,\n         is_next) in examples:\n        all_token_ids.append(torch.tensor(token_ids + [vocab['<pad>']] * (\n            max_len - len(token_ids)), dtype=torch.long))\n        all_segments.append(torch.tensor(segments + [0] * (\n            max_len - len(segments)), dtype=torch.long))\n        # `valid_lens` excludes count of '<pad>' tokens\n        valid_lens.append(torch.tensor(len(token_ids), dtype=torch.float32))\n        all_pred_positions.append(torch.tensor(pred_positions + [0] * (\n            max_num_mlm_preds - len(pred_positions)), dtype=torch.long))\n        # Predictions of padded tokens will be filtered out in the loss via\n        # multiplication of 0 weights\n        all_mlm_weights.append(\n            torch.tensor([1.0] * len(mlm_pred_label_ids) + [0.0] * (\n                max_num_mlm_preds - len(pred_positions)),\n                dtype=torch.float32))\n        all_mlm_labels.append(torch.tensor(mlm_pred_label_ids + [0] * (\n            max_num_mlm_preds - len(mlm_pred_label_ids)), dtype=torch.long))\n        nsp_labels.append(torch.tensor(is_next, dtype=torch.long))\n    return (all_token_ids, all_segments, valid_lens, all_pred_positions,\n            all_mlm_weights, all_mlm_labels, nsp_labels)"
+    },
+    {
+      "type": "paragraph",
+      "text": "Đặt các chức năng trợ giúp để tạo ra các ví dụ đào tạo về hai nhiệm vụ\nđào tạo trước và chức năng trợ giúp cho đầu vào đệm lại với nhau, chúng\ntôi tùy chỉnh lớp _WikiTextDataset sau làm bộ dữ liệu WikiText-2 để\nđào tạo trước BERT. Bằng cách thực hiện chức năng __getitem__ , chúng\nta có thể tùy ý truy cập các ví dụ pretraining (mô hình hóa ngôn ngữ đeo\nmặt nạ và dự đoán câu tiếp theo) được tạo ra từ một cặp câu từ cơ thể\nWikiText-2."
+    },
+    {
+      "type": "paragraph",
+      "text": "Mô hình BERT ban đầu sử dụng nhúng WordPiece có kích thước từ vựng là\n30000 [Wu et al., 2016] . Phương pháp mã hóa của\nWordPiece là một sửa đổi nhỏ của thuật toán mã hóa cặp byte ban đầu\ntrong Section 14.6.2 . Để đơn giản, chúng tôi sử\ndụng hàm d2l.tokenize để mã hóa. Các mã thông báo không thường xuyên\nxuất hiện ít hơn năm lần được lọc ra."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "#@save\nclass _WikiTextDataset(gluon.data.Dataset):\n    def __init__(self, paragraphs, max_len):\n        # Input `paragraphs[i]` is a list of sentence strings representing a\n        # paragraph; while output `paragraphs[i]` is a list of sentences\n        # representing a paragraph, where each sentence is a list of tokens\n        paragraphs = [d2l.tokenize(\n            paragraph, token='word') for paragraph in paragraphs]\n        sentences = [sentence for paragraph in paragraphs\n                     for sentence in paragraph]\n        self.vocab = d2l.Vocab(sentences, min_freq=5, reserved_tokens=[\n            '<pad>', '<mask>', '<cls>', '<sep>'])\n        # Get data for the next sentence prediction task\n        examples = []\n        for paragraph in paragraphs:\n            examples.extend(_get_nsp_data_from_paragraph(\n                paragraph, paragraphs, self.vocab, max_len))\n        # Get data for the masked language model task\n        examples = [(_get_mlm_data_from_tokens(tokens, self.vocab)\n                      + (segments, is_next))\n                     for tokens, segments, is_next in examples]\n        # Pad inputs\n        (self.all_token_ids, self.all_segments, self.valid_lens,\n         self.all_pred_positions, self.all_mlm_weights,\n         self.all_mlm_labels, self.nsp_labels) = _pad_bert_inputs(\n            examples, max_len, self.vocab)\n\n    def __getitem__(self, idx):\n        return (self.all_token_ids[idx], self.all_segments[idx],\n                self.valid_lens[idx], self.all_pred_positions[idx],\n                self.all_mlm_weights[idx], self.all_mlm_labels[idx],\n                self.nsp_labels[idx])\n\n    def __len__(self):\n        return len(self.all_token_ids)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "#@save\nclass _WikiTextDataset(torch.utils.data.Dataset):\n    def __init__(self, paragraphs, max_len):\n        # Input `paragraphs[i]` is a list of sentence strings representing a\n        # paragraph; while output `paragraphs[i]` is a list of sentences\n        # representing a paragraph, where each sentence is a list of tokens\n        paragraphs = [d2l.tokenize(\n            paragraph, token='word') for paragraph in paragraphs]\n        sentences = [sentence for paragraph in paragraphs\n                     for sentence in paragraph]\n        self.vocab = d2l.Vocab(sentences, min_freq=5, reserved_tokens=[\n            '<pad>', '<mask>', '<cls>', '<sep>'])\n        # Get data for the next sentence prediction task\n        examples = []\n        for paragraph in paragraphs:\n            examples.extend(_get_nsp_data_from_paragraph(\n                paragraph, paragraphs, self.vocab, max_len))\n        # Get data for the masked language model task\n        examples = [(_get_mlm_data_from_tokens(tokens, self.vocab)\n                      + (segments, is_next))\n                     for tokens, segments, is_next in examples]\n        # Pad inputs\n        (self.all_token_ids, self.all_segments, self.valid_lens,\n         self.all_pred_positions, self.all_mlm_weights,\n         self.all_mlm_labels, self.nsp_labels) = _pad_bert_inputs(\n            examples, max_len, self.vocab)\n\n    def __getitem__(self, idx):\n        return (self.all_token_ids[idx], self.all_segments[idx],\n                self.valid_lens[idx], self.all_pred_positions[idx],\n                self.all_mlm_weights[idx], self.all_mlm_labels[idx],\n                self.nsp_labels[idx])\n\n    def __len__(self):\n        return len(self.all_token_ids)"
+    },
+    {
+      "type": "paragraph",
+      "text": "Bằng cách sử dụng hàm _read_wiki và lớp _WikiTextDataset , chúng\ntôi xác định load_data_wiki sau đây để tải xuống và tập dữ liệu\nWikiText-2 và tạo ra các ví dụ đào tạo trước từ nó."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "#@save\ndef load_data_wiki(batch_size, max_len):\n    \"\"\"Load the WikiText-2 dataset.\"\"\"\n    num_workers = d2l.get_dataloader_workers()\n    data_dir = d2l.download_extract('wikitext-2', 'wikitext-2')\n    paragraphs = _read_wiki(data_dir)\n    train_set = _WikiTextDataset(paragraphs, max_len)\n    train_iter = gluon.data.DataLoader(train_set, batch_size, shuffle=True,\n                                       num_workers=num_workers)\n    return train_iter, train_set.vocab"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "#@save\ndef load_data_wiki(batch_size, max_len):\n    \"\"\"Load the WikiText-2 dataset.\"\"\"\n    num_workers = d2l.get_dataloader_workers()\n    data_dir = d2l.download_extract('wikitext-2', 'wikitext-2')\n    paragraphs = _read_wiki(data_dir)\n    train_set = _WikiTextDataset(paragraphs, max_len)\n    train_iter = torch.utils.data.DataLoader(train_set, batch_size,\n                                        shuffle=True, num_workers=num_workers)\n    return train_iter, train_set.vocab"
+    },
+    {
+      "type": "paragraph",
+      "text": "Đặt kích thước lô thành 512 và độ dài tối đa của chuỗi đầu vào BERT là\n64, chúng tôi in ra các hình dạng của một minibatch các ví dụ\npretraining BERT. Lưu ý rằng trong mỗi chuỗi đầu vào BERT, \\(10\\) ( \\(64 \\times 0.15\\) ) vị trí được dự đoán cho nhiệm vụ mô hình hóa\nngôn ngữ đeo mặt nạ."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "batch_size, max_len = 512, 64\ntrain_iter, vocab = load_data_wiki(batch_size, max_len)\n\nfor (tokens_X, segments_X, valid_lens_x, pred_positions_X, mlm_weights_X,\n     mlm_Y, nsp_y) in train_iter:\n    print(tokens_X.shape, segments_X.shape, valid_lens_x.shape,\n          pred_positions_X.shape, mlm_weights_X.shape, mlm_Y.shape,\n          nsp_y.shape)\n    break"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "Downloading ../data/wikitext-2-v1.zip from https://s3.amazonaws.com/research.metamind.io/wikitext/wikitext-2-v1.zip...\n(512, 64) (512, 64) (512,) (512, 10) (512, 10) (512, 10) (512,)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "batch_size, max_len = 512, 64\ntrain_iter, vocab = load_data_wiki(batch_size, max_len)\n\nfor (tokens_X, segments_X, valid_lens_x, pred_positions_X, mlm_weights_X,\n     mlm_Y, nsp_y) in train_iter:\n    print(tokens_X.shape, segments_X.shape, valid_lens_x.shape,\n          pred_positions_X.shape, mlm_weights_X.shape, mlm_Y.shape,\n          nsp_y.shape)\n    break"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "Downloading ../data/wikitext-2-v1.zip from https://s3.amazonaws.com/research.metamind.io/wikitext/wikitext-2-v1.zip...\ntorch.Size([512, 64]) torch.Size([512, 64]) torch.Size([512]) torch.Size([512, 10]) torch.Size([512, 10]) torch.Size([512, 10]) torch.Size([512])"
+    },
+    {
+      "type": "paragraph",
+      "text": "Cuối cùng, chúng ta hãy nhìn vào kích thước từ vựng. Ngay cả sau khi lọc\ncác mã thông báo không thường xuyên, nó vẫn lớn hơn hai lần so với tập\ndữ liệu PTB."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "len(vocab)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "20256"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "len(vocab)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "20256"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tom-tat",
+      "text": "14.9.3. Tóm tắt"
+    },
+    {
+      "type": "list",
+      "ordered": false,
+      "items": [
+        "So sánh với tập dữ liệu PTB, tập ngày WikiText-2 giữ lại dấu câu ban\nđầu, chữ hoa và số, và lớn hơn hai lần.",
+        "Chúng ta có thể tùy ý truy cập các ví dụ pretraining (mô hình hóa\nngôn ngữ đeo mặt nạ và dự đoán câu tiếp theo) được tạo ra từ một cặp\ncâu từ WikiText-2 corpus."
+      ]
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bai-tap",
+      "text": "14.9.4. Bài tập"
+    },
+    {
+      "type": "list",
+      "ordered": true,
+      "items": [
+        "Để đơn giản, khoảng thời gian được sử dụng làm dấu phân cách duy nhất\nđể tách câu. Hãy thử các kỹ thuật tách câu khác, chẳng hạn như spacy\nvà NLTK. Lấy NLTK làm ví dụ. Bạn cần cài đặt NLTK trước: pip install nltk . Trong mã, import nltk đầu tiên. Sau đó, tải\nxuống trình mã hóa câu Punkt: nltk.download('punkt') . Để chia các\ncâu như sentences = 'Điều này thật tuyệt! Tại sao không? ' ,\ninvoking nltk.tokenize.sent_tokenize (câu) will return a list of\ntwo sentence strings: ['Điều này thật tuyệt! ' , 'Tại sao không? '] .",
+        "Kích thước từ vựng nếu chúng ta không lọc ra bất kỳ mã thông báo\nkhông thường xuyên nào?"
+      ]
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    }
+  ],
+  "images": [],
+  "text": "14.9. Tập dữ liệu cho Pretraining BERT\nĐể chuẩn bị mô hình BERT như được triển khai trong Section 14.8 ,\nchúng ta cần tạo bộ dữ liệu ở định dạng lý tưởng để tạo điều kiện thuận\nlợi cho hai nhiệm vụ đào tạo trước: mô hình hóa ngôn ngữ đeo mặt nạ và\ndự đoán câu tiếp theo. Một mặt, mô hình BERT ban đầu được đào tạo sơ bộ\nvề việc nối hai corpora BookCorpus khổng lồ và Wikipedia tiếng Anh (xem Section 14.8.5 ), khiến hầu hết độc giả của\ncuốn sách này khó chạy. Mặt khác, mô hình BERT được đào tạo sẵn sẵn có\nthể không phù hợp với các ứng dụng từ các lĩnh vực cụ thể như y học. Do\nđó, nó đang trở nên phổ biến để pretrain BERT trên một tập dữ liệu tùy\nchỉnh. Để tạo điều kiện cho việc trình diễn pretraining BERT, chúng tôi\nsử dụng một cơ thể nhỏ hơn WikiText-2 [Merity et al., 2016] .\nSo sánh với tập dữ liệu PTB được sử dụng để đào tạo trước word2vec trong Section 14.3 , WikiText-2 (i) giữ lại dấu câu ban đầu,\nlàm cho nó phù hợp với dự đoán câu tiếp theo; (ii) giữ lại trường hợp và\nsố gốc; (iii) lớn hơn hai lần.\nTrong tập dữ liệu WikiText-2, mỗi dòng đại diện cho một đoạn văn mà\nkhông gian được chèn giữa bất kỳ dấu chấm câu nào và mã thông báo trước\nđó. Các đoạn có ít nhất hai câu được giữ lại. Để chia câu, chúng ta chỉ\nsử dụng dấu chấm làm dấu phân cách để đơn giản. Chúng tôi để lại các\ncuộc thảo luận về các kỹ thuật tách câu phức tạp hơn trong các bài tập ở\ncuối phần này.\n14.9.1. Xác định hàm trợ giúp cho các nhiệm vụ Pretraining\nSau đây, chúng ta bắt đầu bằng cách thực hiện các hàm trợ giúp cho hai\nnhiệm vụ pretraining BERT: dự đoán câu tiếp theo và mô hình ngôn ngữ đeo\nmặt nạ. Các chức năng trợ giúp này sẽ được gọi sau khi chuyển đổi cơ thể\nvăn bản thô thành tập dữ liệu của định dạng lý tưởng để pretrain BERT.\n14.9.1.1. Tạo nhiệm vụ dự đoán câu tiếp theo\nTheo mô tả của Section 14.8.5.2 , hàm _get_next_sentence tạo ra\nmột ví dụ đào tạo cho nhiệm vụ phân loại nhị phân.\nHàm sau tạo ra các ví dụ đào tạo cho dự đoán câu tiếp theo từ đầu vào paragraph bằng cách gọi hàm _get_next_sentence . Ở đây paragraph là danh sách các câu, trong đó mỗi câu là danh sách các\ntoken. Đối số max_len chỉ định độ dài tối đa của một chuỗi đầu vào\nBERT trong quá trình đào tạo trước.\n14.9.1.2. Tạo tác vụ mô hình hóa ngôn ngữ đeo mặt nạ\nĐể tạo ra các ví dụ đào tạo cho tác vụ mô hình hóa ngôn ngữ được đeo mặt\nnạ từ một chuỗi đầu vào BERT, chúng tôi xác định hàm _replace_mlm_tokens sau. Trong đầu vào của nó, tokens là danh\nsách các mã thông báo đại diện cho chuỗi đầu vào BERT, candidate_pred_positions là danh sách các chỉ số mã thông báo của\nchuỗi đầu vào BERT không bao gồm các mã thông báo đặc biệt (mã thông báo\nđặc biệt không được dự đoán trong nhiệm vụ mô hình hóa ngôn ngữ đeo mặt\nnạ) và num_mlm_preds chỉ ra số dự đoán (thu hồi 15% mã thông báo\nngẫu nhiên để dự đoán). Theo định nghĩa của nhiệm vụ mô hình hóa ngôn\nngữ đeo mặt nạ trong Section 14.8.5.1 , tại mỗi vị trí dự đoán, đầu\nvào có thể được thay thế bằng một mã thông báo “” đặc biệt hoặc một mã\nthông báo ngẫu nhiên, hoặc vẫn không thay đổi. Cuối cùng, hàm trả về các\ntoken đầu vào sau khi có thể thay thế, các chỉ số mã thông báo nơi dự\nđoán diễn ra và dán nhãn cho các dự đoán này.\nBằng cách gọi hàm _replace_mlm_tokens đã nói ở trên, hàm sau lấy\nchuỗi đầu vào BERT ( tokens ) làm đầu vào và trả về các chỉ số của mã\nthông báo đầu vào (sau khi thay thế token có thể như được mô tả trong Section 14.8.5.1 ), các chỉ số mã thông báo nơi dự đoán diễn ra và\ncác chỉ số nhãn cho những dự đoán.\n14.9.2. Chuyển văn bản thành tập dữ liệu Pretraining\nBây giờ chúng tôi gần như đã sẵn sàng để tùy chỉnh một lớp Dataset cho BERT pretraining. Trước đó, chúng ta vẫn cần định nghĩa một hàm\nhelper _pad_bert_inputs để thêm các token “” đặc biệt vào các đầu\nvào. Lập luận của nó examples chứa các đầu ra từ các chức năng trợ\ngiúp _get_nsp_data_from_paragraph và _get_mlm_data_from_tokens cho hai nhiệm vụ pretraining.\nĐặt các chức năng trợ giúp để tạo ra các ví dụ đào tạo về hai nhiệm vụ\nđào tạo trước và chức năng trợ giúp cho đầu vào đệm lại với nhau, chúng\ntôi tùy chỉnh lớp _WikiTextDataset sau làm bộ dữ liệu WikiText-2 để\nđào tạo trước BERT. Bằng cách thực hiện chức năng __getitem__ , chúng\nta có thể tùy ý truy cập các ví dụ pretraining (mô hình hóa ngôn ngữ đeo\nmặt nạ và dự đoán câu tiếp theo) được tạo ra từ một cặp câu từ cơ thể\nWikiText-2.\nMô hình BERT ban đầu sử dụng nhúng WordPiece có kích thước từ vựng là\n30000 [Wu et al., 2016] . Phương pháp mã hóa của\nWordPiece là một sửa đổi nhỏ của thuật toán mã hóa cặp byte ban đầu\ntrong Section 14.6.2 . Để đơn giản, chúng tôi sử\ndụng hàm d2l.tokenize để mã hóa. Các mã thông báo không thường xuyên\nxuất hiện ít hơn năm lần được lọc ra.\nBằng cách sử dụng hàm _read_wiki và lớp _WikiTextDataset , chúng\ntôi xác định load_data_wiki sau đây để tải xuống và tập dữ liệu\nWikiText-2 và tạo ra các ví dụ đào tạo trước từ nó.\nĐặt kích thước lô thành 512 và độ dài tối đa của chuỗi đầu vào BERT là\n64, chúng tôi in ra các hình dạng của một minibatch các ví dụ\npretraining BERT. Lưu ý rằng trong mỗi chuỗi đầu vào BERT, \\(10\\) ( \\(64 \\times 0.15\\) ) vị trí được dự đoán cho nhiệm vụ mô hình hóa\nngôn ngữ đeo mặt nạ.\nCuối cùng, chúng ta hãy nhìn vào kích thước từ vựng. Ngay cả sau khi lọc\ncác mã thông báo không thường xuyên, nó vẫn lớn hơn hai lần so với tập\ndữ liệu PTB.\n14.9.3. Tóm tắt\nSo sánh với tập dữ liệu PTB, tập ngày WikiText-2 giữ lại dấu câu ban\nđầu, chữ hoa và số, và lớn hơn hai lần.\nChúng ta có thể tùy ý truy cập các ví dụ pretraining (mô hình hóa\nngôn ngữ đeo mặt nạ và dự đoán câu tiếp theo) được tạo ra từ một cặp\ncâu từ WikiText-2 corpus.\n14.9.4. Bài tập\nĐể đơn giản, khoảng thời gian được sử dụng làm dấu phân cách duy nhất\nđể tách câu. Hãy thử các kỹ thuật tách câu khác, chẳng hạn như spacy\nvà NLTK. Lấy NLTK làm ví dụ. Bạn cần cài đặt NLTK trước: pip install nltk . Trong mã, import nltk đầu tiên. Sau đó, tải\nxuống trình mã hóa câu Punkt: nltk.download('punkt') . Để chia các\ncâu như sentences = 'Điều này thật tuyệt! Tại sao không? ' ,\ninvoking nltk.tokenize.sent_tokenize (câu) will return a list of\ntwo sentence strings: ['Điều này thật tuyệt! ' , 'Tại sao không? '] .\nKích thước từ vựng nếu chúng ta không lọc ra bất kỳ mã thông báo\nkhông thường xuyên nào?\nDiscussions\nDiscussions"
+}

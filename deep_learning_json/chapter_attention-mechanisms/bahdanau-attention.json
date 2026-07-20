@@ -1,0 +1,393 @@
+{
+  "url": "https://vi.d2l.ai/chapter_attention-mechanisms/bahdanau-attention.html",
+  "chapter": "chapter_attention-mechanisms",
+  "title": "10.4. Bahdanau Chú ý",
+  "crawled_at": "2026-07-20T12:40:14.068382+00:00",
+  "headings": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "bahdanau-chu-y",
+      "text": "10.4. Bahdanau Chú ý"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "mo-hinh",
+      "text": "10.4.1. Mô hình"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "xac-dinh-bo-giai-ma-voi-su-chu-y",
+      "text": "10.4.2. Xác định bộ giải mã với sự chú ý"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "dao-tao",
+      "text": "10.4.3. Đào tạo"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tom-tat",
+      "text": "10.4.4. Tóm tắt"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bai-tap",
+      "text": "10.4.5. Bài tập"
+    }
+  ],
+  "content": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "bahdanau-chu-y",
+      "text": "10.4. Bahdanau Chú ý"
+    },
+    {
+      "type": "paragraph",
+      "text": "Chúng tôi đã nghiên cứu vấn đề dịch máy trong Section 9.7 ,\nnơi chúng tôi thiết kế một kiến trúc bộ mã hóa-giải mã dựa trên hai RNNs\ncho trình tự để học trình tự. Cụ thể, bộ mã hóa RNN biến một chuỗi có độ\ndài biến đổi thành một biến ngữ cảnh hình dạng cố định, sau đó bộ giải\nmã RNN tạo ra mã thông báo chuỗi đầu ra (mục tiêu) theo mã thông báo dựa\ntrên các token được tạo ra và biến ngữ cảnh. Tuy nhiên, mặc dù không\nphải tất cả các mã thông báo đầu vào (nguồn) đều hữu ích cho việc giải\nmã một mã thông báo nhất định, biến ngữ cảnh same mã hóa toàn bộ chuỗi\nđầu vào vẫn được sử dụng ở mỗi bước giải mã."
+    },
+    {
+      "type": "paragraph",
+      "text": "Trong một thách thức riêng biệt nhưng liên quan về thế hệ chữ viết tay\ncho một chuỗi văn bản nhất định, Graves đã thiết kế một mô hình chú ý\nkhác biệt để căn chỉnh các ký tự văn bản với dấu vết bút dài hơn nhiều,\ntrong đó căn chỉnh chỉ di chuyển theo một hướng [Graves.2013] .\nLấy cảm hứng từ ý tưởng học cách căn chỉnh, Bahdanau et al. đề xuất một\nmô hình chú ý khác biệt mà không có giới hạn liên kết một chiều nghiêm\ntrọng [Bahdanau et al., 2014] . Khi dự đoán một mã thông báo,\nnếu không phải tất cả các token đầu vào đều có liên quan, mô hình sẽ căn\nchỉnh (hoặc tham dự) chỉ với các phần của chuỗi đầu vào có liên quan đến\ndự đoán hiện tại. Điều này đạt được bằng cách coi biến ngữ cảnh như một\nđầu ra của sự chú ý pooling."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "mo-hinh",
+      "text": "10.4.1. Mô hình"
+    },
+    {
+      "type": "paragraph",
+      "text": "Khi mô tả sự chú ý của Bahdanau cho bộ giải mã RNN bên dưới, chúng tôi\nsẽ làm theo cùng một ký hiệu trong Section 9.7 . Mô hình dựa\ntrên sự chú ý mới giống như trong Section 9.7 ngoại trừ biến\nngữ cảnh \\(\\mathbf{c}\\) trong (9.7.3) được thay\nthế bằng \\(\\mathbf{c}_{t'}\\) tại bất kỳ bước thời gian giải mã nào \\(t'\\) . Giả sử có \\(T\\) token trong chuỗi đầu vào, biến ngữ cảnh\ntại bước thời gian giải mã \\(t'\\) là đầu ra của sự chú ý pooling:"
+    },
+    {
+      "type": "math",
+      "latex": "(10.4.1)¶\\[\\mathbf{c}_{t'} = \\sum_{t=1}^T \\alpha(\\mathbf{s}_{t' - 1}, \\mathbf{h}_t) \\mathbf{h}_t,\\]"
+    },
+    {
+      "type": "paragraph",
+      "text": "trong đó bộ giải mã ẩn trạng thái \\(\\mathbf{s}_{t' - 1}\\) tại thời\nđiểm bước \\(t' - 1\\) là truy vấn và các trạng thái ẩn mã hóa \\(\\mathbf{h}_t\\) là cả các phím và giá trị, và trọng lượng chú ý \\(\\alpha\\) được tính như trong (10.3.2) bằng\ncách sử dụng chức năng chấm điểm chú ý phụ gia được xác định bởi (10.3.3) ."
+    },
+    {
+      "type": "paragraph",
+      "text": "Hơi khác so với kiến trúc mã hóa giải mã RNN vani trong Fig. 9.7.2 , kiến trúc tương tự với sự chú ý\nBahdanau được mô tả trong Fig. 10.4.1 ."
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/seq2seq-attention-details.svg",
+      "local_path": "_images/seq2seq-attention-details.svg",
+      "alt": "../_images/seq2seq-attention-details.svg"
+    },
+    {
+      "type": "paragraph",
+      "text": "Fig. 10.4.1 Layers in an RNN encoder-decoder model with Bahdanau attention. ¶"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "from mxnet import np, npx\nfrom mxnet.gluon import nn, rnn\nfrom d2l import mxnet as d2l\n\nnpx.set_np()"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "import torch\nfrom torch import nn\nfrom d2l import torch as d2l"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "import tensorflow as tf\nfrom d2l import tensorflow as d2l"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "xac-dinh-bo-giai-ma-voi-su-chu-y",
+      "text": "10.4.2. Xác định bộ giải mã với sự chú ý"
+    },
+    {
+      "type": "paragraph",
+      "text": "Để thực hiện bộ giải mã mã RNN với sự chú ý của Bahdanau, chúng ta chỉ\ncần xác định lại bộ giải mã. Để hình dung các trọng lượng chú ý đã học\nđược thuận tiện hơn, lớp AttentionDecoder sau định nghĩa giao diện\ncơ bản cho bộ giải mã với cơ chế chú ý."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "#@save\nclass AttentionDecoder(d2l.Decoder):\n    \"\"\"The base attention-based decoder interface.\"\"\"\n    def __init__(self, **kwargs):\n        super(AttentionDecoder, self).__init__(**kwargs)\n\n    @property\n    def attention_weights(self):\n        raise NotImplementedError"
+    },
+    {
+      "type": "paragraph",
+      "text": "Bây giờ chúng ta hãy triển khai bộ giải mã RNN với sự chú ý Bahdanau\ntrong lớp Seq2SeqAttentionDecoder sau. Trạng thái của bộ giải mã\nđược khởi tạo với (i) các trạng thái ẩn lớp cuối của bộ mã hóa ở tất cả\ncác bước thời gian (như các phím và giá trị của sự chú ý); (ii) bộ mã\nhóa tất cả các lớp ẩn trạng thái ở bước thời gian cuối cùng (để khởi tạo\ntrạng thái ẩn của bộ giải mã); và (iii) bộ mã hóa độ dài hợp lệ (để loại\ntrừ các thẻ đệm trong tập hợp chú ý). Tại mỗi bước thời gian giải mã,\ntrạng thái ẩn lớp cuối của bộ giải mã ở bước thời gian trước đó được sử\ndụng làm truy vấn của sự chú ý. Kết quả là, cả đầu ra chú ý và nhúng đầu\nvào được nối làm đầu vào của bộ giải mã RNN."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "class Seq2SeqAttentionDecoder(AttentionDecoder):\n    def __init__(self, vocab_size, embed_size, num_hiddens, num_layers,\n                 dropout=0, **kwargs):\n        super(Seq2SeqAttentionDecoder, self).__init__(**kwargs)\n        self.attention = d2l.AdditiveAttention(num_hiddens, dropout)\n        self.embedding = nn.Embedding(vocab_size, embed_size)\n        self.rnn = rnn.GRU(num_hiddens, num_layers, dropout=dropout)\n        self.dense = nn.Dense(vocab_size, flatten=False)\n\n    def init_state(self, enc_outputs, enc_valid_lens, *args):\n        # Shape of `outputs`: (`num_steps`, `batch_size`, `num_hiddens`).\n        # Shape of `hidden_state[0]`: (`num_layers`, `batch_size`,\n        # `num_hiddens`)\n        outputs, hidden_state = enc_outputs\n        return (outputs.swapaxes(0, 1), hidden_state, enc_valid_lens)\n\n    def forward(self, X, state):\n        # Shape of `enc_outputs`: (`batch_size`, `num_steps`, `num_hiddens`).\n        # Shape of `hidden_state[0]`: (`num_layers`, `batch_size`,\n        # `num_hiddens`)\n        enc_outputs, hidden_state, enc_valid_lens = state\n        # Shape of the output `X`: (`num_steps`, `batch_size`, `embed_size`)\n        X = self.embedding(X).swapaxes(0, 1)\n        outputs, self._attention_weights = [], []\n        for x in X:\n            # Shape of `query`: (`batch_size`, 1, `num_hiddens`)\n            query = np.expand_dims(hidden_state[0][-1], axis=1)\n            # Shape of `context`: (`batch_size`, 1, `num_hiddens`)\n            context = self.attention(\n                query, enc_outputs, enc_outputs, enc_valid_lens)\n            # Concatenate on the feature dimension\n            x = np.concatenate((context, np.expand_dims(x, axis=1)), axis=-1)\n            # Reshape `x` as (1, `batch_size`, `embed_size` + `num_hiddens`)\n            out, hidden_state = self.rnn(x.swapaxes(0, 1), hidden_state)\n            outputs.append(out)\n            self._attention_weights.append(self.attention.attention_weights)\n        # After fully-connected layer transformation, shape of `outputs`:\n        # (`num_steps`, `batch_size`, `vocab_size`)\n        outputs = self.dense(np.concatenate(outputs, axis=0))\n        return outputs.swapaxes(0, 1), [enc_outputs, hidden_state,\n                                        enc_valid_lens]\n\n    @property\n    def attention_weights(self):\n        return self._attention_weights"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "class Seq2SeqAttentionDecoder(AttentionDecoder):\n    def __init__(self, vocab_size, embed_size, num_hiddens, num_layers,\n                 dropout=0, **kwargs):\n        super(Seq2SeqAttentionDecoder, self).__init__(**kwargs)\n        self.attention = d2l.AdditiveAttention(\n            num_hiddens, num_hiddens, num_hiddens, dropout)\n        self.embedding = nn.Embedding(vocab_size, embed_size)\n        self.rnn = nn.GRU(\n            embed_size + num_hiddens, num_hiddens, num_layers,\n            dropout=dropout)\n        self.dense = nn.Linear(num_hiddens, vocab_size)\n\n    def init_state(self, enc_outputs, enc_valid_lens, *args):\n        # Shape of `outputs`: (`num_steps`, `batch_size`, `num_hiddens`).\n        # Shape of `hidden_state[0]`: (`num_layers`, `batch_size`,\n        # `num_hiddens`)\n        outputs, hidden_state = enc_outputs\n        return (outputs.permute(1, 0, 2), hidden_state, enc_valid_lens)\n\n    def forward(self, X, state):\n        # Shape of `enc_outputs`: (`batch_size`, `num_steps`, `num_hiddens`).\n        # Shape of `hidden_state[0]`: (`num_layers`, `batch_size`,\n        # `num_hiddens`)\n        enc_outputs, hidden_state, enc_valid_lens = state\n        # Shape of the output `X`: (`num_steps`, `batch_size`, `embed_size`)\n        X = self.embedding(X).permute(1, 0, 2)\n        outputs, self._attention_weights = [], []\n        for x in X:\n            # Shape of `query`: (`batch_size`, 1, `num_hiddens`)\n            query = torch.unsqueeze(hidden_state[-1], dim=1)\n            # Shape of `context`: (`batch_size`, 1, `num_hiddens`)\n            context = self.attention(\n                query, enc_outputs, enc_outputs, enc_valid_lens)\n            # Concatenate on the feature dimension\n            x = torch.cat((context, torch.unsqueeze(x, dim=1)), dim=-1)\n            # Reshape `x` as (1, `batch_size`, `embed_size` + `num_hiddens`)\n            out, hidden_state = self.rnn(x.permute(1, 0, 2), hidden_state)\n            outputs.append(out)\n            self._attention_weights.append(self.attention.attention_weights)\n        # After fully-connected layer transformation, shape of `outputs`:\n        # (`num_steps`, `batch_size`, `vocab_size`)\n        outputs = self.dense(torch.cat(outputs, dim=0))\n        return outputs.permute(1, 0, 2), [enc_outputs, hidden_state,\n                                          enc_valid_lens]\n\n    @property\n    def attention_weights(self):\n        return self._attention_weights"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "class Seq2SeqAttentionDecoder(AttentionDecoder):\n    def __init__(self, vocab_size, embed_size, num_hiddens, num_layers,\n                 dropout=0, **kwargs):\n        super().__init__(**kwargs)\n        self.attention = d2l.AdditiveAttention(num_hiddens, num_hiddens,\n                                               num_hiddens, dropout)\n        self.embedding = tf.keras.layers.Embedding(vocab_size, embed_size)\n        self.rnn = tf.keras.layers.RNN(tf.keras.layers.StackedRNNCells(\n            [tf.keras.layers.GRUCell(num_hiddens, dropout=dropout)\n             for _ in range(num_layers)]),\n                                      return_sequences=True, return_state=True)\n        self.dense = tf.keras.layers.Dense(vocab_size)\n\n    def init_state(self, enc_outputs, enc_valid_lens, *args):\n        # Shape of `outputs`: (`batch_size`, `num_steps`, `num_hiddens`).\n        # Shape of `hidden_state[0]`: (`num_layers`, `batch_size`, `num_hiddens`)\n        outputs, hidden_state = enc_outputs\n        return (outputs, hidden_state, enc_valid_lens)\n\n    def call(self, X, state, **kwargs):\n        # Shape of `enc_outputs`: (`batch_size`, `num_steps`, `num_hiddens`).\n        # Shape of `hidden_state[0]`: (`num_layers`, `batch_size`, `num_hiddens`)\n        enc_outputs, hidden_state, enc_valid_lens = state\n        # Shape of the output `X`: (`num_steps`, `batch_size`, `embed_size`)\n        X = self.embedding(X) # Input `X` has shape: (`batch_size`, `num_steps`)\n        X = tf.transpose(X, perm=(1, 0, 2))\n        outputs, self._attention_weights = [], []\n        for x in X:\n            # Shape of `query`: (`batch_size`, 1, `num_hiddens`)\n            query = tf.expand_dims(hidden_state[-1], axis=1)\n            # Shape of `context`: (`batch_size, 1, `num_hiddens`)\n            context = self.attention(query, enc_outputs, enc_outputs,\n                                     enc_valid_lens, **kwargs)\n            # Concatenate on the feature dimension\n            x = tf.concat((context, tf.expand_dims(x, axis=1)), axis=-1)\n            out = self.rnn(x, hidden_state, **kwargs)\n            hidden_state = out[1:]\n            outputs.append(out[0])\n            self._attention_weights.append(self.attention.attention_weights)\n        # After fully-connected layer transformation, shape of `outputs`:\n        # (`batch_size`, `num_steps`, `vocab_size`)\n        outputs = self.dense(tf.concat(outputs, axis=1))\n        return outputs, [enc_outputs, hidden_state, enc_valid_lens]\n\n    @property\n    def attention_weights(self):\n        return self._attention_weights"
+    },
+    {
+      "type": "paragraph",
+      "text": "Sau đây, chúng tôi test the implemented decoder với Bahdanau chú ý sử\ndụng một minibatch gồm 4 chuỗi đầu vào của 7 bước thời gian."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "encoder = d2l.Seq2SeqEncoder(vocab_size=10, embed_size=8, num_hiddens=16,\n                             num_layers=2)\nencoder.initialize()\ndecoder = Seq2SeqAttentionDecoder(vocab_size=10, embed_size=8, num_hiddens=16,\n                                  num_layers=2)\ndecoder.initialize()\nX = np.zeros((4, 7))  # (`batch_size`, `num_steps`)\nstate = decoder.init_state(encoder(X), None)\noutput, state = decoder(X, state)\noutput.shape, len(state), state[0].shape, len(state[1]), state[1][0].shape"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "((4, 7, 10), 3, (4, 7, 16), 1, (2, 4, 16))"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "encoder = d2l.Seq2SeqEncoder(vocab_size=10, embed_size=8, num_hiddens=16,\n                             num_layers=2)\nencoder.eval()\ndecoder = Seq2SeqAttentionDecoder(vocab_size=10, embed_size=8, num_hiddens=16,\n                                  num_layers=2)\ndecoder.eval()\nX = torch.zeros((4, 7), dtype=torch.long)  # (`batch_size`, `num_steps`)\nstate = decoder.init_state(encoder(X), None)\noutput, state = decoder(X, state)\noutput.shape, len(state), state[0].shape, len(state[1]), state[1][0].shape"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "(torch.Size([4, 7, 10]), 3, torch.Size([4, 7, 16]), 2, torch.Size([4, 16]))"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "encoder = d2l.Seq2SeqEncoder(vocab_size=10, embed_size=8, num_hiddens=16,\n                             num_layers=2)\ndecoder = Seq2SeqAttentionDecoder(vocab_size=10, embed_size=8, num_hiddens=16,\n                                  num_layers=2)\nX = tf.zeros((4, 7))\nstate = decoder.init_state(encoder(X, training=False), None)\noutput, state = decoder(X, state, training=False)\noutput.shape, len(state), state[0].shape, len(state[1]), state[1][0].shape"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "(TensorShape([4, 7, 10]), 3, TensorShape([4, 7, 16]), 2, TensorShape([4, 16]))"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "dao-tao",
+      "text": "10.4.3. Đào tạo"
+    },
+    {
+      "type": "paragraph",
+      "text": "Tương tự như Section 9.7.4 , ở đây chúng tôi chỉ định\nhyperparemeters, khởi tạo bộ mã hóa và bộ giải mã với sự chú ý của\nBahdanau và đào tạo mô hình này để dịch máy. Do cơ chế chú ý mới được\nthêm vào, việc đào tạo này chậm hơn nhiều so với năm Section 9.7.4 mà không có cơ chế chú ý."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "embed_size, num_hiddens, num_layers, dropout = 32, 32, 2, 0.1\nbatch_size, num_steps = 64, 10\nlr, num_epochs, device = 0.005, 250, d2l.try_gpu()\n\ntrain_iter, src_vocab, tgt_vocab = d2l.load_data_nmt(batch_size, num_steps)\nencoder = d2l.Seq2SeqEncoder(\n    len(src_vocab), embed_size, num_hiddens, num_layers, dropout)\ndecoder = Seq2SeqAttentionDecoder(\n    len(tgt_vocab), embed_size, num_hiddens, num_layers, dropout)\nnet = d2l.EncoderDecoder(encoder, decoder)\nd2l.train_seq2seq(net, train_iter, lr, num_epochs, tgt_vocab, device)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "loss 0.025, 2888.8 tokens/sec on gpu(0)"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_bahdanau-attention_7f08d9_41_1.svg",
+      "local_path": "_images/output_bahdanau-attention_7f08d9_41_1.svg",
+      "alt": "../_images/output_bahdanau-attention_7f08d9_41_1.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "embed_size, num_hiddens, num_layers, dropout = 32, 32, 2, 0.1\nbatch_size, num_steps = 64, 10\nlr, num_epochs, device = 0.005, 250, d2l.try_gpu()\n\ntrain_iter, src_vocab, tgt_vocab = d2l.load_data_nmt(batch_size, num_steps)\nencoder = d2l.Seq2SeqEncoder(\n    len(src_vocab), embed_size, num_hiddens, num_layers, dropout)\ndecoder = Seq2SeqAttentionDecoder(\n    len(tgt_vocab), embed_size, num_hiddens, num_layers, dropout)\nnet = d2l.EncoderDecoder(encoder, decoder)\nd2l.train_seq2seq(net, train_iter, lr, num_epochs, tgt_vocab, device)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "loss 0.020, 5580.3 tokens/sec on cuda:0"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_bahdanau-attention_7f08d9_44_1.svg",
+      "local_path": "_images/output_bahdanau-attention_7f08d9_44_1.svg",
+      "alt": "../_images/output_bahdanau-attention_7f08d9_44_1.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "embed_size, num_hiddens, num_layers, dropout = 32, 32, 2, 0.1\nbatch_size, num_steps = 64, 10\nlr, num_epochs, device = 0.005, 250, d2l.try_gpu()\n\ntrain_iter, src_vocab, tgt_vocab = d2l.load_data_nmt(batch_size, num_steps)\nencoder = d2l.Seq2SeqEncoder(\n    len(src_vocab), embed_size, num_hiddens, num_layers, dropout)\ndecoder = Seq2SeqAttentionDecoder(\n    len(tgt_vocab), embed_size, num_hiddens, num_layers, dropout)\nnet = d2l.EncoderDecoder(encoder, decoder)\nd2l.train_seq2seq(net, train_iter, lr, num_epochs, tgt_vocab, device)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "loss 0.028, 510.3 tokens/sec on <tensorflow.python.eager.context._EagerDeviceContext object at 0x7f9a391bf880>"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_bahdanau-attention_7f08d9_47_1.svg",
+      "local_path": "_images/output_bahdanau-attention_7f08d9_47_1.svg",
+      "alt": "../_images/output_bahdanau-attention_7f08d9_47_1.svg"
+    },
+    {
+      "type": "paragraph",
+      "text": "Sau khi mô hình được đào tạo, chúng tôi sử dụng nó để dịch một vài câu\ntiếng Anh sang tiếng Pháp và tính điểm BLEU của họ."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "engs = ['go .', \"i lost .\", 'he\\'s calm .', 'i\\'m home .']\nfras = ['va !', 'j\\'ai perdu .', 'il est calme .', 'je suis chez moi .']\nfor eng, fra in zip(engs, fras):\n    translation, dec_attention_weight_seq = d2l.predict_seq2seq(\n        net, eng, src_vocab, tgt_vocab, num_steps, device, True)\n    print(f'{eng} => {translation}, ',\n          f'bleu {d2l.bleu(translation, fra, k=2):.3f}')"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "go . => va !,  bleu 1.000\ni lost . => j'ai perdu .,  bleu 1.000\nhe's calm . => il est riche .,  bleu 0.658\ni'm home . => je suis chez moi .,  bleu 1.000"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "attention_weights = np.concatenate([step[0][0][0] for step in dec_attention_weight_seq], 0\n    ).reshape((1, 1, -1, num_steps))"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "engs = ['go .', \"i lost .\", 'he\\'s calm .', 'i\\'m home .']\nfras = ['va !', 'j\\'ai perdu .', 'il est calme .', 'je suis chez moi .']\nfor eng, fra in zip(engs, fras):\n    translation, dec_attention_weight_seq = d2l.predict_seq2seq(\n        net, eng, src_vocab, tgt_vocab, num_steps, device, True)\n    print(f'{eng} => {translation}, ',\n          f'bleu {d2l.bleu(translation, fra, k=2):.3f}')"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "go . => va !,  bleu 1.000\ni lost . => j'ai perdu .,  bleu 1.000\nhe's calm . => il est riche .,  bleu 0.658\ni'm home . => je suis chez moi .,  bleu 1.000"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "attention_weights = torch.cat([step[0][0][0] for step in dec_attention_weight_seq], 0).reshape((\n    1, 1, -1, num_steps))"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "engs = ['go .', \"i lost .\", 'he\\'s calm .', 'i\\'m home .']\nfras = ['va !', 'j\\'ai perdu .', 'il est calme .', 'je suis chez moi .']\nfor eng, fra in zip(engs, fras):\n    translation, dec_attention_weight_seq = d2l.predict_seq2seq(\n        net, eng, src_vocab, tgt_vocab, num_steps, True)\n    print(f'{eng} => {translation}, ',\n          f'bleu {d2l.bleu(translation, fra, k=2):.3f}')"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "go . => va !,  bleu 1.000\ni lost . => j'ai perdu .,  bleu 1.000\nhe's calm . => il est <unk> .,  bleu 0.658\ni'm home . => je suis calme .,  bleu 0.512"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "attention_weights = tf.reshape(\n    tf.concat([step[0][0][0] for step in dec_attention_weight_seq], 0),\n    (1, 1, -1, num_steps))"
+    },
+    {
+      "type": "paragraph",
+      "text": "Bằng cách visualizing the attention weights khi dịch câu tiếng Anh cuối\ncùng, chúng ta có thể thấy rằng mỗi truy vấn gán trọng lượng không thống\nnhất trên các cặp key-value. Nó cho thấy ở mỗi bước giải mã, các phần\nkhác nhau của chuỗi đầu vào được tổng hợp một cách chọn lọc trong tập\nhợp sự chú ý."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "# Plus one to include the end-of-sequence token\nd2l.show_heatmaps(\n    attention_weights[:, :, :, :len(engs[-1].split()) + 1],\n    xlabel='Key positions', ylabel='Query positions')"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_bahdanau-attention_7f08d9_68_0.svg",
+      "local_path": "_images/output_bahdanau-attention_7f08d9_68_0.svg",
+      "alt": "../_images/output_bahdanau-attention_7f08d9_68_0.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "# Plus one to include the end-of-sequence token\nd2l.show_heatmaps(\n    attention_weights[:, :, :, :len(engs[-1].split()) + 1].cpu(),\n    xlabel='Key positions', ylabel='Query positions')"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_bahdanau-attention_7f08d9_71_0.svg",
+      "local_path": "_images/output_bahdanau-attention_7f08d9_71_0.svg",
+      "alt": "../_images/output_bahdanau-attention_7f08d9_71_0.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "# Plus one to include the end-of-sequence token\nd2l.show_heatmaps(attention_weights[:, :, :, :len(engs[-1].split()) + 1],\n                  xlabel='Key posistions', ylabel='Query posistions')"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_bahdanau-attention_7f08d9_74_0.svg",
+      "local_path": "_images/output_bahdanau-attention_7f08d9_74_0.svg",
+      "alt": "../_images/output_bahdanau-attention_7f08d9_74_0.svg"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tom-tat",
+      "text": "10.4.4. Tóm tắt"
+    },
+    {
+      "type": "list",
+      "ordered": false,
+      "items": [
+        "Khi dự đoán một mã thông báo, nếu không phải tất cả các mã thông báo\nđầu vào đều có liên quan, bộ giải mã RNN với sự chú ý Bahdanau tập\nhợp chọn lọc các phần khác nhau của chuỗi đầu vào. Điều này đạt được\nbằng cách coi biến ngữ cảnh như một đầu ra của sự chú ý phụ gia tập\nhợp.",
+        "Trong bộ giải mã RNN, sự chú ý Bahdanau xử lý trạng thái ẩn bộ giải\nmã ở bước thời gian trước như truy vấn và các trạng thái ẩn mã hóa ở\ntất cả các bước thời gian như cả các phím và giá trị."
+      ]
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bai-tap",
+      "text": "10.4.5. Bài tập"
+    },
+    {
+      "type": "list",
+      "ordered": true,
+      "items": [
+        "Thay thế GRU bằng LSTM trong thí nghiệm.",
+        "Sửa đổi thí nghiệm để thay thế chức năng chấm điểm sự chú ý phụ gia\nbằng sản phẩm điểm thu nhỏ. Làm thế nào để nó ảnh hưởng đến hiệu quả\nđào tạo?"
+      ]
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    }
+  ],
+  "images": [
+    {
+      "original_url": "https://vi.d2l.ai/_images/seq2seq-attention-details.svg",
+      "local_path": "_images/seq2seq-attention-details.svg",
+      "alt": "../_images/seq2seq-attention-details.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_bahdanau-attention_7f08d9_41_1.svg",
+      "local_path": "_images/output_bahdanau-attention_7f08d9_41_1.svg",
+      "alt": "../_images/output_bahdanau-attention_7f08d9_41_1.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_bahdanau-attention_7f08d9_44_1.svg",
+      "local_path": "_images/output_bahdanau-attention_7f08d9_44_1.svg",
+      "alt": "../_images/output_bahdanau-attention_7f08d9_44_1.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_bahdanau-attention_7f08d9_47_1.svg",
+      "local_path": "_images/output_bahdanau-attention_7f08d9_47_1.svg",
+      "alt": "../_images/output_bahdanau-attention_7f08d9_47_1.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_bahdanau-attention_7f08d9_68_0.svg",
+      "local_path": "_images/output_bahdanau-attention_7f08d9_68_0.svg",
+      "alt": "../_images/output_bahdanau-attention_7f08d9_68_0.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_bahdanau-attention_7f08d9_71_0.svg",
+      "local_path": "_images/output_bahdanau-attention_7f08d9_71_0.svg",
+      "alt": "../_images/output_bahdanau-attention_7f08d9_71_0.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_bahdanau-attention_7f08d9_74_0.svg",
+      "local_path": "_images/output_bahdanau-attention_7f08d9_74_0.svg",
+      "alt": "../_images/output_bahdanau-attention_7f08d9_74_0.svg"
+    }
+  ],
+  "text": "10.4. Bahdanau Chú ý\nChúng tôi đã nghiên cứu vấn đề dịch máy trong Section 9.7 ,\nnơi chúng tôi thiết kế một kiến trúc bộ mã hóa-giải mã dựa trên hai RNNs\ncho trình tự để học trình tự. Cụ thể, bộ mã hóa RNN biến một chuỗi có độ\ndài biến đổi thành một biến ngữ cảnh hình dạng cố định, sau đó bộ giải\nmã RNN tạo ra mã thông báo chuỗi đầu ra (mục tiêu) theo mã thông báo dựa\ntrên các token được tạo ra và biến ngữ cảnh. Tuy nhiên, mặc dù không\nphải tất cả các mã thông báo đầu vào (nguồn) đều hữu ích cho việc giải\nmã một mã thông báo nhất định, biến ngữ cảnh same mã hóa toàn bộ chuỗi\nđầu vào vẫn được sử dụng ở mỗi bước giải mã.\nTrong một thách thức riêng biệt nhưng liên quan về thế hệ chữ viết tay\ncho một chuỗi văn bản nhất định, Graves đã thiết kế một mô hình chú ý\nkhác biệt để căn chỉnh các ký tự văn bản với dấu vết bút dài hơn nhiều,\ntrong đó căn chỉnh chỉ di chuyển theo một hướng [Graves.2013] .\nLấy cảm hứng từ ý tưởng học cách căn chỉnh, Bahdanau et al. đề xuất một\nmô hình chú ý khác biệt mà không có giới hạn liên kết một chiều nghiêm\ntrọng [Bahdanau et al., 2014] . Khi dự đoán một mã thông báo,\nnếu không phải tất cả các token đầu vào đều có liên quan, mô hình sẽ căn\nchỉnh (hoặc tham dự) chỉ với các phần của chuỗi đầu vào có liên quan đến\ndự đoán hiện tại. Điều này đạt được bằng cách coi biến ngữ cảnh như một\nđầu ra của sự chú ý pooling.\n10.4.1. Mô hình\nKhi mô tả sự chú ý của Bahdanau cho bộ giải mã RNN bên dưới, chúng tôi\nsẽ làm theo cùng một ký hiệu trong Section 9.7 . Mô hình dựa\ntrên sự chú ý mới giống như trong Section 9.7 ngoại trừ biến\nngữ cảnh \\(\\mathbf{c}\\) trong (9.7.3) được thay\nthế bằng \\(\\mathbf{c}_{t'}\\) tại bất kỳ bước thời gian giải mã nào \\(t'\\) . Giả sử có \\(T\\) token trong chuỗi đầu vào, biến ngữ cảnh\ntại bước thời gian giải mã \\(t'\\) là đầu ra của sự chú ý pooling:\ntrong đó bộ giải mã ẩn trạng thái \\(\\mathbf{s}_{t' - 1}\\) tại thời\nđiểm bước \\(t' - 1\\) là truy vấn và các trạng thái ẩn mã hóa \\(\\mathbf{h}_t\\) là cả các phím và giá trị, và trọng lượng chú ý \\(\\alpha\\) được tính như trong (10.3.2) bằng\ncách sử dụng chức năng chấm điểm chú ý phụ gia được xác định bởi (10.3.3) .\nHơi khác so với kiến trúc mã hóa giải mã RNN vani trong Fig. 9.7.2 , kiến trúc tương tự với sự chú ý\nBahdanau được mô tả trong Fig. 10.4.1 .\nFig. 10.4.1 Layers in an RNN encoder-decoder model with Bahdanau attention. ¶\n10.4.2. Xác định bộ giải mã với sự chú ý\nĐể thực hiện bộ giải mã mã RNN với sự chú ý của Bahdanau, chúng ta chỉ\ncần xác định lại bộ giải mã. Để hình dung các trọng lượng chú ý đã học\nđược thuận tiện hơn, lớp AttentionDecoder sau định nghĩa giao diện\ncơ bản cho bộ giải mã với cơ chế chú ý.\nBây giờ chúng ta hãy triển khai bộ giải mã RNN với sự chú ý Bahdanau\ntrong lớp Seq2SeqAttentionDecoder sau. Trạng thái của bộ giải mã\nđược khởi tạo với (i) các trạng thái ẩn lớp cuối của bộ mã hóa ở tất cả\ncác bước thời gian (như các phím và giá trị của sự chú ý); (ii) bộ mã\nhóa tất cả các lớp ẩn trạng thái ở bước thời gian cuối cùng (để khởi tạo\ntrạng thái ẩn của bộ giải mã); và (iii) bộ mã hóa độ dài hợp lệ (để loại\ntrừ các thẻ đệm trong tập hợp chú ý). Tại mỗi bước thời gian giải mã,\ntrạng thái ẩn lớp cuối của bộ giải mã ở bước thời gian trước đó được sử\ndụng làm truy vấn của sự chú ý. Kết quả là, cả đầu ra chú ý và nhúng đầu\nvào được nối làm đầu vào của bộ giải mã RNN.\nSau đây, chúng tôi test the implemented decoder với Bahdanau chú ý sử\ndụng một minibatch gồm 4 chuỗi đầu vào của 7 bước thời gian.\n10.4.3. Đào tạo\nTương tự như Section 9.7.4 , ở đây chúng tôi chỉ định\nhyperparemeters, khởi tạo bộ mã hóa và bộ giải mã với sự chú ý của\nBahdanau và đào tạo mô hình này để dịch máy. Do cơ chế chú ý mới được\nthêm vào, việc đào tạo này chậm hơn nhiều so với năm Section 9.7.4 mà không có cơ chế chú ý.\nSau khi mô hình được đào tạo, chúng tôi sử dụng nó để dịch một vài câu\ntiếng Anh sang tiếng Pháp và tính điểm BLEU của họ.\nBằng cách visualizing the attention weights khi dịch câu tiếng Anh cuối\ncùng, chúng ta có thể thấy rằng mỗi truy vấn gán trọng lượng không thống\nnhất trên các cặp key-value. Nó cho thấy ở mỗi bước giải mã, các phần\nkhác nhau của chuỗi đầu vào được tổng hợp một cách chọn lọc trong tập\nhợp sự chú ý.\n10.4.4. Tóm tắt\nKhi dự đoán một mã thông báo, nếu không phải tất cả các mã thông báo\nđầu vào đều có liên quan, bộ giải mã RNN với sự chú ý Bahdanau tập\nhợp chọn lọc các phần khác nhau của chuỗi đầu vào. Điều này đạt được\nbằng cách coi biến ngữ cảnh như một đầu ra của sự chú ý phụ gia tập\nhợp.\nTrong bộ giải mã RNN, sự chú ý Bahdanau xử lý trạng thái ẩn bộ giải\nmã ở bước thời gian trước như truy vấn và các trạng thái ẩn mã hóa ở\ntất cả các bước thời gian như cả các phím và giá trị.\n10.4.5. Bài tập\nThay thế GRU bằng LSTM trong thí nghiệm.\nSửa đổi thí nghiệm để thay thế chức năng chấm điểm sự chú ý phụ gia\nbằng sản phẩm điểm thu nhỏ. Làm thế nào để nó ảnh hưởng đến hiệu quả\nđào tạo?\nDiscussions\nDiscussions"
+}

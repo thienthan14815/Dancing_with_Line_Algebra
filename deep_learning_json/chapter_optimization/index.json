@@ -1,0 +1,111 @@
+{
+  "url": "https://vi.d2l.ai/chapter_optimization/index.html",
+  "chapter": "chapter_optimization",
+  "title": "11. Thuật toán tối ưu hóa",
+  "crawled_at": "2026-07-20T12:40:18.551664+00:00",
+  "headings": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "thuat-toan-toi-uu-hoa",
+      "text": "11. Thuật toán tối ưu hóa"
+    }
+  ],
+  "content": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "thuat-toan-toi-uu-hoa",
+      "text": "11. Thuật toán tối ưu hóa"
+    },
+    {
+      "type": "paragraph",
+      "text": "Nếu bạn đọc cuốn sách theo thứ tự cho đến thời điểm này, bạn đã sử dụng\nmột số thuật toán tối ưu hóa để đào tạo các mô hình học sâu. Chúng là\nnhững công cụ cho phép chúng tôi tiếp tục cập nhật các tham số mô hình\nvà giảm thiểu giá trị của chức năng mất mát, như được đánh giá trên bộ\nđào tạo. Thật vậy, bất kỳ ai nội dung với việc xử lý tối ưu hóa như một\nthiết bị hộp đen để giảm thiểu các chức năng khách quan trong một cài\nđặt đơn giản cũng có thể nội dung chính mình với kiến thức rằng tồn tại\nmột loạt các câu thần chú của một thủ tục như vậy (với tên như “SGD” và\n“Adam”)."
+    },
+    {
+      "type": "paragraph",
+      "text": "Tuy nhiên, để làm tốt, một số kiến thức sâu hơn là bắt buộc. Thuật toán\ntối ưu hóa rất quan trọng đối với việc học sâu. Một mặt, đào tạo một mô\nhình học sâu phức tạp có thể mất hàng giờ, ngày hoặc thậm chí vài tuần.\nHiệu suất của thuật toán tối ưu hóa ảnh hưởng trực tiếp đến hiệu quả đào\ntạo của mô hình. Mặt khác, việc hiểu các nguyên tắc của các thuật toán\ntối ưu hóa khác nhau và vai trò của các siêu tham số của chúng sẽ cho\nphép chúng ta điều chỉnh các siêu tham số theo cách nhắm mục tiêu để cải\nthiện hiệu suất của các mô hình học sâu."
+    },
+    {
+      "type": "paragraph",
+      "text": "Trong chương này, chúng tôi khám phá các thuật toán tối ưu hóa học sâu\nphổ biến trong chuyên sâu. Hầu như tất cả các vấn đề tối ưu hóa phát\nsinh trong học sâu đều là * nonconvex * . Tuy nhiên, việc thiết kế và\nphân tích các thuật toán trong bối cảnh các bài toán * lồi đã được chứng\nminh là rất hướng dẫn. Chính vì lý do đó mà chương này bao gồm một mồi\nvề tối ưu hóa lồi và bằng chứng cho một thuật toán gốc gradient ngẫu\nnhiên rất đơn giản trên một chức năng khách quan lồi."
+    },
+    {
+      "type": "list",
+      "ordered": false,
+      "items": [
+        "11.1. Tối ưu hóa và học sâu 11.1.1. Mục tiêu tối ưu hóa 11.1.2. Tối ưu hóa thách thức trong Deep Learning 11.1.3. Tóm tắt 11.1.4. Bài tập",
+        "11.1.1. Mục tiêu tối ưu hóa",
+        "11.1.2. Tối ưu hóa thách thức trong Deep Learning",
+        "11.1.3. Tóm tắt",
+        "11.1.4. Bài tập",
+        "11.2. Độ lồi 11.2.1. Định nghĩa 11.2.2. Thuộc tính 11.2.3. Ràng buộc 11.2.4. Tóm tắt 11.2.5. Bài tập",
+        "11.2.1. Định nghĩa",
+        "11.2.2. Thuộc tính",
+        "11.2.3. Ràng buộc",
+        "11.2.4. Tóm tắt",
+        "11.2.5. Bài tập",
+        "11.3. Gradient Descent 11.3.1. Một chiều Gradient Descent 11.3.2. Đa biến Gradient Descent 11.3.3. Phương pháp thích ứng 11.3.4. Tóm tắt 11.3.5. Bài tập",
+        "11.3.1. Một chiều Gradient Descent",
+        "11.3.2. Đa biến Gradient Descent",
+        "11.3.3. Phương pháp thích ứng",
+        "11.3.4. Tóm tắt",
+        "11.3.5. Bài tập",
+        "11.4. Stochastic Gradient Descent 11.4.1. Stochastic Gradient Những Thông Tin Cập Nhập 11.4.2. Tốc độ học động 11.4.3. Phân tích hội tụ cho mục tiêu lồi 11.4.4. Gradient Stochastic và mẫu hữu hạn 11.4.5. Tóm tắt 11.4.6. Bài tập",
+        "11.4.1. Stochastic Gradient Những Thông Tin Cập Nhập",
+        "11.4.2. Tốc độ học động",
+        "11.4.3. Phân tích hội tụ cho mục tiêu lồi",
+        "11.4.4. Gradient Stochastic và mẫu hữu hạn",
+        "11.4.5. Tóm tắt",
+        "11.4.6. Bài tập",
+        "11.5. Minibatch Stochastic Gradient Descent 11.5.1. Vector hóa và bộ nhớ cache 11.5.2. Minibatches 11.5.3. Đọc tập dữ liệu 11.5.4. Thực hiện từ đầu 11.5.5. Thực hiện ngắn gọn 11.5.6. Tóm tắt 11.5.7. Bài tập",
+        "11.5.1. Vector hóa và bộ nhớ cache",
+        "11.5.2. Minibatches",
+        "11.5.3. Đọc tập dữ liệu",
+        "11.5.4. Thực hiện từ đầu",
+        "11.5.5. Thực hiện ngắn gọn",
+        "11.5.6. Tóm tắt",
+        "11.5.7. Bài tập",
+        "11.6. Đà 11.6.1. Khái niệm cơ bản 11.6.2. Các thí nghiệm thực tế 11.6.3. Phân tích lý thuyết 11.6.4. Tóm tắt 11.6.5. Bài tập",
+        "11.6.1. Khái niệm cơ bản",
+        "11.6.2. Các thí nghiệm thực tế",
+        "11.6.3. Phân tích lý thuyết",
+        "11.6.4. Tóm tắt",
+        "11.6.5. Bài tập",
+        "11.7. Adagrad 11.7.1. Tính năng thưa thớt và tỷ lệ học tập 11.7.2. Điều hòa trước 11.7.3. Các thuật toán 11.7.4. Thực hiện từ đầu 11.7.5. Thực hiện ngắn gọn 11.7.6. Tóm tắt 11.7.7. Bài tập",
+        "11.7.1. Tính năng thưa thớt và tỷ lệ học tập",
+        "11.7.2. Điều hòa trước",
+        "11.7.3. Các thuật toán",
+        "11.7.4. Thực hiện từ đầu",
+        "11.7.5. Thực hiện ngắn gọn",
+        "11.7.6. Tóm tắt",
+        "11.7.7. Bài tập",
+        "11.8. RMSProp 11.8.1. Các thuật toán 11.8.2. Thực hiện từ đầu 11.8.3. Thực hiện ngắn gọn 11.8.4. Tóm tắt 11.8.5. Bài tập",
+        "11.8.1. Các thuật toán",
+        "11.8.2. Thực hiện từ đầu",
+        "11.8.3. Thực hiện ngắn gọn",
+        "11.8.4. Tóm tắt",
+        "11.8.5. Bài tập",
+        "11.9. Adadelta 11.9.1. Các thuật toán 11.9.2. Thực hiện 11.9.3. Tóm tắt 11.9.4. Bài tập",
+        "11.9.1. Các thuật toán",
+        "11.9.2. Thực hiện",
+        "11.9.3. Tóm tắt",
+        "11.9.4. Bài tập",
+        "11.10. Ađam 11.10.1. Các thuật toán 11.10.2. Thực hiện 11.10.3. Yogi 11.10.4. Tóm tắt 11.10.5. Bài tập",
+        "11.10.1. Các thuật toán",
+        "11.10.2. Thực hiện",
+        "11.10.3. Yogi",
+        "11.10.4. Tóm tắt",
+        "11.10.5. Bài tập",
+        "11.11. Lập kế hoạch tỷ lệ học tập 11.11.1. Vấn đề Toy 11.11.2. Người lập lịch 11.11.3. Chính sách 11.11.4. Tóm tắt 11.11.5. Bài tập",
+        "11.11.1. Vấn đề Toy",
+        "11.11.2. Người lập lịch",
+        "11.11.3. Chính sách",
+        "11.11.4. Tóm tắt",
+        "11.11.5. Bài tập"
+      ]
+    }
+  ],
+  "images": [],
+  "text": "11. Thuật toán tối ưu hóa\nNếu bạn đọc cuốn sách theo thứ tự cho đến thời điểm này, bạn đã sử dụng\nmột số thuật toán tối ưu hóa để đào tạo các mô hình học sâu. Chúng là\nnhững công cụ cho phép chúng tôi tiếp tục cập nhật các tham số mô hình\nvà giảm thiểu giá trị của chức năng mất mát, như được đánh giá trên bộ\nđào tạo. Thật vậy, bất kỳ ai nội dung với việc xử lý tối ưu hóa như một\nthiết bị hộp đen để giảm thiểu các chức năng khách quan trong một cài\nđặt đơn giản cũng có thể nội dung chính mình với kiến thức rằng tồn tại\nmột loạt các câu thần chú của một thủ tục như vậy (với tên như “SGD” và\n“Adam”).\nTuy nhiên, để làm tốt, một số kiến thức sâu hơn là bắt buộc. Thuật toán\ntối ưu hóa rất quan trọng đối với việc học sâu. Một mặt, đào tạo một mô\nhình học sâu phức tạp có thể mất hàng giờ, ngày hoặc thậm chí vài tuần.\nHiệu suất của thuật toán tối ưu hóa ảnh hưởng trực tiếp đến hiệu quả đào\ntạo của mô hình. Mặt khác, việc hiểu các nguyên tắc của các thuật toán\ntối ưu hóa khác nhau và vai trò của các siêu tham số của chúng sẽ cho\nphép chúng ta điều chỉnh các siêu tham số theo cách nhắm mục tiêu để cải\nthiện hiệu suất của các mô hình học sâu.\nTrong chương này, chúng tôi khám phá các thuật toán tối ưu hóa học sâu\nphổ biến trong chuyên sâu. Hầu như tất cả các vấn đề tối ưu hóa phát\nsinh trong học sâu đều là * nonconvex * . Tuy nhiên, việc thiết kế và\nphân tích các thuật toán trong bối cảnh các bài toán * lồi đã được chứng\nminh là rất hướng dẫn. Chính vì lý do đó mà chương này bao gồm một mồi\nvề tối ưu hóa lồi và bằng chứng cho một thuật toán gốc gradient ngẫu\nnhiên rất đơn giản trên một chức năng khách quan lồi.\n11.1. Tối ưu hóa và học sâu 11.1.1. Mục tiêu tối ưu hóa 11.1.2. Tối ưu hóa thách thức trong Deep Learning 11.1.3. Tóm tắt 11.1.4. Bài tập\n11.1.1. Mục tiêu tối ưu hóa\n11.1.2. Tối ưu hóa thách thức trong Deep Learning\n11.1.3. Tóm tắt\n11.1.4. Bài tập\n11.2. Độ lồi 11.2.1. Định nghĩa 11.2.2. Thuộc tính 11.2.3. Ràng buộc 11.2.4. Tóm tắt 11.2.5. Bài tập\n11.2.1. Định nghĩa\n11.2.2. Thuộc tính\n11.2.3. Ràng buộc\n11.2.4. Tóm tắt\n11.2.5. Bài tập\n11.3. Gradient Descent 11.3.1. Một chiều Gradient Descent 11.3.2. Đa biến Gradient Descent 11.3.3. Phương pháp thích ứng 11.3.4. Tóm tắt 11.3.5. Bài tập\n11.3.1. Một chiều Gradient Descent\n11.3.2. Đa biến Gradient Descent\n11.3.3. Phương pháp thích ứng\n11.3.4. Tóm tắt\n11.3.5. Bài tập\n11.4. Stochastic Gradient Descent 11.4.1. Stochastic Gradient Những Thông Tin Cập Nhập 11.4.2. Tốc độ học động 11.4.3. Phân tích hội tụ cho mục tiêu lồi 11.4.4. Gradient Stochastic và mẫu hữu hạn 11.4.5. Tóm tắt 11.4.6. Bài tập\n11.4.1. Stochastic Gradient Những Thông Tin Cập Nhập\n11.4.2. Tốc độ học động\n11.4.3. Phân tích hội tụ cho mục tiêu lồi\n11.4.4. Gradient Stochastic và mẫu hữu hạn\n11.4.5. Tóm tắt\n11.4.6. Bài tập\n11.5. Minibatch Stochastic Gradient Descent 11.5.1. Vector hóa và bộ nhớ cache 11.5.2. Minibatches 11.5.3. Đọc tập dữ liệu 11.5.4. Thực hiện từ đầu 11.5.5. Thực hiện ngắn gọn 11.5.6. Tóm tắt 11.5.7. Bài tập\n11.5.1. Vector hóa và bộ nhớ cache\n11.5.2. Minibatches\n11.5.3. Đọc tập dữ liệu\n11.5.4. Thực hiện từ đầu\n11.5.5. Thực hiện ngắn gọn\n11.5.6. Tóm tắt\n11.5.7. Bài tập\n11.6. Đà 11.6.1. Khái niệm cơ bản 11.6.2. Các thí nghiệm thực tế 11.6.3. Phân tích lý thuyết 11.6.4. Tóm tắt 11.6.5. Bài tập\n11.6.1. Khái niệm cơ bản\n11.6.2. Các thí nghiệm thực tế\n11.6.3. Phân tích lý thuyết\n11.6.4. Tóm tắt\n11.6.5. Bài tập\n11.7. Adagrad 11.7.1. Tính năng thưa thớt và tỷ lệ học tập 11.7.2. Điều hòa trước 11.7.3. Các thuật toán 11.7.4. Thực hiện từ đầu 11.7.5. Thực hiện ngắn gọn 11.7.6. Tóm tắt 11.7.7. Bài tập\n11.7.1. Tính năng thưa thớt và tỷ lệ học tập\n11.7.2. Điều hòa trước\n11.7.3. Các thuật toán\n11.7.4. Thực hiện từ đầu\n11.7.5. Thực hiện ngắn gọn\n11.7.6. Tóm tắt\n11.7.7. Bài tập\n11.8. RMSProp 11.8.1. Các thuật toán 11.8.2. Thực hiện từ đầu 11.8.3. Thực hiện ngắn gọn 11.8.4. Tóm tắt 11.8.5. Bài tập\n11.8.1. Các thuật toán\n11.8.2. Thực hiện từ đầu\n11.8.3. Thực hiện ngắn gọn\n11.8.4. Tóm tắt\n11.8.5. Bài tập\n11.9. Adadelta 11.9.1. Các thuật toán 11.9.2. Thực hiện 11.9.3. Tóm tắt 11.9.4. Bài tập\n11.9.1. Các thuật toán\n11.9.2. Thực hiện\n11.9.3. Tóm tắt\n11.9.4. Bài tập\n11.10. Ađam 11.10.1. Các thuật toán 11.10.2. Thực hiện 11.10.3. Yogi 11.10.4. Tóm tắt 11.10.5. Bài tập\n11.10.1. Các thuật toán\n11.10.2. Thực hiện\n11.10.3. Yogi\n11.10.4. Tóm tắt\n11.10.5. Bài tập\n11.11. Lập kế hoạch tỷ lệ học tập 11.11.1. Vấn đề Toy 11.11.2. Người lập lịch 11.11.3. Chính sách 11.11.4. Tóm tắt 11.11.5. Bài tập\n11.11.1. Vấn đề Toy\n11.11.2. Người lập lịch\n11.11.3. Chính sách\n11.11.4. Tóm tắt\n11.11.5. Bài tập"
+}

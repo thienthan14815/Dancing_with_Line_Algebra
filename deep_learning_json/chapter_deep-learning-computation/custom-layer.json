@@ -1,0 +1,344 @@
+{
+  "url": "https://vi.d2l.ai/chapter_deep-learning-computation/custom-layer.html",
+  "chapter": "chapter_deep-learning-computation",
+  "title": "5.4. Layers tùy chỉnh",
+  "crawled_at": "2026-07-20T12:39:38.045808+00:00",
+  "headings": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "layers-tuy-chinh",
+      "text": "5.4. Layers tùy chỉnh"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "cac-lop-khong-co-tham-so",
+      "text": "5.4.1. Các lớp không có tham số"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "cac-lop-co-tham-so",
+      "text": "5.4.2. Các lớp có tham số"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tom-tat",
+      "text": "5.4.3. Tóm tắt"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bai-tap",
+      "text": "5.4.4. Bài tập"
+    }
+  ],
+  "content": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "layers-tuy-chinh",
+      "text": "5.4. Layers tùy chỉnh"
+    },
+    {
+      "type": "paragraph",
+      "text": "Một yếu tố đằng sau sự thành công của deep learning là sự sẵn có của một\nloạt các lớp có thể được sáng tác theo những cách sáng tạo để thiết kế\nkiến trúc phù hợp với nhiều nhiệm vụ khác nhau. Ví dụ, các nhà nghiên\ncứu đã phát minh ra các lớp đặc biệt để xử lý hình ảnh, văn bản, lặp lại\ndữ liệu tuần tự và thực hiện lập trình động. Sớm hay muộn, bạn sẽ gặp\nhoặc phát minh ra một lớp chưa tồn tại trong khuôn khổ học sâu. Trong\nnhững trường hợp này, bạn phải xây dựng một lớp tùy chỉnh. Trong phần\nnày, chúng tôi chỉ cho bạn như thế nào."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "cac-lop-khong-co-tham-so",
+      "text": "5.4.1. Các lớp không có tham số"
+    },
+    {
+      "type": "paragraph",
+      "text": "Để bắt đầu, chúng tôi xây dựng một lớp tùy chỉnh không có bất kỳ tham số\nnào của riêng nó. Điều này sẽ trông quen thuộc nếu bạn nhớ lại giới\nthiệu của chúng tôi để chặn trong Section 5.1 .\nLớp CenteredLayer sau chỉ đơn giản là trừ trung bình từ đầu vào của\nnó. Để xây dựng nó, chúng ta chỉ cần kế thừa từ lớp lớp cơ sở và thực\nhiện hàm tuyên truyền chuyển tiếp."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "from mxnet import np, npx\nfrom mxnet.gluon import nn\n\nnpx.set_np()\n\nclass CenteredLayer(nn.Block):\n    def __init__(self, **kwargs):\n        super().__init__(**kwargs)\n\n    def forward(self, X):\n        return X - X.mean()"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "import torch\nfrom torch import nn\nfrom torch.nn import functional as F\n\n\nclass CenteredLayer(nn.Module):\n    def __init__(self):\n        super().__init__()\n\n    def forward(self, X):\n        return X - X.mean()"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "import tensorflow as tf\n\n\nclass CenteredLayer(tf.keras.Model):\n    def __init__(self):\n        super().__init__()\n\n    def call(self, inputs):\n        return inputs - tf.reduce_mean(inputs)"
+    },
+    {
+      "type": "paragraph",
+      "text": "Hãy để chúng tôi xác minh rằng lớp của chúng tôi hoạt động như dự định\nbằng cách cung cấp một số dữ liệu thông qua nó."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "layer = CenteredLayer()\nlayer(np.array([1, 2, 3, 4, 5]))"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "array([-2., -1.,  0.,  1.,  2.])"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "layer = CenteredLayer()\nlayer(torch.FloatTensor([1, 2, 3, 4, 5]))"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "tensor([-2., -1.,  0.,  1.,  2.])"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "layer = CenteredLayer()\nlayer(tf.constant([1, 2, 3, 4, 5]))"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "<tf.Tensor: shape=(5,), dtype=int32, numpy=array([-2, -1,  0,  1,  2], dtype=int32)>"
+    },
+    {
+      "type": "paragraph",
+      "text": "Bây giờ chúng ta có thể kết hợp layer của chúng ta như một component\ntrong việc xây dựng các mô hình phức tạp hơn."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "net = nn.Sequential()\nnet.add(nn.Dense(128), CenteredLayer())\nnet.initialize()"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "net = nn.Sequential(nn.Linear(8, 128), CenteredLayer())"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "net = tf.keras.Sequential([tf.keras.layers.Dense(128), CenteredLayer()])"
+    },
+    {
+      "type": "paragraph",
+      "text": "Là một kiểm tra thêm sự tỉnh táo, chúng tôi có thể gửi dữ liệu ngẫu\nnhiên thông qua mạng và kiểm tra xem trung bình có thực tế 0 không. Bởi\nvì chúng ta đang xử lý các số điểm nổi, chúng ta vẫn có thể thấy một số\nnonzero rất nhỏ do lượng tử hóa."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "Y = net(np.random.uniform(size=(4, 8)))\nY.mean()"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "array(3.783498e-10)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "Y = net(torch.rand(4, 8))\nY.mean()"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "tensor(-4.6566e-09, grad_fn=<MeanBackward0>)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "Y = net(tf.random.uniform((4, 8)))\ntf.reduce_mean(Y)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "<tf.Tensor: shape=(), dtype=float32, numpy=9.313226e-10>"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "cac-lop-co-tham-so",
+      "text": "5.4.2. Các lớp có tham số"
+    },
+    {
+      "type": "paragraph",
+      "text": "Bây giờ chúng ta đã biết cách xác định các lớp đơn giản, chúng ta hãy\nchuyển sang xác định các lớp với các tham số có thể được điều chỉnh\nthông qua đào tạo. Chúng ta có thể sử dụng các chức năng tích hợp để tạo\ncác tham số, cung cấp một số chức năng dọn phòng cơ bản. Đặc biệt, họ\nchi phối quyền truy cập, khởi tạo, chia sẻ, lưu và tải các tham số mô\nhình. Bằng cách này, trong số các lợi ích khác, chúng tôi sẽ không cần\nphải viết các thói quen serialization tùy chỉnh cho mọi lớp tùy chỉnh."
+    },
+    {
+      "type": "paragraph",
+      "text": "Bây giờ chúng ta hãy thực hiện phiên bản riêng của chúng ta của lớp được\nkết nối hoàn toàn. Nhớ lại rằng lớp này yêu cầu hai tham số, một để đại\ndiện cho trọng lượng và một cho sự thiên vị. Trong triển khai này, chúng\ntôi nướng trong kích hoạt ReLU dưới dạng mặc định. Lớp này yêu cầu nhập\nđối số: in_units và units , biểu thị số lượng đầu vào và đầu ra,\ntương ứng."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "class MyDense(nn.Block):\n    def __init__(self, units, in_units, **kwargs):\n        super().__init__(**kwargs)\n        self.weight = self.params.get('weight', shape=(in_units, units))\n        self.bias = self.params.get('bias', shape=(units,))\n\n    def forward(self, x):\n        linear = np.dot(x, self.weight.data(ctx=x.ctx)) + self.bias.data(\n            ctx=x.ctx)\n        return npx.relu(linear)"
+    },
+    {
+      "type": "paragraph",
+      "text": "Tiếp theo, chúng tôi khởi tạo lớp MyDense và truy cập các tham số mô\nhình của nó."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "dense = MyDense(units=3, in_units=5)\ndense.params"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "mydense0_ (\n  Parameter mydense0_weight (shape=(5, 3), dtype=<class 'numpy.float32'>)\n  Parameter mydense0_bias (shape=(3,), dtype=<class 'numpy.float32'>)\n)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "class MyLinear(nn.Module):\n    def __init__(self, in_units, units):\n        super().__init__()\n        self.weight = nn.Parameter(torch.randn(in_units, units))\n        self.bias = nn.Parameter(torch.randn(units,))\n    def forward(self, X):\n        linear = torch.matmul(X, self.weight.data) + self.bias.data\n        return F.relu(linear)"
+    },
+    {
+      "type": "paragraph",
+      "text": "Tiếp theo, chúng tôi khởi tạo lớp MyLinear và truy cập các tham số\nmô hình của nó."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "linear = MyLinear(5, 3)\nlinear.weight"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "Parameter containing:\ntensor([[-0.5447, -0.4223, -0.7320],\n        [-0.3532,  1.4021,  0.3656],\n        [ 0.4039,  0.0149, -1.7429],\n        [-0.9663, -2.5671, -1.0107],\n        [ 0.4001, -0.4510,  0.6005]], requires_grad=True)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "class MyDense(tf.keras.Model):\n    def __init__(self, units):\n        super().__init__()\n        self.units = units\n\n    def build(self, X_shape):\n        self.weight = self.add_weight(name='weight',\n            shape=[X_shape[-1], self.units],\n            initializer=tf.random_normal_initializer())\n        self.bias = self.add_weight(\n            name='bias', shape=[self.units],\n            initializer=tf.zeros_initializer())\n\n    def call(self, X):\n        linear = tf.matmul(X, self.weight) + self.bias\n        return tf.nn.relu(linear)"
+    },
+    {
+      "type": "paragraph",
+      "text": "Tiếp theo, chúng tôi khởi tạo lớp MyDense và truy cập các tham số mô\nhình của nó."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "dense = MyDense(3)\ndense(tf.random.uniform((2, 5)))\ndense.get_weights()"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "[array([[ 0.09981945, -0.04308238, -0.06013313],\n        [-0.04979542, -0.02897512,  0.02753923],\n        [ 0.06066662,  0.09469151, -0.00839288],\n        [-0.00426127, -0.03299933,  0.01423264],\n        [-0.00832251,  0.03117967,  0.02648194]], dtype=float32),\n array([0., 0., 0.], dtype=float32)]"
+    },
+    {
+      "type": "paragraph",
+      "text": "Chúng ta có thể trực tiếp thực hiện các phép tính tuyên truyền chuyển\ntiếp bằng cách sử dụng các lớp tùy chỉnh"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "dense.initialize()\ndense(np.random.uniform(size=(2, 5)))"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "array([[0.        , 0.01633355, 0.        ],\n       [0.        , 0.01581812, 0.        ]])"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "linear(torch.rand(2, 5))"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "tensor([[1.8603, 0.0000, 0.0000],\n        [1.9760, 0.0000, 0.0000]])"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "dense(tf.random.uniform((2, 5)))"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "<tf.Tensor: shape=(2, 3), dtype=float32, numpy=\narray([[0.06079437, 0.06208537, 0.00877108],\n       [0.06171731, 0.0429856 , 0.01308466]], dtype=float32)>"
+    },
+    {
+      "type": "paragraph",
+      "text": "Chúng ta cũng có thể xây dựng các mô hình bằng cách sử dụng lớp tùy\nchỉnh Khi chúng ta có rằng chúng ta có thể sử dụng nó giống như lớp được\nkết nối hoàn toàn tích hợp."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "net = nn.Sequential()\nnet.add(MyDense(8, in_units=64),\n        MyDense(1, in_units=8))\nnet.initialize()\nnet(np.random.uniform(size=(2, 64)))"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "array([[0.06508517],\n       [0.0615553 ]])"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "net = nn.Sequential(MyLinear(64, 8), MyLinear(8, 1))\nnet(torch.rand(2, 64))"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "tensor([[0.],\n        [0.]])"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "net = tf.keras.models.Sequential([MyDense(8), MyDense(1)])\nnet(tf.random.uniform((2, 64)))"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "<tf.Tensor: shape=(2, 1), dtype=float32, numpy=\narray([[0.],\n       [0.]], dtype=float32)>"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tom-tat",
+      "text": "5.4.3. Tóm tắt"
+    },
+    {
+      "type": "list",
+      "ordered": false,
+      "items": [
+        "Chúng ta có thể thiết kế các lớp tùy chỉnh thông qua lớp lớp cơ bản.\nĐiều này cho phép chúng ta xác định các lớp mới linh hoạt hoạt hoạt\nkhác với bất kỳ lớp hiện có nào trong thư viện.",
+        "Sau khi được xác định, các lớp tùy chỉnh có thể được gọi trong bối\ncảnh và kiến trúc tùy ý.",
+        "Các lớp có thể có các tham số cục bộ, có thể được tạo thông qua các\nchức năng tích hợp."
+      ]
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bai-tap",
+      "text": "5.4.4. Bài tập"
+    },
+    {
+      "type": "list",
+      "ordered": true,
+      "items": [
+        "Thiết kế một lớp lấy đầu vào và tính toán giảm tensor, tức là nó trả\nvề \\(y_k = \\sum_{i, j} W_{ijk} x_i x_j\\) .",
+        "Thiết kế một lớp trả về một nửa hàng đầu của hệ số Fourier của dữ\nliệu."
+      ]
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    }
+  ],
+  "images": [],
+  "text": "5.4. Layers tùy chỉnh\nMột yếu tố đằng sau sự thành công của deep learning là sự sẵn có của một\nloạt các lớp có thể được sáng tác theo những cách sáng tạo để thiết kế\nkiến trúc phù hợp với nhiều nhiệm vụ khác nhau. Ví dụ, các nhà nghiên\ncứu đã phát minh ra các lớp đặc biệt để xử lý hình ảnh, văn bản, lặp lại\ndữ liệu tuần tự và thực hiện lập trình động. Sớm hay muộn, bạn sẽ gặp\nhoặc phát minh ra một lớp chưa tồn tại trong khuôn khổ học sâu. Trong\nnhững trường hợp này, bạn phải xây dựng một lớp tùy chỉnh. Trong phần\nnày, chúng tôi chỉ cho bạn như thế nào.\n5.4.1. Các lớp không có tham số\nĐể bắt đầu, chúng tôi xây dựng một lớp tùy chỉnh không có bất kỳ tham số\nnào của riêng nó. Điều này sẽ trông quen thuộc nếu bạn nhớ lại giới\nthiệu của chúng tôi để chặn trong Section 5.1 .\nLớp CenteredLayer sau chỉ đơn giản là trừ trung bình từ đầu vào của\nnó. Để xây dựng nó, chúng ta chỉ cần kế thừa từ lớp lớp cơ sở và thực\nhiện hàm tuyên truyền chuyển tiếp.\nHãy để chúng tôi xác minh rằng lớp của chúng tôi hoạt động như dự định\nbằng cách cung cấp một số dữ liệu thông qua nó.\nBây giờ chúng ta có thể kết hợp layer của chúng ta như một component\ntrong việc xây dựng các mô hình phức tạp hơn.\nLà một kiểm tra thêm sự tỉnh táo, chúng tôi có thể gửi dữ liệu ngẫu\nnhiên thông qua mạng và kiểm tra xem trung bình có thực tế 0 không. Bởi\nvì chúng ta đang xử lý các số điểm nổi, chúng ta vẫn có thể thấy một số\nnonzero rất nhỏ do lượng tử hóa.\n5.4.2. Các lớp có tham số\nBây giờ chúng ta đã biết cách xác định các lớp đơn giản, chúng ta hãy\nchuyển sang xác định các lớp với các tham số có thể được điều chỉnh\nthông qua đào tạo. Chúng ta có thể sử dụng các chức năng tích hợp để tạo\ncác tham số, cung cấp một số chức năng dọn phòng cơ bản. Đặc biệt, họ\nchi phối quyền truy cập, khởi tạo, chia sẻ, lưu và tải các tham số mô\nhình. Bằng cách này, trong số các lợi ích khác, chúng tôi sẽ không cần\nphải viết các thói quen serialization tùy chỉnh cho mọi lớp tùy chỉnh.\nBây giờ chúng ta hãy thực hiện phiên bản riêng của chúng ta của lớp được\nkết nối hoàn toàn. Nhớ lại rằng lớp này yêu cầu hai tham số, một để đại\ndiện cho trọng lượng và một cho sự thiên vị. Trong triển khai này, chúng\ntôi nướng trong kích hoạt ReLU dưới dạng mặc định. Lớp này yêu cầu nhập\nđối số: in_units và units , biểu thị số lượng đầu vào và đầu ra,\ntương ứng.\nTiếp theo, chúng tôi khởi tạo lớp MyDense và truy cập các tham số mô\nhình của nó.\nTiếp theo, chúng tôi khởi tạo lớp MyLinear và truy cập các tham số\nmô hình của nó.\nTiếp theo, chúng tôi khởi tạo lớp MyDense và truy cập các tham số mô\nhình của nó.\nChúng ta có thể trực tiếp thực hiện các phép tính tuyên truyền chuyển\ntiếp bằng cách sử dụng các lớp tùy chỉnh\nChúng ta cũng có thể xây dựng các mô hình bằng cách sử dụng lớp tùy\nchỉnh Khi chúng ta có rằng chúng ta có thể sử dụng nó giống như lớp được\nkết nối hoàn toàn tích hợp.\n5.4.3. Tóm tắt\nChúng ta có thể thiết kế các lớp tùy chỉnh thông qua lớp lớp cơ bản.\nĐiều này cho phép chúng ta xác định các lớp mới linh hoạt hoạt hoạt\nkhác với bất kỳ lớp hiện có nào trong thư viện.\nSau khi được xác định, các lớp tùy chỉnh có thể được gọi trong bối\ncảnh và kiến trúc tùy ý.\nCác lớp có thể có các tham số cục bộ, có thể được tạo thông qua các\nchức năng tích hợp.\n5.4.4. Bài tập\nThiết kế một lớp lấy đầu vào và tính toán giảm tensor, tức là nó trả\nvề \\(y_k = \\sum_{i, j} W_{ijk} x_i x_j\\) .\nThiết kế một lớp trả về một nửa hàng đầu của hệ số Fourier của dữ\nliệu.\nDiscussions\nDiscussions\nDiscussions"
+}

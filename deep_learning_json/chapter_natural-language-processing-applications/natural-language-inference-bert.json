@@ -1,0 +1,310 @@
+{
+  "url": "https://vi.d2l.ai/chapter_natural-language-processing-applications/natural-language-inference-bert.html",
+  "chapter": "chapter_natural-language-processing-applications",
+  "title": "15.7. Suy luận ngôn ngữ tự nhiên: Tinh chỉnh BERT",
+  "crawled_at": "2026-07-20T12:41:09.244068+00:00",
+  "headings": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "suy-luan-ngon-ngu-tu-nhien-tinh-chinh-bert",
+      "text": "15.7. Suy luận ngôn ngữ tự nhiên: Tinh chỉnh BERT"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "dang-tai-bert-pretrained",
+      "text": "15.7.1. Đang tải BERT Pretrained"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tap-du-lieu-cho-tinh-chinh-bert",
+      "text": "15.7.2. Tập dữ liệu cho tinh chỉnh BERT"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tinh-chinh-bert",
+      "text": "15.7.3. Tinh chỉnh BERT"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tom-tat",
+      "text": "15.7.4. Tóm tắt"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bai-tap",
+      "text": "15.7.5. Bài tập"
+    }
+  ],
+  "content": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "suy-luan-ngon-ngu-tu-nhien-tinh-chinh-bert",
+      "text": "15.7. Suy luận ngôn ngữ tự nhiên: Tinh chỉnh BERT"
+    },
+    {
+      "type": "paragraph",
+      "text": "Trong các phần trước của chương này, chúng tôi đã thiết kế một kiến trúc\ndựa trên sự chú ý (trong Section 15.5 ) cho nhiệm vụ suy\nluận ngôn ngữ tự nhiên trên tập dữ liệu SNLI (như được mô tả trong Section 15.4 ). Bây giờ chúng\ntôi xem lại nhiệm vụ này bằng cách tinh chỉnh BERT. Như đã thảo luận\ntrong Section 15.6 , suy luận ngôn ngữ tự nhiên là một\nbài toán phân loại cặp văn bản cấp trình tự, và tinh chỉnh BERT chỉ đòi\nhỏi một kiến trúc dựa trên MLP bổ sung, như minh họa trong Fig. 15.7.1 ."
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/nlp-map-nli-bert.svg",
+      "local_path": "_images/nlp-map-nli-bert.svg",
+      "alt": "../_images/nlp-map-nli-bert.svg"
+    },
+    {
+      "type": "paragraph",
+      "text": "Fig. 15.7.1 This section feeds pretrained BERT to an MLP-based architecture for\nnatural language inference. ¶"
+    },
+    {
+      "type": "paragraph",
+      "text": "Trong phần này, chúng tôi sẽ tải xuống một phiên bản nhỏ được đào tạo\ntrước của BERT, sau đó tinh chỉnh nó để suy luận ngôn ngữ tự nhiên trên\nbộ dữ liệu SNLI."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "import json\nimport multiprocessing\nimport os\nfrom mxnet import gluon, np, npx\nfrom mxnet.gluon import nn\nfrom d2l import mxnet as d2l\n\nnpx.set_np()"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "import json\nimport multiprocessing\nimport os\nimport torch\nfrom torch import nn\nfrom d2l import torch as d2l"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "dang-tai-bert-pretrained",
+      "text": "15.7.1. Đang tải BERT Pretrained"
+    },
+    {
+      "type": "paragraph",
+      "text": "Chúng tôi đã giải thích cách chuẩn bị BERT trên bộ dữ liệu WikiText-2\ntrong Section 14.9 và Section 14.10 (lưu ý rằng mô hình BERT ban đầu được đào tạo trước trên corpora lớn hơn\nnhiều). Như đã thảo luận trong Section 14.10 , mô hình\nBERT ban đầu có hàng trăm triệu thông số. Trong phần sau, chúng tôi cung\ncấp hai phiên bản BERT được đào tạo trước: “bert.base” lớn bằng mô hình\ncơ sở BERT ban đầu đòi hỏi rất nhiều tài nguyên tính toán để tinh chỉnh,\ntrong khi “bert.small” là một phiên bản nhỏ để tạo điều kiện cho trình\ndiễn."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "d2l.DATA_HUB['bert.base'] = (d2l.DATA_URL + 'bert.base.zip',\n                             '7b3820b35da691042e5d34c0971ac3edbd80d3f4')\nd2l.DATA_HUB['bert.small'] = (d2l.DATA_URL + 'bert.small.zip',\n                              'a4e718a47137ccd1809c9107ab4f5edd317bae2c')"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "d2l.DATA_HUB['bert.base'] = (d2l.DATA_URL + 'bert.base.torch.zip',\n                             '225d66f04cae318b841a13d32af3acc165f253ac')\nd2l.DATA_HUB['bert.small'] = (d2l.DATA_URL + 'bert.small.torch.zip',\n                              'c72329e68a732bef0452e4b96a1c341c8910f81f')"
+    },
+    {
+      "type": "paragraph",
+      "text": "Hoặc mô hình BERT được đào tạo trước chứa một tập tin “vocab.json” xác\nđịnh tập từ vựng và một tập tin “pretrained.params” của các tham số được\nđào tạo trước. Chúng tôi thực hiện chức năng load_pretrained_model sau đây để tải các thông số BERT được đào tạo trước."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def load_pretrained_model(pretrained_model, num_hiddens, ffn_num_hiddens,\n                          num_heads, num_layers, dropout, max_len, devices):\n    data_dir = d2l.download_extract(pretrained_model)\n    # Define an empty vocabulary to load the predefined vocabulary\n    vocab = d2l.Vocab()\n    vocab.idx_to_token = json.load(open(os.path.join(data_dir, 'vocab.json')))\n    vocab.token_to_idx = {token: idx for idx, token in enumerate(\n        vocab.idx_to_token)}\n    bert = d2l.BERTModel(len(vocab), num_hiddens, ffn_num_hiddens, num_heads,\n                         num_layers, dropout, max_len)\n    # Load pretrained BERT parameters\n    bert.load_parameters(os.path.join(data_dir, 'pretrained.params'),\n                         ctx=devices)\n    return bert, vocab"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def load_pretrained_model(pretrained_model, num_hiddens, ffn_num_hiddens,\n                          num_heads, num_layers, dropout, max_len, devices):\n    data_dir = d2l.download_extract(pretrained_model)\n    # Define an empty vocabulary to load the predefined vocabulary\n    vocab = d2l.Vocab()\n    vocab.idx_to_token = json.load(open(os.path.join(data_dir, 'vocab.json')))\n    vocab.token_to_idx = {token: idx for idx, token in enumerate(\n        vocab.idx_to_token)}\n    bert = d2l.BERTModel(len(vocab), num_hiddens, norm_shape=[256],\n                         ffn_num_input=256, ffn_num_hiddens=ffn_num_hiddens,\n                         num_heads=4, num_layers=2, dropout=0.2,\n                         max_len=max_len, key_size=256, query_size=256,\n                         value_size=256, hid_in_features=256,\n                         mlm_in_features=256, nsp_in_features=256)\n    # Load pretrained BERT parameters\n    bert.load_state_dict(torch.load(os.path.join(data_dir,\n                                                 'pretrained.params')))\n    return bert, vocab"
+    },
+    {
+      "type": "paragraph",
+      "text": "Để tạo điều kiện cho trình diễn trên hầu hết các máy móc, chúng tôi sẽ\ntải và tinh chỉnh phiên bản nhỏ (“bert.small”) của BERT được đào tạo\ntrước trong phần này. Trong bài tập, chúng tôi sẽ chỉ ra cách tinh chỉnh\n“bert.base” lớn hơn nhiều để cải thiện đáng kể độ chính xác của thử\nnghiệm."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "devices = d2l.try_all_gpus()\nbert, vocab = load_pretrained_model(\n    'bert.small', num_hiddens=256, ffn_num_hiddens=512, num_heads=4,\n    num_layers=2, dropout=0.1, max_len=512, devices=devices)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "Downloading ../data/bert.small.zip from http://d2l-data.s3-accelerate.amazonaws.com/bert.small.zip..."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "devices = d2l.try_all_gpus()\nbert, vocab = load_pretrained_model(\n    'bert.small', num_hiddens=256, ffn_num_hiddens=512, num_heads=4,\n    num_layers=2, dropout=0.1, max_len=512, devices=devices)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "Downloading ../data/bert.small.torch.zip from http://d2l-data.s3-accelerate.amazonaws.com/bert.small.torch.zip..."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tap-du-lieu-cho-tinh-chinh-bert",
+      "text": "15.7.2. Tập dữ liệu cho tinh chỉnh BERT"
+    },
+    {
+      "type": "paragraph",
+      "text": "Đối với nhiệm vụ hạ lưu suy luận ngôn ngữ tự nhiên trên tập dữ liệu\nSNLI, chúng tôi xác định một lớp tập dữ liệu tùy chỉnh SNLIBERTDataset . Trong mỗi ví dụ, tiền đề và giả thuyết tạo thành\nmột cặp chuỗi văn bản và được đóng gói thành một chuỗi đầu vào BERT như\nmô tả trong Fig. 15.6.2 . Nhớ lại Section 14.8.4 rằng ID phân đoạn được sử dụng để phân\nbiệt tiền đề và giả thuyết trong một chuỗi đầu vào BERT. Với độ dài tối\nđa được xác định trước của chuỗi đầu vào BERT ( max_len ), token cuối\ncùng của cặp văn bản đầu vào dài hơn sẽ bị xóa cho đến khi max_len được đáp ứng. Để tăng tốc tạo bộ dữ liệu SNLI để tinh chỉnh BERT, chúng\ntôi sử dụng 4 quy trình công nhân để tạo ra các ví dụ đào tạo hoặc thử\nnghiệm song song."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "class SNLIBERTDataset(gluon.data.Dataset):\n    def __init__(self, dataset, max_len, vocab=None):\n        all_premise_hypothesis_tokens = [[\n            p_tokens, h_tokens] for p_tokens, h_tokens in zip(\n            *[d2l.tokenize([s.lower() for s in sentences])\n              for sentences in dataset[:2]])]\n\n        self.labels = np.array(dataset[2])\n        self.vocab = vocab\n        self.max_len = max_len\n        (self.all_token_ids, self.all_segments,\n         self.valid_lens) = self._preprocess(all_premise_hypothesis_tokens)\n        print('read ' + str(len(self.all_token_ids)) + ' examples')\n\n    def _preprocess(self, all_premise_hypothesis_tokens):\n        pool = multiprocessing.Pool(4)  # Use 4 worker processes\n        out = pool.map(self._mp_worker, all_premise_hypothesis_tokens)\n        all_token_ids = [\n            token_ids for token_ids, segments, valid_len in out]\n        all_segments = [segments for token_ids, segments, valid_len in out]\n        valid_lens = [valid_len for token_ids, segments, valid_len in out]\n        return (np.array(all_token_ids, dtype='int32'),\n                np.array(all_segments, dtype='int32'),\n                np.array(valid_lens))\n\n    def _mp_worker(self, premise_hypothesis_tokens):\n        p_tokens, h_tokens = premise_hypothesis_tokens\n        self._truncate_pair_of_tokens(p_tokens, h_tokens)\n        tokens, segments = d2l.get_tokens_and_segments(p_tokens, h_tokens)\n        token_ids = self.vocab[tokens] + [self.vocab['<pad>']] \\\n                             * (self.max_len - len(tokens))\n        segments = segments + [0] * (self.max_len - len(segments))\n        valid_len = len(tokens)\n        return token_ids, segments, valid_len\n\n    def _truncate_pair_of_tokens(self, p_tokens, h_tokens):\n        # Reserve slots for '<CLS>', '<SEP>', and '<SEP>' tokens for the BERT\n        # input\n        while len(p_tokens) + len(h_tokens) > self.max_len - 3:\n            if len(p_tokens) > len(h_tokens):\n                p_tokens.pop()\n            else:\n                h_tokens.pop()\n\n    def __getitem__(self, idx):\n        return (self.all_token_ids[idx], self.all_segments[idx],\n                self.valid_lens[idx]), self.labels[idx]\n\n    def __len__(self):\n        return len(self.all_token_ids)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "class SNLIBERTDataset(torch.utils.data.Dataset):\n    def __init__(self, dataset, max_len, vocab=None):\n        all_premise_hypothesis_tokens = [[\n            p_tokens, h_tokens] for p_tokens, h_tokens in zip(\n            *[d2l.tokenize([s.lower() for s in sentences])\n              for sentences in dataset[:2]])]\n\n        self.labels = torch.tensor(dataset[2])\n        self.vocab = vocab\n        self.max_len = max_len\n        (self.all_token_ids, self.all_segments,\n         self.valid_lens) = self._preprocess(all_premise_hypothesis_tokens)\n        print('read ' + str(len(self.all_token_ids)) + ' examples')\n\n    def _preprocess(self, all_premise_hypothesis_tokens):\n        pool = multiprocessing.Pool(4)  # Use 4 worker processes\n        out = pool.map(self._mp_worker, all_premise_hypothesis_tokens)\n        all_token_ids = [\n            token_ids for token_ids, segments, valid_len in out]\n        all_segments = [segments for token_ids, segments, valid_len in out]\n        valid_lens = [valid_len for token_ids, segments, valid_len in out]\n        return (torch.tensor(all_token_ids, dtype=torch.long),\n                torch.tensor(all_segments, dtype=torch.long),\n                torch.tensor(valid_lens))\n\n    def _mp_worker(self, premise_hypothesis_tokens):\n        p_tokens, h_tokens = premise_hypothesis_tokens\n        self._truncate_pair_of_tokens(p_tokens, h_tokens)\n        tokens, segments = d2l.get_tokens_and_segments(p_tokens, h_tokens)\n        token_ids = self.vocab[tokens] + [self.vocab['<pad>']] \\\n                             * (self.max_len - len(tokens))\n        segments = segments + [0] * (self.max_len - len(segments))\n        valid_len = len(tokens)\n        return token_ids, segments, valid_len\n\n    def _truncate_pair_of_tokens(self, p_tokens, h_tokens):\n        # Reserve slots for '<CLS>', '<SEP>', and '<SEP>' tokens for the BERT\n        # input\n        while len(p_tokens) + len(h_tokens) > self.max_len - 3:\n            if len(p_tokens) > len(h_tokens):\n                p_tokens.pop()\n            else:\n                h_tokens.pop()\n\n    def __getitem__(self, idx):\n        return (self.all_token_ids[idx], self.all_segments[idx],\n                self.valid_lens[idx]), self.labels[idx]\n\n    def __len__(self):\n        return len(self.all_token_ids)"
+    },
+    {
+      "type": "paragraph",
+      "text": "Sau khi tải xuống tập dữ liệu SNLI, chúng tôi tạo ra các ví dụ đào tạo\nvà thử nghiệm bằng cách khởi tạo lớp SNLIBERTDataset . Những ví dụ\nnhư vậy sẽ được đọc trong minibatches trong quá trình đào tạo và thử\nnghiệm suy luận ngôn ngữ tự nhiên."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "# Reduce `batch_size` if there is an out of memory error. In the original BERT\n# model, `max_len` = 512\nbatch_size, max_len, num_workers = 512, 128, d2l.get_dataloader_workers()\ndata_dir = d2l.download_extract('SNLI')\ntrain_set = SNLIBERTDataset(d2l.read_snli(data_dir, True), max_len, vocab)\ntest_set = SNLIBERTDataset(d2l.read_snli(data_dir, False), max_len, vocab)\ntrain_iter = gluon.data.DataLoader(train_set, batch_size, shuffle=True,\n                                   num_workers=num_workers)\ntest_iter = gluon.data.DataLoader(test_set, batch_size,\n                                  num_workers=num_workers)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "read 549367 examples\nread 9824 examples"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "# Reduce `batch_size` if there is an out of memory error. In the original BERT\n# model, `max_len` = 512\nbatch_size, max_len, num_workers = 512, 128, d2l.get_dataloader_workers()\ndata_dir = d2l.download_extract('SNLI')\ntrain_set = SNLIBERTDataset(d2l.read_snli(data_dir, True), max_len, vocab)\ntest_set = SNLIBERTDataset(d2l.read_snli(data_dir, False), max_len, vocab)\ntrain_iter = torch.utils.data.DataLoader(train_set, batch_size, shuffle=True,\n                                   num_workers=num_workers)\ntest_iter = torch.utils.data.DataLoader(test_set, batch_size,\n                                  num_workers=num_workers)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "read 549367 examples\nread 9824 examples"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tinh-chinh-bert",
+      "text": "15.7.3. Tinh chỉnh BERT"
+    },
+    {
+      "type": "paragraph",
+      "text": "Như Fig. 15.6.2 chỉ ra, tinh chỉnh BERT cho suy luận\nngôn ngữ tự nhiên chỉ yêu cầu thêm MLP bao gồm hai lớp được kết nối hoàn\ntoàn (xem self.hidden và self.output trong lớp BERTClassifier sau). MLP này biến đổi đại diện BERT của mã thông báo\n“” đặc biệt, mã hóa thông tin của cả tiền đề và giả thuyết, thành ba đầu\nra của suy luận ngôn ngữ tự nhiên: entailment, mâu thuẫn, và trung lập."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "class BERTClassifier(nn.Block):\n    def __init__(self, bert):\n        super(BERTClassifier, self).__init__()\n        self.encoder = bert.encoder\n        self.hidden = bert.hidden\n        self.output = nn.Dense(3)\n\n    def forward(self, inputs):\n        tokens_X, segments_X, valid_lens_x = inputs\n        encoded_X = self.encoder(tokens_X, segments_X, valid_lens_x)\n        return self.output(self.hidden(encoded_X[:, 0, :]))"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "class BERTClassifier(nn.Module):\n    def __init__(self, bert):\n        super(BERTClassifier, self).__init__()\n        self.encoder = bert.encoder\n        self.hidden = bert.hidden\n        self.output = nn.Linear(256, 3)\n\n    def forward(self, inputs):\n        tokens_X, segments_X, valid_lens_x = inputs\n        encoded_X = self.encoder(tokens_X, segments_X, valid_lens_x)\n        return self.output(self.hidden(encoded_X[:, 0, :]))"
+    },
+    {
+      "type": "paragraph",
+      "text": "Sau đây, mô hình BERT được đào tạo trước bert được đưa vào phiên bản BERTClassifier net cho ứng dụng hạ lưu. Trong các triển khai phổ\nbiến của tinh chỉnh BERT, chỉ các tham số của lớp đầu ra của MLP bổ sung\n( net.output ) sẽ được học từ đầu. Tất cả các thông số của bộ mã hóa\nBERT được đào tạo trước ( net.encoder ) và lớp ẩn của MLP bổ sung\n( net.hidden ) sẽ được tinh chỉnh."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "net = BERTClassifier(bert)\nnet.output.initialize(ctx=devices)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "net = BERTClassifier(bert)"
+    },
+    {
+      "type": "paragraph",
+      "text": "Nhớ lại rằng trong Section 14.8 cả lớp MaskLM và lớp NextSentencePred đều có các thông số trong MLP được sử dụng của họ.\nCác thông số này là một phần của những thông số trong mô hình BERT được\nđào tạo trước bert , và do đó là một phần của các thông số trong net . Tuy nhiên, các thông số như vậy chỉ để tính toán mất mô hình\nhóa ngôn ngữ đeo mặt nạ và mất dự đoán câu tiếp theo trong quá trình đào\ntạo trước. Hai chức năng mất mát này không liên quan đến việc tinh chỉnh\ncác ứng dụng hạ lưu, do đó các thông số của MLP được sử dụng trong MaskLM và NextSentencePred không được cập nhật (staled) khi BERT\nđược tinh chỉnh."
+    },
+    {
+      "type": "paragraph",
+      "text": "Để cho phép các tham số với gradient cũ, cờ ignore_stale_grad=True được đặt trong hàm step của d2l.train_batch_ch13 . Chúng tôi sử\ndụng chức năng này để đào tạo và đánh giá mô hình net bằng cách sử\ndụng bộ đào tạo ( train_iter ) và bộ thử nghiệm ( test_iter ) của\nSNLI. Do các nguồn lực tính toán hạn chế, độ chính xác đào tạo và thử\nnghiệm có thể được cải thiện hơn nữa: chúng tôi để lại các cuộc thảo\nluận của nó trong các bài tập."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "lr, num_epochs = 1e-4, 5\ntrainer = gluon.Trainer(net.collect_params(), 'adam', {'learning_rate': lr})\nloss = gluon.loss.SoftmaxCrossEntropyLoss()\nd2l.train_ch13(net, train_iter, test_iter, loss, trainer, num_epochs, devices,\n               d2l.split_batch_multi_inputs)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "loss 0.480, train acc 0.810, test acc 0.785\n6981.9 examples/sec on [gpu(0), gpu(1)]"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_natural-language-inference-bert_1857e6_75_1.svg",
+      "local_path": "_images/output_natural-language-inference-bert_1857e6_75_1.svg",
+      "alt": "../_images/output_natural-language-inference-bert_1857e6_75_1.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "lr, num_epochs = 1e-4, 5\ntrainer = torch.optim.Adam(net.parameters(), lr=lr)\nloss = nn.CrossEntropyLoss(reduction='none')\nd2l.train_ch13(net, train_iter, test_iter, loss, trainer, num_epochs, devices)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "loss 0.518, train acc 0.791, test acc 0.779\n10236.7 examples/sec on [device(type='cuda', index=0), device(type='cuda', index=1)]"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_natural-language-inference-bert_1857e6_78_1.svg",
+      "local_path": "_images/output_natural-language-inference-bert_1857e6_78_1.svg",
+      "alt": "../_images/output_natural-language-inference-bert_1857e6_78_1.svg"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tom-tat",
+      "text": "15.7.4. Tóm tắt"
+    },
+    {
+      "type": "list",
+      "ordered": false,
+      "items": [
+        "Chúng ta có thể tinh chỉnh mô hình BERT được đào tạo trước cho các\nứng dụng hạ nguồn, chẳng hạn như suy luận ngôn ngữ tự nhiên trên bộ\ndữ liệu SNLI.",
+        "Trong quá trình tinh chỉnh, mô hình BERT trở thành một phần của mô\nhình cho ứng dụng hạ lưu. Các thông số chỉ liên quan đến mất sơ bộ sẽ\nkhông được cập nhật trong quá trình tinh chỉnh."
+      ]
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bai-tap",
+      "text": "15.7.5. Bài tập"
+    },
+    {
+      "type": "list",
+      "ordered": true,
+      "items": [
+        "Tinh chỉnh một mô hình BERT được đào tạo trước lớn hơn nhiều như mô\nhình cơ sở BERT ban đầu nếu tài nguyên tính toán của bạn cho phép.\nĐặt các đối số trong hàm load_pretrained_model là: thay thế\n‘bert.small’ bằng ‘bert.base’, tăng giá trị lần lượt là num_hiddens=256 , ffn_num_hiddens=512 , num_heads=4 và num_layers=2 lên 768, 3072, 12 và 12. Bằng cách tăng kỷ nguyên\ntinh chỉnh (và có thể điều chỉnh các siêu tham số khác), bạn có thể\nnhận được độ chính xác thử nghiệm cao hơn 0,86 không?",
+        "Làm thế nào để cắt ngắn một cặp chuỗi theo tỷ lệ chiều dài của chúng?\nSo sánh phương pháp cắt ngắn cặp này và phương pháp được sử dụng\ntrong lớp SNLIBERTDataset . Ưu và nhược điểm của họ là gì?"
+      ]
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    }
+  ],
+  "images": [
+    {
+      "original_url": "https://vi.d2l.ai/_images/nlp-map-nli-bert.svg",
+      "local_path": "_images/nlp-map-nli-bert.svg",
+      "alt": "../_images/nlp-map-nli-bert.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_natural-language-inference-bert_1857e6_75_1.svg",
+      "local_path": "_images/output_natural-language-inference-bert_1857e6_75_1.svg",
+      "alt": "../_images/output_natural-language-inference-bert_1857e6_75_1.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_natural-language-inference-bert_1857e6_78_1.svg",
+      "local_path": "_images/output_natural-language-inference-bert_1857e6_78_1.svg",
+      "alt": "../_images/output_natural-language-inference-bert_1857e6_78_1.svg"
+    }
+  ],
+  "text": "15.7. Suy luận ngôn ngữ tự nhiên: Tinh chỉnh BERT\nTrong các phần trước của chương này, chúng tôi đã thiết kế một kiến trúc\ndựa trên sự chú ý (trong Section 15.5 ) cho nhiệm vụ suy\nluận ngôn ngữ tự nhiên trên tập dữ liệu SNLI (như được mô tả trong Section 15.4 ). Bây giờ chúng\ntôi xem lại nhiệm vụ này bằng cách tinh chỉnh BERT. Như đã thảo luận\ntrong Section 15.6 , suy luận ngôn ngữ tự nhiên là một\nbài toán phân loại cặp văn bản cấp trình tự, và tinh chỉnh BERT chỉ đòi\nhỏi một kiến trúc dựa trên MLP bổ sung, như minh họa trong Fig. 15.7.1 .\nFig. 15.7.1 This section feeds pretrained BERT to an MLP-based architecture for\nnatural language inference. ¶\nTrong phần này, chúng tôi sẽ tải xuống một phiên bản nhỏ được đào tạo\ntrước của BERT, sau đó tinh chỉnh nó để suy luận ngôn ngữ tự nhiên trên\nbộ dữ liệu SNLI.\n15.7.1. Đang tải BERT Pretrained\nChúng tôi đã giải thích cách chuẩn bị BERT trên bộ dữ liệu WikiText-2\ntrong Section 14.9 và Section 14.10 (lưu ý rằng mô hình BERT ban đầu được đào tạo trước trên corpora lớn hơn\nnhiều). Như đã thảo luận trong Section 14.10 , mô hình\nBERT ban đầu có hàng trăm triệu thông số. Trong phần sau, chúng tôi cung\ncấp hai phiên bản BERT được đào tạo trước: “bert.base” lớn bằng mô hình\ncơ sở BERT ban đầu đòi hỏi rất nhiều tài nguyên tính toán để tinh chỉnh,\ntrong khi “bert.small” là một phiên bản nhỏ để tạo điều kiện cho trình\ndiễn.\nHoặc mô hình BERT được đào tạo trước chứa một tập tin “vocab.json” xác\nđịnh tập từ vựng và một tập tin “pretrained.params” của các tham số được\nđào tạo trước. Chúng tôi thực hiện chức năng load_pretrained_model sau đây để tải các thông số BERT được đào tạo trước.\nĐể tạo điều kiện cho trình diễn trên hầu hết các máy móc, chúng tôi sẽ\ntải và tinh chỉnh phiên bản nhỏ (“bert.small”) của BERT được đào tạo\ntrước trong phần này. Trong bài tập, chúng tôi sẽ chỉ ra cách tinh chỉnh\n“bert.base” lớn hơn nhiều để cải thiện đáng kể độ chính xác của thử\nnghiệm.\n15.7.2. Tập dữ liệu cho tinh chỉnh BERT\nĐối với nhiệm vụ hạ lưu suy luận ngôn ngữ tự nhiên trên tập dữ liệu\nSNLI, chúng tôi xác định một lớp tập dữ liệu tùy chỉnh SNLIBERTDataset . Trong mỗi ví dụ, tiền đề và giả thuyết tạo thành\nmột cặp chuỗi văn bản và được đóng gói thành một chuỗi đầu vào BERT như\nmô tả trong Fig. 15.6.2 . Nhớ lại Section 14.8.4 rằng ID phân đoạn được sử dụng để phân\nbiệt tiền đề và giả thuyết trong một chuỗi đầu vào BERT. Với độ dài tối\nđa được xác định trước của chuỗi đầu vào BERT ( max_len ), token cuối\ncùng của cặp văn bản đầu vào dài hơn sẽ bị xóa cho đến khi max_len được đáp ứng. Để tăng tốc tạo bộ dữ liệu SNLI để tinh chỉnh BERT, chúng\ntôi sử dụng 4 quy trình công nhân để tạo ra các ví dụ đào tạo hoặc thử\nnghiệm song song.\nSau khi tải xuống tập dữ liệu SNLI, chúng tôi tạo ra các ví dụ đào tạo\nvà thử nghiệm bằng cách khởi tạo lớp SNLIBERTDataset . Những ví dụ\nnhư vậy sẽ được đọc trong minibatches trong quá trình đào tạo và thử\nnghiệm suy luận ngôn ngữ tự nhiên.\n15.7.3. Tinh chỉnh BERT\nNhư Fig. 15.6.2 chỉ ra, tinh chỉnh BERT cho suy luận\nngôn ngữ tự nhiên chỉ yêu cầu thêm MLP bao gồm hai lớp được kết nối hoàn\ntoàn (xem self.hidden và self.output trong lớp BERTClassifier sau). MLP này biến đổi đại diện BERT của mã thông báo\n“” đặc biệt, mã hóa thông tin của cả tiền đề và giả thuyết, thành ba đầu\nra của suy luận ngôn ngữ tự nhiên: entailment, mâu thuẫn, và trung lập.\nSau đây, mô hình BERT được đào tạo trước bert được đưa vào phiên bản BERTClassifier net cho ứng dụng hạ lưu. Trong các triển khai phổ\nbiến của tinh chỉnh BERT, chỉ các tham số của lớp đầu ra của MLP bổ sung\n( net.output ) sẽ được học từ đầu. Tất cả các thông số của bộ mã hóa\nBERT được đào tạo trước ( net.encoder ) và lớp ẩn của MLP bổ sung\n( net.hidden ) sẽ được tinh chỉnh.\nNhớ lại rằng trong Section 14.8 cả lớp MaskLM và lớp NextSentencePred đều có các thông số trong MLP được sử dụng của họ.\nCác thông số này là một phần của những thông số trong mô hình BERT được\nđào tạo trước bert , và do đó là một phần của các thông số trong net . Tuy nhiên, các thông số như vậy chỉ để tính toán mất mô hình\nhóa ngôn ngữ đeo mặt nạ và mất dự đoán câu tiếp theo trong quá trình đào\ntạo trước. Hai chức năng mất mát này không liên quan đến việc tinh chỉnh\ncác ứng dụng hạ lưu, do đó các thông số của MLP được sử dụng trong MaskLM và NextSentencePred không được cập nhật (staled) khi BERT\nđược tinh chỉnh.\nĐể cho phép các tham số với gradient cũ, cờ ignore_stale_grad=True được đặt trong hàm step của d2l.train_batch_ch13 . Chúng tôi sử\ndụng chức năng này để đào tạo và đánh giá mô hình net bằng cách sử\ndụng bộ đào tạo ( train_iter ) và bộ thử nghiệm ( test_iter ) của\nSNLI. Do các nguồn lực tính toán hạn chế, độ chính xác đào tạo và thử\nnghiệm có thể được cải thiện hơn nữa: chúng tôi để lại các cuộc thảo\nluận của nó trong các bài tập.\n15.7.4. Tóm tắt\nChúng ta có thể tinh chỉnh mô hình BERT được đào tạo trước cho các\nứng dụng hạ nguồn, chẳng hạn như suy luận ngôn ngữ tự nhiên trên bộ\ndữ liệu SNLI.\nTrong quá trình tinh chỉnh, mô hình BERT trở thành một phần của mô\nhình cho ứng dụng hạ lưu. Các thông số chỉ liên quan đến mất sơ bộ sẽ\nkhông được cập nhật trong quá trình tinh chỉnh.\n15.7.5. Bài tập\nTinh chỉnh một mô hình BERT được đào tạo trước lớn hơn nhiều như mô\nhình cơ sở BERT ban đầu nếu tài nguyên tính toán của bạn cho phép.\nĐặt các đối số trong hàm load_pretrained_model là: thay thế\n‘bert.small’ bằng ‘bert.base’, tăng giá trị lần lượt là num_hiddens=256 , ffn_num_hiddens=512 , num_heads=4 và num_layers=2 lên 768, 3072, 12 và 12. Bằng cách tăng kỷ nguyên\ntinh chỉnh (và có thể điều chỉnh các siêu tham số khác), bạn có thể\nnhận được độ chính xác thử nghiệm cao hơn 0,86 không?\nLàm thế nào để cắt ngắn một cặp chuỗi theo tỷ lệ chiều dài của chúng?\nSo sánh phương pháp cắt ngắn cặp này và phương pháp được sử dụng\ntrong lớp SNLIBERTDataset . Ưu và nhược điểm của họ là gì?\nDiscussions\nDiscussions"
+}

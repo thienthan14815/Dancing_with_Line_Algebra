@@ -1,0 +1,437 @@
+{
+  "url": "https://vi.d2l.ai/chapter_natural-language-processing-pretraining/word2vec-pretraining.html",
+  "chapter": "chapter_natural-language-processing-pretraining",
+  "title": "14.4. Pretraining word2vec",
+  "crawled_at": "2026-07-20T12:40:55.989344+00:00",
+  "headings": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "pretraining-word2vec",
+      "text": "14.4. Pretraining word2vec"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "mo-hinh-skip-gram",
+      "text": "14.4.1. Mô hình Skip-Gram"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "lop-nhung",
+      "text": "14.4.1.1. Lớp nhúng"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "xac-dinh-tuyen-truyen-chuyen-tiep",
+      "text": "14.4.1.2. Xác định tuyên truyền chuyển tiếp"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "dao-tao",
+      "text": "14.4.2. Đào tạo"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "nhi-phan-cross-entropy-mat",
+      "text": "14.4.2.1. Nhị phân Cross-Entropy Mất"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "khoi-tao-cac-tham-so-mo-hinh",
+      "text": "14.4.2.2. Khởi tạo các tham số mô hình"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "xac-dinh-vong-dao-tao",
+      "text": "14.4.2.3. Xác định vòng đào tạo"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "ap-dung-word-embeddings",
+      "text": "14.4.3. Áp dụng Word Embeddings"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tom-tat",
+      "text": "14.4.4. Tóm tắt"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bai-tap",
+      "text": "14.4.5. Bài tập"
+    }
+  ],
+  "content": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "pretraining-word2vec",
+      "text": "14.4. Pretraining word2vec"
+    },
+    {
+      "type": "paragraph",
+      "text": "Chúng tôi tiếp tục thực hiện mô hình skip-gram được xác định trong Section 14.1 . Sau đó, chúng ta sẽ pretrain word2vec bằng\ncách sử dụng lấy mẫu âm trên tập dữ liệu PTB. Trước hết, chúng ta hãy\nlấy bộ lặp dữ liệu và từ vựng cho tập dữ liệu này bằng cách gọi hàm d2l.load_data_ptb , được mô tả trong Section 14.3"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "import math\nfrom mxnet import autograd, gluon, np, npx\nfrom mxnet.gluon import nn\nfrom d2l import mxnet as d2l\n\nnpx.set_np()\n\nbatch_size, max_window_size, num_noise_words = 512, 5, 5\ndata_iter, vocab = d2l.load_data_ptb(batch_size, max_window_size,\n                                     num_noise_words)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "import math\nimport torch\nfrom torch import nn\nfrom d2l import torch as d2l\n\nbatch_size, max_window_size, num_noise_words = 512, 5, 5\ndata_iter, vocab = d2l.load_data_ptb(batch_size, max_window_size,\n                                     num_noise_words)"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "mo-hinh-skip-gram",
+      "text": "14.4.1. Mô hình Skip-Gram"
+    },
+    {
+      "type": "paragraph",
+      "text": "Chúng tôi thực hiện mô hình skip-gram bằng cách sử dụng các lớp nhúng và\nphép nhân ma trận hàng loạt. Đầu tiên, chúng ta hãy xem lại cách nhúng\nlớp hoạt động."
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "lop-nhung",
+      "text": "14.4.1.1. Lớp nhúng"
+    },
+    {
+      "type": "paragraph",
+      "text": "Như được mô tả trong Section 9.7 , một lớp nhúng ánh xạ chỉ\nmục của mã thông báo vào vector tính năng của nó. Trọng lượng của lớp\nnày là một ma trận có số hàng bằng với kích thước từ điển\n( input_dim ) và số cột bằng với chiều vectơ cho mỗi mã thông báo\n( output_dim ). Sau khi một mô hình nhúng từ được đào tạo, trọng lượng\nnày là những gì chúng ta cần."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "embed = nn.Embedding(input_dim=20, output_dim=4)\nembed.initialize()\nembed.weight"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "Parameter embedding0_weight (shape=(20, 4), dtype=float32)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "embed = nn.Embedding(num_embeddings=20, embedding_dim=4)\nprint(f'Parameter embedding_weight ({embed.weight.shape}, '\n      f'dtype={embed.weight.dtype})')"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "Parameter embedding_weight (torch.Size([20, 4]), dtype=torch.float32)"
+    },
+    {
+      "type": "paragraph",
+      "text": "Đầu vào của một lớp nhúng là chỉ mục của một mã thông báo (word). Đối\nvới bất kỳ chỉ số token \\(i\\) , biểu diễn vectơ của nó có thể được\nlấy từ hàng \\(i^\\mathrm{th}\\) của ma trận trọng lượng trong lớp\nnhúng. Vì kích thước vectơ ( output_dim ) được đặt thành 4, lớp nhúng\ntrả về vectơ có hình dạng (2, 3, 4) cho một minibatch các chỉ số token\ncó hình dạng (2, 3)."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "x = np.array([[1, 2, 3], [4, 5, 6]])\nembed(x)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "array([[[ 0.01438687,  0.05011239,  0.00628365,  0.04861524],\n        [-0.01068833,  0.01729892,  0.02042518, -0.01618656],\n        [-0.00873779, -0.02834515,  0.05484822, -0.06206018]],\n\n       [[ 0.06491279, -0.03182812, -0.01631819, -0.00312688],\n        [ 0.0408415 ,  0.04370362,  0.00404529, -0.0028032 ],\n        [ 0.00952624, -0.01501013,  0.05958354,  0.04705103]]])"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "x = torch.tensor([[1, 2, 3], [4, 5, 6]])\nembed(x)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "tensor([[[ 0.2342, -0.6645, -0.9946,  0.6809],\n         [-0.6361,  0.8065, -0.8825,  0.9175],\n         [ 0.7129,  0.6453,  0.1846,  0.5313]],\n\n        [[-1.0855,  0.9735, -0.0118, -0.5253],\n         [ 0.8133,  0.0536,  1.0759, -0.4699],\n         [ 0.7664, -1.3129, -1.5751,  0.0097]]], grad_fn=<EmbeddingBackward0>)"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "xac-dinh-tuyen-truyen-chuyen-tiep",
+      "text": "14.4.1.2. Xác định tuyên truyền chuyển tiếp"
+    },
+    {
+      "type": "paragraph",
+      "text": "Trong tuyên truyền chuyển tiếp, đầu vào của mô hình bỏ qua gram bao gồm\ncác chỉ số từ trung tâm center của hình dạng (kích thước lô, 1) và\nngữ cảnh nối và các chỉ số từ tiếng ồn contexts_and_negatives của\nhình dạng (kích thước lô, max_len ), trong đó max_len được xác\nđịnh trong Section 14.3.5 . Hai biến này\nlần đầu tiên được chuyển đổi từ các chỉ số token thành vectơ thông qua\nlớp nhúng, sau đó phép nhân ma trận lô của chúng (được mô tả trong Section 10.2.4.1 ) trả về một đầu ra của hình dạng (kích\nthước lô, 1, max_len ). Mỗi phần tử trong đầu ra là tích chấm của một\nvector từ trung tâm và một vector ngữ cảnh hoặc từ nhiễu."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def skip_gram(center, contexts_and_negatives, embed_v, embed_u):\n    v = embed_v(center)\n    u = embed_u(contexts_and_negatives)\n    pred = npx.batch_dot(v, u.swapaxes(1, 2))\n    return pred"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def skip_gram(center, contexts_and_negatives, embed_v, embed_u):\n    v = embed_v(center)\n    u = embed_u(contexts_and_negatives)\n    pred = torch.bmm(v, u.permute(0, 2, 1))\n    return pred"
+    },
+    {
+      "type": "paragraph",
+      "text": "Chúng ta hãy in hình dạng đầu ra của chức năng skip_gram này cho một\nsố đầu vào ví dụ."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "skip_gram(np.ones((2, 1)), np.ones((2, 4)), embed, embed).shape"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "(2, 1, 4)"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "skip_gram(torch.ones((2, 1), dtype=torch.long),\n          torch.ones((2, 4), dtype=torch.long), embed, embed).shape"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "torch.Size([2, 1, 4])"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "dao-tao",
+      "text": "14.4.2. Đào tạo"
+    },
+    {
+      "type": "paragraph",
+      "text": "Trước khi đào tạo mô hình skip-gram với lấy mẫu âm, trước tiên chúng ta\nhãy xác định chức năng mất mát của nó."
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "nhi-phan-cross-entropy-mat",
+      "text": "14.4.2.1. Nhị phân Cross-Entropy Mất"
+    },
+    {
+      "type": "paragraph",
+      "text": "Theo định nghĩa của hàm mất để lấy mẫu âm trong Section 14.2.1 , chúng ta sẽ sử dụng mất nhị phân\ncross-entropy."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "loss = gluon.loss.SigmoidBCELoss()"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "class SigmoidBCELoss(nn.Module):\n    # Binary cross-entropy loss with masking\n    def __init__(self):\n        super().__init__()\n\n    def forward(self, inputs, target, mask=None):\n        out = nn.functional.binary_cross_entropy_with_logits(\n            inputs, target, weight=mask, reduction=\"none\")\n        return out.mean(dim=1)\n\nloss = SigmoidBCELoss()"
+    },
+    {
+      "type": "paragraph",
+      "text": "Nhớ lại mô tả của chúng tôi về biến mặt nạ và biến nhãn trong Section 14.3.5 . Sau đây tính toán mất nhị\nphân cross-entropy cho các biến đã cho."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "pred = np.array([[1.1, -2.2, 3.3, -4.4]] * 2)\nlabel = np.array([[1.0, 0.0, 0.0, 0.0], [0.0, 1.0, 0.0, 0.0]])\nmask = np.array([[1, 1, 1, 1], [1, 1, 0, 0]])\nloss(pred, label, mask) * mask.shape[1] / mask.sum(axis=1)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "array([0.93521017, 1.8462094 ])"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "pred = torch.tensor([[1.1, -2.2, 3.3, -4.4]] * 2)\nlabel = torch.tensor([[1.0, 0.0, 0.0, 0.0], [0.0, 1.0, 0.0, 0.0]])\nmask = torch.tensor([[1, 1, 1, 1], [1, 1, 0, 0]])\nloss(pred, label, mask) * mask.shape[1] / mask.sum(axis=1)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "tensor([0.9352, 1.8462])"
+    },
+    {
+      "type": "paragraph",
+      "text": "Dưới đây cho thấy cách tính toán các kết quả trên (theo cách kém hiệu\nquả hơn) bằng cách sử dụng chức năng kích hoạt sigmoid trong mất nhị\nphân cross-entropy. Chúng ta có thể xem xét hai đầu ra là hai tổn thất\nbình thường được tính trung bình so với các dự đoán không đeo mặt nạ."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def sigmd(x):\n    return -math.log(1 / (1 + math.exp(-x)))\n\nprint(f'{(sigmd(1.1) + sigmd(2.2) + sigmd(-3.3) + sigmd(4.4)) / 4:.4f}')\nprint(f'{(sigmd(-1.1) + sigmd(-2.2)) / 2:.4f}')"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "0.9352\n1.8462"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def sigmd(x):\n    return -math.log(1 / (1 + math.exp(-x)))\n\nprint(f'{(sigmd(1.1) + sigmd(2.2) + sigmd(-3.3) + sigmd(4.4)) / 4:.4f}')\nprint(f'{(sigmd(-1.1) + sigmd(-2.2)) / 2:.4f}')"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "0.9352\n1.8462"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "khoi-tao-cac-tham-so-mo-hinh",
+      "text": "14.4.2.2. Khởi tạo các tham số mô hình"
+    },
+    {
+      "type": "paragraph",
+      "text": "Chúng tôi xác định hai lớp nhúng cho tất cả các từ trong từ vựng khi\nchúng được sử dụng làm từ trung tâm và từ ngữ cảnh, tương ứng. Kích\nthước vector từ embed_size được đặt thành 100."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "embed_size = 100\nnet = nn.Sequential()\nnet.add(nn.Embedding(input_dim=len(vocab), output_dim=embed_size),\n        nn.Embedding(input_dim=len(vocab), output_dim=embed_size))"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "embed_size = 100\nnet = nn.Sequential(nn.Embedding(num_embeddings=len(vocab),\n                                 embedding_dim=embed_size),\n                    nn.Embedding(num_embeddings=len(vocab),\n                                 embedding_dim=embed_size))"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "xac-dinh-vong-dao-tao",
+      "text": "14.4.2.3. Xác định vòng đào tạo"
+    },
+    {
+      "type": "paragraph",
+      "text": "Vòng đào tạo được định nghĩa dưới đây. Do sự tồn tại của đệm, việc tính\ntoán chức năng mất mát hơi khác so với các chức năng đào tạo trước đó."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def train(net, data_iter, lr, num_epochs, device=d2l.try_gpu()):\n    net.initialize(ctx=device, force_reinit=True)\n    trainer = gluon.Trainer(net.collect_params(), 'adam',\n                            {'learning_rate': lr})\n    animator = d2l.Animator(xlabel='epoch', ylabel='loss',\n                            xlim=[1, num_epochs])\n    # Sum of normalized losses, no. of normalized losses\n    metric = d2l.Accumulator(2)\n    for epoch in range(num_epochs):\n        timer, num_batches = d2l.Timer(), len(data_iter)\n        for i, batch in enumerate(data_iter):\n            center, context_negative, mask, label = [\n                data.as_in_ctx(device) for data in batch]\n            with autograd.record():\n                pred = skip_gram(center, context_negative, net[0], net[1])\n                l = (loss(pred.reshape(label.shape), label, mask) *\n                     mask.shape[1] / mask.sum(axis=1))\n            l.backward()\n            trainer.step(batch_size)\n            metric.add(l.sum(), l.size)\n            if (i + 1) % (num_batches // 5) == 0 or i == num_batches - 1:\n                animator.add(epoch + (i + 1) / num_batches,\n                             (metric[0] / metric[1],))\n    print(f'loss {metric[0] / metric[1]:.3f}, '\n          f'{metric[1] / timer.stop():.1f} tokens/sec on {str(device)}')"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def train(net, data_iter, lr, num_epochs, device=d2l.try_gpu()):\n    def init_weights(m):\n        if type(m) == nn.Embedding:\n            nn.init.xavier_uniform_(m.weight)\n    net.apply(init_weights)\n    net = net.to(device)\n    optimizer = torch.optim.Adam(net.parameters(), lr=lr)\n    animator = d2l.Animator(xlabel='epoch', ylabel='loss',\n                            xlim=[1, num_epochs])\n    # Sum of normalized losses, no. of normalized losses\n    metric = d2l.Accumulator(2)\n    for epoch in range(num_epochs):\n        timer, num_batches = d2l.Timer(), len(data_iter)\n        for i, batch in enumerate(data_iter):\n            optimizer.zero_grad()\n            center, context_negative, mask, label = [\n                data.to(device) for data in batch]\n\n            pred = skip_gram(center, context_negative, net[0], net[1])\n            l = (loss(pred.reshape(label.shape).float(), label.float(), mask)\n                     / mask.sum(axis=1) * mask.shape[1])\n            l.sum().backward()\n            optimizer.step()\n            metric.add(l.sum(), l.numel())\n            if (i + 1) % (num_batches // 5) == 0 or i == num_batches - 1:\n                animator.add(epoch + (i + 1) / num_batches,\n                             (metric[0] / metric[1],))\n    print(f'loss {metric[0] / metric[1]:.3f}, '\n          f'{metric[1] / timer.stop():.1f} tokens/sec on {str(device)}')"
+    },
+    {
+      "type": "paragraph",
+      "text": "Bây giờ chúng ta có thể đào tạo một mô hình skip-gram bằng cách sử dụng\nlấy mẫu âm."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "lr, num_epochs = 0.002, 5\ntrain(net, data_iter, lr, num_epochs)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "loss 0.408, 93701.4 tokens/sec on gpu(0)"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_word2vec-pretraining_d81279_93_1.svg",
+      "local_path": "_images/output_word2vec-pretraining_d81279_93_1.svg",
+      "alt": "../_images/output_word2vec-pretraining_d81279_93_1.svg"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "lr, num_epochs = 0.002, 5\ntrain(net, data_iter, lr, num_epochs)"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "loss 0.410, 303154.0 tokens/sec on cuda:0"
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/output_word2vec-pretraining_d81279_96_1.svg",
+      "local_path": "_images/output_word2vec-pretraining_d81279_96_1.svg",
+      "alt": "../_images/output_word2vec-pretraining_d81279_96_1.svg"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "ap-dung-word-embeddings",
+      "text": "14.4.3. Áp dụng Word Embeddings"
+    },
+    {
+      "type": "paragraph",
+      "text": "Sau khi đào tạo mô hình word2vec, chúng ta có thể sử dụng sự tương đồng\ncosin của các vectơ từ từ từ mô hình được đào tạo để tìm các từ từ điển\ntương tự về mặt ngữ nghĩa nhất với từ đầu vào."
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def get_similar_tokens(query_token, k, embed):\n    W = embed.weight.data()\n    x = W[vocab[query_token]]\n    # Compute the cosine similarity. Add 1e-9 for numerical stability\n    cos = np.dot(W, x) / np.sqrt(np.sum(W * W, axis=1) * np.sum(x * x) + 1e-9)\n    topk = npx.topk(cos, k=k+1, ret_typ='indices').asnumpy().astype('int32')\n    for i in topk[1:]:  # Remove the input words\n        print(f'cosine sim={float(cos[i]):.3f}: {vocab.to_tokens(i)}')\n\nget_similar_tokens('chip', 3, net[0])"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "cosine sim=0.543: computer\ncosine sim=0.540: desktop\ncosine sim=0.536: intel"
+    },
+    {
+      "type": "code",
+      "language": "python",
+      "text": "def get_similar_tokens(query_token, k, embed):\n    W = embed.weight.data\n    x = W[vocab[query_token]]\n    # Compute the cosine similarity. Add 1e-9 for numerical stability\n    cos = torch.mv(W, x) / torch.sqrt(torch.sum(W * W, dim=1) *\n                                      torch.sum(x * x) + 1e-9)\n    topk = torch.topk(cos, k=k+1)[1].cpu().numpy().astype('int32')\n    for i in topk[1:]:  # Remove the input words\n        print(f'cosine sim={float(cos[i]):.3f}: {vocab.to_tokens(i)}')\n\nget_similar_tokens('chip', 3, net[0])"
+    },
+    {
+      "type": "code",
+      "language": "default",
+      "text": "cosine sim=0.676: microprocessor\ncosine sim=0.652: intel\ncosine sim=0.617: computer"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tom-tat",
+      "text": "14.4.4. Tóm tắt"
+    },
+    {
+      "type": "list",
+      "ordered": false,
+      "items": [
+        "Chúng ta có thể đào tạo một mô hình skip-gram với lấy mẫu âm bằng\ncách sử dụng các lớp nhúng và mất nhị phân cross-entropy.",
+        "Các ứng dụng của nhúng từ bao gồm việc tìm các từ tương tự về mặt ngữ\nnghĩa cho một từ nhất định dựa trên sự tương đồng cosin của vectơ từ."
+      ]
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bai-tap",
+      "text": "14.4.5. Bài tập"
+    },
+    {
+      "type": "list",
+      "ordered": true,
+      "items": [
+        "Sử dụng mô hình được đào tạo, tìm các từ tương tự về mặt ngữ nghĩa\ncho các từ đầu vào khác. Bạn có thể cải thiện kết quả bằng cách điều\nchỉnh các siêu tham số?",
+        "Khi một cơ thể đào tạo là rất lớn, chúng ta thường lấy mẫu từ ngữ\ncảnh và các từ tiếng ồn cho các từ trung tâm trong minibatch hiện tại\n* khi cập nhật tham số mô hình*. Nói cách khác, cùng một từ trung\ntâm có thể có các từ ngữ cảnh khác nhau hoặc từ tiếng ồn trong các kỷ\nnguyên đào tạo khác nhau. Lợi ích của phương pháp này là gì? Cố gắng\nthực hiện phương pháp đào tạo này."
+      ]
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    }
+  ],
+  "images": [
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_word2vec-pretraining_d81279_93_1.svg",
+      "local_path": "_images/output_word2vec-pretraining_d81279_93_1.svg",
+      "alt": "../_images/output_word2vec-pretraining_d81279_93_1.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/output_word2vec-pretraining_d81279_96_1.svg",
+      "local_path": "_images/output_word2vec-pretraining_d81279_96_1.svg",
+      "alt": "../_images/output_word2vec-pretraining_d81279_96_1.svg"
+    }
+  ],
+  "text": "14.4. Pretraining word2vec\nChúng tôi tiếp tục thực hiện mô hình skip-gram được xác định trong Section 14.1 . Sau đó, chúng ta sẽ pretrain word2vec bằng\ncách sử dụng lấy mẫu âm trên tập dữ liệu PTB. Trước hết, chúng ta hãy\nlấy bộ lặp dữ liệu và từ vựng cho tập dữ liệu này bằng cách gọi hàm d2l.load_data_ptb , được mô tả trong Section 14.3\n14.4.1. Mô hình Skip-Gram\nChúng tôi thực hiện mô hình skip-gram bằng cách sử dụng các lớp nhúng và\nphép nhân ma trận hàng loạt. Đầu tiên, chúng ta hãy xem lại cách nhúng\nlớp hoạt động.\n14.4.1.1. Lớp nhúng\nNhư được mô tả trong Section 9.7 , một lớp nhúng ánh xạ chỉ\nmục của mã thông báo vào vector tính năng của nó. Trọng lượng của lớp\nnày là một ma trận có số hàng bằng với kích thước từ điển\n( input_dim ) và số cột bằng với chiều vectơ cho mỗi mã thông báo\n( output_dim ). Sau khi một mô hình nhúng từ được đào tạo, trọng lượng\nnày là những gì chúng ta cần.\nĐầu vào của một lớp nhúng là chỉ mục của một mã thông báo (word). Đối\nvới bất kỳ chỉ số token \\(i\\) , biểu diễn vectơ của nó có thể được\nlấy từ hàng \\(i^\\mathrm{th}\\) của ma trận trọng lượng trong lớp\nnhúng. Vì kích thước vectơ ( output_dim ) được đặt thành 4, lớp nhúng\ntrả về vectơ có hình dạng (2, 3, 4) cho một minibatch các chỉ số token\ncó hình dạng (2, 3).\n14.4.1.2. Xác định tuyên truyền chuyển tiếp\nTrong tuyên truyền chuyển tiếp, đầu vào của mô hình bỏ qua gram bao gồm\ncác chỉ số từ trung tâm center của hình dạng (kích thước lô, 1) và\nngữ cảnh nối và các chỉ số từ tiếng ồn contexts_and_negatives của\nhình dạng (kích thước lô, max_len ), trong đó max_len được xác\nđịnh trong Section 14.3.5 . Hai biến này\nlần đầu tiên được chuyển đổi từ các chỉ số token thành vectơ thông qua\nlớp nhúng, sau đó phép nhân ma trận lô của chúng (được mô tả trong Section 10.2.4.1 ) trả về một đầu ra của hình dạng (kích\nthước lô, 1, max_len ). Mỗi phần tử trong đầu ra là tích chấm của một\nvector từ trung tâm và một vector ngữ cảnh hoặc từ nhiễu.\nChúng ta hãy in hình dạng đầu ra của chức năng skip_gram này cho một\nsố đầu vào ví dụ.\n14.4.2. Đào tạo\nTrước khi đào tạo mô hình skip-gram với lấy mẫu âm, trước tiên chúng ta\nhãy xác định chức năng mất mát của nó.\n14.4.2.1. Nhị phân Cross-Entropy Mất\nTheo định nghĩa của hàm mất để lấy mẫu âm trong Section 14.2.1 , chúng ta sẽ sử dụng mất nhị phân\ncross-entropy.\nNhớ lại mô tả của chúng tôi về biến mặt nạ và biến nhãn trong Section 14.3.5 . Sau đây tính toán mất nhị\nphân cross-entropy cho các biến đã cho.\nDưới đây cho thấy cách tính toán các kết quả trên (theo cách kém hiệu\nquả hơn) bằng cách sử dụng chức năng kích hoạt sigmoid trong mất nhị\nphân cross-entropy. Chúng ta có thể xem xét hai đầu ra là hai tổn thất\nbình thường được tính trung bình so với các dự đoán không đeo mặt nạ.\n14.4.2.2. Khởi tạo các tham số mô hình\nChúng tôi xác định hai lớp nhúng cho tất cả các từ trong từ vựng khi\nchúng được sử dụng làm từ trung tâm và từ ngữ cảnh, tương ứng. Kích\nthước vector từ embed_size được đặt thành 100.\n14.4.2.3. Xác định vòng đào tạo\nVòng đào tạo được định nghĩa dưới đây. Do sự tồn tại của đệm, việc tính\ntoán chức năng mất mát hơi khác so với các chức năng đào tạo trước đó.\nBây giờ chúng ta có thể đào tạo một mô hình skip-gram bằng cách sử dụng\nlấy mẫu âm.\n14.4.3. Áp dụng Word Embeddings\nSau khi đào tạo mô hình word2vec, chúng ta có thể sử dụng sự tương đồng\ncosin của các vectơ từ từ từ mô hình được đào tạo để tìm các từ từ điển\ntương tự về mặt ngữ nghĩa nhất với từ đầu vào.\n14.4.4. Tóm tắt\nChúng ta có thể đào tạo một mô hình skip-gram với lấy mẫu âm bằng\ncách sử dụng các lớp nhúng và mất nhị phân cross-entropy.\nCác ứng dụng của nhúng từ bao gồm việc tìm các từ tương tự về mặt ngữ\nnghĩa cho một từ nhất định dựa trên sự tương đồng cosin của vectơ từ.\n14.4.5. Bài tập\nSử dụng mô hình được đào tạo, tìm các từ tương tự về mặt ngữ nghĩa\ncho các từ đầu vào khác. Bạn có thể cải thiện kết quả bằng cách điều\nchỉnh các siêu tham số?\nKhi một cơ thể đào tạo là rất lớn, chúng ta thường lấy mẫu từ ngữ\ncảnh và các từ tiếng ồn cho các từ trung tâm trong minibatch hiện tại\n* khi cập nhật tham số mô hình*. Nói cách khác, cùng một từ trung\ntâm có thể có các từ ngữ cảnh khác nhau hoặc từ tiếng ồn trong các kỷ\nnguyên đào tạo khác nhau. Lợi ích của phương pháp này là gì? Cố gắng\nthực hiện phương pháp đào tạo này.\nDiscussions\nDiscussions"
+}

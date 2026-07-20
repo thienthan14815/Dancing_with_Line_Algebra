@@ -1,0 +1,1016 @@
+{
+  "url": "https://vi.d2l.ai/chapter_introduction/index.html",
+  "chapter": "chapter_introduction",
+  "title": "1. Giới thiệu",
+  "crawled_at": "2026-07-20T12:39:09.808387+00:00",
+  "headings": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "gioi-thieu",
+      "text": "1. Giới thiệu"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "mot-vi-du-dong-luc",
+      "text": "1.1. Một ví dụ động lực"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "cac-thanh-phan-chinh",
+      "text": "1.2. Các thành phần chính"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "du-lieu",
+      "text": "1.2.1. Dữ liệu"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "mo-hinh",
+      "text": "1.2.2. Mô hình"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "ham-muc-tieu",
+      "text": "1.2.3. Hàm mục tiêu"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "thuat-toan-toi-uu-hoa",
+      "text": "1.2.4. Thuật toán tối ưu hóa"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "cac-loai-van-de-ve-may-hoc",
+      "text": "1.3. Các loại vấn đề về máy học"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "hoc-duoc-giam-sat",
+      "text": "1.3.1. Học được giám sát"
+    },
+    {
+      "type": "heading",
+      "level": 4,
+      "id": "hoi-quy",
+      "text": "1.3.1.1. Hồi quy"
+    },
+    {
+      "type": "heading",
+      "level": 4,
+      "id": "phan-loai",
+      "text": "1.3.1.2. Phân loại"
+    },
+    {
+      "type": "heading",
+      "level": 4,
+      "id": "gan-the",
+      "text": "1.3.1.3. Gắn thẻ"
+    },
+    {
+      "type": "heading",
+      "level": 4,
+      "id": "tim",
+      "text": "1.3.1.4. Tìm"
+    },
+    {
+      "type": "heading",
+      "level": 4,
+      "id": "he-thong-recommender",
+      "text": "1.3.1.5. Hệ thống Recommender"
+    },
+    {
+      "type": "heading",
+      "level": 4,
+      "id": "hoc-trinh-tu",
+      "text": "1.3.1.6. Học trình tự"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "hoc-tap-khong-duoc-giam-sat-va-tu-giam-sat",
+      "text": "1.3.2. Học tập không được giám sát và tự giám sát"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "tuong-tac-voi-moi-truong",
+      "text": "1.3.3. Tương tác với môi trường"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "hoc-tang-cuong",
+      "text": "1.3.4. Học tăng cường"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "re",
+      "text": "1.4. Rễ"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "con-duong-den-sau-hoc",
+      "text": "1.5. Con đường đến sâu học"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "cau-chuyen-thanh-cong",
+      "text": "1.6. Câu chuyện thành công"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "cac-diem",
+      "text": "1.7. các điểm"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tom-tat",
+      "text": "1.8. Tóm tắt"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bai-tap",
+      "text": "1.9. Bài tập"
+    }
+  ],
+  "content": [
+    {
+      "type": "heading",
+      "level": 1,
+      "id": "gioi-thieu",
+      "text": "1. Giới thiệu"
+    },
+    {
+      "type": "paragraph",
+      "text": "Cho đến gần đây, gần như mọi chương trình máy tính mà chúng tôi tương\ntác với hàng ngày được mã hóa bởi các nhà phát triển phần mềm từ các\nnguyên tắc đầu tiên. Nói rằng chúng tôi muốn viết một ứng dụng để quản\nlý một nền tảng thương mại điện tử. Sau khi huddling xung quanh một bảng\ntrắng trong một vài giờ để suy nghĩ về vấn đề, chúng tôi sẽ đưa ra những\nnét rộng của một giải pháp làm việc có thể trông giống như thế này: (i)\nngười dùng tương tác với các ứng dụng thông qua một giao diện chạy trong\nmột trình duyệt web hoặc ứng dụng di động; (ii) ứng dụng của chúng tôi\ntương tác với một công cụ cơ sở dữ liệu cấp thương mại để theo dõi trạng\nthái của từng người dùng và duy trì hồ sơ về các giao dịch lịch sử; và\n(iii) ở trung tâm của ứng dụng của chúng tôi, * business logic* (bạn\ncó thể nói, nãi ) ứng dụng của chúng tôi đánh vần chi tiết về phương\npháp hành động thích hợp của chúng tôi program chương trình should take\nin every mỗi conceivable có thể tưởng tượng circumstance hoàn cảnh."
+    },
+    {
+      "type": "paragraph",
+      "text": "Để xây dựng bộ não của ứng dụng của chúng tôi, chúng tôi sẽ phải bước\nqua mọi trường hợp góc có thể mà chúng tôi dự đoán gặp phải, đưa ra các\nquy tắc phù hợp. Mỗi lần khách hàng nhấp chuột để thêm một mặt hàng vào\ngiỏ hàng của họ, chúng tôi thêm một mục nhập vào bảng cơ sở dữ liệu giỏ\nhàng, liên kết ID của người dùng đó với ID của sản phẩm được yêu cầu.\nTrong khi vài nhà phát triển bao giờ nhận được nó hoàn toàn đúng lần đầu\ntiên (nó có thể mất một số thử nghiệm chạy để làm việc ra những trở\nngại), đối với hầu hết các phần, chúng tôi có thể viết một chương trình\nnhư vậy từ nguyên tắc đầu tiên và tự tin khởi động nó trước bao giờ\nnhìn thấy một khách hàng thực sự. Khả năng thiết kế các hệ thống tự động\ncủa chúng tôi từ các nguyên tắc đầu tiên thúc đẩy các sản phẩm và hệ\nthống hoạt động, thường là trong các tình huống mới lạ, là một kỳ công\nnhận thức đáng chú ý. Và khi bạn có thể đưa ra các giải pháp hoạt động\n$100% $ thời gian, bạn không nên sử dụng máy học."
+    },
+    {
+      "type": "paragraph",
+      "text": "May mắn thay cho cộng đồng ngày càng tăng của các nhà khoa học máy học,\nnhiều nhiệm vụ mà chúng tôi muốn tự động hóa không dễ uốn cong đến sự\nkhéo léo của con người. Hãy tưởng tượng xoay quanh bảng trắng với những\nbộ óc thông minh nhất mà bạn biết, nhưng lần này bạn đang giải quyết một\ntrong những vấn đề sau:"
+    },
+    {
+      "type": "list",
+      "ordered": false,
+      "items": [
+        "Viết một chương trình dự đoán thời tiết ngày mai được đưa ra thông\ntin địa lý, hình ảnh vệ tinh và một cửa sổ theo dõi thời tiết trong\nquá khứ.",
+        "Viết một chương trình có trong một câu hỏi, thể hiện bằng văn bản\ndạng tự do, và trả lời nó một cách chính xác.",
+        "Viết một chương trình đưa ra một hình ảnh có thể xác định tất cả\nnhững người mà nó chứa, vẽ phác thảo xung quanh mỗi.",
+        "Viết một chương trình trình bày cho người dùng các sản phẩm mà họ có\nkhả năng thưởng thức nhưng không thể, trong quá trình duyệt tự nhiên,\nđể gặp phải."
+      ]
+    },
+    {
+      "type": "paragraph",
+      "text": "Trong mỗi trường hợp này, ngay cả các lập trình viên ưu tú cũng không có\nkhả năng mã hóa các giải pháp từ đầu. Những lý do cho điều này có thể\nkhác nhau. Đôi khi chương trình mà chúng tôi đang tìm kiếm theo một mô\nhình thay đổi theo thời gian và chúng tôi cần các chương trình của mình\nđể điều chỉnh. Trong các trường hợp khác, mối quan hệ (nói giữa pixel và\ndanh mục trừu tượng) có thể quá phức tạp, đòi hỏi hàng ngàn hoặc hàng\ntriệu tính toán vượt quá sự hiểu biết có ý thức của chúng ta ngay cả khi\nmắt chúng ta quản lý nhiệm vụ dễ dàng. Học máy là nghiên cứu mạnh mẽ\nkỹ thuật mà có thể học hỏi từ kinh nghiệm. Là một thuật toán học máy\ntích lũy nhiều kinh nghiệm hơn, điển hình dưới dạng dữ liệu quan sát\nhoặc tương tác với một môi trường, hiệu suất của nó được cải thiện.\nTương phản điều này với nền tảng thương mại điện tử xác định của chúng\ntôi, thực hiện theo cùng một logic kinh doanh, bất kể kinh nghiệm tích\nlũy bao nhiêu, cho đến khi các nhà phát triển tự học và quyết định rằng\nđã đến lúc cập nhật phần mềm. Trong cuốn sách này, chúng tôi sẽ dạy cho\nbạn những nguyên tắc cơ bản của máy học và đặc biệt tập trung vào *\ndeep learning*, một bộ kỹ thuật mạnh mẽ thúc đẩy đổi mới trong các lĩnh\nvực đa dạng như thị giác máy tính, xử lý ngôn ngữ tự nhiên, chăm sóc sức\nkhỏe và bộ gen."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "mot-vi-du-dong-luc",
+      "text": "1.1. Một ví dụ động lực"
+    },
+    {
+      "type": "paragraph",
+      "text": "Trước khi bắt đầu viết, các tác giả của cuốn sách này, giống như nhiều\nlực lượng lao động, đã phải trở thành caffein. Chúng tôi nhảy vào xe và\nbắt đầu lái xe. Sử dụng iPhone, Alex gọi ra “Hey Siri”, đánh thức hệ\nthống nhận dạng giọng nói của điện thoại. Sau đó Mục chỉ huy “hướng đến\nquán cà phê Blue Bottle”. Điện thoại nhanh chóng hiển thị phiên mã lệnh\ncủa mình. Nó cũng nhận ra rằng chúng tôi đang yêu cầu chỉ đường và khởi\nchạy ứng dụng Maps (ứng dụng) để đáp ứng yêu cầu của chúng tôi. Sau khi\nra mắt, ứng dụng Maps đã xác định được một số tuyến đường. Bên cạnh mỗi\ntuyến đường, điện thoại hiển thị thời gian vận chuyển dự đoán. Trong khi\nchúng tôi chế tạo câu chuyện này để thuận tiện sư phạm, nó chứng minh\nrằng trong khoảng thời gian chỉ vài giây, các tương tác hàng ngày của\nchúng tôi với một chiếc điện thoại thông minh có thể tham gia vào một số\nmô hình máy học."
+    },
+    {
+      "type": "paragraph",
+      "text": "Hãy tưởng tượng chỉ cần viết một chương trình để trả lời một từ wake như “Alexa”, “OK Google”, và “Hey Siri”. Hãy thử tự mình mã hóa nó trong\nmột căn phòng mà không có gì ngoài máy tính và trình soạn thảo mã, như\nminh họa trong Fig. 1.1.1 . Làm thế nào bạn sẽ viết một\nchương trình như vậy từ các nguyên tắc đầu tiên? Hãy suy nghĩ về nó…\nvấn đề là khó khăn. Mỗi giây, micrô sẽ thu thập khoảng 44000 mẫu. Mỗi\nmẫu là một phép đo biên độ của sóng âm. Quy tắc nào có thể ánh xạ đáng\ntin cậy từ một đoạn âm thanh thô để dự đoán tự tin \\(\\{\\text{yes}, \\text{no}\\}\\) về việc liệu đoạn mã có chứa từ thức\nhay không? Nếu bạn bị mắc kẹt, đừng lo lắng. Chúng tôi cũng không biết\nlàm thế nào để viết một chương trình như vậy từ đầu. Đó là lý do tại sao\nchúng tôi sử dụng máy học."
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/wake-word.svg",
+      "local_path": "_images/wake-word.svg",
+      "alt": "../_images/wake-word.svg"
+    },
+    {
+      "type": "paragraph",
+      "text": "Fig. 1.1.1 Identify a wake word. ¶"
+    },
+    {
+      "type": "paragraph",
+      "text": "Đây là mánh khóe. Thông thường, ngay cả khi chúng ta không biết làm thế\nnào để nói với một máy tính một cách rõ ràng làm thế nào để ánh xạ từ\nđầu vào đến đầu ra, dù sao chúng ta vẫn có khả năng tự thực hiện chiến\ncông nhận thức. Nói cách khác, ngay cả khi bạn không biết cách lập trình\nmáy tính để nhận ra từ “Alexa”, bản thân bạn có thể nhận ra nó. Được\ntrang bị khả năng này, chúng ta có thể thu thập một bộ dữ liệu* khổng\nlồ* chứa các ví dụ về âm thanh và gắn nhãn những người làm và không\nchứa từ thức dậy. Trong phương pháp học máy, chúng tôi không cố gắng\nthiết kế một hệ thống rõ ràng để nhận ra các từ thức. Thay vào đó,\nchúng tôi xác định một chương trình linh hoạt có hành vi được xác định\nbởi một số tham số*. Sau đó, chúng tôi sử dụng tập dữ liệu để xác định\nbộ tham số tốt nhất có thể, những thông số cải thiện hiệu suất của\nchương trình của chúng tôi đối với một số biện pháp hiệu suất đối với\nnhiệm vụ quan tâm."
+    },
+    {
+      "type": "paragraph",
+      "text": "Bạn có thể nghĩ về các tham số như các nút bấm mà chúng ta có thể xoay,\nthao tác hành vi của chương trình. Sửa các tham số, chúng tôi gọi chương\ntrình là mô hình **. Tập hợp tất cả các chương trình riêng biệt (ánh\nxạ đầu vào-đầu ra) mà chúng ta có thể tạo ra chỉ bằng cách thao tác các\ntham số được gọi là family của mô hình. Và meta-chương trình sử dụng\ntập dữ liệu của chúng tôi để chọn các tham số được gọi là thuật toán * learning * ."
+    },
+    {
+      "type": "paragraph",
+      "text": "Trước khi chúng ta có thể tiếp tục và tham gia vào thuật toán học tập,\nchúng ta phải xác định chính xác vấn đề, ghim bản chất chính xác của các\nđầu vào và đầu ra, và chọn một gia đình mô hình thích hợp. Trong trường\nhợp này, mô hình của chúng tôi nhận được một đoạn âm thanh dưới dạng *\nđầu vào* và mô hình tạo ra một lựa chọn trong số \\(\\{\\text{yes}, \\text{no}\\}\\) dưới dạng * đầu ra*. Nếu tất cả diễn\nra theo kế hoạch, các dự đoán của mô hình thường sẽ chính xác về việc\nđoạn mã có chứa từ đánh thức hay không."
+    },
+    {
+      "type": "paragraph",
+      "text": "Nếu chúng ta chọn đúng dòng mô hình, sẽ tồn tại một cài đặt của các nút\nbấm sao cho mô hình sẽ cháy “có” mỗi khi nó nghe từ “Alexa”. Bởi vì sự\nlựa chọn chính xác của từ thức là tùy ý, chúng ta có thể sẽ cần một gia\nđình người mẫu đủ phong phú rằng, thông qua một thiết lập khác của các\nnút bấm, nó có thể bắn “có” chỉ khi nghe từ “Apricot”. Chúng tôi hy vọng\nrằng cùng một gia đình mô hình nên phù hợp để công nhận “Alexa” và công\nnhận “Apricot” bởi vì chúng có vẻ, trực giác, là những nhiệm vụ tương\ntự. Tuy nhiên, chúng ta có thể cần một dòng mô hình khác hoàn toàn nếu\nchúng ta muốn đối phó với các đầu vào hoặc đầu ra khác nhau về cơ bản,\nhãy nói nếu chúng ta muốn ánh xạ từ hình ảnh sang chú thích, hoặc từ câu\ntiếng Anh sang câu Trung Quốc."
+    },
+    {
+      "type": "paragraph",
+      "text": "Như bạn có thể đoán, nếu chúng ta chỉ cần đặt tất cả các nút một cách\nngẫu nhiên, không chắc mô hình của chúng tôi sẽ nhận ra “Alexa”,\n“Apricot” hoặc bất kỳ từ tiếng Anh nào khác. Trong machine learning, *\nlearning* là quá trình mà chúng tôi khám phá ra cài đặt phù hợp của các\nnút nhấn ép buộc hành vi mong muốn từ mô hình của chúng tôi. Nói cách\nkhác, chúng tôi * đào tạo* mô hình của chúng tôi với dữ liệu. Như thể\nhiện trong Fig. 1.1.2 , quá trình đào tạo thường trông như\nsau:"
+    },
+    {
+      "type": "list",
+      "ordered": true,
+      "items": [
+        "Bắt đầu với một mô hình được khởi tạo ngẫu nhiên mà không thể làm bất\ncứ điều gì hữu ích.",
+        "Lấy một số dữ liệu của bạn (ví dụ: đoạn âm thanh và nhãn \\(\\{\\text{yes}, \\text{no}\\}\\) tương ứng).",
+        "Tinh chỉnh các núm để mô hình hút ít hơn so với những ví dụ đó.",
+        "Lặp lại Bước 2 và 3 cho đến khi mô hình tuyệt vời."
+      ]
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/ml-loop.svg",
+      "local_path": "_images/ml-loop.svg",
+      "alt": "../_images/ml-loop.svg"
+    },
+    {
+      "type": "paragraph",
+      "text": "Fig. 1.1.2 A typical training process. ¶"
+    },
+    {
+      "type": "paragraph",
+      "text": "Để tóm tắt, thay vì mã hóa một công cụ nhận dạng từ thức, chúng tôi mã\nhóa một chương trình có thể * learn* để nhận ra các từ thức, nếu chúng\ntôi trình bày nó với một tập dữ liệu được dán nhãn lớn. Bạn có thể nghĩ\nđến hành động này để xác định hành vi của một chương trình bằng cách\ntrình bày nó với một tập dữ liệu dưới dạng lập trình với dữ liệu . Điều\nđó có nghĩa là, chúng ta có thể “lập trình” một máy dò mèo bằng cách\ncung cấp hệ thống học máy của chúng tôi nhiều ví dụ về mèo và chó. Bằng\ncách này, máy dò cuối cùng sẽ học cách phát ra một số dương rất lớn nếu\nnó là một con mèo, một số âm rất lớn nếu nó là chó, và một cái gì đó gần\nbằng không nếu nó không chắc chắn, và điều này hầu như không làm trầy\nxước bề mặt của những gì máy học có thể làm. Deep learning, mà chúng tôi\nsẽ giải thích chi tiết hơn sau này, chỉ là một trong số nhiều phương\npháp phổ biến để giải quyết các vấn đề máy học."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "cac-thanh-phan-chinh",
+      "text": "1.2. Các thành phần chính"
+    },
+    {
+      "type": "paragraph",
+      "text": "Trong ví dụ từ thức dậy của chúng tôi, chúng tôi đã mô tả một tập dữ\nliệu bao gồm đoạn âm thanh và nhãn nhị phân, và chúng tôi đã đưa ra một\ncảm giác lượn sóng tay về cách chúng tôi có thể đào tạo một mô hình để\nxấp xỉ một ánh xạ từ đoạn trích đến phân loại. Loại vấn đề này, nơi\nchúng tôi cố gắng dự đoán một nhãn không xác định được chỉ định dựa trên\ncác đầu vào đã biết được đưa ra một tập dữ liệu bao gồm các ví dụ mà các\nnhãn được biết đến, được gọi là * học được giám sách*. Đây chỉ là một\ntrong số nhiều loại vấn đề máy học. Sau đó chúng ta sẽ đi sâu vào các\nvấn đề học máy khác nhau. Đầu tiên, chúng tôi muốn làm sáng tỏ nhiều hơn\nvề một số thành phần cốt lõi sẽ theo dõi chúng tôi xung quanh, bất kể\nchúng tôi gặp phải vấn đề máy học nào:"
+    },
+    {
+      "type": "list",
+      "ordered": true,
+      "items": [
+        "dữ liệu mà chúng ta có thể học hỏi từ.",
+        "Một* mô hình* về cách chuyển đổi dữ liệu.",
+        "Chức năng * mục tiêu * định lượng mô hình đang hoạt động tốt như thế\nnào (hoặc xấu).",
+        "* algorithm * để điều chỉnh các tham số của mô hình để tối ưu hóa hàm\nmục tiêu."
+      ]
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "du-lieu",
+      "text": "1.2.1. Dữ liệu"
+    },
+    {
+      "type": "paragraph",
+      "text": "Nó có thể đi mà không nói rằng bạn không thể làm khoa học dữ liệu mà\nkhông có dữ liệu. Chúng ta có thể mất hàng trăm trang suy ngẫm những gì\nchính xác cấu thành dữ liệu, nhưng bây giờ, chúng ta sẽ sai về mặt thực\ntế và tập trung vào các thuộc tính chính cần quan tâm. Nói chung, chúng\ntôi quan tâm đến một bộ sưu tập các ví dụ. Để làm việc với dữ liệu một\ncách hữu ích, chúng ta thường cần phải đưa ra một đại diện số phù hợp.\nMỗi ví dụ (hoặc data point , data instance , sample ) thường bao\ngồm một tập hợp các thuộc tính gọi là features (hoặc covariates ), từ\nđó mô hình phải đưa ra dự đoán của nó. Trong các vấn đề học tập được\ngiám sát ở trên, điều cần dự đoán là một thuộc tính đặc biệt được chỉ\nđịnh là label (hoặc target )."
+    },
+    {
+      "type": "paragraph",
+      "text": "Nếu chúng ta đang làm việc với dữ liệu hình ảnh, mỗi bức ảnh riêng lẻ có\nthể tạo thành một ví dụ, mỗi bức ảnh được biểu thị bằng một danh sách có\nthứ tự các giá trị số tương ứng với độ sáng của mỗi pixel. Một bức ảnh\nmàu \\(200\\times 200\\) sẽ bao gồm \\(200\\times200\\times3=120000\\) giá trị số, tương ứng với độ sáng của các kênh màu đỏ, xanh lá cây và\nxanh cho mỗi vị trí không gian. Trong một nhiệm vụ truyền thống khác,\nchúng ta có thể cố gắng dự đoán liệu bệnh nhân có tồn tại hay không, với\nmột tập hợp các tính năng tiêu chuẩn như tuổi tác, dấu hiệu quan trọng\nvà chẩn đoán."
+    },
+    {
+      "type": "paragraph",
+      "text": "Khi mỗi ví dụ được đặc trưng bởi cùng một số giá trị số, chúng ta nói\nrằng dữ liệu bao gồm các vectơ có độ dài cố định và chúng ta mô tả độ\ndài không đổi của các vectơ là dimensionality của dữ liệu. Như bạn có\nthể tưởng tượng, chiều dài cố định có thể là một tài sản thuận tiện. Nếu\nchúng ta muốn đào tạo một mô hình để nhận ra ung thư trong hình ảnh kính\nhiển vi, các đầu vào có độ dài cố định có nghĩa là chúng ta có ít điều\ncần lo lắng hơn."
+    },
+    {
+      "type": "paragraph",
+      "text": "Tuy nhiên, không phải tất cả dữ liệu đều có thể dễ dàng được biểu diễn\ndưới dạng chiều dài cố định vectơ. Mặc dù chúng ta có thể mong đợi\nhình ảnh kính hiển vi đến từ thiết bị tiêu chuẩn, nhưng chúng ta không\nthể mong đợi hình ảnh được khai thác từ Internet để tất cả hiển thị với\ncùng độ phân giải hoặc hình dạng. Đối với hình ảnh, chúng ta có thể xem\nxét cắt tất cả chúng đến một kích thước tiêu chuẩn, nhưng chiến lược đó\nchỉ giúp chúng ta cho đến nay. Chúng tôi có nguy cơ mất thông tin trong\ncác phần cắt ra. Hơn nữa, dữ liệu văn bản chống lại các biểu diễn độ dài\ncố định thậm chí còn bướng bỉnh hơn. Xem xét các đánh giá của khách hàng\ncòn lại trên các trang thương mại điện tử như Amazon, IMDB và\nTripAdvisor. Một số là ngắn: “nó bốc mùi!”. Những người khác ramble cho\ncác trang. Một lợi thế lớn của học sâu so với các phương pháp truyền\nthống là ân sủng so sánh mà các mô hình hiện đại có thể xử lý dữ liệu *\nchiều dài thay đổi*."
+    },
+    {
+      "type": "paragraph",
+      "text": "Nói chung, chúng ta càng có nhiều dữ liệu, công việc của chúng ta càng\ntrở nên dễ dàng hơn. Khi chúng ta có nhiều dữ liệu hơn, chúng ta có thể\nđào tạo các mô hình mạnh mẽ hơn và ít dựa vào các giả định được hình\nthành trước. Sự thay đổi chế độ từ (tương đối) nhỏ sang dữ liệu lớn là\nmột đóng góp chính cho sự thành công của học sâu hiện đại. Để thúc đẩy\nđiểm về nhà, nhiều mô hình thú vị nhất trong học sâu không hoạt động mà\nkhông có bộ dữ liệu lớn. Một số người khác làm việc trong chế độ dữ liệu\nnhỏ, nhưng không tốt hơn các cách tiếp cận truyền thống."
+    },
+    {
+      "type": "paragraph",
+      "text": "Cuối cùng, nó không đủ để có nhiều dữ liệu và xử lý nó một cách khéo\nléo. Chúng tôi cần dữ liệu phải . Nếu dữ liệu đầy những sai lầm hoặc\nnếu các tính năng được chọn không dự đoán về số lượng mục tiêu quan tâm,\nviệc học sẽ thất bại. Tình hình bị bắt tốt bởi sáo rỗng: rác vào, rác\nra . Hơn nữa, hiệu suất dự đoán kém không phải là hậu quả tiềm năng duy\nnhất. Trong các ứng dụng nhạy cảm của học máy, như chính sách dự đoán,\nsàng lọc tiếp tục và các mô hình rủi ro được sử dụng để cho vay, chúng\nta phải đặc biệt cảnh giác với hậu quả của dữ liệu rác. Một chế độ lỗi\nphổ biến xảy ra trong các bộ dữ liệu nơi một số nhóm người không được\nđại diện trong dữ liệu đào tạo. Hãy tưởng tượng áp dụng một hệ thống\nnhận dạng ung thư da trong tự nhiên chưa từng thấy da đen trước đây.\nThất bại cũng có thể xảy ra khi dữ liệu không chỉ đơn thuần là đại diện\ncho một số nhóm mà phản ánh định kiến xã hội. Ví dụ: nếu các quyết định\ntuyển dụng trong quá khứ được sử dụng để đào tạo một mô hình dự đoán sẽ\nđược sử dụng để sàng lọc sơ yếu lý lịch, thì các mô hình học máy có thể\nvô tình nắm bắt và tự động hóa các bất công lịch sử. Lưu ý rằng tất cả\nđiều này có thể xảy ra mà không có nhà khoa học dữ liệu tích cực âm mưu,\nhoặc thậm chí nhận thức được."
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "mo-hinh",
+      "text": "1.2.2. Mô hình"
+    },
+    {
+      "type": "paragraph",
+      "text": "Hầu hết các máy học liên quan đến việc chuyển đổi dữ liệu theo một số\nnghĩa. Chúng ta có thể muốn xây dựng một hệ thống chụp ảnh và dự đoán nụ\ncười. Ngoài ra, chúng ta có thể muốn ăn một tập hợp các bài đọc cảm biến\nvà dự đoán mức độ bình thường so với các bài đọc dị thường như thế nào.\nTheo mô hình * , chúng tôi biểu thị máy tính toán để nhập dữ liệu của một\nloại và phun ra các dự đoán của một loại có thể khác. Đặc biệt, chúng\ntôi quan tâm đến các mô hình thống kê có thể được ước tính từ dữ liệu.\nTrong khi các mô hình đơn giản hoàn toàn có khả năng giải quyết các vấn\nđề đơn giản thích hợp, các vấn đề mà chúng tôi tập trung vào trong cuốn\nsách này kéo dài giới hạn của các phương pháp cổ điển. Học sâu được phân\nbiệt với cách tiếp cận cổ điển chủ yếu bởi tập hợp các mô hình mạnh mẽ\nmà nó tập trung vào. Các mô hình này bao gồm nhiều biến đổi liên tiếp\ncủa dữ liệu được liên kết với nhau từ trên xuống dưới, do đó tên * deep\nlearning*. Trên đường thảo luận về các mô hình sâu sắc, chúng tôi cũng\nsẽ thảo luận về một số phương pháp truyền thống hơn."
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "ham-muc-tieu",
+      "text": "1.2.3. Hàm mục tiêu"
+    },
+    {
+      "type": "paragraph",
+      "text": "Trước đó, chúng tôi giới thiệu machine learning là học hỏi từ kinh\nnghiệm. Bằng cách * learning* ở đây, chúng tôi có nghĩa là cải thiện\ntại một số nhiệm vụ theo thời gian. Nhưng ai là để nói những gì tạo\nthành một sự cải thiện? Bạn có thể tưởng tượng rằng chúng tôi có thể đề\nxuất cập nhật mô hình của chúng tôi và một số người có thể không đồng ý\nvề việc bản cập nhật được đề xuất cấu thành một cải tiến hay suy giảm."
+    },
+    {
+      "type": "paragraph",
+      "text": "Để phát triển một hệ thống toán học chính thức của máy học, chúng ta cần\nphải có các biện pháp chính thức về mức độ tốt (hoặc xấu) mô hình của\nchúng ta. Trong học máy và tối ưu hóa nói chung hơn, chúng tôi gọi các\nchức năng * mục tiêu này * . Theo quy ước, chúng ta thường xác định các\nhàm khách quan để thấp hơn là tốt hơn. Đây chỉ đơn thuần là một quy ước.\nBạn có thể thực hiện bất kỳ chức năng nào cao hơn tốt hơn và biến nó\nthành một chức năng mới giống hệt nhau về chất lượng nhưng thấp hơn là\ntốt hơn bằng cách lật dấu hiệu. Bởi vì thấp hơn là tốt hơn, các chức\nnăng này đôi khi được gọi * chức năng mất*."
+    },
+    {
+      "type": "paragraph",
+      "text": "Khi cố gắng dự đoán các giá trị số, hàm mất mát phổ biến nhất là squared error , tức là bình phương của sự khác biệt giữa dự đoán và sự\nthật mặt đất. Để phân loại, mục tiêu phổ biến nhất là giảm thiểu tỷ lệ\nlỗi, tức là phần nhỏ các ví dụ mà các dự đoán của chúng ta không đồng ý\nvới sự thật nền tảng. Một số mục tiêu (ví dụ, lỗi bình phương) rất dễ\ntối ưu hóa. Những người khác (ví dụ, tỷ lệ lỗi) rất khó để tối ưu hóa\ntrực tiếp, do không phân biệt hoặc các biến chứng khác. Trong những\ntrường hợp này, thông thường tối ưu hóa một * thay thế khách thể*."
+    },
+    {
+      "type": "paragraph",
+      "text": "Thông thường, hàm mất được xác định đối với các tham số của mô hình và\nphụ thuộc vào tập dữ liệu. Chúng tôi tìm hiểu các giá trị tốt nhất của\ncác thông số mô hình của chúng tôi bằng cách giảm thiểu tổn thất phát\nsinh trên một bộ bao gồm một số ví dụ được thu thập để đào tạo. Tuy\nnhiên, làm tốt trên dữ liệu đào tạo không đảm bảo rằng chúng tôi sẽ làm\ntốt trên dữ liệu không nhìn thấy. Vì vậy, chúng tôi thường sẽ muốn chia\ndữ liệu có sẵn thành hai phân vùng: training dataset (hoặc training\nset , cho các tham số mô hình phù hợp) và * test dataset* (hoặc *\ntest set * , được tổ chức ra để đánh giá), báo cáo cách mô hình thực\nhiện trên cả hai chúng. Bạn có thể nghĩ về hiệu suất đào tạo như là\ngiống như một sinh viên ‘s điểm số trên các kỳ thi thực hành được sử\ndụng để chuẩn bị cho một số kỳ thi cuối cùng thực tế. Ngay cả khi kết\nquả là đáng khích lệ, điều đó không đảm bảo thành công trong kỳ thi cuối\ncùng. Nói cách khác, hiệu suất thử nghiệm có thể đi chệch đáng kể so với\nhiệu suất đào tạo. Khi một mô hình hoạt động tốt trên bộ đào tạo nhưng\nkhông khái quát hóa với dữ liệu không nhìn thấy, chúng tôi nói rằng đó\nlà * overfitting*. Trong điều kiện thực tế, điều này giống như flunking\nkỳ thi thực sự mặc dù làm tốt trên các kỳ thi thực hành."
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "thuat-toan-toi-uu-hoa",
+      "text": "1.2.4. Thuật toán tối ưu hóa"
+    },
+    {
+      "type": "paragraph",
+      "text": "Khi chúng ta đã có một số nguồn dữ liệu và đại diện, một mô hình và một\nhàm mục tiêu được xác định rõ, chúng ta cần một thuật toán có khả năng\ntìm kiếm các tham số tốt nhất có thể để giảm thiểu hàm mất mát. Các\nthuật toán tối ưu hóa phổ biến cho học sâu dựa trên cách tiếp cận gọi là\n* gradient descent*. Nói tóm lại, ở mỗi bước, phương pháp này kiểm tra\nđể xem, cho mỗi tham số, theo cách mà bộ đào tạo mất sẽ di chuyển nếu\nbạn làm phiền tham số đó chỉ là một lượng nhỏ. Sau đó, nó cập nhật tham\nsố theo hướng có thể làm giảm tổn thất."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "cac-loai-van-de-ve-may-hoc",
+      "text": "1.3. Các loại vấn đề về máy học"
+    },
+    {
+      "type": "paragraph",
+      "text": "Vấn đề từ thức trong ví dụ thúc đẩy của chúng tôi chỉ là một trong số\nnhiều vấn đề mà machine learning có thể giải quyết. Để thúc đẩy người\nđọc hơn nữa và cung cấp cho chúng tôi một số ngôn ngữ chung khi chúng\ntôi nói về nhiều vấn đề hơn trong suốt cuốn sách, trong phần sau, chúng\ntôi liệt kê một mẫu các vấn đề về máy học. Chúng tôi sẽ liên tục tham\nkhảo các khái niệm đã nói ở trên của chúng tôi như dữ liệu, mô hình và\nkỹ thuật đào tạo."
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "hoc-duoc-giam-sat",
+      "text": "1.3.1. Học được giám sát"
+    },
+    {
+      "type": "paragraph",
+      "text": "Việc học được giám sát giải quyết nhiệm vụ dự đoán các nhãn được đưa ra\ncác tính năng đầu vào. Mỗi tính năng—cặp nhãn được gọi là một ví dụ. Đôi\nkhi, khi ngữ cảnh rõ ràng, chúng ta có thể sử dụng thuật ngữ examples để chỉ một tập hợp các đầu vào, ngay cả khi các nhãn tương ứng không\nđược biết. Mục tiêu của chúng tôi là tạo ra một mô hình ánh xạ bất kỳ\nđầu vào nào đến dự đoán nhãn."
+    },
+    {
+      "type": "paragraph",
+      "text": "Để đưa ra mô tả này trong một ví dụ cụ thể, nếu chúng ta đang làm việc\ntrong chăm sóc sức khỏe, thì chúng ta có thể muốn dự đoán liệu bệnh nhân\ncó bị đau tim hay không. Quan sát này, “đau tim” hoặc “không đau tim”,\nsẽ là nhãn hiệu của chúng tôi. Các tính năng đầu vào có thể là dấu hiệu\nquan trọng như nhịp tim, huyết áp tâm trương và huyết áp tâm thu."
+    },
+    {
+      "type": "paragraph",
+      "text": "Việc giám sát phát huy tác dụng vì để chọn các tham số, chúng tôi (các\ngiám sát viên) cung cấp cho mô hình một tập dữ liệu bao gồm các ví dụ\nđược dán nhãn, trong đó mỗi ví dụ được khớp với nhãn chân lý mặt đất.\nTrong thuật ngữ xác suất, chúng tôi thường quan tâm đến việc ước tính\nxác suất có điều kiện của một nhãn cho các tính năng đầu vào. Mặc dù nó\nchỉ là một trong số một số mô hình trong machine learning, nhưng việc\nhọc được giám sát chiếm phần lớn các ứng dụng thành công của machine\nlearning trong ngành. Một phần, đó là do nhiều nhiệm vụ quan trọng có\nthể được mô tả rõ ràng là ước tính xác suất của một cái gì đó chưa biết\nđược đưa ra một tập hợp dữ liệu có sẵn cụ thể:"
+    },
+    {
+      "type": "list",
+      "ordered": false,
+      "items": [
+        "Dự đoán ung thư so với ung thư, được đưa ra một hình ảnh chụp cắt lớp\nvi tính.",
+        "Dự đoán bản dịch chính xác bằng tiếng Pháp, được đưa ra một câu bằng\ntiếng Anh.",
+        "Dự đoán giá cổ phiếu vào tháng tới dựa trên dữ liệu báo cáo tài chính\ncủa tháng này."
+      ]
+    },
+    {
+      "type": "paragraph",
+      "text": "Ngay cả với mô tả đơn giản “dự đoán nhãn cho các tính năng đầu vào” học\ntập giám sát có thể có rất nhiều hình thức và đòi hỏi rất nhiều quyết\nđịnh mô hình hóa, tùy thuộc vào (trong số các cân nhắc khác) loại, kích\nthước và số lượng đầu vào và đầu ra. Ví dụ, chúng ta sử dụng các mô hình\nkhác nhau để xử lý các chuỗi có độ dài tùy ý và để xử lý các biểu diễn\nvectơ có độ dài cố định. Chúng tôi sẽ đến thăm nhiều vấn đề này một cách\nsâu sắc trong suốt cuốn sách này."
+    },
+    {
+      "type": "paragraph",
+      "text": "Không chính thức, quá trình học tập trông giống như sau. Đầu tiên, lấy\nmột bộ sưu tập lớn các ví dụ mà các tính năng được biết đến và chọn từ\nchúng một tập hợp con ngẫu nhiên, có được các nhãn chân lý nền cho mỗi.\nĐôi khi các nhãn này có thể là dữ liệu có sẵn đã được thu thập (ví dụ:\nbệnh nhân có chết trong năm tiếp theo không?) và những lần khác, chúng\nta có thể cần sử dụng các chú thích của con người để gắn nhãn dữ liệu,\n(ví dụ: gán hình ảnh cho các danh mục). Cùng nhau, các đầu vào và nhãn\ntương ứng này bao gồm bộ đào tạo. Chúng tôi cung cấp tập dữ liệu đào tạo\nvào một thuật toán học tập được giám sát, một chức năng lấy làm đầu vào\nmột tập dữ liệu và xuất ra một chức năng khác: mô hình đã học. Cuối\ncùng, chúng ta có thể cung cấp các đầu vào chưa nhìn thấy trước đây cho\nmô hình đã học, sử dụng đầu ra của nó làm dự đoán của nhãn tương ứng.\nQuá trình đầy đủ được rút ra trong Fig. 1.3.1 ."
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/supervised-learning.svg",
+      "local_path": "_images/supervised-learning.svg",
+      "alt": "../_images/supervised-learning.svg"
+    },
+    {
+      "type": "paragraph",
+      "text": "Fig. 1.3.1 Supervised learning. ¶"
+    },
+    {
+      "type": "heading",
+      "level": 4,
+      "id": "hoi-quy",
+      "text": "1.3.1.1. Hồi quy"
+    },
+    {
+      "type": "paragraph",
+      "text": "Có lẽ nhiệm vụ học tập được giám sát đơn giản nhất để quấn đầu của bạn\nlà * hồi quy*. Hãy xem xét, ví dụ, một tập hợp dữ liệu thu hoạch từ cơ\nsở dữ liệu về doanh số bán nhà. Chúng ta có thể xây dựng một bảng, trong\nđó mỗi hàng tương ứng với một ngôi nhà khác nhau và mỗi cột tương ứng\nvới một số thuộc tính có liên quan, chẳng hạn như cảnh vuông của một\nngôi nhà, số phòng ngủ, số lượng phòng tắm, và số phút (đi bộ) đến trung\ntâm thị trấn. Trong tập dữ liệu này, mỗi ví dụ sẽ là một ngôi nhà cụ thể\nvà vector tính năng tương ứng sẽ là một hàng trong bảng. Nếu bạn sống ở\nNew York hoặc San Francisco, và bạn không phải là Giám đốc điều hành của\nAmazon, Google, Microsoft hoặc Facebook, (cảnh quay vuông, số phòng ngủ,\nsố phòng tắm, khoảng cách đi bộ) có vector cho ngôi nhà của bạn có thể\ntrông giống như: \\([600, 1, 1, 60]\\) . Tuy nhiên, nếu bạn sống ở\nPittsburgh, nó có thể trông giống như \\([3000, 4, 3, 10]\\) hơn. Các\nvectơ tính năng như thế này rất cần thiết cho hầu hết các thuật toán\nmachine learning cổ điển."
+    },
+    {
+      "type": "paragraph",
+      "text": "Điều gì làm cho một vấn đề trở thành hồi quy thực sự là đầu ra. Nói rằng\nbạn đang ở trong thị trường cho một ngôi nhà mới. Bạn có thể muốn ước\ntính giá trị thị trường hợp lý của một ngôi nhà, với một số tính năng\nnhư trên. Nhãn, giá bán, là một giá trị số. Khi nhãn lấy các giá trị số\ntùy ý, chúng tôi gọi đây là vấn đề * regression*. Mục tiêu của chúng\ntôi là tạo ra một mô hình có dự đoán gần đúng các giá trị nhãn thực tế."
+    },
+    {
+      "type": "paragraph",
+      "text": "Rất nhiều vấn đề thực tế là các vấn đề hồi quy được mô tả tốt. Dự đoán\nđánh giá mà người dùng sẽ gán cho một bộ phim có thể được coi là một vấn\nđề hồi quy và nếu bạn thiết kế một thuật toán tuyệt vời để hoàn thành kỳ\ncông này trong 2009, bạn có thể đã giành được 1-million-dollar Netflix\nprize . Dự đoán thời\ngian lưu trú cho bệnh nhân trong bệnh viện cũng là một vấn đề hồi quy.\nMột nguyên tắc tốt của ngón tay cái là bất kỳ * bao nhiêu? * hoặc * bao\nnhiêu? * vấn đề nên đề nghị hồi quy, chẳng hạn như:"
+    },
+    {
+      "type": "list",
+      "ordered": false,
+      "items": [
+        "Phẫu thuật này sẽ mất bao nhiêu giờ?",
+        "Thị trấn này sẽ có bao nhiêu lượng mưa trong sáu giờ tới?"
+      ]
+    },
+    {
+      "type": "paragraph",
+      "text": "Ngay cả khi bạn chưa bao giờ làm việc với machine learning trước đây,\nbạn có thể đã làm việc thông qua một vấn đề hồi quy một cách không chính\nthức. Hãy tưởng tượng, ví dụ, rằng bạn đã sửa chữa cống rãnh của bạn và\nnhà thầu của bạn đã dành 3 giờ để loại bỏ gunk khỏi đường ống nước thải\ncủa bạn. Sau đó, ông ta gửi cho bạn một hóa đơn 350 đô la. Bây giờ hãy\ntưởng tượng rằng bạn của bạn đã thuê cùng một nhà thầu trong 2 giờ và\nanh ta đã nhận được một hóa đơn 250 đô la. Nếu ai đó hỏi bạn mong đợi\nbao nhiêu vào hóa đơn loại bỏ gunk-removal sắp tới của họ, bạn có thể\nđưa ra một số giả định hợp lý, chẳng hạn như nhiều giờ làm việc chi phí\nnhiều đô la hơn. Bạn cũng có thể giả định rằng có một số phí cơ bản và\nnhà thầu sau đó tính phí mỗi giờ. Nếu những giả định này đúng, sau đó\nđưa ra hai ví dụ dữ liệu này, bạn đã có thể xác định cấu trúc giá của\nnhà thầu: 100 đô la mỗi giờ cộng với 50 đô la để xuất hiện tại nhà bạn.\nNếu bạn làm theo nhiều điều đó thì bạn đã hiểu ý tưởng cấp cao đằng sau\nhồi quy tuyến tính."
+    },
+    {
+      "type": "paragraph",
+      "text": "Trong trường hợp này, chúng tôi có thể sản xuất các thông số phù hợp\nchính xác với giá của nhà thầu. Đôi khi điều này là không thể, ví dụ,\nnếu một số phương sai nợ một vài yếu tố bên cạnh hai tính năng của bạn.\nTrong những trường hợp này, chúng ta sẽ cố gắng tìm hiểu các mô hình\ngiảm thiểu khoảng cách giữa các dự đoán của chúng tôi và các giá trị\nquan sát được. Trong hầu hết các chương của chúng tôi, chúng tôi sẽ tập\ntrung vào việc giảm thiểu hàm mất lỗi bình phương. Như chúng ta sẽ thấy\nsau, sự mất mát này tương ứng với giả định rằng dữ liệu của chúng tôi đã\nbị hỏng bởi tiếng ồn Gaussian."
+    },
+    {
+      "type": "heading",
+      "level": 4,
+      "id": "phan-loai",
+      "text": "1.3.1.2. Phân loại"
+    },
+    {
+      "type": "paragraph",
+      "text": "Trong khi các mô hình hồi quy là tuyệt vời để giải quyết * bao nhiêu?\n* câu hỏi, rất nhiều vấn đề không uốn cong thoải mái với mẫu này. Ví\ndụ: một ngân hàng muốn thêm quét séc vào ứng dụng di động của mình. Điều\nnày sẽ liên quan đến khách hàng chụp ảnh séc bằng máy ảnh của điện thoại\nthông minh của họ và ứng dụng sẽ cần phải có thể tự động hiểu văn bản\nnhìn thấy trong hình ảnh. Cụ thể, nó cũng sẽ cần phải hiểu văn bản viết\ntay để trở nên mạnh mẽ hơn, chẳng hạn như ánh xạ một ký tự viết tay với\nmột trong những ký tự đã biết. Đây là loại * cái nào? * vấn đề được\ngọi là * phân loại * . Nó được xử lý bằng một tập hợp các thuật toán khác\nvới các thuật toán được sử dụng để hồi quy mặc dù nhiều kỹ thuật sẽ tiếp\ntục."
+    },
+    {
+      "type": "paragraph",
+      "text": "Trong classification , chúng tôi muốn mô hình của chúng tôi xem xét các\ntính năng, ví dụ, các giá trị pixel trong một hình ảnh, và sau đó dự\nđoán loại ** (chính thức gọi là class ), trong số một tập hợp các tùy\nchọn rời rạc, một ví dụ thuộc về. Đối với chữ số viết tay, chúng ta có\nthể có mười lớp, tương ứng với các chữ số 0 đến 9. Hình thức phân loại\nđơn giản nhất là khi chỉ có hai lớp, một vấn đề mà chúng ta gọi là * phân\nloại nhị phân * . Ví dụ, tập dữ liệu của chúng ta có thể bao gồm hình ảnh\ncủa động vật và nhãn của chúng ta có thể là các lớp \\(\\mathrm{\\{cat, dog\\}}\\) . Trong khi trong hồi quy, chúng tôi tìm\nkiếm một regressor để xuất ra một giá trị số, trong phân loại, chúng tôi\ntìm kiếm một phân loại, có đầu ra là gán lớp dự đoán."
+    },
+    {
+      "type": "paragraph",
+      "text": "Vì những lý do mà chúng ta sẽ tham gia khi cuốn sách trở nên kỹ thuật\nhơn, có thể khó tối ưu hóa một mô hình chỉ có thể xuất ra một nhiệm vụ\nphân loại cứng, ví dụ: “mèo” hoặc “chó”. Trong những trường hợp này,\nthay vào đó, việc thể hiện mô hình của chúng ta bằng ngôn ngữ xác suất\nthường dễ dàng hơn nhiều. Cho các tính năng của một ví dụ, mô hình của\nchúng tôi gán một xác suất cho mỗi lớp có thể. Quay trở lại ví dụ phân\nloại động vật của chúng tôi trong đó các lớp là \\(\\mathrm{\\{cat, dog\\}}\\) , một phân loại có thể thấy một hình ảnh và\nxuất ra xác suất rằng hình ảnh là một con mèo là 0.9. Chúng ta có thể\ngiải thích con số này bằng cách nói rằng phân loại là 90% chắc chắn rằng\nhình ảnh mô tả một con mèo. Độ lớn của xác suất cho lớp dự đoán truyền\ntải một khái niệm về sự không chắc chắn. Đó không phải là khái niệm duy\nnhất về sự không chắc chắn và chúng ta sẽ thảo luận về những người khác\ntrong các chương nâng cao hơn."
+    },
+    {
+      "type": "paragraph",
+      "text": "Khi chúng ta có nhiều hơn hai lớp có thể, chúng ta gọi vấn đề * phân\nloại đa lượng * . Các ví dụ phổ biến bao gồm nhận dạng ký tự viết tay \\(\\mathrm{\\{0, 1, 2, ... 9, a, b, c, ...\\}}\\) . Trong khi chúng ta\ntấn công các bài toán hồi quy bằng cách cố gắng giảm thiểu hàm mất lỗi\nbình phương, hàm tổn thất phổ biến cho các bài toán phân loại được gọi\nlà * cross-entropy*, tên của nó có thể được demystified thông qua một\ngiới thiệu về lý thuyết thông tin trong các chương tiếp theo."
+    },
+    {
+      "type": "paragraph",
+      "text": "Lưu ý rằng lớp có khả năng nhất không nhất thiết phải là lớp mà bạn sẽ\nsử dụng cho quyết định của mình. Giả sử rằng bạn tìm thấy một loại nấm\nđẹp ở sân sau của bạn như thể hiện trong Fig. 1.3.2 ."
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/death-cap.jpg",
+      "local_path": "_images/death-cap.jpg",
+      "alt": "../_images/death-cap.jpg"
+    },
+    {
+      "type": "paragraph",
+      "text": "Fig. 1.3.2 Death cap—do not eat! ¶"
+    },
+    {
+      "type": "paragraph",
+      "text": "Bây giờ, giả sử rằng bạn đã xây dựng một nhà phân loại và đào tạo nó để\ndự đoán liệu một loại nấm có độc dựa trên một bức ảnh hay không. Giả sử\nđầu ra phân loại phát hiện chất độc của chúng tôi rằng xác suất Fig. 1.3.2 chứa nắp tử vong là 0,2. Nói cách khác, phân\nloại là 80% chắc chắn rằng nấm của chúng tôi không phải là một cái chết\nnắp. Tuy nhiên, bạn sẽ phải là một kẻ ngốc để ăn nó. Đó là bởi vì lợi\ních nhất định của một bữa tối ngon không đáng để có nguy cơ tử vong từ\nnó 20%. Nói cách khác, ảnh hưởng của rủi ro không chắc chắn lớn hơn lợi\ních cho đến nay. Do đó, chúng ta cần tính toán rủi ro dự kiến mà chúng\nta phải chịu như chức năng mất mát, tức là, chúng ta cần nhân xác suất\ncủa kết quả với lợi ích (hoặc tác hại) liên quan đến nó. Trong trường\nhợp này, sự mất mát phát sinh do ăn nấm có thể là \\(0.2 \\times \\infty + 0.8 \\times 0 = \\infty\\) , trong khi mất việc\nloại bỏ nó là \\(0.2 \\times 0 + 0.8 \\times 1 = 0.8\\) . Sự thận trọng\ncủa chúng tôi đã được chứng minh: như bất kỳ nhà nghiên cứu nấm nào cũng\ncho chúng tôi biết, nấm vào năm Fig. 1.3.2 thực sự là một\ncái mũ chết."
+    },
+    {
+      "type": "paragraph",
+      "text": "Phân loại có thể trở nên phức tạp hơn nhiều so với chỉ phân loại nhị\nphân, đa phân loại hoặc thậm chí nhiều nhãn. Ví dụ, có một số biến thể\ncủa phân loại để giải quyết các hệ thống phân cấp. Hệ thống phân cấp giả\nđịnh rằng có tồn tại một số mối quan hệ giữa nhiều lớp. Vì vậy, không\nphải tất cả các lỗi đều bằng nhau - nếu chúng ta phải sai, chúng ta muốn\nphân loại sai thành một lớp liên quan hơn là đến một lớp xa. Thông\nthường, điều này được gọi là * phân loại phân học*. Một ví dụ ban đầu\nlà do Linnaeus , người\nđã tổ chức các loài động vật theo hệ thống phân cấp."
+    },
+    {
+      "type": "paragraph",
+      "text": "Trong trường hợp phân loại động vật, có thể không quá tệ khi nhầm lẫn\nmột con chó xù (giống chó) cho schnauzer (một giống chó khác), nhưng mô\nhình của chúng tôi sẽ phải trả một hình phạt lớn nếu nó nhầm lẫn một con\nchó xù cho một con khủng long. Hệ thống phân cấp nào có liên quan có thể\nphụ thuộc vào cách bạn định sử dụng mô hình. Ví dụ, rắn lục lạc và rắn\ngarter có thể gần trên cây phát sinh loài, nhưng nhầm một con rattler\ncho một garter có thể gây chết người."
+    },
+    {
+      "type": "heading",
+      "level": 4,
+      "id": "gan-the",
+      "text": "1.3.1.3. Gắn thẻ"
+    },
+    {
+      "type": "paragraph",
+      "text": "Một số bài toán phân loại phù hợp gọn gàng vào các thiết lập phân loại\nnhị phân hoặc đa lớp. Ví dụ, chúng ta có thể huấn luyện một phân loại\nnhị phân bình thường để phân biệt mèo với chó. Với trạng thái hiện tại\ncủa tầm nhìn máy tính, chúng ta có thể làm điều này một cách dễ dàng,\nvới các công cụ off-the-shelf. Tuy nhiên, cho dù mô hình của chúng tôi\nchính xác đến mức nào, chúng ta có thể thấy mình gặp rắc rối khi nhà\nphân loại gặp phải hình ảnh của * Town Musicians of Bremen*, một câu\nchuyện cổ tích nổi tiếng của Đức có bốn con vật trong Fig. 1.3.3 ."
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/stackedanimals.png",
+      "local_path": "_images/stackedanimals.png",
+      "alt": "../_images/stackedanimals.png"
+    },
+    {
+      "type": "paragraph",
+      "text": "Fig. 1.3.3 A donkey, a dog, a cat, and a rooster. ¶"
+    },
+    {
+      "type": "paragraph",
+      "text": "Như bạn có thể thấy, có một con mèo trong Fig. 1.3.3 , và một con gà trống, chó và một con lừa,\nvới một số cây trong nền. Tùy thuộc vào những gì chúng ta muốn làm với\nmô hình của chúng ta cuối cùng, coi đây là một vấn đề phân loại nhị phân\ncó thể không có nhiều ý nghĩa. Thay vào đó, chúng ta có thể muốn cung\ncấp cho người mẫu tùy chọn nói rằng hình ảnh mô tả một con mèo, chó, một\ncon lừa, và một con gà trống."
+    },
+    {
+      "type": "paragraph",
+      "text": "Vấn đề học cách dự đoán các lớp không loại trừ lẫn nhau được gọi là phân loại nhiều nhãn mác . Các vấn đề tự động gắn thẻ thường được mô tả\ntốt nhất là các vấn đề phân loại đa nhãn. Hãy suy nghĩ về các thẻ mà mọi\nngười có thể áp dụng cho các bài đăng trên blog kỹ thuật, ví dụ:\n“machine learning”, “technology”, “tiện ích”, “ngôn ngữ lập trình”,\n“Linux”, “điện toán đám mây”, “AWS”. Một bài viết điển hình có thể có\n5—10 thẻ được áp dụng bởi vì các khái niệm này có tương quan. Bài viết\nvề “điện toán đám mây” có khả năng đề cập đến “AWS” và các bài đăng về\n“machine learning” cũng có thể đối phó với “ngôn ngữ lập trình”."
+    },
+    {
+      "type": "paragraph",
+      "text": "Chúng ta cũng phải đối phó với loại vấn đề này khi đối phó với các tài\nliệu y sinh, nơi gắn thẻ chính xác các bài báo là quan trọng vì nó cho\nphép các nhà nghiên cứu thực hiện các đánh giá đầy đủ về tài liệu. Tại\nThư viện Y học Quốc gia, một số chú thích chuyên nghiệp đi qua mỗi bài\nviết được lập chỉ mục trong PubMed để liên kết nó với các điều khoản có\nliên quan từ mesh, một bộ sưu tập khoảng 28000 thẻ. Đây là một quá trình\ntốn thời gian và các chú thích thường có độ trễ một năm giữa lưu trữ và\ngắn thẻ. Học máy có thể được sử dụng ở đây để cung cấp các thẻ tạm thời\ncho đến khi mỗi bài viết có thể có một đánh giá thủ công thích hợp. Thật\nvậy, trong vài năm, tổ chức BioASQ có hosted\ncompetitions để làm chính xác điều này."
+    },
+    {
+      "type": "heading",
+      "level": 4,
+      "id": "tim",
+      "text": "1.3.1.4. Tìm"
+    },
+    {
+      "type": "paragraph",
+      "text": "Đôi khi chúng ta không chỉ muốn gán từng ví dụ cho một xô hoặc cho một\ngiá trị thực. Trong lĩnh vực truy xuất thông tin, chúng tôi muốn áp đặt\nmột bảng xếp hạng trên một tập hợp các mục. Lấy tìm kiếm trên web cho\nmột ví dụ. Mục tiêu ít hơn để xác định xem một trang cụ thể có liên quan\nđến truy vấn hay không, mà là một trong rất nhiều kết quả tìm kiếm có\nliên quan nhất cho một người dùng cụ thể. Chúng tôi thực sự quan tâm đến\nviệc sắp xếp các kết quả tìm kiếm có liên quan và thuật toán học tập của\nchúng tôi cần tạo ra các tập con có thứ tự của các yếu tố từ một tập hợp\nlớn hơn. Nói cách khác, nếu chúng ta được yêu cầu tạo ra 5 chữ cái đầu\ntiên từ bảng chữ cái, có sự khác biệt giữa việc trả về “A B C D E” và “C\nA B E D”. Ngay cả khi tập kết quả là như nhau, thứ tự trong bộ vấn đề."
+    },
+    {
+      "type": "paragraph",
+      "text": "Một giải pháp khả thi cho vấn đề này là lần đầu tiên gán cho mọi yếu tố\ntrong tập hợp một điểm liên quan tương ứng và sau đó lấy các yếu tố được\nxếp hạng hàng đầu. PageRank , nước sốt bí mật\nban đầu đằng sau công cụ tìm kiếm của Google là một ví dụ ban đầu của\nmột hệ thống tính điểm như vậy nhưng nó đặc biệt ở chỗ nó đã làm không\nphụ thuộc vào truy vấn thực tế. Ở đây, họ dựa vào một bộ lọc liên quan\nđơn giản để xác định tập hợp các mục có liên quan và sau đó vào PageRank\nđể đặt hàng những kết quả có chứa thuật ngữ truy vấn. Ngày nay, các công\ncụ tìm kiếm sử dụng máy học và mô hình hành vi để có được điểm số liên\nquan phụ thuộc vào truy vấn. Có toàn bộ hội nghị học thuật dành cho môn\nhọc này."
+    },
+    {
+      "type": "heading",
+      "level": 4,
+      "id": "he-thong-recommender",
+      "text": "1.3.1.5. Hệ thống Recommender"
+    },
+    {
+      "type": "paragraph",
+      "text": "Hệ thống giới thiệu là một cài đặt vấn đề khác có liên quan đến tìm kiếm\nvà xếp hạng. Các vấn đề tương tự như mục tiêu là hiển thị một tập hợp\ncác mục có liên quan cho người dùng. Sự khác biệt chính là sự nhấn mạnh\nvào cá nhân hóa cho người dùng cụ thể trong bối cảnh của các hệ thống\ngiới thiệu. Ví dụ: đối với các đề xuất phim, trang kết quả cho một người\nhâm mộ khoa học viễn tưởng và trang kết quả cho một người sành phim hài\nPeter Sellers có thể khác nhau đáng kể. Các vấn đề tương tự bật lên\ntrong các cài đặt đề xuất khác, ví dụ, cho các sản phẩm bán lẻ, âm nhạc\nvà khuyến nghị tin tức."
+    },
+    {
+      "type": "paragraph",
+      "text": "Trong một số trường hợp, khách hàng cung cấp phản hồi rõ ràng cho biết\nhọ thích một sản phẩm cụ thể như thế nào (ví dụ: xếp hạng và đánh giá\nsản phẩm trên Amazon, IMDb và Goodreads). Trong một số trường hợp khác,\nhọ cung cấp phản hồi ngầm, ví dụ: bằng cách bỏ qua tiêu đề trên danh\nsách phát, điều này có thể cho thấy sự không hài lòng nhưng có thể chỉ\nra rằng bài hát không phù hợp trong ngữ cảnh. Trong các công thức đơn\ngiản nhất, các hệ thống này được đào tạo để ước tính một số điểm, chẳng\nhạn như đánh giá ước tính hoặc xác suất mua hàng, cho người dùng và một\nmặt hàng."
+    },
+    {
+      "type": "paragraph",
+      "text": "Với một mô hình như vậy, đối với bất kỳ người dùng nhất định nào, chúng\nta có thể lấy tập hợp các đối tượng với điểm số lớn nhất, sau đó có thể\nđược đề xuất cho người dùng. Hệ thống sản xuất tiên tiến hơn đáng kể và\ntính đến hoạt động chi tiết của người dùng và đặc điểm mục khi tính toán\nđiểm số đó. Fig. 1.3.4 là một ví dụ về sách học\nsâu được Amazon đề xuất dựa trên các thuật toán cá nhân hóa được điều\nchỉnh để nắm bắt sở thích của một người."
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/deeplearning-amazon.jpg",
+      "local_path": "_images/deeplearning-amazon.jpg",
+      "alt": "../_images/deeplearning-amazon.jpg"
+    },
+    {
+      "type": "paragraph",
+      "text": "Fig. 1.3.4 Deep learning books recommended by Amazon. ¶"
+    },
+    {
+      "type": "paragraph",
+      "text": "Mặc dù giá trị kinh tế to lớn của họ, các hệ thống khuyến nghị ngây thơ\nđược xây dựng trên đầu trang của các mô hình dự đoán phải chịu một số\nsai sót quan niệm nghiêm trọng. Để bắt đầu, chúng tôi chỉ quan sát * phản\nhồi kiểm duyệt * : người dùng ưu tiên đánh giá những bộ phim mà họ cảm\nthấy mạnh mẽ. Ví dụ: trên thang điểm năm điểm, bạn có thể nhận thấy rằng\ncác mặt hàng nhận được nhiều xếp hạng năm và một sao nhưng có rất ít xếp\nhạng ba sao dễ thấy. Hơn nữa, thói quen mua hàng hiện tại thường là kết\nquả của thuật toán đề xuất hiện tại, nhưng các thuật toán học tập không\nphải lúc nào cũng tính đến chi tiết này. Do đó, các vòng phản hồi có thể\nhình thành nơi một hệ thống giới thiệu ưu tiên đẩy một mục sau đó được\nthực hiện tốt hơn (do mua hàng lớn hơn) và lần lượt được khuyến nghị\nthường xuyên hơn. Nhiều vấn đề trong số này về cách đối phó với kiểm\nduyệt, ưu đãi và vòng lặp phản hồi, là những câu hỏi nghiên cứu mở quan\ntrọng."
+    },
+    {
+      "type": "heading",
+      "level": 4,
+      "id": "hoc-trinh-tu",
+      "text": "1.3.1.6. Học trình tự"
+    },
+    {
+      "type": "paragraph",
+      "text": "Cho đến nay, chúng tôi đã xem xét các vấn đề mà chúng tôi có một số cố\nđịnh số đầu vào và tạo ra một số cố định của đầu ra. Ví dụ, chúng tôi đã\nxem xét dự đoán giá nhà từ một tập hợp các tính năng cố định: cảnh\nvuông, số phòng ngủ, số phòng tắm, thời gian đi bộ đến trung tâm thành\nphố. Chúng tôi cũng thảo luận về ánh xạ từ một hình ảnh (có kích thước\ncố định) đến xác suất dự đoán rằng nó thuộc về mỗi lớp cố định hoặc lấy\nID người dùng và ID sản phẩm và dự đoán xếp hạng sao. Trong những trường\nhợp này, một khi chúng tôi cung cấp đầu vào chiều dài cố định của mình\nvào mô hình để tạo ra một đầu ra, mô hình ngay lập tức quên những gì nó\nvừa thấy."
+    },
+    {
+      "type": "paragraph",
+      "text": "Điều này có thể ổn nếu đầu vào của chúng ta thực sự tất cả đều có cùng\nkích thước và nếu các đầu vào liên tiếp thực sự không liên quan gì đến\nnhau. Nhưng làm thế nào chúng ta sẽ đối phó với đoạn video? Trong trường\nhợp này, mỗi đoạn mã có thể bao gồm một số khung khác nhau. Và đoán của\nchúng tôi về những gì đang xảy ra trong mỗi khung hình có thể mạnh hơn\nnhiều nếu chúng ta tính đến các khung trước đó hoặc thành công. Cũng vậy\nvới ngôn ngữ. Một vấn đề học sâu phổ biến là dịch máy: nhiệm vụ nhập câu\nbằng một số ngôn ngữ nguồn và dự đoán bản dịch của chúng bằng một ngôn\nngữ khác."
+    },
+    {
+      "type": "paragraph",
+      "text": "Những vấn đề này cũng xảy ra trong y học. Chúng tôi có thể muốn một mô\nhình để theo dõi bệnh nhân trong phòng chăm sóc đặc biệt và bắn ra cảnh\nbáo nếu nguy cơ tử vong của họ trong 24 giờ tới vượt quá ngưỡng. Chúng\ntôi chắc chắn sẽ không muốn mô hình này vứt bỏ mọi thứ mà nó biết về\nlịch sử bệnh nhân mỗi giờ và chỉ đưa ra dự đoán của nó dựa trên các phép\nđo gần đây nhất."
+    },
+    {
+      "type": "paragraph",
+      "text": "Những vấn đề này là một trong những ứng dụng thú vị nhất của machine\nlearning và chúng là các trường hợp của học trình tự * . Chúng yêu cầu\nmột mô hình để ăn các chuỗi đầu vào hoặc phát ra chuỗi đầu ra (hoặc cả\nhai). Cụ thể, * trình tự để học trình tự* xem xét các vấn đề trong đó\nđầu vào và đầu ra đều là chuỗi có độ dài thay đổi, chẳng hạn như dịch\nmáy và phiên âm văn bản từ bài phát biểu nói. Mặc dù không thể xem xét\ntất cả các loại biến đổi trình tự, nhưng các trường hợp đặc biệt sau đây\nlà đáng nói đến."
+    },
+    {
+      "type": "paragraph",
+      "text": "** Gắn thẻ và phân tích cú pháp**. Điều này liên quan đến việc chú\nthích một chuỗi văn bản với các thuộc tính. Nói cách khác, số lượng đầu\nvào và đầu ra về cơ bản là giống nhau. Ví dụ, chúng ta có thể muốn biết\ncác động từ và chủ thể ở đâu. Ngoài ra, chúng ta có thể muốn biết từ nào\nlà các thực thể được đặt tên. Nói chung, mục tiêu là phân hủy và chú\nthích văn bản dựa trên các giả định cấu trúc và ngữ pháp để có được một\nsố chú thích. Điều này nghe có vẻ phức tạp hơn so với thực tế. Dưới đây\nlà một ví dụ rất đơn giản về chú thích một câu với các thẻ cho biết từ\nnào đề cập đến các thực thể được đặt tên (được gắn thẻ là “Ent”)."
+    },
+    {
+      "type": "code",
+      "language": "text",
+      "text": "Tom has dinner in Washington with Sally\nEnt  -    -    -     Ent      -    Ent"
+    },
+    {
+      "type": "paragraph",
+      "text": "** Nhận dạng giọng nói tự động**. Với nhận dạng giọng nói, trình tự\nđầu vào là một bản ghi âm của một loa (hiển thị trong Fig. 1.3.5 ), và đầu ra là bảng điểm văn bản của những gì\nngười nói. Thách thức là có nhiều khung âm thanh hơn (âm thanh thường\nđược lấy mẫu ở tốc độ 8kHz hoặc 16kHz) so với văn bản, tức là, không có\nsự tương ứng 1:1 giữa âm thanh và văn bản, vì hàng ngàn mẫu có thể tương\nứng với một từ nói duy nhất. Đây là những chuỗi để sắp xếp các vấn đề\nhọc tập trong đó đầu ra ngắn hơn nhiều so với đầu vào."
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/speech.png",
+      "local_path": "_images/speech.png",
+      "alt": "../_images/speech.png"
+    },
+    {
+      "type": "paragraph",
+      "text": "Fig. 1.3.5 -D-e-e-p- L-ea-r-ni-ng- in an audio recording. ¶"
+    },
+    {
+      "type": "paragraph",
+      "text": "Text to Speech . Đây là nghịch đảo của nhận dạng giọng nói tự động.\nNói cách khác, đầu vào là văn bản và đầu ra là một tệp âm thanh. Trong\ntrường hợp này, đầu ra dài hơn nhiều so với đầu vào. Mặc dù con người dễ\ndàng nhận ra một tệp âm thanh xấu, nhưng điều này không hoàn toàn tầm\nthường đối với máy tính."
+    },
+    {
+      "type": "paragraph",
+      "text": "** Dịch máy**. Không giống như trường hợp nhận dạng giọng nói, nơi\ntương ứng đầu vào và đầu ra xảy ra theo cùng một thứ tự (sau khi căn\nchỉnh), trong dịch máy, đảo ngược thứ tự có thể rất quan trọng. Nói cách\nkhác, trong khi chúng ta vẫn đang chuyển đổi một chuỗi thành chuỗi khác,\nkhông phải số lượng đầu vào và đầu ra cũng như thứ tự của các ví dụ dữ\nliệu tương ứng được giả định là giống nhau. Hãy xem xét ví dụ minh họa\nsau đây về xu hướng đặc biệt của người Đức để đặt các động từ ở cuối\ncâu."
+    },
+    {
+      "type": "code",
+      "language": "text",
+      "text": "German:           Haben Sie sich schon dieses grossartige Lehrwerk angeschaut?\nEnglish:          Did you already check out this excellent tutorial?\nWrong alignment:  Did you yourself already this excellent tutorial looked-at?"
+    },
+    {
+      "type": "paragraph",
+      "text": "Nhiều vấn đề liên quan bật lên trong các nhiệm vụ học tập khác. Ví dụ,\nxác định thứ tự mà người dùng đọc một trang web là một vấn đề phân tích\nbố cục hai chiều. Các vấn đề đối thoại thể hiện tất cả các loại biến\nchứng bổ sung, trong đó việc xác định những gì cần nói tiếp theo đòi hỏi\nphải tính đến kiến thức trong thế giới thực và trạng thái trước đó của\ncuộc trò chuyện trên khoảng cách thời gian dài. Đây là những lĩnh vực\nnghiên cứu tích cực."
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "hoc-tap-khong-duoc-giam-sat-va-tu-giam-sat",
+      "text": "1.3.2. Học tập không được giám sát và tự giám sát"
+    },
+    {
+      "type": "paragraph",
+      "text": "Tất cả các ví dụ cho đến nay đều liên quan đến việc học được giám sát,\ntức là, các tình huống mà chúng tôi cung cấp cho mô hình một tập dữ liệu\nkhổng lồ chứa cả các tính năng và giá trị nhãn tương ứng. Bạn có thể\nnghĩ về người học được giám sát là có một công việc cực kỳ chuyên biệt\nvà một ông chủ cực kỳ tầm thường. Ông chủ đứng trên vai của bạn và cho\nbạn biết chính xác phải làm gì trong mọi tình huống cho đến khi bạn học\ncách lập bản đồ từ các tình huống đến hành động. Làm việc cho một ông\nchủ như vậy nghe có vẻ khá khập khiễng. Mặt khác, thật dễ dàng để làm\nhài lòng ông chủ này. Bạn chỉ cần nhận ra mô hình càng nhanh càng tốt và\nbắt chước hành động của họ."
+    },
+    {
+      "type": "paragraph",
+      "text": "Theo một cách hoàn toàn ngược lại, có thể là bực bội khi làm việc cho\nmột ông chủ không biết họ muốn bạn làm gì. Tuy nhiên, nếu bạn có kế\nhoạch trở thành một nhà khoa học dữ liệu, bạn nên làm quen với nó. Ông\nchủ có thể chỉ đưa cho bạn một bãi dữ liệu khổng lồ và nói với bạn để *\nlàm một số khoa học dữ liệu với nó! * Điều này nghe có vẻ mơ hồ vì nó\nlà. Chúng tôi gọi lớp vấn đề này* học không được giám sách*, và loại\nvà số câu hỏi chúng tôi có thể hỏi chỉ bị giới hạn bởi sự sáng tạo của\nchúng tôi. Chúng tôi sẽ giải quyết các kỹ thuật học tập không được giám\nsát trong các chương sau. Để kích thích sự thèm ăn của bạn bây giờ,\nchúng tôi mô tả một vài trong số các câu hỏi sau đây bạn có thể hỏi."
+    },
+    {
+      "type": "list",
+      "ordered": false,
+      "items": [
+        "Can we find a small nhỏ bé numbercon số of prototypenguyên mẫu that\naccurately chính xác summarize tóm tắt the data dữ liệu? Với một bộ\nảnh, chúng ta có thể nhóm chúng thành ảnh phong cảnh, hình ảnh của\nchó, trẻ sơ sinh, mèo và đỉnh núi không? Tương tự như vậy, với một bộ\nsưu tập các hoạt động duyệt web của người dùng, chúng ta có thể nhóm\nchúng thành những người dùng có hành vi tương tự không? Vấn đề này\nthường được gọi là cùng .",
+        "Chúng ta có thể tìm thấy một số lượng nhỏ các tham số mà nắm bắt\nchính xác các thuộc tính có liên quan của dữ liệu? Quỹ đạo của một\nquả bóng được mô tả khá tốt bằng vận tốc, đường kính và khối lượng\ncủa quả bóng. Thợ may đã phát triển một số lượng nhỏ các thông số mô\ntả hình dạng cơ thể con người khá chính xác với mục đích phù hợp với\nquần áo. Những vấn đề này được gọi là ước tính không gian con . Nếu\nsự phụ thuộc là tuyến tính, nó được gọi là * phân tích thành phần\nchính*.",
+        "Có một đại diện của các đối tượng (cấu trúc tùy ý) trong không gian\nEuclide như vậy mà tính chất tượng trưng có thể được phù hợp tốt?\nĐiều này có thể được sử dụng để mô tả các thực thể và quan hệ của họ,\nchẳng hạn như “Rome” \\(-\\) “Italy” \\(+\\) “Pháp” \\(=\\) “Paris”.",
+        "Có mô tả về nguyên nhân gốc rễ of much of the data dữ liệu that we\nobserve quan sát? Ví dụ, nếu chúng ta có dữ liệu nhân khẩu học về giá\nnhà, ô nhiễm, tội phạm, vị trí, giáo dục và tiền lương, chúng ta có\nthể khám phá ra cách chúng liên quan đơn giản dựa trên dữ liệu thực\nnghiệm không? Các trường liên quan đến causality và mô hình đồ họa\nxác suất giải quyết vấn đề này.",
+        "Một sự phát triển gần đây quan trọng và thú vị khác trong việc học\nkhông được giám sát là sự ra đời của * generative adversarial\nnetworks*. Những điều này cho chúng ta một cách thủ tục để tổng hợp\ndữ liệu, thậm chí dữ liệu có cấu trúc phức tạp như hình ảnh và âm\nthanh. Các cơ chế thống kê cơ bản là các thử nghiệm để kiểm tra xem\ndữ liệu thực và giả có giống nhau hay không."
+      ]
+    },
+    {
+      "type": "paragraph",
+      "text": "As a formhình thức of unsupervised không giám sát learning học tập, tự\ngiám sát tận dụng dữ liệu không được dán nhãn để cung cấp sự giám sát\ntrong đào tạo, chẳng hạn như bằng cách dự đoán một số phần giữ lại của\ndữ liệu bằng cách sử dụng các phần khác. Đối với văn bản, chúng ta có\nthể đào tạo các mô hình để “điền vào khoảng trống” bằng cách dự đoán các\ntừ được che giấu ngẫu nhiên bằng cách sử dụng các từ xung quanh (ngữ\ncảnh) của chúng trong thể lớn mà không cần bất kỳ nỗ lực ghi nhãn [Devlin et al., 2018] ! Đối với hình ảnh, chúng tôi có thể\nđào tạo các mô hình để cho biết vị trí tương đối giữa hai vùng bị cắt\ncủa cùng một hình ảnh [Doersch.Gupta.Efros.2015] . Trong hai ví\ndụ về việc học tự giám sát này, các mô hình đào tạo để dự đoán các từ có\nthể và vị trí tương đối đều là nhiệm vụ phân loại (từ việc học được giám\nsát)."
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "tuong-tac-voi-moi-truong",
+      "text": "1.3.3. Tương tác với môi trường"
+    },
+    {
+      "type": "paragraph",
+      "text": "Cho đến nay, chúng ta chưa thảo luận về dữ liệu thực sự đến từ đâu, hoặc\nnhững gì thực sự xảy ra khi một mô hình máy học tạo ra một đầu ra. Đó là\nbởi vì việc học được giám sát và học tập không được giám sát không giải\nquyết những vấn đề này một cách rất tinh vi. Trong cả hai trường hợp,\nchúng tôi lấy trước một đống dữ liệu lớn, sau đó thiết lập các máy nhận\ndạng mẫu của chúng tôi chuyển động mà không bao giờ tương tác với môi\ntrường một lần nữa. Bởi vì tất cả các quá trình học tập diễn ra sau khi\nthuật toán bị ngắt kết nối khỏi môi trường, điều này đôi khi được gọi là học ngoại tuyết . Đối với việc học được giám sát, quá trình này bằng\ncách xem xét thu thập dữ liệu từ một môi trường trông giống như Fig. 1.3.6 ."
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/data-collection.svg",
+      "local_path": "_images/data-collection.svg",
+      "alt": "../_images/data-collection.svg"
+    },
+    {
+      "type": "paragraph",
+      "text": "Fig. 1.3.6 Collecting data for supervised learning from an environment. ¶"
+    },
+    {
+      "type": "paragraph",
+      "text": "Sự đơn giản của việc học ngoại tuyến này có sự quyến rũ của nó. Nhược\nđiểm là chúng ta có thể lo lắng về việc nhận dạng mô hình trong sự cô\nlập, mà không bị phân tâm từ những vấn đề khác. Nhưng nhược điểm là công\nthức vấn đề khá hạn chế. Nếu bạn tham vọng hơn, hoặc nếu bạn lớn lên đọc\nloạt Robot của Asimov, thì bạn có thể tưởng tượng các bot thông minh\nnhân tạo có khả năng không chỉ đưa ra dự đoán mà còn thực hiện các hành\nđộng trên thế giới. Chúng tôi muốn suy nghĩ về thông minh* đại lý * ,\nkhông chỉ là các mô hình dự đoán. Điều này có nghĩa là chúng ta cần suy\nnghĩ về việc lựa chọn * actions*, không chỉ đưa ra dự đoán. Hơn nữa,\nkhông giống như dự đoán, các hành động thực sự ảnh hưởng đến môi trường.\nNếu chúng ta muốn đào tạo một đại lý thông minh, chúng ta phải tính đến\ncách hành động của nó có thể ảnh hưởng đến các quan sát trong tương lai\ncủa tác nhân."
+    },
+    {
+      "type": "paragraph",
+      "text": "Xem xét sự tương tác với một môi trường mở ra một tập hợp các câu hỏi mô\nhình hóa mới. Sau đây chỉ là một vài ví dụ."
+    },
+    {
+      "type": "list",
+      "ordered": false,
+      "items": [
+        "Môi trường có nhớ những gì chúng ta đã làm trước đây không?",
+        "Môi trường có muốn giúp chúng tôi, ví dụ: người dùng đọc văn bản vào\nbộ nhận dạng giọng nói không?",
+        "Môi trường có muốn đánh bại chúng ta, tức là, một thiết lập đối thủ\nnhư lọc thư rác (chống lại kẻ gửi thư rác) hoặc chơi một trò chơi (so\nvới đối thủ)?",
+        "Môi trường không quan tâm?",
+        "Môi trường có động lực dịch chuyển không? Ví dụ: dữ liệu trong tương\nlai luôn giống với quá khứ hay các mẫu thay đổi theo thời gian, một\ncách tự nhiên hoặc để đáp ứng với các công cụ tự động của chúng tôi?"
+      ]
+    },
+    {
+      "type": "paragraph",
+      "text": "Câu hỏi cuối cùng này đặt ra vấn đề của dịch chuyển phân phố , khi dữ\nliệu đào tạo và kiểm tra khác nhau. Đó là một vấn đề mà hầu hết chúng ta\nđã trải qua khi tham gia các kỳ thi được viết bởi một giảng viên, trong\nkhi bài tập về nhà được sáng tác bởi các trợ lý giảng dạy của ông. Tiếp\ntheo, chúng tôi sẽ mô tả ngắn gọn học tập củng cố, một thiết lập xem xét\nrõ ràng tương tác với một môi trường."
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "id": "hoc-tang-cuong",
+      "text": "1.3.4. Học tăng cường"
+    },
+    {
+      "type": "paragraph",
+      "text": "Nếu bạn quan tâm đến việc sử dụng máy học để phát triển một tác nhân\ntương tác với môi trường và thực hiện các hành động, thì có lẽ bạn sẽ\ntập trung vào * học tăng cường * . Điều này có thể bao gồm các ứng dụng\ncho robot, hệ thống đối thoại và thậm chí để phát triển trí tuệ nhân tạo\n(AI) cho trò chơi điện tử. * Học tăng cường sâu*, áp dụng học sâu để\ncủng cố các vấn đề học tập, đã tăng lên phổ biến. Đột phá sâu Q-mạng\nđánh bại con người tại các trò chơi Atari chỉ sử dụng đầu vào trực quan,\nvà chương trình AlphaGo đã truất ngôi nhà vô địch thế giới tại trò chơi\nboard game Go là hai ví dụ nổi bật."
+    },
+    {
+      "type": "paragraph",
+      "text": "Học củng cố đưa ra một tuyên bố rất chung chung về một vấn đề, trong đó\nmột tác nhân tương tác với một môi trường trong một loạt các bước thời\ngian. Tại mỗi bước thời gian, tác nhân nhận được một số quan sách từ\nmôi trường và phải chọn một hành động sau đó được truyền trở lại môi\ntrường thông qua một số cơ chế (đôi khi được gọi là bộ truyền động).\nCuối cùng, đại lý nhận được phần thưởng từ môi trường. Quá trình này\nđược minh họa trong Fig. 1.3.7 . Các tác nhân sau đó\nnhận được một quan sát tiếp theo, và chọn một hành động tiếp theo, và\nnhư vậy. Hành vi của một đại lý học tập củng cố được điều chỉnh bởi một\nchính sách. Nói tóm lại, một policy chỉ là một chức năng ánh xạ từ\nquan sát môi trường đến hành động. Mục tiêu của việc học củng cố là tạo\nra một chính sách tốt."
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/rl-environment.svg",
+      "local_path": "_images/rl-environment.svg",
+      "alt": "../_images/rl-environment.svg"
+    },
+    {
+      "type": "paragraph",
+      "text": "Fig. 1.3.7 The interaction between reinforcement learning and an environment. ¶"
+    },
+    {
+      "type": "paragraph",
+      "text": "Thật khó để nói quá mức tổng quát của khung học tập củng cố. Ví dụ,\nchúng ta có thể đưa bất kỳ vấn đề học tập được giám sát nào như một vấn\nđề học tập củng cố. Giả sử chúng tôi đã có một vấn đề phân loại. Chúng\nta có thể tạo ra một đại lý học tập tăng cường với một hành động tương\nứng với mỗi lớp. Sau đó chúng ta có thể tạo ra một môi trường cho một\nphần thưởng chính xác bằng với chức năng mất từ vấn đề học tập được giám\nsát ban đầu."
+    },
+    {
+      "type": "paragraph",
+      "text": "Điều đó đang được nói, việc học củng cố cũng có thể giải quyết nhiều vấn\nđề mà việc học được giám sát không thể. Ví dụ, trong việc học được giám\nsát, chúng tôi luôn mong đợi rằng đầu vào đào tạo được liên kết với nhãn\nchính xác. Nhưng trong học tập củng cố, chúng tôi không cho rằng đối với\nmỗi quan sát môi trường cho chúng ta biết hành động tối ưu. Nói chung,\nchúng tôi chỉ nhận được một số phần thưởng. Hơn nữa, môi trường thậm chí\ncó thể không cho chúng ta biết hành động nào dẫn đến phần thưởng."
+    },
+    {
+      "type": "paragraph",
+      "text": "Xem xét ví dụ như các trò chơi của cờ vua. Tín hiệu phần thưởng thực sự\nduy nhất đến ở cuối trò chơi khi chúng ta giành chiến thắng, mà chúng ta\ncó thể gán phần thưởng là 1, hoặc khi chúng ta thua, mà chúng ta có thể\ngán phần thưởng là -1. Vì vậy, người học củng cố phải giải quyết vấn đề tín dục : xác định hành động nào cần ghi nhận hoặc đổ lỗi cho một kết\nquả. Điều tương tự cũng xảy ra đối với một nhân viên được khuyến mãi vào\nngày 11 tháng 10. Chương trình khuyến mãi đó có thể phản ánh một số\nlượng lớn các hành động được lựa chọn tốt trong năm trước. Nhận được\nnhiều chương trình khuyến mãi trong tương lai đòi hỏi phải tìm ra những\nhành động nào trên đường đi dẫn đến chương trình khuyến mãi."
+    },
+    {
+      "type": "paragraph",
+      "text": "Người học củng cố cũng có thể phải đối phó với vấn đề quan sát từng\nphần. Đó là, quan sát hiện tại có thể không cho bạn biết mọi thứ về\ntrạng thái hiện tại của bạn. Nói rằng một robot làm sạch thấy mình bị\nmắc kẹt trong một trong nhiều tủ quần áo giống hệt nhau trong một ngôi\nnhà. Suy ra vị trí chính xác (và do đó trạng thái) của robot có thể yêu\ncầu xem xét các quan sát trước đó của nó trước khi vào tủ quần áo."
+    },
+    {
+      "type": "paragraph",
+      "text": "Cuối cùng, tại bất kỳ thời điểm nào, người học củng cố có thể biết về\nmột chính sách tốt, nhưng có thể có nhiều chính sách tốt hơn khác mà đại\nlý chưa bao giờ thử. Người học củng cố phải liên tục lựa chọn để * khai\nthác * chiến lược tốt nhất hiện nay được biết đến như một chính sách,\nhoặc để * khám phát* không gian của các chiến lược, có khả năng từ bỏ\nmột số phần thưởng ngắn hạn để đổi lấy kiến thức."
+    },
+    {
+      "type": "paragraph",
+      "text": "Vấn đề học tập củng cố chung là một bối cảnh rất chung chung. Các hành\nđộng ảnh hưởng đến các quan sát tiếp theo. Phần thưởng chỉ được quan sát\ntương ứng với các hành động đã chọn. Môi trường có thể được quan sát đầy\nđủ hoặc một phần. Kế toán cho tất cả sự phức tạp này cùng một lúc có thể\nhỏi quá nhiều các nhà nghiên cứu. Hơn nữa, không phải mọi vấn đề thực tế\nthể hiện tất cả sự phức tạp này. Kết quả là, các nhà nghiên cứu đã\nnghiên cứu một số trường hợp đặc biệt của các vấn đề học tập củng cố."
+    },
+    {
+      "type": "paragraph",
+      "text": "Khi môi trường được quan sát đầy đủ, chúng tôi gọi vấn đề học tập củng\ncố là quy trình quyết định * Markov . Khi trạng thái không phụ thuộc\nvào các hành động trước đó, chúng ta gọi vấn đề là vấn đề tên cướp theo\nngữ cảnh *. *. Khi không có trạng thái, chỉ là một tập hợp các hành động\ncó sẵn với phần thưởng ban đầu chưa biết, vấn đề này là vấn đề cướp đa\nvũ cổ cổ điển*."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "re",
+      "text": "1.4. Rễ"
+    },
+    {
+      "type": "paragraph",
+      "text": "Chúng tôi vừa xem xét một tập hợp nhỏ các vấn đề mà machine learning có\nthể giải quyết. Đối với một tập hợp các vấn đề máy học đa dạng, deep\nlearning cung cấp các công cụ mạnh mẽ để giải quyết chúng. Mặc dù nhiều\nphương pháp học sâu là những phát minh gần đây, ý tưởng cốt lõi của lập\ntrình với dữ liệu và mạng thần kinh (tên của nhiều mô hình học sâu) đã\nđược nghiên cứu trong nhiều thế kỷ. Trên thực tế, con người đã tổ chức\nmong muốn phân tích dữ liệu và dự đoán kết quả trong tương lai lâu dài\nvà phần lớn khoa học tự nhiên có nguồn gốc từ việc này. Ví dụ, bản phân\nbố Bernoulli được đặt theo tên [ Jacob Bernoulli\n(1655—1705) , và bản\nphân bố Gaussian được phát hiện bởi Carl Friedrich Gauss\n(1777—1855) . Ông\nđã phát minh ra, ví dụ, thuật toán ô vuông ít trung bình nhất, mà vẫn\nđược sử dụng ngày nay cho vô số vấn đề từ tính toán bảo hiểm đến chẩn\nđoán y tế. Những công cụ này đã tạo ra một cách tiếp cận thực nghiệm\ntrong khoa học tự nhiên - ví dụ, định luật Ohm liên quan đến dòng điện\nvà điện áp trong một điện trở được mô tả hoàn hảo bởi một mô hình tuyến\ntính."
+    },
+    {
+      "type": "paragraph",
+      "text": "Ngay cả trong thời trung cổ, các nhà toán học đã có một trực giác quan\ntâm về ước tính. Ví dụ, cuốn sách hình học của [ Jacob Köbel\n(1460—1533) minh họa trung bình chiều dài của 16 chân nam trưởng thành để có được\nchiều dài chân trung bình."
+    },
+    {
+      "type": "image",
+      "original_url": "https://vi.d2l.ai/_images/koebel.jpg",
+      "local_path": "_images/koebel.jpg",
+      "alt": "../_images/koebel.jpg"
+    },
+    {
+      "type": "paragraph",
+      "text": "Fig. 1.4.1 Estimating the length of a foot. ¶"
+    },
+    {
+      "type": "paragraph",
+      "text": "Fig. 1.4.1 minh họa cách thức ước tính này hoạt động. 16\nngười đàn ông trưởng thành được yêu cầu xếp hàng liên tiếp, khi rời khỏi\nnhà thờ. Chiều dài tổng hợp của chúng sau đó được chia cho 16 để có được\nước tính cho những gì bây giờ là 1 foot. “Thuật toán” này sau đó được\ncải tiến để đối phó với đôi chân sai mạnh—2 người đàn ông có bàn chân\nngắn nhất và dài nhất lần lượt được gửi đi, trung bình chỉ hơn phần còn\nlại. Đây là một trong những ví dụ sớm nhất về ước tính trung bình được\ncắt tỉa."
+    },
+    {
+      "type": "paragraph",
+      "text": "Thống kê thực sự cất cánh với việc thu thập và tính sẵn có của dữ liệu.\nMột trong những người khổng lồ của nó, Ronald Fisher\n(1890—1962) , đóng góp\nđáng kể cho lý thuyết của nó và cũng là các ứng dụng của nó trong di\ntruyền học. Nhiều thuật toán của ông (như phân tích phân biệt đối xử\ntuyến tính) và công thức (như ma trận thông tin Fisher) vẫn đang được sử\ndụng thường xuyên ngày nay. Trên thực tế, ngay cả bộ dữ liệu Iris mà\nFisher phát hành vào năm 1936 vẫn còn được sử dụng đôi khi để minh họa\ncho các thuật toán học máy. Ông cũng là một người đề xuất ưu sinh, điều\nnày nên nhắc nhở chúng ta rằng việc sử dụng khoa học dữ liệu đáng ngờ về\nmặt đạo đức đã lâu dài và lâu dài một lịch sử như việc sử dụng sản xuất\ncủa nó trong công nghiệp và khoa học tự nhiên."
+    },
+    {
+      "type": "paragraph",
+      "text": "Ảnh hưởng thứ hai đối với học máy đến từ lý thuyết thông tin của Claude\nShannon (1916—2001) và\nlý thuyết tính toán qua Alan Turing\n(1912—1954) . Turing đặt\nra câu hỏi “máy móc có thể nghĩ không?” trong bài báo nổi tiếng của mình\n* Computing Machinery and Intelligence* [Turing, 1950] . Trong\nnhững gì ông mô tả là thử nghiệm Turing, một cỗ máy có thể được coi là thông minh nếu người đánh giá của con người khó phân biệt giữa các câu\ntrả lời với một máy và một con người dựa trên tương tác văn bản."
+    },
+    {
+      "type": "paragraph",
+      "text": "Một ảnh hưởng khác có thể được tìm thấy trong khoa học thần kinh và tâm\nlý học. Rốt cuộc, con người thể hiện rõ hành vi thông minh. Do đó, chỉ\nhợp lý để hỏi liệu người ta có thể giải thích và có thể đảo ngược khả\nnăng này. Một trong những thuật toán lâu đời nhất lấy cảm hứng từ thời\ntrang này được xây dựng bởi Donald Hebb\n(1904—1985) . Trong\ncuốn sách đột phá của mình * Tổ chức hành vi* [Hebb & Hebb, 1949] , ông khẳng định rằng các tế bào thần kinh học\nbằng cách củng cố tích cực. Điều này được biết đến như là quy tắc học\ntập Hebbian. Đây là nguyên mẫu của thuật toán học perceptron của\nRosenblatt và nó đã đặt nền móng của nhiều thuật toán gốc gradient ngẫu\nnhiên làm nền tảng học sâu ngày nay: củng cố hành vi mong muốn và giảm\nbớt hành vi không mong muốn để có được cài đặt tốt của các thông số\ntrong mạng thần kinh."
+    },
+    {
+      "type": "paragraph",
+      "text": "Cảm hứng sinh học là những gì đã cho * mạng thần kinh * tên của họ.\nTrong hơn một thế kỷ (có niên đại từ các mô hình của Alexander Bain,\n1873 và James Sherrington, 1890), các nhà nghiên cứu đã cố gắng lắp ráp\ncác mạch tính toán giống với mạng lưới các tế bào thần kinh tương tác.\nTheo thời gian, việc giải thích sinh học đã trở nên ít theo nghĩa đen\nhơn nhưng cái tên bị mắc kẹt. Tại trái tim của nó, nói dối một vài\nnguyên tắc chính có thể được tìm thấy trong hầu hết các mạng hiện nay:"
+    },
+    {
+      "type": "list",
+      "ordered": false,
+      "items": [
+        "Sự xen kẽ của các đơn vị xử lý tuyến tính và phi tuyến, thường được\ngọi là * lớp*.",
+        "Việc sử dụng quy tắc chuỗi (còn được gọi là backpropagation ) để\nđiều chỉnh các tham số trong toàn bộ mạng cùng một lúc."
+      ]
+    },
+    {
+      "type": "paragraph",
+      "text": "Sau những tiến bộ nhanh chóng ban đầu, nghiên cứu trong các mạng thần\nkinh mệt mỏi từ khoảng năm 1995 cho đến năm 2005. Điều này chủ yếu là do\nhai lý do. Đầu tiên, đào tạo một mạng là tính toán rất tốn kém. Trong\nkhi bộ nhớ truy cập ngẫu nhiên rất phong phú vào cuối thế kỷ qua, sức\nmạnh tính toán rất khan hiếm. Thứ hai, các bộ dữ liệu tương đối nhỏ.\nTrên thực tế, tập dữ liệu Iris của Fisher từ năm 1932 là một công cụ phổ\nbiến để kiểm tra hiệu quả của các thuật toán. Tập dữ liệu MNIST với\n60000 chữ số viết tay của nó được coi là rất lớn."
+    },
+    {
+      "type": "paragraph",
+      "text": "Với sự khan hiếm của dữ liệu và tính toán, các công cụ thống kê mạnh mẽ\nnhư phương pháp hạt nhân, cây quyết định và mô hình đồ họa tỏ ra vượt\ntrội theo kinh nghiệm. Không giống như các mạng thần kinh, họ không cần\nnhiều tuần để đào tạo và cung cấp kết quả có thể dự đoán được với những\nđảm bảo lý thuyết mạnh mẽ."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "con-duong-den-sau-hoc",
+      "text": "1.5. Con đường đến sâu học"
+    },
+    {
+      "type": "paragraph",
+      "text": "Phần lớn điều này đã thay đổi với sự sẵn có sẵn của một lượng lớn dữ\nliệu, do World Wide Web, sự ra đời của các công ty phục vụ hàng trăm\ntriệu người dùng trực tuyến, phổ biến các cảm biến giá rẻ, chất lượng\ncao, lưu trữ dữ liệu giá rẻ (định luật Kryder) và tính toán giá rẻ (định\nluật Moore), đặc biệt là dạng GPU, ban đầu được thiết kế để chơi game\ntrên máy tính. Đột nhiên các thuật toán và mô hình dường như không khả\nthi tính toán trở nên có liên quan (và ngược lại). Điều này được minh\nhọa tốt nhất trong Section 1.5 ."
+    },
+    {
+      "type": "table",
+      "html": "<table class=\"docutils align-default\">\n<colgroup>\n<col style=\"width: 10%\"/>\n<col style=\"width: 39%\"/>\n<col style=\"width: 10%\"/>\n<col style=\"width: 41%\"/>\n</colgroup>\n<thead>\n<tr class=\"row-odd\"><th class=\"head\"><p>Decade</p></th>\n<th class=\"head\"><p>Dataset</p></th>\n<th class=\"head\"><p>Memory</p></th>\n<th class=\"head\"><p>Floating point calculations per second</p></th>\n</tr>\n</thead>\n<tbody>\n<tr class=\"row-even\"><td><p>1970</p></td>\n<td><p>100 (Iris)</p></td>\n<td><p>1 KB</p></td>\n<td><p>100 KF (Intel 8080)</p></td>\n</tr>\n<tr class=\"row-odd\"><td><p>1980</p></td>\n<td><p>1 K (House prices in Boston)</p></td>\n<td><p>100 KB</p></td>\n<td><p>1 MF (Intel 80186)</p></td>\n</tr>\n<tr class=\"row-even\"><td><p>1990</p></td>\n<td><p>10 K (optical character recognition)</p></td>\n<td><p>10 MB</p></td>\n<td><p>10 MF (Intel 80486)</p></td>\n</tr>\n<tr class=\"row-odd\"><td><p>2000</p></td>\n<td><p>10 M (web pages)</p></td>\n<td><p>100 MB</p></td>\n<td><p>1 GF (Intel Core)</p></td>\n</tr>\n<tr class=\"row-even\"><td><p>2010</p></td>\n<td><p>10 G (advertising)</p></td>\n<td><p>1 GB</p></td>\n<td><p>1 TF (Nvidia C2050)</p></td>\n</tr>\n<tr class=\"row-odd\"><td><p>2020</p></td>\n<td><p>1 T (social network)</p></td>\n<td><p>100 GB</p></td>\n<td><p>1 PF (Nvidia DGX-2)</p></td>\n</tr>\n</tbody>\n</table>",
+      "text": "Decade Dataset Memory Floating point calculations per second 1970 100 (Iris) 1 KB 100 KF (Intel 8080) 1980 1 K (House prices in Boston) 100 KB 1 MF (Intel 80186) 1990 10 K (optical character recognition) 10 MB 10 MF (Intel 80486) 2000 10 M (web pages) 100 MB 1 GF (Intel Core) 2010 10 G (advertising) 1 GB 1 TF (Nvidia C2050) 2020 1 T (social network) 100 GB 1 PF (Nvidia DGX-2)"
+    },
+    {
+      "type": "paragraph",
+      "text": "Table: Dataset so với bộ nhớ máy tính và sức mạnh tính toán"
+    },
+    {
+      "type": "paragraph",
+      "text": "Rõ ràng là bộ nhớ truy cập ngẫu nhiên đã không theo kịp sự tăng trưởng\ncủa dữ liệu. Đồng thời, sự gia tăng sức mạnh tính toán đã vượt xa dữ\nliệu có sẵn. Điều này có nghĩa là các mô hình thống kê cần phải trở nên\nhiệu quả hơn bộ nhớ (điều này thường đạt được bằng cách thêm phi tuyến\ntính) trong khi đồng thời có thể dành nhiều thời gian hơn để tối ưu hóa\ncác thông số này, do ngân sách tính toán tăng lên. Do đó, điểm ngọt ngào\ntrong máy học và thống kê đã chuyển từ các mô hình tuyến tính (tổng\nquát) và phương pháp hạt nhân sang các mạng thần kinh sâu. Đây cũng là\nmột trong những lý do tại sao nhiều trụ cột của học sâu, chẳng hạn như\nnhận thức đa lớp [McCulloch & Pitts, 1943] , mạng thần kinh phức tạp [LeCun et al., 1998] , bộ nhớ ngắn hạn dài [Hochreiter & Schmidhuber, 1997] và Q-Learning [Watkins & Dayan, 1992] , về cơ bản là “phát hiện lại” trong thập kỷ\nqua, sau khi đặt tương đối không hoạt động cho considerable đáng kể\ntime."
+    },
+    {
+      "type": "paragraph",
+      "text": "Sự tiến bộ gần đây trong các mô hình thống kê, ứng dụng, và thuật toán\nđôi khi đã được so sánh với vụ nổ Cambri: một khoảnh khắc tiến bộ nhanh\nchóng trong quá trình tiến hóa của các loài. Thật vậy, nhà nước của nghệ\nthuật không chỉ là một hậu quả đơn thuần của các nguồn lực có sẵn, áp\ndụng cho các thuật toán hàng thập kỷ cũ. Lưu ý rằng danh sách dưới đây\nhầu như không làm trầy xước bề mặt của những ý tưởng đã giúp các nhà\nnghiên cứu đạt được tiến bộ to lớn trong thập kỷ qua."
+    },
+    {
+      "type": "list",
+      "ordered": false,
+      "items": [
+        "Các phương pháp mới để kiểm soát công suất, chẳng hạn như *\ndropout* [Srivastava et al., 2014] , đã giúp\ngiảm thiểu nguy cơ quá mức. Điều này đạt được bằng cách áp dụng tiếng\nồn tiêm [Bishop, 1995] trên toàn mạng thần kinh, thay thế\ntrọng lượng bằng các biến ngẫu nhiên cho mục đích đào tạo.",
+        "Các cơ chế chú ý đã giải quyết một vấn đề thứ hai đã cản trở số liệu\nthống kê trong hơn một thế kỷ: làm thế nào để tăng bộ nhớ và độ phức\ntạp của một hệ thống mà không làm tăng số lượng các tham số có thể\nhọc được. Các nhà nghiên cứu đã tìm thấy một giải pháp thanh lịch\nbằng cách sử dụng những gì chỉ có thể được xem như một cấu trúc con\ntrỏ có thể học được [Bahdanau et al., 2014] . Thay vì phải\nnhớ toàn bộ một chuỗi văn bản, ví dụ, đối với dịch máy trong một biểu\ndiễn chiều cố định, tất cả những gì cần được lưu trữ là một con trỏ\nđến trạng thái trung gian của quá trình dịch thuật. Điều này cho phép\ntăng độ chính xác đáng kể cho các chuỗi dài, vì mô hình không còn cần\nphải nhớ toàn bộ chuỗi trước khi bắt đầu tạo ra một chuỗi mới.",
+        "Thiết kế đa giai đoạn, ví dụ, thông qua các mạng bộ nhớ [Sukhbaatar et al., 2015] và lập trình viên thần\nkinh [Reed & DeFreitas, 2015] cho phép các mô hình thống kê mô\ntả các phương pháp lặp đi lặp lại để lập luận. Những công cụ này cho\nphép một trạng thái nội bộ của mạng thần kinh sâu được sửa đổi nhiều\nlần, do đó thực hiện các bước tiếp theo trong một chuỗi lý luận,\ntương tự như cách một bộ xử lý có thể sửa đổi bộ nhớ cho một tính\ntoán.",
+        "Một phát triển quan trọng khác là phát minh ra các mạng đối thủ thế\nhệ [Goodfellow et al., 2014] . Theo truyền\nthống, các phương pháp thống kê để ước tính mật độ và các mô hình tạo\ntập trung vào việc tìm kiếm các phân phối xác suất thích hợp và\n(thường là gần đúng) thuật toán lấy mẫu từ chúng. Kết quả là, các\nthuật toán này phần lớn bị giới hạn bởi sự thiếu linh hoạt vốn có\ntrong các mô hình thống kê. Sự đổi mới quan trọng trong các mạng đối\nthủ thế hệ là thay thế bộ lấy mẫu bằng một thuật toán tùy ý với các\ntham số khác biệt. Chúng sau đó được điều chỉnh theo cách mà người\nphân biệt đối xử (hiệu quả là thử nghiệm hai mẫu) không thể phân biệt\ngiả với dữ liệu thực. Thông qua khả năng sử dụng các thuật toán tùy ý\nđể tạo ra dữ liệu, nó đã mở ra ước tính mật độ cho nhiều kỹ thuật\nkhác nhau. Ví dụ về Zebras phi nước đại [Zhu et al., 2017] và của những người nổi tiếng giả mạo\nphải đối mặt [Karras et al., 2017] đều là lời khai cho\nsự tiến bộ này. Ngay cả những người vẽ tranh nghiệp dư cũng có thể\ntạo ra những hình ảnh thực tế dựa trên các bản phác thảo mô tả cách\nbố trí của một cảnh trông giống như [Park et al., 2019] .",
+        "Trong nhiều trường hợp, một GPU duy nhất là không đủ để xử lý một\nlượng lớn dữ liệu có sẵn để đào tạo. Trong thập kỷ qua, khả năng xây\ndựng các thuật toán đào tạo song song và phân tán đã được cải thiện\nđáng kể. Một trong những thách thức chính trong việc thiết kế các\nthuật toán có thể mở rộng là việc làm việc tối ưu hóa học tập sâu,\ngốc gradient ngẫu nhiên, dựa vào các minibatches dữ liệu tương đối\nnhỏ sẽ được xử lý. Đồng thời, các lô nhỏ hạn chế hiệu quả của GPU. Do\nđó, đào tạo trên 1024 GPU với kích thước minibatch, giả sử 32 hình\nảnh mỗi lô lên tới một minibatch tổng hợp khoảng 32000 hình ảnh. Công\nviệc gần đây, đầu tiên là Li [Li, 2017] , và sau đó là [You et al., 2017] và [Jia et al., 2018] đã đẩy kích thước lên đến 64000 quan sát, giảm thời gian đào tạo cho\nmô hình ResNet-50 trên bộ dữ liệu ImageNet xuống chưa đầy 7 phút. Để\nso sánh, thời gian đào tạo ban đầu được đo theo thứ tự ngày.",
+        "Khả năng tính toán song song cũng đã đóng góp khá quan trọng để tiến\nbộ trong học tập củng cố, ít nhất là bất cứ khi nào mô phỏng là một\nlựa chọn. Điều này đã dẫn đến những tiến bộ đáng kể trong các máy\ntính đạt được hiệu suất siêu phàm trong các game Go, Atari,\nStarcraft, và trong các mô phỏng vật lý (ví dụ, sử dụng MuJoCo). Xem\nví dụ, [Silver et al., 2016] để biết mô tả về cách\nđạt được điều này trong AlphaGo. Tóm lại, việc học tăng cường hoạt\nđộng tốt nhất nếu có nhiều (trạng thái, hành động, phần thưởng) gấp\nba lần, tức là, bất cứ khi nào có thể thử nhiều thứ để tìm hiểu cách\nchúng liên quan đến nhau. Mô phỏng cung cấp một đại lộ như vậy.",
+        "Các khuôn khổ học sâu đã đóng một vai trò quan trọng trong việc phổ\nbiến các ý tưởng. Thế hệ khung đầu tiên cho phép mô hình hóa dễ dàng\nbao gồm Caffe , Torch và Theano . Nhiều bài báo tinh\ndịch được viết bằng các công cụ này. Đến bây giờ, chúng đã được thay\nthế bởi TensorFlow (thường được sử dụng thông qua API cấp cao Keras ), CNTK , Caffe\n2 , và Apache\nMXNet . Thế hệ công cụ\nthứ ba, cụ thể là các công cụ bắt buộc để học sâu, được cho là dẫn\nđầu bởi Chainer , sử dụng một\ncú pháp tương tự như Python NumPy để mô tả các mô hình. Ý tưởng này\nđã được thông qua bởi cả PyTorch , Gluon\nAPI của MXNet và Jax ."
+      ]
+    },
+    {
+      "type": "paragraph",
+      "text": "Việc phân chia lao động giữa các nhà nghiên cứu hệ thống xây dựng các\ncông cụ tốt hơn và các nhà mô hình thống kê xây dựng mạng thần kinh tốt\nhơn đã đơn giản hóa mọi thứ rất nhiều. Ví dụ, đào tạo một mô hình hồi\nquy logistic tuyến tính từng là một vấn đề bài tập về nhà không tầm\nthường, xứng đáng để cung cấp cho sinh viên máy học mới tiến sĩ tại Đại\nhọc Carnegie Mellon vào năm 2014. Đến bây giờ, nhiệm vụ này có thể được\nthực hiện với ít hơn 10 dòng mã, đặt nó vững chắc vào nắm bắt các lập\ntrình viên."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "cau-chuyen-thanh-cong",
+      "text": "1.6. Câu chuyện thành công"
+    },
+    {
+      "type": "paragraph",
+      "text": "AI có một lịch sử lâu dài của việc cung cấp kết quả sẽ rất khó để thực\nhiện nếu không. Ví dụ, các hệ thống phân loại thư sử dụng nhận dạng ký\ntự quang học đã được triển khai từ những năm 1990. Đây là, sau tất cả,\nnguồn gốc của tập dữ liệu MNIST nổi tiếng của các chữ số viết tay. Điều\ntương tự cũng áp dụng cho việc đọc séc cho tiền gửi ngân hàng và ghi\nđiểm tín dụng của người nộp đơn. Các giao dịch tài chính được kiểm tra\ngian lận tự động. Điều này tạo thành xương sống của nhiều hệ thống thanh\ntoán thương mại điện tử, chẳng hạn như PayPal, Stripe, AliPay, WeChat,\nApple, Visa và MasterCard. Các chương trình máy tính cho cờ vua đã cạnh\ntranh trong nhiều thập kỷ. Máy học nguồn cấp dữ liệu tìm kiếm, khuyến\nnghị, cá nhân hóa và xếp hạng trên Internet. Nói cách khác, học máy rất\nphổ biến, mặc dù thường bị che giấu khỏi tầm nhìn."
+    },
+    {
+      "type": "paragraph",
+      "text": "Chỉ gần đây AI mới ở trong ánh đèn sân khấu, chủ yếu là do các giải pháp\ncho các vấn đề được coi là khó chữa trước đây và có liên quan trực tiếp\nđến người tiêu dùng. Nhiều tiến bộ như vậy được quy cho học sâu."
+    },
+    {
+      "type": "list",
+      "ordered": false,
+      "items": [
+        "Các trợ lý thông minh, chẳng hạn như Siri của Apple, Alexa của Amazon\nvà trợ lý của Google, có thể trả lời các câu hỏi nói với mức độ chính\nxác hợp lý. Điều này bao gồm các nhiệm vụ quan trọng như bật công tắc\nđèn (một lợi ích cho người khuyết tật) để thực hiện các cuộc hẹn của\nthợ cắt tóc và cung cấp hộp thoại hỗ trợ điện thoại. Đây có thể là\ndấu hiệu đáng chú ý nhất cho thấy AI đang ảnh hưởng đến cuộc sống của\nchúng ta.",
+        "Một thành phần quan trọng trong trợ lý kỹ thuật số là khả năng nhận\ndạng giọng nói chính xác. Dần dần độ chính xác của các hệ thống như\nvậy đã tăng lên đến mức chúng đạt đến độ chẵn lẻ của con người đối\nvới một số ứng dụng nhất định [Xiong et al., 2018] .",
+        "Nhận dạng đối tượng tương tự như vậy đã đi một chặng đường dài. Ước\ntính đối tượng trong một bức tranh là một nhiệm vụ khá khó khăn trong\nnăm 2010. Trên các nhà nghiên cứu điểm chuẩn ImageNet từ NEC Labs và\nĐại học Illinois tại Urbana-Champaign đã đạt được tỷ lệ lỗi top-5 là\n28% [Lin et al., 2010] . Đến năm 2017, tỷ lệ lỗi này đã giảm\nxuống còn 2,25% [Hu et al., 2018] . Tương tự như vậy, kết quả\ntuyệt đẹp đã đạt được để xác định các loài chim hoặc chẩn đoán ung\nthư da.",
+        "Trò chơi từng là một pháo đài của trí thông minh của con người. Bắt\nđầu từ TD-Gammon, một chương trình chơi backgammon bằng cách sử dụng\nhọc tăng cường chênh lệch thời gian, tiến trình thuật toán và tính\ntoán đã dẫn đến các thuật toán cho một loạt các ứng dụng. Không giống\nnhư backgammon, cờ vua có một không gian trạng thái phức tạp hơn\nnhiều và tập hợp các hành động. DeepBlue đánh bại Garry Kasparov sử\ndụng song song lớn, phần cứng chuyên dụng và tìm kiếm hiệu quả thông\nqua cây trò chơi [Campbell et al., 2002] . Đi vẫn còn khó\nkhăn hơn, do không gian trạng thái khổng lồ của nó. AlphaGo đạt đến\nđộ chẵn lẻ của con người vào năm 2015, sử dụng học sâu kết hợp với\nlấy mẫu cây Monte Carlo [Silver et al., 2016] .\nThách thức trong Poker là không gian nhà nước lớn và nó không được\nquan sát đầy đủ (chúng tôi không biết thẻ của đối thủ). Libratus vượt\nquá hiệu suất của con người trong Poker sử dụng chiến lược có cấu\ntrúc hiệu quả [Brown & Sandholm, 2017] . Điều này minh họa sự\ntiến bộ ấn tượng trong các trò chơi và thực tế là các thuật toán tiên\ntiến đóng một phần quan trọng trong đó.",
+        "Một dấu hiệu khác của sự tiến bộ trong AI là sự ra đời của ô tô và xe\ntải tự lái. Mặc dù quyền tự chủ hoàn toàn chưa hoàn toàn nằm trong\ntầm tay, nhưng tiến bộ tuyệt vời đã được thực hiện theo hướng này,\nvới các công ty như Tesla, NVIDIA và các sản phẩm vận chuyển Waymo\ncho phép ít nhất một phần tự chủ. Điều làm cho quyền tự chủ đầy đủ\ntrở nên khó khăn là lái xe thích hợp đòi hỏi khả năng nhận thức, lý\nluận và kết hợp các quy tắc vào một hệ thống. Hiện nay, học sâu được\nsử dụng chủ yếu trong khía cạnh thị giác máy tính của những vấn đề\nnày. Phần còn lại được điều chỉnh rất nhiều bởi các kỹ sư."
+      ]
+    },
+    {
+      "type": "paragraph",
+      "text": "Một lần nữa, danh sách trên hầu như không làm trầy xước bề mặt của nơi\nmáy học đã ảnh hưởng đến các ứng dụng thực tế. Ví dụ, robot, hậu cần,\nsinh học tính toán, vật lý hạt và thiên văn học nợ một số tiến bộ ấn\ntượng nhất gần đây của họ ít nhất là trong các phần của học máy. Do đó,\nhọc máy đang trở thành một công cụ phổ biến cho các kỹ sư và nhà khoa\nhọc."
+    },
+    {
+      "type": "paragraph",
+      "text": "Thông thường, câu hỏi về ngày tận thế AI, hoặc điểm kỳ dị AI đã được nêu\nra trong các bài viết phi kỹ thuật về AI. Nỗi sợ hãi là bằng cách nào đó\nhệ thống học máy sẽ trở nên tình cảm và quyết định độc lập với các lập\ntrình viên (và thạc sĩ) của họ về những thứ ảnh hưởng trực tiếp đến sinh\nkế của con người. Ở một mức độ nào đó, AI đã ảnh hưởng đến sinh kế của\ncon người một cách ngay lập tức: tính tín dụng được đánh giá tự động,\ncác phi công tự động chủ yếu điều hướng phương tiện, quyết định về việc\ncó cấp bảo lãnh sử dụng dữ liệu thống kê làm đầu vào hay không. Phù\nphiếm hơn, chúng ta có thể yêu cầu Alexa bật máy pha cà phê."
+    },
+    {
+      "type": "paragraph",
+      "text": "May mắn thay, chúng ta còn xa một hệ thống AI có cảm giác sẵn sàng thao\ntúng những người tạo ra con người (hoặc đốt cà phê của họ). Đầu tiên,\ncác hệ thống AI được thiết kế, đào tạo và triển khai theo một cách cụ\nthể, hướng đến mục tiêu. Mặc dù hành vi của họ có thể tạo ra ảo giác về\ntrí thông minh chung, nhưng đó là sự kết hợp của các quy tắc, heuristics\nvà các mô hình thống kê làm nền tảng cho thiết kế. Thứ hai, hiện tại các\ncông cụ cho * trí tuệ tổng quát nhân tạo* đơn giản là không tồn tại có\nthể cải thiện bản thân, lý do về bản thân và có thể sửa đổi, mở rộng và\ncải thiện kiến trúc của riêng họ trong khi cố gắng giải quyết các nhiệm\nvụ chung."
+    },
+    {
+      "type": "paragraph",
+      "text": "Một mối quan tâm cấp bách hơn nhiều là cách AI đang được sử dụng trong\ncuộc sống hàng ngày của chúng ta. Có khả năng nhiều nhiệm vụ menial được\nthực hiện bởi các tài xế xe tải và trợ lý cửa hàng có thể và sẽ được tự\nđộng hóa. Robot nông trại có thể sẽ giảm chi phí cho canh tác hữu cơ\nnhưng chúng cũng sẽ tự động hóa các hoạt động thu hoạch. Giai đoạn này\ncủa cuộc cách mạng công nghiệp có thể có hậu quả sâu sắc đối với những\nphần lớn của xã hội, vì tài xế xe tải và trợ lý cửa hàng là một số công\nviệc phổ biến nhất ở nhiều quốc gia. Hơn nữa, các mô hình thống kê, khi\náp dụng mà không cần chăm sóc có thể dẫn đến thiên vị chủng tộc, giới\ntính hoặc tuổi tác và nêu ra những lo ngại hợp lý về sự công bằng về thủ\ntục nếu tự động thúc đẩy các quyết định do hậu quả. Điều quan trọng là\nđảm bảo rằng các thuật toán này được sử dụng cẩn thận. Với những gì\nchúng ta biết ngày nay, điều này gây ra cho chúng ta một mối quan tâm\ncấp bách hơn nhiều so với tiềm năng của siêu trí thông minh ác độc để\ntiêu diệt nhân loại."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "cac-diem",
+      "text": "1.7. các điểm"
+    },
+    {
+      "type": "paragraph",
+      "text": "Cho đến nay, chúng ta đã nói về máy học một cách rộng rãi, vừa là một\nnhánh của AI vừa là cách tiếp cận với AI. Mặc dù deep learning là một\ntập hợp con của machine learning, nhưng tập hợp các thuật toán và ứng\ndụng chóng mặt gây khó khăn cho việc đánh giá các thành phần cụ thể cho\nhọc sâu có thể là gì. Điều này khó khăn như cố gắng pin xuống các thành\nphần cần thiết cho pizza vì hầu hết mọi thành phần đều có thể thay thế."
+    },
+    {
+      "type": "paragraph",
+      "text": "Như chúng tôi đã mô tả, machine learning có thể sử dụng dữ liệu để tìm\nhiểu các biến đổi giữa đầu vào và đầu ra, chẳng hạn như chuyển đổi âm\nthanh thành văn bản trong nhận dạng giọng nói. Khi làm như vậy, thường\ncần phải đại diện cho dữ liệu theo cách phù hợp với các thuật toán để\nbiến đổi các biểu diễn như vậy thành đầu ra. Học sâu là * sâu* theo\nnghĩa chính xác rằng các mô hình của nó học nhiều * lớp* biến đổi,\ntrong đó mỗi lớp cung cấp biểu diễn ở một cấp độ. Ví dụ, các lớp gần đầu\nvào có thể đại diện cho các chi tiết cấp thấp của dữ liệu, trong khi các\nlớp gần đầu ra phân loại có thể đại diện cho các khái niệm trừu tượng\nhơn được sử dụng để phân biệt đối xử. Vì học đại diện *nhằm mục đích\ntìm ra bản thân đại diện, học sâu có thể được gọi là học đại diện đa\ncấp."
+    },
+    {
+      "type": "paragraph",
+      "text": "Các vấn đề mà chúng ta đã thảo luận cho đến nay, chẳng hạn như học từ\ntín hiệu âm thanh thô, giá trị pixel thô của hình ảnh hoặc ánh xạ giữa\ncác câu có độ dài tùy ý và các đối tác của chúng bằng ngoại ngữ, là\nnhững vấn đề mà học sâu vượt trội và nơi các phương pháp học máy truyền\nthống chùn bước. Nó chỉ ra rằng các mô hình nhiều lớp này có khả năng\ngiải quyết dữ liệu nhận thức cấp thấp theo cách mà các công cụ trước đây\nkhông thể. Có thể cho là điểm chung quan trọng nhất trong các phương\npháp học sâu là việc sử dụng * đào tạo end-to-end * . Đó là, thay vì\nlắp ráp một hệ thống dựa trên các thành phần được điều chỉnh riêng lẻ,\nngười ta xây dựng hệ thống và sau đó điều chỉnh hiệu suất của chúng cùng\nnhau. Ví dụ, trong tầm nhìn máy tính các nhà khoa học sử dụng để tách\nquá trình kỹ thuật * tính năng* khỏi quá trình xây dựng các mô hình\nhọc máy. Máy dò cạnh Canny [Canny, 1987] và máy trích xuất tính\nnăng SIFT của Lowe [Lowe, 2004] trị vì tối cao trong hơn một thập\nkỷ như các thuật toán để lập bản đồ hình ảnh thành các vectơ tính năng.\nTrong những ngày đã qua, phần quan trọng của việc áp dụng máy học vào\nnhững vấn đề này bao gồm việc đưa ra các cách được thiết kế thủ công để\nchuyển đổi dữ liệu thành một số hình thức phù hợp với các mô hình nông.\nThật không may, chỉ có rất ít mà con người có thể thực hiện bằng sự khéo\nléo so với một đánh giá nhất quán trên hàng triệu lựa chọn được thực\nhiện tự động bởi một thuật toán. Khi học sâu tiếp quản, các bộ chiết\nxuất tính năng này được thay thế bằng các bộ lọc được điều chỉnh tự\nđộng, mang lại độ chính xác vượt trội."
+    },
+    {
+      "type": "paragraph",
+      "text": "Do đó, một lợi thế chính của học sâu là nó thay thế không chỉ các mô\nhình nông ở cuối các đường ống học tập truyền thống, mà còn là quá trình\nkỹ thuật tính năng tốn nhiều lao động. Hơn nữa, bằng cách thay thế phần\nlớn tiền xử lý miền cụ thể, deep learning đã loại bỏ nhiều ranh giới mà\ntrước đây tách tầm nhìn máy tính, nhận dạng giọng nói, xử lý ngôn ngữ tự\nnhiên, tin học y tế và các lĩnh vực ứng dụng khác, cung cấp một bộ công\ncụ thống nhất để giải quyết đa dạng vấn đề."
+    },
+    {
+      "type": "paragraph",
+      "text": "Ngoài đào tạo từ đầu đến cuối, chúng tôi đang trải qua một sự chuyển đổi\ntừ mô tả thống kê tham số sang các mô hình hoàn toàn không tham số. Khi\ndữ liệu khan hiếm, người ta cần dựa vào việc đơn giản hóa các giả định\nvề thực tế để có được các mô hình hữu ích. Khi dữ liệu dồi dào, điều này\ncó thể được thay thế bằng các mô hình không tham số phù hợp với thực tế\nchính xác hơn. Ở một mức độ nào đó, điều này phản ánh sự tiến bộ mà vật\nlý trải qua vào giữa thế kỷ trước với sự sẵn có của máy tính. Thay vì\ngiải các xấp xỉ tham số về cách điện tử hoạt động bằng tay, giờ đây\nngười ta có thể dùng đến các mô phỏng số của các phương trình vi phân\ntừng phần liên quan. Điều này đã dẫn đến các mô hình chính xác hơn\nnhiều, mặc dù thường xuyên với chi phí giải thích."
+    },
+    {
+      "type": "paragraph",
+      "text": "Một điểm khác biệt khác đối với công việc trước đây là việc chấp nhận\ncác giải pháp tối ưu, giải quyết các vấn đề tối ưu hóa phi tuyến không\nlồi và sẵn sàng thử mọi thứ trước khi chứng minh chúng. Chủ nghĩa kinh\nnghiệm mới được tìm thấy này trong việc đối phó với các vấn đề thống kê,\nkết hợp với một dòng tài năng nhanh chóng đã dẫn đến tiến bộ nhanh chóng\ncủa các thuật toán thực tế, mặc dù trong nhiều trường hợp với chi phí\nsửa đổi và tái phát minh các công cụ tồn tại trong nhiều thập kỷ."
+    },
+    {
+      "type": "paragraph",
+      "text": "Cuối cùng, cộng đồng deep learning tự hào về việc chia sẻ các công cụ\ntrên các ranh giới học thuật và doanh nghiệp, phát hành nhiều thư viện\ntuyệt vời, mô hình thống kê và các mạng được đào tạo làm nguồn mở. Theo\ntinh thần này, các máy tính xách tay hình thành cuốn sách này có sẵn\nmiễn phí để phân phối và sử dụng. Chúng tôi đã làm việc chăm chỉ để giảm\nbớt các rào cản tiếp cận để mọi người tìm hiểu về học sâu và chúng tôi\nhy vọng rằng độc giả của chúng tôi sẽ được hưởng lợi từ việc này."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "tom-tat",
+      "text": "1.8. Tóm tắt"
+    },
+    {
+      "type": "list",
+      "ordered": false,
+      "items": [
+        "Machine learning nghiên cứu cách các hệ thống máy tính có thể tận\ndụng trải nghiệm (thường là dữ liệu) để cải thiện hiệu suất tại các\ntác vụ cụ thể. Nó kết hợp các ý tưởng từ thống kê, khai thác dữ liệu\nvà tối ưu hóa. Thông thường, nó được sử dụng như một phương tiện\ntriển khai các giải pháp AI.",
+        "Là một lớp học máy học, việc học đại diện tập trung vào cách tự động\ntìm ra cách thể hiện dữ liệu thích hợp. Deep learning là học đại diện\nđa cấp thông qua việc học nhiều lớp biến đổi.",
+        "Deep learning thay thế không chỉ các mô hình nông ở cuối các đường\nống học máy truyền thống, mà còn là quá trình kỹ thuật tính năng tốn\nnhiều lao động.",
+        "Phần lớn tiến bộ gần đây trong học sâu đã được kích hoạt bởi sự phong\nphú của dữ liệu phát sinh từ các cảm biến giá rẻ và các ứng dụng quy\nmô Internet, và bởi sự tiến bộ đáng kể trong tính toán, chủ yếu là\nthông qua GPU.",
+        "Tối ưu hóa toàn bộ hệ thống là một thành phần quan trọng trong việc\nđạt được hiệu suất cao. Sự sẵn có của các khung học sâu hiệu quả đã\ngiúp thiết kế và triển khai điều này dễ dàng hơn đáng kể."
+      ]
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "id": "bai-tap",
+      "text": "1.9. Bài tập"
+    },
+    {
+      "type": "list",
+      "ordered": true,
+      "items": [
+        "Những phần nào của mã mà bạn hiện đang viết có thể được “học”, tức\nlà, được cải thiện bằng cách học và tự động xác định các lựa chọn\nthiết kế được thực hiện trong mã của bạn? Mã của bạn có bao gồm các\nlựa chọn thiết kế heuristic không?",
+        "Những vấn đề mà bạn gặp phải có nhiều ví dụ về cách giải quyết chúng,\nnhưng không có cách nào cụ thể để tự động hóa chúng? Đây có thể là\nnhững ứng cử viên chính để sử dụng deep learning.",
+        "Xem sự phát triển của AI như một cuộc cách mạng công nghiệp mới, mối\nquan hệ giữa các thuật toán và dữ liệu là gì? Nó có tương tự như động\ncơ hơi nước và than? Sự khác biệt cơ bản là gì?",
+        "Bạn có thể áp dụng phương pháp đào tạo từ đầu đến cuối ở đâu khác,\nchẳng hạn như trong Fig. 1.1.2 , vật lý, kỹ thuật và kinh\ntế học?"
+      ]
+    },
+    {
+      "type": "paragraph",
+      "text": "Discussions"
+    }
+  ],
+  "images": [
+    {
+      "original_url": "https://vi.d2l.ai/_images/wake-word.svg",
+      "local_path": "_images/wake-word.svg",
+      "alt": "../_images/wake-word.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/ml-loop.svg",
+      "local_path": "_images/ml-loop.svg",
+      "alt": "../_images/ml-loop.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/supervised-learning.svg",
+      "local_path": "_images/supervised-learning.svg",
+      "alt": "../_images/supervised-learning.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/death-cap.jpg",
+      "local_path": "_images/death-cap.jpg",
+      "alt": "../_images/death-cap.jpg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/stackedanimals.png",
+      "local_path": "_images/stackedanimals.png",
+      "alt": "../_images/stackedanimals.png"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/deeplearning-amazon.jpg",
+      "local_path": "_images/deeplearning-amazon.jpg",
+      "alt": "../_images/deeplearning-amazon.jpg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/speech.png",
+      "local_path": "_images/speech.png",
+      "alt": "../_images/speech.png"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/data-collection.svg",
+      "local_path": "_images/data-collection.svg",
+      "alt": "../_images/data-collection.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/rl-environment.svg",
+      "local_path": "_images/rl-environment.svg",
+      "alt": "../_images/rl-environment.svg"
+    },
+    {
+      "original_url": "https://vi.d2l.ai/_images/koebel.jpg",
+      "local_path": "_images/koebel.jpg",
+      "alt": "../_images/koebel.jpg"
+    }
+  ],
+  "text": "1. Giới thiệu\nCho đến gần đây, gần như mọi chương trình máy tính mà chúng tôi tương\ntác với hàng ngày được mã hóa bởi các nhà phát triển phần mềm từ các\nnguyên tắc đầu tiên. Nói rằng chúng tôi muốn viết một ứng dụng để quản\nlý một nền tảng thương mại điện tử. Sau khi huddling xung quanh một bảng\ntrắng trong một vài giờ để suy nghĩ về vấn đề, chúng tôi sẽ đưa ra những\nnét rộng của một giải pháp làm việc có thể trông giống như thế này: (i)\nngười dùng tương tác với các ứng dụng thông qua một giao diện chạy trong\nmột trình duyệt web hoặc ứng dụng di động; (ii) ứng dụng của chúng tôi\ntương tác với một công cụ cơ sở dữ liệu cấp thương mại để theo dõi trạng\nthái của từng người dùng và duy trì hồ sơ về các giao dịch lịch sử; và\n(iii) ở trung tâm của ứng dụng của chúng tôi, * business logic* (bạn\ncó thể nói, nãi ) ứng dụng của chúng tôi đánh vần chi tiết về phương\npháp hành động thích hợp của chúng tôi program chương trình should take\nin every mỗi conceivable có thể tưởng tượng circumstance hoàn cảnh.\nĐể xây dựng bộ não của ứng dụng của chúng tôi, chúng tôi sẽ phải bước\nqua mọi trường hợp góc có thể mà chúng tôi dự đoán gặp phải, đưa ra các\nquy tắc phù hợp. Mỗi lần khách hàng nhấp chuột để thêm một mặt hàng vào\ngiỏ hàng của họ, chúng tôi thêm một mục nhập vào bảng cơ sở dữ liệu giỏ\nhàng, liên kết ID của người dùng đó với ID của sản phẩm được yêu cầu.\nTrong khi vài nhà phát triển bao giờ nhận được nó hoàn toàn đúng lần đầu\ntiên (nó có thể mất một số thử nghiệm chạy để làm việc ra những trở\nngại), đối với hầu hết các phần, chúng tôi có thể viết một chương trình\nnhư vậy từ nguyên tắc đầu tiên và tự tin khởi động nó trước bao giờ\nnhìn thấy một khách hàng thực sự. Khả năng thiết kế các hệ thống tự động\ncủa chúng tôi từ các nguyên tắc đầu tiên thúc đẩy các sản phẩm và hệ\nthống hoạt động, thường là trong các tình huống mới lạ, là một kỳ công\nnhận thức đáng chú ý. Và khi bạn có thể đưa ra các giải pháp hoạt động\n$100% $ thời gian, bạn không nên sử dụng máy học.\nMay mắn thay cho cộng đồng ngày càng tăng của các nhà khoa học máy học,\nnhiều nhiệm vụ mà chúng tôi muốn tự động hóa không dễ uốn cong đến sự\nkhéo léo của con người. Hãy tưởng tượng xoay quanh bảng trắng với những\nbộ óc thông minh nhất mà bạn biết, nhưng lần này bạn đang giải quyết một\ntrong những vấn đề sau:\nViết một chương trình dự đoán thời tiết ngày mai được đưa ra thông\ntin địa lý, hình ảnh vệ tinh và một cửa sổ theo dõi thời tiết trong\nquá khứ.\nViết một chương trình có trong một câu hỏi, thể hiện bằng văn bản\ndạng tự do, và trả lời nó một cách chính xác.\nViết một chương trình đưa ra một hình ảnh có thể xác định tất cả\nnhững người mà nó chứa, vẽ phác thảo xung quanh mỗi.\nViết một chương trình trình bày cho người dùng các sản phẩm mà họ có\nkhả năng thưởng thức nhưng không thể, trong quá trình duyệt tự nhiên,\nđể gặp phải.\nTrong mỗi trường hợp này, ngay cả các lập trình viên ưu tú cũng không có\nkhả năng mã hóa các giải pháp từ đầu. Những lý do cho điều này có thể\nkhác nhau. Đôi khi chương trình mà chúng tôi đang tìm kiếm theo một mô\nhình thay đổi theo thời gian và chúng tôi cần các chương trình của mình\nđể điều chỉnh. Trong các trường hợp khác, mối quan hệ (nói giữa pixel và\ndanh mục trừu tượng) có thể quá phức tạp, đòi hỏi hàng ngàn hoặc hàng\ntriệu tính toán vượt quá sự hiểu biết có ý thức của chúng ta ngay cả khi\nmắt chúng ta quản lý nhiệm vụ dễ dàng. Học máy là nghiên cứu mạnh mẽ\nkỹ thuật mà có thể học hỏi từ kinh nghiệm. Là một thuật toán học máy\ntích lũy nhiều kinh nghiệm hơn, điển hình dưới dạng dữ liệu quan sát\nhoặc tương tác với một môi trường, hiệu suất của nó được cải thiện.\nTương phản điều này với nền tảng thương mại điện tử xác định của chúng\ntôi, thực hiện theo cùng một logic kinh doanh, bất kể kinh nghiệm tích\nlũy bao nhiêu, cho đến khi các nhà phát triển tự học và quyết định rằng\nđã đến lúc cập nhật phần mềm. Trong cuốn sách này, chúng tôi sẽ dạy cho\nbạn những nguyên tắc cơ bản của máy học và đặc biệt tập trung vào *\ndeep learning*, một bộ kỹ thuật mạnh mẽ thúc đẩy đổi mới trong các lĩnh\nvực đa dạng như thị giác máy tính, xử lý ngôn ngữ tự nhiên, chăm sóc sức\nkhỏe và bộ gen.\n1.1. Một ví dụ động lực\nTrước khi bắt đầu viết, các tác giả của cuốn sách này, giống như nhiều\nlực lượng lao động, đã phải trở thành caffein. Chúng tôi nhảy vào xe và\nbắt đầu lái xe. Sử dụng iPhone, Alex gọi ra “Hey Siri”, đánh thức hệ\nthống nhận dạng giọng nói của điện thoại. Sau đó Mục chỉ huy “hướng đến\nquán cà phê Blue Bottle”. Điện thoại nhanh chóng hiển thị phiên mã lệnh\ncủa mình. Nó cũng nhận ra rằng chúng tôi đang yêu cầu chỉ đường và khởi\nchạy ứng dụng Maps (ứng dụng) để đáp ứng yêu cầu của chúng tôi. Sau khi\nra mắt, ứng dụng Maps đã xác định được một số tuyến đường. Bên cạnh mỗi\ntuyến đường, điện thoại hiển thị thời gian vận chuyển dự đoán. Trong khi\nchúng tôi chế tạo câu chuyện này để thuận tiện sư phạm, nó chứng minh\nrằng trong khoảng thời gian chỉ vài giây, các tương tác hàng ngày của\nchúng tôi với một chiếc điện thoại thông minh có thể tham gia vào một số\nmô hình máy học.\nHãy tưởng tượng chỉ cần viết một chương trình để trả lời một từ wake như “Alexa”, “OK Google”, và “Hey Siri”. Hãy thử tự mình mã hóa nó trong\nmột căn phòng mà không có gì ngoài máy tính và trình soạn thảo mã, như\nminh họa trong Fig. 1.1.1 . Làm thế nào bạn sẽ viết một\nchương trình như vậy từ các nguyên tắc đầu tiên? Hãy suy nghĩ về nó…\nvấn đề là khó khăn. Mỗi giây, micrô sẽ thu thập khoảng 44000 mẫu. Mỗi\nmẫu là một phép đo biên độ của sóng âm. Quy tắc nào có thể ánh xạ đáng\ntin cậy từ một đoạn âm thanh thô để dự đoán tự tin \\(\\{\\text{yes}, \\text{no}\\}\\) về việc liệu đoạn mã có chứa từ thức\nhay không? Nếu bạn bị mắc kẹt, đừng lo lắng. Chúng tôi cũng không biết\nlàm thế nào để viết một chương trình như vậy từ đầu. Đó là lý do tại sao\nchúng tôi sử dụng máy học.\nFig. 1.1.1 Identify a wake word. ¶\nĐây là mánh khóe. Thông thường, ngay cả khi chúng ta không biết làm thế\nnào để nói với một máy tính một cách rõ ràng làm thế nào để ánh xạ từ\nđầu vào đến đầu ra, dù sao chúng ta vẫn có khả năng tự thực hiện chiến\ncông nhận thức. Nói cách khác, ngay cả khi bạn không biết cách lập trình\nmáy tính để nhận ra từ “Alexa”, bản thân bạn có thể nhận ra nó. Được\ntrang bị khả năng này, chúng ta có thể thu thập một bộ dữ liệu* khổng\nlồ* chứa các ví dụ về âm thanh và gắn nhãn những người làm và không\nchứa từ thức dậy. Trong phương pháp học máy, chúng tôi không cố gắng\nthiết kế một hệ thống rõ ràng để nhận ra các từ thức. Thay vào đó,\nchúng tôi xác định một chương trình linh hoạt có hành vi được xác định\nbởi một số tham số*. Sau đó, chúng tôi sử dụng tập dữ liệu để xác định\nbộ tham số tốt nhất có thể, những thông số cải thiện hiệu suất của\nchương trình của chúng tôi đối với một số biện pháp hiệu suất đối với\nnhiệm vụ quan tâm.\nBạn có thể nghĩ về các tham số như các nút bấm mà chúng ta có thể xoay,\nthao tác hành vi của chương trình. Sửa các tham số, chúng tôi gọi chương\ntrình là mô hình **. Tập hợp tất cả các chương trình riêng biệt (ánh\nxạ đầu vào-đầu ra) mà chúng ta có thể tạo ra chỉ bằng cách thao tác các\ntham số được gọi là family của mô hình. Và meta-chương trình sử dụng\ntập dữ liệu của chúng tôi để chọn các tham số được gọi là thuật toán * learning * .\nTrước khi chúng ta có thể tiếp tục và tham gia vào thuật toán học tập,\nchúng ta phải xác định chính xác vấn đề, ghim bản chất chính xác của các\nđầu vào và đầu ra, và chọn một gia đình mô hình thích hợp. Trong trường\nhợp này, mô hình của chúng tôi nhận được một đoạn âm thanh dưới dạng *\nđầu vào* và mô hình tạo ra một lựa chọn trong số \\(\\{\\text{yes}, \\text{no}\\}\\) dưới dạng * đầu ra*. Nếu tất cả diễn\nra theo kế hoạch, các dự đoán của mô hình thường sẽ chính xác về việc\nđoạn mã có chứa từ đánh thức hay không.\nNếu chúng ta chọn đúng dòng mô hình, sẽ tồn tại một cài đặt của các nút\nbấm sao cho mô hình sẽ cháy “có” mỗi khi nó nghe từ “Alexa”. Bởi vì sự\nlựa chọn chính xác của từ thức là tùy ý, chúng ta có thể sẽ cần một gia\nđình người mẫu đủ phong phú rằng, thông qua một thiết lập khác của các\nnút bấm, nó có thể bắn “có” chỉ khi nghe từ “Apricot”. Chúng tôi hy vọng\nrằng cùng một gia đình mô hình nên phù hợp để công nhận “Alexa” và công\nnhận “Apricot” bởi vì chúng có vẻ, trực giác, là những nhiệm vụ tương\ntự. Tuy nhiên, chúng ta có thể cần một dòng mô hình khác hoàn toàn nếu\nchúng ta muốn đối phó với các đầu vào hoặc đầu ra khác nhau về cơ bản,\nhãy nói nếu chúng ta muốn ánh xạ từ hình ảnh sang chú thích, hoặc từ câu\ntiếng Anh sang câu Trung Quốc.\nNhư bạn có thể đoán, nếu chúng ta chỉ cần đặt tất cả các nút một cách\nngẫu nhiên, không chắc mô hình của chúng tôi sẽ nhận ra “Alexa”,\n“Apricot” hoặc bất kỳ từ tiếng Anh nào khác. Trong machine learning, *\nlearning* là quá trình mà chúng tôi khám phá ra cài đặt phù hợp của các\nnút nhấn ép buộc hành vi mong muốn từ mô hình của chúng tôi. Nói cách\nkhác, chúng tôi * đào tạo* mô hình của chúng tôi với dữ liệu. Như thể\nhiện trong Fig. 1.1.2 , quá trình đào tạo thường trông như\nsau:\nBắt đầu với một mô hình được khởi tạo ngẫu nhiên mà không thể làm bất\ncứ điều gì hữu ích.\nLấy một số dữ liệu của bạn (ví dụ: đoạn âm thanh và nhãn \\(\\{\\text{yes}, \\text{no}\\}\\) tương ứng).\nTinh chỉnh các núm để mô hình hút ít hơn so với những ví dụ đó.\nLặp lại Bước 2 và 3 cho đến khi mô hình tuyệt vời.\nFig. 1.1.2 A typical training process. ¶\nĐể tóm tắt, thay vì mã hóa một công cụ nhận dạng từ thức, chúng tôi mã\nhóa một chương trình có thể * learn* để nhận ra các từ thức, nếu chúng\ntôi trình bày nó với một tập dữ liệu được dán nhãn lớn. Bạn có thể nghĩ\nđến hành động này để xác định hành vi của một chương trình bằng cách\ntrình bày nó với một tập dữ liệu dưới dạng lập trình với dữ liệu . Điều\nđó có nghĩa là, chúng ta có thể “lập trình” một máy dò mèo bằng cách\ncung cấp hệ thống học máy của chúng tôi nhiều ví dụ về mèo và chó. Bằng\ncách này, máy dò cuối cùng sẽ học cách phát ra một số dương rất lớn nếu\nnó là một con mèo, một số âm rất lớn nếu nó là chó, và một cái gì đó gần\nbằng không nếu nó không chắc chắn, và điều này hầu như không làm trầy\nxước bề mặt của những gì máy học có thể làm. Deep learning, mà chúng tôi\nsẽ giải thích chi tiết hơn sau này, chỉ là một trong số nhiều phương\npháp phổ biến để giải quyết các vấn đề máy học.\n1.2. Các thành phần chính\nTrong ví dụ từ thức dậy của chúng tôi, chúng tôi đã mô tả một tập dữ\nliệu bao gồm đoạn âm thanh và nhãn nhị phân, và chúng tôi đã đưa ra một\ncảm giác lượn sóng tay về cách chúng tôi có thể đào tạo một mô hình để\nxấp xỉ một ánh xạ từ đoạn trích đến phân loại. Loại vấn đề này, nơi\nchúng tôi cố gắng dự đoán một nhãn không xác định được chỉ định dựa trên\ncác đầu vào đã biết được đưa ra một tập dữ liệu bao gồm các ví dụ mà các\nnhãn được biết đến, được gọi là * học được giám sách*. Đây chỉ là một\ntrong số nhiều loại vấn đề máy học. Sau đó chúng ta sẽ đi sâu vào các\nvấn đề học máy khác nhau. Đầu tiên, chúng tôi muốn làm sáng tỏ nhiều hơn\nvề một số thành phần cốt lõi sẽ theo dõi chúng tôi xung quanh, bất kể\nchúng tôi gặp phải vấn đề máy học nào:\ndữ liệu mà chúng ta có thể học hỏi từ.\nMột* mô hình* về cách chuyển đổi dữ liệu.\nChức năng * mục tiêu * định lượng mô hình đang hoạt động tốt như thế\nnào (hoặc xấu).\n* algorithm * để điều chỉnh các tham số của mô hình để tối ưu hóa hàm\nmục tiêu.\n1.2.1. Dữ liệu\nNó có thể đi mà không nói rằng bạn không thể làm khoa học dữ liệu mà\nkhông có dữ liệu. Chúng ta có thể mất hàng trăm trang suy ngẫm những gì\nchính xác cấu thành dữ liệu, nhưng bây giờ, chúng ta sẽ sai về mặt thực\ntế và tập trung vào các thuộc tính chính cần quan tâm. Nói chung, chúng\ntôi quan tâm đến một bộ sưu tập các ví dụ. Để làm việc với dữ liệu một\ncách hữu ích, chúng ta thường cần phải đưa ra một đại diện số phù hợp.\nMỗi ví dụ (hoặc data point , data instance , sample ) thường bao\ngồm một tập hợp các thuộc tính gọi là features (hoặc covariates ), từ\nđó mô hình phải đưa ra dự đoán của nó. Trong các vấn đề học tập được\ngiám sát ở trên, điều cần dự đoán là một thuộc tính đặc biệt được chỉ\nđịnh là label (hoặc target ).\nNếu chúng ta đang làm việc với dữ liệu hình ảnh, mỗi bức ảnh riêng lẻ có\nthể tạo thành một ví dụ, mỗi bức ảnh được biểu thị bằng một danh sách có\nthứ tự các giá trị số tương ứng với độ sáng của mỗi pixel. Một bức ảnh\nmàu \\(200\\times 200\\) sẽ bao gồm \\(200\\times200\\times3=120000\\) giá trị số, tương ứng với độ sáng của các kênh màu đỏ, xanh lá cây và\nxanh cho mỗi vị trí không gian. Trong một nhiệm vụ truyền thống khác,\nchúng ta có thể cố gắng dự đoán liệu bệnh nhân có tồn tại hay không, với\nmột tập hợp các tính năng tiêu chuẩn như tuổi tác, dấu hiệu quan trọng\nvà chẩn đoán.\nKhi mỗi ví dụ được đặc trưng bởi cùng một số giá trị số, chúng ta nói\nrằng dữ liệu bao gồm các vectơ có độ dài cố định và chúng ta mô tả độ\ndài không đổi của các vectơ là dimensionality của dữ liệu. Như bạn có\nthể tưởng tượng, chiều dài cố định có thể là một tài sản thuận tiện. Nếu\nchúng ta muốn đào tạo một mô hình để nhận ra ung thư trong hình ảnh kính\nhiển vi, các đầu vào có độ dài cố định có nghĩa là chúng ta có ít điều\ncần lo lắng hơn.\nTuy nhiên, không phải tất cả dữ liệu đều có thể dễ dàng được biểu diễn\ndưới dạng chiều dài cố định vectơ. Mặc dù chúng ta có thể mong đợi\nhình ảnh kính hiển vi đến từ thiết bị tiêu chuẩn, nhưng chúng ta không\nthể mong đợi hình ảnh được khai thác từ Internet để tất cả hiển thị với\ncùng độ phân giải hoặc hình dạng. Đối với hình ảnh, chúng ta có thể xem\nxét cắt tất cả chúng đến một kích thước tiêu chuẩn, nhưng chiến lược đó\nchỉ giúp chúng ta cho đến nay. Chúng tôi có nguy cơ mất thông tin trong\ncác phần cắt ra. Hơn nữa, dữ liệu văn bản chống lại các biểu diễn độ dài\ncố định thậm chí còn bướng bỉnh hơn. Xem xét các đánh giá của khách hàng\ncòn lại trên các trang thương mại điện tử như Amazon, IMDB và\nTripAdvisor. Một số là ngắn: “nó bốc mùi!”. Những người khác ramble cho\ncác trang. Một lợi thế lớn của học sâu so với các phương pháp truyền\nthống là ân sủng so sánh mà các mô hình hiện đại có thể xử lý dữ liệu *\nchiều dài thay đổi*.\nNói chung, chúng ta càng có nhiều dữ liệu, công việc của chúng ta càng\ntrở nên dễ dàng hơn. Khi chúng ta có nhiều dữ liệu hơn, chúng ta có thể\nđào tạo các mô hình mạnh mẽ hơn và ít dựa vào các giả định được hình\nthành trước. Sự thay đổi chế độ từ (tương đối) nhỏ sang dữ liệu lớn là\nmột đóng góp chính cho sự thành công của học sâu hiện đại. Để thúc đẩy\nđiểm về nhà, nhiều mô hình thú vị nhất trong học sâu không hoạt động mà\nkhông có bộ dữ liệu lớn. Một số người khác làm việc trong chế độ dữ liệu\nnhỏ, nhưng không tốt hơn các cách tiếp cận truyền thống.\nCuối cùng, nó không đủ để có nhiều dữ liệu và xử lý nó một cách khéo\nléo. Chúng tôi cần dữ liệu phải . Nếu dữ liệu đầy những sai lầm hoặc\nnếu các tính năng được chọn không dự đoán về số lượng mục tiêu quan tâm,\nviệc học sẽ thất bại. Tình hình bị bắt tốt bởi sáo rỗng: rác vào, rác\nra . Hơn nữa, hiệu suất dự đoán kém không phải là hậu quả tiềm năng duy\nnhất. Trong các ứng dụng nhạy cảm của học máy, như chính sách dự đoán,\nsàng lọc tiếp tục và các mô hình rủi ro được sử dụng để cho vay, chúng\nta phải đặc biệt cảnh giác với hậu quả của dữ liệu rác. Một chế độ lỗi\nphổ biến xảy ra trong các bộ dữ liệu nơi một số nhóm người không được\nđại diện trong dữ liệu đào tạo. Hãy tưởng tượng áp dụng một hệ thống\nnhận dạng ung thư da trong tự nhiên chưa từng thấy da đen trước đây.\nThất bại cũng có thể xảy ra khi dữ liệu không chỉ đơn thuần là đại diện\ncho một số nhóm mà phản ánh định kiến xã hội. Ví dụ: nếu các quyết định\ntuyển dụng trong quá khứ được sử dụng để đào tạo một mô hình dự đoán sẽ\nđược sử dụng để sàng lọc sơ yếu lý lịch, thì các mô hình học máy có thể\nvô tình nắm bắt và tự động hóa các bất công lịch sử. Lưu ý rằng tất cả\nđiều này có thể xảy ra mà không có nhà khoa học dữ liệu tích cực âm mưu,\nhoặc thậm chí nhận thức được.\n1.2.2. Mô hình\nHầu hết các máy học liên quan đến việc chuyển đổi dữ liệu theo một số\nnghĩa. Chúng ta có thể muốn xây dựng một hệ thống chụp ảnh và dự đoán nụ\ncười. Ngoài ra, chúng ta có thể muốn ăn một tập hợp các bài đọc cảm biến\nvà dự đoán mức độ bình thường so với các bài đọc dị thường như thế nào.\nTheo mô hình * , chúng tôi biểu thị máy tính toán để nhập dữ liệu của một\nloại và phun ra các dự đoán của một loại có thể khác. Đặc biệt, chúng\ntôi quan tâm đến các mô hình thống kê có thể được ước tính từ dữ liệu.\nTrong khi các mô hình đơn giản hoàn toàn có khả năng giải quyết các vấn\nđề đơn giản thích hợp, các vấn đề mà chúng tôi tập trung vào trong cuốn\nsách này kéo dài giới hạn của các phương pháp cổ điển. Học sâu được phân\nbiệt với cách tiếp cận cổ điển chủ yếu bởi tập hợp các mô hình mạnh mẽ\nmà nó tập trung vào. Các mô hình này bao gồm nhiều biến đổi liên tiếp\ncủa dữ liệu được liên kết với nhau từ trên xuống dưới, do đó tên * deep\nlearning*. Trên đường thảo luận về các mô hình sâu sắc, chúng tôi cũng\nsẽ thảo luận về một số phương pháp truyền thống hơn.\n1.2.3. Hàm mục tiêu\nTrước đó, chúng tôi giới thiệu machine learning là học hỏi từ kinh\nnghiệm. Bằng cách * learning* ở đây, chúng tôi có nghĩa là cải thiện\ntại một số nhiệm vụ theo thời gian. Nhưng ai là để nói những gì tạo\nthành một sự cải thiện? Bạn có thể tưởng tượng rằng chúng tôi có thể đề\nxuất cập nhật mô hình của chúng tôi và một số người có thể không đồng ý\nvề việc bản cập nhật được đề xuất cấu thành một cải tiến hay suy giảm.\nĐể phát triển một hệ thống toán học chính thức của máy học, chúng ta cần\nphải có các biện pháp chính thức về mức độ tốt (hoặc xấu) mô hình của\nchúng ta. Trong học máy và tối ưu hóa nói chung hơn, chúng tôi gọi các\nchức năng * mục tiêu này * . Theo quy ước, chúng ta thường xác định các\nhàm khách quan để thấp hơn là tốt hơn. Đây chỉ đơn thuần là một quy ước.\nBạn có thể thực hiện bất kỳ chức năng nào cao hơn tốt hơn và biến nó\nthành một chức năng mới giống hệt nhau về chất lượng nhưng thấp hơn là\ntốt hơn bằng cách lật dấu hiệu. Bởi vì thấp hơn là tốt hơn, các chức\nnăng này đôi khi được gọi * chức năng mất*.\nKhi cố gắng dự đoán các giá trị số, hàm mất mát phổ biến nhất là squared error , tức là bình phương của sự khác biệt giữa dự đoán và sự\nthật mặt đất. Để phân loại, mục tiêu phổ biến nhất là giảm thiểu tỷ lệ\nlỗi, tức là phần nhỏ các ví dụ mà các dự đoán của chúng ta không đồng ý\nvới sự thật nền tảng. Một số mục tiêu (ví dụ, lỗi bình phương) rất dễ\ntối ưu hóa. Những người khác (ví dụ, tỷ lệ lỗi) rất khó để tối ưu hóa\ntrực tiếp, do không phân biệt hoặc các biến chứng khác. Trong những\ntrường hợp này, thông thường tối ưu hóa một * thay thế khách thể*.\nThông thường, hàm mất được xác định đối với các tham số của mô hình và\nphụ thuộc vào tập dữ liệu. Chúng tôi tìm hiểu các giá trị tốt nhất của\ncác thông số mô hình của chúng tôi bằng cách giảm thiểu tổn thất phát\nsinh trên một bộ bao gồm một số ví dụ được thu thập để đào tạo. Tuy\nnhiên, làm tốt trên dữ liệu đào tạo không đảm bảo rằng chúng tôi sẽ làm\ntốt trên dữ liệu không nhìn thấy. Vì vậy, chúng tôi thường sẽ muốn chia\ndữ liệu có sẵn thành hai phân vùng: training dataset (hoặc training\nset , cho các tham số mô hình phù hợp) và * test dataset* (hoặc *\ntest set * , được tổ chức ra để đánh giá), báo cáo cách mô hình thực\nhiện trên cả hai chúng. Bạn có thể nghĩ về hiệu suất đào tạo như là\ngiống như một sinh viên ‘s điểm số trên các kỳ thi thực hành được sử\ndụng để chuẩn bị cho một số kỳ thi cuối cùng thực tế. Ngay cả khi kết\nquả là đáng khích lệ, điều đó không đảm bảo thành công trong kỳ thi cuối\ncùng. Nói cách khác, hiệu suất thử nghiệm có thể đi chệch đáng kể so với\nhiệu suất đào tạo. Khi một mô hình hoạt động tốt trên bộ đào tạo nhưng\nkhông khái quát hóa với dữ liệu không nhìn thấy, chúng tôi nói rằng đó\nlà * overfitting*. Trong điều kiện thực tế, điều này giống như flunking\nkỳ thi thực sự mặc dù làm tốt trên các kỳ thi thực hành.\n1.2.4. Thuật toán tối ưu hóa\nKhi chúng ta đã có một số nguồn dữ liệu và đại diện, một mô hình và một\nhàm mục tiêu được xác định rõ, chúng ta cần một thuật toán có khả năng\ntìm kiếm các tham số tốt nhất có thể để giảm thiểu hàm mất mát. Các\nthuật toán tối ưu hóa phổ biến cho học sâu dựa trên cách tiếp cận gọi là\n* gradient descent*. Nói tóm lại, ở mỗi bước, phương pháp này kiểm tra\nđể xem, cho mỗi tham số, theo cách mà bộ đào tạo mất sẽ di chuyển nếu\nbạn làm phiền tham số đó chỉ là một lượng nhỏ. Sau đó, nó cập nhật tham\nsố theo hướng có thể làm giảm tổn thất.\n1.3. Các loại vấn đề về máy học\nVấn đề từ thức trong ví dụ thúc đẩy của chúng tôi chỉ là một trong số\nnhiều vấn đề mà machine learning có thể giải quyết. Để thúc đẩy người\nđọc hơn nữa và cung cấp cho chúng tôi một số ngôn ngữ chung khi chúng\ntôi nói về nhiều vấn đề hơn trong suốt cuốn sách, trong phần sau, chúng\ntôi liệt kê một mẫu các vấn đề về máy học. Chúng tôi sẽ liên tục tham\nkhảo các khái niệm đã nói ở trên của chúng tôi như dữ liệu, mô hình và\nkỹ thuật đào tạo.\n1.3.1. Học được giám sát\nViệc học được giám sát giải quyết nhiệm vụ dự đoán các nhãn được đưa ra\ncác tính năng đầu vào. Mỗi tính năng—cặp nhãn được gọi là một ví dụ. Đôi\nkhi, khi ngữ cảnh rõ ràng, chúng ta có thể sử dụng thuật ngữ examples để chỉ một tập hợp các đầu vào, ngay cả khi các nhãn tương ứng không\nđược biết. Mục tiêu của chúng tôi là tạo ra một mô hình ánh xạ bất kỳ\nđầu vào nào đến dự đoán nhãn.\nĐể đưa ra mô tả này trong một ví dụ cụ thể, nếu chúng ta đang làm việc\ntrong chăm sóc sức khỏe, thì chúng ta có thể muốn dự đoán liệu bệnh nhân\ncó bị đau tim hay không. Quan sát này, “đau tim” hoặc “không đau tim”,\nsẽ là nhãn hiệu của chúng tôi. Các tính năng đầu vào có thể là dấu hiệu\nquan trọng như nhịp tim, huyết áp tâm trương và huyết áp tâm thu.\nViệc giám sát phát huy tác dụng vì để chọn các tham số, chúng tôi (các\ngiám sát viên) cung cấp cho mô hình một tập dữ liệu bao gồm các ví dụ\nđược dán nhãn, trong đó mỗi ví dụ được khớp với nhãn chân lý mặt đất.\nTrong thuật ngữ xác suất, chúng tôi thường quan tâm đến việc ước tính\nxác suất có điều kiện của một nhãn cho các tính năng đầu vào. Mặc dù nó\nchỉ là một trong số một số mô hình trong machine learning, nhưng việc\nhọc được giám sát chiếm phần lớn các ứng dụng thành công của machine\nlearning trong ngành. Một phần, đó là do nhiều nhiệm vụ quan trọng có\nthể được mô tả rõ ràng là ước tính xác suất của một cái gì đó chưa biết\nđược đưa ra một tập hợp dữ liệu có sẵn cụ thể:\nDự đoán ung thư so với ung thư, được đưa ra một hình ảnh chụp cắt lớp\nvi tính.\nDự đoán bản dịch chính xác bằng tiếng Pháp, được đưa ra một câu bằng\ntiếng Anh.\nDự đoán giá cổ phiếu vào tháng tới dựa trên dữ liệu báo cáo tài chính\ncủa tháng này.\nNgay cả với mô tả đơn giản “dự đoán nhãn cho các tính năng đầu vào” học\ntập giám sát có thể có rất nhiều hình thức và đòi hỏi rất nhiều quyết\nđịnh mô hình hóa, tùy thuộc vào (trong số các cân nhắc khác) loại, kích\nthước và số lượng đầu vào và đầu ra. Ví dụ, chúng ta sử dụng các mô hình\nkhác nhau để xử lý các chuỗi có độ dài tùy ý và để xử lý các biểu diễn\nvectơ có độ dài cố định. Chúng tôi sẽ đến thăm nhiều vấn đề này một cách\nsâu sắc trong suốt cuốn sách này.\nKhông chính thức, quá trình học tập trông giống như sau. Đầu tiên, lấy\nmột bộ sưu tập lớn các ví dụ mà các tính năng được biết đến và chọn từ\nchúng một tập hợp con ngẫu nhiên, có được các nhãn chân lý nền cho mỗi.\nĐôi khi các nhãn này có thể là dữ liệu có sẵn đã được thu thập (ví dụ:\nbệnh nhân có chết trong năm tiếp theo không?) và những lần khác, chúng\nta có thể cần sử dụng các chú thích của con người để gắn nhãn dữ liệu,\n(ví dụ: gán hình ảnh cho các danh mục). Cùng nhau, các đầu vào và nhãn\ntương ứng này bao gồm bộ đào tạo. Chúng tôi cung cấp tập dữ liệu đào tạo\nvào một thuật toán học tập được giám sát, một chức năng lấy làm đầu vào\nmột tập dữ liệu và xuất ra một chức năng khác: mô hình đã học. Cuối\ncùng, chúng ta có thể cung cấp các đầu vào chưa nhìn thấy trước đây cho\nmô hình đã học, sử dụng đầu ra của nó làm dự đoán của nhãn tương ứng.\nQuá trình đầy đủ được rút ra trong Fig. 1.3.1 .\nFig. 1.3.1 Supervised learning. ¶\n1.3.1.1. Hồi quy\nCó lẽ nhiệm vụ học tập được giám sát đơn giản nhất để quấn đầu của bạn\nlà * hồi quy*. Hãy xem xét, ví dụ, một tập hợp dữ liệu thu hoạch từ cơ\nsở dữ liệu về doanh số bán nhà. Chúng ta có thể xây dựng một bảng, trong\nđó mỗi hàng tương ứng với một ngôi nhà khác nhau và mỗi cột tương ứng\nvới một số thuộc tính có liên quan, chẳng hạn như cảnh vuông của một\nngôi nhà, số phòng ngủ, số lượng phòng tắm, và số phút (đi bộ) đến trung\ntâm thị trấn. Trong tập dữ liệu này, mỗi ví dụ sẽ là một ngôi nhà cụ thể\nvà vector tính năng tương ứng sẽ là một hàng trong bảng. Nếu bạn sống ở\nNew York hoặc San Francisco, và bạn không phải là Giám đốc điều hành của\nAmazon, Google, Microsoft hoặc Facebook, (cảnh quay vuông, số phòng ngủ,\nsố phòng tắm, khoảng cách đi bộ) có vector cho ngôi nhà của bạn có thể\ntrông giống như: \\([600, 1, 1, 60]\\) . Tuy nhiên, nếu bạn sống ở\nPittsburgh, nó có thể trông giống như \\([3000, 4, 3, 10]\\) hơn. Các\nvectơ tính năng như thế này rất cần thiết cho hầu hết các thuật toán\nmachine learning cổ điển.\nĐiều gì làm cho một vấn đề trở thành hồi quy thực sự là đầu ra. Nói rằng\nbạn đang ở trong thị trường cho một ngôi nhà mới. Bạn có thể muốn ước\ntính giá trị thị trường hợp lý của một ngôi nhà, với một số tính năng\nnhư trên. Nhãn, giá bán, là một giá trị số. Khi nhãn lấy các giá trị số\ntùy ý, chúng tôi gọi đây là vấn đề * regression*. Mục tiêu của chúng\ntôi là tạo ra một mô hình có dự đoán gần đúng các giá trị nhãn thực tế.\nRất nhiều vấn đề thực tế là các vấn đề hồi quy được mô tả tốt. Dự đoán\nđánh giá mà người dùng sẽ gán cho một bộ phim có thể được coi là một vấn\nđề hồi quy và nếu bạn thiết kế một thuật toán tuyệt vời để hoàn thành kỳ\ncông này trong 2009, bạn có thể đã giành được 1-million-dollar Netflix\nprize . Dự đoán thời\ngian lưu trú cho bệnh nhân trong bệnh viện cũng là một vấn đề hồi quy.\nMột nguyên tắc tốt của ngón tay cái là bất kỳ * bao nhiêu? * hoặc * bao\nnhiêu? * vấn đề nên đề nghị hồi quy, chẳng hạn như:\nPhẫu thuật này sẽ mất bao nhiêu giờ?\nThị trấn này sẽ có bao nhiêu lượng mưa trong sáu giờ tới?\nNgay cả khi bạn chưa bao giờ làm việc với machine learning trước đây,\nbạn có thể đã làm việc thông qua một vấn đề hồi quy một cách không chính\nthức. Hãy tưởng tượng, ví dụ, rằng bạn đã sửa chữa cống rãnh của bạn và\nnhà thầu của bạn đã dành 3 giờ để loại bỏ gunk khỏi đường ống nước thải\ncủa bạn. Sau đó, ông ta gửi cho bạn một hóa đơn 350 đô la. Bây giờ hãy\ntưởng tượng rằng bạn của bạn đã thuê cùng một nhà thầu trong 2 giờ và\nanh ta đã nhận được một hóa đơn 250 đô la. Nếu ai đó hỏi bạn mong đợi\nbao nhiêu vào hóa đơn loại bỏ gunk-removal sắp tới của họ, bạn có thể\nđưa ra một số giả định hợp lý, chẳng hạn như nhiều giờ làm việc chi phí\nnhiều đô la hơn. Bạn cũng có thể giả định rằng có một số phí cơ bản và\nnhà thầu sau đó tính phí mỗi giờ. Nếu những giả định này đúng, sau đó\nđưa ra hai ví dụ dữ liệu này, bạn đã có thể xác định cấu trúc giá của\nnhà thầu: 100 đô la mỗi giờ cộng với 50 đô la để xuất hiện tại nhà bạn.\nNếu bạn làm theo nhiều điều đó thì bạn đã hiểu ý tưởng cấp cao đằng sau\nhồi quy tuyến tính.\nTrong trường hợp này, chúng tôi có thể sản xuất các thông số phù hợp\nchính xác với giá của nhà thầu. Đôi khi điều này là không thể, ví dụ,\nnếu một số phương sai nợ một vài yếu tố bên cạnh hai tính năng của bạn.\nTrong những trường hợp này, chúng ta sẽ cố gắng tìm hiểu các mô hình\ngiảm thiểu khoảng cách giữa các dự đoán của chúng tôi và các giá trị\nquan sát được. Trong hầu hết các chương của chúng tôi, chúng tôi sẽ tập\ntrung vào việc giảm thiểu hàm mất lỗi bình phương. Như chúng ta sẽ thấy\nsau, sự mất mát này tương ứng với giả định rằng dữ liệu của chúng tôi đã\nbị hỏng bởi tiếng ồn Gaussian.\n1.3.1.2. Phân loại\nTrong khi các mô hình hồi quy là tuyệt vời để giải quyết * bao nhiêu?\n* câu hỏi, rất nhiều vấn đề không uốn cong thoải mái với mẫu này. Ví\ndụ: một ngân hàng muốn thêm quét séc vào ứng dụng di động của mình. Điều\nnày sẽ liên quan đến khách hàng chụp ảnh séc bằng máy ảnh của điện thoại\nthông minh của họ và ứng dụng sẽ cần phải có thể tự động hiểu văn bản\nnhìn thấy trong hình ảnh. Cụ thể, nó cũng sẽ cần phải hiểu văn bản viết\ntay để trở nên mạnh mẽ hơn, chẳng hạn như ánh xạ một ký tự viết tay với\nmột trong những ký tự đã biết. Đây là loại * cái nào? * vấn đề được\ngọi là * phân loại * . Nó được xử lý bằng một tập hợp các thuật toán khác\nvới các thuật toán được sử dụng để hồi quy mặc dù nhiều kỹ thuật sẽ tiếp\ntục.\nTrong classification , chúng tôi muốn mô hình của chúng tôi xem xét các\ntính năng, ví dụ, các giá trị pixel trong một hình ảnh, và sau đó dự\nđoán loại ** (chính thức gọi là class ), trong số một tập hợp các tùy\nchọn rời rạc, một ví dụ thuộc về. Đối với chữ số viết tay, chúng ta có\nthể có mười lớp, tương ứng với các chữ số 0 đến 9. Hình thức phân loại\nđơn giản nhất là khi chỉ có hai lớp, một vấn đề mà chúng ta gọi là * phân\nloại nhị phân * . Ví dụ, tập dữ liệu của chúng ta có thể bao gồm hình ảnh\ncủa động vật và nhãn của chúng ta có thể là các lớp \\(\\mathrm{\\{cat, dog\\}}\\) . Trong khi trong hồi quy, chúng tôi tìm\nkiếm một regressor để xuất ra một giá trị số, trong phân loại, chúng tôi\ntìm kiếm một phân loại, có đầu ra là gán lớp dự đoán.\nVì những lý do mà chúng ta sẽ tham gia khi cuốn sách trở nên kỹ thuật\nhơn, có thể khó tối ưu hóa một mô hình chỉ có thể xuất ra một nhiệm vụ\nphân loại cứng, ví dụ: “mèo” hoặc “chó”. Trong những trường hợp này,\nthay vào đó, việc thể hiện mô hình của chúng ta bằng ngôn ngữ xác suất\nthường dễ dàng hơn nhiều. Cho các tính năng của một ví dụ, mô hình của\nchúng tôi gán một xác suất cho mỗi lớp có thể. Quay trở lại ví dụ phân\nloại động vật của chúng tôi trong đó các lớp là \\(\\mathrm{\\{cat, dog\\}}\\) , một phân loại có thể thấy một hình ảnh và\nxuất ra xác suất rằng hình ảnh là một con mèo là 0.9. Chúng ta có thể\ngiải thích con số này bằng cách nói rằng phân loại là 90% chắc chắn rằng\nhình ảnh mô tả một con mèo. Độ lớn của xác suất cho lớp dự đoán truyền\ntải một khái niệm về sự không chắc chắn. Đó không phải là khái niệm duy\nnhất về sự không chắc chắn và chúng ta sẽ thảo luận về những người khác\ntrong các chương nâng cao hơn.\nKhi chúng ta có nhiều hơn hai lớp có thể, chúng ta gọi vấn đề * phân\nloại đa lượng * . Các ví dụ phổ biến bao gồm nhận dạng ký tự viết tay \\(\\mathrm{\\{0, 1, 2, ... 9, a, b, c, ...\\}}\\) . Trong khi chúng ta\ntấn công các bài toán hồi quy bằng cách cố gắng giảm thiểu hàm mất lỗi\nbình phương, hàm tổn thất phổ biến cho các bài toán phân loại được gọi\nlà * cross-entropy*, tên của nó có thể được demystified thông qua một\ngiới thiệu về lý thuyết thông tin trong các chương tiếp theo.\nLưu ý rằng lớp có khả năng nhất không nhất thiết phải là lớp mà bạn sẽ\nsử dụng cho quyết định của mình. Giả sử rằng bạn tìm thấy một loại nấm\nđẹp ở sân sau của bạn như thể hiện trong Fig. 1.3.2 .\nFig. 1.3.2 Death cap—do not eat! ¶\nBây giờ, giả sử rằng bạn đã xây dựng một nhà phân loại và đào tạo nó để\ndự đoán liệu một loại nấm có độc dựa trên một bức ảnh hay không. Giả sử\nđầu ra phân loại phát hiện chất độc của chúng tôi rằng xác suất Fig. 1.3.2 chứa nắp tử vong là 0,2. Nói cách khác, phân\nloại là 80% chắc chắn rằng nấm của chúng tôi không phải là một cái chết\nnắp. Tuy nhiên, bạn sẽ phải là một kẻ ngốc để ăn nó. Đó là bởi vì lợi\ních nhất định của một bữa tối ngon không đáng để có nguy cơ tử vong từ\nnó 20%. Nói cách khác, ảnh hưởng của rủi ro không chắc chắn lớn hơn lợi\ních cho đến nay. Do đó, chúng ta cần tính toán rủi ro dự kiến mà chúng\nta phải chịu như chức năng mất mát, tức là, chúng ta cần nhân xác suất\ncủa kết quả với lợi ích (hoặc tác hại) liên quan đến nó. Trong trường\nhợp này, sự mất mát phát sinh do ăn nấm có thể là \\(0.2 \\times \\infty + 0.8 \\times 0 = \\infty\\) , trong khi mất việc\nloại bỏ nó là \\(0.2 \\times 0 + 0.8 \\times 1 = 0.8\\) . Sự thận trọng\ncủa chúng tôi đã được chứng minh: như bất kỳ nhà nghiên cứu nấm nào cũng\ncho chúng tôi biết, nấm vào năm Fig. 1.3.2 thực sự là một\ncái mũ chết.\nPhân loại có thể trở nên phức tạp hơn nhiều so với chỉ phân loại nhị\nphân, đa phân loại hoặc thậm chí nhiều nhãn. Ví dụ, có một số biến thể\ncủa phân loại để giải quyết các hệ thống phân cấp. Hệ thống phân cấp giả\nđịnh rằng có tồn tại một số mối quan hệ giữa nhiều lớp. Vì vậy, không\nphải tất cả các lỗi đều bằng nhau - nếu chúng ta phải sai, chúng ta muốn\nphân loại sai thành một lớp liên quan hơn là đến một lớp xa. Thông\nthường, điều này được gọi là * phân loại phân học*. Một ví dụ ban đầu\nlà do Linnaeus , người\nđã tổ chức các loài động vật theo hệ thống phân cấp.\nTrong trường hợp phân loại động vật, có thể không quá tệ khi nhầm lẫn\nmột con chó xù (giống chó) cho schnauzer (một giống chó khác), nhưng mô\nhình của chúng tôi sẽ phải trả một hình phạt lớn nếu nó nhầm lẫn một con\nchó xù cho một con khủng long. Hệ thống phân cấp nào có liên quan có thể\nphụ thuộc vào cách bạn định sử dụng mô hình. Ví dụ, rắn lục lạc và rắn\ngarter có thể gần trên cây phát sinh loài, nhưng nhầm một con rattler\ncho một garter có thể gây chết người.\n1.3.1.3. Gắn thẻ\nMột số bài toán phân loại phù hợp gọn gàng vào các thiết lập phân loại\nnhị phân hoặc đa lớp. Ví dụ, chúng ta có thể huấn luyện một phân loại\nnhị phân bình thường để phân biệt mèo với chó. Với trạng thái hiện tại\ncủa tầm nhìn máy tính, chúng ta có thể làm điều này một cách dễ dàng,\nvới các công cụ off-the-shelf. Tuy nhiên, cho dù mô hình của chúng tôi\nchính xác đến mức nào, chúng ta có thể thấy mình gặp rắc rối khi nhà\nphân loại gặp phải hình ảnh của * Town Musicians of Bremen*, một câu\nchuyện cổ tích nổi tiếng của Đức có bốn con vật trong Fig. 1.3.3 .\nFig. 1.3.3 A donkey, a dog, a cat, and a rooster. ¶\nNhư bạn có thể thấy, có một con mèo trong Fig. 1.3.3 , và một con gà trống, chó và một con lừa,\nvới một số cây trong nền. Tùy thuộc vào những gì chúng ta muốn làm với\nmô hình của chúng ta cuối cùng, coi đây là một vấn đề phân loại nhị phân\ncó thể không có nhiều ý nghĩa. Thay vào đó, chúng ta có thể muốn cung\ncấp cho người mẫu tùy chọn nói rằng hình ảnh mô tả một con mèo, chó, một\ncon lừa, và một con gà trống.\nVấn đề học cách dự đoán các lớp không loại trừ lẫn nhau được gọi là phân loại nhiều nhãn mác . Các vấn đề tự động gắn thẻ thường được mô tả\ntốt nhất là các vấn đề phân loại đa nhãn. Hãy suy nghĩ về các thẻ mà mọi\nngười có thể áp dụng cho các bài đăng trên blog kỹ thuật, ví dụ:\n“machine learning”, “technology”, “tiện ích”, “ngôn ngữ lập trình”,\n“Linux”, “điện toán đám mây”, “AWS”. Một bài viết điển hình có thể có\n5—10 thẻ được áp dụng bởi vì các khái niệm này có tương quan. Bài viết\nvề “điện toán đám mây” có khả năng đề cập đến “AWS” và các bài đăng về\n“machine learning” cũng có thể đối phó với “ngôn ngữ lập trình”.\nChúng ta cũng phải đối phó với loại vấn đề này khi đối phó với các tài\nliệu y sinh, nơi gắn thẻ chính xác các bài báo là quan trọng vì nó cho\nphép các nhà nghiên cứu thực hiện các đánh giá đầy đủ về tài liệu. Tại\nThư viện Y học Quốc gia, một số chú thích chuyên nghiệp đi qua mỗi bài\nviết được lập chỉ mục trong PubMed để liên kết nó với các điều khoản có\nliên quan từ mesh, một bộ sưu tập khoảng 28000 thẻ. Đây là một quá trình\ntốn thời gian và các chú thích thường có độ trễ một năm giữa lưu trữ và\ngắn thẻ. Học máy có thể được sử dụng ở đây để cung cấp các thẻ tạm thời\ncho đến khi mỗi bài viết có thể có một đánh giá thủ công thích hợp. Thật\nvậy, trong vài năm, tổ chức BioASQ có hosted\ncompetitions để làm chính xác điều này.\n1.3.1.4. Tìm\nĐôi khi chúng ta không chỉ muốn gán từng ví dụ cho một xô hoặc cho một\ngiá trị thực. Trong lĩnh vực truy xuất thông tin, chúng tôi muốn áp đặt\nmột bảng xếp hạng trên một tập hợp các mục. Lấy tìm kiếm trên web cho\nmột ví dụ. Mục tiêu ít hơn để xác định xem một trang cụ thể có liên quan\nđến truy vấn hay không, mà là một trong rất nhiều kết quả tìm kiếm có\nliên quan nhất cho một người dùng cụ thể. Chúng tôi thực sự quan tâm đến\nviệc sắp xếp các kết quả tìm kiếm có liên quan và thuật toán học tập của\nchúng tôi cần tạo ra các tập con có thứ tự của các yếu tố từ một tập hợp\nlớn hơn. Nói cách khác, nếu chúng ta được yêu cầu tạo ra 5 chữ cái đầu\ntiên từ bảng chữ cái, có sự khác biệt giữa việc trả về “A B C D E” và “C\nA B E D”. Ngay cả khi tập kết quả là như nhau, thứ tự trong bộ vấn đề.\nMột giải pháp khả thi cho vấn đề này là lần đầu tiên gán cho mọi yếu tố\ntrong tập hợp một điểm liên quan tương ứng và sau đó lấy các yếu tố được\nxếp hạng hàng đầu. PageRank , nước sốt bí mật\nban đầu đằng sau công cụ tìm kiếm của Google là một ví dụ ban đầu của\nmột hệ thống tính điểm như vậy nhưng nó đặc biệt ở chỗ nó đã làm không\nphụ thuộc vào truy vấn thực tế. Ở đây, họ dựa vào một bộ lọc liên quan\nđơn giản để xác định tập hợp các mục có liên quan và sau đó vào PageRank\nđể đặt hàng những kết quả có chứa thuật ngữ truy vấn. Ngày nay, các công\ncụ tìm kiếm sử dụng máy học và mô hình hành vi để có được điểm số liên\nquan phụ thuộc vào truy vấn. Có toàn bộ hội nghị học thuật dành cho môn\nhọc này.\n1.3.1.5. Hệ thống Recommender\nHệ thống giới thiệu là một cài đặt vấn đề khác có liên quan đến tìm kiếm\nvà xếp hạng. Các vấn đề tương tự như mục tiêu là hiển thị một tập hợp\ncác mục có liên quan cho người dùng. Sự khác biệt chính là sự nhấn mạnh\nvào cá nhân hóa cho người dùng cụ thể trong bối cảnh của các hệ thống\ngiới thiệu. Ví dụ: đối với các đề xuất phim, trang kết quả cho một người\nhâm mộ khoa học viễn tưởng và trang kết quả cho một người sành phim hài\nPeter Sellers có thể khác nhau đáng kể. Các vấn đề tương tự bật lên\ntrong các cài đặt đề xuất khác, ví dụ, cho các sản phẩm bán lẻ, âm nhạc\nvà khuyến nghị tin tức.\nTrong một số trường hợp, khách hàng cung cấp phản hồi rõ ràng cho biết\nhọ thích một sản phẩm cụ thể như thế nào (ví dụ: xếp hạng và đánh giá\nsản phẩm trên Amazon, IMDb và Goodreads). Trong một số trường hợp khác,\nhọ cung cấp phản hồi ngầm, ví dụ: bằng cách bỏ qua tiêu đề trên danh\nsách phát, điều này có thể cho thấy sự không hài lòng nhưng có thể chỉ\nra rằng bài hát không phù hợp trong ngữ cảnh. Trong các công thức đơn\ngiản nhất, các hệ thống này được đào tạo để ước tính một số điểm, chẳng\nhạn như đánh giá ước tính hoặc xác suất mua hàng, cho người dùng và một\nmặt hàng.\nVới một mô hình như vậy, đối với bất kỳ người dùng nhất định nào, chúng\nta có thể lấy tập hợp các đối tượng với điểm số lớn nhất, sau đó có thể\nđược đề xuất cho người dùng. Hệ thống sản xuất tiên tiến hơn đáng kể và\ntính đến hoạt động chi tiết của người dùng và đặc điểm mục khi tính toán\nđiểm số đó. Fig. 1.3.4 là một ví dụ về sách học\nsâu được Amazon đề xuất dựa trên các thuật toán cá nhân hóa được điều\nchỉnh để nắm bắt sở thích của một người.\nFig. 1.3.4 Deep learning books recommended by Amazon. ¶\nMặc dù giá trị kinh tế to lớn của họ, các hệ thống khuyến nghị ngây thơ\nđược xây dựng trên đầu trang của các mô hình dự đoán phải chịu một số\nsai sót quan niệm nghiêm trọng. Để bắt đầu, chúng tôi chỉ quan sát * phản\nhồi kiểm duyệt * : người dùng ưu tiên đánh giá những bộ phim mà họ cảm\nthấy mạnh mẽ. Ví dụ: trên thang điểm năm điểm, bạn có thể nhận thấy rằng\ncác mặt hàng nhận được nhiều xếp hạng năm và một sao nhưng có rất ít xếp\nhạng ba sao dễ thấy. Hơn nữa, thói quen mua hàng hiện tại thường là kết\nquả của thuật toán đề xuất hiện tại, nhưng các thuật toán học tập không\nphải lúc nào cũng tính đến chi tiết này. Do đó, các vòng phản hồi có thể\nhình thành nơi một hệ thống giới thiệu ưu tiên đẩy một mục sau đó được\nthực hiện tốt hơn (do mua hàng lớn hơn) và lần lượt được khuyến nghị\nthường xuyên hơn. Nhiều vấn đề trong số này về cách đối phó với kiểm\nduyệt, ưu đãi và vòng lặp phản hồi, là những câu hỏi nghiên cứu mở quan\ntrọng.\n1.3.1.6. Học trình tự\nCho đến nay, chúng tôi đã xem xét các vấn đề mà chúng tôi có một số cố\nđịnh số đầu vào và tạo ra một số cố định của đầu ra. Ví dụ, chúng tôi đã\nxem xét dự đoán giá nhà từ một tập hợp các tính năng cố định: cảnh\nvuông, số phòng ngủ, số phòng tắm, thời gian đi bộ đến trung tâm thành\nphố. Chúng tôi cũng thảo luận về ánh xạ từ một hình ảnh (có kích thước\ncố định) đến xác suất dự đoán rằng nó thuộc về mỗi lớp cố định hoặc lấy\nID người dùng và ID sản phẩm và dự đoán xếp hạng sao. Trong những trường\nhợp này, một khi chúng tôi cung cấp đầu vào chiều dài cố định của mình\nvào mô hình để tạo ra một đầu ra, mô hình ngay lập tức quên những gì nó\nvừa thấy.\nĐiều này có thể ổn nếu đầu vào của chúng ta thực sự tất cả đều có cùng\nkích thước và nếu các đầu vào liên tiếp thực sự không liên quan gì đến\nnhau. Nhưng làm thế nào chúng ta sẽ đối phó với đoạn video? Trong trường\nhợp này, mỗi đoạn mã có thể bao gồm một số khung khác nhau. Và đoán của\nchúng tôi về những gì đang xảy ra trong mỗi khung hình có thể mạnh hơn\nnhiều nếu chúng ta tính đến các khung trước đó hoặc thành công. Cũng vậy\nvới ngôn ngữ. Một vấn đề học sâu phổ biến là dịch máy: nhiệm vụ nhập câu\nbằng một số ngôn ngữ nguồn và dự đoán bản dịch của chúng bằng một ngôn\nngữ khác.\nNhững vấn đề này cũng xảy ra trong y học. Chúng tôi có thể muốn một mô\nhình để theo dõi bệnh nhân trong phòng chăm sóc đặc biệt và bắn ra cảnh\nbáo nếu nguy cơ tử vong của họ trong 24 giờ tới vượt quá ngưỡng. Chúng\ntôi chắc chắn sẽ không muốn mô hình này vứt bỏ mọi thứ mà nó biết về\nlịch sử bệnh nhân mỗi giờ và chỉ đưa ra dự đoán của nó dựa trên các phép\nđo gần đây nhất.\nNhững vấn đề này là một trong những ứng dụng thú vị nhất của machine\nlearning và chúng là các trường hợp của học trình tự * . Chúng yêu cầu\nmột mô hình để ăn các chuỗi đầu vào hoặc phát ra chuỗi đầu ra (hoặc cả\nhai). Cụ thể, * trình tự để học trình tự* xem xét các vấn đề trong đó\nđầu vào và đầu ra đều là chuỗi có độ dài thay đổi, chẳng hạn như dịch\nmáy và phiên âm văn bản từ bài phát biểu nói. Mặc dù không thể xem xét\ntất cả các loại biến đổi trình tự, nhưng các trường hợp đặc biệt sau đây\nlà đáng nói đến.\n** Gắn thẻ và phân tích cú pháp**. Điều này liên quan đến việc chú\nthích một chuỗi văn bản với các thuộc tính. Nói cách khác, số lượng đầu\nvào và đầu ra về cơ bản là giống nhau. Ví dụ, chúng ta có thể muốn biết\ncác động từ và chủ thể ở đâu. Ngoài ra, chúng ta có thể muốn biết từ nào\nlà các thực thể được đặt tên. Nói chung, mục tiêu là phân hủy và chú\nthích văn bản dựa trên các giả định cấu trúc và ngữ pháp để có được một\nsố chú thích. Điều này nghe có vẻ phức tạp hơn so với thực tế. Dưới đây\nlà một ví dụ rất đơn giản về chú thích một câu với các thẻ cho biết từ\nnào đề cập đến các thực thể được đặt tên (được gắn thẻ là “Ent”).\n** Nhận dạng giọng nói tự động**. Với nhận dạng giọng nói, trình tự\nđầu vào là một bản ghi âm của một loa (hiển thị trong Fig. 1.3.5 ), và đầu ra là bảng điểm văn bản của những gì\nngười nói. Thách thức là có nhiều khung âm thanh hơn (âm thanh thường\nđược lấy mẫu ở tốc độ 8kHz hoặc 16kHz) so với văn bản, tức là, không có\nsự tương ứng 1:1 giữa âm thanh và văn bản, vì hàng ngàn mẫu có thể tương\nứng với một từ nói duy nhất. Đây là những chuỗi để sắp xếp các vấn đề\nhọc tập trong đó đầu ra ngắn hơn nhiều so với đầu vào.\nFig. 1.3.5 -D-e-e-p- L-ea-r-ni-ng- in an audio recording. ¶\nText to Speech . Đây là nghịch đảo của nhận dạng giọng nói tự động.\nNói cách khác, đầu vào là văn bản và đầu ra là một tệp âm thanh. Trong\ntrường hợp này, đầu ra dài hơn nhiều so với đầu vào. Mặc dù con người dễ\ndàng nhận ra một tệp âm thanh xấu, nhưng điều này không hoàn toàn tầm\nthường đối với máy tính.\n** Dịch máy**. Không giống như trường hợp nhận dạng giọng nói, nơi\ntương ứng đầu vào và đầu ra xảy ra theo cùng một thứ tự (sau khi căn\nchỉnh), trong dịch máy, đảo ngược thứ tự có thể rất quan trọng. Nói cách\nkhác, trong khi chúng ta vẫn đang chuyển đổi một chuỗi thành chuỗi khác,\nkhông phải số lượng đầu vào và đầu ra cũng như thứ tự của các ví dụ dữ\nliệu tương ứng được giả định là giống nhau. Hãy xem xét ví dụ minh họa\nsau đây về xu hướng đặc biệt của người Đức để đặt các động từ ở cuối\ncâu.\nNhiều vấn đề liên quan bật lên trong các nhiệm vụ học tập khác. Ví dụ,\nxác định thứ tự mà người dùng đọc một trang web là một vấn đề phân tích\nbố cục hai chiều. Các vấn đề đối thoại thể hiện tất cả các loại biến\nchứng bổ sung, trong đó việc xác định những gì cần nói tiếp theo đòi hỏi\nphải tính đến kiến thức trong thế giới thực và trạng thái trước đó của\ncuộc trò chuyện trên khoảng cách thời gian dài. Đây là những lĩnh vực\nnghiên cứu tích cực.\n1.3.2. Học tập không được giám sát và tự giám sát\nTất cả các ví dụ cho đến nay đều liên quan đến việc học được giám sát,\ntức là, các tình huống mà chúng tôi cung cấp cho mô hình một tập dữ liệu\nkhổng lồ chứa cả các tính năng và giá trị nhãn tương ứng. Bạn có thể\nnghĩ về người học được giám sát là có một công việc cực kỳ chuyên biệt\nvà một ông chủ cực kỳ tầm thường. Ông chủ đứng trên vai của bạn và cho\nbạn biết chính xác phải làm gì trong mọi tình huống cho đến khi bạn học\ncách lập bản đồ từ các tình huống đến hành động. Làm việc cho một ông\nchủ như vậy nghe có vẻ khá khập khiễng. Mặt khác, thật dễ dàng để làm\nhài lòng ông chủ này. Bạn chỉ cần nhận ra mô hình càng nhanh càng tốt và\nbắt chước hành động của họ.\nTheo một cách hoàn toàn ngược lại, có thể là bực bội khi làm việc cho\nmột ông chủ không biết họ muốn bạn làm gì. Tuy nhiên, nếu bạn có kế\nhoạch trở thành một nhà khoa học dữ liệu, bạn nên làm quen với nó. Ông\nchủ có thể chỉ đưa cho bạn một bãi dữ liệu khổng lồ và nói với bạn để *\nlàm một số khoa học dữ liệu với nó! * Điều này nghe có vẻ mơ hồ vì nó\nlà. Chúng tôi gọi lớp vấn đề này* học không được giám sách*, và loại\nvà số câu hỏi chúng tôi có thể hỏi chỉ bị giới hạn bởi sự sáng tạo của\nchúng tôi. Chúng tôi sẽ giải quyết các kỹ thuật học tập không được giám\nsát trong các chương sau. Để kích thích sự thèm ăn của bạn bây giờ,\nchúng tôi mô tả một vài trong số các câu hỏi sau đây bạn có thể hỏi.\nCan we find a small nhỏ bé numbercon số of prototypenguyên mẫu that\naccurately chính xác summarize tóm tắt the data dữ liệu? Với một bộ\nảnh, chúng ta có thể nhóm chúng thành ảnh phong cảnh, hình ảnh của\nchó, trẻ sơ sinh, mèo và đỉnh núi không? Tương tự như vậy, với một bộ\nsưu tập các hoạt động duyệt web của người dùng, chúng ta có thể nhóm\nchúng thành những người dùng có hành vi tương tự không? Vấn đề này\nthường được gọi là cùng .\nChúng ta có thể tìm thấy một số lượng nhỏ các tham số mà nắm bắt\nchính xác các thuộc tính có liên quan của dữ liệu? Quỹ đạo của một\nquả bóng được mô tả khá tốt bằng vận tốc, đường kính và khối lượng\ncủa quả bóng. Thợ may đã phát triển một số lượng nhỏ các thông số mô\ntả hình dạng cơ thể con người khá chính xác với mục đích phù hợp với\nquần áo. Những vấn đề này được gọi là ước tính không gian con . Nếu\nsự phụ thuộc là tuyến tính, nó được gọi là * phân tích thành phần\nchính*.\nCó một đại diện của các đối tượng (cấu trúc tùy ý) trong không gian\nEuclide như vậy mà tính chất tượng trưng có thể được phù hợp tốt?\nĐiều này có thể được sử dụng để mô tả các thực thể và quan hệ của họ,\nchẳng hạn như “Rome” \\(-\\) “Italy” \\(+\\) “Pháp” \\(=\\) “Paris”.\nCó mô tả về nguyên nhân gốc rễ of much of the data dữ liệu that we\nobserve quan sát? Ví dụ, nếu chúng ta có dữ liệu nhân khẩu học về giá\nnhà, ô nhiễm, tội phạm, vị trí, giáo dục và tiền lương, chúng ta có\nthể khám phá ra cách chúng liên quan đơn giản dựa trên dữ liệu thực\nnghiệm không? Các trường liên quan đến causality và mô hình đồ họa\nxác suất giải quyết vấn đề này.\nMột sự phát triển gần đây quan trọng và thú vị khác trong việc học\nkhông được giám sát là sự ra đời của * generative adversarial\nnetworks*. Những điều này cho chúng ta một cách thủ tục để tổng hợp\ndữ liệu, thậm chí dữ liệu có cấu trúc phức tạp như hình ảnh và âm\nthanh. Các cơ chế thống kê cơ bản là các thử nghiệm để kiểm tra xem\ndữ liệu thực và giả có giống nhau hay không.\nAs a formhình thức of unsupervised không giám sát learning học tập, tự\ngiám sát tận dụng dữ liệu không được dán nhãn để cung cấp sự giám sát\ntrong đào tạo, chẳng hạn như bằng cách dự đoán một số phần giữ lại của\ndữ liệu bằng cách sử dụng các phần khác. Đối với văn bản, chúng ta có\nthể đào tạo các mô hình để “điền vào khoảng trống” bằng cách dự đoán các\ntừ được che giấu ngẫu nhiên bằng cách sử dụng các từ xung quanh (ngữ\ncảnh) của chúng trong thể lớn mà không cần bất kỳ nỗ lực ghi nhãn [Devlin et al., 2018] ! Đối với hình ảnh, chúng tôi có thể\nđào tạo các mô hình để cho biết vị trí tương đối giữa hai vùng bị cắt\ncủa cùng một hình ảnh [Doersch.Gupta.Efros.2015] . Trong hai ví\ndụ về việc học tự giám sát này, các mô hình đào tạo để dự đoán các từ có\nthể và vị trí tương đối đều là nhiệm vụ phân loại (từ việc học được giám\nsát).\n1.3.3. Tương tác với môi trường\nCho đến nay, chúng ta chưa thảo luận về dữ liệu thực sự đến từ đâu, hoặc\nnhững gì thực sự xảy ra khi một mô hình máy học tạo ra một đầu ra. Đó là\nbởi vì việc học được giám sát và học tập không được giám sát không giải\nquyết những vấn đề này một cách rất tinh vi. Trong cả hai trường hợp,\nchúng tôi lấy trước một đống dữ liệu lớn, sau đó thiết lập các máy nhận\ndạng mẫu của chúng tôi chuyển động mà không bao giờ tương tác với môi\ntrường một lần nữa. Bởi vì tất cả các quá trình học tập diễn ra sau khi\nthuật toán bị ngắt kết nối khỏi môi trường, điều này đôi khi được gọi là học ngoại tuyết . Đối với việc học được giám sát, quá trình này bằng\ncách xem xét thu thập dữ liệu từ một môi trường trông giống như Fig. 1.3.6 .\nFig. 1.3.6 Collecting data for supervised learning from an environment. ¶\nSự đơn giản của việc học ngoại tuyến này có sự quyến rũ của nó. Nhược\nđiểm là chúng ta có thể lo lắng về việc nhận dạng mô hình trong sự cô\nlập, mà không bị phân tâm từ những vấn đề khác. Nhưng nhược điểm là công\nthức vấn đề khá hạn chế. Nếu bạn tham vọng hơn, hoặc nếu bạn lớn lên đọc\nloạt Robot của Asimov, thì bạn có thể tưởng tượng các bot thông minh\nnhân tạo có khả năng không chỉ đưa ra dự đoán mà còn thực hiện các hành\nđộng trên thế giới. Chúng tôi muốn suy nghĩ về thông minh* đại lý * ,\nkhông chỉ là các mô hình dự đoán. Điều này có nghĩa là chúng ta cần suy\nnghĩ về việc lựa chọn * actions*, không chỉ đưa ra dự đoán. Hơn nữa,\nkhông giống như dự đoán, các hành động thực sự ảnh hưởng đến môi trường.\nNếu chúng ta muốn đào tạo một đại lý thông minh, chúng ta phải tính đến\ncách hành động của nó có thể ảnh hưởng đến các quan sát trong tương lai\ncủa tác nhân.\nXem xét sự tương tác với một môi trường mở ra một tập hợp các câu hỏi mô\nhình hóa mới. Sau đây chỉ là một vài ví dụ.\nMôi trường có nhớ những gì chúng ta đã làm trước đây không?\nMôi trường có muốn giúp chúng tôi, ví dụ: người dùng đọc văn bản vào\nbộ nhận dạng giọng nói không?\nMôi trường có muốn đánh bại chúng ta, tức là, một thiết lập đối thủ\nnhư lọc thư rác (chống lại kẻ gửi thư rác) hoặc chơi một trò chơi (so\nvới đối thủ)?\nMôi trường không quan tâm?\nMôi trường có động lực dịch chuyển không? Ví dụ: dữ liệu trong tương\nlai luôn giống với quá khứ hay các mẫu thay đổi theo thời gian, một\ncách tự nhiên hoặc để đáp ứng với các công cụ tự động của chúng tôi?\nCâu hỏi cuối cùng này đặt ra vấn đề của dịch chuyển phân phố , khi dữ\nliệu đào tạo và kiểm tra khác nhau. Đó là một vấn đề mà hầu hết chúng ta\nđã trải qua khi tham gia các kỳ thi được viết bởi một giảng viên, trong\nkhi bài tập về nhà được sáng tác bởi các trợ lý giảng dạy của ông. Tiếp\ntheo, chúng tôi sẽ mô tả ngắn gọn học tập củng cố, một thiết lập xem xét\nrõ ràng tương tác với một môi trường.\n1.3.4. Học tăng cường\nNếu bạn quan tâm đến việc sử dụng máy học để phát triển một tác nhân\ntương tác với môi trường và thực hiện các hành động, thì có lẽ bạn sẽ\ntập trung vào * học tăng cường * . Điều này có thể bao gồm các ứng dụng\ncho robot, hệ thống đối thoại và thậm chí để phát triển trí tuệ nhân tạo\n(AI) cho trò chơi điện tử. * Học tăng cường sâu*, áp dụng học sâu để\ncủng cố các vấn đề học tập, đã tăng lên phổ biến. Đột phá sâu Q-mạng\nđánh bại con người tại các trò chơi Atari chỉ sử dụng đầu vào trực quan,\nvà chương trình AlphaGo đã truất ngôi nhà vô địch thế giới tại trò chơi\nboard game Go là hai ví dụ nổi bật.\nHọc củng cố đưa ra một tuyên bố rất chung chung về một vấn đề, trong đó\nmột tác nhân tương tác với một môi trường trong một loạt các bước thời\ngian. Tại mỗi bước thời gian, tác nhân nhận được một số quan sách từ\nmôi trường và phải chọn một hành động sau đó được truyền trở lại môi\ntrường thông qua một số cơ chế (đôi khi được gọi là bộ truyền động).\nCuối cùng, đại lý nhận được phần thưởng từ môi trường. Quá trình này\nđược minh họa trong Fig. 1.3.7 . Các tác nhân sau đó\nnhận được một quan sát tiếp theo, và chọn một hành động tiếp theo, và\nnhư vậy. Hành vi của một đại lý học tập củng cố được điều chỉnh bởi một\nchính sách. Nói tóm lại, một policy chỉ là một chức năng ánh xạ từ\nquan sát môi trường đến hành động. Mục tiêu của việc học củng cố là tạo\nra một chính sách tốt.\nFig. 1.3.7 The interaction between reinforcement learning and an environment. ¶\nThật khó để nói quá mức tổng quát của khung học tập củng cố. Ví dụ,\nchúng ta có thể đưa bất kỳ vấn đề học tập được giám sát nào như một vấn\nđề học tập củng cố. Giả sử chúng tôi đã có một vấn đề phân loại. Chúng\nta có thể tạo ra một đại lý học tập tăng cường với một hành động tương\nứng với mỗi lớp. Sau đó chúng ta có thể tạo ra một môi trường cho một\nphần thưởng chính xác bằng với chức năng mất từ vấn đề học tập được giám\nsát ban đầu.\nĐiều đó đang được nói, việc học củng cố cũng có thể giải quyết nhiều vấn\nđề mà việc học được giám sát không thể. Ví dụ, trong việc học được giám\nsát, chúng tôi luôn mong đợi rằng đầu vào đào tạo được liên kết với nhãn\nchính xác. Nhưng trong học tập củng cố, chúng tôi không cho rằng đối với\nmỗi quan sát môi trường cho chúng ta biết hành động tối ưu. Nói chung,\nchúng tôi chỉ nhận được một số phần thưởng. Hơn nữa, môi trường thậm chí\ncó thể không cho chúng ta biết hành động nào dẫn đến phần thưởng.\nXem xét ví dụ như các trò chơi của cờ vua. Tín hiệu phần thưởng thực sự\nduy nhất đến ở cuối trò chơi khi chúng ta giành chiến thắng, mà chúng ta\ncó thể gán phần thưởng là 1, hoặc khi chúng ta thua, mà chúng ta có thể\ngán phần thưởng là -1. Vì vậy, người học củng cố phải giải quyết vấn đề tín dục : xác định hành động nào cần ghi nhận hoặc đổ lỗi cho một kết\nquả. Điều tương tự cũng xảy ra đối với một nhân viên được khuyến mãi vào\nngày 11 tháng 10. Chương trình khuyến mãi đó có thể phản ánh một số\nlượng lớn các hành động được lựa chọn tốt trong năm trước. Nhận được\nnhiều chương trình khuyến mãi trong tương lai đòi hỏi phải tìm ra những\nhành động nào trên đường đi dẫn đến chương trình khuyến mãi.\nNgười học củng cố cũng có thể phải đối phó với vấn đề quan sát từng\nphần. Đó là, quan sát hiện tại có thể không cho bạn biết mọi thứ về\ntrạng thái hiện tại của bạn. Nói rằng một robot làm sạch thấy mình bị\nmắc kẹt trong một trong nhiều tủ quần áo giống hệt nhau trong một ngôi\nnhà. Suy ra vị trí chính xác (và do đó trạng thái) của robot có thể yêu\ncầu xem xét các quan sát trước đó của nó trước khi vào tủ quần áo.\nCuối cùng, tại bất kỳ thời điểm nào, người học củng cố có thể biết về\nmột chính sách tốt, nhưng có thể có nhiều chính sách tốt hơn khác mà đại\nlý chưa bao giờ thử. Người học củng cố phải liên tục lựa chọn để * khai\nthác * chiến lược tốt nhất hiện nay được biết đến như một chính sách,\nhoặc để * khám phát* không gian của các chiến lược, có khả năng từ bỏ\nmột số phần thưởng ngắn hạn để đổi lấy kiến thức.\nVấn đề học tập củng cố chung là một bối cảnh rất chung chung. Các hành\nđộng ảnh hưởng đến các quan sát tiếp theo. Phần thưởng chỉ được quan sát\ntương ứng với các hành động đã chọn. Môi trường có thể được quan sát đầy\nđủ hoặc một phần. Kế toán cho tất cả sự phức tạp này cùng một lúc có thể\nhỏi quá nhiều các nhà nghiên cứu. Hơn nữa, không phải mọi vấn đề thực tế\nthể hiện tất cả sự phức tạp này. Kết quả là, các nhà nghiên cứu đã\nnghiên cứu một số trường hợp đặc biệt của các vấn đề học tập củng cố.\nKhi môi trường được quan sát đầy đủ, chúng tôi gọi vấn đề học tập củng\ncố là quy trình quyết định * Markov . Khi trạng thái không phụ thuộc\nvào các hành động trước đó, chúng ta gọi vấn đề là vấn đề tên cướp theo\nngữ cảnh *. *. Khi không có trạng thái, chỉ là một tập hợp các hành động\ncó sẵn với phần thưởng ban đầu chưa biết, vấn đề này là vấn đề cướp đa\nvũ cổ cổ điển*.\n1.4. Rễ\nChúng tôi vừa xem xét một tập hợp nhỏ các vấn đề mà machine learning có\nthể giải quyết. Đối với một tập hợp các vấn đề máy học đa dạng, deep\nlearning cung cấp các công cụ mạnh mẽ để giải quyết chúng. Mặc dù nhiều\nphương pháp học sâu là những phát minh gần đây, ý tưởng cốt lõi của lập\ntrình với dữ liệu và mạng thần kinh (tên của nhiều mô hình học sâu) đã\nđược nghiên cứu trong nhiều thế kỷ. Trên thực tế, con người đã tổ chức\nmong muốn phân tích dữ liệu và dự đoán kết quả trong tương lai lâu dài\nvà phần lớn khoa học tự nhiên có nguồn gốc từ việc này. Ví dụ, bản phân\nbố Bernoulli được đặt theo tên [ Jacob Bernoulli\n(1655—1705) , và bản\nphân bố Gaussian được phát hiện bởi Carl Friedrich Gauss\n(1777—1855) . Ông\nđã phát minh ra, ví dụ, thuật toán ô vuông ít trung bình nhất, mà vẫn\nđược sử dụng ngày nay cho vô số vấn đề từ tính toán bảo hiểm đến chẩn\nđoán y tế. Những công cụ này đã tạo ra một cách tiếp cận thực nghiệm\ntrong khoa học tự nhiên - ví dụ, định luật Ohm liên quan đến dòng điện\nvà điện áp trong một điện trở được mô tả hoàn hảo bởi một mô hình tuyến\ntính.\nNgay cả trong thời trung cổ, các nhà toán học đã có một trực giác quan\ntâm về ước tính. Ví dụ, cuốn sách hình học của [ Jacob Köbel\n(1460—1533) minh họa trung bình chiều dài của 16 chân nam trưởng thành để có được\nchiều dài chân trung bình.\nFig. 1.4.1 Estimating the length of a foot. ¶\nFig. 1.4.1 minh họa cách thức ước tính này hoạt động. 16\nngười đàn ông trưởng thành được yêu cầu xếp hàng liên tiếp, khi rời khỏi\nnhà thờ. Chiều dài tổng hợp của chúng sau đó được chia cho 16 để có được\nước tính cho những gì bây giờ là 1 foot. “Thuật toán” này sau đó được\ncải tiến để đối phó với đôi chân sai mạnh—2 người đàn ông có bàn chân\nngắn nhất và dài nhất lần lượt được gửi đi, trung bình chỉ hơn phần còn\nlại. Đây là một trong những ví dụ sớm nhất về ước tính trung bình được\ncắt tỉa.\nThống kê thực sự cất cánh với việc thu thập và tính sẵn có của dữ liệu.\nMột trong những người khổng lồ của nó, Ronald Fisher\n(1890—1962) , đóng góp\nđáng kể cho lý thuyết của nó và cũng là các ứng dụng của nó trong di\ntruyền học. Nhiều thuật toán của ông (như phân tích phân biệt đối xử\ntuyến tính) và công thức (như ma trận thông tin Fisher) vẫn đang được sử\ndụng thường xuyên ngày nay. Trên thực tế, ngay cả bộ dữ liệu Iris mà\nFisher phát hành vào năm 1936 vẫn còn được sử dụng đôi khi để minh họa\ncho các thuật toán học máy. Ông cũng là một người đề xuất ưu sinh, điều\nnày nên nhắc nhở chúng ta rằng việc sử dụng khoa học dữ liệu đáng ngờ về\nmặt đạo đức đã lâu dài và lâu dài một lịch sử như việc sử dụng sản xuất\ncủa nó trong công nghiệp và khoa học tự nhiên.\nẢnh hưởng thứ hai đối với học máy đến từ lý thuyết thông tin của Claude\nShannon (1916—2001) và\nlý thuyết tính toán qua Alan Turing\n(1912—1954) . Turing đặt\nra câu hỏi “máy móc có thể nghĩ không?” trong bài báo nổi tiếng của mình\n* Computing Machinery and Intelligence* [Turing, 1950] . Trong\nnhững gì ông mô tả là thử nghiệm Turing, một cỗ máy có thể được coi là thông minh nếu người đánh giá của con người khó phân biệt giữa các câu\ntrả lời với một máy và một con người dựa trên tương tác văn bản.\nMột ảnh hưởng khác có thể được tìm thấy trong khoa học thần kinh và tâm\nlý học. Rốt cuộc, con người thể hiện rõ hành vi thông minh. Do đó, chỉ\nhợp lý để hỏi liệu người ta có thể giải thích và có thể đảo ngược khả\nnăng này. Một trong những thuật toán lâu đời nhất lấy cảm hứng từ thời\ntrang này được xây dựng bởi Donald Hebb\n(1904—1985) . Trong\ncuốn sách đột phá của mình * Tổ chức hành vi* [Hebb & Hebb, 1949] , ông khẳng định rằng các tế bào thần kinh học\nbằng cách củng cố tích cực. Điều này được biết đến như là quy tắc học\ntập Hebbian. Đây là nguyên mẫu của thuật toán học perceptron của\nRosenblatt và nó đã đặt nền móng của nhiều thuật toán gốc gradient ngẫu\nnhiên làm nền tảng học sâu ngày nay: củng cố hành vi mong muốn và giảm\nbớt hành vi không mong muốn để có được cài đặt tốt của các thông số\ntrong mạng thần kinh.\nCảm hứng sinh học là những gì đã cho * mạng thần kinh * tên của họ.\nTrong hơn một thế kỷ (có niên đại từ các mô hình của Alexander Bain,\n1873 và James Sherrington, 1890), các nhà nghiên cứu đã cố gắng lắp ráp\ncác mạch tính toán giống với mạng lưới các tế bào thần kinh tương tác.\nTheo thời gian, việc giải thích sinh học đã trở nên ít theo nghĩa đen\nhơn nhưng cái tên bị mắc kẹt. Tại trái tim của nó, nói dối một vài\nnguyên tắc chính có thể được tìm thấy trong hầu hết các mạng hiện nay:\nSự xen kẽ của các đơn vị xử lý tuyến tính và phi tuyến, thường được\ngọi là * lớp*.\nViệc sử dụng quy tắc chuỗi (còn được gọi là backpropagation ) để\nđiều chỉnh các tham số trong toàn bộ mạng cùng một lúc.\nSau những tiến bộ nhanh chóng ban đầu, nghiên cứu trong các mạng thần\nkinh mệt mỏi từ khoảng năm 1995 cho đến năm 2005. Điều này chủ yếu là do\nhai lý do. Đầu tiên, đào tạo một mạng là tính toán rất tốn kém. Trong\nkhi bộ nhớ truy cập ngẫu nhiên rất phong phú vào cuối thế kỷ qua, sức\nmạnh tính toán rất khan hiếm. Thứ hai, các bộ dữ liệu tương đối nhỏ.\nTrên thực tế, tập dữ liệu Iris của Fisher từ năm 1932 là một công cụ phổ\nbiến để kiểm tra hiệu quả của các thuật toán. Tập dữ liệu MNIST với\n60000 chữ số viết tay của nó được coi là rất lớn.\nVới sự khan hiếm của dữ liệu và tính toán, các công cụ thống kê mạnh mẽ\nnhư phương pháp hạt nhân, cây quyết định và mô hình đồ họa tỏ ra vượt\ntrội theo kinh nghiệm. Không giống như các mạng thần kinh, họ không cần\nnhiều tuần để đào tạo và cung cấp kết quả có thể dự đoán được với những\nđảm bảo lý thuyết mạnh mẽ.\n1.5. Con đường đến sâu học\nPhần lớn điều này đã thay đổi với sự sẵn có sẵn của một lượng lớn dữ\nliệu, do World Wide Web, sự ra đời của các công ty phục vụ hàng trăm\ntriệu người dùng trực tuyến, phổ biến các cảm biến giá rẻ, chất lượng\ncao, lưu trữ dữ liệu giá rẻ (định luật Kryder) và tính toán giá rẻ (định\nluật Moore), đặc biệt là dạng GPU, ban đầu được thiết kế để chơi game\ntrên máy tính. Đột nhiên các thuật toán và mô hình dường như không khả\nthi tính toán trở nên có liên quan (và ngược lại). Điều này được minh\nhọa tốt nhất trong Section 1.5 .\nTable: Dataset so với bộ nhớ máy tính và sức mạnh tính toán\nRõ ràng là bộ nhớ truy cập ngẫu nhiên đã không theo kịp sự tăng trưởng\ncủa dữ liệu. Đồng thời, sự gia tăng sức mạnh tính toán đã vượt xa dữ\nliệu có sẵn. Điều này có nghĩa là các mô hình thống kê cần phải trở nên\nhiệu quả hơn bộ nhớ (điều này thường đạt được bằng cách thêm phi tuyến\ntính) trong khi đồng thời có thể dành nhiều thời gian hơn để tối ưu hóa\ncác thông số này, do ngân sách tính toán tăng lên. Do đó, điểm ngọt ngào\ntrong máy học và thống kê đã chuyển từ các mô hình tuyến tính (tổng\nquát) và phương pháp hạt nhân sang các mạng thần kinh sâu. Đây cũng là\nmột trong những lý do tại sao nhiều trụ cột của học sâu, chẳng hạn như\nnhận thức đa lớp [McCulloch & Pitts, 1943] , mạng thần kinh phức tạp [LeCun et al., 1998] , bộ nhớ ngắn hạn dài [Hochreiter & Schmidhuber, 1997] và Q-Learning [Watkins & Dayan, 1992] , về cơ bản là “phát hiện lại” trong thập kỷ\nqua, sau khi đặt tương đối không hoạt động cho considerable đáng kể\ntime.\nSự tiến bộ gần đây trong các mô hình thống kê, ứng dụng, và thuật toán\nđôi khi đã được so sánh với vụ nổ Cambri: một khoảnh khắc tiến bộ nhanh\nchóng trong quá trình tiến hóa của các loài. Thật vậy, nhà nước của nghệ\nthuật không chỉ là một hậu quả đơn thuần của các nguồn lực có sẵn, áp\ndụng cho các thuật toán hàng thập kỷ cũ. Lưu ý rằng danh sách dưới đây\nhầu như không làm trầy xước bề mặt của những ý tưởng đã giúp các nhà\nnghiên cứu đạt được tiến bộ to lớn trong thập kỷ qua.\nCác phương pháp mới để kiểm soát công suất, chẳng hạn như *\ndropout* [Srivastava et al., 2014] , đã giúp\ngiảm thiểu nguy cơ quá mức. Điều này đạt được bằng cách áp dụng tiếng\nồn tiêm [Bishop, 1995] trên toàn mạng thần kinh, thay thế\ntrọng lượng bằng các biến ngẫu nhiên cho mục đích đào tạo.\nCác cơ chế chú ý đã giải quyết một vấn đề thứ hai đã cản trở số liệu\nthống kê trong hơn một thế kỷ: làm thế nào để tăng bộ nhớ và độ phức\ntạp của một hệ thống mà không làm tăng số lượng các tham số có thể\nhọc được. Các nhà nghiên cứu đã tìm thấy một giải pháp thanh lịch\nbằng cách sử dụng những gì chỉ có thể được xem như một cấu trúc con\ntrỏ có thể học được [Bahdanau et al., 2014] . Thay vì phải\nnhớ toàn bộ một chuỗi văn bản, ví dụ, đối với dịch máy trong một biểu\ndiễn chiều cố định, tất cả những gì cần được lưu trữ là một con trỏ\nđến trạng thái trung gian của quá trình dịch thuật. Điều này cho phép\ntăng độ chính xác đáng kể cho các chuỗi dài, vì mô hình không còn cần\nphải nhớ toàn bộ chuỗi trước khi bắt đầu tạo ra một chuỗi mới.\nThiết kế đa giai đoạn, ví dụ, thông qua các mạng bộ nhớ [Sukhbaatar et al., 2015] và lập trình viên thần\nkinh [Reed & DeFreitas, 2015] cho phép các mô hình thống kê mô\ntả các phương pháp lặp đi lặp lại để lập luận. Những công cụ này cho\nphép một trạng thái nội bộ của mạng thần kinh sâu được sửa đổi nhiều\nlần, do đó thực hiện các bước tiếp theo trong một chuỗi lý luận,\ntương tự như cách một bộ xử lý có thể sửa đổi bộ nhớ cho một tính\ntoán.\nMột phát triển quan trọng khác là phát minh ra các mạng đối thủ thế\nhệ [Goodfellow et al., 2014] . Theo truyền\nthống, các phương pháp thống kê để ước tính mật độ và các mô hình tạo\ntập trung vào việc tìm kiếm các phân phối xác suất thích hợp và\n(thường là gần đúng) thuật toán lấy mẫu từ chúng. Kết quả là, các\nthuật toán này phần lớn bị giới hạn bởi sự thiếu linh hoạt vốn có\ntrong các mô hình thống kê. Sự đổi mới quan trọng trong các mạng đối\nthủ thế hệ là thay thế bộ lấy mẫu bằng một thuật toán tùy ý với các\ntham số khác biệt. Chúng sau đó được điều chỉnh theo cách mà người\nphân biệt đối xử (hiệu quả là thử nghiệm hai mẫu) không thể phân biệt\ngiả với dữ liệu thực. Thông qua khả năng sử dụng các thuật toán tùy ý\nđể tạo ra dữ liệu, nó đã mở ra ước tính mật độ cho nhiều kỹ thuật\nkhác nhau. Ví dụ về Zebras phi nước đại [Zhu et al., 2017] và của những người nổi tiếng giả mạo\nphải đối mặt [Karras et al., 2017] đều là lời khai cho\nsự tiến bộ này. Ngay cả những người vẽ tranh nghiệp dư cũng có thể\ntạo ra những hình ảnh thực tế dựa trên các bản phác thảo mô tả cách\nbố trí của một cảnh trông giống như [Park et al., 2019] .\nTrong nhiều trường hợp, một GPU duy nhất là không đủ để xử lý một\nlượng lớn dữ liệu có sẵn để đào tạo. Trong thập kỷ qua, khả năng xây\ndựng các thuật toán đào tạo song song và phân tán đã được cải thiện\nđáng kể. Một trong những thách thức chính trong việc thiết kế các\nthuật toán có thể mở rộng là việc làm việc tối ưu hóa học tập sâu,\ngốc gradient ngẫu nhiên, dựa vào các minibatches dữ liệu tương đối\nnhỏ sẽ được xử lý. Đồng thời, các lô nhỏ hạn chế hiệu quả của GPU. Do\nđó, đào tạo trên 1024 GPU với kích thước minibatch, giả sử 32 hình\nảnh mỗi lô lên tới một minibatch tổng hợp khoảng 32000 hình ảnh. Công\nviệc gần đây, đầu tiên là Li [Li, 2017] , và sau đó là [You et al., 2017] và [Jia et al., 2018] đã đẩy kích thước lên đến 64000 quan sát, giảm thời gian đào tạo cho\nmô hình ResNet-50 trên bộ dữ liệu ImageNet xuống chưa đầy 7 phút. Để\nso sánh, thời gian đào tạo ban đầu được đo theo thứ tự ngày.\nKhả năng tính toán song song cũng đã đóng góp khá quan trọng để tiến\nbộ trong học tập củng cố, ít nhất là bất cứ khi nào mô phỏng là một\nlựa chọn. Điều này đã dẫn đến những tiến bộ đáng kể trong các máy\ntính đạt được hiệu suất siêu phàm trong các game Go, Atari,\nStarcraft, và trong các mô phỏng vật lý (ví dụ, sử dụng MuJoCo). Xem\nví dụ, [Silver et al., 2016] để biết mô tả về cách\nđạt được điều này trong AlphaGo. Tóm lại, việc học tăng cường hoạt\nđộng tốt nhất nếu có nhiều (trạng thái, hành động, phần thưởng) gấp\nba lần, tức là, bất cứ khi nào có thể thử nhiều thứ để tìm hiểu cách\nchúng liên quan đến nhau. Mô phỏng cung cấp một đại lộ như vậy.\nCác khuôn khổ học sâu đã đóng một vai trò quan trọng trong việc phổ\nbiến các ý tưởng. Thế hệ khung đầu tiên cho phép mô hình hóa dễ dàng\nbao gồm Caffe , Torch và Theano . Nhiều bài báo tinh\ndịch được viết bằng các công cụ này. Đến bây giờ, chúng đã được thay\nthế bởi TensorFlow (thường được sử dụng thông qua API cấp cao Keras ), CNTK , Caffe\n2 , và Apache\nMXNet . Thế hệ công cụ\nthứ ba, cụ thể là các công cụ bắt buộc để học sâu, được cho là dẫn\nđầu bởi Chainer , sử dụng một\ncú pháp tương tự như Python NumPy để mô tả các mô hình. Ý tưởng này\nđã được thông qua bởi cả PyTorch , Gluon\nAPI của MXNet và Jax .\nViệc phân chia lao động giữa các nhà nghiên cứu hệ thống xây dựng các\ncông cụ tốt hơn và các nhà mô hình thống kê xây dựng mạng thần kinh tốt\nhơn đã đơn giản hóa mọi thứ rất nhiều. Ví dụ, đào tạo một mô hình hồi\nquy logistic tuyến tính từng là một vấn đề bài tập về nhà không tầm\nthường, xứng đáng để cung cấp cho sinh viên máy học mới tiến sĩ tại Đại\nhọc Carnegie Mellon vào năm 2014. Đến bây giờ, nhiệm vụ này có thể được\nthực hiện với ít hơn 10 dòng mã, đặt nó vững chắc vào nắm bắt các lập\ntrình viên.\n1.6. Câu chuyện thành công\nAI có một lịch sử lâu dài của việc cung cấp kết quả sẽ rất khó để thực\nhiện nếu không. Ví dụ, các hệ thống phân loại thư sử dụng nhận dạng ký\ntự quang học đã được triển khai từ những năm 1990. Đây là, sau tất cả,\nnguồn gốc của tập dữ liệu MNIST nổi tiếng của các chữ số viết tay. Điều\ntương tự cũng áp dụng cho việc đọc séc cho tiền gửi ngân hàng và ghi\nđiểm tín dụng của người nộp đơn. Các giao dịch tài chính được kiểm tra\ngian lận tự động. Điều này tạo thành xương sống của nhiều hệ thống thanh\ntoán thương mại điện tử, chẳng hạn như PayPal, Stripe, AliPay, WeChat,\nApple, Visa và MasterCard. Các chương trình máy tính cho cờ vua đã cạnh\ntranh trong nhiều thập kỷ. Máy học nguồn cấp dữ liệu tìm kiếm, khuyến\nnghị, cá nhân hóa và xếp hạng trên Internet. Nói cách khác, học máy rất\nphổ biến, mặc dù thường bị che giấu khỏi tầm nhìn.\nChỉ gần đây AI mới ở trong ánh đèn sân khấu, chủ yếu là do các giải pháp\ncho các vấn đề được coi là khó chữa trước đây và có liên quan trực tiếp\nđến người tiêu dùng. Nhiều tiến bộ như vậy được quy cho học sâu.\nCác trợ lý thông minh, chẳng hạn như Siri của Apple, Alexa của Amazon\nvà trợ lý của Google, có thể trả lời các câu hỏi nói với mức độ chính\nxác hợp lý. Điều này bao gồm các nhiệm vụ quan trọng như bật công tắc\nđèn (một lợi ích cho người khuyết tật) để thực hiện các cuộc hẹn của\nthợ cắt tóc và cung cấp hộp thoại hỗ trợ điện thoại. Đây có thể là\ndấu hiệu đáng chú ý nhất cho thấy AI đang ảnh hưởng đến cuộc sống của\nchúng ta.\nMột thành phần quan trọng trong trợ lý kỹ thuật số là khả năng nhận\ndạng giọng nói chính xác. Dần dần độ chính xác của các hệ thống như\nvậy đã tăng lên đến mức chúng đạt đến độ chẵn lẻ của con người đối\nvới một số ứng dụng nhất định [Xiong et al., 2018] .\nNhận dạng đối tượng tương tự như vậy đã đi một chặng đường dài. Ước\ntính đối tượng trong một bức tranh là một nhiệm vụ khá khó khăn trong\nnăm 2010. Trên các nhà nghiên cứu điểm chuẩn ImageNet từ NEC Labs và\nĐại học Illinois tại Urbana-Champaign đã đạt được tỷ lệ lỗi top-5 là\n28% [Lin et al., 2010] . Đến năm 2017, tỷ lệ lỗi này đã giảm\nxuống còn 2,25% [Hu et al., 2018] . Tương tự như vậy, kết quả\ntuyệt đẹp đã đạt được để xác định các loài chim hoặc chẩn đoán ung\nthư da.\nTrò chơi từng là một pháo đài của trí thông minh của con người. Bắt\nđầu từ TD-Gammon, một chương trình chơi backgammon bằng cách sử dụng\nhọc tăng cường chênh lệch thời gian, tiến trình thuật toán và tính\ntoán đã dẫn đến các thuật toán cho một loạt các ứng dụng. Không giống\nnhư backgammon, cờ vua có một không gian trạng thái phức tạp hơn\nnhiều và tập hợp các hành động. DeepBlue đánh bại Garry Kasparov sử\ndụng song song lớn, phần cứng chuyên dụng và tìm kiếm hiệu quả thông\nqua cây trò chơi [Campbell et al., 2002] . Đi vẫn còn khó\nkhăn hơn, do không gian trạng thái khổng lồ của nó. AlphaGo đạt đến\nđộ chẵn lẻ của con người vào năm 2015, sử dụng học sâu kết hợp với\nlấy mẫu cây Monte Carlo [Silver et al., 2016] .\nThách thức trong Poker là không gian nhà nước lớn và nó không được\nquan sát đầy đủ (chúng tôi không biết thẻ của đối thủ). Libratus vượt\nquá hiệu suất của con người trong Poker sử dụng chiến lược có cấu\ntrúc hiệu quả [Brown & Sandholm, 2017] . Điều này minh họa sự\ntiến bộ ấn tượng trong các trò chơi và thực tế là các thuật toán tiên\ntiến đóng một phần quan trọng trong đó.\nMột dấu hiệu khác của sự tiến bộ trong AI là sự ra đời của ô tô và xe\ntải tự lái. Mặc dù quyền tự chủ hoàn toàn chưa hoàn toàn nằm trong\ntầm tay, nhưng tiến bộ tuyệt vời đã được thực hiện theo hướng này,\nvới các công ty như Tesla, NVIDIA và các sản phẩm vận chuyển Waymo\ncho phép ít nhất một phần tự chủ. Điều làm cho quyền tự chủ đầy đủ\ntrở nên khó khăn là lái xe thích hợp đòi hỏi khả năng nhận thức, lý\nluận và kết hợp các quy tắc vào một hệ thống. Hiện nay, học sâu được\nsử dụng chủ yếu trong khía cạnh thị giác máy tính của những vấn đề\nnày. Phần còn lại được điều chỉnh rất nhiều bởi các kỹ sư.\nMột lần nữa, danh sách trên hầu như không làm trầy xước bề mặt của nơi\nmáy học đã ảnh hưởng đến các ứng dụng thực tế. Ví dụ, robot, hậu cần,\nsinh học tính toán, vật lý hạt và thiên văn học nợ một số tiến bộ ấn\ntượng nhất gần đây của họ ít nhất là trong các phần của học máy. Do đó,\nhọc máy đang trở thành một công cụ phổ biến cho các kỹ sư và nhà khoa\nhọc.\nThông thường, câu hỏi về ngày tận thế AI, hoặc điểm kỳ dị AI đã được nêu\nra trong các bài viết phi kỹ thuật về AI. Nỗi sợ hãi là bằng cách nào đó\nhệ thống học máy sẽ trở nên tình cảm và quyết định độc lập với các lập\ntrình viên (và thạc sĩ) của họ về những thứ ảnh hưởng trực tiếp đến sinh\nkế của con người. Ở một mức độ nào đó, AI đã ảnh hưởng đến sinh kế của\ncon người một cách ngay lập tức: tính tín dụng được đánh giá tự động,\ncác phi công tự động chủ yếu điều hướng phương tiện, quyết định về việc\ncó cấp bảo lãnh sử dụng dữ liệu thống kê làm đầu vào hay không. Phù\nphiếm hơn, chúng ta có thể yêu cầu Alexa bật máy pha cà phê.\nMay mắn thay, chúng ta còn xa một hệ thống AI có cảm giác sẵn sàng thao\ntúng những người tạo ra con người (hoặc đốt cà phê của họ). Đầu tiên,\ncác hệ thống AI được thiết kế, đào tạo và triển khai theo một cách cụ\nthể, hướng đến mục tiêu. Mặc dù hành vi của họ có thể tạo ra ảo giác về\ntrí thông minh chung, nhưng đó là sự kết hợp của các quy tắc, heuristics\nvà các mô hình thống kê làm nền tảng cho thiết kế. Thứ hai, hiện tại các\ncông cụ cho * trí tuệ tổng quát nhân tạo* đơn giản là không tồn tại có\nthể cải thiện bản thân, lý do về bản thân và có thể sửa đổi, mở rộng và\ncải thiện kiến trúc của riêng họ trong khi cố gắng giải quyết các nhiệm\nvụ chung.\nMột mối quan tâm cấp bách hơn nhiều là cách AI đang được sử dụng trong\ncuộc sống hàng ngày của chúng ta. Có khả năng nhiều nhiệm vụ menial được\nthực hiện bởi các tài xế xe tải và trợ lý cửa hàng có thể và sẽ được tự\nđộng hóa. Robot nông trại có thể sẽ giảm chi phí cho canh tác hữu cơ\nnhưng chúng cũng sẽ tự động hóa các hoạt động thu hoạch. Giai đoạn này\ncủa cuộc cách mạng công nghiệp có thể có hậu quả sâu sắc đối với những\nphần lớn của xã hội, vì tài xế xe tải và trợ lý cửa hàng là một số công\nviệc phổ biến nhất ở nhiều quốc gia. Hơn nữa, các mô hình thống kê, khi\náp dụng mà không cần chăm sóc có thể dẫn đến thiên vị chủng tộc, giới\ntính hoặc tuổi tác và nêu ra những lo ngại hợp lý về sự công bằng về thủ\ntục nếu tự động thúc đẩy các quyết định do hậu quả. Điều quan trọng là\nđảm bảo rằng các thuật toán này được sử dụng cẩn thận. Với những gì\nchúng ta biết ngày nay, điều này gây ra cho chúng ta một mối quan tâm\ncấp bách hơn nhiều so với tiềm năng của siêu trí thông minh ác độc để\ntiêu diệt nhân loại.\n1.7. các điểm\nCho đến nay, chúng ta đã nói về máy học một cách rộng rãi, vừa là một\nnhánh của AI vừa là cách tiếp cận với AI. Mặc dù deep learning là một\ntập hợp con của machine learning, nhưng tập hợp các thuật toán và ứng\ndụng chóng mặt gây khó khăn cho việc đánh giá các thành phần cụ thể cho\nhọc sâu có thể là gì. Điều này khó khăn như cố gắng pin xuống các thành\nphần cần thiết cho pizza vì hầu hết mọi thành phần đều có thể thay thế.\nNhư chúng tôi đã mô tả, machine learning có thể sử dụng dữ liệu để tìm\nhiểu các biến đổi giữa đầu vào và đầu ra, chẳng hạn như chuyển đổi âm\nthanh thành văn bản trong nhận dạng giọng nói. Khi làm như vậy, thường\ncần phải đại diện cho dữ liệu theo cách phù hợp với các thuật toán để\nbiến đổi các biểu diễn như vậy thành đầu ra. Học sâu là * sâu* theo\nnghĩa chính xác rằng các mô hình của nó học nhiều * lớp* biến đổi,\ntrong đó mỗi lớp cung cấp biểu diễn ở một cấp độ. Ví dụ, các lớp gần đầu\nvào có thể đại diện cho các chi tiết cấp thấp của dữ liệu, trong khi các\nlớp gần đầu ra phân loại có thể đại diện cho các khái niệm trừu tượng\nhơn được sử dụng để phân biệt đối xử. Vì học đại diện *nhằm mục đích\ntìm ra bản thân đại diện, học sâu có thể được gọi là học đại diện đa\ncấp.\nCác vấn đề mà chúng ta đã thảo luận cho đến nay, chẳng hạn như học từ\ntín hiệu âm thanh thô, giá trị pixel thô của hình ảnh hoặc ánh xạ giữa\ncác câu có độ dài tùy ý và các đối tác của chúng bằng ngoại ngữ, là\nnhững vấn đề mà học sâu vượt trội và nơi các phương pháp học máy truyền\nthống chùn bước. Nó chỉ ra rằng các mô hình nhiều lớp này có khả năng\ngiải quyết dữ liệu nhận thức cấp thấp theo cách mà các công cụ trước đây\nkhông thể. Có thể cho là điểm chung quan trọng nhất trong các phương\npháp học sâu là việc sử dụng * đào tạo end-to-end * . Đó là, thay vì\nlắp ráp một hệ thống dựa trên các thành phần được điều chỉnh riêng lẻ,\nngười ta xây dựng hệ thống và sau đó điều chỉnh hiệu suất của chúng cùng\nnhau. Ví dụ, trong tầm nhìn máy tính các nhà khoa học sử dụng để tách\nquá trình kỹ thuật * tính năng* khỏi quá trình xây dựng các mô hình\nhọc máy. Máy dò cạnh Canny [Canny, 1987] và máy trích xuất tính\nnăng SIFT của Lowe [Lowe, 2004] trị vì tối cao trong hơn một thập\nkỷ như các thuật toán để lập bản đồ hình ảnh thành các vectơ tính năng.\nTrong những ngày đã qua, phần quan trọng của việc áp dụng máy học vào\nnhững vấn đề này bao gồm việc đưa ra các cách được thiết kế thủ công để\nchuyển đổi dữ liệu thành một số hình thức phù hợp với các mô hình nông.\nThật không may, chỉ có rất ít mà con người có thể thực hiện bằng sự khéo\nléo so với một đánh giá nhất quán trên hàng triệu lựa chọn được thực\nhiện tự động bởi một thuật toán. Khi học sâu tiếp quản, các bộ chiết\nxuất tính năng này được thay thế bằng các bộ lọc được điều chỉnh tự\nđộng, mang lại độ chính xác vượt trội.\nDo đó, một lợi thế chính của học sâu là nó thay thế không chỉ các mô\nhình nông ở cuối các đường ống học tập truyền thống, mà còn là quá trình\nkỹ thuật tính năng tốn nhiều lao động. Hơn nữa, bằng cách thay thế phần\nlớn tiền xử lý miền cụ thể, deep learning đã loại bỏ nhiều ranh giới mà\ntrước đây tách tầm nhìn máy tính, nhận dạng giọng nói, xử lý ngôn ngữ tự\nnhiên, tin học y tế và các lĩnh vực ứng dụng khác, cung cấp một bộ công\ncụ thống nhất để giải quyết đa dạng vấn đề.\nNgoài đào tạo từ đầu đến cuối, chúng tôi đang trải qua một sự chuyển đổi\ntừ mô tả thống kê tham số sang các mô hình hoàn toàn không tham số. Khi\ndữ liệu khan hiếm, người ta cần dựa vào việc đơn giản hóa các giả định\nvề thực tế để có được các mô hình hữu ích. Khi dữ liệu dồi dào, điều này\ncó thể được thay thế bằng các mô hình không tham số phù hợp với thực tế\nchính xác hơn. Ở một mức độ nào đó, điều này phản ánh sự tiến bộ mà vật\nlý trải qua vào giữa thế kỷ trước với sự sẵn có của máy tính. Thay vì\ngiải các xấp xỉ tham số về cách điện tử hoạt động bằng tay, giờ đây\nngười ta có thể dùng đến các mô phỏng số của các phương trình vi phân\ntừng phần liên quan. Điều này đã dẫn đến các mô hình chính xác hơn\nnhiều, mặc dù thường xuyên với chi phí giải thích.\nMột điểm khác biệt khác đối với công việc trước đây là việc chấp nhận\ncác giải pháp tối ưu, giải quyết các vấn đề tối ưu hóa phi tuyến không\nlồi và sẵn sàng thử mọi thứ trước khi chứng minh chúng. Chủ nghĩa kinh\nnghiệm mới được tìm thấy này trong việc đối phó với các vấn đề thống kê,\nkết hợp với một dòng tài năng nhanh chóng đã dẫn đến tiến bộ nhanh chóng\ncủa các thuật toán thực tế, mặc dù trong nhiều trường hợp với chi phí\nsửa đổi và tái phát minh các công cụ tồn tại trong nhiều thập kỷ.\nCuối cùng, cộng đồng deep learning tự hào về việc chia sẻ các công cụ\ntrên các ranh giới học thuật và doanh nghiệp, phát hành nhiều thư viện\ntuyệt vời, mô hình thống kê và các mạng được đào tạo làm nguồn mở. Theo\ntinh thần này, các máy tính xách tay hình thành cuốn sách này có sẵn\nmiễn phí để phân phối và sử dụng. Chúng tôi đã làm việc chăm chỉ để giảm\nbớt các rào cản tiếp cận để mọi người tìm hiểu về học sâu và chúng tôi\nhy vọng rằng độc giả của chúng tôi sẽ được hưởng lợi từ việc này.\n1.8. Tóm tắt\nMachine learning nghiên cứu cách các hệ thống máy tính có thể tận\ndụng trải nghiệm (thường là dữ liệu) để cải thiện hiệu suất tại các\ntác vụ cụ thể. Nó kết hợp các ý tưởng từ thống kê, khai thác dữ liệu\nvà tối ưu hóa. Thông thường, nó được sử dụng như một phương tiện\ntriển khai các giải pháp AI.\nLà một lớp học máy học, việc học đại diện tập trung vào cách tự động\ntìm ra cách thể hiện dữ liệu thích hợp. Deep learning là học đại diện\nđa cấp thông qua việc học nhiều lớp biến đổi.\nDeep learning thay thế không chỉ các mô hình nông ở cuối các đường\nống học máy truyền thống, mà còn là quá trình kỹ thuật tính năng tốn\nnhiều lao động.\nPhần lớn tiến bộ gần đây trong học sâu đã được kích hoạt bởi sự phong\nphú của dữ liệu phát sinh từ các cảm biến giá rẻ và các ứng dụng quy\nmô Internet, và bởi sự tiến bộ đáng kể trong tính toán, chủ yếu là\nthông qua GPU.\nTối ưu hóa toàn bộ hệ thống là một thành phần quan trọng trong việc\nđạt được hiệu suất cao. Sự sẵn có của các khung học sâu hiệu quả đã\ngiúp thiết kế và triển khai điều này dễ dàng hơn đáng kể.\n1.9. Bài tập\nNhững phần nào của mã mà bạn hiện đang viết có thể được “học”, tức\nlà, được cải thiện bằng cách học và tự động xác định các lựa chọn\nthiết kế được thực hiện trong mã của bạn? Mã của bạn có bao gồm các\nlựa chọn thiết kế heuristic không?\nNhững vấn đề mà bạn gặp phải có nhiều ví dụ về cách giải quyết chúng,\nnhưng không có cách nào cụ thể để tự động hóa chúng? Đây có thể là\nnhững ứng cử viên chính để sử dụng deep learning.\nXem sự phát triển của AI như một cuộc cách mạng công nghiệp mới, mối\nquan hệ giữa các thuật toán và dữ liệu là gì? Nó có tương tự như động\ncơ hơi nước và than? Sự khác biệt cơ bản là gì?\nBạn có thể áp dụng phương pháp đào tạo từ đầu đến cuối ở đâu khác,\nchẳng hạn như trong Fig. 1.1.2 , vật lý, kỹ thuật và kinh\ntế học?\nDiscussions"
+}

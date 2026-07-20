@@ -9,6 +9,22 @@ interface Msg {
   text: string;
 }
 
+/** Chế độ giao diện. 'system' = theo thiết bị (không set data-theme). */
+type ThemeMode = 'system' | 'light' | 'dark';
+
+const THEME_KEY = 'linalglab-v2:theme';
+const THEME_OPTIONS: { value: ThemeMode; label: string; icon: string }[] = [
+  { value: 'system', label: 'Hệ thống', icon: '🖥️' },
+  { value: 'light', label: 'Sáng', icon: '☀️' },
+  { value: 'dark', label: 'Tối', icon: '🌙' },
+];
+
+/** Đọc chế độ đang lưu (khớp boot script trong main.tsx). */
+function readTheme(): ThemeMode {
+  const v = localStorage.getItem(THEME_KEY);
+  return v === 'dark' || v === 'light' ? v : 'system';
+}
+
 /** The REST contract the RemoteAdapter speaks — shown so users can build one. */
 const ENDPOINTS: { method: string; path: string; note: string }[] = [
   { method: 'GET', path: '/ping', note: 'Kiểm tra sống (liveness)' },
@@ -28,6 +44,23 @@ export default function Settings() {
   const [busy, setBusy] = useState<null | 'test' | 'push' | 'pull'>(null);
   const [msg, setMsg] = useState<Msg | null>(null);
   const [lastSyncedAt, setLastSyncedAt] = useState<string | null>(cfg?.lastSyncedAt ?? null);
+  const [theme, setTheme] = useState<ThemeMode>(readTheme);
+  /** Drill-in: 'home' = chỉ Giao diện + nút; 'backend' = phần đồng bộ. */
+  const [view, setView] = useState<'home' | 'backend'>('home');
+  /** Ẩn/hiện hợp đồng endpoint trong phần backend. */
+  const [showContract, setShowContract] = useState(false);
+
+  /** Áp chế độ giao diện: light/dark set data-theme + localStorage; system xoá cả hai. */
+  const onTheme = (next: ThemeMode): void => {
+    setTheme(next);
+    if (next === 'system') {
+      delete document.documentElement.dataset.theme;
+      localStorage.removeItem(THEME_KEY);
+    } else {
+      document.documentElement.dataset.theme = next;
+      localStorage.setItem(THEME_KEY, next);
+    }
+  };
 
   /** Persist URL + token to localStorage (device-local). */
   const persist = (): void => {
@@ -122,37 +155,57 @@ export default function Settings() {
   return (
     <div className="dl-page st-page">
       <header className="st-hero">
-        <h1 className="st-title">Cài đặt · Đồng bộ backend</h1>
-        <p className="dl-muted">
-          Cắm một REST API tương thích để đồng bộ tiến độ giữa nhiều thiết bị.
-        </p>
+        <h1 className="st-title">Cài đặt</h1>
       </header>
 
-      {/* Honest explainer */}
-      <Card className="st-note">
-        <div className="st-note-head">
-          <span className="st-note-icon">ℹ️</span>
-          <b>App chạy hoàn toàn cục bộ (localStorage)</b>
-        </div>
-        <p>
-          Mặc định, mọi tiến độ được lưu ngay trên trình duyệt của bạn — không có máy chủ, không
-          tài khoản, không gửi dữ liệu đi đâu cả. Ứng dụng này <b>không đi kèm backend</b>.
-        </p>
-        <p>
-          Để đồng bộ nhiều thiết bị hoặc có tài khoản, bạn cần tự dựng <b>một backend REST tương
-          thích</b> (theo hợp đồng endpoint bên dưới) + nơi lưu trữ (hosting) + token của riêng bạn.
-          Có thể dùng Supabase Edge Functions, Cloudflare Workers, một app Express nhỏ… bất kỳ dịch
-          vụ nào đáp ứng đúng các endpoint.
-        </p>
-        <p className="st-note-warn">
-          Lưu ý: tính năng AI Tutor / Anthropic (nếu có) cần <b>API key riêng</b> của bạn và một
-          proxy phía server — token đồng bộ ở đây <b>không</b> dùng cho việc đó.
-        </p>
-      </Card>
+      {view === 'home' ? (
+        <div className="st-tab" key="home">
+          {/* Chọn giao diện */}
+          <Card className="st-theme">
+            <div className="st-note-head">
+              <span className="st-note-icon">🎨</span>
+              <b>Giao diện</b>
+            </div>
+            <p className="st-hint">
+              Chọn tông màu hiển thị. “Hệ thống” sẽ tự đổi theo cài đặt sáng/tối của thiết bị.
+            </p>
+            <div className="st-seg" role="radiogroup" aria-label="Giao diện">
+              {THEME_OPTIONS.map((opt) => (
+                <button
+                  key={opt.value}
+                  type="button"
+                  role="radio"
+                  aria-checked={theme === opt.value}
+                  className={`st-seg-btn${theme === opt.value ? ' is-active' : ''}`}
+                  onClick={() => onTheme(opt.value)}
+                >
+                  <span className="st-seg-icon" aria-hidden>
+                    {opt.icon}
+                  </span>
+                  {opt.label}
+                </button>
+              ))}
+            </div>
+          </Card>
 
-      {/* Config form */}
-      <Card className="st-form">
-        <label className="st-field">
+          <Button variant="ghost" block onClick={() => setView('backend')}>
+            🔌 Đồng bộ backend →
+          </Button>
+        </div>
+      ) : (
+        <div className="st-tab" key="backend">
+          <button type="button" className="st-back" onClick={() => setView('home')}>
+            ← Cài đặt
+          </button>
+
+          {/* Config form */}
+          <Card className="st-form">
+            <p className="st-hint">
+              App chạy hoàn toàn cục bộ (localStorage) — không máy chủ, không tài khoản. Cắm một REST
+              API tương thích của riêng bạn để đồng bộ tiến độ giữa nhiều thiết bị.
+            </p>
+
+            <label className="st-field">
           <span className="st-label">Backend URL</span>
           <input
             className="st-input"
@@ -223,31 +276,46 @@ export default function Settings() {
         </div>
       </Card>
 
-      {/* Endpoint contract */}
-      <Card className="st-contract">
-        <h2 className="st-h2">Hợp đồng endpoint (tự dựng backend)</h2>
-        <p className="dl-muted">
-          RemoteAdapter gọi các đường dẫn sau (tương đối với Backend URL). Mọi request kèm header{' '}
-          <code>Authorization: Bearer &lt;token&gt;</code>; body JSON dùng{' '}
-          <code>Content-Type: application/json</code>. Server tự phân vùng dữ liệu theo người dùng
-          suy ra từ token.
-        </p>
-        <div className="st-endpoints">
-          {ENDPOINTS.map((ep) => (
-            <div className="st-ep" key={`${ep.method} ${ep.path}`}>
-              <span className={`st-verb st-verb-${ep.method.toLowerCase()}`}>{ep.method}</span>
-              <code className="st-path">{ep.path}</code>
-              <span className="st-ep-note dl-muted">{ep.note}</span>
-            </div>
-          ))}
+          {/* Endpoint contract — ẩn sau nút */}
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setShowContract((s) => !s)}
+            aria-expanded={showContract}
+          >
+            {showContract ? 'Ẩn hợp đồng endpoint' : 'Xem hợp đồng endpoint'}
+          </Button>
+
+          {showContract && (
+            <Card className="st-contract">
+              <h2 className="st-h2">Hợp đồng endpoint (tự dựng backend)</h2>
+              <p className="dl-muted">
+                RemoteAdapter gọi các đường dẫn sau (tương đối với Backend URL). Mọi request kèm
+                header <code>Authorization: Bearer &lt;token&gt;</code>; body JSON dùng{' '}
+                <code>Content-Type: application/json</code>. Server tự phân vùng dữ liệu theo người
+                dùng suy ra từ token.
+              </p>
+              <div className="st-endpoints">
+                {ENDPOINTS.map((ep) => (
+                  <div className="st-ep" key={`${ep.method} ${ep.path}`}>
+                    <span className={`st-verb st-verb-${ep.method.toLowerCase()}`}>
+                      {ep.method}
+                    </span>
+                    <code className="st-path">{ep.path}</code>
+                    <span className="st-ep-note dl-muted">{ep.note}</span>
+                  </div>
+                ))}
+              </div>
+              <p className="st-fine dl-muted">
+                Dữ liệu được đồng bộ: tài liệu <code>learn-state</code> và bộ sưu tập{' '}
+                <code>xpTransactions</code>. Chiến lược hợp nhất mặc định là ghi đè theo hướng bạn
+                chọn (Đẩy lên / Kéo về); khi bật Tự đồng bộ sẽ dùng last-write-wins theo mốc thời
+                gian ISO nếu có, ưu tiên bản cục bộ khi hòa.
+              </p>
+            </Card>
+          )}
         </div>
-        <p className="st-fine dl-muted">
-          Dữ liệu được đồng bộ: tài liệu <code>learn-state</code> và bộ sưu tập{' '}
-          <code>xpTransactions</code>. Chiến lược hợp nhất mặc định là ghi đè theo hướng bạn chọn
-          (Đẩy lên / Kéo về); khi bật Tự đồng bộ sẽ dùng last-write-wins theo mốc thời gian ISO nếu
-          có, ưu tiên bản cục bộ khi hòa.
-        </p>
-      </Card>
+      )}
     </div>
   );
 }
