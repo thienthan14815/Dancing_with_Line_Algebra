@@ -290,7 +290,7 @@ export default function Scene3D(props: Scene3DProps) {
         frameloop="demand"
         camera={{ position: [4.5, 3.5, 4.5], fov: 45 }}
         gl={{ alpha: true, antialias: true }}
-        style={{ background: 'transparent' }}
+        style={{ background: 'transparent', touchAction: 'none' }}
       >
         <SceneContent {...props} />
       </Canvas>

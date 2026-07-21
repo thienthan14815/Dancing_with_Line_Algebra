@@ -260,15 +260,83 @@ function LessonRunner({ lessonId }: { lessonId: string }) {
 
   // ---- INTRO (bài khái niệm) ----
   if (phase === 'intro') {
+    // Tận dụng khoảng trống: bubbles số liệu + kỹ năng sẽ luyện + dạng bài.
+    const estMin = Math.max(1, Math.round((total * 45) / 60));
+    const maxXp = total * XP.NO_MISTAKES + XP.LESSON_COMPLETE;
+    const introSkillIds = lesson.skillIds?.length
+      ? lesson.skillIds
+      : Array.from(new Set(exercises.map((e) => e.skillId)));
+    // Đọc mastery MỘT LẦN lúc mở màn (như banner prereq) — không subscribe.
+    const masteryNow = useLearnStore.getState().masteryBySkill;
+    const typeCounts = exercises.reduce<Record<string, number>>((m, e) => {
+      const k = typeLabel(e.type);
+      m[k] = (m[k] ?? 0) + 1;
+      return m;
+    }, {});
+
     return (
-      <div className="dl-page dl-player">
+      <div className="dl-page dl-player dl-intro-page">
         <Card className="dl-intro">
           <span className="dl-continue-kicker">KHÁI NIỆM</span>
           <h1 className="dl-intro-title">{lesson.title}</h1>
-          <p className="dl-muted">
-            Xem phần trực quan tương tác để nắm ý tưởng, rồi quay lại làm bài tập
-            củng cố. Bạn có thể bỏ qua và luyện tập ngay.
+          <p className="dl-muted dl-intro-lead">
+            Xem phần trực quan tương tác để nắm ý tưởng, rồi củng cố bằng {total} câu
+            hỏi ngắn — hoặc bắt đầu luyện ngay.
           </p>
+
+          <div className="dl-bubbles dl-intro-bubbles">
+            <div className="dl-bubble">
+              <div className="dl-bubble-circle">
+                <span className="dl-bubble-num">{total}</span>
+              </div>
+              <span className="dl-bubble-lbl">Câu hỏi</span>
+            </div>
+            <div className="dl-bubble">
+              <div className="dl-bubble-circle">
+                <span className="dl-bubble-num">~{estMin}′</span>
+              </div>
+              <span className="dl-bubble-lbl">Thời gian</span>
+            </div>
+            <div className="dl-bubble">
+              <div className="dl-bubble-circle">
+                <span className="dl-bubble-num is-xp">+{maxXp}</span>
+              </div>
+              <span className="dl-bubble-lbl">XP tối đa</span>
+            </div>
+          </div>
+
+          <div className="dl-intro-block">
+            <div className="dl-intro-block-title">Kỹ năng sẽ luyện</div>
+            <ul className="dl-intro-skills">
+              {introSkillIds.map((id) => {
+                const pct = Math.round((masteryNow[id]?.score ?? 0) * 100);
+                return (
+                  <li key={id} className="dl-intro-skill">
+                    <span className="dl-intro-skill-name">
+                      {SKILL_BY_ID[id]?.name ?? id}
+                    </span>
+                    <span className="dl-intro-skill-bar">
+                      <span style={{ width: `${pct}%` }} />
+                    </span>
+                    <span className="dl-intro-skill-pct">{pct}%</span>
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
+
+          <div className="dl-intro-block">
+            <div className="dl-intro-block-title">Dạng bài</div>
+            <div className="dl-intro-types">
+              {Object.entries(typeCounts).map(([label, n]) => (
+                <span key={label} className="dl-type-chip">
+                  {label}
+                  {n > 1 ? ` ×${n}` : ''}
+                </span>
+              ))}
+            </div>
+          </div>
+
           <div className="dl-intro-actions">
             {lesson.deepDiveRoute && (
               <a
@@ -280,7 +348,9 @@ function LessonRunner({ lessonId }: { lessonId: string }) {
                 🔎 Xem trực quan
               </a>
             )}
-            <Button onClick={() => setPhase('quiz')}>Bắt đầu luyện tập →</Button>
+            <Button size="lg" onClick={() => setPhase('quiz')}>
+              Bắt đầu luyện tập →
+            </Button>
           </div>
         </Card>
       </div>

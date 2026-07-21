@@ -88,7 +88,7 @@
   flex-shrink: 0;
   border-radius: 10px;
   background: var(--grad-primary);
-  color: #fff;
+  color: var(--on-primary);
 }
 .la-brand-text {
   display: flex;
@@ -563,6 +563,150 @@
   gap: 12px;
   margin-top: 24px;
   flex-wrap: wrap;
+}
+
+/* Intro v2 — tận dụng khoảng trống: card căn giữa MÀN HÌNH, bubbles số liệu,
+   kỹ năng sẽ luyện (kèm mastery) và dạng bài. Theo bubble architecture. */
+.dl-intro-page {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* Màn player ẩn TopBar/sidenav (dl-focus) → căn giữa theo TOÀN viewport;
+     padding đều 24 (đè bottom 64 của .dl-page) để tâm không lệch. */
+  min-height: 100dvh;
+  padding: 24px;
+}
+/* padding-bottom của .dl-content dành cho dock màn quiz — intro không cần,
+   bỏ đi để 100dvh không sinh scroll và card căn đúng tâm. */
+.dl-content:has(.dl-intro-page) {
+  padding-bottom: 0;
+}
+.dl-intro {
+  width: 100%;
+  max-width: 560px;
+  margin-inline: auto;
+}
+.dl-intro-lead {
+  margin: 4px 0 0;
+}
+.dl-intro-bubbles {
+  margin: 20px 0 4px;
+  justify-content: center;
+}
+.dl-bubble-num.is-xp {
+  color: var(--primary);
+}
+.dl-intro-block {
+  margin-top: 20px;
+}
+.dl-intro-block-title {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-hint);
+  margin-bottom: 10px;
+}
+.dl-intro-skills {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.dl-intro-skill {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.dl-intro-skill-name {
+  flex: 1 1 auto;
+  min-width: 0;
+  font-size: 14px;
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.dl-intro-skill-bar {
+  flex: 0 0 96px;
+  height: 8px;
+  border-radius: var(--radius-chip);
+  background: var(--primary-soft);
+  overflow: hidden;
+}
+.dl-intro-skill-bar > span {
+  display: block;
+  height: 100%;
+  background: var(--primary);
+  border-radius: var(--radius-chip);
+}
+.dl-intro-skill-pct {
+  flex: 0 0 40px;
+  text-align: right;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+}
+.dl-intro-types {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.dl-type-chip {
+  padding: 5px 12px;
+  border-radius: var(--radius-chip);
+  background: var(--panel-2);
+  border: 1px solid var(--border);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+.dl-intro-actions .dl-btn-primary {
+  flex: 1 1 auto;
+}
+
+@media (max-width: 768px) {
+  /* Focus mode khoá scroll body → intro tự cuộn khi thiếu chỗ (lưới an toàn) */
+  .dl-intro-page {
+    min-height: 0;
+    max-height: 100dvh;
+    overflow-y: auto;
+    align-items: flex-start;
+  }
+  .dl-intro {
+    padding: 18px;
+  }
+  .dl-intro-title {
+    font-size: var(--fs-title);
+  }
+  .dl-intro .dl-bubble {
+    min-width: 0; /* để 3 bubble luôn nằm 1 hàng ở màn 360px */
+  }
+  .dl-intro .dl-bubble-circle {
+    width: 76px;
+    height: 76px;
+  }
+  .dl-intro .dl-bubble-num {
+    font-size: var(--fs-title);
+  }
+  .dl-intro-bubbles {
+    gap: 10px;
+    margin: 14px 0 0;
+  }
+  .dl-intro-block {
+    margin-top: 12px;
+  }
+  .dl-intro-skill-bar {
+    flex-basis: 72px;
+  }
+  .dl-intro-actions {
+    flex-direction: column;
+    align-items: stretch;
+    margin-top: 16px;
+  }
 }
 
 /* summary */
@@ -2013,7 +2157,7 @@
   height: 58px;
   border-radius: 50%;
   background: var(--grad-primary);
-  color: #fff;
+  color: var(--on-primary);
   border: 4px solid var(--surface);
   box-shadow: var(--elev-3);
   transition: transform var(--dur-1) var(--ease);

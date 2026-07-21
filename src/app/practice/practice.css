@@ -288,7 +288,7 @@
   border-radius: var(--radius-chip);
   display: grid;
   place-items: center;
-  color: white;
+  color: var(--on-primary);
   font-size: 14px;
 }
 .pc-feedback.good .pc-feedback-icon {

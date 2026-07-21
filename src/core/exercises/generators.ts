@@ -16,6 +16,9 @@
 
 import type { Exercise, NumericInputExercise, MatrixInputExercise } from './types';
 import { mulberry32, randInt, randNonZeroInt, hashStr } from '../rng';
+// Generator theo miền (mỗi file tự chứa, chỉ export mảng ExerciseGenerator).
+import { VECTOR_GENERATORS } from './generators.vectors';
+import { SYSTEM_GENERATORS } from './generators.systems';
 
 /** Sinh MỘT Exercise hợp lệ từ một RNG tất định. */
 export type GenFn = (rng: () => number) => Exercise;
@@ -241,8 +244,10 @@ export function registerGenerators(gens: ExerciseGenerator[]): void {
   }
 }
 
-// Nạp sẵn các generator builtin ngay khi module được import.
+// Nạp sẵn các generator builtin + theo miền ngay khi module được import.
 registerGenerators(BUILTIN_GENERATORS);
+registerGenerators(VECTOR_GENERATORS);
+registerGenerators(SYSTEM_GENERATORS);
 
 /**
  * Sinh bài MỚI cho các skill CÓ generator, trộn đều kiểu round-robin, tối đa

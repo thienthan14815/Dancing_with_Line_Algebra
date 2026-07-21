@@ -504,7 +504,7 @@ export default function Canvas2D({
                   stroke={color}
                   strokeOpacity={0.5}
                   strokeWidth={1.5}
-                  style={{ cursor: 'grab' }}
+                  style={{ cursor: 'grab', touchAction: 'none' }}
                   onPointerDown={(e) => onPointerDownVec(e, v.id)}
                 />
               )}

@@ -192,6 +192,16 @@ code, pre, .mono {
   border-radius: 4px;
 }
 
+/* Mobile: ô nhập liệu ≥16px để iOS Safari KHÔNG tự phóng to khi focus.
+   Loại trừ checkbox/radio/range (không gây zoom). */
+@media (max-width: 768px) {
+  input:not([type='checkbox']):not([type='radio']):not([type='range']),
+  textarea,
+  select {
+    font-size: 16px;
+  }
+}
+
 /* Reduced motion — kill-switch */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
@@ -547,7 +557,7 @@ code, pre, .mono {
 @media (max-width: 768px) {
   .ch-links {
     right: 12px;
-    bottom: calc(80px + env(safe-area-inset-bottom));
+    bottom: calc(var(--bottomnav-h) + 44px + env(safe-area-inset-bottom));
     width: min(184px, calc(100vw - 24px));
   }
 }
@@ -913,6 +923,12 @@ input[type='range']::-moz-range-thumb {
   border: 1px solid var(--border);
   border-radius: var(--radius);
   overflow: hidden;
+}
+/* Xoay/zoom 3D bằng ngón KHÔNG cuộn trang. R3F đặt inline `touch-action:auto`
+   thẳng lên <canvas> nên cần !important để đè inline đó (đây là lý do hợp lệ
+   duy nhất dùng !important — ghi đè style bên thứ ba). */
+.scene3d-wrap canvas {
+  touch-action: none !important;
 }
 
 /* ================================================================

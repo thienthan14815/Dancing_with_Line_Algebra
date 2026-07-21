@@ -242,7 +242,7 @@ function basicsFig(ex: Exercise, vs: Vec[], h: number): Fig {
     ),
     caption: `Vector v = (${r2(v[0])}, ${r2(v[1])}) là mũi tên từ gốc tọa độ: đi ngang ${r2(
       v[0],
-    )} rồi đi dọc ${r2(v[1])} tới ngọn mũi tên. Độ dài ‖v‖ = ${r2(Math.hypot(v[0], v[1]))}.`,
+    )} rồi đi dọc ${r2(v[1])} tới ngọn mũi tên. Độ dài ‖v‖ là khoảng cách từ gốc tới ngọn mũi tên.`,
     note,
   };
 }
@@ -288,9 +288,7 @@ function additionFig(vs: Vec[], h: number): Fig {
         ])}
       </Canvas2D>
     ),
-    caption: `Cộng vector = nối đuôi–đầu: dời b tới ngọn của a (nét đứt). Vector tổng a + b = (${r2(
-      sum[0],
-    )}, ${r2(sum[1])}) là đường chéo hình bình hành.`,
+    caption: `Cộng vector = nối đuôi–đầu: dời b tới ngọn của a (nét đứt). Vector tổng a + b là đường chéo hình bình hành, đi từ gốc tới điểm cuối.`,
     note,
   };
 }
@@ -367,9 +365,7 @@ function lincombFig(ex: Exercise, vs: Vec[], h: number): Fig {
     ),
     caption: `Tổ hợp tuyến tính ${r2(ca)}·a + ${r2(
       cb,
-    )}·b: đi ${r2(ca)} lần theo a rồi ${r2(cb)} lần theo b; điểm đến (hồng) = (${r2(res[0])}, ${r2(
-      res[1],
-    )}).`,
+    )}·b: đi ${r2(ca)} lần theo a rồi ${r2(cb)} lần theo b; điểm đến (hồng) là kết quả.`,
     note,
   };
 }
@@ -433,9 +429,7 @@ function dotFig(ex: Exercise, h: number): Fig {
         <CoordLabel x={p[0]} y={p[1]} color={C.v3} />
       </Canvas2D>
     ),
-    caption: `u·v = ‖u‖‖v‖cos θ = ${r2(
-      uv,
-    )}. Đoạn xanh lá là hình chiếu của v lên u; dấu của u·v cho biết góc θ là góc ${sign}.`,
+    caption: `u·v = ‖u‖‖v‖cos θ. Đoạn xanh lá là hình chiếu của v lên u; θ là góc ${sign} giữa hai vector.`,
     note,
   };
 }
@@ -594,11 +588,7 @@ function matrixFig(parsed: Mat2 | null, focus: 'det' | 'transform', h: number): 
         : '';
   return {
     figure,
-    caption: `det = ad − bc = ${r2(a)}·${r2(d)} − ${r2(b)}·${r2(c)} = ${r2(
-      det,
-    )}. Ô vuông đơn vị (diện tích 1) biến thành hình bình hành có diện tích |det| = ${r2(
-      Math.abs(det),
-    )}.${tail}`,
+    caption: `det = ad − bc. Ô vuông đơn vị (diện tích 1) biến thành hình bình hành có diện tích |det| (dấu của det cho biết hướng có bị lật hay không).${tail}`,
     note,
   };
 }

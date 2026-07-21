@@ -112,15 +112,16 @@
   text-overflow: ellipsis;
 }
 
-/* Mobile: nổi TRÊN bottom-nav, thu gọn */
+/* Mobile: nâng LÊN TRÊN bottom-nav + FAB "Học ngay" (FAB nhô 26px, cao 58px →
+   đỉnh ở ~bottomnav-h+26). Đặt dock trên đỉnh FAB để không đè/đụng nhau. */
 @media (max-width: 768px) {
   .lesson-fab-dock {
     right: 12px;
-    bottom: calc(80px + env(safe-area-inset-bottom));
-    width: min(220px, calc(100vw - 24px));
+    bottom: calc(var(--bottomnav-h) + 44px + env(safe-area-inset-bottom));
+    width: min(208px, calc(100vw - 24px));
   }
   .lfd-btn {
-    padding: 11px 16px;
+    padding: 10px 15px;
     font-size: 13px;
   }
 }

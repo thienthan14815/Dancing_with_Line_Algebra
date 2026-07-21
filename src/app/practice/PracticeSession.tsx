@@ -1,8 +1,9 @@
-import { useMemo, useState, useRef } from 'react';
+import { useMemo, useState, useRef, useEffect } from 'react';
 import type { CheckResult, Exercise } from '../../core/exercises/types';
 import { checkExercise, pickHint } from '../../core/exercises/engine';
 import { SKILL_GENERATORS } from '../../core/exercises/generators';
-import { mulberry32, hashStr } from '../../core/rng';
+import { EXERCISES_BY_SKILL } from '../../core/content/exerciseBank';
+import { mulberry32, hashStr, shuffle } from '../../core/rng';
 import { useLearnStore } from '../../core/progress/store';
 import { XP } from '../../core/progress/xp';
 // Tái dùng (read-only) hạ tầng của Lesson Player để render + nhập đáp án đồng bộ.
@@ -43,19 +44,32 @@ export default function PracticeSession({ category, onExit }: PracticeSessionPro
   // Hạt giống MỚI mỗi phiên: làm mới SỐ LIỆU của các bài có generator (cùng
   // DẠNG bài để giữ nguyên bố cục danh mục — vd danh mục ma trận vẫn toàn bài
   // ma trận). Skill không có generator → giữ nguyên bản tĩnh (backward-compat).
-  const seed = useMemo(() => (Date.now() ^ (Math.random() * 1e9)) >>> 0, [category.id]);
+  // `nonce` tăng mỗi lần "Ôn lại" → seed MỚI → đề mới. Đây là mấu chốt khiến
+  // luyện lại KHÔNG trùng (trước đây seed cố định theo category.id nên ra y hệt).
+  const [nonce, setNonce] = useState(0);
+  const seed = useMemo(
+    () => (Date.now() ^ (Math.random() * 1e9) ^ Math.imul(nonce + 1, 0x9e3779b1)) >>> 0,
+    [category.id, nonce],
+  );
   const exercises = useMemo<Exercise[]>(() => {
-    let n = 0;
-    return category.exercises.map((e) => {
+    const list = category.exercises.map((e, i) => {
+      const rng = mulberry32((seed ^ (hashStr(e.skillId) + i)) >>> 0);
+      // 1) Có generator cùng DẠNG bài → số liệu MỚI theo seed.
       const gens = SKILL_GENERATORS[e.skillId];
-      if (!gens || gens.length === 0) return e;
-      const rng = mulberry32((seed ^ (hashStr(e.skillId) + n++)) >>> 0);
-      for (const g of gens) {
-        const cand = g(rng);
-        if (cand.type === e.type) return cand; // thay bằng bản cùng dạng, số mới
+      if (gens && gens.length > 0) {
+        for (const g of gens) {
+          const cand = g(rng);
+          if (cand.type === e.type) return cand;
+        }
       }
+      // 2) Không generator → XOAY sang đề TĨNH khác cùng skill+dạng (nếu pool >1).
+      const pool = (EXERCISES_BY_SKILL[e.skillId] ?? []).filter((x) => x.type === e.type);
+      if (pool.length > 1) return pool[Math.floor(rng() * pool.length)];
+      // 3) Chỉ có đúng 1 đề tĩnh cho skill+dạng này → giữ nguyên.
       return e;
     });
+    // 4) Xáo thứ tự để các phiên không "đồng bộ" giống nhau.
+    return shuffle(mulberry32((seed ^ 0x85ebca6b) >>> 0), list);
   }, [category, seed]);
   const recordAttempt = useLearnStore((s) => s.recordAttempt);
 
@@ -74,6 +88,17 @@ export default function PracticeSession({ category, onExit }: PracticeSessionPro
   const [xpEarned, setXpEarned] = useState(0);
 
   const startedAt = useRef<number>(Date.now());
+
+  // Khi bộ đề đổi (đổi danh mục hoặc bấm Ôn lại → nonce mới) → về câu đầu &
+  // reset đáp án cho khớp bài mới.
+  useEffect(() => {
+    setIdx(0);
+    setAnswer(exercises.length ? initialAnswer(exercises[0]) : null);
+    setChecked(null);
+    setHintLevel(0);
+    setHintsUsed(0);
+    startedAt.current = Date.now();
+  }, [exercises]);
 
   // Danh mục rỗng (không nên xảy ra vì UI chặn sẵn) — thoát an toàn.
   if (exercises.length === 0) {
@@ -147,7 +172,8 @@ export default function PracticeSession({ category, onExit }: PracticeSessionPro
     setWrongCount(0);
     setXpEarned(0);
     setDone(false);
-    goTo(0);
+    setIdx(0);
+    setNonce((n) => n + 1); // seed mới → đề mới; effect [exercises] đồng bộ đáp án
   };
 
   // ---- TỔNG KẾT ----
