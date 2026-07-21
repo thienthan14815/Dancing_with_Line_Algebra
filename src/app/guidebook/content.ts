@@ -10,6 +10,9 @@
 //   '\\\\'      -> KaTeX nhận '\\' (xuống dòng trong matrix/cases)
 // ---------------------------------------------------------------------------
 
+// Content module (giáo án plugin) — merge additive vào GUIDEBOOK, giữ nguyên mục gốc.
+import { moduleGuideEntries } from '../../content/registry';
+
 /** Ký hiệu kèm giải nghĩa ngắn. */
 export interface GuideSymbol {
   /** TeX render bằng MathText (inline). */
@@ -50,7 +53,7 @@ export interface GuideEntry {
   applications: string[];
 }
 
-export const GUIDEBOOK: GuideEntry[] = [
+const BASE_GUIDEBOOK: GuideEntry[] = [
   // ---------------------------------------------------------------- ch0
   {
     id: 'ch0-foundations',
@@ -455,6 +458,8 @@ export const GUIDEBOOK: GuideEntry[] = [
     nameVi: 'Học máy & Hồi quy',
     nameEn: 'Machine Learning & Regression',
     concepts: [
+      'Tensor là "hộp chứa dữ liệu" của Deep Learning: số vô hướng (0D) → mảng (1D) → ma trận (2D) → nhiều chiều hơn; shape cho biết kích thước từng chiều, chỉ số đếm từ 0.',
+      'Trong bộ nhớ, tensor nằm thành dãy 1 chiều; stride là bước nhảy khi di chuyển theo từng chiều. Reshape giữ nguyên tổng phần tử; permute chỉ hoán đổi stride (dữ liệu đứng yên).',
       'Hồi quy tuyến tính khớp ŷ = w·x + b vào dữ liệu; huấn luyện = tối thiểu hóa MSE.',
       'Gradient descent lặp: đi ngược hướng gradient của hàm mất mát để giảm dần lỗi.',
       'Softmax biến logits thành phân phối xác suất; cross-entropy đo sai lệch phân loại.',
@@ -462,6 +467,8 @@ export const GUIDEBOOK: GuideEntry[] = [
       'Nối với LA: bài toán least squares (ch7–ch8) CHÍNH LÀ hồi quy tuyến tính. Nghiệm chuẩn (normal equation) x̂ = (AᵀA)⁻¹Aᵀb là công thức đóng; gradient descent là cách lặp thay thế khi dữ liệu lớn. Mặt mất mát MSE là một dạng toàn phương lồi (ch9).',
     ],
     symbols: [
+      { tex: '(2, 3, 3)', desc: 'Shape của tensor: 2 khối × 3 hàng × 3 cột — tổng 18 phần tử' },
+      { tex: '(9, 3, 1)', desc: 'Stride của tensor (2,3,3): sang khối nhảy 9, sang hàng nhảy 3, sang cột nhảy 1' },
       { tex: '\\hat{y} = wx + b', desc: 'Dự đoán của hồi quy tuyến tính' },
       { tex: 'L(w,b)', desc: 'Hàm mất mát (loss) theo tham số' },
       { tex: '\\nabla L', desc: 'Gradient — vector đạo hàm riêng của L' },
@@ -481,6 +488,8 @@ export const GUIDEBOOK: GuideEntry[] = [
       tex: '\\hat{y} = wx + b,\\quad \\theta \\leftarrow \\theta - \\eta\\,\\nabla L',
     },
     pitfalls: [
+      'Đếm chỉ số tensor từ 1 (đúng: từ 0 — phần tử "hàng 2 cột 3" là A[1][2]).',
+      'Reshape sang shape có tổng phần tử khác (9 phần tử không thể thành [2, 4]); nhầm reshape với permute.',
       'Learning rate quá lớn → phân kỳ; quá nhỏ → hội tụ chậm.',
       'Quên chuẩn hóa đặc trưng khiến mặt mất mát méo, GD zig-zag.',
       'Nhầm softmax (xác suất, tổng 1) với logits thô (điểm số chưa chuẩn hóa).',
@@ -673,6 +682,9 @@ export const GUIDEBOOK: GuideEntry[] = [
     ],
   },
 ];
+
+// Merge: mục sổ tay gốc + mục từ content module (giữ nguyên export tên `GUIDEBOOK`).
+export const GUIDEBOOK: GuideEntry[] = [...BASE_GUIDEBOOK, ...moduleGuideEntries];
 
 /** Tra cứu nhanh mục sổ tay theo Section id. */
 export const GUIDE_BY_ID: Record<string, GuideEntry> = Object.fromEntries(

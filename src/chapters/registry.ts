@@ -12,7 +12,10 @@ export interface ChapterMeta {
   load: () => Promise<{ default: React.ComponentType<{ lessonId: string }> }>;
 }
 
-export const chapters: ChapterMeta[] = [
+// Content module (giáo án plugin) — merge additive, KHÔNG đổi 14 chương gốc.
+import { moduleChapters } from '../content/registry';
+
+const baseChapters: ChapterMeta[] = [
   {
     id: 'ch0-foundations',
     num: 0,
@@ -162,6 +165,7 @@ export const chapters: ChapterMeta[] = [
     title: 'Học máy & Hồi quy',
     subtitle: 'Từ Least Squares đến mô hình học máy',
     lessons: [
+      { id: 'tensor', title: 'Tensor — dữ liệu của Deep Learning' },
       { id: 'linear-regression', title: 'Hồi quy tuyến tính = Least Squares' },
       { id: 'gradient-descent', title: 'Gradient Descent' },
       { id: 'softmax', title: 'Hồi quy Softmax & phân loại' },
@@ -210,6 +214,9 @@ export const chapters: ChapterMeta[] = [
     load: () => import('./ch13-optimization-apps/index'),
   },
 ];
+
+// Merge: 14 chương gốc + các chương từ content module (giữ nguyên export `chapters`).
+export const chapters: ChapterMeta[] = [...baseChapters, ...moduleChapters];
 
 export function findChapter(chapterId: string): ChapterMeta | undefined {
   return chapters.find((c) => c.id === chapterId);

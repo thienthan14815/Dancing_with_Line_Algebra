@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 import Canvas2D, { useCanvas2D } from '../../components/Canvas2D';
+import { useDiagramHeight } from '../lib/useDiagramHeight';
 import type { Exercise } from '../../core/exercises/types';
 import {
   diagramKind,
@@ -40,7 +41,8 @@ const C = {
   dim: 'var(--text-dim)',
 };
 
-const H = 300;
+/** Chiều cao hình trên PC; mobile co theo viewport (useDiagramHeight). */
+const DESKTOP_H = 300;
 
 interface Fig {
   figure: ReactNode;
@@ -52,9 +54,10 @@ interface Fig {
 const TYPICAL = 'Hình minh họa ý nghĩa (ví dụ tiêu biểu).';
 
 export default function TutorDiagram({ exercise }: { exercise: Exercise }) {
+  const h = useDiagramHeight(DESKTOP_H);
   const kind = diagramKind(exercise);
   if (!kind) return null;
-  const fig = buildFig(exercise, kind);
+  const fig = buildFig(exercise, kind, h);
   return (
     <div className="tt-diagram-body">
       <div className="tt-diagram-figure">{fig.figure}</div>
@@ -65,25 +68,29 @@ export default function TutorDiagram({ exercise }: { exercise: Exercise }) {
 }
 
 /** Chọn & dựng đồ thị theo loại; KHÔNG BAO GIỜ ném lỗi (fallback an toàn). */
-function buildFig(ex: Exercise, kind: NonNullable<ReturnType<typeof diagramKind>>): Fig {
+function buildFig(
+  ex: Exercise,
+  kind: NonNullable<ReturnType<typeof diagramKind>>,
+  h: number,
+): Fig {
   try {
     switch (kind) {
       case 'trig':
-        return trigFig(ex);
+        return trigFig(ex, h);
       case 'vectors':
-        return vectorsFig(ex);
+        return vectorsFig(ex, h);
       case 'dot':
-        return dotFig(ex);
+        return dotFig(ex, h);
       case 'projection':
-        return projectionFig(ex);
+        return projectionFig(ex, h);
       case 'determinant':
-        return matrixFig(parseMatrix2(gatherText(ex)), 'det');
+        return matrixFig(parseMatrix2(gatherText(ex)), 'det', h);
       case 'transform':
-        return matrixFig(parseMatrix2(gatherText(ex)), 'transform');
+        return matrixFig(parseMatrix2(gatherText(ex)), 'transform', h);
       case 'eigen':
-        return eigenFig(ex);
+        return eigenFig(ex, h);
       case 'system':
-        return systemFig(ex);
+        return systemFig(ex, h);
       default: {
         const _never: never = kind;
         return { figure: null, caption: String(_never) };
@@ -101,6 +108,19 @@ function buildFig(ex: Exercise, kind: NonNullable<ReturnType<typeof diagramKind>
 
 function maxAbs(...xs: number[]): number {
   return xs.reduce((m, x) => (Number.isFinite(x) && Math.abs(x) > m ? Math.abs(x) : m), 0);
+}
+
+// -- Định dạng số & tọa độ đầu vector (số đo trục nay do Canvas2D lo) ------
+function clamp(v: number, lo: number, hi: number): number {
+  return Math.max(lo, Math.min(hi, v));
+}
+
+/** Số gọn cho nhãn tọa độ: nguyên → bỏ ".0"; còn lại 1 chữ số thập phân. */
+function fmtNum(n: number): string {
+  if (!Number.isFinite(n)) return '0';
+  const r = Math.round(n * 10) / 10;
+  const z = Object.is(r, -0) ? 0 : r;
+  return Number.isInteger(z) ? String(z) : z.toFixed(1);
 }
 
 /** Đường thẳng qua gốc theo hướng d (để làm "trục" / không gian con). */
@@ -168,7 +188,7 @@ function CircleAndAngles({ angles }: { angles: number[] }) {
   );
 }
 
-function trigFig(ex: Exercise): Fig {
+function trigFig(ex: Exercise, h: number): Fig {
   let angles = parseAngles(gatherText(ex));
   let note: string | undefined;
   if (angles.length === 0) {
@@ -180,7 +200,7 @@ function trigFig(ex: Exercise): Fig {
 
   return {
     figure: (
-      <Canvas2D height={H} range={1.7} showGrid={false} showAxes>
+      <Canvas2D height={h} range={1.7} showGrid={false} showAxes>
         <CircleAndAngles angles={angles} />
       </Canvas2D>
     ),
@@ -194,17 +214,17 @@ function trigFig(ex: Exercise): Fig {
 // 2) VECTORS — basics / addition / scalar / linear combination
 // ---------------------------------------------------------------------------
 
-function vectorsFig(ex: Exercise): Fig {
+function vectorsFig(ex: Exercise, h: number): Fig {
   const vs = only2D(parseVectors(gatherText(ex)));
   const skill = ex.skillId;
 
-  if (skill === 'vector_addition') return additionFig(vs);
-  if (skill === 'scalar_multiplication') return scalarFig(ex, vs);
-  if (skill === 'linear_combination') return lincombFig(ex, vs);
-  return basicsFig(ex, vs);
+  if (skill === 'vector_addition') return additionFig(vs, h);
+  if (skill === 'scalar_multiplication') return scalarFig(ex, vs, h);
+  if (skill === 'linear_combination') return lincombFig(ex, vs, h);
+  return basicsFig(ex, vs, h);
 }
 
-function basicsFig(ex: Exercise, vs: Vec[]): Fig {
+function basicsFig(ex: Exercise, vs: Vec[], h: number): Fig {
   let v: number[];
   let note: string | undefined;
   if (ex.type === 'vector-drawing') v = [ex.target[0], ex.target[1]];
@@ -216,7 +236,7 @@ function basicsFig(ex: Exercise, vs: Vec[]): Fig {
   const range = niceRange(maxAbs(v[0], v[1]));
   return {
     figure: (
-      <Canvas2D height={H} range={range}>
+      <Canvas2D height={h} range={range}>
         {renderVectors([{ id: 'v', x: v[0], y: v[1], color: C.v1, label: 'v' }])}
       </Canvas2D>
     ),
@@ -227,7 +247,7 @@ function basicsFig(ex: Exercise, vs: Vec[]): Fig {
   };
 }
 
-function additionFig(vs: Vec[]): Fig {
+function additionFig(vs: Vec[], h: number): Fig {
   let a: number[];
   let b: number[];
   let note: string | undefined;
@@ -244,7 +264,7 @@ function additionFig(vs: Vec[]): Fig {
   return {
     figure: (
       <Canvas2D
-        height={H}
+        height={h}
         range={range}
         polygons={[
           {
@@ -275,7 +295,7 @@ function additionFig(vs: Vec[]): Fig {
   };
 }
 
-function scalarFig(ex: Exercise, vs: Vec[]): Fig {
+function scalarFig(ex: Exercise, vs: Vec[], h: number): Fig {
   const text = gatherText(ex);
   let v: number[];
   let note: string | undefined;
@@ -290,7 +310,7 @@ function scalarFig(ex: Exercise, vs: Vec[]): Fig {
   const range = niceRange(maxAbs(v[0], v[1], cv[0], cv[1]));
   return {
     figure: (
-      <Canvas2D height={H} range={range}>
+      <Canvas2D height={h} range={range}>
         {renderVectors([
           { id: 'cv', x: cv[0], y: cv[1], color: C.res, label: `${r2(c)}·v`, dashed: true },
           { id: 'v', x: v[0], y: v[1], color: C.v1, label: 'v' },
@@ -304,7 +324,7 @@ function scalarFig(ex: Exercise, vs: Vec[]): Fig {
   };
 }
 
-function lincombFig(ex: Exercise, vs: Vec[]): Fig {
+function lincombFig(ex: Exercise, vs: Vec[], h: number): Fig {
   let a: number[];
   let b: number[];
   let ca: number;
@@ -331,7 +351,7 @@ function lincombFig(ex: Exercise, vs: Vec[]): Fig {
   return {
     figure: (
       <Canvas2D
-        height={H}
+        height={h}
         range={range}
         segments={[
           { from: [0, 0], to: [step1[0], step1[1]], color: C.v1 },
@@ -373,7 +393,7 @@ function AngleArc({ from, to, radius }: { from: number; to: number; radius: numb
   return <polyline points={pts.join(' ')} fill="none" stroke={C.dim} strokeWidth={1.5} />;
 }
 
-function dotFig(ex: Exercise): Fig {
+function dotFig(ex: Exercise, h: number): Fig {
   const vs = only2D(parseVectors(gatherText(ex)));
   let u: number[];
   let v: number[];
@@ -397,7 +417,7 @@ function dotFig(ex: Exercise): Fig {
   return {
     figure: (
       <Canvas2D
-        height={H}
+        height={h}
         range={range}
         segments={[
           { from: [0, 0], to: [p[0], p[1]], color: C.v3 },
@@ -410,6 +430,7 @@ function dotFig(ex: Exercise): Fig {
           { id: 'u', x: u[0], y: u[1], color: C.v1, label: 'u' },
           { id: 'v', x: v[0], y: v[1], color: C.v2, label: 'v' },
         ])}
+        <CoordLabel x={p[0]} y={p[1]} color={C.v3} />
       </Canvas2D>
     ),
     caption: `u·v = ‖u‖‖v‖cos θ = ${r2(
@@ -444,7 +465,7 @@ function norm2(d: number[]): number[] {
   return L < 1e-12 ? [0, 0] : [d[0] / L, d[1] / L];
 }
 
-function projectionFig(ex: Exercise): Fig {
+function projectionFig(ex: Exercise, h: number): Fig {
   const vs = only2D(parseVectors(gatherText(ex)));
   let b: number[];
   let a: number[];
@@ -469,7 +490,7 @@ function projectionFig(ex: Exercise): Fig {
   return {
     figure: (
       <Canvas2D
-        height={H}
+        height={h}
         range={range}
         lines={[{ ...lineThroughOrigin(a), color: C.muted, label: 'đường (span a)' }]}
         segments={[{ from: [b[0], b[1]], to: [p[0], p[1]], color: C.v2, dashed: true, label: 'b − p' }]}
@@ -518,7 +539,7 @@ function StaticUnitSquare() {
   );
 }
 
-function matrixFig(parsed: Mat2 | null, focus: 'det' | 'transform'): Fig {
+function matrixFig(parsed: Mat2 | null, focus: 'det' | 'transform', h: number): Fig {
   const note = parsed ? undefined : TYPICAL;
   const M: Mat2 = parsed ?? (focus === 'transform' ? [[0, -1], [1, 0]] : [[2, 1], [1, 2]]);
   const a = M[0][0];
@@ -531,7 +552,7 @@ function matrixFig(parsed: Mat2 | null, focus: 'det' | 'transform'): Fig {
 
   const figure = (
     <Canvas2D
-      height={H}
+      height={h}
       range={range}
       matrix={M}
       polygons={[
@@ -586,7 +607,7 @@ function matrixFig(parsed: Mat2 | null, focus: 'det' | 'transform'): Fig {
 // 7) EIGENVALUE / EIGENVECTOR — v và Av cùng đường (hoặc lệch hướng)
 // ---------------------------------------------------------------------------
 
-function eigenFig(ex: Exercise): Fig {
+function eigenFig(ex: Exercise, h: number): Fig {
   const parsed = parseMatrix2(gatherText(ex));
   const note = parsed ? undefined : TYPICAL;
   const M: Mat2 = parsed ?? [[2, 1], [1, 2]];
@@ -607,7 +628,7 @@ function eigenFig(ex: Exercise): Fig {
     return {
       figure: (
         <Canvas2D
-          height={H}
+          height={h}
           range={range}
           lines={[{ ...lineThroughOrigin(v), color: C.muted, label: 'đường của v' }]}
         >
@@ -633,7 +654,7 @@ function eigenFig(ex: Exercise): Fig {
   return {
     figure: (
       <Canvas2D
-        height={H}
+        height={h}
         range={range}
         lines={[{ ...lineThroughOrigin(w), color: C.muted, label: 'đường của v' }]}
       >
@@ -653,7 +674,7 @@ function eigenFig(ex: Exercise): Fig {
 // 8) LINEAR SYSTEM / SOLUTION TYPES — 2 đường thẳng (row picture) + giao điểm
 // ---------------------------------------------------------------------------
 
-function systemFig(ex: Exercise): Fig {
+function systemFig(ex: Exercise, h: number): Fig {
   const eqs = parseEquations(ex.prompt);
   let l1: Line;
   let l2: Line;
@@ -673,7 +694,7 @@ function systemFig(ex: Exercise): Fig {
   return {
     figure: (
       <Canvas2D
-        height={H}
+        height={h}
         range={range}
         lines={[
           { ...l1, color: C.v1, label: 'PT 1' },
@@ -692,6 +713,28 @@ function systemFig(ex: Exercise): Fig {
         (note ? ' ' + note : '')
       : note,
   };
+}
+
+/** Nhãn tọa độ "(x, y)" cho một điểm world (vd chấm chiếu xanh lá ở dot product). */
+function CoordLabel({ x, y, color, dx = 6, dy = 14 }: { x: number; y: number; color: string; dx?: number; dy?: number }) {
+  const { toScreen } = useCanvas2D();
+  const [ox, oy] = toScreen(0, 0);
+  const [sx, sy] = toScreen(x, y);
+  const width = ox * 2;
+  const height = oy * 2;
+  return (
+    <text
+      x={clamp(sx + dx, 6, width - 6)}
+      y={clamp(sy + dy, 12, height - 6)}
+      fill={color}
+      fillOpacity={0.85}
+      fontSize={10}
+      textAnchor="start"
+      style={{ fontVariantNumeric: 'tabular-nums' }}
+    >
+      {`(${fmtNum(x)}, ${fmtNum(y)})`}
+    </text>
+  );
 }
 
 // ---------------------------------------------------------------------------
@@ -715,6 +758,8 @@ function renderVectors(arrows: ArrowSpec[]): ReactNode {
 function ArrowsLayer({ arrows }: { arrows: ArrowSpec[] }) {
   const { toScreen } = useCanvas2D();
   const [ox, oy] = toScreen(0, 0);
+  const width = ox * 2;
+  const height = oy * 2;
   return (
     <g>
       <defs>
@@ -733,6 +778,15 @@ function ArrowsLayer({ arrows }: { arrows: ArrowSpec[] }) {
       {arrows.map((v) => {
         const [ex, ey] = toScreen(v.x, v.y);
         const color = v.color ?? C.v1;
+        // Đặt nhãn lệch RA NGOÀI đầu mũi tên theo hướng vector: tên ở trong,
+        // tọa độ ở lớp ngoài hơn (không đè lên tên, không quặt lại thân vector).
+        const dlen = Math.hypot(ex - ox, ey - oy) || 1;
+        const ux = (ex - ox) / dlen;
+        const uy = (ey - oy) / dlen;
+        const anchor = ux >= 0 ? 'start' : 'end';
+        const nameX = clamp(ex + (ux >= 0 ? 8 : -8), 6, width - 6);
+        const nameY = clamp(ey + (uy >= 0 ? 15 : -7), 12, height - 6);
+        const coordY = clamp(uy >= 0 ? nameY + 12 : nameY - 12, 12, height - 6);
         return (
           <g key={v.id}>
             <line
@@ -746,10 +800,21 @@ function ArrowsLayer({ arrows }: { arrows: ArrowSpec[] }) {
               markerEnd="url(#tt-arrow)"
             />
             {v.label && (
-              <text x={ex + 8} y={ey - 8} fill={color} fontSize={13} fontWeight={600}>
+              <text x={nameX} y={nameY} fill={color} fontSize={13} fontWeight={600} textAnchor={anchor}>
                 {v.label}
               </text>
             )}
+            <text
+              x={nameX}
+              y={coordY}
+              fill={color}
+              fillOpacity={0.85}
+              fontSize={10}
+              textAnchor={anchor}
+              style={{ fontVariantNumeric: 'tabular-nums' }}
+            >
+              {`(${fmtNum(v.x)}, ${fmtNum(v.y)})`}
+            </text>
           </g>
         );
       })}

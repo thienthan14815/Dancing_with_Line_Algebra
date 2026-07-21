@@ -1,0 +1,869 @@
+{
+  "project": {
+    "name": "Linal Lab",
+    "version": "design-v1-approved",
+    "platform": "mobile",
+    "referenceViewport": {
+      "width": 390,
+      "height": 844,
+      "unit": "dp"
+    },
+    "language": "vi-VN",
+    "description": "Bộ giao diện đã duyệt cho ứng dụng học đại số tuyến tính Linal Lab."
+  },
+  "designSystem": {
+    "styleDirection": {
+      "linearApp": 0.4,
+      "appleHumanInterface": 0.25,
+      "notion": 0.2,
+      "duolingoGamification": 0.15
+    },
+    "colors": {
+      "background": "#F8F9FF",
+      "surface": "#FFFFFF",
+      "surfaceMuted": "#F4F2FF",
+      "primary": "#6C4CF6",
+      "primaryDark": "#4E2ED8",
+      "primaryLight": "#EEE9FF",
+      "secondary": "#5E7BFF",
+      "success": "#32C58A",
+      "warning": "#FFB443",
+      "danger": "#FF5D73",
+      "textPrimary": "#12182B",
+      "textSecondary": "#687086",
+      "textMuted": "#99A0B3",
+      "border": "#E7E9F2",
+      "divider": "#ECEEF5",
+      "overlay": "rgba(18,24,43,0.42)"
+    },
+    "gradients": {
+      "primary": {
+        "type": "linear",
+        "angle": 135,
+        "colors": [
+          "#7B5CFF",
+          "#5B37E8"
+        ]
+      },
+      "softPurple": {
+        "type": "linear",
+        "angle": 135,
+        "colors": [
+          "#F4F1FF",
+          "#ECE7FF"
+        ]
+      },
+      "successSoft": {
+        "type": "linear",
+        "angle": 135,
+        "colors": [
+          "#F1FFF8",
+          "#E4F9EE"
+        ]
+      }
+    },
+    "typography": {
+      "fontFamily": "Inter",
+      "fallback": [
+        "SF Pro Display",
+        "SF Pro Text",
+        "sans-serif"
+      ],
+      "styles": {
+        "display": {
+          "fontSize": 32,
+          "fontWeight": 700,
+          "lineHeight": 40
+        },
+        "h1": {
+          "fontSize": 28,
+          "fontWeight": 700,
+          "lineHeight": 36
+        },
+        "h2": {
+          "fontSize": 24,
+          "fontWeight": 700,
+          "lineHeight": 32
+        },
+        "h3": {
+          "fontSize": 20,
+          "fontWeight": 700,
+          "lineHeight": 28
+        },
+        "title": {
+          "fontSize": 18,
+          "fontWeight": 600,
+          "lineHeight": 26
+        },
+        "body": {
+          "fontSize": 16,
+          "fontWeight": 400,
+          "lineHeight": 24
+        },
+        "bodyStrong": {
+          "fontSize": 16,
+          "fontWeight": 600,
+          "lineHeight": 24
+        },
+        "caption": {
+          "fontSize": 14,
+          "fontWeight": 400,
+          "lineHeight": 20
+        },
+        "captionStrong": {
+          "fontSize": 14,
+          "fontWeight": 600,
+          "lineHeight": 20
+        },
+        "small": {
+          "fontSize": 12,
+          "fontWeight": 500,
+          "lineHeight": 16
+        }
+      }
+    },
+    "spacing": {
+      "xs": 4,
+      "sm": 8,
+      "md": 12,
+      "lg": 16,
+      "xl": 20,
+      "xxl": 24,
+      "section": 32
+    },
+    "radius": {
+      "sm": 10,
+      "md": 14,
+      "lg": 18,
+      "xl": 24,
+      "pill": 999
+    },
+    "shadow": {
+      "card": {
+        "x": 0,
+        "y": 8,
+        "blur": 24,
+        "spread": 0,
+        "color": "rgba(67,57,122,0.08)"
+      },
+      "floating": {
+        "x": 0,
+        "y": 10,
+        "blur": 30,
+        "spread": 0,
+        "color": "rgba(74,52,180,0.16)"
+      }
+    },
+    "motion": {
+      "fast": 160,
+      "normal": 240,
+      "slow": 360,
+      "curve": "cubic-bezier(0.2, 0.8, 0.2, 1)"
+    },
+    "layout": {
+      "screenPaddingHorizontal": 20,
+      "screenPaddingTop": 16,
+      "sectionGap": 24,
+      "cardPadding": 16,
+      "bottomNavigationHeight": 78,
+      "minimumTouchTarget": 44
+    }
+  },
+  "assets": {
+    "logo": {
+      "type": "icon",
+      "name": "lab-flask",
+      "style": "purple-gradient"
+    },
+    "aiTutor": {
+      "type": "character",
+      "name": "Linal",
+      "description": "Robot gia sư màu tím, khuôn mặt đen, áo blouse trắng, biểu cảm thân thiện."
+    },
+    "defaultAvatar": {
+      "type": "illustration",
+      "style": "3d-soft",
+      "description": "Avatar người dùng trẻ, nền tím nhạt."
+    }
+  },
+  "navigation": {
+    "type": "bottomTabBar",
+    "floatingCenterAction": true,
+    "items": [
+      {
+        "id": "home",
+        "label": "Trang chủ",
+        "icon": "home",
+        "route": "/home"
+      },
+      {
+        "id": "roadmap",
+        "label": "Lộ trình",
+        "icon": "map",
+        "route": "/roadmap"
+      },
+      {
+        "id": "aiTutor",
+        "label": "Gia sư AI",
+        "icon": "lab-flask",
+        "route": "/ai-tutor",
+        "isCenterAction": true
+      },
+      {
+        "id": "exercise",
+        "label": "Bài tập",
+        "icon": "document",
+        "route": "/exercise"
+      },
+      {
+        "id": "profile",
+        "label": "Tài khoản",
+        "icon": "user",
+        "route": "/profile"
+      }
+    ]
+  },
+  "components": {
+    "AppHeader": {
+      "height": 64,
+      "left": [
+        "backButton?",
+        "logo?",
+        "title"
+      ],
+      "right": [
+        "search?",
+        "notification?",
+        "history?",
+        "settings?",
+        "more?"
+      ]
+    },
+    "StatCard": {
+      "layout": "horizontal-grid",
+      "radius": "xl",
+      "background": "surface",
+      "shadow": "card",
+      "itemFields": [
+        "icon",
+        "value",
+        "label"
+      ]
+    },
+    "ProgressBar": {
+      "height": 6,
+      "radius": "pill",
+      "trackColor": "border",
+      "fill": "primaryGradient"
+    },
+    "SectionHeader": {
+      "left": [
+        "title"
+      ],
+      "right": [
+        "actionLabel?",
+        "chevron?"
+      ]
+    },
+    "CourseCard": {
+      "radius": "lg",
+      "background": "surface",
+      "fields": [
+        "thumbnail",
+        "tag",
+        "title",
+        "subtitle?",
+        "progress?",
+        "action"
+      ]
+    },
+    "RoadmapNode": {
+      "states": [
+        "completed",
+        "current",
+        "locked"
+      ],
+      "fields": [
+        "index",
+        "level",
+        "title",
+        "description",
+        "visual",
+        "progress",
+        "status"
+      ]
+    },
+    "PrimaryButton": {
+      "height": 52,
+      "radius": "pill",
+      "background": "primaryGradient",
+      "textColor": "#FFFFFF"
+    },
+    "IconButton": {
+      "size": 44,
+      "radius": "pill",
+      "background": "surface"
+    },
+    "QuickActionCard": {
+      "layout": "vertical",
+      "radius": "lg",
+      "iconSize": 48,
+      "minHeight": 116
+    },
+    "ListRow": {
+      "height": 64,
+      "left": [
+        "icon",
+        "label"
+      ],
+      "right": [
+        "badge?",
+        "value?",
+        "chevron"
+      ]
+    }
+  },
+  "screens": [
+    {
+      "id": "home",
+      "name": "Trang chủ",
+      "route": "/home",
+      "scroll": true,
+      "header": {
+        "variant": "brand",
+        "logo": true,
+        "title": "Linal Lab",
+        "subtitle": "Linear Algebra • Made Simple",
+        "actions": [
+          "search",
+          "notification"
+        ]
+      },
+      "sections": [
+        {
+          "id": "welcome",
+          "type": "hero",
+          "layout": "text-left-character-right",
+          "title": "Chào mừng trở lại,",
+          "userName": "Wan Hsin 👋",
+          "subtitle": "Học một chút mỗi ngày, tiến bộ mỗi ngày.",
+          "character": "aiTutor"
+        },
+        {
+          "id": "stats",
+          "type": "StatCard",
+          "columns": 4,
+          "items": [
+            {
+              "icon": "flame",
+              "value": "12",
+              "label": "Ngày liên tiếp"
+            },
+            {
+              "icon": "xp",
+              "value": "870 XP",
+              "label": "Tổng điểm"
+            },
+            {
+              "icon": "target",
+              "value": "24 / 50",
+              "label": "Bài đã hoàn thành"
+            },
+            {
+              "icon": "crown",
+              "value": "Lv. 8",
+              "label": "Cấp độ hiện tại"
+            }
+          ]
+        },
+        {
+          "id": "continueLearning",
+          "type": "section",
+          "title": "Học tiếp",
+          "action": "Xem tất cả",
+          "content": {
+            "type": "CourseCard",
+            "tag": "Chương 3",
+            "title": "Không gian vector và tổ hợp tuyến tính",
+            "progress": 0.65,
+            "visual": "3d-vector-space",
+            "actionIcon": "play"
+          }
+        },
+        {
+          "id": "roadmapPreview",
+          "type": "section",
+          "title": "Lộ trình của bạn",
+          "action": "Xem lộ trình",
+          "layout": "horizontal-scroll",
+          "items": [
+            {
+              "title": "Ma trận",
+              "status": "completed"
+            },
+            {
+              "title": "Vector",
+              "status": "completed"
+            },
+            {
+              "title": "Không gian vector",
+              "status": "current"
+            },
+            {
+              "title": "Biến đổi tuyến tính",
+              "status": "locked"
+            },
+            {
+              "title": "Giá trị riêng",
+              "status": "locked"
+            }
+          ]
+        },
+        {
+          "id": "weeklyStats",
+          "type": "section",
+          "title": "Thống kê",
+          "filter": "7 ngày qua",
+          "metrics": [
+            {
+              "value": "8h 24m",
+              "label": "Thời gian học"
+            },
+            {
+              "value": "+32%",
+              "label": "Tiến độ"
+            },
+            {
+              "value": "6",
+              "label": "Buổi học"
+            }
+          ],
+          "chart": {
+            "type": "bar",
+            "labels": [
+              "T2",
+              "T3",
+              "T4",
+              "T5",
+              "T6",
+              "T7",
+              "CN"
+            ]
+          }
+        },
+        {
+          "id": "quickTools",
+          "type": "section",
+          "title": "Công cụ nhanh",
+          "layout": "horizontal-grid",
+          "items": [
+            {
+              "icon": "calculator",
+              "label": "Máy tính ma trận"
+            },
+            {
+              "icon": "book",
+              "label": "Lý thuyết"
+            },
+            {
+              "icon": "edit",
+              "label": "Bài tập"
+            },
+            {
+              "icon": "cards",
+              "label": "Flashcards"
+            },
+            {
+              "icon": "note",
+              "label": "Ghi chú"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "roadmap",
+      "name": "Lộ trình học",
+      "route": "/roadmap",
+      "scroll": true,
+      "header": {
+        "variant": "standard",
+        "back": true,
+        "logo": true,
+        "title": "Linal Lab",
+        "actions": [
+          "search",
+          "analytics"
+        ]
+      },
+      "titleBlock": {
+        "title": "Lộ trình học ✦",
+        "subtitle": "Học theo lộ trình được thiết kế từ cơ bản đến nâng cao."
+      },
+      "summary": {
+        "type": "progress-summary-card",
+        "overallProgress": 0.24,
+        "completed": 12,
+        "total": 50,
+        "currentChapter": "Chương 3",
+        "estimate": "42 ngày còn lại"
+      },
+      "filters": [
+        {
+          "id": "all",
+          "label": "Tất cả",
+          "selected": true
+        },
+        {
+          "id": "basic",
+          "label": "Cơ bản"
+        },
+        {
+          "id": "intermediate",
+          "label": "Trung cấp"
+        },
+        {
+          "id": "advanced",
+          "label": "Nâng cao"
+        }
+      ],
+      "timeline": {
+        "orientation": "vertical",
+        "showConnector": true,
+        "nodes": [
+          {
+            "index": 1,
+            "level": "CƠ BẢN",
+            "title": "Ma trận",
+            "description": "Các khái niệm và phép toán với ma trận.",
+            "status": "completed",
+            "progress": 1,
+            "visual": "matrix"
+          },
+          {
+            "index": 2,
+            "level": "CƠ BẢN",
+            "title": "Vector",
+            "description": "Không gian vector và các phép toán.",
+            "status": "completed",
+            "progress": 1,
+            "visual": "vector"
+          },
+          {
+            "index": 3,
+            "level": "CƠ BẢN",
+            "title": "Không gian vector",
+            "description": "Tổ hợp tuyến tính, phụ thuộc tuyến tính, cơ sở và số chiều.",
+            "status": "current",
+            "progress": 0.65,
+            "visual": "3d-vector-space"
+          },
+          {
+            "index": 4,
+            "level": "TRUNG CẤP",
+            "title": "Biến đổi tuyến tính",
+            "description": "Định nghĩa, ma trận biểu diễn và hạt nhân.",
+            "status": "locked",
+            "progress": 0,
+            "visual": "linear-map"
+          },
+          {
+            "index": 5,
+            "level": "TRUNG CẤP",
+            "title": "Giá trị riêng & vector riêng",
+            "description": "Đa thức đặc trưng và chéo hóa ma trận.",
+            "status": "locked",
+            "progress": 0,
+            "visual": "eigen"
+          },
+          {
+            "index": 6,
+            "level": "NÂNG CAO",
+            "title": "Không gian Euclid",
+            "description": "Tích vô hướng, trực giao và chuẩn vector.",
+            "status": "locked",
+            "progress": 0,
+            "visual": "euclidean-space"
+          }
+        ]
+      }
+    },
+    {
+      "id": "exercise",
+      "name": "Bài tập",
+      "route": "/exercise",
+      "scroll": true,
+      "header": {
+        "variant": "standard",
+        "back": true,
+        "logo": true,
+        "title": "Linal Lab",
+        "actions": [
+          "bookmark",
+          "more"
+        ]
+      },
+      "progressHeader": {
+        "current": 3,
+        "total": 10,
+        "xp": 300,
+        "progress": 0.3
+      },
+      "lessonInfo": {
+        "chapter": "Chương 3",
+        "title": "Không gian vector và tổ hợp tuyến tính",
+        "mode": "Kiểm tra hiểu biết",
+        "timer": "12:45"
+      },
+      "questionCard": {
+        "questionNumber": 3,
+        "prompt": "Cho các vector trong ℝ³.",
+        "mathContent": [
+          "v₁ = [1, 2, -1]ᵀ",
+          "v₂ = [2, 1, 3]ᵀ",
+          "v₃ = [3, 4, 2]ᵀ"
+        ],
+        "question": "Vector nào thuộc không gian con sinh bởi {v₁, v₂}?",
+        "hint": "Kiểm tra xem vector có thể viết dưới dạng av₁ + bv₂ hay không.",
+        "answerType": "single-choice",
+        "options": [
+          {
+            "id": "A",
+            "content": "u₁ = [5, 6, 1]ᵀ"
+          },
+          {
+            "id": "B",
+            "content": "u₂ = [4, 5, 1]ᵀ",
+            "selected": true
+          },
+          {
+            "id": "C",
+            "content": "u₃ = [1, 0, 1]ᵀ"
+          },
+          {
+            "id": "D",
+            "content": "u₄ = [0, 1, 0]ᵀ"
+          }
+        ],
+        "personalNoteEnabled": true
+      },
+      "bottomActions": [
+        {
+          "id": "back",
+          "label": "Quay lại",
+          "variant": "secondary"
+        },
+        {
+          "id": "skip",
+          "label": "Bỏ qua",
+          "variant": "secondary"
+        },
+        {
+          "id": "check",
+          "label": "Kiểm tra đáp án",
+          "variant": "primary"
+        }
+      ],
+      "secondaryNavigation": [
+        {
+          "label": "Danh sách bài tập",
+          "icon": "list"
+        },
+        {
+          "label": "Nộp bài",
+          "icon": "upload"
+        },
+        {
+          "label": "Cài đặt",
+          "icon": "settings"
+        }
+      ]
+    },
+    {
+      "id": "aiTutor",
+      "name": "Gia sư AI",
+      "route": "/ai-tutor",
+      "scroll": false,
+      "header": {
+        "variant": "tutor",
+        "back": true,
+        "avatar": "aiTutor",
+        "title": "Gia sư AI",
+        "status": "Online",
+        "actions": [
+          "history"
+        ]
+      },
+      "content": {
+        "layout": "single-column-centered",
+        "hero": {
+          "character": "aiTutor",
+          "title": "Xin chào! 👋",
+          "subtitle": "Mình là LinAI, mình có thể giúp bạn hiểu bài, giải bài tập và luyện tập hiệu quả hơn.",
+          "prompt": "Bạn muốn mình giúp gì hôm nay?"
+        },
+        "quickActions": [
+          {
+            "id": "explain",
+            "icon": "chat",
+            "label": "Giải thích khái niệm"
+          },
+          {
+            "id": "solve",
+            "icon": "pencil",
+            "label": "Giải bài tập"
+          },
+          {
+            "id": "practice",
+            "icon": "target",
+            "label": "Luyện tập"
+          },
+          {
+            "id": "studyTip",
+            "icon": "lightbulb",
+            "label": "Gợi ý học tập"
+          }
+        ],
+        "suggestions": [
+          "Tổ hợp tuyến tính là gì?",
+          "Cho ví dụ trong ℝ³",
+          "Giải bài tập chương 3"
+        ]
+      },
+      "inputComposer": {
+        "placeholder": "Nhập câu hỏi của bạn...",
+        "voiceInput": true,
+        "sendButton": true,
+        "fixedAboveBottomNav": true
+      }
+    },
+    {
+      "id": "profile",
+      "name": "Hồ sơ",
+      "route": "/profile",
+      "scroll": true,
+      "header": {
+        "variant": "page-title",
+        "title": "Hồ sơ",
+        "actions": [
+          "notification",
+          "settings"
+        ]
+      },
+      "profileHero": {
+        "avatar": "defaultAvatar",
+        "editable": true,
+        "name": "Wan Hsin",
+        "username": "@wanhsin_linal",
+        "level": 8,
+        "xpCurrent": 1870,
+        "xpTarget": 3000,
+        "tagline": "Học mỗi ngày, tiến bộ mỗi ngày."
+      },
+      "stats": {
+        "type": "StatCard",
+        "columns": 4,
+        "items": [
+          {
+            "icon": "flame",
+            "value": "12",
+            "label": "Ngày liên tiếp"
+          },
+          {
+            "icon": "xp",
+            "value": "870",
+            "label": "Tổng điểm"
+          },
+          {
+            "icon": "target",
+            "value": "24 / 50",
+            "label": "Bài đã hoàn thành"
+          },
+          {
+            "icon": "crown",
+            "value": "Lv. 8",
+            "label": "Cấp độ hiện tại"
+          }
+        ]
+      },
+      "subscription": {
+        "plan": "LinAI Premium",
+        "status": "Đang sử dụng",
+        "expiry": "20/08/2025",
+        "action": "Quản lý gói"
+      },
+      "menu": [
+        {
+          "icon": "user",
+          "label": "Thông tin cá nhân"
+        },
+        {
+          "icon": "chart",
+          "label": "Thống kê học tập"
+        },
+        {
+          "icon": "bookmark",
+          "label": "Sưu tập",
+          "badge": 24
+        },
+        {
+          "icon": "trophy",
+          "label": "Thành tích",
+          "badge": 12
+        },
+        {
+          "icon": "download",
+          "label": "Tải xuống",
+          "badge": 7
+        },
+        {
+          "icon": "credit-card",
+          "label": "Phương thức thanh toán"
+        },
+        {
+          "icon": "shield",
+          "label": "Bảo mật & Quyền riêng tư"
+        },
+        {
+          "icon": "help-circle",
+          "label": "Trợ giúp & Phản hồi"
+        }
+      ]
+    }
+  ],
+  "responsiveRules": {
+    "smallPhone": {
+      "maxWidth": 360,
+      "screenPaddingHorizontal": 16,
+      "statColumns": 2,
+      "quickActionColumns": 2,
+      "roadmapCardVisualPosition": "top-right"
+    },
+    "standardPhone": {
+      "minWidth": 361,
+      "maxWidth": 430,
+      "screenPaddingHorizontal": 20,
+      "statColumns": 4,
+      "quickActionColumns": 4
+    },
+    "tablet": {
+      "minWidth": 768,
+      "contentMaxWidth": 720,
+      "centerContent": true
+    }
+  },
+  "accessibility": {
+    "minimumContrast": "WCAG AA",
+    "minimumTouchTarget": 44,
+    "supportsDynamicText": true,
+    "supportsReducedMotion": true,
+    "iconLabelsRequired": true
+  },
+  "implementationNotes": [
+    "Không đặt quá nhiều dữ liệu trên màn hình Gia sư AI; chỉ hiển thị 4 hành động chính, gợi ý nhanh và ô nhập.",
+    "Bottom navigation dùng xuyên suốt 5 màn hình; nút Gia sư AI nằm giữa và nổi bật.",
+    "Mỗi màn hình chỉ nên có một hành động chính nổi bật bằng màu tím.",
+    "Các biểu thức toán học nên render bằng KaTeX hoặc MathJax.",
+    "Dữ liệu tên người dùng, XP, bài học và tiến độ phải lấy từ state/API thay vì hard-code."
+  ]
+}

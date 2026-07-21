@@ -13,6 +13,7 @@ const Roadmap = lazy(() => import('./roadmap/Roadmap'));
 const Practice = lazy(() => import('./practice/Practice'));
 
 // Màn hình shell MỚI (lazy-load).
+const AppHome = lazy(() => import('./app/home/Home')); // do agent HOME tạo song song
 const LearningPath = lazy(() => import('./app/path/LearningPath'));
 const LessonPlayer = lazy(() => import('./app/player/LessonPlayer'));
 const Dashboard = lazy(() => import('./app/progress/Dashboard'));
@@ -31,7 +32,7 @@ function Loading() {
 function HomeRoute() {
   const onboarded = useLearnStore((s) => s.profile.onboarded);
   if (!onboarded) return <Navigate to="/onboarding" replace />;
-  return <LearningPath />;
+  return <AppHome />;
 }
 
 export default function App() {
@@ -42,6 +43,8 @@ export default function App() {
           <Routes>
             {/* Bộ mặt mới */}
             <Route path="/" element={<HomeRoute />} />
+            <Route path="/lo-trinh" element={<LearningPath />} />
+            <Route path="/ke-hoach" element={<Roadmap />} />
             <Route path="/learn/:lessonId" element={<LessonPlayer />} />
             <Route path="/luyen" element={<PracticeCenter />} />
             <Route path="/tien-do" element={<Dashboard />} />
@@ -55,10 +58,10 @@ export default function App() {
             {/* Trang "Chương (cổ điển)" = Home cũ */}
             <Route path="/chapters" element={<Home />} />
 
-            {/* Route CŨ — giữ nguyên */}
+            {/* Route CŨ — giữ nguyên; thêm trang Kiểm tra hiểu tách riêng */}
             <Route path="/ch/:chapterId/:lessonId" element={<LessonPage />} />
+            <Route path="/ch/:chapterId/:lessonId/kiem-tra" element={<LessonPage view="quiz" />} />
             <Route path="/wiki" element={<MathWiki />} />
-            <Route path="/lo-trinh" element={<Roadmap />} />
             <Route path="/luyen-tap" element={<Practice />} />
             <Route path="/luyen-tap/:chapterId" element={<Practice />} />
             <Route path="/dev-check" element={<DevCheck />} />

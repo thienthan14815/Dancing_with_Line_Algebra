@@ -1,123 +1,176 @@
 /* =====================================================================
-   HỒ SƠ / THÀNH TỰU — style riêng, prefix `pf-`.
-   Redesign v2 "calm workspace": mọi thẻ nền --surface viền mềm (kể cả
-   thẻ tổng quan — navy chỉ dành cho panel toán/code), thành tựu mở khóa
-   dùng --good, XP/streak dùng status color đúng nghĩa. Token global.css.
+   TÀI KHOẢN / HỒ SƠ — style riêng, prefix `pf-`.
+   Redesign "Linal Lab v1": vỏ dùng lớp dùng-chung `.la-*` (SHELL định nghĩa
+   trong shell.css); file này chỉ thêm phần đặc thù của trang. Màu = token
+   global.css (không hard-code hex, trừ SVG).
    ===================================================================== */
 
-/* ---------- Header hồ sơ (thẻ tổng quan trắng, calm) ---------- */
-/* .pf-page tăng specificity để thắng .dl-card (shell) bất kể thứ tự nạp CSS. */
-.pf-page .pf-hero {
+/* ---------- Hàng đầu: tiêu đề trang + nút Cài đặt ---------- */
+.pf-top {
   display: flex;
   align-items: center;
-  gap: var(--sp-2);
-  margin-bottom: var(--sp-2);
-  background: var(--surface);
-  border: 1px solid var(--border);
-  box-shadow: var(--elev-1);
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+.pf-title {
+  margin: 0;
+  font-size: var(--fs-heading);
+  font-weight: 700;
+  letter-spacing: -0.02em;
   color: var(--text);
+}
+
+/* ---------- Hero (la-card-xl la-hero-grad) ---------- */
+/* Scope `.pf-page` để override an toàn `display` mặc định của la-card-xl. */
+.pf-page .pf-hero {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  margin-bottom: 16px;
+}
+.pf-hero-top {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  min-width: 0;
 }
 .pf-avatar {
   flex-shrink: 0;
   width: 72px;
   height: 72px;
-  border-radius: var(--radius-sm);
+  border-radius: 50%;
   display: grid;
   place-items: center;
-  font-size: 32px;
-  font-weight: 800;
-  color: white;
-  background: var(--primary);
+  font-size: 28px;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--on-primary);
+  background: var(--grad-primary);
+  box-shadow: var(--elev-2);
 }
-.pf-hero-body {
+.pf-hero-id {
+  flex: 1;
   min-width: 0;
 }
-.pf-hero .pf-name {
+.pf-name-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+.pf-name {
+  margin: 0;
   font-size: var(--fs-title);
   font-weight: 700;
   letter-spacing: -0.02em;
-  margin: 0 0 8px;
   color: var(--text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
-.pf-hero-tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
+.pf-name-edit {
+  flex-shrink: 0;
+  display: inline-grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: none;
+  background: transparent;
+  color: var(--text-hint);
+  cursor: pointer;
+  transition: color var(--dur-1) var(--ease), background var(--dur-1) var(--ease);
 }
-.pf-hero .pf-since {
-  margin: 8px 0 0;
-  font-size: var(--fs-caption);
-  color: var(--text-secondary);
+.pf-name-edit:hover {
+  color: var(--primary);
+  background: var(--primary-soft);
 }
 
-/* ---------- 2 bubble tiêu điểm (số liệu tròn) ---------- */
-.pf-bubbles {
+/* Sửa tên inline */
+.pf-name-form {
   display: flex;
-  gap: var(--sp-3);
-  flex-wrap: wrap;
-  margin-bottom: var(--sp-3);
-}
-.pf-bubble {
-  display: flex;
-  flex-direction: column;
   align-items: center;
   gap: 8px;
+  min-width: 0;
 }
-.pf-bubble-circle {
-  width: 104px;
-  height: 104px;
+.pf-name-input {
+  flex: 1;
+  min-width: 0;
+  height: 40px;
+  padding: 0 14px;
   border-radius: var(--radius-chip);
-  display: grid;
-  place-items: center;
+  border: 1.5px solid var(--border);
   background: var(--surface);
-  border: 1px solid var(--border);
-  box-shadow: var(--elev-1);
-  font-size: var(--fs-heading);
-  font-weight: 700;
-  line-height: 1;
   color: var(--text);
+  font: inherit;
+  font-size: var(--fs-body);
+  font-weight: 600;
+}
+.pf-name-input:focus-visible {
+  outline: none;
+  border-color: var(--primary);
+}
+.pf-name-btn {
+  flex-shrink: 0;
+  display: inline-grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: background var(--dur-1) var(--ease), color var(--dur-1) var(--ease);
+}
+.pf-name-btn--save {
+  background: var(--grad-primary);
+  border-color: transparent;
+  color: var(--on-primary);
+}
+
+.pf-tagline {
+  margin: 4px 0 0;
+  font-size: var(--fs-caption);
+  line-height: 1.4;
+  color: var(--text-secondary);
+}
+
+/* Khối level/XP trong hero */
+.pf-level {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.pf-level-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+}
+.pf-level-name {
+  font-size: var(--fs-body);
+  font-weight: 700;
+  color: var(--text);
+}
+.pf-level-xp {
+  font-size: var(--fs-small);
+  color: var(--text-secondary);
   font-variant-numeric: tabular-nums;
 }
-.pf-bubble-streak {
-  color: var(--warn);
-}
-.pf-bubble-lbl {
-  font-size: var(--fs-caption);
-  color: var(--text-secondary);
+
+/* ---------- Stat grid ---------- */
+.pf-stats {
+  margin-bottom: 8px;
 }
 
-/* ---------- Navi trong trang (chip segmented) ---------- */
-.pf-nav {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-  margin-bottom: var(--sp-3);
-}
-.pf-nav-chip {
-  min-height: 44px;
-  padding: 8px 18px;
-  border-radius: var(--radius-chip);
-  border: 1px solid var(--border);
-  background: var(--surface);
-  color: var(--text-secondary);
-  font: inherit;
-  font-size: 0.95rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background var(--dur-2) var(--ease), color var(--dur-2) var(--ease),
-    border-color var(--dur-2) var(--ease);
-}
-.pf-nav-chip:hover {
-  color: var(--text);
-  border-color: var(--text-hint);
-}
-.pf-nav-chip.is-active {
-  background: var(--primary-soft);
-  color: var(--primary);
-  border-color: transparent;
+/* ---------- Tab (la-chip-row) ---------- */
+.pf-tabs {
+  margin: 20px 0 16px;
 }
 
-/* ---------- Khối tab (fade nhẹ khi chuyển) ---------- */
+/* Fade nhẹ khi chuyển tab */
 .pf-tab {
   animation: pf-fade var(--dur-2) var(--ease);
 }
@@ -131,58 +184,71 @@
     transform: none;
   }
 }
-.pf-since {
-  margin: 0;
-  font-size: var(--fs-caption);
-  color: var(--text-secondary);
-}
-.pf-social-note {
-  margin: 8px 0 0;
-  font-size: var(--fs-caption);
-  line-height: 1.5;
-  color: var(--text-secondary);
-}
 @media (prefers-reduced-motion: reduce) {
   .pf-tab {
     animation: none;
   }
 }
 
-/* ---------- Thẻ chỉ số (trắng nổi) ---------- */
-.pf-stat-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 12px;
-  margin-bottom: var(--sp-2);
-}
-.pf-stat {
+/* ---------- Tab "Chỉ số": danh sách chi tiết ---------- */
+.pf-detail {
   display: flex;
   flex-direction: column;
+  padding-block: 4px;
+}
+.pf-detail-row {
+  display: flex;
   align-items: center;
-  text-align: center;
-  gap: 4px;
-  padding: var(--sp-2) 10px;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 0;
 }
-.pf-stat-icon {
-  font-size: 24px;
+.pf-detail-row + .pf-detail-row {
+  border-top: 1px solid var(--divider);
 }
-.pf-stat-num {
-  font-size: 26px;
-  font-weight: 700;
-  line-height: 1.1;
-  color: var(--text);
-  font-variant-numeric: tabular-nums;
-}
-.pf-stat-lbl {
+.pf-detail-lbl {
   font-size: var(--fs-caption);
   color: var(--text-secondary);
-  line-height: 1.35;
+}
+.pf-detail-val {
+  font-size: var(--fs-caption);
+  font-weight: 700;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+.pf-social-note {
+  margin: 16px 2px 0;
+  font-size: var(--fs-caption);
+  line-height: 1.5;
+  color: var(--text-secondary);
 }
 
-/* ---------- Khối chung ---------- */
-.pf-sec {
-  margin-bottom: var(--sp-2);
+/* ---------- Nút reset ---------- */
+.pf-foot {
+  margin-top: 16px;
+  display: flex;
+  justify-content: center;
 }
+.pf-reset {
+  height: 44px;
+  padding: 0 22px;
+  border-radius: var(--radius-chip);
+  border: 1.5px solid var(--border);
+  background: var(--surface);
+  color: var(--bad);
+  font: inherit;
+  font-size: var(--fs-caption);
+  font-weight: 600;
+  cursor: pointer;
+  transition: background var(--dur-1) var(--ease), border-color var(--dur-1) var(--ease);
+}
+.pf-reset:hover {
+  background: var(--bad-soft);
+  border-color: var(--bad);
+}
+
+/* ---------- Khối chung trong tab ---------- */
 .pf-sec-head {
   display: flex;
   align-items: center;
@@ -211,8 +277,8 @@
   text-align: center;
   gap: 5px;
   padding: var(--sp-2) 12px;
-  border-radius: var(--radius-sm);
-  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-soft);
   background: var(--panel-2);
 }
 .pf-ach.unlocked {
@@ -255,9 +321,9 @@
   align-items: center;
   gap: 14px;
   padding: 12px 14px;
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-md);
   background: var(--panel-2);
-  border: 1px solid var(--border);
+  border: 1px solid var(--border-soft);
 }
 .pf-quest-ring {
   font-size: 12px;
@@ -281,44 +347,165 @@
   color: var(--text-secondary);
   font-variant-numeric: tabular-nums;
 }
+.pf-quest-done {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  border-radius: var(--radius-chip);
+  background: var(--good-soft);
+  color: var(--good);
+  font-size: var(--fs-small);
+  font-weight: 700;
+}
 
-/* ---------- Social placeholder ---------- */
-.pf-social-body {
+/* ---------- Đã lưu (bookmark + ghi chú) ---------- */
+.pf-saved-empty {
+  margin: 0;
+}
+.pf-saved-group {
+  margin-top: var(--sp-2);
+}
+.pf-saved-group:first-of-type {
+  margin-top: 0;
+}
+.pf-saved-group-head {
   display: flex;
   align-items: center;
-  gap: var(--sp-2);
+  gap: 6px;
+  margin-bottom: 8px;
+  font-size: var(--fs-caption);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--text-hint);
 }
-.pf-social-icon {
-  font-size: 40px;
-  flex-shrink: 0;
-}
-.pf-social-text {
+.pf-saved-list {
+  list-style: none;
   margin: 0;
-  line-height: 1.5;
-  font-size: 14px;
-}
-
-/* ---------- Footer ---------- */
-.pf-foot {
-  margin-top: 10px;
+  padding: 0;
   display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.pf-saved-item {
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-soft);
+  background: var(--panel-2);
+  padding: 10px 12px;
+}
+.pf-saved-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.pf-saved-link {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14.5px;
+  font-weight: 600;
+  color: var(--text);
+  text-decoration: none;
+  transition: color var(--dur-1) var(--ease);
+}
+.pf-saved-link:hover {
+  color: var(--primary);
+}
+.pf-saved-kind {
+  flex-shrink: 0;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--primary);
+  background: var(--primary-soft);
+  padding: 2px 8px;
+  border-radius: var(--radius-chip);
+}
+.pf-saved-remove {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
   justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: var(--radius-sm);
+  background: none;
+  border: none;
+  color: var(--text-hint);
+  cursor: pointer;
+  transition: color var(--dur-1) var(--ease), background var(--dur-1) var(--ease);
+}
+.pf-saved-remove:hover {
+  color: var(--bad);
+  background: var(--bad-soft);
 }
 
-/* ---------- Responsive ---------- */
-@media (max-width: 640px) {
-  .pf-stat-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-  .pf-hero {
-    flex-direction: column;
-    text-align: center;
-  }
-  .pf-hero-tags {
-    justify-content: center;
-  }
-  .pf-social-body {
-    flex-direction: column;
-    text-align: center;
-  }
+/* Ghi chú expandable (native <details>) */
+.pf-saved-note {
+  margin-top: 8px;
+  border-top: 1px solid var(--divider);
+  padding-top: 8px;
+}
+.pf-saved-note-sum {
+  cursor: pointer;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--text-secondary);
+  list-style: none;
+}
+.pf-saved-note-sum::-webkit-details-marker {
+  display: none;
+}
+.pf-saved-note-sum::before {
+  content: '▸ ';
+  color: var(--text-hint);
+}
+details[open] > .pf-saved-note-sum::before {
+  content: '▾ ';
+}
+.pf-saved-note-text {
+  margin-top: 6px;
+  font-size: 13.5px;
+  line-height: 1.55;
+  color: var(--text);
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.pf-saved-note-del {
+  margin-top: 8px;
+  padding: 4px 12px;
+  border-radius: var(--radius-chip);
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--bad);
+  font: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background var(--dur-1) var(--ease), border-color var(--dur-1) var(--ease);
+}
+.pf-saved-note-del:hover {
+  background: var(--bad-soft);
+  border-color: var(--bad);
+}
+
+/* ---------- Menu điều hướng (la-card + .la-row) ---------- */
+.pf-page .pf-menu {
+  margin-top: 16px;
+  padding: 4px 16px;
+}
+.pf-menu-row {
+  text-decoration: none;
+}
+.pf-menu-row + .pf-menu-row {
+  border-top: 1px solid var(--divider);
+}
+.pf-menu-row:hover .la-row-label {
+  color: var(--primary);
+}
+.pf-menu-chev {
+  flex-shrink: 0;
+  color: var(--text-hint);
 }

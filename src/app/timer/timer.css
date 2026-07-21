@@ -1,0 +1,251 @@
+/* Pomodoro (TopBar) — prefix pm-, token-thuần, dark tự chạy.
+   Chỉ dùng biến token; không màu trần, không nền chuyển sắc. */
+
+/* --- Vùng bọc (định vị popover) ----------------------------------------- */
+.pm-wrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+/* --- Nút biểu tượng (trạng thái idle) ----------------------------------- */
+.pm-trigger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-btn);
+  background: var(--panel-2);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: background var(--dur-2) var(--ease), border-color var(--dur-2) var(--ease),
+    color var(--dur-2) var(--ease);
+}
+.pm-trigger:hover {
+  background: var(--surface);
+  border-color: var(--divider);
+  color: var(--text);
+}
+.pm-trigger:active {
+  transform: scale(0.97);
+}
+
+/* --- Chip đếm ngược (running / paused / done) --------------------------- */
+.pm-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 36px;
+  padding: 0 12px;
+  border: 1px solid transparent;
+  border-radius: var(--radius-chip);
+  background: var(--primary-soft);
+  color: var(--primary);
+  font-family: var(--font);
+  font-size: var(--fs-caption);
+  font-weight: 650;
+  cursor: pointer;
+  transition: background var(--dur-2) var(--ease), color var(--dur-2) var(--ease);
+}
+.pm-chip:active {
+  transform: scale(0.97);
+}
+.pm-chip-text {
+  font-variant-numeric: tabular-nums;
+}
+.pm-chip.warn {
+  background: var(--warn-soft);
+  color: var(--warn);
+}
+.pm-chip.done {
+  background: var(--good-soft);
+  color: var(--good);
+  animation: pm-done-in var(--dur-3) var(--ease);
+}
+
+/* --- Popover ------------------------------------------------------------- */
+.pm-popover {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  z-index: 40;
+  width: 272px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+  padding: var(--sp-3);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--elev-3);
+  animation: pm-pop var(--dur-3) var(--ease);
+}
+
+.pm-pop-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+.pm-pop-title {
+  font-size: var(--fs-body);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--text);
+}
+.pm-pop-status {
+  font-size: var(--fs-caption);
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+
+.pm-pop-ring {
+  display: flex;
+  justify-content: center;
+  padding: var(--sp-1) 0;
+}
+.pm-pop-time {
+  font-family: var(--font-mono);
+  font-size: var(--fs-title);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--text);
+}
+.pm-pop-time.warn {
+  color: var(--warn);
+}
+.pm-pop-time.done {
+  color: var(--good);
+}
+
+/* --- Preset -------------------------------------------------------------- */
+.pm-presets {
+  display: flex;
+  gap: 8px;
+}
+.pm-preset {
+  flex: 1;
+  height: 40px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-btn);
+  background: var(--surface);
+  color: var(--text-secondary);
+  font-family: var(--font);
+  font-size: var(--fs-body);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  cursor: pointer;
+  transition: background var(--dur-2) var(--ease), border-color var(--dur-2) var(--ease),
+    color var(--dur-2) var(--ease);
+}
+.pm-preset:hover {
+  background: var(--panel-2);
+  color: var(--text);
+}
+.pm-preset.active {
+  background: var(--primary-soft);
+  border-color: transparent;
+  color: var(--primary);
+}
+
+/* --- Nút điều khiển ------------------------------------------------------ */
+.pm-controls {
+  display: flex;
+  gap: 8px;
+}
+.pm-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 0 var(--sp-2);
+  border-radius: var(--radius-btn);
+  font-family: var(--font);
+  font-size: var(--fs-body);
+  font-weight: 600;
+  cursor: pointer;
+  transition: background var(--dur-2) var(--ease), border-color var(--dur-2) var(--ease),
+    color var(--dur-2) var(--ease);
+}
+.pm-btn:active {
+  transform: scale(0.97);
+}
+.pm-btn-primary {
+  flex: 1;
+  border: 1px solid transparent;
+  background: var(--primary);
+  color: var(--on-primary);
+}
+.pm-btn-primary:hover {
+  background: var(--accent-strong);
+}
+.pm-btn-ghost {
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text-secondary);
+}
+.pm-btn-ghost:hover {
+  background: var(--panel-2);
+  color: var(--text);
+}
+.pm-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.pm-pop-note {
+  margin: 0;
+  font-size: var(--fs-caption);
+  color: var(--text-hint);
+  text-align: center;
+}
+.pm-pop-close {
+  border: none;
+  background: transparent;
+  color: var(--text-hint);
+  font-family: var(--font);
+  font-size: var(--fs-caption);
+  cursor: pointer;
+  padding: 4px;
+}
+.pm-pop-close:hover {
+  color: var(--text-secondary);
+}
+
+/* --- Motion (≤300ms, không lặp vô hạn) ---------------------------------- */
+@keyframes pm-pop {
+  from {
+    opacity: 0;
+    transform: translateY(-6px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes pm-done-in {
+  from {
+    opacity: 0.35;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .pm-popover,
+  .pm-chip.done {
+    animation: none;
+  }
+}
+
+/* Màn hẹp: popover không tràn mép phải màn hình */
+@media (max-width: 420px) {
+  .pm-popover {
+    width: calc(100vw - 32px);
+    right: -8px;
+  }
+}

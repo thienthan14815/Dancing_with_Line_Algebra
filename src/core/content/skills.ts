@@ -1,9 +1,11 @@
 import type { Skill } from './types';
+// Content module (giáo án plugin) — merge additive vào SKILLS, giữ nguyên skill gốc.
+import { moduleSkills } from '../../content/registry';
 
 // Danh sách kỹ năng cốt lõi của khóa Đại số tuyến tính.
 // id snake_case, ổn định — dùng làm khóa mastery và để exercise trỏ tới.
 // Bao phủ toàn bộ 10 chương (ch0..ch9) trong src/chapters/registry.ts.
-export const SKILLS: Skill[] = [
+const BASE_SKILLS: Skill[] = [
   // Ch0 — Nền tảng
   { id: 'coordinate_systems', name: 'Hệ tọa độ (Coordinate systems)' },
   { id: 'functions_graphs', name: 'Hàm số & đồ thị (Functions & graphs)' },
@@ -70,6 +72,9 @@ export const SKILLS: Skill[] = [
   { id: 'conic_sections', name: 'Đường & mặt bậc hai (Conics & quadrics)' },
 
   // Ch10 — Học máy & Hồi quy
+  { id: 'tensor_basics', name: 'Tensor & shape (Tensor basics)' },
+  { id: 'tensor_memory', name: 'Bố trí bộ nhớ & stride (Memory layout & stride)' },
+  { id: 'tensor_ops', name: 'Reshape & permute (Tensor reshaping)' },
   { id: 'linear_regression_ml', name: 'Hồi quy tuyến tính (Linear regression)' },
   { id: 'gradient_descent', name: 'Hạ gradient (Gradient descent)' },
   { id: 'softmax_regression', name: 'Hồi quy Softmax (Softmax regression)' },
@@ -95,6 +100,9 @@ export const SKILLS: Skill[] = [
   { id: 'computer_vision', name: 'Thị giác máy tính (Computer vision)' },
   { id: 'nlp_lm', name: 'NLP & mô hình ngôn ngữ (NLP & language models)' },
 ];
+
+// Merge: skill gốc + skill từ content module (giữ nguyên export tên `SKILLS`).
+export const SKILLS: Skill[] = [...BASE_SKILLS, ...moduleSkills];
 
 /** Tra cứu nhanh skill theo id. */
 export const SKILL_BY_ID: Record<string, Skill> = Object.fromEntries(

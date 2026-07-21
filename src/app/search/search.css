@@ -1,0 +1,255 @@
+/* SearchPalette (⌘/Ctrl+K) — prefix sp-, token-thuần, dark tự chạy.
+   Ngoại lệ màu duy nhất: rgba() scrim overlay. */
+
+/* --- Nút mở trong TopBar ------------------------------------------------- */
+.sp-search-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 36px;
+  padding: 0 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-btn);
+  background: var(--panel-2);
+  color: var(--text-secondary);
+  font-family: var(--font);
+  font-size: var(--fs-caption);
+  cursor: pointer;
+  transition: background var(--dur-2) var(--ease), border-color var(--dur-2) var(--ease),
+    color var(--dur-2) var(--ease);
+}
+.sp-search-trigger:hover {
+  background: var(--surface);
+  border-color: var(--divider);
+  color: var(--text);
+}
+.sp-search-trigger-label {
+  white-space: nowrap;
+}
+.sp-search-trigger-kbd {
+  display: inline-flex;
+  align-items: center;
+  padding: 1px 6px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--surface);
+  color: var(--text-hint);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  line-height: 1.6;
+}
+@media (max-width: 720px) {
+  .sp-search-trigger {
+    width: 36px;
+    padding: 0;
+    justify-content: center;
+  }
+  .sp-search-trigger-label,
+  .sp-search-trigger-kbd {
+    display: none;
+  }
+}
+
+/* --- Overlay + panel ----------------------------------------------------- */
+.sp-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 14vh 16px 16px;
+  background: rgba(17, 17, 17, 0.5);
+  animation: sp-fade var(--dur-2) var(--ease);
+}
+
+.sp-panel {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 640px;
+  max-height: 68vh;
+  overflow: hidden;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--elev-3);
+  animation: sp-pop var(--dur-3) var(--ease);
+}
+
+/* --- Ô nhập -------------------------------------------------------------- */
+.sp-search {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 var(--sp-2);
+  height: 56px;
+  border-bottom: 1px solid var(--border);
+  flex: 0 0 auto;
+}
+.sp-search-icon {
+  color: var(--text-hint);
+  flex: 0 0 auto;
+}
+.sp-input {
+  flex: 1 1 auto;
+  min-width: 0;
+  height: 100%;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: var(--text);
+  font-family: var(--font);
+  font-size: var(--fs-body);
+}
+.sp-input::placeholder {
+  color: var(--text-hint);
+}
+
+/* --- Danh sách kết quả --------------------------------------------------- */
+.sp-results {
+  overflow-y: auto;
+  padding: var(--sp-1) 0;
+  flex: 1 1 auto;
+}
+
+.sp-group {
+  padding-bottom: 4px;
+}
+.sp-group-label {
+  padding: 8px var(--sp-2) 4px;
+  font-size: var(--fs-caption);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-hint);
+}
+
+.sp-option {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 8px var(--sp-2);
+  border: none;
+  background: transparent;
+  text-align: left;
+  color: var(--text);
+  cursor: pointer;
+  transition: background var(--dur-1) var(--ease);
+}
+.sp-option.active {
+  background: var(--primary-soft);
+}
+
+.sp-option-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  flex: 0 0 auto;
+  border-radius: 10px;
+  background: var(--panel-2);
+  color: var(--text-secondary);
+}
+.sp-option.active .sp-option-icon {
+  color: var(--primary);
+}
+
+.sp-option-body {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+  flex: 1 1 auto;
+}
+.sp-option-title {
+  font-size: var(--fs-body);
+  line-height: 1.4;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.sp-option-title mark {
+  background: transparent;
+  color: var(--primary);
+  font-weight: 650;
+}
+.sp-option-sub {
+  font-size: var(--fs-caption);
+  line-height: 1.4;
+  color: var(--text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.sp-option-enter {
+  flex: 0 0 auto;
+  color: var(--text-hint);
+}
+
+.sp-empty {
+  padding: var(--sp-4) var(--sp-2);
+  text-align: center;
+  color: var(--text-secondary);
+  font-size: var(--fs-body);
+}
+
+/* --- Chân palette -------------------------------------------------------- */
+.sp-foot {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  padding: 8px var(--sp-2);
+  border-top: 1px solid var(--border);
+  font-size: var(--fs-caption);
+  color: var(--text-hint);
+  flex: 0 0 auto;
+}
+.sp-foot-hint {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.sp-kbd {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 5px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--panel-2);
+  color: var(--text-secondary);
+  font-family: var(--font-mono);
+  font-size: 11px;
+}
+
+/* --- Motion (≤300ms) ----------------------------------------------------- */
+@keyframes sp-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes sp-pop {
+  from {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .sp-overlay,
+  .sp-panel {
+    animation: none;
+  }
+}

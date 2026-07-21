@@ -1,6 +1,7 @@
 import type { VectorDrawingExercise } from '../../../core/exercises/types';
 import type { VariantProps } from './types';
 import Canvas2D, { type V2 } from '../../../components/Canvas2D';
+import { useDiagramHeight } from '../../lib/useDiagramHeight';
 
 export default function VectorDrawingVariant({
   exercise,
@@ -8,6 +9,9 @@ export default function VectorDrawingVariant({
   onChange,
   disabled,
 }: VariantProps<VectorDrawingExercise, [number, number]>) {
+  // Canvas là widget trả lời chính (bài này không có khối hình riêng)
+  // nên được phần viewport rộng hơn hình minh họa.
+  const canvasH = useDiagramHeight(320, { ratio: 0.4, min: 200, max: 300 });
   const [x, y] = value;
   const vectors: V2[] = [
     {
@@ -26,7 +30,7 @@ export default function VectorDrawingVariant({
   return (
     <div className="dl-vecdraw">
       <Canvas2D
-        height={320}
+        height={canvasH}
         range={range}
         showGrid
         showAxes

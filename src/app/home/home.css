@@ -1,0 +1,300 @@
+/* =============================================================================
+   HOME — Trang chủ (S1). Prefix class `ho-`.
+   CHỈ dùng token var (màu/gradient/shadow/radius/motion). KHÔNG định nghĩa lại
+   bất kỳ class .la-* nào (SHELL sở hữu trong shell.css) — ở đây chỉ dùng kèm.
+   ========================================================================== */
+
+/* ---- (1) Hero chào ---- */
+.ho-hero {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.ho-hero-text {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.ho-hero-eyebrow {
+  font-size: var(--fs-caption);
+  color: var(--text-secondary);
+}
+.ho-hero-name {
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 1.25;
+  color: var(--text);
+}
+.ho-hero-sub {
+  font-size: var(--fs-caption);
+  color: var(--text-secondary);
+}
+.ho-hero-char {
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+}
+
+/* ---- (2) StatCard grid — chỉ thêm khoảng cách sau hero ---- */
+.ho-stats-grid {
+  margin-top: 16px;
+}
+
+/* ---- (3) Học tiếp ---- */
+.ho-cont {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.ho-cont-body {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.ho-cont .la-badge {
+  align-self: flex-start;
+}
+.ho-cont-title {
+  font-size: var(--fs-body);
+  font-weight: 700;
+  line-height: 1.3;
+  color: var(--text);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.ho-cont-sub {
+  font-size: var(--fs-caption);
+  color: var(--text-secondary);
+}
+.ho-cont-prog {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.ho-cont-prog .la-progress {
+  flex: 1 1 auto;
+}
+.ho-cont-pct {
+  flex: 0 0 auto;
+  font-size: var(--fs-caption);
+  font-weight: 600;
+  color: var(--text-secondary);
+  font-variant-numeric: tabular-nums;
+}
+.ho-cont-cta {
+  flex: 0 0 auto;
+}
+.ho-play {
+  flex: 0 0 auto;
+  width: 52px;
+  height: 52px;
+  padding: 0;
+  border: none;
+  border-radius: var(--radius-chip);
+  background: var(--grad-primary);
+  box-shadow: var(--elev-3);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  appearance: none;
+  transition: transform var(--dur-1) var(--ease);
+}
+.ho-play:hover {
+  transform: scale(1.05);
+}
+.ho-play:active {
+  transform: scale(0.97);
+}
+
+/* ---- (4) Lộ trình preview (scroll ngang) ---- */
+.ho-rm-row {
+  margin-top: 4px;
+}
+.ho-rm-item {
+  flex: 0 0 auto;
+  width: 140px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 14px;
+  text-align: left;
+  font-family: inherit;
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  border: 1px solid var(--border-soft);
+  box-shadow: var(--elev-1);
+  color: inherit;
+  cursor: pointer;
+  appearance: none;
+  transition:
+    border-color var(--dur-1) var(--ease),
+    transform var(--dur-1) var(--ease);
+}
+.ho-rm-item:hover {
+  transform: translateY(-2px);
+}
+.ho-rm-item--current {
+  border-color: var(--primary);
+  box-shadow: var(--elev-2);
+}
+.ho-rm-ico {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+}
+.ho-rm-ico--done {
+  background: var(--good-soft);
+}
+.ho-rm-ico--current {
+  border: 3px solid var(--primary);
+}
+.ho-rm-ico--other::before {
+  content: '';
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--text-disabled);
+}
+.ho-rm-num {
+  font-size: var(--fs-small);
+  color: var(--text-hint);
+}
+.ho-rm-title {
+  font-size: var(--fs-caption);
+  font-weight: 600;
+  line-height: 1.3;
+  color: var(--text);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* ---- (5) Thống kê 7 ngày ---- */
+.ho-sec-note {
+  font-size: var(--fs-caption);
+  color: var(--text-hint);
+}
+.ho-metrics {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+.ho-metric {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  align-items: flex-start;
+  min-width: 0;
+}
+.ho-metric-val {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+}
+.ho-metric-lab {
+  font-size: var(--fs-small);
+  color: var(--text-hint);
+}
+.ho-chart {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 8px;
+  margin-top: 16px;
+}
+.ho-bar-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+.ho-bar-track {
+  position: relative;
+  width: 100%;
+  max-width: 22px;
+  height: 104px;
+  background: var(--primary-soft);
+  border-radius: var(--radius-chip);
+  display: flex;
+  align-items: flex-end;
+  overflow: hidden;
+}
+.ho-bar-fill {
+  width: 100%;
+  background: var(--grad-primary);
+  border-radius: var(--radius-chip);
+  transition: height var(--dur-2) var(--ease);
+}
+.ho-bar-col--today .ho-bar-track {
+  box-shadow: inset 0 0 0 2px var(--primary);
+}
+.ho-bar-lab {
+  font-size: var(--fs-small);
+  color: var(--text-hint);
+}
+.ho-bar-col--today .ho-bar-lab {
+  color: var(--primary);
+  font-weight: 700;
+}
+
+/* ---- (6) Công cụ nhanh ---- */
+.ho-tools {
+  display: grid;
+  /* minmax(0,1fr): không cho min-content của nhãn nong rộng track gây tràn ngang */
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+}
+.ho-tool {
+  min-height: 116px;
+  padding: 14px 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  text-align: center;
+  font-family: inherit;
+  color: inherit;
+  cursor: pointer;
+  appearance: none;
+  transition:
+    transform var(--dur-1) var(--ease),
+    border-color var(--dur-1) var(--ease);
+}
+.ho-tool:hover {
+  transform: translateY(-2px);
+  border-color: var(--primary);
+}
+.ho-tool-ico {
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-md);
+  background: var(--primary-soft);
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+}
+.ho-tool-label {
+  font-size: var(--fs-caption);
+  font-weight: 600;
+  line-height: 1.3;
+  color: var(--text);
+}
+
+/* ---- Responsive: máy nhỏ ≤360px → công cụ nhanh 2 cột ---- */
+@media (max-width: 360px) {
+  .ho-tools {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}

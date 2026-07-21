@@ -10,6 +10,10 @@ import {
 } from 'react';
 import { lerpMat, type Mat } from '../lib/linalg';
 
+// Nhãn số trên trục — trắng mờ trên nền navy (mọi Canvas2D đều nền navy).
+const AXIS_NUM_FILL = 'rgba(255,255,255,0.45)';
+const AXIS_TICK_FILL = 'rgba(255,255,255,0.4)'; // đậm hơn gridline
+
 export type V2 = {
   id: string;
   x: number;
@@ -26,6 +30,8 @@ export interface Canvas2DProps {
   matrix?: [[number, number], [number, number]];
   showGrid?: boolean;
   showAxes?: boolean;
+  /** Số đo trên trục (tick + số nguyên). Mặc định bật; đi kèm showAxes. */
+  axisNumbers?: boolean;
   vectors?: V2[];
   onVectorChange?: (id: string, x: number, y: number) => void;
   points?: { x: number; y: number; color?: string; label?: string }[];
@@ -81,6 +87,7 @@ export default function Canvas2D({
   matrix,
   showGrid = true,
   showAxes = true,
+  axisNumbers = true,
   vectors = [],
   onVectorChange,
   points = [],
@@ -287,6 +294,45 @@ export default function Canvas2D({
     );
   }
 
+  // ---- Nhãn số trên trục (mặc định bật; tắt bằng axisNumbers={false}) ----
+  // Layer TĨNH theo range đang render; suy width/height/scale từ tâm khung nên
+  // luôn khớp trục, kể cả canvas tương tác (kéo vector) hay animation ma trận.
+  const axisNums: ReactNode[] = [];
+  if (showAxes && axisNumbers) {
+    const maxI = Math.floor(range + 1e-6);
+    // Lưới càng rộng, bước đánh số càng thưa để đỡ rối.
+    const stepLbl = range > 15 ? 5 : range > 6 ? 2 : 1;
+    const EDGE = 14; // chừa lề để số không bị cắt ở mép
+    const tabNum = { fontVariantNumeric: 'tabular-nums' as const };
+    axisNums.push(
+      <text key="axnum0" x={cx - 4} y={cy + 13} fill={AXIS_NUM_FILL} fontSize={10} textAnchor="end" style={tabNum}>
+        0
+      </text>
+    );
+    for (let i = stepLbl; i <= maxI; i += stepLbl) {
+      for (const val of [i, -i]) {
+        const sx = cx + val * scale;
+        if (sx > EDGE && sx < width - EDGE) {
+          axisNums.push(
+            <line key={`axnxt${val}`} x1={sx} y1={cy - 3} x2={sx} y2={cy + 3} stroke={AXIS_TICK_FILL} strokeWidth={1.4} />,
+            <text key={`axnxl${val}`} x={sx} y={cy + 14} fill={AXIS_NUM_FILL} fontSize={10} textAnchor="middle" style={tabNum}>
+              {val}
+            </text>
+          );
+        }
+        const sy = cy - val * scale;
+        if (sy > EDGE && sy < height - EDGE) {
+          axisNums.push(
+            <line key={`axnyt${val}`} x1={cx - 3} y1={sy} x2={cx + 3} y2={sy} stroke={AXIS_TICK_FILL} strokeWidth={1.4} />,
+            <text key={`axnyl${val}`} x={cx - 6} y={sy + 3.5} fill={AXIS_NUM_FILL} fontSize={10} textAnchor="end" style={tabNum}>
+              {val}
+            </text>
+          );
+        }
+      }
+    }
+  }
+
   // helper để biến đổi phần tử nếu transformElements
   const tf = (x: number, y: number): [number, number] =>
     transformElements ? applyMat(animMat, x, y) : [x, y];
@@ -354,6 +400,7 @@ export default function Canvas2D({
         {gridLines}
         {tgrid}
         {axes}
+        {axisNums.length > 0 && <g style={{ pointerEvents: 'none' }}>{axisNums}</g>}
 
         {/* polygons */}
         {polygons.map((poly, i) => {

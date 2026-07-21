@@ -1,0 +1,206 @@
+/* ===========================================================================
+   BẢNG VẼ AI (Whiteboard) — style riêng, prefix wb-.
+   Chỉ dùng biến token (không mã màu trực tiếp) nên dark mode tự hoạt động.
+   Accent của khối này là --ai (tím); nền/viền/radius lấy từ .dl-card +
+   .dl-card-ai (shell.css).
+   =========================================================================== */
+
+.wb-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+}
+
+/* ---- Đầu khối: icon Sparkles trong khung soft + tiêu đề ---- */
+.wb-head {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+.wb-head-icon {
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-sm);
+  background: var(--ai-soft);
+  display: grid;
+  place-items: center;
+}
+.wb-head-text {
+  min-width: 0;
+}
+.wb-title {
+  font-size: var(--fs-title);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--text);
+}
+.wb-sub {
+  margin-top: 4px;
+  font-size: var(--fs-body);
+  line-height: 1.5;
+  color: var(--text-secondary);
+}
+
+/* ---- Ô hỏi ---- */
+.wb-form {
+  display: flex;
+  gap: 8px;
+}
+.wb-input {
+  flex: 1;
+  min-width: 0;
+  min-height: 44px;
+  padding: 0 16px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-btn);
+  background: var(--surface);
+  color: var(--text);
+  font-family: var(--font);
+  font-size: var(--fs-body);
+  transition: border-color var(--dur-2) var(--ease);
+}
+.wb-input::placeholder {
+  color: var(--text-hint);
+}
+.wb-input:focus {
+  border-color: var(--ai);
+}
+.wb-submit {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+  min-height: 44px;
+  padding: 0 18px;
+  border: none;
+  border-radius: var(--radius-btn);
+  background: var(--ai);
+  color: var(--surface);
+  font-family: var(--font);
+  font-size: var(--fs-body);
+  font-weight: 650;
+  cursor: pointer;
+  transition: opacity var(--dur-2) var(--ease), transform var(--dur-1) var(--ease);
+}
+.wb-submit:hover {
+  opacity: 0.92;
+}
+.wb-submit:active {
+  transform: scale(0.97);
+}
+
+.wb-caption {
+  margin-top: -4px;
+  font-size: var(--fs-caption);
+  color: var(--text-hint);
+}
+
+/* ---- Kết quả: đồ thị + trực giác + link bài liên quan ---- */
+.wb-result {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding-top: var(--sp-2);
+  border-top: 1px solid var(--border-soft);
+  animation: wb-fade-in var(--dur-3) var(--ease);
+}
+@keyframes wb-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.wb-intuition {
+  font-size: var(--fs-body);
+  line-height: 1.6;
+  color: var(--text);
+}
+.wb-related {
+  display: flex;
+}
+.wb-learn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
+  padding: 8px 16px;
+  border-radius: var(--radius-btn);
+  background: var(--ai-soft);
+  color: var(--ai);
+  font-weight: 650;
+  text-decoration: none;
+  transition: transform var(--dur-2) var(--ease);
+}
+.wb-learn:hover {
+  transform: translateY(-1px);
+}
+.wb-learn-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.25;
+}
+.wb-learn-skill {
+  font-size: var(--fs-caption);
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+.wb-learn-go {
+  flex-shrink: 0;
+}
+
+/* ---- Danh sách chip khái niệm (gợi ý / fallback không match) ---- */
+.wb-suggest {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.wb-suggest-label {
+  font-size: var(--fs-caption);
+  font-weight: 650;
+  color: var(--text-secondary);
+}
+.wb-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.wb-chip {
+  min-height: 36px;
+  padding: 6px 14px;
+  border: 1px solid transparent;
+  border-radius: var(--radius-chip);
+  background: var(--panel-2);
+  color: var(--text);
+  font-family: var(--font);
+  font-size: var(--fs-caption);
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color var(--dur-2) var(--ease), color var(--dur-2) var(--ease);
+}
+.wb-chip:hover {
+  background: var(--ai-soft);
+  color: var(--ai);
+}
+.wb-chip.is-active {
+  background: var(--ai-soft);
+  color: var(--ai);
+}
+
+/* ---- Mobile: input & nút xếp dọc, cùng full-width ---- */
+@media (max-width: 560px) {
+  .wb-form {
+    flex-wrap: wrap;
+  }
+  .wb-input {
+    flex: 1 1 100%;
+  }
+  .wb-submit {
+    flex: 1 1 100%;
+    justify-content: center;
+  }
+}

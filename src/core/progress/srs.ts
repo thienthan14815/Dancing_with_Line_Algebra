@@ -32,3 +32,18 @@ export function isDue(item: ReviewItem, nowISO: string): boolean {
 export function getDue(items: ReviewItem[], nowISO: string): ReviewItem[] {
   return items.filter((it) => isDue(it, nowISO));
 }
+
+/**
+ * Skill ids đang tới hạn ôn tại `nowISO`, sắp SỚM-HẠN trước. Nhận vào một map
+ * (như `reviewItems` trong store) hoặc mảng. Tiện dùng cho flashcard / thống kê.
+ */
+export function getDueSkills(
+  items: Record<string, ReviewItem> | ReviewItem[],
+  nowISO: string,
+): string[] {
+  const arr = Array.isArray(items) ? items : Object.values(items);
+  return arr
+    .filter((it) => isDue(it, nowISO))
+    .sort((a, b) => new Date(a.dueAt).getTime() - new Date(b.dueAt).getTime())
+    .map((it) => it.skillId);
+}

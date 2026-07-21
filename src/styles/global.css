@@ -1,109 +1,138 @@
 :root {
   /* ================================================================
-     LA App · Design Tokens v2  (calm, intelligent workspace)
-     Linear 40% / Apple HIG 25% / Notion 20% / Duolingo 15%
-     Mọi file khác CHỈ dùng các var này — không hard-code hex.
+     Linal Lab · Design Tokens (approved design v1)
+     Tím #6C4CF6 · nền #F8F9FF · shadow tím mềm · radius 10/14/18/24/pill.
+     Mọi file khác CHỈ dùng các var này — không hard-code hex (trừ SVG).
      ================================================================ */
 
-  /* Accent — CHỈ MỘT màu nhấn trong một màn hình */
-  --primary: #5B6CFF;
-  --secondary: #5B6CFF;        /* legacy alias */
-  --accent: #5B6CFF;
-  --accent-2: #5B6CFF;
-  --accent-strong: #4A5AE8;    /* hover / pressed */
-  --primary-soft: #EEF0FF;     /* nền tint cho chip / active / progress track */
+  /* Accent — tím thương hiệu */
+  --primary: #6C4CF6;
+  --secondary: #5E7BFF;
+  --accent: #6C4CF6;
+  --accent-2: #5E7BFF;
+  --accent-strong: #4E2ED8;    /* hover / pressed */
+  --primary-soft: #EEE9FF;     /* nền tint cho chip / active / progress track */
   --on-primary: #FFFFFF;       /* chữ trên nền accent */
 
+  /* Semantic accents theo chức năng — dùng ĐÚNG ngữ nghĩa, không trộn */
+  --ai: #6C4CF6;        --ai-soft: #EEE9FF;      /* AI (tím) */
+  --review: #F97316;    --review-soft: #FFF1E7;  /* Ôn tập (cam) */
+
   /* Status */
-  --good: #2ECC71;  --success: #2ECC71;  --good-soft: #E9F9F1;
-  --warn: #F4B400;  --warning: #F4B400;  --warn-soft: #FEF6E0;
-  --bad:  #FF5F57;  --error:   #FF5F57;  --bad-soft:  #FFEFEE;
+  --good: #32C58A;  --success: #32C58A;  --good-soft: #E6F9EF;
+  --warn: #FFB443;  --warning: #FFB443;  --warn-soft: #FFF4E2;
+  --bad:  #FF5D73;  --error:   #FF5D73;  --bad-soft:  #FFECEF;
 
   /* Surfaces */
-  --bg: #F7F8FA;
+  --bg: #F8F9FF;
   --surface: #FFFFFF;  --bg-elevated: #FFFFFF;  --panel: #FFFFFF;
-  --panel-2: #F2F3F5;
-  --border: #ECECEC;  --border-soft: #F1F1F3;  --divider: #ECECEC;
+  --panel-2: #F4F2FF;
+  --border: #E7E9F2;  --border-soft: #EFF0F7;  --divider: #ECEEF5;
+  --overlay: rgba(18, 24, 43, .42);
 
   /* Navy — CHỈ dùng cho panel trực quan toán / code editor. GIỮ NGUYÊN */
   --navy: #090B2D;  --navy-2: #10143a;
   --vec-1: #4f9cf9; --vec-2: #f97316; --vec-3: #22c55e; --vec-result: #e879f9;
 
   /* Text */
-  --text: #111111;
-  --text-secondary: #666666;  --text-muted: #666666;   /* alias */
-  --text-hint: #999999;       --text-dim: #999999;     /* alias */
-  --text-disabled: #BBBBBB;
+  --text: #12182B;
+  --text-secondary: #687086;  --text-muted: #687086;   /* alias */
+  --text-hint: #99A0B3;       --text-dim: #99A0B3;     /* alias */
+  --text-disabled: #C2C7D6;
 
-  /* Gradient legacy → FLAT. v2 không dùng gradient trang trí */
-  --grad: #5B6CFF;
+  /* Gradient */
+  --grad: #6C4CF6;                                             /* alias phẳng legacy */
+  --grad-primary: linear-gradient(135deg, #7B5CFF, #5B37E8);
+  --grad-soft: linear-gradient(135deg, #F4F1FF, #ECE7FF);
+  --grad-success: linear-gradient(135deg, #F1FFF8, #E4F9EE);
 
   /* Radius */
-  --radius-btn: 18px;
+  --radius-sm: 10px;
+  --radius-md: 14px;
+  --radius-btn: 14px;
+  --radius-lg: 18px;
   --radius: 24px;      /* card */
-  --radius-sm: 18px;
-  --radius-lg: 24px;
   --radius-sheet: 32px;
   --radius-chip: 999px;
 
-  /* Spacing scale — 8 / 16 / 24 / 32 / 48 / 64 */
+  /* Spacing scale — 8 / 16 / 24 / 32 / 48 / 64 (GIỮ NGUYÊN) */
   --sp-1: 8px; --sp-2: 16px; --sp-3: 24px; --sp-4: 32px; --sp-5: 48px; --sp-6: 64px;
 
   /* Typography scale */
-  --fs-display: 40px; --fs-heading: 28px; --fs-title: 22px; --fs-body: 16px; --fs-caption: 13px;
+  --fs-display: 32px; --fs-heading: 28px; --fs-title: 20px; --fs-body: 16px; --fs-caption: 14px;
+  --fs-small: 12px;
 
-  /* Elevation — shadow RẤT mềm, không shadow đậm */
+  /* Elevation — shadow tím mềm */
   --elev-0: none;
-  --elev-1: 0 1px 2px rgba(17,17,17,.04), 0 2px 6px rgba(17,17,17,.04);
-  --elev-2: 0 6px 24px rgba(17,17,17,.07);
-  --elev-3: 0 16px 40px rgba(17,17,17,.12);
+  --elev-1: 0 2px 8px rgba(67, 57, 122, .05);
+  --elev-2: 0 8px 24px rgba(67, 57, 122, .08);   /* = shadow "card" (JSON) */
+  --elev-3: 0 10px 30px rgba(74, 52, 180, .16);  /* = shadow "floating" (JSON) */
   --shadow-sm: var(--elev-1);   /* legacy alias */
   --shadow: var(--elev-2);      /* legacy alias */
 
-  /* Motion — thao tác thường xuyên ≤ 300ms */
-  --dur-1: 120ms; --dur-2: 200ms; --dur-3: 300ms;
+  /* Motion */
+  --dur-1: 160ms; --dur-2: 240ms; --dur-3: 360ms;
   --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
 
   --font: 'Inter Variable', 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
   --font-mono: 'JetBrains Mono Variable', 'JetBrains Mono', 'Fira Code', Consolas, 'Courier New', monospace;
 
   --sidebar-w: 264px;
+  --bottomnav-h: 78px;
 }
 
 /* ================================================================
    Dark mode — hai cơ chế, cùng một bộ giá trị
    ================================================================ */
 :root[data-theme="dark"] {
-  --bg: #101113;
-  --surface: #17181B; --bg-elevated: #17181B; --panel: #17181B;
-  --panel-2: #1E2024;
-  --border: #26282D; --border-soft: #202226; --divider: #26282D;
-  --text: #F2F3F5;
-  --text-secondary: #A8AAB0; --text-muted: #A8AAB0;
-  --text-hint: #808289; --text-dim: #808289; --text-disabled: #5A5C63;
-  --primary: #7583FF; --secondary: #7583FF; --accent: #7583FF; --accent-2: #7583FF;
-  --accent-strong: #8A96FF; --primary-soft: #23263B; --grad: #7583FF;
-  --good-soft: #16291F; --warn-soft: #2C2513; --bad-soft: #2E1B1A;
-  --elev-1: 0 0 0 1px rgba(255,255,255,.02);
-  --elev-2: 0 6px 24px rgba(0,0,0,.35);
-  --elev-3: 0 16px 40px rgba(0,0,0,.5);
+  --bg: #12131E;
+  --surface: #1A1B29; --bg-elevated: #1A1B29; --panel: #1A1B29;
+  --panel-2: #232437;
+  --border: #2B2C42; --border-soft: #232438; --divider: #272840;
+  --overlay: rgba(4, 6, 16, .6);
+  --text: #EEEFFA;
+  --text-secondary: #A3A8C4; --text-muted: #A3A8C4;
+  --text-hint: #767C9F; --text-dim: #767C9F; --text-disabled: #565C80;
+  --primary: #8C74FF; --accent: #8C74FF; --ai: #8C74FF;
+  --secondary: #7D93FF; --accent-2: #7D93FF;
+  --accent-strong: #A18DFF;
+  --primary-soft: #2A2452; --ai-soft: #2A2452; --grad: #8C74FF;
+  --grad-primary: linear-gradient(135deg, #8C74FF, #6244E8);
+  --grad-soft: linear-gradient(135deg, #232043, #1D1A36);
+  --grad-success: linear-gradient(135deg, #16352A, #132D24);
+  --review: #FB923C; --review-soft: #33241A;
+  --good: #3DD598; --success: #3DD598; --good-soft: #17392C;
+  --warn: #FFC062; --warning: #FFC062; --warn-soft: #3A2E17;
+  --bad: #FF6F82; --error: #FF6F82; --bad-soft: #3C2027;
+  --elev-1: 0 0 0 1px rgba(255,255,255,.03);
+  --elev-2: 0 8px 24px rgba(0,0,0,.4);
+  --elev-3: 0 10px 30px rgba(0,0,0,.55);
 }
 
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --bg: #101113;
-    --surface: #17181B; --bg-elevated: #17181B; --panel: #17181B;
-    --panel-2: #1E2024;
-    --border: #26282D; --border-soft: #202226; --divider: #26282D;
-    --text: #F2F3F5;
-    --text-secondary: #A8AAB0; --text-muted: #A8AAB0;
-    --text-hint: #808289; --text-dim: #808289; --text-disabled: #5A5C63;
-    --primary: #7583FF; --secondary: #7583FF; --accent: #7583FF; --accent-2: #7583FF;
-    --accent-strong: #8A96FF; --primary-soft: #23263B; --grad: #7583FF;
-    --good-soft: #16291F; --warn-soft: #2C2513; --bad-soft: #2E1B1A;
-    --elev-1: 0 0 0 1px rgba(255,255,255,.02);
-    --elev-2: 0 6px 24px rgba(0,0,0,.35);
-    --elev-3: 0 16px 40px rgba(0,0,0,.5);
+    --bg: #12131E;
+    --surface: #1A1B29; --bg-elevated: #1A1B29; --panel: #1A1B29;
+    --panel-2: #232437;
+    --border: #2B2C42; --border-soft: #232438; --divider: #272840;
+    --overlay: rgba(4, 6, 16, .6);
+    --text: #EEEFFA;
+    --text-secondary: #A3A8C4; --text-muted: #A3A8C4;
+    --text-hint: #767C9F; --text-dim: #767C9F; --text-disabled: #565C80;
+    --primary: #8C74FF; --accent: #8C74FF; --ai: #8C74FF;
+    --secondary: #7D93FF; --accent-2: #7D93FF;
+    --accent-strong: #A18DFF;
+    --primary-soft: #2A2452; --ai-soft: #2A2452; --grad: #8C74FF;
+    --grad-primary: linear-gradient(135deg, #8C74FF, #6244E8);
+    --grad-soft: linear-gradient(135deg, #232043, #1D1A36);
+    --grad-success: linear-gradient(135deg, #16352A, #132D24);
+    --review: #FB923C; --review-soft: #33241A;
+    --good: #3DD598; --success: #3DD598; --good-soft: #17392C;
+    --warn: #FFC062; --warning: #FFC062; --warn-soft: #3A2E17;
+    --bad: #FF6F82; --error: #FF6F82; --bad-soft: #3C2027;
+    --elev-1: 0 0 0 1px rgba(255,255,255,.03);
+    --elev-2: 0 8px 24px rgba(0,0,0,.4);
+    --elev-3: 0 10px 30px rgba(0,0,0,.55);
   }
 }
 
@@ -495,17 +524,32 @@ code, pre, .mono {
   font-variant-numeric: tabular-nums;
 }
 /* Lối vào ngữ cảnh cuối trang chapters — 3 chip nhỏ 1 hàng */
+/* Bộ 3 lối vào (Lộ trình / Wiki / Luyện tập) — GHIM góc phải dưới, cuộn theo trang */
 .ch-links {
+  position: fixed;
+  right: 24px;
+  /* Nổi phía TRÊN bottom tab bar mới */
+  bottom: calc(var(--bottomnav-h) + env(safe-area-inset-bottom, 0px) + 16px);
+  z-index: 30;
   display: flex;
-  flex-wrap: wrap;
-  gap: var(--sp-2);
-  justify-content: center;
-  margin-top: var(--sp-5);
+  flex-direction: column;
+  align-items: stretch;
+  gap: 8px;
+  width: min(200px, calc(100vw - 32px));
 }
 .ch-links .btn {
+  justify-content: center;
   border-radius: var(--radius-chip);
   font-size: 13px;
-  padding: 8px 18px;
+  padding: 10px 18px;
+  box-shadow: var(--elev-2);
+}
+@media (max-width: 768px) {
+  .ch-links {
+    right: 12px;
+    bottom: calc(80px + env(safe-area-inset-bottom));
+    width: min(184px, calc(100vw - 24px));
+  }
 }
 
 /* ================================================================

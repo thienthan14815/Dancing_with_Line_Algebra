@@ -255,3 +255,245 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* ==================================================================
+   FORMULA TAB — thư viện công thức (prefix "fx-").
+   Token-thuần, không hex trần, nền phẳng. Card collapse 4 phần:
+   Công thức / Trực giác / Dẫn xuất / Ví dụ.
+   ================================================================== */
+
+/* ---- Hàng tab: Ký hiệu | Công thức (segmented control) ---- */
+.fx-tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: var(--sp-3);
+}
+.fx-tab {
+  min-height: 44px;
+  padding: 8px 20px;
+  font-size: var(--fs-body);
+  font-family: var(--font);
+  font-weight: 600;
+  color: var(--text-secondary);
+  background: var(--panel-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-chip);
+  cursor: pointer;
+  transition: color var(--dur-2) var(--ease), background var(--dur-2) var(--ease),
+    border-color var(--dur-2) var(--ease);
+}
+.fx-tab:hover {
+  color: var(--text);
+  border-color: var(--primary);
+}
+.fx-tab-active {
+  color: var(--primary);
+  background: var(--primary-soft);
+  border-color: transparent;
+}
+
+/* ---- Danh sách công thức (mặc định gọn) ---- */
+.fx-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.fx-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--elev-1);
+  overflow: hidden;
+  transition: box-shadow var(--dur-2) var(--ease), border-color var(--dur-2) var(--ease);
+}
+.fx-card:hover {
+  box-shadow: var(--elev-2);
+}
+.fx-card.fx-open {
+  border-color: var(--primary);
+}
+
+/* ---- Đầu thẻ: bấm để mở/đóng ---- */
+.fx-card-head {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px var(--sp-3);
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  font-family: var(--font);
+  transition: background var(--dur-2) var(--ease);
+}
+.fx-card-head:hover {
+  background: var(--panel-2);
+}
+.fx-head-names {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+  min-width: 0;
+}
+.fx-name {
+  font-weight: 650;
+  font-size: var(--fs-body);
+  color: var(--text);
+  letter-spacing: -0.01em;
+}
+.fx-en {
+  font-size: var(--fs-caption);
+  color: var(--text-hint);
+  font-style: italic;
+}
+.fx-head-tex {
+  font-family: var(--font-mono);
+  font-size: 15px;
+  color: var(--text-secondary);
+  max-width: 42%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.fx-head-tex .katex {
+  white-space: nowrap;
+}
+.fx-toggle {
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  line-height: 1;
+  color: var(--text-secondary);
+  background: var(--panel-2);
+  border-radius: var(--radius-chip);
+  font-variant-numeric: tabular-nums;
+}
+.fx-open .fx-toggle {
+  color: var(--primary);
+  background: var(--primary-soft);
+}
+
+/* ---- Thân thẻ mở rộng ---- */
+.fx-body {
+  padding: 0 var(--sp-3) var(--sp-3);
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+  border-top: 1px solid var(--border-soft);
+  animation: fx-reveal var(--dur-2) var(--ease);
+}
+@keyframes fx-reveal {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.fx-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.fx-label {
+  font-size: var(--fs-caption);
+  font-weight: 700;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  color: var(--text-hint);
+}
+.fx-text {
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--text);
+  margin: 0;
+}
+
+/* ---- Callout công thức (block TeX, màu nhấn nhẹ) ---- */
+.fx-formula {
+  background: var(--primary-soft);
+  border-radius: var(--radius-sm);
+  padding: 16px;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+/* ---- Các bước dẫn xuất ---- */
+.fx-steps {
+  margin: 0;
+  padding-left: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.fx-steps li {
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--text);
+}
+.fx-steps li::marker {
+  color: var(--text-hint);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---- Callout ví dụ (nền trung tính) ---- */
+.fx-example {
+  background: var(--panel-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 12px 16px;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+.fx-example-note {
+  font-size: 12px;
+  color: var(--text-hint);
+  margin: 6px 0 0;
+  line-height: 1.5;
+}
+
+/* KaTeX block trong công thức/ví dụ không vỡ layout */
+.fx-formula .katex-display,
+.fx-example .katex-display {
+  margin: 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+/* ---- Link "Học kỹ năng liên quan" (pill primary) ---- */
+.fx-see {
+  padding-top: 4px;
+}
+.fx-see a {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: var(--fs-caption);
+  font-weight: 600;
+  color: var(--primary);
+  background: var(--primary-soft);
+  border-radius: var(--radius-chip);
+  padding: 8px 16px;
+  text-decoration: none;
+  transition: color var(--dur-2) var(--ease);
+}
+.fx-see a:hover {
+  color: var(--accent-strong);
+  text-decoration: none;
+}
+
+@media (max-width: 640px) {
+  .fx-head-tex {
+    display: none;
+  }
+}

@@ -2,6 +2,7 @@
 // Triết lý: Deep Learning = Đại số tuyến tính ÁP DỤNG. Mỗi bài BẮC CẦU rõ ràng
 // về các chương LA: least squares (Ch.7–8), dạng toàn phương lồi (Ch.9),
 // matVec & dot product (Ch.1, Ch.3), eigenvalue (Ch.5), chuẩn vector (Ch.1).
+import TensorLesson from './TensorLesson';
 import LinearRegressionLesson from './LinearRegressionLesson';
 import GradientDescentLesson from './GradientDescentLesson';
 import SoftmaxLesson from './SoftmaxLesson';
@@ -9,6 +10,8 @@ import GeneralizationLesson from './GeneralizationLesson';
 
 export default function Chapter({ lessonId }: { lessonId: string }) {
   switch (lessonId) {
+    case 'tensor':
+      return <TensorLesson />;
     case 'linear-regression':
       return <LinearRegressionLesson />;
     case 'gradient-descent':

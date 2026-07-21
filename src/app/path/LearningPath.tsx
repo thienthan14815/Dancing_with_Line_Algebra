@@ -1,25 +1,89 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState, type KeyboardEvent as ReactKeyboardEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
+import {
+  Check,
+  Lock,
+  ChevronDown,
+  Compass,
+  ArrowUpRight,
+  Rows3,
+  Grid3x3,
+  Box,
+  Aperture,
+  Layers,
+  Code,
+  Ruler,
+  Orbit,
+  Brain,
+  Network,
+  Sparkles,
+  Gauge,
+  BookMarked,
+} from 'lucide-react';
 import { COURSE, flatMicroLessons } from '../../core/content/course';
 import type { MicroLesson, Section } from '../../core/content/types';
 import { useLearnStore } from '../../core/progress/store';
 import { useCompletion } from '../state/completion';
 import { lessonDone, sectionProgress } from '../lib/progress';
-import { Card, Button, ProgressRing, PathNode } from '../ui';
-import type { PathNodeState } from '../ui';
+import './path.css';
 
-const KIND_ICON: Record<string, string> = {
-  concept: '📘',
-  practice: '✏️',
-  review: '🏆',
-  challenge: '⚡',
+// ---------------------------------------------------------------------------
+// PHÂN MỨC SECTION (Interfaces #8) — suy từ id chương gốc `ch{n}-…`.
+//   ch0–ch3 = CƠ BẢN · ch4–ch6 = TRUNG CẤP · ch7–ch9 = NÂNG CAO ·
+//   ch10–ch13 = AI & DEEP LEARNING · mọi section khác (module registry) = MỞ RỘNG.
+// Dùng chính pattern id mà registry dành riêng cho 14 chương gốc → mọi module
+// (id không phải `ch0..ch13`) tự rơi vào "MỞ RỘNG".
+// ---------------------------------------------------------------------------
+type LevelKey = 'basic' | 'intermediate' | 'advanced' | 'ai' | 'ext';
+
+// Mọi icon lucide chung một kiểu component — mượn `typeof` cho gọn & an toàn kiểu.
+type IconCmp = typeof BookMarked;
+
+// Icon minh hoạ theo chương gốc (gợi ý trong contract). Module → BookMarked.
+const VISUAL: Record<number, IconCmp> = {
+  0: Compass,
+  1: ArrowUpRight,
+  2: Rows3,
+  3: Grid3x3,
+  4: Box,
+  5: Aperture,
+  6: Layers,
+  7: Code,
+  8: Ruler,
+  9: Orbit,
+  10: Brain,
+  11: Network,
+  12: Sparkles,
+  13: Gauge,
 };
 
-// Độ lệch trái/phải xen kẽ để tạo đường đi uốn lượn (biên độ gọn hơn bản cũ).
-const OFFSETS = [0, 44, 66, 44, 0, -44, -66, -44];
+interface LevelInfo {
+  key: LevelKey;
+  label: string;
+  icon: IconCmp;
+}
 
-// Trạng thái 1 chip mini-map (theo tiến độ section).
-type ChipState = 'done' | 'current' | 'available' | 'locked';
+function levelInfo(section: Section): LevelInfo {
+  const m = /^ch(\d+)-/.exec(section.id);
+  const n = m ? Number(m[1]) : NaN;
+  if (m && n <= 3) return { key: 'basic', label: 'CƠ BẢN', icon: VISUAL[n] ?? BookMarked };
+  if (m && n <= 6) return { key: 'intermediate', label: 'TRUNG CẤP', icon: VISUAL[n] ?? BookMarked };
+  if (m && n <= 9) return { key: 'advanced', label: 'NÂNG CAO', icon: VISUAL[n] ?? BookMarked };
+  if (m && n <= 13) return { key: 'ai', label: 'AI & DEEP LEARNING', icon: VISUAL[n] ?? BookMarked };
+  return { key: 'ext', label: 'MỞ RỘNG', icon: BookMarked };
+}
+
+// Bộ lọc theo mức (khớp phân mức trên).
+const FILTERS: { key: 'all' | LevelKey; label: string }[] = [
+  { key: 'all', label: 'Tất cả' },
+  { key: 'basic', label: 'Cơ bản' },
+  { key: 'intermediate', label: 'Trung cấp' },
+  { key: 'advanced', label: 'Nâng cao' },
+  { key: 'ai', label: 'AI & DL' },
+  { key: 'ext', label: 'Mở rộng' },
+];
+
+type NodeStatus = 'completed' | 'current' | 'available' | 'locked';
 
 export default function LearningPath() {
   const navigate = useNavigate();
@@ -28,19 +92,22 @@ export default function LearningPath() {
 
   const flat = useMemo(() => flatMicroLessons(), []);
 
-  // Bài "hiện tại" = bài chưa xong đầu tiên theo trình tự học phẳng.
+  // Bài "hiện tại" = micro-lesson chưa xong đầu tiên theo trình tự học phẳng.
   const currentIdx = useMemo(
     () => flat.findIndex((f) => !lessonDone(f.lesson, mastery, done)),
     [flat, mastery, done],
   );
   const current = currentIdx >= 0 ? flat[currentIdx] : undefined;
+  const currentSectionId = current?.sectionId;
+
+  // Map lessonId → chỉ số phẳng (để nhận diện "bài kế tiếp").
   const globalIndex = useMemo(() => {
     const m = new Map<string, number>();
     flat.forEach((f, i) => m.set(f.lesson.id, i));
     return m;
   }, [flat]);
 
-  // Section mở khóa khi mọi prerequisite đạt >= 60% (soft-lock).
+  // Soft-lock: section mở khoá khi MỌI prerequisite đạt ≥ 60%.
   const unlocked = useMemo(() => {
     const map = new Map<string, boolean>();
     for (const s of COURSE.sections) {
@@ -54,222 +121,285 @@ export default function LearningPath() {
     return map;
   }, [mastery, done]);
 
-  const nodeState = (lesson: MicroLesson, sectionId: string): PathNodeState => {
-    if (lessonDone(lesson, mastery, done)) return 'done';
-    if (globalIndex.get(lesson.id) === currentIdx) return 'current';
-    return unlocked.get(sectionId) ? 'available' : 'locked';
+  // Phân mức + icon: tính 1 lần (không phụ thuộc tiến độ).
+  const levels = useMemo(
+    () => new Map(COURSE.sections.map((s) => [s.id, levelInfo(s)] as const)),
+    [],
+  );
+  const hasExt = useMemo(
+    () => COURSE.sections.some((s) => levels.get(s.id)?.key === 'ext'),
+    [levels],
+  );
+
+  // Tiến độ tổng (mọi micro-lesson).
+  const { doneCount, total } = useMemo(() => {
+    let d = 0;
+    for (const f of flat) if (lessonDone(f.lesson, mastery, done)) d += 1;
+    return { doneCount: d, total: flat.length };
+  }, [flat, mastery, done]);
+  const overallPct = total ? Math.round((doneCount / total) * 100) : 0;
+
+  const currentSection = currentSectionId
+    ? COURSE.sections.find((s) => s.id === currentSectionId)
+    : undefined;
+
+  // ----- Bộ lọc -----
+  const [filter, setFilter] = useState<'all' | LevelKey>('all');
+  const visibleSections = useMemo(
+    () =>
+      filter === 'all'
+        ? COURSE.sections
+        : COURSE.sections.filter((s) => levels.get(s.id)?.key === filter),
+    [filter, levels],
+  );
+
+  // ----- Mở/thu node (nhiều node cùng mở; current mặc định mở) -----
+  const [expanded, setExpanded] = useState<Set<string>>(() => {
+    const s = new Set<string>();
+    if (currentSectionId) s.add(currentSectionId);
+    return s;
+  });
+  const toggle = (section: Section) => {
+    if (!(unlocked.get(section.id) ?? true)) return; // locked: không mở
+    setExpanded((prev) => {
+      const next = new Set(prev);
+      if (next.has(section.id)) next.delete(section.id);
+      else next.add(section.id);
+      return next;
+    });
   };
 
-  // ------ ACCORDION (chỉ 1 section mở) + MINI-MAP ------
-  // Section mặc định mở = section chứa bài hiện tại; hết bài → section cuối.
-  const lastSectionId = COURSE.sections[COURSE.sections.length - 1].id;
-  const defaultExpandedId = current?.sectionId ?? lastSectionId;
-  // null = chưa tương tác (bám theo mặc định); '' = người dùng đã thu hết.
-  const [expandedId, setExpandedId] = useState<string | null>(null);
-  const effectiveExpanded = expandedId === null ? defaultExpandedId : expandedId;
-
-  // Ref tới từng <section> để cuộn tới khi chọn.
-  const sectionRefs = useRef<Record<string, HTMLElement | null>>({});
-  const scrollToSection = (id: string) => {
-    sectionRefs.current[id]?.scrollIntoView({ block: 'start', behavior: 'smooth' });
-  };
-
-  // Auto: khi mount, cuộn tới section đang mở (bỏ qua nếu là section đầu để
-  // vẫn thấy thẻ "TIẾP TỤC").
+  // ----- Auto-scroll tới node current khi mount -----
+  const nodeRefs = useRef<Record<string, HTMLLIElement | null>>({});
   const didMount = useRef(false);
   useEffect(() => {
     if (didMount.current) return;
     didMount.current = true;
-    const idx = COURSE.sections.findIndex((s) => s.id === effectiveExpanded);
+    if (!currentSectionId) return;
+    // Bỏ qua nếu current là section đầu (không cần cuộn).
+    const idx = COURSE.sections.findIndex((s) => s.id === currentSectionId);
     if (idx > 0) {
-      requestAnimationFrame(() => scrollToSection(effectiveExpanded));
+      requestAnimationFrame(() => {
+        nodeRefs.current[currentSectionId]?.scrollIntoView({
+          block: 'center',
+          behavior: 'smooth',
+        });
+      });
     }
     // Chỉ chạy 1 lần lúc mount.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Click header: mở section (single-open) hoặc thu nếu đang mở.
-  const toggleSection = (id: string) => {
-    const willOpen = effectiveExpanded !== id;
-    setExpandedId(willOpen ? id : '');
-    if (willOpen) requestAnimationFrame(() => scrollToSection(id));
-  };
-
-  // Click chip mini-map: luôn mở section đó + cuộn tới.
-  const selectSection = (id: string) => {
-    setExpandedId(id);
-    requestAnimationFrame(() => scrollToSection(id));
-  };
-
-  const chipState = (section: Section): ChipState => {
-    const prog = sectionProgress(section, mastery, done);
-    if (prog.pct >= 1) return 'done';
-    if (section.id === current?.sectionId) return 'current';
+  const statusOf = (section: Section): NodeStatus => {
+    const pct = sectionProgress(section, mastery, done).pct;
+    if (pct >= 1) return 'completed';
+    if (section.id === currentSectionId) return 'current';
     return (unlocked.get(section.id) ?? true) ? 'available' : 'locked';
   };
 
-  const laSections = COURSE.sections.filter((s) => s.num < 10);
-  const dlSections = COURSE.sections.filter((s) => s.num >= 10);
-
-  const renderChip = (section: Section) => {
-    const cs = chipState(section);
-    const active = section.id === effectiveExpanded;
-    return (
-      <button
-        key={section.id}
-        type="button"
-        className={`dl-mini-chip dl-mini-${cs}${active ? ' active' : ''}`}
-        onClick={() => selectSection(section.id)}
-        title={`Chương ${section.num}: ${section.title}`}
-        aria-label={`Chương ${section.num}: ${section.title}`}
-        aria-current={active ? 'true' : undefined}
-      >
-        {section.num}
-      </button>
-    );
-  };
+  const prereqNames = (section: Section): string =>
+    (section.prerequisiteSectionIds ?? [])
+      .map((id) => {
+        const s = COURSE.sections.find((x) => x.id === id);
+        return s ? `Chương ${s.num}: ${s.title}` : null;
+      })
+      .filter(Boolean)
+      .join(', ');
 
   return (
-    <div className="dl-page dl-path">
-      {/* Thẻ TIẾP TỤC */}
-      <Card className="dl-continue">
-        {current ? (
-          <>
-            <div className="dl-continue-info">
-              <h2 className="dl-continue-title">{current.lesson.title}</h2>
-            </div>
-            <Button size="lg" onClick={() => navigate(`/learn/${current.lesson.id}`)}>
-              Tiếp tục →
-            </Button>
-          </>
-        ) : (
-          <div className="dl-continue-info">
-            <h2 className="dl-continue-title">Đã đi hết lộ trình 🎉</h2>
-          </div>
-        )}
-      </Card>
+    <div className="la-page rn-page">
+      {/* (1) TitleBlock */}
+      <header className="rn-head">
+        <h1 className="rn-head-title">Lộ trình học ✦</h1>
+        <p className="rn-head-sub">Học theo lộ trình từ cơ bản đến nâng cao.</p>
+      </header>
 
-      {/* Mini-map: dải chip 14 chương, chia 2 nhóm — sticky dưới TopBar */}
-      <nav className="dl-minimap" aria-label="Bản đồ chương">
-        <div className="dl-minimap-group">
-          <span className="dl-minimap-group-label">Đại số tuyến tính</span>
-          <div className="dl-minimap-chips">{laSections.map(renderChip)}</div>
+      {/* (2) Thẻ tổng quan tiến độ */}
+      <section className="la-card-xl rn-summary" aria-label="Tiến độ tổng">
+        <div className="rn-summary-top">
+          <span className="rn-summary-label">Tiến độ tổng</span>
+          <span className="rn-summary-pct">{overallPct}%</span>
         </div>
-        <div className="dl-minimap-group">
-          <span className="dl-minimap-group-label">Deep Learning</span>
-          <div className="dl-minimap-chips">{dlSections.map(renderChip)}</div>
+        <div
+          className="la-progress"
+          role="progressbar"
+          aria-valuemin={0}
+          aria-valuemax={100}
+          aria-valuenow={overallPct}
+        >
+          <i style={{ width: `${overallPct}%` }} />
         </div>
-      </nav>
+        <p className="rn-summary-cap">
+          {doneCount}/{total} bài ·{' '}
+          {currentSection
+            ? `Đang ở: Chương ${currentSection.num} — ${currentSection.title}`
+            : 'Đã hoàn thành toàn bộ lộ trình 🎉'}
+        </p>
+      </section>
 
-      {COURSE.sections.map((section: Section) => {
-        const prog = sectionProgress(section, mastery, done);
-        const isUnlocked = unlocked.get(section.id) ?? true;
-        const isOpen = section.id === effectiveExpanded;
-        const lessons = section.units.flatMap((u) => u.lessons);
-        return (
-          <section
-            key={section.id}
-            ref={(el) => {
-              sectionRefs.current[section.id] = el;
-            }}
-            className="dl-section"
+      {/* (3) Bộ lọc theo mức */}
+      <div className="la-chip-row rn-filters" role="group" aria-label="Lọc theo mức độ">
+        {FILTERS.filter((f) => f.key !== 'ext' || hasExt).map((f) => (
+          <button
+            key={f.key}
+            type="button"
+            aria-pressed={filter === f.key}
+            className={`la-chip${filter === f.key ? ' active' : ''}`}
+            onClick={() => setFilter(f.key)}
           >
-            <div
-              className={`dl-section-head ${isUnlocked ? '' : 'locked'} ${isOpen ? 'open' : ''}`}
-              role="button"
-              tabIndex={0}
-              aria-expanded={isOpen}
-              onClick={() => toggleSection(section.id)}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                  e.preventDefault();
-                  toggleSection(section.id);
-                }
-              }}
-            >
-              <div className="dl-section-num">{section.num}</div>
-              <div className="dl-section-meta">
-                <h3 className="dl-section-title">{section.title}</h3>
-              </div>
-              <div className="dl-section-aside">
-                <ProgressRing
-                  progress={prog.pct}
-                  size={44}
-                  color={prog.pct >= 1 ? 'var(--good)' : 'var(--primary)'}
-                  label={
-                    <span className="dl-section-pct">{Math.round(prog.pct * 100)}%</span>
-                  }
-                />
-                <span className="dl-section-count">
-                  {prog.done}/{prog.total} bài
-                </span>
-              </div>
-              {!isUnlocked && (
-                <span className="dl-section-lock" aria-hidden="true">
-                  🔒
-                </span>
-              )}
-              <span className="dl-section-chevron" aria-hidden="true">
-                {isOpen ? '▾' : '▸'}
-              </span>
-            </div>
+            {f.label}
+          </button>
+        ))}
+      </div>
 
-            {isOpen && (
-              <div className="dl-track">
-                {lessons.map((lesson, i) => {
-                  const st = nodeState(lesson, section.id);
-                  const off = OFFSETS[i % OFFSETS.length];
-                  const isLocked = st === 'locked';
-                  const isCurrent = st === 'current';
-                  return (
-                    <div
-                      key={lesson.id}
-                      className={`dl-node-slot${isCurrent ? ' current' : ''}${
-                        isLocked ? ' locked' : ''
-                      }`}
-                      title={
-                        isLocked ? 'Hoàn thành ≥60% Chương trước để mở' : undefined
-                      }
-                    >
-                      <PathNode
-                        state={st}
-                        label={lesson.title.replace(/ — (Khái niệm|Luyện tập)$/, '')}
-                        sublabel={
-                          isCurrent
-                            ? 'Đang học'
-                            : lesson.kind
-                              ? kindLabel(lesson.kind)
-                              : undefined
-                        }
-                        icon={lesson.kind ? KIND_ICON[lesson.kind] : undefined}
-                        style={{ transform: `translateX(${off}px)` }}
-                        onClick={
-                          isLocked ? undefined : () => navigate(`/learn/${lesson.id}`)
-                        }
-                      />
+      {/* (4) Timeline dọc */}
+      {visibleSections.length === 0 ? (
+        <p className="la-empty">Không có chương nào trong nhóm này.</p>
+      ) : (
+        <ol className="rn-timeline">
+          {visibleSections.map((section, i) => {
+            const info = levels.get(section.id)!;
+            const Icon = info.icon;
+            const status = statusOf(section);
+            const prog = sectionProgress(section, mastery, done);
+            const pct = Math.round(prog.pct * 100);
+            const interactive = status !== 'locked';
+            const isOpen = interactive && expanded.has(section.id);
+            const isLast = i === visibleSections.length - 1;
+
+            const btnProps = interactive
+              ? {
+                  role: 'button' as const,
+                  tabIndex: 0,
+                  'aria-expanded': isOpen,
+                  onClick: () => toggle(section),
+                  onKeyDown: (e: ReactKeyboardEvent) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      toggle(section);
+                    }
+                  },
+                }
+              : {};
+
+            return (
+              <li
+                key={section.id}
+                ref={(el) => {
+                  nodeRefs.current[section.id] = el;
+                }}
+                className="rn-item"
+                data-status={status}
+              >
+                {!isLast && <span className="rn-line" aria-hidden="true" />}
+
+                <span className="rn-badge" aria-hidden="true">
+                  {status === 'completed' ? (
+                    <Check size={20} strokeWidth={2.5} />
+                  ) : (
+                    <span className="rn-badge-num">{section.num}</span>
+                  )}
+                  {status === 'locked' && <Lock className="rn-badge-lock" size={11} />}
+                </span>
+
+                <article className="la-card rn-card">
+                  <div
+                    className="rn-card-btn"
+                    aria-label={`Chương ${section.num}: ${section.title}`}
+                    {...btnProps}
+                  >
+                    <div className="rn-card-head">
+                      <div className="rn-head-mid">
+                        <span className="rn-level">{info.label}</span>
+                        <h2 className="rn-node-title">{section.title}</h2>
+                        <p className="rn-node-sub">{section.subtitle}</p>
+                      </div>
+                      <span className="rn-visual" aria-hidden="true">
+                        <Icon size={22} />
+                      </span>
                     </div>
-                  );
-                })}
-              </div>
-            )}
-          </section>
-        );
-      })}
+
+                    <div className="rn-prog-row">
+                      <div className="la-progress">
+                        <i style={{ width: `${pct}%` }} />
+                      </div>
+                      <span className="rn-pct">{pct}%</span>
+                      {interactive && (
+                        <ChevronDown
+                          className="rn-chevron"
+                          size={18}
+                          data-open={isOpen}
+                          aria-hidden="true"
+                        />
+                      )}
+                    </div>
+                  </div>
+
+                  {isOpen && (
+                    <div className="rn-units">
+                      {section.units.map((unit) => (
+                        <div key={unit.id} className="rn-unit">
+                          <p className="rn-unit-name">{unit.title}</p>
+                          <div className="rn-lessons">
+                            {unit.lessons.map((lesson) => {
+                              const isDoneLesson = lessonDone(lesson, mastery, done);
+                              const isNext = globalIndex.get(lesson.id) === currentIdx;
+                              const state = isDoneLesson
+                                ? 'done'
+                                : isNext
+                                  ? 'next'
+                                  : 'normal';
+                              return (
+                                <button
+                                  key={lesson.id}
+                                  type="button"
+                                  className="rn-lesson"
+                                  data-state={state}
+                                  title={lesson.title}
+                                  aria-label={lesson.title}
+                                  onClick={() => navigate(`/learn/${lesson.id}`)}
+                                >
+                                  {isDoneLesson && (
+                                    <Check size={14} strokeWidth={2.5} aria-hidden="true" />
+                                  )}
+                                  {chipLabel(lesson)}
+                                </button>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  {status === 'locked' && (
+                    <p className="rn-lock-note">
+                      <Lock size={13} aria-hidden="true" />
+                      Hoàn thành {prereqNames(section) || 'chương trước'} ≥ 60% để mở khóa.
+                    </p>
+                  )}
+                </article>
+              </li>
+            );
+          })}
+        </ol>
+      )}
     </div>
   );
 }
 
-function kindLabel(kind: string): string {
-  switch (kind) {
+/** Nhãn ngắn cho lesson-chip theo loại micro-lesson. */
+function chipLabel(lesson: MicroLesson): string {
+  switch (lesson.kind) {
     case 'concept':
       return 'Khái niệm';
     case 'practice':
       return 'Luyện tập';
     case 'review':
-      return 'Ôn tập';
+      return 'Ôn tập chương';
     case 'challenge':
       return 'Thử thách';
     default:
-      return kind;
+      return lesson.title;
   }
 }

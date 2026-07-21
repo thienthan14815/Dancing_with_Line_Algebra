@@ -5,6 +5,8 @@ import type {
   MicroLesson,
   FlatMicroLesson,
 } from './types';
+// Content module (giáo án plugin) — merge additive vào COURSE, giữ nguyên 14 chương gốc.
+import { moduleSections } from '../../content/registry';
 
 // ---------------------------------------------------------------------------
 // DỮ LIỆU NGUỒN — sao chép TĨNH từ src/chapters/registry.ts (chỉ đọc).
@@ -177,6 +179,7 @@ const CHAPTER_SEED: ChapterSeed[] = [
     en: 'Machine Learning & Regression',
     subtitle: 'Từ Least Squares đến mô hình học máy',
     lessons: [
+      { id: 'tensor', title: 'Tensor — dữ liệu của Deep Learning', skills: ['tensor_basics', 'tensor_memory', 'tensor_ops'] },
       { id: 'linear-regression', title: 'Hồi quy tuyến tính = Least Squares', skills: ['linear_regression_ml'] },
       { id: 'gradient-descent', title: 'Gradient Descent', skills: ['gradient_descent'] },
       { id: 'softmax', title: 'Hồi quy Softmax & phân loại', skills: ['softmax_regression'] },
@@ -288,7 +291,11 @@ function buildSection(chapter: ChapterSeed, index: number): Section {
 export const COURSE: Course = {
   id: 'linalglab',
   title: 'LinAlgLab — Đại số tuyến tính',
-  sections: CHAPTER_SEED.map(buildSection),
+  // 14 chương gốc + section từ content module, sort theo num (sort ổn định:
+  // các num bằng nhau giữ nguyên thứ tự khai báo, nên 14 chương gốc bất biến).
+  sections: [...CHAPTER_SEED.map(buildSection), ...moduleSections].sort(
+    (a, b) => a.num - b.num,
+  ),
 };
 
 // ---------------------------------------------------------------------------

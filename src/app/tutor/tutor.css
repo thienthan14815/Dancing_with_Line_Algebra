@@ -172,3 +172,410 @@
   line-height: 1.45;
   color: rgba(255, 255, 255, 0.55);
 }
+
+/* =========================================================================
+   AI TUTOR HUB (màn "Gia sư AI" / screen aiTutor) — style riêng prefix tt-.
+   Chỉ dùng token var() cho màu/gradient/shadow/radius/motion. Dark mode do
+   token lo. Các class shared .la-* do SHELL định nghĩa (chỉ dùng, không đặt lại).
+   ========================================================================= */
+
+.tt-hub {
+  display: flex;
+  flex-direction: column;
+}
+
+/* --- 1) Hero nhân vật Linal (căn giữa) --- */
+.tt-hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 8px;
+}
+
+.tt-hero-title {
+  margin: 4px 0 0;
+  font-size: var(--fs-heading);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--text);
+}
+
+.tt-hero-sub {
+  margin: 0;
+  max-width: 44ch;
+  font-size: var(--fs-caption);
+  line-height: 1.55;
+  color: var(--text-secondary);
+}
+
+/* --- 2) Quick action grid 2×2 --- */
+.tt-quick {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.tt-qa {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 10px;
+  min-height: 92px;
+  width: 100%;
+  font: inherit;
+  color: var(--text);
+  text-align: left;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    border-color var(--dur-1) var(--ease),
+    box-shadow var(--dur-1) var(--ease),
+    transform var(--dur-1) var(--ease);
+}
+
+.tt-qa:hover {
+  border-color: var(--primary);
+}
+
+.tt-qa:active {
+  transform: translateY(1px);
+}
+
+.tt-qa:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.tt-qa-ico {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 999px;
+  background: var(--primary-soft);
+  color: var(--primary);
+}
+
+.tt-qa-label {
+  font-size: var(--fs-caption);
+  font-weight: 600;
+  line-height: 1.3;
+  color: var(--text);
+}
+
+/* --- 3) Card gợi ý học tập --- */
+.tt-tip {
+  margin-top: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.tt-tip-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.tt-tip-ico {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  background: var(--warn-soft);
+  color: var(--warn);
+}
+
+.tt-tip-label {
+  font-size: var(--fs-small);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-secondary);
+}
+
+.tt-tip-title {
+  margin: 0;
+  font-size: var(--fs-title);
+  font-weight: 700;
+  color: var(--text);
+}
+
+.tt-tip-sub {
+  margin: 0;
+  font-size: var(--fs-caption);
+  color: var(--text-secondary);
+}
+
+.tt-tip-cta {
+  align-self: flex-start;
+  margin-top: 4px;
+}
+
+/* --- 4) Suggestion chips --- */
+.tt-suggest {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 20px;
+}
+
+.tt-suggest-label {
+  margin: 0;
+  font-size: var(--fs-small);
+  font-weight: 600;
+  color: var(--text-hint);
+}
+
+.tt-suggest-chip {
+  flex: 0 0 auto;
+  cursor: pointer;
+  transition: border-color var(--dur-1) var(--ease);
+}
+
+.tt-suggest-chip:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+/* --- 5) Lỗi gần đây (mistake chips) --- */
+.tt-mistakes {
+  display: block;
+}
+
+.tt-mistake-row {
+  margin-bottom: 12px;
+}
+
+.tt-mistake-chip {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  max-width: 240px;
+  padding: 8px 14px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  color: var(--text);
+  text-align: left;
+  cursor: pointer;
+  transition:
+    border-color var(--dur-1) var(--ease),
+    background var(--dur-1) var(--ease);
+}
+
+.tt-mistake-chip:hover {
+  border-color: var(--primary);
+}
+
+.tt-mistake-chip.active {
+  border-color: var(--primary);
+  background: var(--primary-soft);
+}
+
+.tt-mistake-chip:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.tt-mistake-skill {
+  font-size: var(--fs-small);
+  font-weight: 700;
+  color: var(--primary);
+}
+
+.tt-mistake-prompt {
+  max-width: 100%;
+  font-size: var(--fs-caption);
+  color: var(--text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* --- 6) Kết quả tìm kiếm của composer --- */
+.tt-results {
+  margin-top: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.tt-results-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: var(--fs-body);
+  font-weight: 700;
+  color: var(--text);
+}
+
+.tt-results-head svg {
+  color: var(--primary);
+}
+
+.tt-results-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.tt-result {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-md);
+  background: var(--panel-2);
+  color: var(--text);
+  text-align: left;
+  cursor: pointer;
+  transition: border-color var(--dur-1) var(--ease);
+}
+
+.tt-result:hover {
+  border-color: var(--primary);
+}
+
+.tt-result:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.tt-result-ico {
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: var(--primary-soft);
+  color: var(--primary);
+}
+
+.tt-result-main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.tt-result-title {
+  font-size: var(--fs-caption);
+  font-weight: 600;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.tt-result-sub {
+  font-size: var(--fs-small);
+  color: var(--text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.tt-result-badge {
+  flex: 0 0 auto;
+}
+
+.tt-api-note {
+  margin: 4px 0 0;
+  font-size: var(--fs-small);
+  color: var(--text-hint);
+}
+
+/* --- 7) Composer --- */
+.tt-composer {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 20px;
+  /* Mobile: dính ngay trên bottom bar, nền che nội dung cuộn phía dưới. */
+  position: sticky;
+  bottom: calc(var(--bottomnav-h) + env(safe-area-inset-bottom, 0px) + 8px);
+  z-index: 20;
+  padding: 10px 0 6px;
+  background: var(--bg);
+}
+
+.tt-composer-input {
+  flex: 1 1 auto;
+  min-width: 0;
+  height: 52px;
+  padding: 0 20px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-chip);
+  background: var(--surface);
+  color: var(--text);
+  font-family: inherit;
+  font-size: var(--fs-body);
+}
+
+.tt-composer-input::placeholder {
+  color: var(--text-hint);
+}
+
+.tt-composer-input:focus-visible {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px var(--primary-soft);
+}
+
+.tt-send {
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border: none;
+  border-radius: 999px;
+  background: var(--grad-primary);
+  color: var(--on-primary);
+  box-shadow: var(--elev-3);
+  cursor: pointer;
+  transition: transform var(--dur-1) var(--ease);
+}
+
+.tt-send:active {
+  transform: translateY(1px);
+}
+
+.tt-send:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* Desktop/tablet: composer nằm cuối cột (không dính). */
+@media (min-width: 768px) {
+  .tt-composer {
+    position: static;
+    padding: 0;
+    margin-top: 24px;
+    background: transparent;
+  }
+}
+
+/* ≤360px: quick action co còn 2 cột nhưng padding gọn hơn. */
+@media (max-width: 360px) {
+  .tt-quick {
+    gap: 10px;
+  }
+
+  .tt-qa {
+    min-height: 84px;
+  }
+}

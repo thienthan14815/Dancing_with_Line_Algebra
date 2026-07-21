@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Lesson, Section } from './components/Lesson';
+import { Lesson, Section, LessonViewProvider } from './components/Lesson';
 import MathText from './components/MathText';
 import Canvas2D, { type V2 } from './components/Canvas2D';
 import Scene3D from './components/Scene3D';
@@ -27,6 +27,8 @@ export default function DevCheck() {
 
   return (
     <div className="page">
+      {/* Trang QA: hiển thị đủ MỌI loại section (kể cả quiz) */}
+      <LessonViewProvider view="all">
       <Lesson id="dev-check" title="🧪 Dev Check — Bảng kiểm mọi component">
         <p className="muted">
           Trang QA: mọi component nền móng với dữ liệu mẫu. Kiểm tra bằng mắt trước khi bàn giao.
@@ -174,6 +176,7 @@ print('norm(v) =', np.linalg.norm(v))`}
           />
         </Section>
       </Lesson>
+      </LessonViewProvider>
     </div>
   );
 }

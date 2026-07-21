@@ -22,6 +22,7 @@ export default function NumericInputVariant({
 
   return (
     <div className="dl-num">
+      {/* ⌫ / C nằm cạnh ô nhập → keypad chỉ 4 hàng, gói vừa 1 màn hình. */}
       <div className="dl-num-field">
         <input
           className="dl-num-input"
@@ -33,6 +34,24 @@ export default function NumericInputVariant({
           onChange={(e) => onChange(e.target.value)}
         />
         {exercise.unit && <span className="dl-num-unit">{exercise.unit}</span>}
+        <button
+          type="button"
+          className="dl-num-ctl"
+          disabled={disabled}
+          aria-label="Xoá ký tự cuối"
+          onClick={() => !disabled && onChange(value.slice(0, -1))}
+        >
+          ⌫
+        </button>
+        <button
+          type="button"
+          className="dl-num-ctl"
+          disabled={disabled}
+          aria-label="Xoá hết"
+          onClick={() => !disabled && onChange('')}
+        >
+          C
+        </button>
       </div>
       <div className="dl-keypad" aria-hidden={disabled}>
         {KEYS.map((k) => (
@@ -46,22 +65,6 @@ export default function NumericInputVariant({
             {k}
           </button>
         ))}
-        <button
-          type="button"
-          className="dl-key dl-key-wide"
-          disabled={disabled}
-          onClick={() => !disabled && onChange(value.slice(0, -1))}
-        >
-          ⌫
-        </button>
-        <button
-          type="button"
-          className="dl-key dl-key-wide"
-          disabled={disabled}
-          onClick={() => !disabled && onChange('')}
-        >
-          C
-        </button>
       </div>
     </div>
   );

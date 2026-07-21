@@ -1,17 +1,14 @@
-import { useState, type ReactNode } from 'react';
+import type { ReactNode } from 'react';
 import TopBar from './TopBar';
-import SideNav from './nav/SideNav';
+import BottomNav from './nav/BottomNav';
 
-/** Khung giao diện: SideNav + TopBar + nội dung định tuyến. */
+/** Khung 1 cột: TopBar trên · nội dung định tuyến · BottomNav đáy (thay sidebar). */
 export default function Shell({ children }: { children: ReactNode }) {
-  const [collapsed, setCollapsed] = useState(false);
   return (
-    <div className={`dl-shell ${collapsed ? 'nav-collapsed' : ''}`}>
-      <SideNav collapsed={collapsed} />
-      <div className="dl-shell-main">
-        <TopBar onMenu={() => setCollapsed((c) => !c)} />
-        <main className="dl-content">{children}</main>
-      </div>
+    <div className="dl-shell">
+      <TopBar />
+      <main className="dl-content">{children}</main>
+      <BottomNav />
     </div>
   );
 }

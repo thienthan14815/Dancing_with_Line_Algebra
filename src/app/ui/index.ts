@@ -10,3 +10,5 @@ export { default as PathNode } from './PathNode';
 export type { PathNodeProps, PathNodeState } from './PathNode';
 export { default as RichText } from './RichText';
 export type { RichTextProps } from './RichText';
+export { default as LinalCharacter } from './LinalCharacter';
+export type { LinalCharacterProps } from './LinalCharacter';

@@ -1,6 +1,8 @@
 import './roadmap.css';
-import { Fragment, useMemo } from 'react';
-import { COURSE, flatMicroLessons } from '../core/content/course';
+import { Fragment, useMemo, useState } from 'react';
+import { GraduationCap, Brain, Box, BarChart3, Check } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
+import { COURSE, flatMicroLessons, getMicroLesson } from '../core/content/course';
 import type { Section, MicroLesson } from '../core/content/types';
 import type { SkillMastery } from '../core/db/schema';
 import { useLearnStore } from '../core/progress/store';
@@ -8,6 +10,8 @@ import { useCompletion } from '../app/state/completion';
 import { lessonDone, sectionProgress } from '../app/lib/progress';
 import { getSkill } from '../core/content/skills';
 import { ProgressRing } from '../app/ui';
+import { GOAL_PATHS, stepMicroLessonId } from './goals';
+import type { GoalId, GoalPath, GoalStep } from './goals';
 
 /* ============================================================
    LỘ TRÌNH SỐNG — Roadmap page (viết lại)
@@ -93,10 +97,152 @@ function Head({ kicker, title, lead }: { kicker: string; title: string; lead?: s
   );
 }
 
+/* ============================================================
+   LỘ TRÌNH THEO MỤC TIÊU (chip đầu trang)
+   "Chuẩn" giữ nguyên UI cũ; 3 mục tiêu còn lại render GoalPathView.
+   Tiến độ mỗi bước bám ĐÚNG cơ chế bước Chuẩn: getMicroLesson +
+   lessonDone(mastery, done) — không tĩnh.
+   ============================================================ */
+const GOAL_ICON: Record<GoalId, LucideIcon> = {
+  standard: GraduationCap,
+  aiml: Brain,
+  graphics: Box,
+  data: BarChart3,
+};
+
+const GOAL_CHIPS: { id: GoalId; label: string }[] = [
+  { id: 'standard', label: 'Chuẩn' },
+  ...GOAL_PATHS.map((g) => ({ id: g.id, label: g.label })),
+];
+
+/** Một bước của lộ trình mục tiêu + trạng thái tiến độ đã suy ra. */
+interface GoalStepView {
+  step: GoalStep;
+  chapterNum?: number;
+  chapterTitle?: string;
+  lessonTitle: string;
+  route: string;
+  done: boolean;
+}
+
+function GoalPathView({
+  path,
+  mastery,
+  done,
+}: {
+  path: GoalPath;
+  mastery: Record<string, SkillMastery>;
+  done: Record<string, string>;
+}) {
+  const Icon = GOAL_ICON[path.id];
+
+  const views: GoalStepView[] = useMemo(
+    () =>
+      path.steps.map((step) => {
+        const microId = stepMicroLessonId(step);
+        const micro = getMicroLesson(microId);
+        const section = COURSE.sections.find((s) => s.id === step.chapterId);
+        return {
+          step,
+          chapterNum: section?.num,
+          chapterTitle: section?.title,
+          lessonTitle: micro?.title ?? step.title,
+          route: `#/learn/${microId}`,
+          done: micro ? lessonDone(micro, mastery, done) : false,
+        };
+      }),
+    [path, mastery, done],
+  );
+
+  const total = views.length;
+  const doneCount = views.filter((v) => v.done).length;
+  const pct = total ? Math.round((doneCount / total) * 100) : 0;
+
+  // Gom bước theo phase, GIỮ thứ tự xuất hiện.
+  const groups: { phase: string; items: GoalStepView[] }[] = [];
+  for (const v of views) {
+    const last = groups[groups.length - 1];
+    if (last && last.phase === v.step.phase) last.items.push(v);
+    else groups.push({ phase: v.step.phase, items: [v] });
+  }
+
+  // Số thứ tự chạy liên tục xuyên suốt các phase.
+  let running = 0;
+
+  return (
+    <div className="gl-path">
+      <div className="gl-path-head">
+        <span className="gl-path-icon" aria-hidden="true">
+          <Icon size={22} />
+        </span>
+        <div className="gl-path-headmeta">
+          <span className="gl-path-kicker">Lộ trình theo mục tiêu</span>
+          <h2 className="gl-path-title">{path.label}</h2>
+          <p className="gl-path-lead">{path.lead}</p>
+        </div>
+      </div>
+
+      <div className="gl-progress">
+        <div className="gl-progress-top">
+          <span className="gl-progress-label">Tiến độ lộ trình này</span>
+          <span className="gl-progress-num">
+            {doneCount}/{total} bước · {pct}%
+          </span>
+        </div>
+        <div className="gl-bar">
+          <span style={{ width: `${pct}%` }} />
+        </div>
+      </div>
+
+      <div className="gl-groups">
+        {groups.map((g) => (
+          <section className="gl-group" key={g.phase}>
+            <h3 className="gl-group-title">{g.phase}</h3>
+            <ol className="gl-steps">
+              {g.items.map((v) => {
+                running += 1;
+                return (
+                  <li
+                    className={`gl-step ${v.done ? 'is-done' : ''}`}
+                    key={stepMicroLessonId(v.step)}
+                  >
+                    <span className="gl-step-marker" aria-hidden="true">
+                      {v.done ? <Check size={14} /> : running}
+                    </span>
+                    <div className="gl-step-body">
+                      <div className="gl-step-titlerow">
+                        <span className="gl-step-title">{v.step.title}</span>
+                        {v.chapterNum != null && (
+                          <span className="gl-step-chip">Ch{v.chapterNum}</span>
+                        )}
+                        {v.done && <span className="gl-step-chip is-done">✓ Đã học</span>}
+                      </div>
+                      <p className="gl-step-desc">{v.step.desc}</p>
+                    </div>
+                    <a className="gl-step-cta" href={v.route}>
+                      {v.done ? 'Ôn lại' : 'Học'} →
+                    </a>
+                  </li>
+                );
+              })}
+            </ol>
+          </section>
+        ))}
+      </div>
+
+      {path.note && <p className="gl-note">📌 {path.note}</p>}
+    </div>
+  );
+}
+
 export default function Roadmap() {
   const mastery = useLearnStore((s) => s.masteryBySkill);
   const profile = useLearnStore((s) => s.profile);
   const done = useCompletion((s) => s.done);
+
+  // Lộ trình theo mục tiêu (chip đầu trang) — state cục bộ, mặc định "Chuẩn".
+  const [goalId, setGoalId] = useState<GoalId>('standard');
+  const activePath = GOAL_PATHS.find((g) => g.id === goalId);
 
   const goal = profile.goal;
   const level = profile.level;
@@ -263,6 +409,30 @@ export default function Roadmap() {
 
   return (
     <div className="page rm-page">
+      {/* ---------- HÀNG CHIP MỤC TIÊU LỘ TRÌNH ---------- */}
+      <div className="gl-goalbar" role="tablist" aria-label="Chọn mục tiêu lộ trình">
+        {GOAL_CHIPS.map((c) => {
+          const Icon = GOAL_ICON[c.id];
+          const active = goalId === c.id;
+          return (
+            <button
+              key={c.id}
+              type="button"
+              role="tab"
+              aria-selected={active}
+              className={`gl-goalchip ${active ? 'is-active' : ''}`}
+              onClick={() => setGoalId(c.id)}
+            >
+              <Icon size={16} />
+              <span>{c.label}</span>
+            </button>
+          );
+        })}
+      </div>
+
+      <div className="gl-swap" key={goalId}>
+        {goalId === 'standard' || !activePath ? (
+          <>
       {/* ---------- 1. HERO — BƯỚC TIẾP THEO NÊN HỌC ---------- */}
       <div className="rm-hero">
         {current ? (
@@ -407,6 +577,11 @@ export default function Roadmap() {
         </div>
         <div className="rm-steps">{DL_SECTIONS.map(renderStep)}</div>
       </section>
+          </>
+        ) : (
+          <GoalPathView path={activePath} mastery={mastery} done={done} />
+        )}
+      </div>
 
       {/* ---------- 5. VÒNG LẶP THỰC HÀNH ---------- */}
       <section className="rm-section">

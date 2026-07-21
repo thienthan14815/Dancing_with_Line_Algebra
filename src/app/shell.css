@@ -10,26 +10,42 @@
      - panel toán (--navy/--vec-*) giữ nguyên; chữ trên nền màu dùng `white`/`--navy`
    ===================================================================== */
 
-/* ---------- Layout khung ---------- */
+/* ---------- Layout khung (1 cột — bottom bar thay sidebar) ---------- */
 .dl-shell {
-  display: flex;
   min-height: 100vh;
   background: var(--bg);
 }
-.dl-shell-main {
-  flex: 1;
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-}
 .dl-content {
-  flex: 1;
   min-width: 0;
+  /* Chừa đáy cho bottom bar trên MỌI trang (kể cả legacy /chapters, /wiki, /cai-dat…) */
+  padding-bottom: calc(var(--bottomnav-h) + env(safe-area-inset-bottom, 0px) + 24px);
 }
 .dl-page {
-  max-width: 760px;
+  max-width: 1080px;
   margin: 0 auto;
   padding: 24px 24px 64px;
+}
+/* Opt-in bố cục rộng hơn (dashboard / trang nhiều cột) */
+.dl-page-wide {
+  max-width: 1280px;
+}
+/* 2 cột: nội dung chính (1fr) + cột ngữ cảnh 320px; aside ẩn <1100px */
+.dl-context-col {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 320px;
+  gap: var(--sp-4);
+  align-items: start;
+}
+.dl-context-aside {
+  min-width: 0;
+}
+@media (max-width: 1100px) {
+  .dl-context-col {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .dl-context-aside {
+    display: none;
+  }
 }
 .dl-loading {
   padding: 64px;
@@ -40,171 +56,75 @@
   color: var(--text-muted);
 }
 
-/* ---------- SideNav (IA v2 — 6 mục, nhóm section, kiểu Linear.app) ---------- */
-.dl-sidenav {
-  width: 240px;
-  flex-shrink: 0;
-  background: var(--surface);
-  border-right: 1px solid var(--divider);
-  padding: 16px 12px;
-  position: sticky;
-  top: 0;
-  height: 100vh;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  transition: width var(--dur-2) var(--ease);
-  overflow: hidden;
-}
-.dl-sidenav.collapsed {
-  width: 76px;
-}
-.dl-sidenav-items {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-.dl-nav-section {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-.dl-nav-section-label {
-  padding: 0 12px;
-  margin: var(--sp-3) 0 4px;
-  font-size: 11px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: var(--text-hint);
-  white-space: nowrap;
-}
-/* Thu gọn: nhãn section biến thành divider mảnh */
-.dl-sidenav.collapsed .dl-nav-section-label {
-  height: 1px;
-  margin: 12px 8px;
-  padding: 0;
-  font-size: 0;
-  color: transparent;
-  background: var(--divider);
-  overflow: hidden;
-}
-.dl-sidenav-foot {
-  margin-top: auto;
-  padding-top: 8px;
-  border-top: 1px solid var(--divider);
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-.dl-nav-item {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  min-height: 44px;
-  padding: 10px 12px;
-  border-radius: 20px;
-  color: var(--text-secondary);
-  font-weight: 600;
-  font-size: 15px;
-  cursor: pointer;
-  text-decoration: none;
-  white-space: nowrap;
-  transition: background var(--dur-1) var(--ease), color var(--dur-1) var(--ease);
-}
-.dl-nav-item:hover {
-  background: var(--panel-2);
-  color: var(--text);
-  text-decoration: none;
-}
-/* Active: nền soft + chữ/icon primary (icon lucide dùng currentColor) */
-.dl-nav-item.active {
-  background: var(--primary-soft);
-  color: var(--primary);
-  font-weight: 700;
-}
-.dl-nav-icon {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 24px;
-  height: 20px;
-  flex-shrink: 0;
-}
-.dl-nav-label {
-  transition: opacity var(--dur-1) var(--ease);
-}
-.dl-sidenav.collapsed .dl-nav-item {
-  justify-content: center;
-  gap: 0;
-}
-.dl-sidenav.collapsed .dl-nav-label {
-  display: none;
-}
-/* Legacy — không còn dùng sau IA v2 nhưng giữ selector cho an toàn */
-.dl-nav-classic {
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--text-dim);
-}
-
-/* ---------- TopBar ---------- */
+/* ---------- TopBar (chrome mới — brand "Linal Lab") ---------- */
 .dl-topbar {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 12px 24px;
+  gap: 10px;
+  height: 64px;
+  padding: 0 16px;
   position: sticky;
   top: 0;
   z-index: 20;
   background: var(--surface);
   border-bottom: 1px solid var(--divider);
 }
-.dl-menu-btn {
-  background: transparent;
-  border: 1px solid transparent;
-  color: var(--text-muted);
-  border-radius: var(--radius-sm);
-  width: 40px;
-  height: 40px;
-  cursor: pointer;
-  font-size: 17px;
-  transition: background var(--dur-1) var(--ease), color var(--dur-1) var(--ease);
-}
-.dl-menu-btn:hover {
-  background: var(--panel-2);
-  color: var(--text);
-}
-.dl-menu-btn:active {
-  transform: scale(0.97);
-}
-.dl-brand {
-  font-size: 19px;
-  font-weight: 700;
-  letter-spacing: -0.02em;
-  color: var(--text);
-  cursor: pointer;
-}
-.dl-topbar-spacer {
-  flex: 1;
-}
-/* Chip thống kê ở TopBar — số dùng tabular-nums */
-.dl-topbar-stat {
-  font-size: 14px;
-  font-variant-numeric: tabular-nums;
-}
-/* Streak (lửa) mang ngữ nghĩa "warn" khi ở TopBar, không phải "bad" */
-.dl-badge-bad.dl-topbar-stat {
-  background: var(--warn-soft);
-  color: var(--warn);
-  border-color: transparent;
-}
-.dl-goal {
+/* Brand: logo gradient + tên + tagline (tagline chỉ ở "/", ẩn <380px) */
+.la-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
   background: none;
   border: none;
   padding: 0;
   cursor: pointer;
-  display: inline-flex;
+  color: var(--text);
+}
+.la-logo {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+  border-radius: 10px;
+  background: var(--grad-primary);
+  color: #fff;
+}
+.la-brand-text {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  line-height: 1.1;
+}
+.la-brand-name {
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+.la-brand-sub {
+  font-size: var(--fs-small);
+  font-weight: 500;
+  color: var(--text-hint);
+}
+@media (max-width: 380px) {
+  .la-brand-sub {
+    display: none;
+  }
+}
+.dl-topbar-spacer {
+  flex: 1;
+}
+/* Vòng mục tiêu ngày — nút 44px bọc ProgressRing 38 */
+.dl-goal {
+  display: inline-grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
   border-radius: 50%;
 }
 .dl-goal:active {
@@ -318,6 +238,43 @@
   box-shadow: var(--elev-2);
 }
 
+/* ---------- Card hierarchy v2 (Wave 1) — modifier trên .dl-card ----------
+   Nền vẫn --surface, radius --radius; các class chỉ thêm điểm phân biệt. */
+/* Hero — "Tiếp tục học": to, nhấn cạnh trái primary, elevation cao hơn */
+.dl-card-hero {
+  padding: var(--sp-4);
+  border-left: 3px solid var(--primary);
+  box-shadow: var(--elev-2);
+}
+/* Metric — số liệu gọn; số lớn dùng .dl-card-metric-value (tabular) */
+.dl-card-metric {
+  padding: var(--sp-3);
+}
+.dl-card-metric-value {
+  font-size: var(--fs-heading);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+}
+/* Action — bấm được: hover nổi nhẹ */
+.dl-card-action {
+  cursor: pointer;
+  transition: transform var(--dur-2) var(--ease), box-shadow var(--dur-2) var(--ease),
+    border-color var(--dur-2) var(--ease);
+}
+.dl-card-action:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--elev-2);
+}
+/* AI — khối gia sư AI: nhấn cạnh trái màu --ai; icon Sparkles màu --ai */
+.dl-card-ai {
+  border-left: 3px solid var(--ai);
+}
+.dl-card-ai-icon {
+  color: var(--ai);
+}
+
 /* ---------- Badge / Chip ---------- */
 .dl-badge {
   display: inline-flex;
@@ -381,98 +338,8 @@
   font-variant-numeric: tabular-nums;
 }
 
-/* ---------- PathNode ---------- */
-.dl-node-wrap {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 6px;
-  transition: transform var(--dur-2) var(--ease);
-}
-.dl-node {
-  position: relative;
-  width: 60px;
-  height: 60px;
-  border-radius: 50%;
-  border: none;
-  cursor: pointer;
-  font-size: 24px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: transform var(--dur-1) var(--ease), box-shadow var(--dur-2) var(--ease);
-}
-.dl-node:active {
-  transform: scale(0.96);
-}
-.dl-node-face {
-  position: relative;
-  z-index: 2;
-}
-.dl-node-done {
-  background: var(--good);
-  color: white;
-  box-shadow: var(--elev-1);
-}
-.dl-node-current {
-  background: var(--primary);
-  color: white;
-  box-shadow: 0 0 0 4px var(--primary-soft);
-}
-.dl-node-available {
-  background: var(--primary-soft);
-  color: var(--primary);
-  border: 1px solid var(--primary-soft);
-}
-.dl-node-locked {
-  background: var(--panel-2);
-  color: var(--text-disabled);
-  border: 1px solid var(--border);
-}
-/* Vòng nhấn tĩnh quanh node hiện tại (không animation vô hạn) */
-.dl-node-pulse {
-  position: absolute;
-  inset: -5px;
-  border-radius: 50%;
-  border: 2px solid var(--primary-soft);
-  z-index: 1;
-}
-@keyframes dl-pulse {
-  0% {
-    transform: scale(1);
-    opacity: 0.6;
-  }
-  100% {
-    transform: scale(1.3);
-    opacity: 0;
-  }
-}
-.dl-node-label {
-  font-size: 12.5px;
-  font-weight: 600;
-  color: var(--text);
-  text-align: center;
-  max-width: 150px;
-  line-height: 1.25;
-}
-.dl-node-sub {
-  font-size: 11px;
-  color: var(--text-dim);
-}
 
-/* ---------- LearningPath ---------- */
-/* Thẻ TIẾP TỤC — card trắng thoáng, kicker màu primary, không dải màu */
-.dl-continue {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  flex-wrap: wrap;
-  margin-bottom: 32px;
-}
-.dl-continue-info {
-  flex: 1;
-  min-width: 0;
-}
+/* Kicker "TIẾP TỤC/CHƯƠNG N" — còn dùng ở LessonPlayer + Onboarding */
 .dl-continue-kicker {
   display: inline-block;
   font-size: 11px;
@@ -480,237 +347,7 @@
   letter-spacing: 0.12em;
   color: var(--primary);
 }
-/* Rút còn 1 dòng tên bài (bubble tối giản) */
-.dl-continue-title {
-  font-size: var(--fs-title);
-  font-weight: 700;
-  letter-spacing: -0.02em;
-  margin: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-.dl-section {
-  margin-bottom: 16px;
-  /* Chừa chỗ cho TopBar (~64px) + mini-map sticky khi scrollIntoView. */
-  scroll-margin-top: 140px;
-}
-.dl-section-head {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 16px 24px;
-  margin-bottom: 8px;
-  box-shadow: var(--elev-1);
-  cursor: pointer;
-  transition: border-color var(--dur-2) var(--ease), box-shadow var(--dur-2) var(--ease);
-}
-.dl-section-head:hover {
-  border-color: var(--primary-soft);
-}
-.dl-section-head:focus-visible {
-  outline: 2px solid var(--primary);
-  outline-offset: 2px;
-}
-.dl-section-head.open {
-  border-color: var(--primary-soft);
-}
-.dl-section-head.locked {
-  opacity: 0.7;
-}
-/* Cụm bên phải header: vòng % + số bài */
-.dl-section-aside {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 2px;
-  flex-shrink: 0;
-}
-.dl-section-count {
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--text-muted);
-  font-variant-numeric: tabular-nums;
-  white-space: nowrap;
-}
-.dl-section-lock {
-  font-size: 15px;
-  line-height: 1;
-  flex-shrink: 0;
-}
-.dl-section-chevron {
-  font-size: 13px;
-  color: var(--text-hint);
-  flex-shrink: 0;
-  width: 14px;
-  text-align: center;
-}
-/* Số chương — soft-square primary, không khối dải màu */
-.dl-section-num {
-  width: 44px;
-  height: 44px;
-  flex-shrink: 0;
-  border-radius: var(--radius-sm);
-  background: var(--primary-soft);
-  color: var(--primary);
-  font-weight: 800;
-  font-size: 20px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-variant-numeric: tabular-nums;
-}
-.dl-section-meta {
-  flex: 1;
-  min-width: 0;
-}
-.dl-section-title {
-  font-size: 17px;
-  font-weight: 700;
-  letter-spacing: -0.02em;
-  margin: 0;
-}
-.dl-section-sub {
-  font-size: 13px;
-  color: var(--text-muted);
-  margin: 2px 0 0;
-}
-.dl-section-pct {
-  font-size: 12px;
-  font-weight: 700;
-  color: var(--primary);
-  font-variant-numeric: tabular-nums;
-}
-.dl-track {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 14px;
-  padding: 16px 0 8px;
-}
-/* Đường nối mảnh, nét đứt bằng border (không dải màu) */
-.dl-track::before {
-  content: '';
-  position: absolute;
-  top: 10px;
-  bottom: 10px;
-  left: 50%;
-  width: 0;
-  transform: translateX(-50%);
-  border-left: 2px dashed var(--border);
-  z-index: 0;
-}
-.dl-track > * {
-  position: relative;
-  z-index: 1;
-}
-/* Bọc mỗi node để gắn tooltip khóa + làm nổi node đang học */
-.dl-node-slot {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-.dl-node-slot.locked {
-  cursor: not-allowed;
-}
-.dl-node-slot.current .dl-node-sub {
-  color: var(--primary);
-  font-weight: 700;
-}
-.dl-node-slot.current .dl-node-label {
-  color: var(--primary);
-}
 
-/* ---------- Mini-map chương (sticky) ---------- */
-.dl-minimap {
-  position: sticky;
-  top: 64px; /* ngay dưới TopBar */
-  z-index: 15;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  margin: 0 -24px 24px;
-  padding: 10px 24px;
-  background: var(--surface);
-  background: color-mix(in srgb, var(--surface) 86%, transparent);
-  -webkit-backdrop-filter: blur(8px);
-  backdrop-filter: blur(8px);
-  border-bottom: 1px solid var(--divider);
-}
-.dl-minimap-group {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-.dl-minimap-group-label {
-  flex-shrink: 0;
-  font-size: 10px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: var(--text-hint);
-  white-space: nowrap;
-}
-.dl-minimap-chips {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-}
-.dl-mini-chip {
-  width: 26px;
-  height: 26px;
-  flex-shrink: 0;
-  border-radius: 50%;
-  border: 1px solid transparent;
-  font-size: 11px;
-  font-weight: 700;
-  font-variant-numeric: tabular-nums;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: transform var(--dur-1) var(--ease), box-shadow var(--dur-2) var(--ease);
-}
-.dl-mini-chip:hover {
-  transform: translateY(-1px);
-}
-.dl-mini-chip:focus-visible {
-  outline: 2px solid var(--primary);
-  outline-offset: 2px;
-}
-.dl-mini-done {
-  background: var(--good);
-  color: white;
-}
-.dl-mini-current {
-  background: var(--primary);
-  color: white;
-}
-.dl-mini-available {
-  background: var(--primary-soft);
-  color: var(--primary);
-}
-.dl-mini-locked {
-  background: var(--panel-2);
-  color: var(--text-hint);
-  border-color: var(--border);
-}
-/* Chip của section đang mở — vòng nhấn accent (giữ nguyên màu nền chip) */
-.dl-mini-chip.active {
-  box-shadow: 0 0 0 2px var(--surface), 0 0 0 4px var(--primary);
-}
-@media (max-width: 768px) {
-  .dl-minimap {
-    margin-left: -16px;
-    margin-right: -16px;
-    padding-left: 16px;
-    padding-right: 16px;
-  }
-}
 
 /* ---------- LessonPlayer ---------- */
 .dl-player {
@@ -1061,6 +698,7 @@
 }
 .dl-num-input {
   flex: 1;
+  min-width: 0; /* input mặc định không chịu co (size≈20ch) — cho phép co theo hàng */
   padding: 14px 16px;
   font-size: 22px;
   font-family: var(--font-mono);
@@ -1105,8 +743,28 @@
   transform: scale(0.97);
   background: var(--panel-2);
 }
-.dl-key-wide {
+/* Nút ⌫ / C nằm cạnh ô nhập (cùng hàng) — keypad chỉ còn 4 hàng số */
+.dl-num-ctl {
+  align-self: stretch;
+  width: 48px;
+  flex-shrink: 0;
   font-size: 15px;
+  font-weight: 600;
+  font-family: var(--font-mono);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: background var(--dur-1) var(--ease), border-color var(--dur-1) var(--ease),
+    color var(--dur-1) var(--ease);
+}
+.dl-num-ctl:hover:not(:disabled) {
+  border-color: var(--primary);
+  color: var(--text);
+}
+.dl-num-ctl:active:not(:disabled) {
+  background: var(--panel-2);
 }
 
 /* ---------- Variant: matrix-input ---------- */
@@ -1528,87 +1186,6 @@
   margin-top: 32px;
 }
 
-/* ---------- TutorHub (trang /tutor host TutorPanel) ---------- */
-.dl-tutorhub {
-  max-width: 720px;
-}
-.dl-tutorhub-head {
-  margin-bottom: 24px;
-}
-.dl-tutorhub-title {
-  font-size: var(--fs-heading);
-  font-weight: 700;
-  letter-spacing: -0.02em;
-  margin: 0 0 8px;
-}
-.dl-tutorhub-mistakes {
-  margin-bottom: 24px;
-}
-.dl-tutorhub-label {
-  display: block;
-  font-size: 11px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: var(--text-hint);
-  margin-bottom: 12px;
-}
-.dl-tutorhub-chips {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-.dl-tutorhub-chip {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  align-items: flex-start;
-  text-align: left;
-  padding: 10px 16px;
-  border-radius: var(--radius-sm);
-  border: 1px solid var(--border);
-  background: var(--surface);
-  color: var(--text);
-  cursor: pointer;
-  font-family: var(--font);
-  max-width: 100%;
-  transition: border-color var(--dur-1) var(--ease), background var(--dur-1) var(--ease);
-}
-.dl-tutorhub-chip:hover {
-  border-color: var(--primary);
-}
-.dl-tutorhub-chip.active {
-  border-color: var(--primary);
-  background: var(--primary-soft);
-}
-.dl-tutorhub-chip-skill {
-  font-size: 11px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  color: var(--primary);
-}
-.dl-tutorhub-chip-prompt {
-  font-size: 13px;
-  color: var(--text-secondary);
-  max-width: 260px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-.dl-tutorhub-empty {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 16px;
-  margin-bottom: 24px;
-}
-.dl-tutorhub-empty-text {
-  margin: 0;
-  color: var(--text-secondary);
-  line-height: 1.6;
-}
-
 /* ---------- LessonPlayer QUIZ — relayout v2 (block-based) ---------- */
 /* PC (mặc định): 1 cột giữa; bài có hình = 2 cột (text trái / hình phải). */
 .dl-player-quiz {
@@ -1661,12 +1238,18 @@
   color: var(--text-hint);
   margin: 0 0 12px;
 }
+/* Đề bài trong BUBBLE BOX (card bo tròn) — text nằm gọn bên trong */
 .dl-quiz-prompt {
   font-size: var(--fs-title);
   font-weight: 700;
   line-height: 1.45;
   letter-spacing: -0.01em;
   color: var(--text);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px 18px;
+  box-shadow: var(--elev-1);
   margin-bottom: 24px;
 }
 .dl-quiz-answer {
@@ -1852,33 +1435,34 @@
 
 /* ---------- Focus mode + màn làm bài 1-màn-hình (mobile) ---------- */
 @media (max-width: 768px) {
-  /* Focus mode: dọn chrome, khoá scroll trang cho màn làm bài */
+  /* Focus mode: dọn chrome, khoá scroll trang cho màn làm bài.
+     (Ẩn TopBar + BottomNav xử lý ở rule global bên dưới — mọi viewport.) */
   body.dl-focus {
     overflow: hidden;
-  }
-  body.dl-focus .dl-topbar {
-    display: none;
-  }
-  body.dl-focus .dl-sidenav {
-    display: none;
   }
   body.dl-focus .dl-content {
     padding-bottom: 0;
   }
 
-  /* Quiz gói trong ĐÚNG 1 màn hình, không scroll trang */
+  /* Quiz gói trong ĐÚNG 1 màn hình, không scroll trang.
+     Ngân sách chiều cao (màn 640px): chrome ~100 + hình ~230 (SVG tự tính
+     ~24dvh qua useDiagramHeight) + đề 2 dòng ~58 + widget trả lời ~220. */
   .dl-player-quiz,
   .dl-player-quiz.has-visual {
     max-width: none;
     height: 100vh;
     height: 100dvh;
     margin: 0;
-    padding: 8px 12px calc(8px + env(safe-area-inset-bottom));
-    gap: 8px;
+    padding: 6px 12px calc(8px + env(safe-area-inset-bottom));
+    gap: 6px;
     overflow: hidden;
   }
   .dl-quiz-bar {
     gap: 12px;
+  }
+  .dl-close {
+    width: 32px;
+    height: 32px;
   }
   .dl-quiz-main,
   .dl-player-quiz.has-visual .dl-quiz-main {
@@ -1886,41 +1470,180 @@
     flex-direction: column;
     flex: 1;
     min-height: 0;
-    gap: 8px;
+    min-width: 0; /* chặn min-content của banner/ô nhập đẩy khung rộng hơn màn */
+    align-items: stretch; /* đè `align-items: start` của grid 2 cột PC */
+    gap: 6px;
   }
+  /* Hình minh họa: SVG đã co theo dvh nên KHÔNG cần cuộn nội bộ;
+     flex-shrink cao hơn panel → khi chật, hình nhường chỗ trước. */
   .dl-quiz-visual {
     order: 0; /* mobile: hình lên trên */
     flex: 0 1 auto;
-    max-height: 38vh;
-    padding: 8px;
+    min-height: 0;
+    width: 100%;
+    max-width: 560px;
+    margin-inline: auto; /* căn giữa cùng trục với panel */
+    padding: 6px;
     position: static;
-    overflow: auto;
+    overflow: hidden;
+  }
+  .dl-quiz-visual .tt-diagram-body {
+    padding: 6px 10px;
+    gap: 4px;
+  }
+  .dl-quiz-visual .tt-diagram-caption {
+    font-size: 11.5px;
+    line-height: 1.45;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .dl-quiz-visual .tt-diagram-note {
+    display: none; /* ghi chú phụ xem trong sheet Trợ giảng */
+  }
+  .dl-quiz-visual .tt-diagram-figure svg {
+    display: block; /* bỏ khe baseline ~6px của inline svg */
   }
   .dl-quiz-panel {
     order: 1;
     flex: 1;
     min-height: 0;
+    width: 100%;
+    max-width: 560px;
+    margin-inline: auto; /* cửa sổ rộng-nhưng-thấp: nội dung vẫn CĂN GIỮA */
   }
   .dl-quiz-content {
     flex: 1;
     min-height: 0;
-    overflow-y: auto;
+    overflow-y: auto; /* chỉ là lưới an toàn — kích thước đã nén để KHÔNG kích hoạt */
   }
   .dl-quiz-meta {
     display: none; /* bỏ caption dạng bài trên mobile */
   }
   .dl-quiz-prompt {
-    margin-bottom: 16px;
+    font-size: 17px;
+    line-height: 1.4;
+    padding: 6px 12px; /* bubble nén lại để giữ ngân sách 1 màn */
+    margin-bottom: 8px;
+  }
+  .dl-quiz-answer {
+    margin-bottom: 0; /* foot đã có margin-top — khỏi cộng dồn */
   }
   .dl-quiz-foot {
-    margin-top: 8px;
+    margin-top: 6px;
     gap: 8px;
   }
-  /* Feedback không đẩy trang: cuộn nội bộ nếu quá dài */
+  .dl-tutor-btn {
+    width: 44px;
+    height: 44px;
+  }
+  .dl-report {
+    width: 40px;
+    height: 40px;
+  }
+  /* Feedback = LỚP PHỦ trên widget trả lời (kiểu Duolingo): không chèn vào
+     flow → đề + đáp án không bị ép cuộn; nút Tiếp tục ở foot vẫn hiện đủ. */
+  .dl-quiz-panel {
+    position: relative;
+  }
   .dl-quiz-panel .dl-feedback {
-    margin-top: 8px;
-    max-height: 40dvh;
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 56px; /* ngay trên .dl-quiz-foot (nút 44px + margin 6) */
+    margin: 0;
+    max-height: 42dvh;
     overflow-y: auto;
+    z-index: 5;
+    box-shadow: var(--elev-2);
+  }
+  /* Nền soft có thể trong mờ → lót thêm surface đục cho lớp phủ */
+  .dl-quiz-panel .dl-feedback.good {
+    background: linear-gradient(var(--good-soft), var(--good-soft)), var(--surface);
+  }
+  .dl-quiz-panel .dl-feedback.bad {
+    background: linear-gradient(var(--bad-soft), var(--bad-soft)), var(--surface);
+  }
+
+  /* ---- Widget trả lời NÉN cho 1 màn hình — áp dụng MỌI dạng bài ---- */
+  /* numeric-input: ô nhập + 4 hàng phím ≈ 220px */
+  .dl-num {
+    gap: 8px;
+    width: 100%;
+    max-width: 340px;
+    margin-inline: auto;
+  }
+  .dl-num-input {
+    padding: 8px 12px;
+    font-size: 18px;
+  }
+  .dl-num-ctl {
+    width: 44px;
+  }
+  .dl-keypad {
+    gap: 6px;
+  }
+  .dl-key {
+    min-height: 36px;
+    padding: 6px 0;
+    font-size: 16px;
+  }
+  /* multiple-choice / error-detection */
+  .dl-choices,
+  .dl-errlines {
+    gap: 8px;
+  }
+  .dl-choice,
+  .dl-errline {
+    padding: 8px 12px;
+    gap: 10px;
+    font-size: 14px;
+  }
+  /* true-false */
+  .dl-tf {
+    gap: 10px;
+  }
+  .dl-tf-statement {
+    padding: 10px 12px;
+    font-size: 15px;
+  }
+  .dl-tf-btn {
+    padding: 12px 0;
+    font-size: 16px;
+  }
+  /* matching — dạng cao nhất (2 cột × n hàng) nên nén mạnh nhất */
+  .dl-match {
+    gap: 6px;
+  }
+  .dl-match-col {
+    gap: 6px;
+  }
+  .dl-match-item {
+    padding: 8px 9px;
+    min-height: 36px;
+    font-size: 12.5px;
+  }
+  /* step-ordering */
+  .dl-steps {
+    gap: 8px;
+  }
+  .dl-step-item {
+    padding: 8px 10px;
+    gap: 10px;
+  }
+  .dl-step-text {
+    font-size: 13px;
+  }
+  /* matrix-input / vector-drawing */
+  .dl-matrix {
+    padding: 4px 0;
+  }
+  .dl-vecdraw {
+    gap: 6px;
+  }
+  .dl-vecdraw-hint {
+    font-size: 12px;
   }
   /* Bottom sheet full-width */
   .dl-tutor-scrim {
@@ -1941,88 +1664,11 @@
   }
 }
 
-/* ---------- Bottom navigation (mobile) ---------- */
-/* Ở mobile, SideNav thành thanh điều hướng cố định đáy màn hình.
-   Đúng 5 tab (design-v2): Trang chủ · Bài học · Gia sư AI · Tiến độ · Hồ sơ.
-   Ẩn: Luyện tập (.dl-nav-hide-mobile), Cài đặt (foot), và nhãn section. */
+/* ---------- Legacy pages · mobile tweaks ---------- */
 @media (max-width: 768px) {
-  .dl-sidenav,
-  .dl-sidenav.collapsed {
-    position: fixed;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    top: auto;
-    width: 100%;
-    height: calc(64px + env(safe-area-inset-bottom));
-    flex-direction: row;
-    align-items: stretch;
-    gap: 0;
-    padding: 0 8px env(safe-area-inset-bottom);
-    background: var(--surface);
-    border-right: none;
-    border-top: 1px solid var(--divider);
-    z-index: 40;
-    overflow: visible;
-  }
-  .dl-sidenav-items {
-    flex: 1;
-    flex-direction: row;
-    gap: 0;
-    justify-content: space-around;
-    align-items: stretch;
-  }
-  /* Dàn phẳng các item của mọi section thành một hàng */
-  .dl-nav-section {
-    display: contents;
-  }
-  .dl-nav-section-label,
-  .dl-sidenav.collapsed .dl-nav-section-label {
-    display: none;
-  }
-  /* Ẩn foot (Cài đặt) + các mục đánh dấu ẩn (Luyện tập) */
-  .dl-sidenav-foot {
-    display: none;
-  }
-  .dl-nav-hide-mobile {
-    display: none;
-  }
-  .dl-nav-item,
-  .dl-sidenav.collapsed .dl-nav-item {
-    flex: 1;
-    flex-direction: column;
-    justify-content: center;
-    gap: 2px;
-    min-height: 56px;
-    padding: 6px 4px;
-    border-radius: var(--radius-sm);
-  }
-  .dl-nav-item:hover {
-    background: transparent;
-    color: var(--text-secondary);
-  }
-  /* Active: chỉ đổi màu icon/label, không nền khối */
-  .dl-nav-item.active {
-    background: transparent;
-    color: var(--primary);
-  }
-  .dl-nav-icon {
-    width: auto;
-  }
-  /* Luôn hiện label (ghi đè quy tắc collapsed) */
-  .dl-sidenav .dl-nav-label,
-  .dl-sidenav.collapsed .dl-nav-label {
-    display: block;
-    font-size: 11px;
-    font-weight: 600;
-    line-height: 1;
-  }
-  /* Chừa chỗ cho thanh đáy, không để nội dung bị che */
-  .dl-content {
-    padding-bottom: calc(64px + env(safe-area-inset-bottom));
-  }
+  /* Toast nổi trên bottom bar */
   .dl-toast {
-    bottom: calc(72px + env(safe-area-inset-bottom));
+    bottom: calc(var(--bottomnav-h) + env(safe-area-inset-bottom) + 12px);
   }
   .dl-page {
     padding: 16px 16px 24px;
@@ -2030,4 +1676,371 @@
   .dl-match {
     grid-template-columns: 1fr;
   }
+}
+
+/* =====================================================================
+   Linal Lab · shared classes .la-*  (approved design v1 — mục L contract)
+   SHELL định nghĩa — các agent khác DÙNG, không định nghĩa lại.
+   ===================================================================== */
+
+/* ---------- Page container ---------- */
+.la-page {
+  width: 100%;
+  max-width: 720px;
+  margin-inline: auto;
+  /* Đáy chỉ cần đệm nhỏ — .dl-content đã chừa sẵn chỗ cho bottom bar. */
+  padding: 16px 20px 16px;
+}
+@media (max-width: 360px) {
+  .la-page {
+    padding-inline: 16px;
+  }
+}
+
+/* ---------- Cards ---------- */
+.la-card {
+  background: var(--surface);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-soft);
+  box-shadow: var(--elev-2);
+  padding: 16px;
+}
+.la-card-xl {
+  background: var(--surface);
+  border-radius: var(--radius);
+  border: 1px solid var(--border-soft);
+  box-shadow: var(--elev-2);
+  padding: 20px;
+}
+/* Dùng kèm .la-card* để nền gradient tím nhạt */
+.la-hero-grad {
+  background: var(--grad-soft);
+  border-color: transparent;
+}
+
+/* ---------- Buttons ---------- */
+.la-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 52px;
+  padding: 0 24px;
+  border-radius: var(--radius-chip);
+  font-family: var(--font);
+  font-weight: 600;
+  font-size: var(--fs-body);
+  border: none;
+  cursor: pointer;
+  text-decoration: none;
+  transition: transform var(--dur-1) var(--ease), background var(--dur-1) var(--ease),
+    border-color var(--dur-1) var(--ease), box-shadow var(--dur-1) var(--ease);
+}
+.la-btn:active {
+  transform: scale(0.98);
+}
+.la-btn-primary {
+  background: var(--grad-primary);
+  color: var(--on-primary);
+  box-shadow: var(--elev-3);
+}
+.la-btn-secondary {
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  color: var(--text);
+}
+.la-btn-sm {
+  height: 44px;
+  padding: 0 18px;
+  font-size: var(--fs-caption);
+}
+.la-btn[disabled],
+.la-btn:disabled {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+/* ---------- Icon button ---------- */
+.la-icon-btn {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  border-radius: 999px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: color var(--dur-1) var(--ease), border-color var(--dur-1) var(--ease),
+    background var(--dur-1) var(--ease), transform var(--dur-1) var(--ease);
+}
+.la-icon-btn:hover {
+  color: var(--text);
+  border-color: var(--primary);
+}
+.la-icon-btn:active {
+  transform: scale(0.97);
+}
+
+/* ---------- Chips ---------- */
+.la-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 38px;
+  padding: 0 16px;
+  flex-shrink: 0;
+  border-radius: 999px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+  font-weight: 600;
+  font-size: var(--fs-caption);
+  white-space: nowrap;
+  cursor: pointer;
+  transition: color var(--dur-1) var(--ease), background var(--dur-1) var(--ease),
+    border-color var(--dur-1) var(--ease);
+}
+.la-chip.active {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: var(--on-primary);
+}
+.la-chip-row {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding-block: 2px;
+  scrollbar-width: none;
+}
+.la-chip-row::-webkit-scrollbar {
+  display: none;
+}
+
+/* ---------- Progress bar ---------- */
+.la-progress {
+  height: 6px;
+  border-radius: 999px;
+  background: var(--border);
+  overflow: hidden;
+}
+.la-progress > i {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: var(--grad-primary);
+  transition: width var(--dur-3) var(--ease);
+}
+
+/* ---------- Section header ---------- */
+.la-sec-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 24px 0 12px;
+}
+.la-sec-title {
+  font-size: 18px;
+  font-weight: 700;
+}
+.la-sec-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  color: var(--primary);
+  font-weight: 600;
+  font-size: var(--fs-caption);
+}
+
+/* ---------- Stat grid ---------- */
+.la-stat-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+}
+@media (max-width: 360px) {
+  .la-stat-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+.la-stat {
+  background: var(--surface);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-soft);
+  box-shadow: var(--elev-2);
+  padding: 12px;
+  display: grid;
+  gap: 4px;
+  justify-items: center;
+}
+.la-stat-ico {
+  display: grid;
+  place-items: center;
+}
+.la-stat-val {
+  font-weight: 700;
+  font-size: 18px;
+  font-variant-numeric: tabular-nums;
+}
+.la-stat-lab {
+  font-size: var(--fs-small);
+  color: var(--text-hint);
+  text-align: center;
+}
+
+/* ---------- Row (list item) ---------- */
+.la-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 64px;
+  padding: 10px 4px;
+  color: inherit;
+  text-decoration: none;
+}
+.la-row-ico {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+  border-radius: 12px;
+  background: var(--primary-soft);
+  color: var(--primary);
+}
+.la-row-label {
+  flex: 1;
+  min-width: 0;
+  font-weight: 500;
+}
+.la-row-end {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  color: var(--text-hint);
+}
+
+/* ---------- Badge (đếm) ---------- */
+.la-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 22px;
+  height: 22px;
+  padding: 0 8px;
+  border-radius: 999px;
+  background: var(--primary-soft);
+  color: var(--primary);
+  font-weight: 600;
+  font-size: var(--fs-small);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------- Empty state ---------- */
+.la-empty {
+  text-align: center;
+  padding: 32px 16px;
+  color: var(--text-hint);
+  font-size: var(--fs-caption);
+}
+
+/* =====================================================================
+   Bottom tab bar (thay sidebar mọi viewport) + FAB Gia sư AI ở giữa
+   ===================================================================== */
+.la-bottomnav {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 45;
+  height: calc(var(--bottomnav-h) + env(safe-area-inset-bottom, 0px));
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  align-items: stretch;
+  background: var(--surface);
+  border-top: 1px solid var(--divider);
+}
+.la-tab {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 0 4px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  text-decoration: none;
+  color: var(--text-hint);
+  transition: color var(--dur-1) var(--ease);
+}
+.la-tab:hover {
+  color: var(--text-secondary);
+  text-decoration: none;
+}
+.la-tab.active {
+  color: var(--primary);
+}
+.la-tab-label {
+  font-size: var(--fs-small);
+  font-weight: 600;
+  line-height: 1;
+}
+/* Center action — FAB nổi lên khỏi thanh */
+.la-tab-center .la-tab-label {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 20px;
+  text-align: center;
+}
+.la-tab-fab {
+  position: absolute;
+  top: -26px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: grid;
+  place-items: center;
+  width: 58px;
+  height: 58px;
+  border-radius: 50%;
+  background: var(--grad-primary);
+  color: #fff;
+  border: 4px solid var(--surface);
+  box-shadow: var(--elev-3);
+  transition: transform var(--dur-1) var(--ease);
+}
+.la-tab-center:hover .la-tab-fab,
+.la-tab-center.active .la-tab-fab {
+  transform: translateX(-50%) translateY(-2px);
+}
+/* Desktop ≥768px: dock nổi giữa màn hình */
+@media (min-width: 768px) {
+  .la-bottomnav {
+    left: 50%;
+    right: auto;
+    transform: translateX(-50%);
+    bottom: 16px;
+    width: 440px;
+    max-width: calc(100vw - 32px);
+    height: var(--bottomnav-h);
+    padding-bottom: 0;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--elev-3);
+  }
+}
+
+/* Focus mode (player mobile) — ẩn TopBar + BottomNav trên mọi viewport */
+body.dl-focus .dl-topbar,
+body.dl-focus .la-bottomnav {
+  display: none;
 }

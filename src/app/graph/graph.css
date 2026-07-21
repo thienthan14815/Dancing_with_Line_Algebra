@@ -1,0 +1,452 @@
+/* =========================================================================
+   BẢN ĐỒ TRI THỨC (Knowledge Map) — prefix kg-
+   Token-thuần (design-contract v2). Không gradient, không hex trần.
+   Node theo 4 trạng thái: locked / available / learning / mastered.
+   ========================================================================= */
+
+/* ---- Toggle "Chương | Bản đồ tri thức" (đặt trong Home) ---- */
+.kg-viewtoggle {
+  display: inline-flex;
+  gap: 4px;
+  padding: 4px;
+  margin-bottom: var(--sp-3);
+  background: var(--panel-2);
+  border-radius: var(--radius-chip);
+}
+.kg-viewchip {
+  appearance: none;
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  font: inherit;
+  font-weight: 600;
+  font-size: var(--fs-caption);
+  min-height: 36px;
+  padding: 0 16px;
+  border-radius: var(--radius-chip);
+  cursor: pointer;
+  transition: background var(--dur-2) var(--ease), color var(--dur-2) var(--ease);
+}
+.kg-viewchip:hover {
+  color: var(--text);
+}
+.kg-viewchip.is-active {
+  background: var(--surface);
+  color: var(--text);
+  box-shadow: var(--elev-1);
+}
+
+.kg-loading {
+  padding: var(--sp-5) 0;
+  text-align: center;
+  color: var(--text-secondary);
+}
+
+/* ---- Khung tổng ---- */
+.kg-main {
+  min-width: 0;
+}
+
+/* Chú giải trạng thái */
+.kg-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-1) var(--sp-3);
+  margin-bottom: var(--sp-2);
+  font-size: var(--fs-caption);
+  color: var(--text-secondary);
+}
+.kg-legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.kg-legend-dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 5px;
+  border: 1px solid var(--border);
+}
+
+/* ---- Bảng vẽ (scroll để pan) ---- */
+.kg-board-wrap {
+  overflow: auto;
+  max-height: calc(100dvh - 240px);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  box-shadow: var(--elev-1);
+  padding: var(--sp-1);
+}
+.kg-board {
+  position: relative;
+}
+
+.kg-edges {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.kg-edge {
+  fill: none;
+  stroke: var(--border);
+  stroke-width: 1.5;
+  transition: stroke var(--dur-2) var(--ease), opacity var(--dur-2) var(--ease);
+}
+.kg-edge--base {
+  opacity: 0.85;
+}
+.kg-edge--dim {
+  opacity: 0.18;
+}
+.kg-edge--prereq {
+  stroke: var(--primary);
+  stroke-width: 2;
+  opacity: 1;
+}
+.kg-edge--dependent {
+  stroke: var(--ai);
+  stroke-width: 2;
+  opacity: 1;
+}
+
+/* ---- Node pill ---- */
+.kg-node {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 4px 10px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+  cursor: pointer;
+  overflow: hidden;
+  transition: transform var(--dur-2) var(--ease), box-shadow var(--dur-2) var(--ease),
+    border-color var(--dur-2) var(--ease), opacity var(--dur-2) var(--ease);
+}
+.kg-node-label {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  font-size: 12.5px;
+  line-height: 1.25;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+.kg-node:hover {
+  box-shadow: var(--elev-2);
+  transform: translateY(-1px);
+}
+
+/* Trạng thái — cũng dùng cho chấm legend */
+.kg-node--locked {
+  background: var(--panel-2);
+  border-color: var(--border-soft);
+  color: var(--text-disabled);
+}
+.kg-node--available {
+  background: var(--surface);
+  border-color: var(--border);
+  color: var(--text);
+}
+.kg-node--learning {
+  background: var(--primary-soft);
+  border-color: var(--primary-soft);
+  color: var(--primary);
+}
+.kg-node--mastered {
+  background: var(--good-soft);
+  border-color: var(--good-soft);
+  color: var(--good);
+}
+
+/* Highlight khi chọn */
+.kg-node.is-selected {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px var(--primary), var(--elev-2);
+  transform: translateY(-1px);
+}
+.kg-node.is-prereq {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 1.5px var(--primary);
+}
+.kg-node.is-dependent {
+  border-color: var(--ai);
+  box-shadow: 0 0 0 1.5px var(--ai);
+}
+.kg-node.is-faded {
+  opacity: 0.45;
+}
+
+/* ---- Panel chi tiết (aside desktop + sheet mobile dùng chung) ---- */
+.kg-aside {
+  position: sticky;
+  top: var(--sp-2);
+}
+.kg-aside-empty {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+  padding: var(--sp-3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  color: var(--text-secondary);
+  font-size: var(--fs-caption);
+  line-height: 1.6;
+}
+.kg-aside-empty-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-sm);
+  background: var(--panel-2);
+  color: var(--primary);
+}
+
+.kg-panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+  padding: var(--sp-3);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--elev-1);
+}
+.kg-panel-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-1);
+}
+.kg-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  border-radius: var(--radius-chip);
+  font-size: var(--fs-caption);
+  font-weight: 650;
+}
+.kg-badge--locked {
+  background: var(--panel-2);
+  color: var(--text-secondary);
+}
+.kg-badge--available {
+  background: var(--primary-soft);
+  color: var(--primary);
+}
+.kg-badge--learning {
+  background: var(--primary-soft);
+  color: var(--primary);
+}
+.kg-badge--mastered {
+  background: var(--good-soft);
+  color: var(--good);
+}
+.kg-panel-close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: background var(--dur-2) var(--ease), color var(--dur-2) var(--ease);
+}
+.kg-panel-close:hover {
+  background: var(--panel-2);
+  color: var(--text);
+}
+.kg-panel-title {
+  margin: 0;
+  font-size: var(--fs-title);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.3;
+  color: var(--text);
+}
+
+/* Thanh mastery */
+.kg-mastery {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.kg-mastery-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+}
+.kg-mastery-lbl {
+  font-size: var(--fs-caption);
+  color: var(--text-secondary);
+}
+.kg-mastery-val {
+  font-size: var(--fs-body);
+  font-weight: 700;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+}
+.kg-mastery-track {
+  height: 8px;
+  border-radius: var(--radius-chip);
+  background: var(--panel-2);
+  overflow: hidden;
+}
+.kg-mastery-fill {
+  display: block;
+  height: 100%;
+  border-radius: var(--radius-chip);
+  background: var(--primary);
+  transition: width var(--dur-3) var(--ease);
+}
+
+/* Prereq trực tiếp */
+.kg-prereqs {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.kg-prereqs-title {
+  font-size: var(--fs-caption);
+  font-weight: 650;
+  color: var(--text-secondary);
+}
+.kg-prereq-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.kg-prereq {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  min-height: 40px;
+  padding: 6px 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+  font-size: var(--fs-caption);
+  text-align: left;
+  cursor: pointer;
+  transition: background var(--dur-2) var(--ease), border-color var(--dur-2) var(--ease);
+}
+.kg-prereq:hover {
+  background: var(--panel-2);
+  border-color: var(--primary);
+}
+.kg-prereq-mark {
+  display: inline-flex;
+  color: var(--text-hint);
+  flex: none;
+}
+.kg-prereq.is-met .kg-prereq-mark {
+  color: var(--good);
+}
+.kg-prereq-name {
+  flex: 1;
+  min-width: 0;
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.kg-prereq-go {
+  color: var(--text-hint);
+  flex: none;
+}
+
+/* Nút "Học kỹ năng này" (dùng dl-btn của app, chỉ chỉnh layout icon) */
+.kg-learn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: var(--sp-1);
+}
+
+/* ---- Bottom-sheet mobile ---- */
+.kg-sheet-scrim,
+.kg-sheet {
+  display: none;
+}
+
+@media (max-width: 1100px) {
+  .kg-board-wrap {
+    max-height: calc(100dvh - 260px);
+  }
+  .kg-sheet-scrim {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background: rgba(17, 17, 17, 0.4);
+    z-index: 40;
+    animation: kg-fade var(--dur-2) var(--ease);
+  }
+  .kg-sheet {
+    display: block;
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 41;
+    max-height: 80dvh;
+    overflow: auto;
+    padding: var(--sp-2);
+    padding-bottom: max(var(--sp-3), env(safe-area-inset-bottom));
+    background: var(--surface);
+    border-top-left-radius: var(--radius-sheet);
+    border-top-right-radius: var(--radius-sheet);
+    box-shadow: var(--elev-3);
+    animation: kg-slide-up var(--dur-3) var(--ease);
+  }
+  .kg-sheet .kg-panel {
+    border: none;
+    box-shadow: none;
+    padding: var(--sp-1) var(--sp-2) var(--sp-2);
+  }
+}
+
+@keyframes kg-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes kg-slide-up {
+  from {
+    transform: translateY(12px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .kg-sheet,
+  .kg-sheet-scrim {
+    animation: none;
+  }
+}

@@ -1,0 +1,126 @@
+/* ===========================================================================
+   LessonPage — bố cục "Lý thuyết / Kiểm tra hiểu" + DOCK HÀNH ĐỘNG GHIM.
+   Dock nổi cố định ở góc phải dưới, đi theo khi cuộn. Chỉ dùng token global.css.
+   =========================================================================== */
+
+/* Chip chế độ xem ngay dưới tiêu đề bài */
+.lesson-view-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin: calc(-1 * var(--sp-2)) 0 var(--sp-3);
+  padding: 4px 12px;
+  border-radius: var(--radius-chip);
+  font-size: 13px;
+  font-weight: 700;
+  background: var(--panel-2);
+  color: var(--text-secondary);
+}
+.lesson-view-chip.is-quiz {
+  background: var(--good-soft);
+  color: var(--good);
+}
+
+/* Dock hành động — GHIM góc phải dưới, cuộn theo trang */
+.lesson-fab-dock {
+  position: fixed;
+  right: 24px;
+  bottom: 24px;
+  z-index: 30;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 8px;
+  width: min(248px, calc(100vw - 32px));
+}
+
+/* Nút chung trong dock */
+.lfd-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 18px;
+  border-radius: var(--radius-chip);
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  font-family: var(--font);
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  text-decoration: none;
+  white-space: nowrap;
+  overflow: hidden;
+  cursor: pointer;
+  box-shadow: var(--elev-2);
+  transition:
+    background var(--dur-1) var(--ease),
+    transform var(--dur-1) var(--ease),
+    border-color var(--dur-1) var(--ease),
+    color var(--dur-1) var(--ease);
+}
+.lfd-btn:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+.lfd-btn:active {
+  transform: scale(0.97);
+}
+
+/* Nút chính: Kiểm tra hiểu */
+.lfd-primary {
+  background: var(--primary);
+  border-color: transparent;
+  color: #fff;
+}
+.lfd-primary:hover {
+  background: var(--accent-strong);
+  border-color: transparent;
+  color: #fff;
+}
+.lfd-primary.is-back {
+  background: var(--surface);
+  color: var(--text);
+  border-color: var(--border);
+}
+.lfd-primary.is-back:hover {
+  background: var(--surface);
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+/* Hàng điều hướng bài trước / bài sau */
+.lfd-nav {
+  display: flex;
+  gap: 8px;
+}
+.lfd-icon {
+  flex: 0 0 auto;
+  width: 44px;
+  padding: 12px 0;
+  font-size: 16px;
+}
+.lfd-icon-placeholder {
+  flex: 0 0 auto;
+  width: 44px;
+}
+.lfd-next {
+  flex: 1 1 auto;
+  min-width: 0;
+  justify-content: flex-start;
+  text-overflow: ellipsis;
+}
+
+/* Mobile: nổi TRÊN bottom-nav, thu gọn */
+@media (max-width: 768px) {
+  .lesson-fab-dock {
+    right: 12px;
+    bottom: calc(80px + env(safe-area-inset-bottom));
+    width: min(220px, calc(100vw - 24px));
+  }
+  .lfd-btn {
+    padding: 11px 16px;
+    font-size: 13px;
+  }
+}

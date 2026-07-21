@@ -1,0 +1,147 @@
+/* =====================================================================
+   PLAYER — Restyle vỏ màn làm bài theo screen `exercise` (approved v1).
+   Prefix `pl-`. Token-thuần (global.css) → dark mode tự chạy.
+
+   KHÔNG sửa shell.css: các lớp .dl-quiz-* / .dl-choice / .dl-tf-btn /
+   .dl-feedback được GIỮ để cơ chế focus-mode 1-màn (shell.css @media) chạy
+   nguyên; phần "look" mới đè bằng selector scope `.pl-quiz …`. player.css
+   nạp SAU shell.css (LessonPlayer lazy) nên thắng ở cùng độ đặc hiệu, và
+   `.pl-quiz` nâng độ đặc hiệu để đè được cả rule trong @media focus khi cần.
+
+   Lớp .la-* (la-icon-btn, la-progress, la-btn*, la-card-xl) do SHELL định
+   nghĩa trong shell.css — ở đây CHỈ DÙNG, không định nghĩa lại. Vài token mới
+   (--radius-md, --fs-small, --radius-lg) có fallback px = giá trị JSON để
+   không vỡ look nếu global.css của SHELL nạp trễ.
+   ===================================================================== */
+
+/* ---------- Header: [đóng] · [tiến độ] · [chip streak] · [⭐] · [ghi chú] ---------- */
+.pl-close {
+  flex-shrink: 0;
+}
+.pl-progressbar {
+  flex: 1;
+  min-width: 0;
+}
+.pl-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  flex-shrink: 0;
+  height: 32px;
+  padding: 0 12px;
+  border-radius: var(--radius-chip);
+  background: var(--review-soft);
+  color: var(--review);
+  font-weight: 700;
+  font-size: var(--fs-caption);
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+.pl-chip svg {
+  flex-shrink: 0;
+}
+
+/* ---------- Thẻ câu hỏi (la-card-xl): "Câu i/n" + đề bài ---------- */
+.pl-qcard {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+.pl-qhead {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+.pl-qnum {
+  font-size: var(--fs-small, 12px);
+  font-weight: 700;
+  color: var(--text-hint);
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+.pl-qmeta {
+  font-size: var(--fs-small, 12px);
+  color: var(--text-hint);
+}
+/* Đề bài nằm GỌN trong card: bỏ vỏ box riêng của .dl-quiz-prompt (giữ nguyên
+   font-size fs-title / 17px-mobile do shell.css cấp — không đụng tới). */
+.pl-qcard .dl-quiz-prompt {
+  background: none;
+  border: none;
+  box-shadow: none;
+  padding: 0;
+  margin: 0;
+}
+
+/* ---------- Trạng thái option (multiple-choice / true-false / error) ---------- */
+.pl-quiz .dl-choice,
+.pl-quiz .dl-errline,
+.pl-quiz .dl-tf-btn {
+  border-width: 1.5px;
+  border-radius: var(--radius-md, 14px);
+}
+/* Sau khi chấm: tô ô ĐÃ CHỌN theo đúng/sai. Chỉ cần checked.correct — không
+   cần biết đáp án đúng ở ô khác (feedback banner lo phần giải thích đó). */
+.pl-answer--correct .dl-choice.selected,
+.pl-answer--correct .dl-errline.selected {
+  border-color: var(--good);
+  background: var(--good-soft);
+}
+.pl-answer--correct .dl-choice.selected .dl-choice-key {
+  background: var(--good);
+  border-color: transparent;
+}
+.pl-answer--wrong .dl-choice.selected,
+.pl-answer--wrong .dl-errline.selected {
+  border-color: var(--bad);
+  background: var(--bad-soft);
+}
+.pl-answer--wrong .dl-choice.selected .dl-choice-key {
+  background: var(--bad);
+  border-color: transparent;
+}
+/* True/False: đè màu preview mặc định của .dl-tf-true/false để phản ánh ĐÚNG
+   tính đúng-sai của lựa chọn (xanh nếu chọn đúng, đỏ nếu chọn sai). */
+.pl-answer--correct .dl-tf-btn.selected {
+  border-color: var(--good);
+  background: var(--good-soft);
+  color: var(--good);
+}
+.pl-answer--wrong .dl-tf-btn.selected {
+  border-color: var(--bad);
+  background: var(--bad-soft);
+  color: var(--bad);
+}
+
+/* ---------- Feedback banner (giữ .dl-feedback + focus-mode overlay) ---------- */
+.pl-quiz .pl-feedback {
+  border-radius: var(--radius-lg, 18px);
+}
+
+/* ---------- Footer sticky: [trợ giảng][báo lỗi] · [Bỏ qua][Kiểm tra] ---------- */
+.pl-foot .la-btn {
+  flex-shrink: 0;
+}
+
+/* ---------- Mobile focus-mode: nén để giữ ngân sách 1-màn ---------- */
+@media (max-width: 768px) {
+  .pl-quiz .pl-qcard {
+    padding: 6px 12px; /* < la-card-xl 20px */
+    gap: 4px;
+    border-radius: var(--radius-lg, 18px);
+    box-shadow: none;
+    margin-bottom: 8px;
+  }
+  .pl-quiz .pl-qhead {
+    margin-bottom: 0;
+  }
+  .pl-quiz .pl-qmeta {
+    display: none; /* như .dl-quiz-meta cũ: ẩn caption dạng bài trên mobile */
+  }
+  .pl-quiz .pl-chip {
+    height: 30px;
+    padding: 0 10px;
+  }
+}

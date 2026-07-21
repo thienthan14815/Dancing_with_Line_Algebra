@@ -9,12 +9,16 @@
 // Export:
 //   • EXERCISES: Exercise[]
 //   • EXERCISES_BY_SKILL: Record<string, Exercise[]>
-//   • getExercisesForSkills(skillIds, max=6): Exercise[]
-//   • getExercisesForLesson(lessonId, max=6): Exercise[]
+//   • getExercisesForSkills(skillIds, max=6, seed?): Exercise[]
+//   • getExercisesForLesson(lessonId, max=6, seed?): Exercise[]
+// Truyền `seed` để LUYỆN KHÔNG LẶP (ưu tiên generator, bù bằng pool tĩnh xáo
+// theo seed); KHÔNG truyền seed → hành vi cũ y nguyên (backward-compatible).
 // ===========================================================================
 
 import type { Exercise } from '../exercises/types';
 import { SAMPLE_EXERCISES } from '../exercises/sampleBank';
+import { genExercisesForSkills } from '../exercises/generators';
+import { mulberry32, shuffle } from '../rng';
 import { getMicroLesson } from './course';
 import { exercises as SECTION3 } from './bank/ch3';
 import { exercises as SECTION4 } from './bank/ch4';
@@ -27,6 +31,9 @@ import { exercises as SECTION10 } from './bank/ch10';
 import { exercises as SECTION11 } from './bank/ch11';
 import { exercises as SECTION12 } from './bank/ch12';
 import { exercises as SECTION13 } from './bank/ch13';
+// Content module (giáo án plugin) — merge additive vào EXERCISES, giữ nguyên bài gốc.
+import { moduleExercises } from '../../content/registry';
+import { exercises as VIDEO_TENSOR } from './bank/video-tensor';
 
 // ---------------------------------------------------------------------------
 // SECTION 0 — KIẾN THỨC NỀN (Foundations)
@@ -874,10 +881,12 @@ export const EXERCISES: Exercise[] = [
   ...SECTION7,
   ...SECTION8,
   ...SECTION9,
+  ...VIDEO_TENSOR,
   ...SECTION10,
   ...SECTION11,
   ...SECTION12,
   ...SECTION13,
+  ...moduleExercises,
 ];
 
 /** Gom bài tập theo skillId (ổn định theo thứ tự khai báo trong EXERCISES). */
@@ -890,10 +899,10 @@ export const EXERCISES_BY_SKILL: Record<string, Exercise[]> = (() => {
 })();
 
 /**
- * Trộn bài của nhiều skill theo kiểu round-robin (ổn định, KHÔNG random) để mỗi
- * skill được góp bài đều nhau. Trả về tối đa `max` bài, không trùng id.
+ * Trộn bài TĨNH của nhiều skill theo kiểu round-robin (ổn định, KHÔNG random) để
+ * mỗi skill được góp bài đều nhau. Trả về tối đa `max` bài, không trùng id.
  */
-export function getExercisesForSkills(skillIds: string[], max = 6): Exercise[] {
+function pickStaticForSkills(skillIds: string[], max: number): Exercise[] {
   if (max <= 0) return [];
   const buckets = skillIds
     .map((id) => EXERCISES_BY_SKILL[id])
@@ -918,13 +927,57 @@ export function getExercisesForSkills(skillIds: string[], max = 6): Exercise[] {
 }
 
 /**
+ * Trộn bài của nhiều skill, tối đa `max` bài, không trùng id.
+ *
+ * • KHÔNG truyền `seed` → hành vi CŨ y nguyên: round-robin ổn định trên pool
+ *   tĩnh (backward-compatible cho mọi chỗ gọi cũ).
+ * • CÓ `seed` → LUYỆN KHÔNG LẶP: ưu tiên bài do generator sinh ra (số liệu mới
+ *   theo seed) cho các skill có generator; còn thiếu thì bù bằng pool tĩnh đã
+ *   `shuffle` theo cùng seed cho đỡ lặp giữa các phiên.
+ */
+export function getExercisesForSkills(
+  skillIds: string[],
+  max = 6,
+  seed?: number,
+): Exercise[] {
+  if (max <= 0) return [];
+  if (seed === undefined) return pickStaticForSkills(skillIds, max);
+
+  const s = seed >>> 0;
+  const out: Exercise[] = [];
+  const seen = new Set<string>();
+
+  // 1) Bài sinh động (nếu skill có generator).
+  for (const ex of genExercisesForSkills(skillIds, max, s)) {
+    if (seen.has(ex.id)) continue;
+    out.push(ex);
+    seen.add(ex.id);
+    if (out.length >= max) return out.slice(0, max);
+  }
+
+  // 2) Bù bằng pool tĩnh, xáo theo seed cho đỡ lặp.
+  const pool = shuffle(mulberry32(s), pickStaticForSkills(skillIds, max * 3));
+  for (const ex of pool) {
+    if (seen.has(ex.id)) continue;
+    out.push(ex);
+    seen.add(ex.id);
+    if (out.length >= max) break;
+  }
+  return out.slice(0, max);
+}
+
+/**
  * Lấy bài tập cho một micro-lesson: map lesson → skillIds → bài (qua
  * getExercisesForSkills). Nếu không tìm được bài nào, fallback vài bài mẫu để
  * KHÔNG BAO GIỜ trả mảng rỗng khi còn cách tránh.
  */
-export function getExercisesForLesson(lessonId: string, max = 6): Exercise[] {
+export function getExercisesForLesson(
+  lessonId: string,
+  max = 6,
+  seed?: number,
+): Exercise[] {
   const skillIds = getMicroLesson(lessonId)?.skillIds ?? [];
-  const picked = getExercisesForSkills(skillIds, max);
+  const picked = getExercisesForSkills(skillIds, max, seed);
   if (picked.length > 0) return picked;
   return SAMPLE_EXERCISES.slice(0, Math.max(0, Math.min(max, SAMPLE_EXERCISES.length)));
 }

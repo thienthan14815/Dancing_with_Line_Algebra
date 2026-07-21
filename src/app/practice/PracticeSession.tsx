@@ -1,13 +1,15 @@
-import { useState, useRef } from 'react';
+import { useMemo, useState, useRef } from 'react';
 import type { CheckResult, Exercise } from '../../core/exercises/types';
 import { checkExercise, pickHint } from '../../core/exercises/engine';
+import { SKILL_GENERATORS } from '../../core/exercises/generators';
+import { mulberry32, hashStr } from '../../core/rng';
 import { useLearnStore } from '../../core/progress/store';
 import { XP } from '../../core/progress/xp';
 // Tái dùng (read-only) hạ tầng của Lesson Player để render + nhập đáp án đồng bộ.
 import { toSchemaErrorType } from '../lib/errorType';
 import { initialAnswer, hasAnswer } from '../player/answers';
 import ExerciseView from '../player/variants';
-import { Button, Card, Badge, RichText } from '../ui';
+import { Badge, RichText } from '../ui';
 import type { PracticeCategory } from './categories';
 
 export interface PracticeSessionProps {
@@ -38,7 +40,23 @@ function typeLabel(t: Exercise['type']): string {
  * { dimension, isWeakReview: true } để cộng XP ôn tập + cập nhật mastery/SRS.
  */
 export default function PracticeSession({ category, onExit }: PracticeSessionProps) {
-  const exercises = category.exercises;
+  // Hạt giống MỚI mỗi phiên: làm mới SỐ LIỆU của các bài có generator (cùng
+  // DẠNG bài để giữ nguyên bố cục danh mục — vd danh mục ma trận vẫn toàn bài
+  // ma trận). Skill không có generator → giữ nguyên bản tĩnh (backward-compat).
+  const seed = useMemo(() => (Date.now() ^ (Math.random() * 1e9)) >>> 0, [category.id]);
+  const exercises = useMemo<Exercise[]>(() => {
+    let n = 0;
+    return category.exercises.map((e) => {
+      const gens = SKILL_GENERATORS[e.skillId];
+      if (!gens || gens.length === 0) return e;
+      const rng = mulberry32((seed ^ (hashStr(e.skillId) + n++)) >>> 0);
+      for (const g of gens) {
+        const cand = g(rng);
+        if (cand.type === e.type) return cand; // thay bằng bản cùng dạng, số mới
+      }
+      return e;
+    });
+  }, [category, seed]);
   const recordAttempt = useLearnStore((s) => s.recordAttempt);
 
   const [idx, setIdx] = useState(0);
@@ -61,16 +79,16 @@ export default function PracticeSession({ category, onExit }: PracticeSessionPro
   if (exercises.length === 0) {
     return (
       <div className="pc-session">
-        <Card className="pc-summary">
+        <div className="la-card pc-summary">
           <div className="pc-summary-emoji">🗂️</div>
           <h1 className="pc-summary-title">Chưa có bài để luyện</h1>
           <p className="dl-muted">{category.emptyHint}</p>
           <div className="pc-summary-actions">
-            <Button size="lg" onClick={onExit}>
+            <button type="button" className="la-btn la-btn-primary" onClick={onExit}>
               ← Về Trung tâm luyện tập
-            </Button>
+            </button>
           </div>
-        </Card>
+        </div>
       </div>
     );
   }
@@ -137,7 +155,7 @@ export default function PracticeSession({ category, onExit }: PracticeSessionPro
     const perfect = wrongCount === 0;
     return (
       <div className="pc-session">
-        <Card className="pc-summary">
+        <div className="la-card pc-summary">
           <div className="pc-summary-emoji">{perfect ? '🏆' : '🎉'}</div>
           <h1 className="pc-summary-title">
             {perfect ? 'Ôn tập hoàn hảo!' : 'Hoàn thành buổi ôn!'}
@@ -156,14 +174,14 @@ export default function PracticeSession({ category, onExit }: PracticeSessionPro
             </div>
           </div>
           <div className="pc-summary-actions">
-            <Button variant="ghost" size="lg" onClick={onRestart}>
+            <button type="button" className="la-btn la-btn-secondary" onClick={onRestart}>
               🔁 Ôn lại
-            </Button>
-            <Button size="lg" onClick={onExit}>
+            </button>
+            <button type="button" className="la-btn la-btn-primary" onClick={onExit}>
               ← Về Trung tâm
-            </Button>
+            </button>
           </div>
-        </Card>
+        </div>
       </div>
     );
   }
@@ -189,7 +207,7 @@ export default function PracticeSession({ category, onExit }: PracticeSessionPro
         </span>
       </div>
 
-      <Card>
+      <div className="la-card-xl pc-q-card">
         <span className="pc-session-kicker">
           {category.icon} {category.title}
         </span>
@@ -234,25 +252,35 @@ export default function PracticeSession({ category, onExit }: PracticeSessionPro
             )}
           </div>
         )}
-      </Card>
+      </div>
 
       <div className="pc-actions">
         {!checked ? (
           <>
-            <Button variant="ghost" onClick={onHint} disabled={hintLevel >= 4}>
+            <button
+              type="button"
+              className="la-btn la-btn-secondary"
+              onClick={onHint}
+              disabled={hintLevel >= 4}
+            >
               💡 Gợi ý
-            </Button>
+            </button>
             <div className="pc-actions-spacer" />
-            <Button onClick={onCheck} disabled={!answered}>
+            <button
+              type="button"
+              className="la-btn la-btn-primary"
+              onClick={onCheck}
+              disabled={!answered}
+            >
               Kiểm tra
-            </Button>
+            </button>
           </>
         ) : (
           <>
             <div className="pc-actions-spacer" />
-            <Button variant={fb?.correct ? 'good' : 'primary'} onClick={onContinue}>
+            <button type="button" className="la-btn la-btn-primary" onClick={onContinue}>
               {idx < total - 1 ? 'Tiếp tục →' : 'Xem kết quả'}
-            </Button>
+            </button>
           </>
         )}
       </div>

@@ -1,7 +1,9 @@
 import { useMemo, useState, useRef, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { X, ChevronsRight, Lightbulb, Flag } from 'lucide-react';
+import { X, ChevronsRight, Lightbulb, Flag, TriangleAlert, Star, NotebookPen, Flame } from 'lucide-react';
 import { getMicroLesson } from '../../core/content/course';
+import { getUnmetPrereqsForSkills } from '../../core/content/knowledgeGraph';
+import { SKILL_BY_ID } from '../../core/content/skills';
 import { checkExercise } from '../../core/exercises/engine';
 import type { CheckResult, Exercise } from '../../core/exercises/types';
 import { SAMPLE_EXERCISES } from '../../core/exercises/sampleBank';
@@ -20,6 +22,9 @@ import type { HintLevel } from '../tutor/provider';
 import { hasDiagram } from '../tutor/diagramSpec';
 import TutorDiagram from '../tutor/TutorDiagram';
 import '../tutor/tutor.css'; // tái dùng style .tt-diagram-* (không sửa file)
+import './deps.css'; // banner "Nên nắm trước" (dependency highlight), prefix dp-
+import './notes.css'; // nút ⭐ + sheet ghi chú trong player, prefix nt-
+import './player.css'; // restyle vỏ màn làm bài theo screen `exercise`, prefix pl-
 
 type Phase = 'intro' | 'quiz' | 'summary';
 
@@ -59,10 +64,55 @@ function LessonRunner({ lessonId }: { lessonId: string }) {
   const streak = useLearnStore((s) => s.streak.current);
   const markDone = useCompletion((s) => s.markDone);
 
+  // ---- Đánh dấu ⭐ + Ghi chú (persist qua store, key `lesson:<id>`) ----
+  const bookmarkId = `lesson:${lessonId}`;
+  const isBookmarked = useLearnStore((s) => s.bookmarks.includes(bookmarkId));
+  const toggleBookmark = useLearnStore((s) => s.toggleBookmark);
+  const savedNote = useLearnStore((s) => s.notes[lessonId] ?? '');
+  const saveNote = useLearnStore((s) => s.saveNote);
+  const [notesOpen, setNotesOpen] = useState(false);
+  const [noteDraft, setNoteDraft] = useState(savedNote);
+  const [notePreview, setNotePreview] = useState(false);
+
+  // Hạt giống MỚI mỗi phiên học → đề có số liệu mới (đồ thị đọc số từ đề nên tự
+  // đổi theo). Date.now/Math.random chỉ dùng ở runtime app, không vào logic thuần.
+  const seed = useMemo(() => (Date.now() ^ (Math.random() * 1e9)) >>> 0, [lessonId]);
   const exercises = useMemo<Exercise[]>(() => {
-    const list = getExercisesForLesson(lessonId, 6);
+    const list = getExercisesForLesson(lessonId, 6, seed);
     return list && list.length ? list : SAMPLE_EXERCISES.slice(0, 6);
-  }, [lessonId]);
+  }, [lessonId, seed]);
+
+  // Dependency highlight: gom skill ids của các exercise trong bài (dedupe), rồi
+  // hỏi những prereq TRỰC TIẾP chưa đạt (mastery < threshold mặc định 0.4).
+  // Đọc mastery MỘT LẦN lúc mở bài qua getState() — không subscribe, không
+  // re-render mỗi lần chấm, và không nhấp nháy khi mastery skill hiện tại tăng.
+  const unmetPrereqs = useMemo(() => {
+    const masteryBySkill = useLearnStore.getState().masteryBySkill;
+    const masteryOf = (id: string) => masteryBySkill[id]?.score ?? 0;
+    const skillIds = Array.from(new Set(exercises.map((e) => e.skillId)));
+    return getUnmetPrereqsForSkills(skillIds, masteryOf);
+  }, [exercises]);
+
+  // Đóng banner: nhớ theo lessonId trong sessionStorage (ẩn suốt phiên).
+  const prereqDismissKey = `dp-prereq-dismissed:${lessonId}`;
+  const [prereqDismissed, setPrereqDismissed] = useState(() => {
+    try {
+      return sessionStorage.getItem(prereqDismissKey) === '1';
+    } catch {
+      return false;
+    }
+  });
+  const dismissPrereq = () => {
+    try {
+      sessionStorage.setItem(prereqDismissKey, '1');
+    } catch {
+      /* sessionStorage không khả dụng — vẫn ẩn trong state cho phiên hiện tại */
+    }
+    setPrereqDismissed(true);
+  };
+  const showPrereqBanner = unmetPrereqs.length > 0 && !prereqDismissed;
+  const prereqShown = unmetPrereqs.slice(0, 3);
+  const prereqExtra = unmetPrereqs.length - prereqShown.length;
 
   const startsWithIntro = lesson?.kind === 'concept' && !!lesson.deepDiveRoute;
   const [phase, setPhase] = useState<Phase>(startsWithIntro ? 'intro' : 'quiz');
@@ -149,6 +199,31 @@ function LessonRunner({ lessonId }: { lessonId: string }) {
   const onContinue = () => {
     if (idx < total - 1) goToExercise(idx + 1);
     else setPhase('summary');
+  };
+
+  // Bỏ qua: chuyển câu kế / kết bài mà KHÔNG chấm, KHÔNG ghi attempt, KHÔNG XP
+  // (điều hướng thuần — không đụng logic chấm/SRS/mastery). Chỉ dùng trước khi chấm.
+  const onSkip = () => {
+    if (checked) return;
+    if (idx < total - 1) goToExercise(idx + 1);
+    else setPhase('summary');
+  };
+
+  // ---- Ghi chú: mở đồng bộ với bản đã lưu, auto-save khi rời/đóng ----
+  const openNotes = () => {
+    setNoteDraft(savedNote);
+    setNotePreview(false);
+    setNotesOpen(true);
+  };
+  const persistNote = () => saveNote(lessonId, noteDraft);
+  const closeNotes = () => {
+    persistNote();
+    setNotesOpen(false);
+  };
+  const saveNotesAndClose = () => {
+    persistNote();
+    setNotesOpen(false);
+    setToast('Đã lưu ghi chú');
   };
 
   // ---- Trợ giảng: mở gợi ý cấp kế tiếp / cấp 4 ----
@@ -250,23 +325,44 @@ function LessonRunner({ lessonId }: { lessonId: string }) {
   // ---- QUIZ ----
   const fb = checked;
   return (
-    <div className={`dl-player-quiz ${showVisual ? 'has-visual' : ''}`.trim()}>
+    <div className={`dl-player-quiz pl-quiz ${showVisual ? 'has-visual' : ''}`.trim()}>
       {/* a. Hàng tiến trình siêu gọn */}
       <header className="dl-quiz-bar">
         <button
           type="button"
-          className="dl-close"
+          className="la-icon-btn pl-close"
           onClick={() => navigate('/')}
           aria-label="Thoát"
         >
           <X size={20} strokeWidth={2} />
         </button>
-        <div className="dl-progress">
-          <span className="dl-progress-fill" style={{ width: `${progress * 100}%` }} />
+        <div className="la-progress pl-progressbar">
+          <i style={{ width: `${progress * 100}%` }} />
         </div>
-        <span className="dl-progress-count">
-          {idx + 1}/{total}
+        <span className="pl-chip" title={`Chuỗi ${streak} ngày liên tiếp`}>
+          <Flame size={15} strokeWidth={2.4} aria-hidden="true" />
+          <span>{streak}</span>
         </span>
+        <button
+          type="button"
+          className={`nt-bar-btn${isBookmarked ? ' is-on' : ''}`}
+          onClick={() => toggleBookmark(bookmarkId)}
+          aria-pressed={isBookmarked}
+          title={isBookmarked ? 'Bỏ đánh dấu bài học' : 'Đánh dấu bài học'}
+          aria-label={isBookmarked ? 'Bỏ đánh dấu bài học' : 'Đánh dấu bài học'}
+        >
+          <Star size={19} strokeWidth={2} fill={isBookmarked ? 'currentColor' : 'none'} />
+        </button>
+        <button
+          type="button"
+          className={`nt-bar-btn${savedNote.trim() ? ' has-note' : ''}`}
+          onClick={openNotes}
+          title="Ghi chú bài học"
+          aria-label="Ghi chú bài học"
+        >
+          <NotebookPen size={18} strokeWidth={2} />
+          {savedNote.trim() && <span className="nt-bar-dot" aria-hidden="true" />}
+        </button>
       </header>
 
       <div className="dl-quiz-main">
@@ -279,18 +375,57 @@ function LessonRunner({ lessonId }: { lessonId: string }) {
 
         <section className="dl-quiz-panel">
           <div className="dl-quiz-content">
-            {/* Caption dạng bài — chỉ hiện trên PC */}
-            <p className="dl-quiz-meta">
-              {typeLabel(ex.type)} · Độ khó {ex.difficulty}
-            </p>
+            {/* Nhắc kiến thức nền chưa đạt — không chặn học, đóng được, nhớ theo phiên */}
+            {showPrereqBanner && (
+              <div className="dp-prereq" role="note" aria-label="Kiến thức nên nắm trước">
+                <TriangleAlert className="dp-prereq-icon" size={16} strokeWidth={2} aria-hidden="true" />
+                <span className="dp-prereq-label">Nên nắm trước:</span>
+                <div className="dp-prereq-pills">
+                  {prereqShown.map((id) => (
+                    <button
+                      key={id}
+                      type="button"
+                      className="dp-prereq-pill"
+                      onClick={() => navigate('/chapters')}
+                      title={SKILL_BY_ID[id]?.name ?? id}
+                    >
+                      {skillShortName(id)}
+                    </button>
+                  ))}
+                  {prereqExtra > 0 && <span className="dp-prereq-more">+{prereqExtra}</span>}
+                </div>
+                <button
+                  type="button"
+                  className="dp-prereq-close"
+                  onClick={dismissPrereq}
+                  aria-label="Đóng nhắc nhở"
+                >
+                  <X size={16} strokeWidth={2} />
+                </button>
+              </div>
+            )}
 
-            {/* c. Đề bài TEXT — in đậm, rõ nét */}
-            <div className="dl-quiz-prompt">
-              <RichText text={ex.prompt} />
+            {/* c. Thẻ câu hỏi (la-card-xl): "Câu i/n" + đề bài */}
+            <div className="pl-qcard la-card-xl">
+              <div className="pl-qhead">
+                <span className="pl-qnum">
+                  Câu {idx + 1}/{total}
+                </span>
+                <span className="pl-qmeta">
+                  {typeLabel(ex.type)} · Độ khó {ex.difficulty}
+                </span>
+              </div>
+              <div className="dl-quiz-prompt pl-prompt">
+                <RichText text={ex.prompt} />
+              </div>
             </div>
 
-            {/* d. Widget trả lời */}
-            <div className="dl-quiz-answer">
+            {/* d. Widget trả lời (sau chấm: tô ô đã chọn theo đúng/sai) */}
+            <div
+              className={`dl-quiz-answer pl-answer${
+                checked ? (checked.correct ? ' pl-answer--correct' : ' pl-answer--wrong') : ''
+              }`}
+            >
               <ExerciseView
                 exercise={ex}
                 value={answer}
@@ -302,7 +437,7 @@ function LessonRunner({ lessonId }: { lessonId: string }) {
 
           {/* Phản hồi đúng/sai — flex-none, không đẩy cả trang scroll */}
           {fb && (
-            <div className={`dl-feedback ${fb.correct ? 'good' : 'bad'}`}>
+            <div className={`dl-feedback pl-feedback ${fb.correct ? 'good' : 'bad'}`}>
               <div className="dl-feedback-head">
                 <span className="dl-feedback-icon">{fb.correct ? '✓' : '✕'}</span>
                 <span className="dl-feedback-title">
@@ -324,8 +459,8 @@ function LessonRunner({ lessonId }: { lessonId: string }) {
             </div>
           )}
 
-          {/* Thanh hành động: 2 nút tròn trợ giảng + báo lỗi + CTA duy nhất */}
-          <div className="dl-quiz-foot">
+          {/* Thanh hành động sticky: [trợ giảng][báo lỗi] · [Bỏ qua][Kiểm tra/Tiếp tục] */}
+          <div className="dl-quiz-foot pl-foot">
             <div className="dl-tutor-btns">
               <button
                 type="button"
@@ -361,13 +496,31 @@ function LessonRunner({ lessonId }: { lessonId: string }) {
             <div className="dl-actions-spacer" />
 
             {!checked ? (
-              <Button onClick={onCheck} disabled={!answered}>
-                Kiểm tra
-              </Button>
+              <>
+                <button
+                  type="button"
+                  className="la-btn la-btn-secondary la-btn-sm"
+                  onClick={onSkip}
+                >
+                  Bỏ qua
+                </button>
+                <button
+                  type="button"
+                  className="la-btn la-btn-primary la-btn-sm"
+                  onClick={onCheck}
+                  disabled={!answered}
+                >
+                  Kiểm tra
+                </button>
+              </>
             ) : (
-              <Button variant={fb?.correct ? 'good' : 'primary'} onClick={onContinue}>
-                {idx < total - 1 ? 'Tiếp tục →' : 'Xem kết quả'}
-              </Button>
+              <button
+                type="button"
+                className="la-btn la-btn-primary la-btn-sm"
+                onClick={onContinue}
+              >
+                {idx < total - 1 ? 'Tiếp tục' : 'Xem kết quả'}
+              </button>
             )}
           </div>
         </section>
@@ -448,6 +601,62 @@ function LessonRunner({ lessonId }: { lessonId: string }) {
         </>
       )}
 
+      {/* Ghi chú: bottom sheet (mobile) / popover (PC) — fixed overlay, không phá luật 1-màn */}
+      {notesOpen && (
+        <>
+          <div className="nt-scrim" onClick={closeNotes} aria-hidden="true" />
+          <div className="nt-sheet" role="dialog" aria-label="Ghi chú bài học">
+            <div className="nt-sheet-head">
+              <span className="nt-sheet-title">📝 Ghi chú</span>
+              <button
+                type="button"
+                className="nt-preview-toggle"
+                onClick={() => setNotePreview((p) => !p)}
+              >
+                {notePreview ? 'Soạn thảo' : 'Xem trước'}
+              </button>
+              <button
+                type="button"
+                className="nt-sheet-close"
+                onClick={closeNotes}
+                aria-label="Đóng"
+              >
+                <X size={18} strokeWidth={2} />
+              </button>
+            </div>
+
+            <div className="nt-sheet-body">
+              {notePreview ? (
+                <div className="nt-preview">
+                  {noteDraft.trim() ? (
+                    <MultiLine text={noteDraft} />
+                  ) : (
+                    <p className="dl-muted">Chưa có nội dung để xem trước.</p>
+                  )}
+                </div>
+              ) : (
+                <textarea
+                  className="nt-textarea"
+                  value={noteDraft}
+                  onChange={(e) => setNoteDraft(e.target.value)}
+                  onBlur={persistNote}
+                  placeholder="Ghi chú của bạn… Hỗ trợ LaTeX $…$ và xuống dòng."
+                  autoFocus
+                />
+              )}
+            </div>
+
+            <div className="nt-sheet-foot">
+              <span className="nt-count">{noteDraft.length} ký tự</span>
+              <div className="nt-spacer" />
+              <Button size="sm" onClick={saveNotesAndClose}>
+                Lưu
+              </Button>
+            </div>
+          </div>
+        </>
+      )}
+
       {toast && <div className="dl-toast">{toast}</div>}
     </div>
   );
@@ -469,6 +678,13 @@ function MultiLine({ text }: { text: string }) {
       )}
     </>
   );
+}
+
+/** Tên hiển thị ngắn của skill: lấy phần tiếng Việt trước dấu ngoặc. */
+function skillShortName(id: string): string {
+  const full = SKILL_BY_ID[id]?.name ?? id;
+  const paren = full.indexOf('(');
+  return (paren > 0 ? full.slice(0, paren) : full).trim();
 }
 
 function typeLabel(t: Exercise['type']): string {

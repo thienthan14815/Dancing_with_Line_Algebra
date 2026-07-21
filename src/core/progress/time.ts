@@ -37,3 +37,16 @@ export function addDaysISO(nowISO: string, days: number): string {
   const t = new Date(nowISO).getTime() + days * 86_400_000;
   return new Date(t).toISOString();
 }
+
+/**
+ * Epoch-ms of the local Monday 00:00 that starts the week containing `input`
+ * (weeks run Mon–Sun in the host's local calendar, matching the analytics view).
+ * Compare an attempt's `Date.parse(createdAt)` against this to test "this week".
+ */
+export function startOfWeekMs(input: string | Date): number {
+  const d = typeof input === 'string' ? new Date(input) : new Date(input.getTime());
+  const dow = (d.getDay() + 6) % 7; // 0 = Monday … 6 = Sunday
+  d.setHours(0, 0, 0, 0);
+  d.setDate(d.getDate() - dow);
+  return d.getTime();
+}

@@ -1,0 +1,318 @@
+/* =====================================================================
+   LỘ TRÌNH HỌC (LearningPath) — screen "roadmap".
+   Prefix `rn-`. Chỉ dùng token var() + tái dùng lớp .la-* (SHELL định nghĩa
+   trong shell.css). KHÔNG định nghĩa lại .la-*. Dark mode tự chạy nhờ token.
+   ===================================================================== */
+
+/* ---------- (1) TitleBlock ---------- */
+.rn-head {
+  margin: 0 0 20px;
+}
+.rn-head-title {
+  margin: 0 0 6px;
+  font-size: var(--fs-heading);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+  color: var(--text);
+}
+.rn-head-sub {
+  margin: 0;
+  font-size: var(--fs-caption);
+  color: var(--text-secondary);
+}
+
+/* ---------- (2) Thẻ tổng quan ---------- */
+.rn-summary {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 0 0 20px;
+}
+.rn-summary-top {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+.rn-summary-label {
+  font-size: var(--fs-body);
+  font-weight: 600;
+  color: var(--text);
+}
+.rn-summary-pct {
+  font-size: var(--fs-heading);
+  font-weight: 700;
+  line-height: 1;
+  color: var(--primary);
+  font-variant-numeric: tabular-nums;
+}
+.rn-summary-cap {
+  margin: 0;
+  font-size: var(--fs-caption);
+  color: var(--text-secondary);
+  line-height: 1.45;
+}
+
+/* ---------- (3) Bộ lọc ---------- */
+.rn-filters {
+  margin: 0 0 20px;
+}
+
+/* ---------- (4) Timeline dọc ---------- */
+.rn-timeline {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.rn-item {
+  position: relative;
+  padding-left: 56px;
+  scroll-margin-top: 84px;
+  scroll-margin-bottom: 24px;
+}
+
+/* Connector trái: từ tâm badge node này xuống tâm badge node kế (gap 16 + 36). */
+.rn-line {
+  position: absolute;
+  left: 27px;
+  top: 36px;
+  bottom: -52px;
+  width: 2px;
+  border-radius: var(--radius-chip);
+  background: var(--border);
+}
+.rn-item[data-status='completed'] .rn-line {
+  background: var(--primary);
+}
+
+/* Badge chỉ số 40px — đặt trong máng trái, đè lên connector. */
+.rn-badge {
+  position: absolute;
+  left: 8px;
+  top: 16px;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-chip);
+  display: grid;
+  place-items: center;
+  font-weight: 700;
+  font-size: 15px;
+  font-variant-numeric: tabular-nums;
+  z-index: 1;
+}
+.rn-badge-num {
+  line-height: 1;
+}
+.rn-item[data-status='completed'] .rn-badge,
+.rn-item[data-status='current'] .rn-badge {
+  background: var(--grad-primary);
+  color: var(--on-primary);
+}
+.rn-item[data-status='current'] .rn-badge {
+  box-shadow: 0 0 0 3px var(--primary-soft);
+}
+.rn-item[data-status='available'] .rn-badge {
+  background: var(--primary-soft);
+  color: var(--primary);
+}
+.rn-item[data-status='locked'] .rn-badge {
+  background: var(--panel-2);
+  color: var(--text-hint);
+}
+.rn-badge-lock {
+  position: absolute;
+  right: -3px;
+  bottom: -3px;
+  padding: 2px;
+  width: 17px;
+  height: 17px;
+  border-radius: var(--radius-chip);
+  background: var(--surface);
+  color: var(--text-hint);
+  box-shadow: 0 0 0 1px var(--border);
+}
+
+/* Node card */
+.rn-card {
+  position: relative;
+  transition:
+    box-shadow var(--dur-2) var(--ease),
+    transform var(--dur-2) var(--ease);
+}
+.rn-item[data-status='locked'] .rn-card {
+  opacity: 0.6;
+}
+.rn-card-btn {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.rn-item:not([data-status='locked']) .rn-card-btn {
+  cursor: pointer;
+}
+.rn-item:not([data-status='locked']) .rn-card:hover {
+  box-shadow: var(--elev-3);
+}
+.rn-card-btn:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 3px;
+  border-radius: var(--radius-md);
+}
+
+.rn-card-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+.rn-head-mid {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.rn-level {
+  font-size: var(--fs-small);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--primary);
+}
+.rn-item[data-status='locked'] .rn-level {
+  color: var(--text-hint);
+}
+.rn-node-title {
+  margin: 0;
+  font-size: var(--fs-title);
+  font-weight: 700;
+  line-height: 1.3;
+  color: var(--text);
+}
+.rn-node-sub {
+  margin: 0;
+  font-size: var(--fs-caption);
+  color: var(--text-secondary);
+  line-height: 1.45;
+}
+.rn-visual {
+  flex: none;
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-md);
+  background: var(--primary-soft);
+  color: var(--primary);
+  display: grid;
+  place-items: center;
+}
+
+/* Hàng tiến độ */
+.rn-prog-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.rn-prog-row > .la-progress {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+.rn-pct {
+  flex: none;
+  min-width: 34px;
+  text-align: right;
+  font-size: var(--fs-small);
+  font-weight: 700;
+  color: var(--text-secondary);
+  font-variant-numeric: tabular-nums;
+}
+.rn-chevron {
+  flex: none;
+  color: var(--text-hint);
+  transition: transform var(--dur-2) var(--ease);
+}
+.rn-chevron[data-open='true'] {
+  transform: rotate(180deg);
+}
+
+/* Units mở ra */
+.rn-units {
+  margin-top: 4px;
+  padding-top: 16px;
+  border-top: 1px solid var(--divider);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.rn-unit-name {
+  margin: 0 0 8px;
+  font-size: var(--fs-caption);
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+.rn-lessons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.rn-lesson {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 40px;
+  padding: 8px 14px;
+  border-radius: var(--radius-chip);
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  font-family: var(--font);
+  font-size: var(--fs-caption);
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    border-color var(--dur-1) var(--ease),
+    color var(--dur-1) var(--ease),
+    background var(--dur-1) var(--ease);
+}
+.rn-lesson:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+.rn-lesson:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+.rn-lesson[data-state='done'] {
+  background: var(--good-soft);
+  border-color: transparent;
+  color: var(--good);
+}
+.rn-lesson[data-state='next'] {
+  border-color: var(--primary);
+  border-width: 1.5px;
+  color: var(--primary);
+}
+
+/* Ghi chú khoá */
+.rn-lock-note {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 12px 0 0;
+  font-size: var(--fs-small);
+  color: var(--text-hint);
+  line-height: 1.4;
+}
+.rn-lock-note svg {
+  flex: none;
+}
+
+@media (max-width: 360px) {
+  .rn-item {
+    padding-left: 50px;
+  }
+}
