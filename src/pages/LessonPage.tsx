@@ -1,7 +1,9 @@
-import { Suspense, lazy, useEffect, useMemo } from 'react';
-import { useParams, useNavigate, Link } from 'react-router-dom';
+import { Suspense, lazy, useEffect, useMemo, useState } from 'react';
+import { useParams, useNavigate, Link, Navigate } from 'react-router-dom';
 import { findChapter, flatLessons } from '../chapters/registry';
 import { LessonViewProvider, type LessonView } from '../components/Lesson';
+import { MODULES } from '../content/registry';
+import LessonBrief from '../app/teaching/LessonBrief';
 import './lesson-page.css';
 
 // Bố cục mới: trang bài học = "Lý thuyết" (Khám phá + Lý thuyết + Từng bước);
@@ -11,6 +13,7 @@ export default function LessonPage({ view = 'theory' }: { view?: LessonView }) {
   const { chapterId = '', lessonId = '' } = useParams();
   const navigate = useNavigate();
   const chapter = findChapter(chapterId);
+  const [expanded, setExpanded] = useState(false);
 
   const LazyChapter = useMemo(() => {
     if (!chapter) return null;
@@ -20,6 +23,7 @@ export default function LessonPage({ view = 'theory' }: { view?: LessonView }) {
   // Đổi bài hoặc đổi chế độ xem → về đầu trang.
   useEffect(() => {
     window.scrollTo(0, 0);
+    setExpanded(false);
   }, [chapterId, lessonId, view]);
 
   if (!chapter || !LazyChapter) {
@@ -41,14 +45,26 @@ export default function LessonPage({ view = 'theory' }: { view?: LessonView }) {
 
   const isQuizView = view === 'quiz';
   const lessonUrl = `/ch/${chapterId}/${lessonId}`;
+  const isModule = MODULES.some((module) => module.id === chapterId);
+
+  // Module exercises belong to the shared exercise engine, not classic Quiz.
+  if (isModule && isQuizView) return <Navigate replace to={`/learn/${chapterId}:${lessonId}:practice`} />;
 
   return (
     <div className="page">
-      <Suspense fallback={<div className="panel">Đang tải chương…</div>}>
-        <LessonViewProvider view={view}>
-          <LazyChapter lessonId={lessonId} key={`${chapterId}/${lessonId}/${view}`} />
-        </LessonViewProvider>
-      </Suspense>
+      {!isQuizView && <LessonBrief key={`${chapterId}/${lessonId}`} chapterId={chapterId} lessonId={lessonId} />}
+      {isQuizView ? (
+        <Suspense fallback={<div className="panel">Đang tải bài kiểm tra…</div>}>
+          <LessonViewProvider view={view}><LazyChapter lessonId={lessonId} key={`${chapterId}/${lessonId}/${view}`} /></LessonViewProvider>
+        </Suspense>
+      ) : (
+        <details className="lesson-deep-dive" open={expanded} onToggle={(event) => setExpanded(event.currentTarget.open)}>
+          <summary>Khám phá tương tác & giải thích chi tiết</summary>
+          {expanded && <Suspense fallback={<div className="panel">Đang tải phần tương tác…</div>}>
+            <LessonViewProvider view={view}><LazyChapter lessonId={lessonId} key={`${chapterId}/${lessonId}/${view}`} /></LessonViewProvider>
+          </Suspense>}
+        </details>
+      )}
 
       {/* Dock hành động — GHIM góc phải dưới, đi theo khi cuộn */}
       <div className="lesson-fab-dock">
@@ -80,8 +96,8 @@ export default function LessonPage({ view = 'theory' }: { view?: LessonView }) {
           </div>
         )}
 
-        <Link className="lfd-btn lfd-ghost" to={`/luyen-tap/${chapterId}`}>
-          ✍️ Luyện tập chương
+        <Link className="lfd-btn lfd-ghost" to={isModule ? `/learn/${chapterId}:${lessonId}:practice` : `/luyen-tap/${chapterId}`}>
+          ✍️ {isModule ? 'Luyện tập bài' : 'Luyện tập chương'}
         </Link>
 
         <button

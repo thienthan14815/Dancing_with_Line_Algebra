@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { isDeveloperMode } from '../developerMode';
 import { storage } from '../persistence/localStorage';
 import type {
   Achievement,
@@ -230,6 +231,7 @@ export const useLearnStore = create<LearnState>()((set, get) => ({
 
   recordAttempt: (a, opts) =>
     set((state) => {
+      if (isDeveloperMode()) return state;
       const now = new Date();
       const nowISO = now.toISOString();
       const today = toDayKey(now);
@@ -286,6 +288,7 @@ export const useLearnStore = create<LearnState>()((set, get) => ({
 
   gradeFlashcard: (skillId, grade) =>
     set((state) => {
+      if (isDeveloperMode()) return state;
       const now = new Date();
       const nowISO = now.toISOString();
       const today = toDayKey(now);
@@ -338,6 +341,7 @@ export const useLearnStore = create<LearnState>()((set, get) => ({
 
   awardXp: (amount, reason) =>
     set((state) => {
+      if (isDeveloperMode()) return state;
       const now = new Date();
       const nowISO = now.toISOString();
       const today = toDayKey(now);
@@ -361,6 +365,7 @@ export const useLearnStore = create<LearnState>()((set, get) => ({
 
   completeLesson: (lessonId, skillIds, opts) =>
     set((state) => {
+      if (isDeveloperMode()) return state;
       const now = new Date();
       const nowISO = now.toISOString();
       const today = toDayKey(now);
@@ -438,6 +443,7 @@ export const useLearnStore = create<LearnState>()((set, get) => ({
 
   toggleBookmark: (id) =>
     set((state) => {
+      if (isDeveloperMode()) return state;
       const nowISO = new Date().toISOString();
       const today = toDayKey(nowISO);
       const has = state.bookmarks.includes(id);
@@ -461,6 +467,7 @@ export const useLearnStore = create<LearnState>()((set, get) => ({
 
   saveNote: (lessonId, text) =>
     set((state) => {
+      if (isDeveloperMode()) return state;
       const nowISO = new Date().toISOString();
       const today = toDayKey(nowISO);
       const hadNote = !!state.notes[lessonId]?.trim();

@@ -6,6 +6,7 @@ import Slider from '../../components/Slider';
 import StepByStep from '../../components/StepByStep';
 import Quiz from '../../components/Quiz';
 import { f2, Stat, StatRow, Hint, TwoCol, Bridge, LegendDot } from './_shared';
+import { useReducedMotion } from '../../components/motion/useReducedMotion';
 
 // ---------------------------------------------------------------------------
 // Mặt loss dạng "thung lũng hẹp": L(x,y) = ½(A·x² + B·y²)
@@ -146,6 +147,7 @@ export default function OptimizersLesson() {
   const [lr, setLr] = useState(0.15);
   const [step, setStep] = useState(STEPS);
   const [running, setRunning] = useState(false);
+  const reducedMotion = useReducedMotion();
 
   const traj = useMemo(
     () => ({ gd: gdTraj(lr), mom: momentumTraj(lr), adam: adamTraj(lr) }),
@@ -161,12 +163,16 @@ export default function OptimizersLesson() {
 
   // Chạy hoạt ảnh: mỗi nhịp tiến 1 bước.
   useEffect(() => {
-    if (!running) return;
+    if (!running || reducedMotion) return;
     const id = window.setInterval(() => {
       setStep((s) => (s >= maxLen - 1 ? s : s + 1));
     }, 130);
     return () => window.clearInterval(id);
-  }, [running, maxLen]);
+  }, [running, maxLen, reducedMotion]);
+
+  useEffect(() => {
+    if (reducedMotion) setRunning(false);
+  }, [reducedMotion]);
 
   useEffect(() => {
     if (step >= maxLen - 1) setRunning(false);
@@ -282,9 +288,21 @@ export default function OptimizersLesson() {
               format={(n) => `${Math.round(n)} / ${maxLen - 1}`}
             />
             <div className="row" style={{ gap: 8, marginTop: 8 }}>
-              <button className="btn btn-primary" onClick={() => setRunning((r) => !r)}>
-                {running ? '⏸ Dừng' : '▶ Chạy'}
+              <button className="btn btn-primary" onClick={() => {
+                if (reducedMotion) {
+                  setRunning(false);
+                  setStep(maxLen - 1);
+                } else {
+                  if (step >= maxLen - 1) setStep(0);
+                  setRunning((r) => !r);
+                }
+              }}>
+                {reducedMotion ? 'Xem kết quả' : running ? '⏸ Dừng' : '▶ Chạy'}
               </button>
+              <button type="button" className="btn" disabled={step >= maxLen - 1} onClick={() => {
+                setRunning(false);
+                setStep((s) => Math.min(maxLen - 1, s + 1));
+              }}>Tiến 1 bước</button>
               <button
                 className="btn"
                 onClick={() => {

@@ -7,6 +7,7 @@ import StepByStep from '../../components/StepByStep';
 import Quiz from '../../components/Quiz';
 import { eigen2x2, inverse, matVec, lerp, type Mat } from '../../lib/linalg';
 import { f2 } from './util';
+import { useReducedMotion } from '../../components/motion/useReducedMotion';
 
 const PRESETS: { label: string; m: Mat }[] = [
   { label: 'Đối xứng [[2,1],[1,2]]', m: [[2, 1], [1, 2]] },
@@ -39,6 +40,9 @@ export default function Lesson3Eigenspace() {
   const [v, setV] = useState({ x: 3, y: 0.5 });
   const [t, setT] = useState(0); // 0 = chưa áp A, 1 = đã áp A
   const rafRef = useRef<number | null>(null);
+  const reducedMotion = useReducedMotion();
+  const currentT = useRef(0);
+  const targetT = useRef(0);
 
   const kind = classify(M);
   const eig = eigen2x2(M);
@@ -47,23 +51,43 @@ export default function Lesson3Eigenspace() {
 
   // Animation áp A: t chạy 0 → 1
   const animate = (dir: 1 | -1) => {
-    if (rafRef.current) cancelAnimationFrame(rafRef.current);
+    if (rafRef.current !== null) cancelAnimationFrame(rafRef.current);
+    rafRef.current = null;
     const start = performance.now();
-    const from = dir === 1 ? 0 : 1;
+    const from = currentT.current;
     const to = dir === 1 ? 1 : 0;
+    targetT.current = to;
+    if (reducedMotion) {
+      currentT.current = to;
+      setT(to);
+      return;
+    }
     const tick = (now: number) => {
       const p = Math.min(1, (now - start) / 700);
       const e = p < 0.5 ? 2 * p * p : 1 - Math.pow(-2 * p + 2, 2) / 2;
-      setT(lerp(from, to, e));
+      currentT.current = lerp(from, to, e);
+      setT(currentT.current);
       if (p < 1) rafRef.current = requestAnimationFrame(tick);
+      else rafRef.current = null;
     };
     rafRef.current = requestAnimationFrame(tick);
   };
   useEffect(() => () => {
-    if (rafRef.current) cancelAnimationFrame(rafRef.current);
+    if (rafRef.current !== null) cancelAnimationFrame(rafRef.current);
   }, []);
+  useEffect(() => {
+    if (!reducedMotion) return;
+    if (rafRef.current !== null) cancelAnimationFrame(rafRef.current);
+    rafRef.current = null;
+    currentT.current = targetT.current;
+    setT(targetT.current);
+  }, [reducedMotion]);
   // Đổi ma trận / kéo v thì đưa về trạng thái chưa áp
   useEffect(() => {
+    if (rafRef.current !== null) cancelAnimationFrame(rafRef.current);
+    rafRef.current = null;
+    currentT.current = 0;
+    targetT.current = 0;
     setT(0);
   }, [M, v.x, v.y]);
 

@@ -9,6 +9,7 @@ import {
   type PointerEvent as ReactPointerEvent,
 } from 'react';
 import { lerpMat, type Mat } from '../lib/linalg';
+import { useReducedMotion } from './motion/useReducedMotion';
 
 // Nhãn số trên trục — trắng mờ trên nền navy (mọi Canvas2D đều nền navy).
 const AXIS_NUM_FILL = 'rgba(255,255,255,0.45)';
@@ -99,6 +100,7 @@ export default function Canvas2D({
 }: Canvas2DProps) {
   const wrapRef = useRef<HTMLDivElement>(null);
   const [width, setWidth] = useState(600);
+  const reducedMotion = useReducedMotion();
 
   // ---- Đo bề rộng container ----
   useLayoutEffect(() => {
@@ -122,6 +124,13 @@ export default function Canvas2D({
   useEffect(() => {
     const to = matrix ? [matrix[0].slice(), matrix[1].slice()] : IDENTITY2;
     const from = fromRef.current;
+    if (rafRef.current !== null) cancelAnimationFrame(rafRef.current);
+    rafRef.current = null;
+    if (reducedMotion) {
+      fromRef.current = to;
+      setAnimMat(to);
+      return;
+    }
     // Nếu không đổi, bỏ qua
     const same =
       from[0][0] === to[0][0] &&
@@ -138,20 +147,24 @@ export default function Canvas2D({
       const t = Math.min(1, (now - start) / duration);
       const e = easeInOut(t);
       const cur = lerpMat(from, to, e);
+      // A new target starts from the last visible frame, even mid-transition.
+      fromRef.current = cur;
       setAnimMat(cur);
       if (t < 1) {
         rafRef.current = requestAnimationFrame(tick);
       } else {
         fromRef.current = to;
+        rafRef.current = null;
         setAnimMat(to);
       }
     };
     rafRef.current = requestAnimationFrame(tick);
     return () => {
-      if (rafRef.current) cancelAnimationFrame(rafRef.current);
+      if (rafRef.current !== null) cancelAnimationFrame(rafRef.current);
+      rafRef.current = null;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [matrix ? JSON.stringify(matrix) : 'id']);
+  }, [matrix ? JSON.stringify(matrix) : 'id', reducedMotion]);
 
   // ---- Chuyển đổi tọa độ ----
   const cx = width / 2;

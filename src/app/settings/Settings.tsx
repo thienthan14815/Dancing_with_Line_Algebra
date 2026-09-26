@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { Button, Card, Badge } from '../ui';
 import { syncService } from '../../core/persistence/sync';
+import { Link } from 'react-router-dom';
+import { useDeveloperMode } from '../../core/developerMode';
 import './settings.css';
 
 type Tone = 'good' | 'bad' | 'muted';
@@ -37,6 +39,8 @@ const ENDPOINTS: { method: string; path: string; note: string }[] = [
 ];
 
 export default function Settings() {
+  const developerMode = useDeveloperMode((state) => state.enabled);
+  const setDeveloperMode = useDeveloperMode((state) => state.setEnabled);
   const cfg = syncService.getConfig();
   const [baseUrl, setBaseUrl] = useState(cfg?.baseUrl ?? '');
   const [token, setToken] = useState(cfg?.token ?? '');
@@ -186,6 +190,16 @@ export default function Settings() {
                 </button>
               ))}
             </div>
+          </Card>
+
+          <Card>
+            <h2 className="st-h2">Developer mode</h2>
+            <p className="st-hint">Mở mọi bài học để kiểm tra. Các lần thử không cộng XP hoặc ghi tiến độ. Cài đặt được lưu trên thiết bị này.</p>
+            <label className="st-toggle">
+              <input type="checkbox" role="switch" checked={developerMode} onChange={(event) => setDeveloperMode(event.target.checked)} />
+              <span>Bật Developer mode</span>
+            </label>
+            {developerMode && <Link to="/developer">Mở danh sách toàn bộ bài học →</Link>}
           </Card>
 
           <Button variant="ghost" block onClick={() => setView('backend')}>

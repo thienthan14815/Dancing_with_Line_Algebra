@@ -1,0 +1,42 @@
+.teach-brief { margin: 0 0 24px; padding: clamp(16px, 3vw, 28px); background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); color: var(--text); }
+.teach-header { margin-bottom: 18px; }
+.teach-header h2 { margin: 5px 0 0; font-size: clamp(19px, 2.7vw, 24px); line-height: 1.4; }
+.teach-eyebrow { margin: 0; color: var(--accent); font-size: 12px; font-weight: 750; letter-spacing: .04em; }
+.teach-stages, .teach-skills { display: flex; gap: 8px; margin: 0 0 18px; flex-wrap: wrap; }
+.teach-stages button, .teach-skills button, .teach-navigation button { cursor: pointer; color: var(--text); font: inherit; border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 10px 12px; background: var(--surface); line-height: 1.4; }
+.teach-stages button { flex: 1 1 145px; display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 13px; }
+.teach-stages button span { border-radius: 50%; display: inline-grid; place-items: center; width: 23px; height: 23px; background: var(--panel-2); font-weight: 700; }
+.teach-stages button[aria-pressed=true], .teach-skills button[aria-pressed=true] { border-color: var(--accent); background: var(--primary-soft); color: var(--accent-strong); }
+.teach-stages button:focus-visible, .teach-skills button:focus-visible, .teach-navigation button:focus-visible, .teach-reminder summary:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
+.teach-skills button { font-size: 12px; }
+.teach-rule { padding: 16px; border-inline-start: 3px solid var(--accent); background: var(--panel-2); border-radius: 0 var(--radius-sm) var(--radius-sm) 0; }
+.teach-rule-text { margin: 0; font-size: 16px; line-height: 1.65; }
+.teach-condition { margin: 10px 0 0; font-size: 13px; line-height: 1.65; color: var(--text-secondary); }
+.teach-rule .mathtext-block { max-width: 100%; overflow-x: auto; padding: 4px 0; }
+.teach-rule .katex-display { margin: .7em 0; }
+.teach-rule .katex { font-size: 1.12em; }
+.teach-visual { margin: 16px 0 0; padding: 10px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm); }
+.teach-visual svg { display: block; width: 100%; max-width: 650px; margin-inline: auto; height: auto; }
+.teach-visual figcaption { text-align: center; color: var(--text-secondary); font-size: 12px; line-height: 1.5; }
+.teach-visual .teach-visual-description { margin: 8px auto 0; max-width: 620px; font-size: 13px; line-height: 1.6; }
+.teach-stage-content h3 { margin: 0 0 16px; font-size: 18px; }
+.teach-stage-content p { line-height: 1.65; }
+.teach-example { padding: 0; margin: 0; list-style: none; display: grid; gap: 12px; }
+.teach-example li { display: flex; align-items: flex-start; gap: 12px; background: var(--panel-2); padding: 14px; border-radius: var(--radius-sm); }
+.teach-example li>span { flex: 0 0 26px; height: 26px; display: grid; place-items: center; border-radius: 50%; background: var(--primary-soft); color: var(--accent); font-weight: 700; }
+.teach-example p { margin: 0; font-size: 14px; }
+.teach-pitfall { border-inline-start: 3px solid var(--warn); background: var(--warn-soft); color: var(--text); padding: 14px; border-radius: 0 var(--radius-sm) var(--radius-sm) 0; }
+.teach-reminder { margin-top: 18px; }
+.teach-reminder summary { padding: 8px 0; color: var(--accent); cursor: pointer; font-size: 14px; }
+.teach-navigation { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 18px; }
+.teach-navigation button { font-size: 13px; }
+.teach-navigation button:disabled { opacity: .45; cursor: default; }
+.teach-navigation>span { font-size: 12px; color: var(--text-secondary); }
+@media (max-width: 480px) {
+  .teach-stages { gap: 5px; }
+  .teach-stages button { flex-basis: 0; padding: 9px 5px; font-size: 11px; flex-direction: column; }
+  .teach-rule { padding: 12px; }
+  .teach-rule-text { font-size: 14px; }
+  .teach-visual { padding: 6px 2px; overflow-x: auto; }
+  .teach-visual svg { min-width: 360px; }
+}

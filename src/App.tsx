@@ -23,6 +23,7 @@ const Profile = lazy(() => import('./app/profile/Profile'));
 const Guidebook = lazy(() => import('./app/guidebook/Guidebook'));
 const Settings = lazy(() => import('./app/settings/Settings'));
 const TutorHub = lazy(() => import('./app/tutor/TutorHub'));
+const DeveloperPage = lazy(() => import('./app/developer/DeveloperPage'));
 
 function Loading() {
   return <div className="dl-loading">Đang tải…</div>;
@@ -53,6 +54,7 @@ export default function App() {
             <Route path="/so-tay" element={<Guidebook />} />
             <Route path="/so-tay/:sectionId" element={<Guidebook />} />
             <Route path="/cai-dat" element={<Settings />} />
+            <Route path="/developer" element={<DeveloperPage />} />
             <Route path="/onboarding" element={<Onboarding />} />
 
             {/* Trang "Chương (cổ điển)" = Home cũ */}

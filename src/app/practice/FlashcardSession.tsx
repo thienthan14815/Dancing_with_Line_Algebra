@@ -4,6 +4,7 @@ import { useLearnStore } from '../../core/progress/store';
 import type { FlashcardGrade } from '../../core/progress/store';
 import { RichText } from '../ui';
 import type { FlashCard } from './flashcards';
+import { useDeveloperMode } from '../../core/developerMode';
 
 export interface FlashcardSessionProps {
   /** Thẻ đến hạn (được CHỤP LẠI lúc mở phiên — không đổi khi store cập nhật). */
@@ -26,6 +27,7 @@ const GRADES: { grade: FlashcardGrade; label: string; key: string; tone: string 
  * nhật lịch Leitner, rồi sang thẻ kế. Hết thẻ → màn chúc mừng.
  */
 export default function FlashcardSession({ cards, onExit }: FlashcardSessionProps) {
+  const developerMode = useDeveloperMode((state) => state.enabled);
   const gradeFlashcard = useLearnStore((s) => s.gradeFlashcard);
 
   // Chụp hàng đợi lúc mở phiên: store đổi (thẻ đã chấm rời "đến hạn") KHÔNG làm
@@ -107,7 +109,7 @@ export default function FlashcardSession({ cards, onExit }: FlashcardSessionProp
           </div>
           <h1 className="pc-summary-title">Xong thẻ hôm nay!</h1>
           <p className="dl-muted">
-            Bạn đã ôn <b>{reviewed}</b> thẻ. Lịch ôn tiếp theo đã được cập nhật.
+            Bạn đã xem <b>{reviewed}</b> thẻ. {developerMode ? 'Chế độ xem thử: giữ nguyên lịch ôn.' : 'Lịch ôn tiếp theo đã được cập nhật.'}
           </p>
           <div className="pc-summary-actions">
             <button type="button" className="la-btn la-btn-primary" onClick={onExit}>

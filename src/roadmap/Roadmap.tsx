@@ -12,6 +12,9 @@ import { getSkill } from '../core/content/skills';
 import { ProgressRing } from '../app/ui';
 import { GOAL_PATHS, stepMicroLessonId } from './goals';
 import type { GoalId, GoalPath, GoalStep } from './goals';
+import { MODULES } from '../content/registry';
+import { sectionIsAccessible } from '../app/lib/access';
+import { useDeveloperMode } from '../core/developerMode';
 
 /* ============================================================
    LỘ TRÌNH SỐNG — Roadmap page (viết lại)
@@ -42,9 +45,17 @@ const KIND_LABEL: Record<string, string> = {
   challenge: 'Thử thách',
 };
 
-/** Cụm track: Đại số tuyến tính = num 0–9, Deep Learning = num 10–13. */
-const LA_SECTIONS = COURSE.sections.filter((s) => s.num <= 9);
-const DL_SECTIONS = COURSE.sections.filter((s) => s.num >= 10);
+/** Chương gốc theo số; giáo án mở rộng theo track của manifest. */
+const moduleTrack = new Map(MODULES.map((module) => [module.id, module.track]));
+const LA_SECTIONS = COURSE.sections.filter((s) => s.num <= 9 || moduleTrack.get(s.id) === 'linear-algebra');
+const DL_SECTIONS = COURSE.sections.filter((s) => (s.num >= 10 && s.num <= 13) || moduleTrack.get(s.id) === 'deep-learning');
+const EXTRA_TRACKS = [...new Set(MODULES.map((module) => module.track))]
+  .filter((track) => track !== 'linear-algebra' && track !== 'deep-learning')
+  .map((track) => ({
+    id: track,
+    title: MODULES.find((module) => module.track === track)?.trackTitle ?? track,
+    sections: COURSE.sections.filter((section) => moduleTrack.get(section.id) === track),
+  }));
 
 type StepStatus = 'done' | 'inprogress' | 'open' | 'locked';
 
@@ -236,6 +247,7 @@ function GoalPathView({
 }
 
 export default function Roadmap() {
+  const developerMode = useDeveloperMode((state) => state.enabled);
   const mastery = useLearnStore((s) => s.masteryBySkill);
   const profile = useLearnStore((s) => s.profile);
   const done = useCompletion((s) => s.done);
@@ -267,15 +279,11 @@ export default function Roadmap() {
   const unlocked = useMemo(() => {
     const map = new Map<string, boolean>();
     for (const s of COURSE.sections) {
-      const prereqs = s.prerequisiteSectionIds ?? [];
-      const ok = prereqs.every((pid) => {
-        const sec = COURSE.sections.find((x) => x.id === pid);
-        return sec ? sectionProgress(sec, mastery, done).pct >= 0.6 : true;
-      });
+      const ok = sectionIsAccessible(s, COURSE.sections, (sec) => sectionProgress(sec, mastery, done).pct, developerMode);
       map.set(s.id, ok);
     }
     return map;
-  }, [mastery, done]);
+  }, [mastery, done, developerMode]);
 
   // Gợi ý ôn tập: kỹ năng đã luyện (có trong map) nhưng mastery còn yếu (<0.5).
   const weak = useMemo(
@@ -577,6 +585,27 @@ export default function Roadmap() {
         </div>
         <div className="rm-steps">{DL_SECTIONS.map(renderStep)}</div>
       </section>
+
+      {EXTRA_TRACKS.map((track, index) => {
+        const stats = trackStats(track.sections);
+        return (
+          <section className="rm-section rm-track" key={track.id}>
+            <div className="rm-track-head">
+              <div className="rm-track-headmeta">
+                <span className="rm-track-tag">Track {index + 3}</span>
+                <h2 className="rm-track-name">{track.title}</h2>
+                <p className="rm-track-desc">{track.sections.map((section) => section.subtitle).join(' · ')}</p>
+              </div>
+              <div className="rm-track-stat">
+                <span className="rm-track-count">{stats.done}/{stats.total} bài</span>
+                <span className="rm-track-time">{fmtTrackTime(stats.remMin)}</span>
+              </div>
+            </div>
+            <div className="rm-bar rm-track-bar"><span style={{ width: `${stats.pct}%` }} /></div>
+            <div className="rm-steps">{track.sections.map(renderStep)}</div>
+          </section>
+        );
+      })}
           </>
         ) : (
           <GoalPathView path={activePath} mastery={mastery} done={done} />

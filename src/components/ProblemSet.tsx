@@ -1,5 +1,7 @@
 import { useState } from 'react';
 import type { Difficulty, Problem } from '../practice/types';
+import LegacyIllustration from '../app/learning-support/LegacyIllustration';
+import { problemSkill } from '../app/learning-support/problemSkill';
 
 const DIFF_META: Record<Difficulty, { label: string; cls: string }> = {
   basic: { label: 'Cơ bản', cls: 'ps-badge-basic' },
@@ -21,6 +23,7 @@ function ProblemCard({ problem, index }: { problem: Problem; index: number }) {
       </div>
 
       <div className="ps-statement">{problem.statement}</div>
+      <LegacyIllustration question={problem.statement} id={problem.id} skillId={problemSkill(problem.topic)} />
 
       <button
         className="btn ps-toggle"

@@ -1,0 +1,39 @@
+.exercise-illustration {
+  margin: 0;
+  padding: 16px;
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  border: 1px solid var(--border, #364253);
+  border-radius: 16px;
+  background: var(--surface, #172132);
+  color: var(--text, #e5eaf1);
+}
+.ei-heading { display: flex; align-items: center; flex-wrap: wrap; gap: 8px 12px; font-size: 14px; }
+.ei-source { font-size: 11px; line-height: 1.4; font-weight: 600; letter-spacing: .04em; color: var(--text-dim, #b7c3d4); border: 1px solid var(--border, #364253); border-radius: 6px; padding: 3px 7px; }
+.ei-provenance { margin: 7px 0 0; color: var(--text-dim, #b7c3d4); font-size: 12px; line-height: 1.5; }
+.ei-svg { display: block; width: 100%; max-height: 300px; height: auto; color: var(--text-dim, #b7c3d4); overflow: visible; }
+.ei-svg text { font-family: inherit; font-size: 17px; text-anchor: middle; }
+.ei-svg text:not([fill]) { fill: currentColor; }
+.ei-svg text[text-anchor="start"] { text-anchor: start; }
+.ei-svg .ei-question { font-size: 25px; font-weight: 650; }
+.ei-svg .ei-position { font-size: 13px; }
+.ei-svg .ei-small-number { font-size: 13px; }
+.ei-glyph { fill: var(--surface, #172132); stroke: currentColor; stroke-width: 1.6; }
+.ei-glyph text { stroke: none; }
+.ei-empty { fill: var(--surface, #172132); stroke: var(--text-muted, #7a8ba3); stroke-width: 1.2; }
+.ei-block { fill: var(--surface, #172132); stroke: var(--vec-1, #64b5f6); stroke-width: 2; }
+.ei-wire { stroke: var(--text-muted, #7a8ba3); stroke-width: 1.3; opacity: .6; }
+.ei-gridline { stroke: var(--text-muted, #7a8ba3); stroke-width: .8; opacity: .22; }
+.exercise-illustration figcaption { font-size: 13px; line-height: 1.55; color: var(--text-dim, #b7c3d4); max-width: 68ch; }
+.ei-data { margin: 0 0 8px; font-size: 13px; line-height: 1.5; overflow-wrap: anywhere; color: var(--text, #e5eaf1); }
+@media (max-width: 520px) {
+  .exercise-illustration { padding: 12px; }
+  .ei-heading { font-size: 13px; }
+  .ei-svg { min-height: 160px; }
+  .ei-svg text { font-size: 25px; }
+  .ei-svg .ei-position { font-size: 23px; }
+  .ei-svg .ei-question { font-size: 29px; }
+  .ei-svg .ei-stage-label { font-size: 25px; }
+  .ei-svg .ei-small-number { font-size: 15px; }
+}

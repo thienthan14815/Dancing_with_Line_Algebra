@@ -145,3 +145,25 @@
     padding: 0 10px;
   }
 }
+/* Rich diagrams and optional rule cards need natural scrolling on small screens. */
+@media (max-width: 768px) {
+  body.dl-focus { overflow: auto; }
+  body.dl-focus .dl-player-quiz,
+  body.dl-focus .dl-player-quiz.has-visual {
+    height: auto;
+    min-height: 100dvh;
+    overflow: visible;
+  }
+  body.dl-focus .dl-quiz-main,
+  body.dl-focus .dl-player-quiz.has-visual .dl-quiz-main,
+  body.dl-focus .dl-quiz-panel,
+  body.dl-focus .dl-quiz-content { flex: initial; overflow: visible; }
+  body.dl-focus .dl-quiz-visual { flex: none; }
+  body.dl-focus .dl-quiz-foot {
+    position: sticky;
+    bottom: 0;
+    z-index: 10;
+    background: var(--surface);
+    padding: 8px 0 max(8px, env(safe-area-inset-bottom));
+  }
+}

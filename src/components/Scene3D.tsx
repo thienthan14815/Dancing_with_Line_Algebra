@@ -1,8 +1,9 @@
-import { useRef, useState, type ReactNode } from 'react';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { OrbitControls, Html, Line, Grid } from '@react-three/drei';
 import * as THREE from 'three';
 import { identity, lerpMat, type Mat } from '../lib/linalg';
+import { useReducedMotion } from './motion/useReducedMotion';
 
 type Vec3 = [number, number, number];
 
@@ -33,29 +34,37 @@ function apply3(m: Mat, v: Vec3): Vec3 {
 // Hook animation ma trận, gọi invalidate để render theo demand
 function useAnimatedMatrix(target: Mat): Mat {
   const { invalidate } = useThree();
+  const reducedMotion = useReducedMotion();
   const [mat, setMat] = useState<Mat>(target);
+  const currentRef = useRef<Mat>(target);
+  const targetRef = useRef<Mat>(target);
   const fromRef = useRef<Mat>(target);
   const startRef = useRef<number>(0);
   const animatingRef = useRef(false);
   const targetKey = JSON.stringify(target);
-  const lastKey = useRef(targetKey);
-
-  if (targetKey !== lastKey.current) {
-    lastKey.current = targetKey;
-    fromRef.current = mat;
+  useEffect(() => {
+    const next: Mat = JSON.parse(targetKey);
+    targetRef.current = next;
+    fromRef.current = currentRef.current;
     startRef.current = performance.now();
-    animatingRef.current = true;
+    animatingRef.current = !reducedMotion && JSON.stringify(currentRef.current) !== targetKey;
+    if (reducedMotion) {
+      currentRef.current = next;
+      setMat(next);
+    }
     invalidate();
-  }
+    return () => { animatingRef.current = false; };
+  }, [targetKey, reducedMotion, invalidate]);
 
   useFrame(() => {
     if (!animatingRef.current) return;
     const t = Math.min(1, (performance.now() - startRef.current) / 600);
     const e = t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
-    setMat(lerpMat(fromRef.current, target, e));
+    const next = t >= 1 ? targetRef.current : lerpMat(fromRef.current, targetRef.current, e);
+    currentRef.current = next;
+    setMat(next);
     if (t >= 1) {
       animatingRef.current = false;
-      setMat(target);
     } else {
       invalidate();
     }
@@ -176,6 +185,7 @@ function Axes() {
 }
 
 function SceneContent(props: Scene3DProps) {
+  const reducedMotion = useReducedMotion();
   const {
     vectors = [],
     points = [],
@@ -277,7 +287,7 @@ function SceneContent(props: Scene3DProps) {
 
       {children}
 
-      <OrbitControls makeDefault enableDamping />
+      <OrbitControls makeDefault enableDamping={!reducedMotion} />
     </>
   );
 }

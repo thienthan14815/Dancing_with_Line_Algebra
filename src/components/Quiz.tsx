@@ -1,5 +1,6 @@
 import { useState, type ReactNode } from 'react';
 import { useProgress } from '../lib/progress';
+import LegacyIllustration from '../app/learning-support/LegacyIllustration';
 
 export interface QuizQuestion {
   q: ReactNode;
@@ -54,6 +55,7 @@ export default function Quiz({ lessonKey, questions }: QuizProps) {
             <div className="quiz-q-text">
               {qi + 1}. {q.q}
             </div>
+            <LegacyIllustration question={q.q} id={`${lessonKey}:${qi}`} />
             <div className="quiz-options">
               {q.options.map((opt, oi) => {
                 let cls = 'quiz-option';

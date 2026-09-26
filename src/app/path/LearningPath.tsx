@@ -25,6 +25,8 @@ import type { MicroLesson, Section } from '../../core/content/types';
 import { useLearnStore } from '../../core/progress/store';
 import { useCompletion } from '../state/completion';
 import { lessonDone, sectionProgress } from '../lib/progress';
+import { sectionIsAccessible } from '../lib/access';
+import { useDeveloperMode } from '../../core/developerMode';
 import './path.css';
 
 // ---------------------------------------------------------------------------
@@ -86,6 +88,7 @@ const FILTERS: { key: 'all' | LevelKey; label: string }[] = [
 type NodeStatus = 'completed' | 'current' | 'available' | 'locked';
 
 export default function LearningPath() {
+  const developerMode = useDeveloperMode((state) => state.enabled);
   const navigate = useNavigate();
   const mastery = useLearnStore((s) => s.masteryBySkill);
   const done = useCompletion((s) => s.done);
@@ -111,15 +114,11 @@ export default function LearningPath() {
   const unlocked = useMemo(() => {
     const map = new Map<string, boolean>();
     for (const s of COURSE.sections) {
-      const prereqs = s.prerequisiteSectionIds ?? [];
-      const ok = prereqs.every((pid) => {
-        const sec = COURSE.sections.find((x) => x.id === pid);
-        return sec ? sectionProgress(sec, mastery, done).pct >= 0.6 : true;
-      });
+      const ok = sectionIsAccessible(s, COURSE.sections, (sec) => sectionProgress(sec, mastery, done).pct, developerMode);
       map.set(s.id, ok);
     }
     return map;
-  }, [mastery, done]);
+  }, [mastery, done, developerMode]);
 
   // Phân mức + icon: tính 1 lần (không phụ thuộc tiến độ).
   const levels = useMemo(

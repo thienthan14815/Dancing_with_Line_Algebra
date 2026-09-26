@@ -1,0 +1,18 @@
+.developer-banner { position: relative; z-index: 5; display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 8px 20px; background: var(--primary-soft); color: var(--text); padding: 8px 16px; font-size: 13px; }
+.developer-banner button { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 6px 12px; color: var(--text); cursor: pointer; }
+.developer-page .panel { padding: 20px; margin: 16px 0; }
+.developer-page h1, .developer-page h2 { margin-top: 0; }
+.developer-search { display: grid; gap: 8px; }
+.developer-search input { padding: 12px; color: var(--text); background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm); font: inherit; }
+.developer-lessons { list-style: none; padding: 0; }
+.developer-lessons li { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; padding: 14px 0; border-bottom: 1px solid var(--border); }
+.developer-lessons li > div { display: flex; flex-wrap: wrap; gap: 16px; }
+.developer-preview-tools { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; padding: 10px; background: var(--primary-soft); border-radius: var(--radius-sm); margin: 8px 0; }
+.developer-preview-tools select { max-width: 100%; padding: 6px; background: var(--surface); color: var(--text); }
+.lesson-deep-dive { margin: 24px 0; }
+.lesson-deep-dive > summary { padding: 16px; cursor: pointer; font-weight: 600; border: 1px solid var(--border); border-radius: var(--radius-md); }
+.lesson-deep-dive[open] > summary { margin-bottom: 16px; }
+.developer-banner :focus-visible, .developer-page :focus-visible { outline: 2px solid var(--primary); outline-offset: 3px; }
+.exercise-rule-help { margin-top: 12px; font-size: 14px; }
+.exercise-rule-help > summary { cursor: pointer; color: var(--primary); font-weight: 600; padding: 8px 0; }
+.steps-controls, .step-dots { flex-wrap: wrap; }

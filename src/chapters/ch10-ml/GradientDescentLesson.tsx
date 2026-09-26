@@ -9,6 +9,7 @@ import { linRegLossMSE, linRegGradStep } from '../../lib/nn';
 import { fitLine, lossQuadForm, contourEllipse, f2, f3 } from './util';
 import { Stat, StatRow, Hint, BridgeLA, TwoCol } from './_shared';
 import type { Mat } from '../../lib/linalg';
+import { useReducedMotion } from '../../components/motion/useReducedMotion';
 
 // Dữ liệu cố định, x đã căn giữa quanh 0 (Σx = 0) cho contour gọn.
 const GXS = [-2, -1, 0, 1, 2];
@@ -93,6 +94,7 @@ export default function GradientDescentLesson() {
   const [trail, setTrail] = useState<[number, number][]>([START]);
   const [running, setRunning] = useState(false);
   const timer = useRef<number | null>(null);
+  const reducedMotion = useReducedMotion();
 
   const opt = fitLine(GXS, GYS); // tâm bát: (w*, b*)
   const M = lossQuadForm(GXS); // dạng toàn phương của mặt loss
@@ -107,23 +109,45 @@ export default function GradientDescentLesson() {
 
   const run = () => {
     stop();
-    let w0 = START[0];
-    let b0 = START[1];
-    const path: [number, number][] = [[w0, b0]];
-    setTrail([[w0, b0]]);
-    setRunning(true);
-    let steps = 0;
+    // Resume a paused/manual exploration; only a finished run starts afresh.
+    const restart = trail.length - 1 >= MAX_STEPS || diverged;
+    const path: [number, number][] = restart
+      ? [[...START]]
+      : trail.map(([w, b]): [number, number] => [w, b]);
+    let [w0, b0] = path[path.length - 1];
+    setTrail(path.slice());
+    let steps = path.length - 1;
     const curLr = lr;
-    timer.current = window.setInterval(() => {
+    const advance = () => {
       const nx = linRegGradStep(GXS, GYS, w0, b0, curLr);
       w0 = nx.w;
       b0 = nx.b;
       steps++;
       path.push([w0, b0]);
-      setTrail(path.slice());
       const blew = !isFinite(w0) || !isFinite(b0) || Math.abs(w0) > 200 || Math.abs(b0) > 200;
-      if (steps >= MAX_STEPS || blew) stop();
+      return steps >= MAX_STEPS || blew;
+    };
+    if (reducedMotion) {
+      while (!advance()) { /* Compute the same path without timed movement. */ }
+      setTrail(path);
+      return;
+    }
+    setRunning(true);
+    timer.current = window.setInterval(() => {
+      const finished = advance();
+      setTrail(path.slice());
+      if (finished) stop();
     }, 90);
+  };
+
+  const singleStep = () => {
+    stop();
+    setTrail((path) => {
+      const last = path[path.length - 1];
+      if (path.length > MAX_STEPS || last.some((n) => !Number.isFinite(n) || Math.abs(n) > 200)) return path;
+      const next = linRegGradStep(GXS, GYS, last[0], last[1], lr);
+      return [...path, [next.w, next.b]];
+    });
   };
 
   const reset = () => {
@@ -132,10 +156,15 @@ export default function GradientDescentLesson() {
   };
 
   useEffect(() => {
+    // A changed speed/preference must never leave the old timer running.
+    if (timer.current !== null) clearInterval(timer.current);
+    timer.current = null;
+    setRunning(false);
     return () => {
       if (timer.current !== null) clearInterval(timer.current);
+      timer.current = null;
     };
-  }, []);
+  }, [lr, reducedMotion]);
 
   const cur = trail[trail.length - 1];
   const curMSE = linRegLossMSE(GXS, GYS, cur[0], cur[1]);
@@ -178,8 +207,12 @@ export default function GradientDescentLesson() {
               />
               <div className="row" style={{ gap: 8, marginTop: 10 }}>
                 <button className="btn" onClick={run} disabled={running}>
-                  ▶ Chạy GD
+                  {reducedMotion ? 'Xem kết quả GD' : '▶ Chạy GD'}
                 </button>
+                <button type="button" className="btn" onClick={singleStep} disabled={trail.length > MAX_STEPS || diverged}>
+                  Tiến 1 bước
+                </button>
+                {running && <button type="button" className="btn" onClick={stop}>⏸ Dừng</button>}
                 <button className="btn" onClick={reset}>
                   ↺ Reset
                 </button>

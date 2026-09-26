@@ -19,8 +19,9 @@ import { Button, Card, RichText } from '../ui';
 // Trợ giảng: dùng provider có sẵn (KHÔNG nhúng TutorPanel trong màn làm bài).
 import { HeuristicTutor } from '../tutor/provider';
 import type { HintLevel } from '../tutor/provider';
-import { hasDiagram } from '../tutor/diagramSpec';
-import TutorDiagram from '../tutor/TutorDiagram';
+import ExerciseIllustration from '../learning-visuals/ExerciseIllustration';
+import LessonBrief, { RuleCard } from '../teaching/LessonBrief';
+import { useDeveloperMode } from '../../core/developerMode';
 import '../tutor/tutor.css'; // tái dùng style .tt-diagram-* (không sửa file)
 import './deps.css'; // banner "Nên nắm trước" (dependency highlight), prefix dp-
 import './notes.css'; // nút ⭐ + sheet ghi chú trong player, prefix nt-
@@ -56,6 +57,7 @@ function NotFound() {
 }
 
 function LessonRunner({ lessonId }: { lessonId: string }) {
+  const developerMode = useDeveloperMode((state) => state.enabled);
   const navigate = useNavigate();
   const lesson = getMicroLesson(lessonId);
 
@@ -110,7 +112,7 @@ function LessonRunner({ lessonId }: { lessonId: string }) {
     }
     setPrereqDismissed(true);
   };
-  const showPrereqBanner = unmetPrereqs.length > 0 && !prereqDismissed;
+  const showPrereqBanner = !developerMode && unmetPrereqs.length > 0 && !prereqDismissed;
   const prereqShown = unmetPrereqs.slice(0, 3);
   const prereqExtra = unmetPrereqs.length - prereqShown.length;
 
@@ -143,12 +145,12 @@ function LessonRunner({ lessonId }: { lessonId: string }) {
 
   // Kết bài: chốt completeLesson đúng 1 lần.
   useEffect(() => {
-    if (phase !== 'summary' || completedRef.current || !lesson) return;
+    if (phase !== 'summary' || completedRef.current || !lesson || developerMode) return;
     completedRef.current = true;
     completeLesson(lessonId, lesson.skillIds, { perfect: wrongCount === 0 });
     markDone(lessonId);
     setXpEarned((x) => x + XP.LESSON_COMPLETE);
-  }, [phase, lesson, lessonId, wrongCount, completeLesson, markDone]);
+  }, [phase, lesson, lessonId, wrongCount, completeLesson, markDone, developerMode]);
 
   // Tự ẩn toast.
   useEffect(() => {
@@ -190,7 +192,7 @@ function LessonRunner({ lessonId }: { lessonId: string }) {
       },
       { dimension: ex.dimension },
     );
-    const gained = result.correct ? XP.NO_MISTAKES : 0;
+    const gained = !developerMode && result.correct ? XP.NO_MISTAKES : 0;
     setXpEarned((x) => x + gained);
     if (result.correct) setCorrectCount((c) => c + 1);
     else setWrongCount((w) => w + 1);
@@ -223,7 +225,7 @@ function LessonRunner({ lessonId }: { lessonId: string }) {
   const saveNotesAndClose = () => {
     persistNote();
     setNotesOpen(false);
-    setToast('Đã lưu ghi chú');
+    setToast(developerMode ? 'Xem thử: ghi chú không được lưu' : 'Đã lưu ghi chú');
   };
 
   // ---- Trợ giảng: mở gợi ý cấp kế tiếp / cấp 4 ----
@@ -255,87 +257,19 @@ function LessonRunner({ lessonId }: { lessonId: string }) {
   const analysis = wrong
     ? tutor.analyzeError({ exercise: ex, lastResult: checked ?? undefined, level: 1 })
     : null;
-  const canDraw = hasDiagram(ex);
-  const showVisual = canDraw && ex.type !== 'vector-drawing';
+  const showVisual = ex.type !== 'vector-drawing';
 
   // ---- INTRO (bài khái niệm) ----
   if (phase === 'intro') {
-    // Tận dụng khoảng trống: bubbles số liệu + kỹ năng sẽ luyện + dạng bài.
-    const estMin = Math.max(1, Math.round((total * 45) / 60));
-    const maxXp = total * XP.NO_MISTAKES + XP.LESSON_COMPLETE;
-    const introSkillIds = lesson.skillIds?.length
-      ? lesson.skillIds
-      : Array.from(new Set(exercises.map((e) => e.skillId)));
-    // Đọc mastery MỘT LẦN lúc mở màn (như banner prereq) — không subscribe.
-    const masteryNow = useLearnStore.getState().masteryBySkill;
-    const typeCounts = exercises.reduce<Record<string, number>>((m, e) => {
-      const k = typeLabel(e.type);
-      m[k] = (m[k] ?? 0) + 1;
-      return m;
-    }, {});
-
     return (
       <div className="dl-page dl-player dl-intro-page">
         <Card className="dl-intro">
           <span className="dl-continue-kicker">KHÁI NIỆM</span>
           <h1 className="dl-intro-title">{lesson.title}</h1>
+          <LessonBrief chapterId={lessonId.split(':')[0]} lessonId={lessonId.split(':')[1]} />
           <p className="dl-muted dl-intro-lead">
-            Xem phần trực quan tương tác để nắm ý tưởng, rồi củng cố bằng {total} câu
-            hỏi ngắn — hoặc bắt đầu luyện ngay.
+            Nắm quy luật, xem ví dụ rồi thử {total} câu hỏi ngắn.
           </p>
-
-          <div className="dl-bubbles dl-intro-bubbles">
-            <div className="dl-bubble">
-              <div className="dl-bubble-circle">
-                <span className="dl-bubble-num">{total}</span>
-              </div>
-              <span className="dl-bubble-lbl">Câu hỏi</span>
-            </div>
-            <div className="dl-bubble">
-              <div className="dl-bubble-circle">
-                <span className="dl-bubble-num">~{estMin}′</span>
-              </div>
-              <span className="dl-bubble-lbl">Thời gian</span>
-            </div>
-            <div className="dl-bubble">
-              <div className="dl-bubble-circle">
-                <span className="dl-bubble-num is-xp">+{maxXp}</span>
-              </div>
-              <span className="dl-bubble-lbl">XP tối đa</span>
-            </div>
-          </div>
-
-          <div className="dl-intro-block">
-            <div className="dl-intro-block-title">Kỹ năng sẽ luyện</div>
-            <ul className="dl-intro-skills">
-              {introSkillIds.map((id) => {
-                const pct = Math.round((masteryNow[id]?.score ?? 0) * 100);
-                return (
-                  <li key={id} className="dl-intro-skill">
-                    <span className="dl-intro-skill-name">
-                      {SKILL_BY_ID[id]?.name ?? id}
-                    </span>
-                    <span className="dl-intro-skill-bar">
-                      <span style={{ width: `${pct}%` }} />
-                    </span>
-                    <span className="dl-intro-skill-pct">{pct}%</span>
-                  </li>
-                );
-              })}
-            </ul>
-          </div>
-
-          <div className="dl-intro-block">
-            <div className="dl-intro-block-title">Dạng bài</div>
-            <div className="dl-intro-types">
-              {Object.entries(typeCounts).map(([label, n]) => (
-                <span key={label} className="dl-type-chip">
-                  {label}
-                  {n > 1 ? ` ×${n}` : ''}
-                </span>
-              ))}
-            </div>
-          </div>
 
           <div className="dl-intro-actions">
             {lesson.deepDiveRoute && (
@@ -365,7 +299,7 @@ function LessonRunner({ lessonId }: { lessonId: string }) {
         <Card className="dl-summary">
           <div className="dl-summary-emoji">{perfect ? '🏆' : '🎉'}</div>
           <h1 className="dl-summary-title">
-            {perfect ? 'Hoàn hảo!' : 'Hoàn thành bài học!'}
+            {developerMode ? 'Đã kiểm tra xong bài' : perfect ? 'Hoàn hảo!' : 'Hoàn thành bài học!'}
           </h1>
           <p className="dl-muted">{lesson.title}</p>
           <div className="dl-summary-stats">
@@ -416,7 +350,7 @@ function LessonRunner({ lessonId }: { lessonId: string }) {
         <button
           type="button"
           className={`nt-bar-btn${isBookmarked ? ' is-on' : ''}`}
-          onClick={() => toggleBookmark(bookmarkId)}
+          onClick={() => developerMode ? setToast('Xem thử: đánh dấu không được lưu') : toggleBookmark(bookmarkId)}
           aria-pressed={isBookmarked}
           title={isBookmarked ? 'Bỏ đánh dấu bài học' : 'Đánh dấu bài học'}
           aria-label={isBookmarked ? 'Bỏ đánh dấu bài học' : 'Đánh dấu bài học'}
@@ -439,12 +373,20 @@ function LessonRunner({ lessonId }: { lessonId: string }) {
         {/* b. Đề bài bằng HÌNH (tự động, nếu có phần trực quan) */}
         {showVisual && (
           <div className="dl-quiz-visual">
-            <TutorDiagram exercise={ex} />
+            <ExerciseIllustration exercise={ex} revealed={!!checked} />
           </div>
         )}
 
         <section className="dl-quiz-panel">
           <div className="dl-quiz-content">
+            {developerMode && <div className="developer-preview-tools">
+              <label>Chuyển nhanh câu hỏi{' '}
+                <select aria-label="Chuyển nhanh câu hỏi" value={idx} onChange={(event) => goToExercise(Number(event.target.value))}>
+                  {exercises.map((item, i) => <option key={`${item.id}:${i}`} value={i}>Câu {i + 1} · {typeLabel(item.type)}</option>)}
+                </select>
+              </label>
+              <button type="button" className="btn" onClick={() => navigate('/developer')}>Danh sách bài</button>
+            </div>}
             {/* Nhắc kiến thức nền chưa đạt — không chặn học, đóng được, nhớ theo phiên */}
             {showPrereqBanner && (
               <div className="dp-prereq" role="note" aria-label="Kiến thức nên nắm trước">
@@ -488,6 +430,10 @@ function LessonRunner({ lessonId }: { lessonId: string }) {
               <div className="dl-quiz-prompt pl-prompt">
                 <RichText text={ex.prompt} />
               </div>
+              <details key={ex.id} className="exercise-rule-help">
+                <summary>Nhắc quy luật</summary>
+                <RuleCard skillId={ex.skillId} />
+              </details>
             </div>
 
             {/* d. Widget trả lời (sau chấm: tô ô đã chọn theo đúng/sai) */}
@@ -511,7 +457,7 @@ function LessonRunner({ lessonId }: { lessonId: string }) {
               <div className="dl-feedback-head">
                 <span className="dl-feedback-icon">{fb.correct ? '✓' : '✕'}</span>
                 <span className="dl-feedback-title">
-                  {fb.correct ? `Chính xác! +${XP.NO_MISTAKES} XP` : 'Chưa đúng'}
+                  {fb.correct ? developerMode ? 'Chính xác! · Xem thử' : `Chính xác! +${XP.NO_MISTAKES} XP` : 'Chưa đúng'}
                 </span>
               </div>
               <div className="dl-feedback-body">
@@ -646,9 +592,9 @@ function LessonRunner({ lessonId }: { lessonId: string }) {
               )}
 
               {/* Bài có hình mà chưa hiện ở Block 1 (vd vẽ vector) → xem tại đây */}
-              {canDraw && !showVisual && (
+                {!showVisual && (
                 <div className="dl-tutor-sheet-diagram">
-                  <TutorDiagram exercise={ex} />
+                    <ExerciseIllustration exercise={ex} revealed={!!checked} />
                 </div>
               )}
             </div>

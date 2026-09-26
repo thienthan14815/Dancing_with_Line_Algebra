@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { isDeveloperMode } from '../../core/developerMode';
 
 // ---------------------------------------------------------------------------
 // COMPLETED-LESSONS (app-local).
@@ -38,6 +39,7 @@ export const useCompletion = create<CompletionState>((set) => ({
   done: load(),
   markDone: (lessonId) =>
     set((s) => {
+      if (isDeveloperMode()) return s;
       const done = { ...s.done, [lessonId]: new Date().toISOString() };
       save(done);
       return { done };

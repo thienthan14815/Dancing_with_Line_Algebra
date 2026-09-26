@@ -1,5 +1,15 @@
 # Viết giáo án cho LinAlgLab — Content Module (plugin)
 
+## Cách trình bày bài học
+
+- Bắt đầu bằng **một quy luật chính**, công thức và điều kiện áp dụng.
+- Đi từ **quan sát hình → hiểu quy luật → ví dụ 3 bước → tự làm**. Mỗi bước chỉ một hoặc hai câu ngắn.
+- Giữ phần chứng minh và giải thích dài trong mục mở rộng. Học sinh vẫn mở được toàn bộ nội dung.
+- Các thẻ học ngắn dùng `src/app/teaching/rules.ts`, tra theo skill của bài. Khi thêm kỹ năng, bổ sung quy luật và ví dụ phù hợp rồi chạy kiểm thử độ phủ.
+- Hình cho đề bài được dựng bằng SVG từ dữ kiện đề qua `src/app/learning-visuals/`. Không lấy số từ đáp án, lựa chọn hoặc lời giải. Hình khái niệm phải được ghi rõ để phân biệt với hình từ dữ kiện thật.
+- Hoạt ảnh cần có điều khiển từng bước, dừng được và tôn trọng `prefers-reduced-motion`.
+- Để duyệt mọi bài mà không ghi tiến độ: vào **Cài đặt → Developer mode → Tất cả bài học** (`#/developer`). Tắt chế độ để trở lại việc học bình thường.
+
 Hệ thống **Content Module** cho phép **thêm/gỡ một giáo án chỉ bằng cách thả/xóa
 MỘT thư mục**, KHÔNG cần sửa bất kỳ file trung tâm nào. Một giáo án hợp lệ sẽ tự
 xuất hiện trên **Learning Path**, **Roadmap**, **Sổ tay**, **Practice** và **ngân

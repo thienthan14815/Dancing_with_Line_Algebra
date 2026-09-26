@@ -12,6 +12,9 @@ import { initialAnswer, hasAnswer } from '../player/answers';
 import ExerciseView from '../player/variants';
 import { Badge, RichText } from '../ui';
 import type { PracticeCategory } from './categories';
+import { useDeveloperMode } from '../../core/developerMode';
+import ExerciseIllustration from '../learning-visuals/ExerciseIllustration';
+import { RuleCard } from '../teaching/LessonBrief';
 
 export interface PracticeSessionProps {
   /** Danh mục đang luyện (đã kèm sẵn tập bài). */
@@ -41,6 +44,7 @@ function typeLabel(t: Exercise['type']): string {
  * { dimension, isWeakReview: true } để cộng XP ôn tập + cập nhật mastery/SRS.
  */
 export default function PracticeSession({ category, onExit }: PracticeSessionProps) {
+  const developerMode = useDeveloperMode((state) => state.enabled);
   // Hạt giống MỚI mỗi phiên: làm mới SỐ LIỆU của các bài có generator (cùng
   // DẠNG bài để giữ nguyên bố cục danh mục — vd danh mục ma trận vẫn toàn bài
   // ma trận). Skill không có generator → giữ nguyên bản tĩnh (backward-compat).
@@ -151,7 +155,7 @@ export default function PracticeSession({ category, onExit }: PracticeSessionPro
     );
     if (result.correct) {
       setCorrectCount((c) => c + 1);
-      setXpEarned((x) => x + XP.WEAK_REVIEW);
+      if (!developerMode) setXpEarned((x) => x + XP.WEAK_REVIEW);
     } else {
       setWrongCount((w) => w + 1);
     }
@@ -244,6 +248,11 @@ export default function PracticeSession({ category, onExit }: PracticeSessionPro
         <div className="pc-prompt">
           <RichText text={ex.prompt} />
         </div>
+        <ExerciseIllustration exercise={ex} revealed={!!checked} />
+        <details key={ex.id} className="exercise-rule-help">
+          <summary>Nhắc quy luật</summary>
+          <RuleCard skillId={ex.skillId} />
+        </details>
 
         <ExerciseView
           exercise={ex}
@@ -262,7 +271,7 @@ export default function PracticeSession({ category, onExit }: PracticeSessionPro
           <div className={`pc-feedback ${fb.correct ? 'good' : 'bad'}`}>
             <div className="pc-feedback-head">
               <span className="pc-feedback-icon">{fb.correct ? '✓' : '✕'}</span>
-              <span>{fb.correct ? `Chính xác! +${XP.WEAK_REVIEW} XP` : 'Chưa đúng'}</span>
+              <span>{fb.correct ? developerMode ? 'Chính xác! · Xem thử' : `Chính xác! +${XP.WEAK_REVIEW} XP` : 'Chưa đúng'}</span>
             </div>
             <div className="pc-feedback-body">
               <RichText text={fb.feedback} />

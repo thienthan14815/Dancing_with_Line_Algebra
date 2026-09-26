@@ -1,0 +1,17 @@
+.digital-lesson { padding: clamp(16px, 4vw, 32px); line-height: 1.75; min-width: 0; }
+.digital-lesson h2 { margin-top: 0; }
+.digital-lesson li + li { margin-top: 8px; }
+.digital-lesson .mathtext-block { max-width: 100%; overflow-x: auto; }
+.digital-objective, .digital-lab { padding: 16px; border-radius: var(--radius-md); background: var(--panel-2); }
+.digital-table { max-width: 100%; overflow-x: auto; margin: 16px 0; }
+.digital-table table { width: 100%; border-collapse: collapse; text-align: center; }
+.digital-table th, .digital-table td { padding: 8px 12px; border: 1px solid var(--border); }
+.digital-table th { background: var(--panel-2); }
+.digital-table caption { text-align: left; font-weight: 600; padding-bottom: 8px; }
+.digital-controls { display: flex; flex-wrap: wrap; gap: 16px; align-items: center; }
+.digital-controls label { display: grid; gap: 4px; }
+.digital-controls button, .digital-controls select { padding: 8px 12px; color: var(--text); background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm); font: inherit; }
+.digital-controls button { cursor: pointer; }
+.digital-controls button[aria-pressed="true"] { background: var(--primary); color: var(--on-primary); }
+.digital-controls :focus-visible { outline: 2px solid var(--primary); outline-offset: 3px; }
+.digital-lesson nav { margin-top: 24px; justify-content: space-between; }

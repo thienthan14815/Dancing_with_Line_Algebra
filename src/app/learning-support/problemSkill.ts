@@ -1,0 +1,42 @@
+/** Topic metadata identifies the concept; only the statement supplies numbers. */
+const TOPIC_SKILLS: [RegExp, string][] = [
+  [/khoảng cách|độ dài|vector đơn vị/i, 'vector_basics'],
+  [/ký hiệu/i, 'math_notation'],
+  [/sin\/cos/i, 'trigonometry'],
+  [/hệ 2 ẩn|Ax=b|mô hình/i, 'linear_system'],
+  [/cộng\/trừ/i, 'vector_addition'],
+  [/span/i, 'span'],
+  [/dot product/i, 'dot_product'],
+  [/cross product/i, 'cross_product'],
+  [/projection|hình chiếu|ma trận chiếu/i, 'projection'],
+  [/gauss/i, 'gaussian_elimination'],
+  [/vô số nghiệm|phân loại nghiệm/i, 'solution_types'],
+  [/column space|null space|four subspaces/i, 'column_null_space'],
+  [/nhân ma trận/i, 'matrix_multiplication'],
+  [/biến đổi|graphics/i, 'matrix_transformation'],
+  [/nghịch đảo|khả nghịch/i, 'matrix_inverse'],
+  [/determinant|det =/i, 'determinant'],
+  [/linear independence/i, 'linear_independence'],
+  [/coordinate vector|change of basis/i, 'change_of_basis'],
+  [/characteristic/i, 'characteristic_polynomial'],
+  [/eigenvectors/i, 'eigenvector'],
+  [/matrix powers|recurrence/i, 'matrix_powers'],
+  [/orthogonal diagonalization/i, 'spectral_theorem'],
+  [/diagonalization/i, 'diagonalization'],
+  [/markov|pagerank/i, 'markov_pagerank'],
+  [/power iteration/i, 'eigenvalue'],
+  [/least squares/i, 'least_squares'],
+  [/rank-1|rank-k|image compression/i, 'rank_k_approximation'],
+  [/singular values/i, 'singular_values'],
+  [/svd/i, 'svd'],
+  [/quadratic/i, 'quadratic_form'],
+  [/definiteness/i, 'definiteness'],
+  [/conic/i, 'conic_sections'],
+  [/trực giao/i, 'orthogonality'],
+  [/gram/i, 'gram_schmidt'],
+  [/qr/i, 'qr_decomposition'],
+];
+
+export function problemSkill(topic: string): string | undefined {
+  return TOPIC_SKILLS.find(([pattern]) => pattern.test(topic))?.[1];
+}

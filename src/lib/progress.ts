@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import { isDeveloperMode } from '../core/developerMode';
 
 export interface ProgressState {
   completedLessons: Record<string, boolean>;
@@ -15,11 +16,11 @@ export const useProgress = create<ProgressState>()(
       completedLessons: {},
       quizScores: {},
       markComplete: (lessonKey) =>
-        set((state) => ({
+        set((state) => isDeveloperMode() ? state : ({
           completedLessons: { ...state.completedLessons, [lessonKey]: true },
         })),
       setQuizScore: (lessonKey, score) =>
-        set((state) => ({
+        set((state) => isDeveloperMode() ? state : ({
           quizScores: { ...state.quizScores, [lessonKey]: score },
         })),
     }),
