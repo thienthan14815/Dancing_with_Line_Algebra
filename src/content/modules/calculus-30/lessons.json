@@ -1,0 +1,242 @@
+[
+  {
+    "id": "d01",
+    "day": 1,
+    "title": "Hàm số và đại số",
+    "skillId": "calculus_d01",
+    "objective": "đọc được $f(x)$, thay số, tìm điều kiện xác định và rút gọn có điều kiện.",
+    "stage": "Chặng 1 · Nền tảng"
+  },
+  {
+    "id": "d02",
+    "day": 2,
+    "title": "Lũy thừa, logarit, lượng giác",
+    "skillId": "calculus_d02",
+    "objective": "đổi căn thành lũy thừa; dùng logarit và góc radian.",
+    "stage": "Chặng 1 · Nền tảng"
+  },
+  {
+    "id": "d03",
+    "day": 3,
+    "title": "Giới hạn là \"tiến gần\"",
+    "skillId": "calculus_d03",
+    "objective": "phân biệt giá trị tại một điểm với giá trị tiến tới điểm đó.",
+    "stage": "Chặng 1 · Giới hạn"
+  },
+  {
+    "id": "d04",
+    "day": 4,
+    "title": "Xử lý dạng 0/0",
+    "skillId": "calculus_d04",
+    "objective": "chọn đúng công cụ: phân tích nhân tử hoặc nhân liên hợp.",
+    "stage": "Chặng 1 · Giới hạn"
+  },
+  {
+    "id": "d05",
+    "day": 5,
+    "title": "Lượng giác và vô cực",
+    "skillId": "calculus_d05",
+    "objective": "dùng giới hạn $\\sin$ chuẩn và so sánh bậc cao nhất của đa thức.",
+    "stage": "Chặng 1 · Giới hạn"
+  },
+  {
+    "id": "d06",
+    "day": 6,
+    "title": "Liên tục và kiểm tra chặng 1",
+    "skillId": "calculus_d06",
+    "objective": "nối giới hạn với tính liên tục; tự kiểm tra nền tảng.",
+    "stage": "Chặng 1 · Giới hạn"
+  },
+  {
+    "id": "d07",
+    "day": 7,
+    "title": "Tốc độ thay đổi tức thời",
+    "skillId": "calculus_d07",
+    "objective": "hiểu đạo hàm là giới hạn của hệ số góc cát tuyến.",
+    "stage": "Chặng 2 · Đạo hàm"
+  },
+  {
+    "id": "d08",
+    "day": 8,
+    "title": "Quy tắc lũy thừa và tổng",
+    "skillId": "calculus_d08",
+    "objective": "lấy đạo hàm đa thức, căn và lũy thừa âm.",
+    "stage": "Chặng 2 · Đạo hàm"
+  },
+  {
+    "id": "d09",
+    "day": 9,
+    "title": "Đạo hàm tích và thương",
+    "skillId": "calculus_d09",
+    "objective": "phân biệt đạo hàm của một tổng với đạo hàm của một tích hoặc thương.",
+    "stage": "Chặng 2 · Đạo hàm"
+  },
+  {
+    "id": "d10",
+    "day": 10,
+    "title": "Quy tắc dây chuyền",
+    "skillId": "calculus_d10",
+    "objective": "nhận ra hàm ngoài và hàm trong, rồi nhân đủ đạo hàm hàm trong.",
+    "stage": "Chặng 2 · Đạo hàm"
+  },
+  {
+    "id": "d11",
+    "day": 11,
+    "title": "Hàm mũ, logarit, lượng giác",
+    "skillId": "calculus_d11",
+    "objective": "dùng bảng đạo hàm cơ bản cùng quy tắc dây chuyền.",
+    "stage": "Chặng 2 · Đạo hàm"
+  },
+  {
+    "id": "d12",
+    "day": 12,
+    "title": "Tiếp tuyến, vi phân, hàm ẩn",
+    "skillId": "calculus_d12",
+    "objective": "dùng đạo hàm để viết tiếp tuyến và xấp xỉ; nhận biết $y$ phụ thuộc $x$.",
+    "stage": "Chặng 2 · Đạo hàm"
+  },
+  {
+    "id": "d13",
+    "day": 13,
+    "title": "Tăng, giảm và cực trị",
+    "skillId": "calculus_d13",
+    "objective": "lập bảng dấu $f'$ và phân biệt cực trị địa phương với giá trị lớn nhất, nhỏ nhất.",
+    "stage": "Chặng 2 · Ứng dụng đạo hàm"
+  },
+  {
+    "id": "d14",
+    "day": 14,
+    "title": "Tối ưu và kiểm tra chặng 2",
+    "skillId": "calculus_d14",
+    "objective": "đổi đề bằng lời thành hàm số cần tối ưu hoặc đạo hàm theo thời gian.",
+    "stage": "Chặng 2 · Ứng dụng đạo hàm"
+  },
+  {
+    "id": "d15",
+    "day": 15,
+    "title": "Nguyên hàm và hằng số C",
+    "skillId": "calculus_d15",
+    "objective": "hiểu nguyên hàm là \"tìm ngược\" đạo hàm.",
+    "stage": "Chặng 3 · Tích phân"
+  },
+  {
+    "id": "d16",
+    "day": 16,
+    "title": "Đổi biến",
+    "skillId": "calculus_d16",
+    "objective": "nhìn ra một hàm bên trong và đạo hàm của nó ở bên ngoài.",
+    "stage": "Chặng 3 · Tích phân"
+  },
+  {
+    "id": "d17",
+    "day": 17,
+    "title": "Tích phân từng phần",
+    "skillId": "calculus_d17",
+    "objective": "giảm độ khó của tích hai hàm bằng cách chọn $u$ và $dv$.",
+    "stage": "Chặng 3 · Tích phân"
+  },
+  {
+    "id": "d18",
+    "day": 18,
+    "title": "Tích phân xác định",
+    "skillId": "calculus_d18",
+    "objective": "tính tích lũy trên một đoạn bằng nguyên hàm và hai cận.",
+    "stage": "Chặng 3 · Tích phân"
+  },
+  {
+    "id": "d19",
+    "day": 19,
+    "title": "Diện tích và dấu",
+    "skillId": "calculus_d19",
+    "objective": "phân biệt tích phân có dấu với diện tích hình học.",
+    "stage": "Chặng 3 · Ứng dụng tích phân"
+  },
+  {
+    "id": "d20",
+    "day": 20,
+    "title": "Thể tích và giá trị trung bình",
+    "skillId": "calculus_d20",
+    "objective": "chọn mặt cắt để tính thể tích; tính giá trị trung bình của hàm.",
+    "stage": "Chặng 3 · Ứng dụng tích phân"
+  },
+  {
+    "id": "d21",
+    "day": 21,
+    "title": "Chuyển động và điện lượng",
+    "skillId": "calculus_d21",
+    "objective": "nhìn tích phân như sự tích lũy và giữ đúng đơn vị.",
+    "stage": "Chặng 3 · Ứng dụng tích phân"
+  },
+  {
+    "id": "d22",
+    "day": 22,
+    "title": "Kiểm tra chặng 3",
+    "skillId": "calculus_d22",
+    "objective": "tự chọn nguyên hàm cơ bản, đổi biến, từng phần hoặc chia miền.",
+    "stage": "Chặng 3 · Tích phân"
+  },
+  {
+    "id": "d23",
+    "day": 23,
+    "title": "Đạo hàm riêng",
+    "skillId": "calculus_d23",
+    "objective": "lấy đạo hàm theo một biến khi các biến khác được giữ cố định.",
+    "stage": "Chặng 4 · Nhiều biến"
+  },
+  {
+    "id": "d24",
+    "day": 24,
+    "title": "Vi phân toàn phần và gradient",
+    "skillId": "calculus_d24",
+    "objective": "xấp xỉ thay đổi theo hai biến; tính đạo hàm theo một hướng.",
+    "stage": "Chặng 4 · Nhiều biến"
+  },
+  {
+    "id": "d25",
+    "day": 25,
+    "title": "Cực trị hai biến",
+    "skillId": "calculus_d25",
+    "objective": "tìm điểm dừng và dùng định thức Hessian để phân loại.",
+    "stage": "Chặng 4 · Nhiều biến"
+  },
+  {
+    "id": "d26",
+    "day": 26,
+    "title": "Vectơ và đường cong tham số",
+    "skillId": "calculus_d26",
+    "objective": "tính tích vô hướng, tích có hướng, vận tốc và tốc độ.",
+    "stage": "Chặng 5 · Vectơ"
+  },
+  {
+    "id": "d27",
+    "day": 27,
+    "title": "Trường vectơ, div và curl",
+    "skillId": "calculus_d27",
+    "objective": "tính được gradient, divergence và curl ở ví dụ đơn giản.",
+    "stage": "Chặng 5 · Vectơ"
+  },
+  {
+    "id": "d28",
+    "day": 28,
+    "title": "Tích phân kép và miền tích phân",
+    "skillId": "calculus_d28",
+    "objective": "đọc thứ tự tích phân và đặt cận cho hình chữ nhật, tam giác.",
+    "stage": "Chặng 6 · Nhiều lớp"
+  },
+  {
+    "id": "d29",
+    "day": 29,
+    "title": "Tọa độ cực và tích phân ba lớp",
+    "skillId": "calculus_d29",
+    "objective": "nhớ hệ số $r$ khi đổi sang tọa độ cực; tính ba lớp trên khối hộp.",
+    "stage": "Chặng 6 · Nhiều lớp"
+  },
+  {
+    "id": "d30",
+    "day": 30,
+    "title": "Bài kiểm tra cuối tháng",
+    "skillId": "calculus_d30",
+    "objective": "tự nhận ra dạng bài, chọn công cụ và trình bày có điều kiện, đơn vị.",
+    "stage": "Chặng 6 · Tổng kết"
+  }
+]

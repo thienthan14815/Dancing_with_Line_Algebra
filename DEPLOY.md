@@ -96,4 +96,31 @@ Routing vẫn chạy nhờ HashRouter; PWA vẫn chạy vì `start_url`/`scope` 
   làm điểm cắm sẵn trong `src/core/persistence/`).
 - **PWA cần HTTPS** (mọi host ở mục 2 đều có) hoặc `localhost`. Không chạy qua
   `file://` hay `http://` LAN.
-</content>
+## cPanel: cập nhật bản app có giáo án Giải tích 30 ngày
+
+Hosting hiện tại: `https://www.buy902.com`, Document Root: `public_html`.
+Bản Giải tích được triển khai ngày 2026-09-30; bản sao trước cập nhật được lưu
+ngoài Document Root với tên `linal-lab-before-calculus-20260930.zip`.
+
+Giáo án mới ở `#/giai-tich`, đồng thời có trong Lộ trình, Sổ tay và Luyện tập.
+Nội dung HTML được nhập bằng `python scripts/import-calculus.py` (cần
+`beautifulsoup4`); dữ liệu JSON đã được lưu trong source nên build thông thường
+không cần Python hoặc tải MathJax từ CDN.
+
+```powershell
+npm test
+npm run build
+python scripts/package-cpanel.py
+```
+
+Gói trong `releases/` chứa **nội dung** `dist/` ngay ở gốc ZIP, với quyền file
+Linux `0644` được đặt rõ ràng kể cả khi đóng gói trên Windows. Trong cPanel,
+xác nhận Document Root của đúng tên miền, sao lưu bản hiện tại rồi tải ZIP vào
+thư mục đó và giải nén. Không xóa các thư mục ứng dụng khác, `.htaccess` hoặc
+các asset cũ trong lúc cập nhật: tab đang mở có thể vẫn dùng asset bản trước.
+Nếu triển khai qua SFTP, tải asset trước, sau đó mới thay `index.html`,
+`manifest.webmanifest`, `registerSW.js` và `sw.js`.
+
+Sau triển khai, mở `https://<ten-mien>/#/giai-tich`, kiểm tra ngày 1, ngày 30,
+thẻ công thức và bài luyện tập. Tải lại app để service worker nhận bản mới.
+Không xóa localStorage: tiến độ học vẫn được lưu trên thiết bị của người học.

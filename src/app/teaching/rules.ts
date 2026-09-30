@@ -1,3 +1,5 @@
+import { calculusRules } from '../../content/modules/calculus-30/practice';
+
 /** Original, concise teaching notes. Formulas retain their applicability conditions. */
 export interface TeachingRule {
   formula: string;
@@ -13,6 +15,7 @@ const r = (formula: string, rule: string, condition: string, example: TeachingRu
 const tex = String.raw;
 
 export const TEACHING_RULES: Record<string, TeachingRule> = {
+  ...calculusRules,
   ai_as_function: r(tex`\hat y=f_\theta(x)`, 'Mô hình AI dùng một hàm có tham số để biến dữ liệu đầu vào thành dự đoán.', 'Đây là mô hình hóa một nhiệm vụ; không phải định nghĩa đầy đủ của trí tuệ.', ['Nhiệm vụ: dự đoán giá từ diện tích x.', 'Mô hình đơn giản f(x) = 2x + 1 nhận x = 3.', 'Dự đoán ŷ = 7; so với dữ liệu thật để điều chỉnh tham số.'], 'Dự đoán của hàm không phải lúc nào cũng đúng thực tế.', ['Dữ liệu x', 'Hàm đã học fθ', 'Dự đoán ŷ']),
   perceptron: r(tex`y=\begin{cases}1&w^Tx\ge b\\0&w^Tx<b\end{cases}`, 'Perceptron cộng điểm có trọng số rồi bật khi đạt ngưỡng.', 'Trong bài này b là ngưỡng; nếu viết bias cộng vào tổng thì bias = −b.', ['x = (1, 1), w = (2, −1), ngưỡng b = 0.5.', 'Tổng điểm wᵀx = 2 − 1 = 1.', '1 ≥ 0.5 nên y = 1.'], 'Một perceptron chỉ tạo ranh giới tuyến tính.', ['Đặc trưng x', 'Điểm wᵀx so với b', 'Bật 1 / tắt 0']),
   xor_mlp: r(tex`A\oplus B=(A\lor B)\land\neg(A\land B)`, 'XOR bật khi hai bit khác nhau; cần kết hợp nhiều ranh giới tuyến tính để học nó.', 'A, B ∈ {0, 1}; MLP cần hàm kích hoạt phi tuyến.', ['XOR gán 00, 11 vào nhóm 0; 01, 10 vào nhóm 1.', 'Một lớp ẩn tính OR và AND của hai bit.', 'Lớp sau ghép OR AND NOT(AND) để cho đúng XOR.'], 'Chồng lớp mà không có phi tuyến vẫn không giải được XOR.', ['Hai bit A, B', 'Lớp ẩn OR và AND', 'Ghép → XOR']),

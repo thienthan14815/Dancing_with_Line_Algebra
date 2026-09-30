@@ -5,9 +5,10 @@ import type { Exercise } from '../../core/exercises/types';
 export type IllustrationInput = Pick<Exercise, 'prompt' | 'skillId' | 'type'>;
 export type Family = 'coordinates' | 'vectors' | 'trig' | 'function' | 'system' | 'matrix'
   | 'space' | 'eigen' | 'decomposition' | 'quadratic' | 'tensor' | 'network'
-  | 'training' | 'data' | 'sequence' | 'base' | 'logic';
+  | 'training' | 'data' | 'sequence' | 'base' | 'logic' | 'calculus';
 
 export const FAMILY_SKILLS: Record<Family, readonly string[]> = {
+  calculus: Array.from({ length: 30 }, (_, index) => `calculus_d${String(index + 1).padStart(2, '0')}`),
   coordinates: ['coordinate_systems', 'math_notation'],
   vectors: ['vector_basics', 'vector_addition', 'scalar_multiplication', 'linear_combination', 'dot_product', 'cross_product'],
   trig: ['trigonometry'],
@@ -38,6 +39,7 @@ export interface Concept {
 }
 
 export const CONCEPTS: Record<Family, Concept> = {
+  calculus: { title: 'Nhận dạng bài giải tích', stages: ['Hàm và miền', 'Giới hạn / vi tích phân', 'Kết quả và đơn vị'], caption: 'Sơ đồ khái niệm: chọn phép toán theo yêu cầu đề, kiểm tra điều kiện và cận trước khi tính.' },
   coordinates: { title: 'Đọc tọa độ', stages: ['Gốc O', 'Trục x, y', 'Vị trí ?'], caption: 'Xác định trục, chiều dương và đơn vị trước khi đọc hình.' },
   vectors: { title: 'Theo dõi từng vector', stages: ['Vector đã cho', 'Phép toán', 'Vector / số ?'], caption: 'Đọc hướng và thành phần; giữ riêng dữ kiện và đại lượng cần tìm.' },
   trig: { title: 'Góc và hai trục', stages: ['Góc θ', 'Đường tròn', 'Tọa độ ?'], caption: 'Đánh dấu góc từ trục ngang; xác định đại lượng đề yêu cầu.' },

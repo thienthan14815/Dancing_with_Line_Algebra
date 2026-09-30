@@ -1,0 +1,2259 @@
+<!doctype html><html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"></head><body><title>Giải tích 30 ngày</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@500;700;800&family=Noto+Sans:ital,wght@0,400;0,600;1,400&family=Noto+Sans+TC:wght@500;700&display=swap">
+<style>
+:root{
+  --paper:#ffffff; --ground:#f4f6f9; --ink:#1b2433; --muted:#5c6b7e; --line:#d8dfe9; --tint:#eef3fa;
+  --blue:#1a56b0; --blue-ink:#123f85; --blue-soft:#e3ecfa;
+  --orange:#e3711a; --orange-soft:#fdeee1;
+  --green:#178a5a; --green-soft:#e4f4ec;
+  --red:#c53d34; --red-soft:#fbe6e4;
+  --violet:#6a4fc4; --violet-soft:#ece7fa;
+  --code:#f1f4f8;
+  --shadow:0 1px 2px rgba(20,30,50,.06),0 6px 18px rgba(20,30,50,.06);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme:dark;
+    --paper:#151b26; --ground:#0f141c; --ink:#e6ebf3; --muted:#a3afc0; --line:#2b3546; --tint:#1b2432;
+    --blue:#7aa8f0; --blue-ink:#a9c6f7; --blue-soft:#1b2b45;
+    --orange:#f0995a; --orange-soft:#3a2716;
+    --green:#5cc596; --green-soft:#16302a;
+    --red:#ef7f77; --red-soft:#3b1f1d;
+    --violet:#b39df0; --violet-soft:#2a2340;
+    --code:#1b2230;
+    --shadow:0 1px 2px rgba(0,0,0,.4),0 6px 18px rgba(0,0,0,.35);
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --paper:#151b26; --ground:#0f141c; --ink:#e6ebf3; --muted:#a3afc0; --line:#2b3546; --tint:#1b2432;
+  --blue:#7aa8f0; --blue-ink:#a9c6f7; --blue-soft:#1b2b45;
+  --orange:#f0995a; --orange-soft:#3a2716;
+  --green:#5cc596; --green-soft:#16302a;
+  --red:#ef7f77; --red-soft:#3b1f1d;
+  --violet:#b39df0; --violet-soft:#2a2340;
+  --code:#1b2230;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 6px 18px rgba(0,0,0,.35);
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--ground);color:var(--ink);font-family:"Noto Sans","Be Vietnam Pro",system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;font-size:16px;line-height:1.65;-webkit-font-smoothing:antialiased}
+h1,h2,h3,h4{font-family:"Be Vietnam Pro","Noto Sans",system-ui,sans-serif;line-height:1.2;margin:0;text-wrap:balance}
+p{margin:0}
+a{color:var(--blue)}
+.zh{font-family:"Noto Sans TC","Noto Sans",sans-serif;font-weight:700}
+mjx-container{font-size:1.02em}
+mjx-container[display="true"]{margin:.5em 0 !important;overflow-x:auto;overflow-y:hidden;max-width:100%}
+
+/* top bar */
+.topbar{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--paper);border-bottom:1px solid var(--line);}
+.topbar .in{max-width:1160px;margin:0 auto;padding:10px 16px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:10px;font-family:"Be Vietnam Pro",sans-serif;font-weight:800;font-size:17px;letter-spacing:-.01em}
+.brand .mark{width:30px;height:30px;border-radius:7px;background:var(--blue);color:#fff;display:grid;place-items:center;font-size:15px;font-weight:800}
+.brand .mark b{font-family:"Be Vietnam Pro",sans-serif}
+.topbar .sub{color:var(--muted);font-size:13px}
+.topbar .prog{margin-left:auto;display:flex;align-items:center;gap:10px;font-size:13px;color:var(--muted);white-space:nowrap}
+@media (max-width:600px){.topbar .sub{display:none}.topbar .prog{margin-left:0;flex:1}.topbar select{flex:1;min-width:0}}
+.bar{width:140px;height:8px;border-radius:99px;background:var(--tint);border:1px solid var(--line);overflow:hidden}
+.bar i{display:block;height:100%;width:0;background:var(--orange);transition:width .3s}
+.topbar select{font:inherit;font-size:13px;padding:6px 8px;border:1px solid var(--line);border-radius:6px;background:var(--paper);color:var(--ink)}
+
+/* layout */
+.wrap{max-width:1160px;margin:0 auto;padding-block:20px 60px;padding-inline:16px;display:grid;grid-template-columns:240px minmax(0,1fr);gap:28px;align-items:start}
+@media (max-width:900px){.wrap{grid-template-columns:minmax(0,1fr)}.side{display:none}}
+.side{position:sticky;top:calc(env(safe-area-inset-top,0px) + 66px);max-height:calc(100vh - 90px);overflow:auto;padding-right:6px}
+.side h4{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin:14px 0 6px 8px}
+.side h4:first-child{margin-top:0}
+.side a{display:flex;align-items:center;gap:8px;padding:5px 8px;border-radius:6px;color:var(--ink);text-decoration:none;font-size:13.5px;line-height:1.3}
+.side a:hover{background:var(--tint)}
+.side a .d{font-family:"Be Vietnam Pro",sans-serif;font-weight:700;color:var(--orange);width:22px;flex:none;font-variant-numeric:tabular-nums}
+.side a .ck{margin-left:auto;color:var(--green);font-weight:700;display:none}
+.side a.is-done .ck{display:inline}
+.side a.is-done{color:var(--muted)}
+main{min-width:0}
+
+/* cover */
+.cover{background:var(--paper);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);overflow:hidden;margin-bottom:28px}
+.cover .band{background:var(--blue);color:#fff;padding:26px 28px;display:flex;flex-wrap:wrap;gap:18px;align-items:flex-end}
+.cover .band .kicker{font-size:12px;letter-spacing:.14em;text-transform:uppercase;opacity:.85}
+.cover .band h1{font-size:clamp(28px,4.5vw,44px);font-weight:800;letter-spacing:-.02em;margin-top:4px;color:#fff}
+.cover .band .chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.cover .band .chips span{background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.35);border-radius:99px;padding:2px 10px;font-size:12.5px}
+.cover .body{padding:22px 28px;display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:18px}
+.cover .body h3{font-size:14px;color:var(--blue);margin-bottom:6px}
+.cover .body p,.cover .body li{font-size:14.5px;color:var(--ink)}
+.cover .body ul{margin:0;padding-left:18px}
+.cover .body ul li{margin:3px 0}
+.timeline{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-top:6px}
+.timeline div{background:var(--tint);border:1px solid var(--line);border-radius:8px;padding:8px 10px;font-size:12.5px;line-height:1.35}
+.timeline b{display:block;color:var(--orange);font-family:"Be Vietnam Pro",sans-serif;font-size:15px}
+@media (max-width:700px){.timeline{grid-template-columns:repeat(2,1fr)}}
+
+/* roadmap table */
+.roadmap{background:var(--paper);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);padding:22px 24px;margin-bottom:28px}
+.roadmap h2{font-size:20px;color:var(--blue-ink);margin-bottom:12px}
+.rm{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px 22px}
+.stage{border-top:3px solid var(--orange);padding-top:8px}
+.stage h3{font-size:14px;margin-bottom:4px}
+.stage h3 small{color:var(--muted);font-weight:500;font-family:"Noto Sans",sans-serif;font-size:12.5px;margin-left:6px}
+.stage p{font-size:13px;color:var(--muted);margin-bottom:6px}
+.stage ol{list-style:none;margin:0;padding:0}
+.stage li a{display:flex;gap:10px;padding:4px 0;border-bottom:1px dashed var(--line);text-decoration:none;color:var(--ink);font-size:14px}
+.stage li a:hover{color:var(--blue)}
+.stage li a .d{font-family:"Be Vietnam Pro",sans-serif;font-weight:700;color:var(--orange);width:24px;flex:none;font-variant-numeric:tabular-nums}
+.stage li a .ck{margin-left:auto;color:var(--green);font-weight:700;display:none}
+.stage li a.is-done .ck{display:inline}
+
+/* day */
+.day{background:var(--paper);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);padding:0 0 26px;margin-bottom:28px;overflow:hidden;scroll-margin-top:calc(env(safe-area-inset-top,0px) + 76px)}
+.cover,.roadmap{scroll-margin-top:calc(env(safe-area-inset-top,0px) + 76px)}
+.day > *:not(.opener){margin-left:26px;margin-right:26px}
+@media (max-width:600px){.day > *:not(.opener){margin-left:16px;margin-right:16px}}
+.opener{display:grid;grid-template-columns:auto minmax(0,1fr);gap:18px;align-items:start;padding:22px 26px 18px;background:linear-gradient(180deg,var(--tint),var(--paper));border-bottom:1px solid var(--line);margin-bottom:20px}
+@media (max-width:600px){.opener{padding:18px 16px 14px;gap:12px}}
+.opener .num{display:flex;flex-direction:column;align-items:center;line-height:1;color:var(--orange);font-family:"Be Vietnam Pro",sans-serif;padding-top:4px}
+.opener .num .lbl{font-size:10px;letter-spacing:.2em;font-weight:700}
+.opener .num .n{font-size:56px;font-weight:800;letter-spacing:-.04em}
+@media (max-width:600px){.opener .num .n{font-size:42px}}
+.opener .eyebrow{font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--blue);font-weight:600}
+.opener h2{font-size:clamp(22px,3.2vw,30px);font-weight:800;letter-spacing:-.015em;margin:4px 0 6px}
+.opener .goal{font-size:14.5px;color:var(--muted)}
+.opener .goal b{color:var(--ink);font-weight:600}
+.done{display:inline-flex;align-items:center;gap:6px;font-size:13px;color:var(--muted);margin-top:10px;cursor:pointer;user-select:none}
+.done input{width:16px;height:16px;accent-color:var(--green)}
+
+/* section heading */
+.sec{display:flex;align-items:center;gap:10px;font-size:17px;font-weight:800;color:var(--blue-ink);margin:22px 0 8px}
+.sec .zh{font-size:12px;color:#fff;background:var(--blue);border-radius:4px;padding:1px 7px;letter-spacing:.08em}
+.day p.txt{margin:6px 0;max-width:72ch}
+.day p.txt + p.txt{margin-top:8px}
+
+/* boxes */
+.box{position:relative;border:1.5px solid var(--line);border-radius:10px;padding:18px 18px 14px;margin:24px 0 8px;background:var(--paper)}
+.box .tag{position:absolute;top:-13px;left:14px;display:inline-flex;align-items:center;gap:8px;background:var(--paper);padding:0 8px;font-family:"Be Vietnam Pro",sans-serif;font-weight:700;font-size:14px;color:var(--ink)}
+.box .tag .zh{font-size:11.5px;color:#fff;border-radius:4px;padding:2px 7px;letter-spacing:.08em}
+.box.key{border-color:var(--blue);background:var(--blue-soft)}
+.box.key .tag{background:var(--blue-soft)} .box.key .tag .zh{background:var(--blue)}
+.box.ex{border-color:var(--green)} .box.ex .tag .zh{background:var(--green)}
+.box.tip{border-color:var(--orange);background:var(--orange-soft)} .box.tip .tag{background:var(--orange-soft)} .box.tip .tag .zh{background:var(--orange)}
+.box.warn{border-color:var(--red);background:var(--red-soft)} .box.warn .tag{background:var(--red-soft)} .box.warn .tag .zh{background:var(--red)}
+.box.drill{border-color:var(--violet)} .box.drill .tag .zh{background:var(--violet)}
+.box.recap{border-color:var(--line);background:var(--tint)} .box.recap .tag{background:var(--tint)} .box.recap .tag .zh{background:var(--muted)}
+.box.aims{border-style:dashed;background:var(--tint)} .box.aims .tag{background:var(--tint)} .box.aims .tag .zh{background:var(--orange)}
+.box p,.box li{font-size:15px}
+.box ul{margin:4px 0 0;padding-left:20px}
+.box ul li{margin:4px 0}
+.box.aims ul{list-style:none;padding-left:0}
+.box.aims ul li{padding-left:22px;position:relative}
+.box.aims ul li::before{content:"☐";position:absolute;left:0;color:var(--orange);font-weight:700}
+
+/* key formula table */
+.ktab{width:100%;border-collapse:collapse;font-size:15px}
+.ktab td{padding:8px 6px;border-top:1px solid var(--line);vertical-align:middle}
+.ktab tr:first-child td{border-top:0}
+.ktab td.f{min-width:38%;font-size:16px}
+.ktab td.f mjx-container{overflow-x:auto;overflow-y:hidden;max-width:100%}
+.ktab td.c{color:var(--muted);font-size:13.5px}
+.ktab td.c b{color:var(--ink);font-weight:600}
+@media (max-width:640px){
+  .ktab,.ktab tr,.ktab td{display:block;width:100%}
+  .ktab td{border-top:0;padding:4px 0}
+  .ktab td.f{padding-top:10px}
+  .ktab tr{border-top:1px solid var(--line);padding:4px 0}
+  .ktab tr:first-child{border-top:0}
+}
+.scroll{overflow-x:auto}
+
+/* examples */
+.prob{font-size:15px;margin-bottom:8px}
+.prob b{color:var(--green);font-weight:700}
+.steps{list-style:none;margin:6px 0 0;padding:0;counter-reset:st}
+.steps li{display:grid;grid-template-columns:28px minmax(0,1.1fr) minmax(0,1fr);gap:10px;align-items:center;padding:8px 0;border-top:1px dashed var(--line)}
+.steps li:first-child{border-top:0}
+.steps li::before{counter-increment:st;content:counter(st);width:24px;height:24px;border-radius:50%;background:var(--green);color:#fff;font-weight:700;font-size:12.5px;display:grid;place-items:center;font-family:"Be Vietnam Pro",sans-serif}
+.steps .m{font-size:16px;min-width:0;overflow-x:auto}
+.steps .note{font-size:13.5px;color:var(--muted);min-width:0}
+.steps .note::before{content:"◀ ";color:var(--green);font-weight:700}
+@media (max-width:640px){.steps li{grid-template-columns:28px minmax(0,1fr)}.steps .note{grid-column:2}.steps .note::before{content:"↳ "}}
+.result{margin-top:10px;padding:8px 12px;border-left:3px solid var(--green);background:var(--green-soft);border-radius:0 6px 6px 0;font-size:15px}
+.result b{color:var(--green)}
+
+/* drills */
+.probs{list-style:none;margin:0;padding:0}
+.probs > li{padding:10px 0;border-top:1px dashed var(--line);font-size:15px}
+.probs > li:first-child{border-top:0;padding-top:2px}
+.pid{display:inline-block;font-family:"Be Vietnam Pro",sans-serif;font-weight:700;color:var(--violet);margin-right:6px;font-variant-numeric:tabular-nums}
+.probs .q{display:block}
+.probs .q mjx-container[display="true"]{margin:.35em 0 !important}
+details.ans{margin-top:6px}
+details.ans summary{cursor:pointer;display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:600;color:var(--violet);background:var(--violet-soft);border-radius:99px;padding:3px 11px;list-style:none;user-select:none}
+details.ans summary::-webkit-details-marker{display:none}
+details.ans summary::before{content:"▸";font-size:11px}
+details[open].ans summary::before{content:"▾"}
+details.ans .body{margin-top:8px;padding:10px 14px;background:var(--code);border-radius:8px;font-size:14.5px;border-left:3px solid var(--violet)}
+details.ans .body p{margin:4px 0}
+details.ans .body .fin{font-weight:600}
+details.ans .body .fin::before{content:"Kết quả: ";color:var(--violet)}
+.score{font-size:13px;color:var(--muted);margin-top:8px}
+
+/* recap */
+.box.recap ul{list-style:none;padding-left:0}
+.box.recap li{padding-left:24px;position:relative;font-size:14.5px}
+.box.recap li.ok::before{content:"✔";position:absolute;left:0;color:var(--green);font-weight:700}
+.box.recap li.re::before{content:"↻";position:absolute;left:0;color:var(--orange);font-weight:700}
+.box.recap li.tm::before{content:"⏱";position:absolute;left:0}
+
+/* test badge */
+.test{display:inline-block;font-size:12px;font-weight:700;background:var(--red);color:#fff;border-radius:4px;padding:1px 8px;margin-left:8px;vertical-align:middle;letter-spacing:.04em}
+
+/* appendix cards */
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px;margin-top:8px}
+.card{border:1px solid var(--line);border-radius:10px;padding:14px 16px;background:var(--tint)}
+.card h4{font-size:14px;color:var(--blue);margin-bottom:6px}
+.card p,.card li{font-size:14px}
+.card ul{margin:0;padding-left:18px}
+.foot{text-align:center;color:var(--muted);font-size:13px;margin-top:20px}
+:focus-visible{outline:2px solid var(--orange);outline-offset:2px}
+@media (prefers-reduced-motion: reduce){*{transition:none !important}}
+</style>
+
+<script>
+window.MathJax = {
+  tex: { inlineMath: [['$','$'], ['\\(','\\)']], displayMath: [['$$','$$'], ['\\[','\\]']], processEscapes: true },
+  svg: { fontCache: 'global' },
+  options: { skipHtmlTags: ['script','noscript','style','textarea','pre','code'] }
+};
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-svg.js" async></script>
+
+<div class="topbar"><div class="in">
+  <div class="brand"><span class="mark"><b>∫</b></span>Giải tích 30 ngày</div>
+  <span class="sub">Bài giảng trình bày lại theo lối sách 旗標</span>
+  <div class="prog"><span id="progTxt">0/30 ngày</span><span class="bar"><i id="progBar"></i></span>
+    <select id="jump" aria-label="Nhảy tới ngày"><option value="">Tới ngày…</option></select>
+  </div>
+</div></div>
+
+<div class="wrap">
+<nav class="side" id="side" aria-label="Mục lục"></nav>
+<main>
+
+<section class="cover" id="top">
+  <div class="band">
+    <div>
+      <div class="kicker">Lộ trình cá nhân · 2 giờ mỗi ngày · 30/09 → 29/10/2026</div>
+      <h1>Giải tích trong 30 ngày</h1>
+      <div class="chips"><span>Giới hạn</span><span>Đạo hàm</span><span>Tích phân</span><span>Nhiều biến</span><span>Vectơ</span></div>
+    </div>
+  </div>
+  <div class="body">
+    <div>
+      <h3>Mục tiêu của tháng này</h3>
+      <p>Hiểu ý nghĩa, nhớ các công thức cốt lõi và tự giải được bài cơ bản. Đây là lộ trình khoảng 60 giờ, chưa tương đương một học phần đầy đủ hay toàn bộ toán kỹ thuật. Nếu đại số còn yếu, ưu tiên chắc phần một biến và xem phần nhiều biến là nhập môn.</p>
+    </div>
+    <div>
+      <h3>Cách đọc một bài trong sách này</h3>
+      <ul>
+        <li><b>觀念 Khái niệm</b>: hiểu bài nói về cái gì trước khi nhìn công thức.</li>
+        <li><b>重點 Cốt lõi</b>: bảng công thức kèm điều kiện dùng.</li>
+        <li><b>範例 Ví dụ</b>: từng bước có chú thích bên phải, che lại làm lần hai.</li>
+        <li><b>提示 / 注意</b>: mẹo và lỗi hay gặp.</li>
+        <li><b>練習 Bạn tự làm</b>: thử ít nhất 10–15 phút rồi mới mở đáp án.</li>
+      </ul>
+    </div>
+    <div>
+      <h3>Một buổi 120 phút</h3>
+      <div class="timeline">
+        <div><b>15′</b>Nhắc lại bài cũ</div>
+        <div><b>25′</b>Hiểu ý nghĩa và công thức</div>
+        <div><b>20′</b>Tự làm lại ví dụ</div>
+        <div><b>45′</b>Bài tập</div>
+        <div><b>15′</b>Chữa lỗi</div>
+      </div>
+      <p style="margin-top:8px">Với mỗi bài tập, ghi đủ bốn dòng: <b>dạng bài → công thức và điều kiện → biến đổi → kiểm tra kết quả</b>. Ngày thường mục tiêu 3/4 câu; ngày kiểm tra (6, 14, 22) mục tiêu 5/6.</p>
+    </div>
+  </div>
+</section>
+
+<section class="roadmap" id="roadmap">
+  <h2>Bản đồ 30 ngày</h2>
+  <div class="rm" id="rm"></div>
+</section>
+
+<!-- ================= NGÀY 01 ================= -->
+<section class="day" id="d01">
+  <header class="opener">
+    <div class="num"><span class="lbl">NGÀY</span><span class="n">01</span></div>
+    <div>
+      <div class="eyebrow">Chặng 1 · Nền tảng</div>
+      <h2>Hàm số và đại số</h2>
+      <p class="goal"><b>Mục tiêu:</b> đọc được $f(x)$, thay số, tìm điều kiện xác định và rút gọn có điều kiện.</p>
+      <label class="done"><input type="checkbox" data-done="1"> Đã học xong</label>
+    </div>
+  </header>
+
+  <div class="box aims"><div class="tag"><span class="zh">本日重點</span>Bài này bạn sẽ</div>
+    <ul><li>Xem hàm số là một "cái máy": bỏ $x$ vào, nhận đúng một $y$ ra.</li>
+    <li>Tìm miền xác định bằng ba câu hỏi: mẫu, căn, logarit.</li>
+    <li>Rút gọn biểu thức mà không đánh rơi điều kiện.</li></ul>
+  </div>
+
+  <h3 class="sec"><span class="zh">觀念</span>Khái niệm</h3>
+  <p class="txt">Hàm số là một quy tắc: đưa một giá trị $x$ hợp lệ vào, nhận về <b>đúng một</b> giá trị $y$. Tập các $x$ được phép dùng gọi là <b>miền xác định</b>. Cùng một cái máy nhưng nếu bạn bỏ vào thứ nó không nhận (chia cho 0, căn số âm), nó không trả kết quả.</p>
+  <p class="txt">Khi rút gọn, ta chỉ đổi <em>cách viết</em> của hàm, không đổi <em>tập đầu vào</em> ban đầu. Đây là ý sẽ theo bạn suốt phần giới hạn.</p>
+
+  <div class="box key"><div class="tag"><span class="zh">重點</span>Công thức cốt lõi</div>
+    <div class="scroll"><table class="ktab">
+      <tr><td class="f">$y=f(x),\qquad f(a)=f(x)\big|_{x=a}$</td><td class="c">Thay <b>toàn bộ</b> $x$ bằng $a$.</td></tr>
+      <tr><td class="f">$a^2-b^2=(a-b)(a+b)$</td><td class="c">Hiệu hai bình phương, dùng để khử nhân tử.</td></tr>
+      <tr><td class="f">$\dfrac{x^2-a^2}{x-a}=x+a\quad(x\neq a)$</td><td class="c">Rút gọn <b>kèm điều kiện</b> $x\ne a$.</td></tr>
+    </table></div>
+    <p style="margin-top:10px;font-size:14px"><b>Quy tắc miền xác định:</b> mẫu khác 0; biểu thức dưới căn bậc hai không âm; đối số của logarit phải dương.</p>
+  </div>
+
+  <div class="box ex"><div class="tag"><span class="zh">範例</span>Ví dụ 1 · Thay số</div>
+    <p class="prob"><b>Đề:</b> Cho $f(x)=2x+3$. Tính $f(4)$.</p>
+    <ol class="steps">
+      <li><div class="m">$f(4)=2\cdot 4+3$</div><div class="note">Mọi chỗ có $x$ đều thay bằng 4.</div></li>
+      <li><div class="m">$=8+3=11$</div><div class="note">Nhân trước, cộng sau.</div></li>
+    </ol>
+    <p class="result"><b>Kết quả:</b> $f(4)=11$.</p>
+  </div>
+
+  <div class="box ex"><div class="tag"><span class="zh">範例</span>Ví dụ 2 · Rút gọn có điều kiện</div>
+    <p class="prob"><b>Đề:</b> Rút gọn $g(x)=\dfrac{x^2-1}{x-1}$.</p>
+    <ol class="steps">
+      <li><div class="m">$x-1\neq 0 \Rightarrow x\neq 1$</div><div class="note">Ghi điều kiện <b>trước</b> khi biến đổi.</div></li>
+      <li><div class="m">$\dfrac{(x-1)(x+1)}{x-1}$</div><div class="note">Tử là hiệu hai bình phương.</div></li>
+      <li><div class="m">$g(x)=x+1\quad(x\neq 1)$</div><div class="note">Khử nhân tử chung, giữ điều kiện.</div></li>
+    </ol>
+    <p class="result"><b>Kết quả:</b> $g(x)=x+1$ với $x\ne1$. Dù biểu thức mới trông "hiền", $g$ vẫn <b>không xác định</b> tại $x=1$.</p>
+  </div>
+
+  <div class="box warn"><div class="tag"><span class="zh">注意</span>Lỗi hay gặp</div>
+    <ul><li>Rút gọn xong rồi quên điều kiện, sau đó thay $x=1$ vào $x+1$ và kết luận $g(1)=2$. Sai: $g(1)$ không tồn tại.</li>
+    <li>Chỉ được khử <b>nhân tử chung</b> của tử và mẫu, không được khử từng số hạng trong một tổng.</li></ul>
+  </div>
+
+  <div class="box drill"><div class="tag"><span class="zh">練習</span>Bạn tự làm</div>
+    <ol class="probs">
+      <li><span class="pid">01.1</span>Cho $f(x)=3x-2$. Tính $f(0)$, $f(2)$, $f(-1)$.
+        <details class="ans"><summary>Xem đáp án</summary><div class="body"><p>Thay từng giá trị vào $3x-2$.</p><p class="fin">$f(0)=-2,\; f(2)=4,\; f(-1)=-5$.</p></div></details></li>
+      <li><span class="pid">01.2</span>Tìm miền xác định của $g(x)=\dfrac{1}{x-4}$.
+        <details class="ans"><summary>Xem đáp án</summary><div class="body"><p>Mẫu phải khác 0: $x-4\neq0$.</p><p class="fin">$D=\mathbb{R}\setminus\{4\}$.</p></div></details></li>
+      <li><span class="pid">01.3</span>Tìm miền xác định của $h(x)=\sqrt{x+2}$.
+        <details class="ans"><summary>Xem đáp án</summary><div class="body"><p>Dưới căn không âm: $x+2\ge0$.</p><p class="fin">$D=[-2,+\infty)$.</p></div></details></li>
+      <li><span class="pid">01.4</span>Rút gọn và ghi điều kiện: $\dfrac{x^2-9}{x-3}$.
+        <details class="ans"><summary>Xem đáp án</summary><div class="body"><p>$x^2-9=(x-3)(x+3)$, điều kiện $x\ne3$.</p><p class="fin">$\dfrac{(x-3)(x+3)}{x-3}=x+3,\quad x\neq3$.</p></div></details></li>
+    </ol>
+  </div>
+
+  <div class="box recap"><div class="tag"><span class="zh">回顧</span>Trước khi đóng sách</div>
+    <ul><li class="ok">Đạt yêu cầu: tự giải đúng ít nhất 3/4 câu và <b>luôn ghi điều kiện</b> ở câu 4.</li>
+    <li class="re">Chưa có bài cũ; ghi lại chỗ bạn còn lúng túng để ngày mai mở ra xem.</li></ul>
+  </div>
+</section>
+
+<!-- ================= NGÀY 02 ================= -->
+<section class="day" id="d02">
+  <header class="opener">
+    <div class="num"><span class="lbl">NGÀY</span><span class="n">02</span></div>
+    <div>
+      <div class="eyebrow">Chặng 1 · Nền tảng</div>
+      <h2>Lũy thừa, logarit, lượng giác</h2>
+      <p class="goal"><b>Mục tiêu:</b> đổi căn thành lũy thừa; dùng logarit và góc radian.</p>
+      <label class="done"><input type="checkbox" data-done="2"> Đã học xong</label>
+    </div>
+  </header>
+
+  <div class="box aims"><div class="tag"><span class="zh">本日重點</span>Bài này bạn sẽ</div>
+    <ul><li>Viết mọi căn và phân thức đơn giản thành dạng $x^{p}$ để sau này lấy đạo hàm dễ.</li>
+    <li>Đọc logarit là "câu hỏi về số mũ".</li>
+    <li>Chuyển máy tính sang RAD và không quay lại nữa.</li></ul>
+  </div>
+
+  <h3 class="sec"><span class="zh">觀念</span>Khái niệm</h3>
+  <p class="txt"><b>Logarit là phép hỏi số mũ.</b> $\log_a b$ trả lời câu: "đặt số mũ nào lên $a$ để được $b$?". Vì thế $\log_2 32=5$ chỉ vì $2^5=32$. Ký hiệu $\ln$ là logarit cơ số $e\approx2{,}71828$.</p>
+  <p class="txt">Trong giải tích, mọi công thức lượng giác dùng <b>radian</b>: một vòng tròn là $2\pi$, nửa vòng là $\pi$. Lý do sẽ rõ ở ngày 5 khi ta cần $\sin x\approx x$ với $x$ nhỏ.</p>
+
+  <div class="box key"><div class="tag"><span class="zh">重點</span>Công thức cốt lõi</div>
+    <div class="scroll"><table class="ktab">
+      <tr><td class="f">$x^m x^n=x^{m+n},\quad (x^m)^n=x^{mn}$</td><td class="c">Với $x&gt;0$ để an toàn cho mọi số mũ thực.</td></tr>
+      <tr><td class="f">$\sqrt{x}=x^{1/2},\quad \dfrac1{x^k}=x^{-k}$</td><td class="c">Hai phép đổi dùng nhiều nhất của cả tháng.</td></tr>
+      <tr><td class="f">$\log_a b=c \iff a^c=b$</td><td class="c">$a&gt;0,\ a\ne1,\ b&gt;0$.</td></tr>
+      <tr><td class="f">$\ln(ab)=\ln a+\ln b,\quad \ln(a^k)=k\ln a$</td><td class="c">$a,b&gt;0$. <b>Không có</b> quy tắc cho $\ln(a+b)$.</td></tr>
+      <tr><td class="f">$180^\circ=\pi\ \text{rad},\quad \sin^2x+\cos^2x=1$</td><td class="c">Đổi độ sang rad: nhân $\pi/180$.</td></tr>
+    </table></div>
+  </div>
+
+  <div class="box ex"><div class="tag"><span class="zh">範例</span>Ví dụ 1 · Đổi căn thành lũy thừa</div>
+    <p class="prob"><b>Đề:</b> Rút gọn $\dfrac{\sqrt{x}}{x^2}$ với $x&gt;0$.</p>
+    <ol class="steps">
+      <li><div class="m">$\dfrac{x^{1/2}}{x^{2}}$</div><div class="note">Căn bậc hai là lũy thừa $1/2$.</div></li>
+      <li><div class="m">$=x^{1/2-2}$</div><div class="note">Chia lũy thừa cùng cơ số: trừ số mũ.</div></li>
+      <li><div class="m">$=x^{-3/2}$</div><div class="note">Dạng này lấy đạo hàm được ngay ở ngày 8.</div></li>
+    </ol>
+  </div>
+
+  <div class="box ex"><div class="tag"><span class="zh">範例</span>Ví dụ 2 · Đổi độ sang radian</div>
+    <p class="prob"><b>Đề:</b> Đổi $60^\circ$ sang radian.</p>
+    <ol class="steps">
+      <li><div class="m">$60\cdot\dfrac{\pi}{180}$</div><div class="note">$180^\circ$ ứng với $\pi$ rad.</div></li>
+      <li><div class="m">$=\dfrac{\pi}{3}$</div><div class="note">Rút gọn $60/180=1/3$.</div></li>
+    </ol>
+  </div>
+
+  <div class="box tip"><div class="tag"><span class="zh">提示</span>Mẹo nhớ góc đặc biệt</div>
+    <p>Xếp $\sin$ của $0^\circ,30^\circ,45^\circ,60^\circ,90^\circ$ theo mẫu $\dfrac{\sqrt{0}}{2},\dfrac{\sqrt{1}}{2},\dfrac{\sqrt{2}}{2},\dfrac{\sqrt{3}}{2},\dfrac{\sqrt{4}}{2}$. Dãy $\cos$ là dãy đó đọc ngược lại.</p>
+  </div>
+
+  <div class="box warn"><div class="tag"><span class="zh">注意</span>Lỗi hay gặp</div>
+    <ul><li>Viết $\ln(a+b)=\ln a+\ln b$. Không tồn tại quy tắc này.</li>
+    <li>Để máy tính ở chế độ DEG rồi tính giới hạn có $\sin$. Kết quả sẽ sai lệch hoàn toàn.</li>
+    <li>$\ln x$ chỉ có nghĩa thực khi $x&gt;0$.</li></ul>
+  </div>
+
+  <div class="box drill"><div class="tag"><span class="zh">練習</span>Bạn tự làm</div>
+    <ol class="probs">
+      <li><span class="pid">02.1</span>Rút gọn $x^3x^{-5}$, giả sử $x&gt;0$.
+        <details class="ans"><summary>Xem đáp án</summary><div class="body"><p>Cộng số mũ: $3+(-5)=-2$.</p><p class="fin">$x^{-2}=\dfrac1{x^2}$.</p></div></details></li>
+      <li><span class="pid">02.2</span>Tính $\ln(e^4)$ và $\log_2 32$.
+        <details class="ans"><summary>Xem đáp án</summary><div class="body"><p>$\ln$ và $e^{x}$ là hai phép ngược nhau; $2^5=32$.</p><p class="fin">$4$ và $5$.</p></div></details></li>
+      <li><span class="pid">02.3</span>Đổi $30^\circ$ và $90^\circ$ sang radian.
+        <details class="ans"><summary>Xem đáp án</summary><div class="body"><p>Nhân với $\pi/180$.</p><p class="fin">$\pi/6$ và $\pi/2$.</p></div></details></li>
+      <li><span class="pid">02.4</span>Tính chính xác $\sin(\pi/6)$, $\cos(\pi/3)$, $\sin(\pi/2)$.
+        <details class="ans"><summary>Xem đáp án</summary><div class="body"><p>Dùng các góc đặc biệt ($30^\circ,60^\circ,90^\circ$).</p><p class="fin">$\tfrac12,\ \tfrac12,\ 1$.</p></div></details></li>
+    </ol>
+  </div>
+
+  <div class="box recap"><div class="tag"><span class="zh">回顧</span>Trước khi đóng sách</div>
+    <ul><li class="ok">Đạt yêu cầu: đúng 3/4 câu; biết $\ln x$ chỉ có nghĩa khi $x&gt;0$.</li>
+    <li class="re">Ôn ngày 1: miền xác định và phân tích nhân tử.</li></ul>
+  </div>
+</section>
+
+<!-- ================= NGÀY 03 ================= -->
+<section class="day" id="d03">
+  <header class="opener">
+    <div class="num"><span class="lbl">NGÀY</span><span class="n">03</span></div>
+    <div>
+      <div class="eyebrow">Chặng 1 · Giới hạn</div>
+      <h2>Giới hạn là "tiến gần"</h2>
+      <p class="goal"><b>Mục tiêu:</b> phân biệt <em>giá trị tại</em> một điểm với <em>giá trị tiến tới</em> điểm đó.</p>
+      <label class="done"><input type="checkbox" data-done="3"> Đã học xong</label>
+    </div>
+  </header>
+
+  <div class="box aims"><div class="tag"><span class="zh">本日重點</span>Bài này bạn sẽ</div>
+    <ul><li>Đọc $\lim_{x\to a}f(x)=L$ thành một câu tiếng Việt.</li>
+    <li>Biết khi nào được thay số trực tiếp.</li>
+    <li>Nhận ra dạng $0/0$ và dừng lại, không kết luận.</li></ul>
+  </div>
+
+  <h3 class="sec"><span class="zh">觀念</span>Khái niệm</h3>
+  <p class="txt">Giới hạn mô tả $f(x)$ <b>tiến tới đâu</b> khi $x$ tiến gần $a$. Chú ý hai điều: $x$ không bao giờ bằng $a$, và $f(a)$ có thể không tồn tại hoặc bằng một số khác hẳn. Giới hạn hai phía tồn tại khi giới hạn bên trái và bên phải bằng nhau.</p>
+  <p class="txt">Hình dung: bạn đi bộ dọc đồ thị về phía $x=a$ từ hai bên. Nếu cả hai bên đều dẫn bạn tới cùng một độ cao $L$ thì giới hạn là $L$, bất kể tại đúng vị trí $a$ có "lỗ" hay có một điểm bay lơ lửng ở nơi khác.</p>
+
+  <div class="box key"><div class="tag"><span class="zh">重點</span>Công thức cốt lõi</div>
+    <div class="scroll"><table class="ktab">
+      <tr><td class="f">$\displaystyle\lim_{x\to a}f(x)=L$</td><td class="c">"Khi $x$ tiến gần $a$, $f(x)$ tiến gần $L$."</td></tr>
+      <tr><td class="f">$\lim(f+g)=\lim f+\lim g,\quad \lim(fg)=(\lim f)(\lim g)$</td><td class="c">Dùng khi các giới hạn thành phần <b>tồn tại, hữu hạn</b>.</td></tr>
+      <tr><td class="f">$\lim\dfrac{f}{g}=\dfrac{\lim f}{\lim g}\quad(\lim g\neq0)$</td><td class="c">Mẫu phải có giới hạn khác 0.</td></tr>
+    </table></div>
+    <p style="margin-top:10px;font-size:14px"><b>Khi nào thay trực tiếp:</b> đa thức thì thay $x=a$; phân thức có mẫu tại $a$ khác 0 thì thay trực tiếp. Nếu ra $0/0$ thì <b>chưa có đáp án</b>, phải biến đổi (ngày 4).</p>
+  </div>
+
+  <div class="box ex"><div class="tag"><span class="zh">範例</span>Ví dụ · Thay trực tiếp</div>
+    <p class="prob"><b>Đề:</b> Tính $\displaystyle\lim_{x\to2}(x^2+3x)$.</p>
+    <ol class="steps">
+      <li><div class="m">$x^2+3x$ là đa thức</div><div class="note">Đa thức liên tục mọi nơi nên được thay số.</div></li>
+      <li><div class="m">$=2^2+3\cdot2=4+6=10$</div><div class="note">Thay $x=2$.</div></li>
+    </ol>
+    <p class="result"><b>Kết quả:</b> $10$.</p>
+  </div>
+
+  <div class="box tip"><div class="tag"><span class="zh">提示</span>Quy trình ba bước</div>
+    <p><b>1.</b> Thử thay $x=a$. <b>2.</b> Ra số thì đó là giới hạn. <b>3.</b> Ra $0/0$ thì đánh dấu "vô định", chuyển sang công cụ của ngày 4. Đừng bao giờ viết $0/0=0$ hay $0/0=1$.</p>
+  </div>
+
+  <div class="box drill"><div class="tag"><span class="zh">練習</span>Bạn tự làm</div>
+    <ol class="probs">
+      <li><span class="pid">03.1</span>Tính $\displaystyle\lim_{x\to3}(2x+1)$.
+        <details class="ans"><summary>Xem đáp án</summary><div class="body"><p>Đa thức, thay $x=3$.</p><p class="fin">$7$.</p></div></details></li>
+      <li><span class="pid">03.2</span>Tính $\displaystyle\lim_{x\to-1}(x^2-2x+4)$.
+        <details class="ans"><summary>Xem đáp án</summary><div class="body"><p>Thay $x=-1$, chú ý dấu: $1+2+4$.</p><p class="fin">$7$.</p></div></details></li>
+      <li><span class="pid">03.3</span>Tính $\displaystyle\lim_{x\to2}\dfrac{x+1}{x+3}$.
+        <details class="ans"><summary>Xem đáp án</summary><div class="body"><p>Mẫu tại 2 bằng 5, khác 0, thay trực tiếp.</p><p class="fin">$\dfrac35$.</p></div></details></li>
+      <li><span class="pid">03.4</span>Cho $f(x)=x+1$ khi $x\ne1$ và $f(1)=9$. Tìm $\lim_{x\to1}f(x)$ và so với $f(1)$.
+        <details class="ans"><summary>Xem đáp án</summary><div class="body"><p>Gần $x=1$ (nhưng khác 1), giá trị đi theo $x+1\to2$. Giá trị riêng lẻ tại điểm không ảnh hưởng giới hạn.</p><p class="fin">$\lim_{x\to1}f(x)=2\neq f(1)=9$.</p></div></details></li>
+    </ol>
+  </div>
+
+  <div class="box recap"><div class="tag"><span class="zh">回顧</span>Trước khi đóng sách</div>
+    <ul><li class="ok">Đạt yêu cầu: giải thích được vì sao giới hạn có thể khác $f(a)$.</li>
+    <li class="re">Ôn ngày 2: lũy thừa và radian.</li></ul>
+  </div>
+</section>
+
+<!-- ================= NGÀY 04 ================= -->
+<section class="day" id="d04">
+  <header class="opener">
+    <div class="num"><span class="lbl">NGÀY</span><span class="n">04</span></div>
+    <div>
+      <div class="eyebrow">Chặng 1 · Giới hạn</div>
+      <h2>Xử lý dạng 0/0</h2>
+      <p class="goal"><b>Mục tiêu:</b> chọn đúng công cụ: phân tích nhân tử hoặc nhân liên hợp.</p>
+      <label class="done"><input type="checkbox" data-done="4"> Đã học xong</label>
+    </div>
+  </header>
+
+  <div class="box aims"><div class="tag"><span class="zh">本日重點</span>Bài này bạn sẽ</div>
+    <ul><li>Hiểu $0/0$ là "chưa biết", không phải một con số.</li>
+    <li>Gặp đa thức thì phân tích nhân tử; gặp hiệu hai căn thì nhân liên hợp.</li>
+    <li>Khử đúng chỗ: chỉ khử nhân tử chung.</li></ul>
+  </div>
+
+  <h3 class="sec"><span class="zh">觀念</span>Khái niệm</h3>
+  <p class="txt">$0/0$ là <b>dạng vô định</b>: cả tử và mẫu cùng chạy về 0, nên tỉ số của chúng có thể là bất cứ số nào. Chiến thuật là tìm một biểu thức <em>bằng biểu thức ban đầu tại mọi điểm lân cận</em> (chỉ trừ chính điểm $a$), rồi thay số vào biểu thức mới.</p>
+
+  <div class="box key"><div class="tag"><span class="zh">重點</span>Công thức cốt lõi</div>
+    <div class="scroll"><table class="ktab">
+      <tr><td class="f">$x^2-a^2=(x-a)(x+a)$</td><td class="c">Công cụ 1: <b>phân tích nhân tử</b>, dùng cho đa thức.</td></tr>
+      <tr><td class="f">$(\sqrt u-\sqrt v)(\sqrt u+\sqrt v)=u-v$</td><td class="c">Công cụ 2: <b>nhân liên hợp</b>, dùng cho hiệu hai căn.</td></tr>
+    </table></div>
+  </div>
+
+  <div class="box ex"><div class="tag"><span class="zh">範例</span>Ví dụ 1 · Phân tích nhân tử</div>
+    <p class="prob"><b>Đề:</b> Tính $\displaystyle\lim_{x\to2}\dfrac{x^2-4}{x-2}$.</p>
+    <ol class="steps">
+      <li><div class="m">Thay $x=2$: $\dfrac{0}{0}$</div><div class="note">Vô định. Không kết luận.</div></li>
+      <li><div class="m">$\dfrac{(x-2)(x+2)}{x-2}$</div><div class="note">Hiệu hai bình phương.</div></li>
+      <li><div class="m">$=x+2\quad(x\neq2)$</div><div class="note">Khử nhân tử chung; hợp lệ vì $x\to2$ nhưng $x\ne2$.</div></li>
+      <li><div class="m">$\displaystyle\lim_{x\to2}(x+2)=4$</div><div class="note">Giờ mới thay số.</div></li>
+    </ol>
+    <p class="result"><b>Kết quả:</b> $4$.</p>
+  </div>
+
+  <div class="box ex"><div class="tag"><span class="zh">範例</span>Ví dụ 2 · Nhân liên hợp</div>
+    <p class="prob"><b>Đề:</b> Tính $\displaystyle\lim_{x\to0}\dfrac{\sqrt{1+x}-1}{x}$.</p>
+    <ol class="steps">
+      <li><div class="m">Thay $x=0$: $\dfrac{0}{0}$</div><div class="note">Có hiệu hai căn ($\sqrt{1+x}$ và $\sqrt1$) nên nghĩ tới liên hợp.</div></li>
+      <li><div class="m">$\dfrac{(\sqrt{1+x}-1)(\sqrt{1+x}+1)}{x(\sqrt{1+x}+1)}$</div><div class="note">Nhân cả tử và mẫu với $\sqrt{1+x}+1$.</div></li>
+      <li><div class="m">$=\dfrac{(1+x)-1}{x(\sqrt{1+x}+1)}=\dfrac{x}{x(\sqrt{1+x}+1)}$</div><div class="note">Tử mất căn.</div></li>
+      <li><div class="m">$=\dfrac{1}{\sqrt{1+x}+1}\longrightarrow\dfrac{1}{1+1}=\dfrac12$</div><div class="note">Khử $x$, rồi thay $x=0$.</div></li>
+    </ol>
+    <p class="result"><b>Kết quả:</b> $\dfrac12$.</p>
+  </div>
+
+  <div class="box warn"><div class="tag"><span class="zh">注意</span>Lỗi hay gặp</div>
+    <p>Viết $\dfrac{x^2-9}{x-3}=x-3$ bằng cách "chia $x^2$ cho $x$ và $9$ cho $3$". Đây là chia từng số hạng, hoàn toàn sai. Phải đưa tử thành <b>tích</b> $(x-3)(x+3)$ rồi mới khử.</p>
+  </div>
+
+  <div class="box drill"><div class="tag"><span class="zh">練習</span>Bạn tự làm</div>
+    <ol class="probs">
+      <li><span class="pid">04.1</span>Tính bằng phân tích nhân tử: $\displaystyle\lim_{x\to3}\dfrac{x^2-9}{x-3}$.
+        <details class="ans"><summary>Xem đáp án</summary><div class="body"><p>$\dfrac{(x-3)(x+3)}{x-3}=x+3\to 6$.</p><p class="fin">$6$.</p></div></details></li>
+      <li><span class="pid">04.2</span>Tính bằng phân tích nhân tử: $\displaystyle\lim_{x\to2}\dfrac{x^2-5x+6}{x-2}$.
+        <details class="ans"><summary>Xem đáp án</summary><div class="body"><p>Tử $=(x-2)(x-3)$; khử $x-2$ còn $x-3\to-1$.</p><p class="fin">$-1$.</p></div></details></li>
+      <li><span class="pid">04.3</span>Tính bằng nhân liên hợp: $\displaystyle\lim_{x\to0}\dfrac{\sqrt{4+x}-2}{x}$.
+        <details class="ans"><summary>Xem đáp án</summary><div class="body"><p>Nhân với $\sqrt{4+x}+2$: tử thành $x$, còn $\dfrac{1}{\sqrt{4+x}+2}\to\dfrac14$.</p><p class="fin">$\dfrac14$.</p></div></details></li>
+      <li><span class="pid">04.4</span>Tìm lỗi của cách làm "$(x^2-9)/(x-3)=x-3$". Viết cách đúng.
+        <details class="ans"><summary>Xem đáp án</summary><div class="body"><p>Lỗi: chia từng số hạng của tử cho từng số hạng của mẫu. Phép chia chỉ khử được <em>nhân tử chung</em>.</p><p class="fin">$\dfrac{x^2-9}{x-3}=\dfrac{(x-3)(x+3)}{x-3}=x+3\ (x\ne3)$; giới hạn khi $x\to3$ là $6$.</p></div></details></li>
+    </ol>
+  </div>
+
+  <div class="box recap"><div class="tag"><span class="zh">回顧</span>Trước khi đóng sách</div>
+    <ul><li class="ok">Đạt yêu cầu: nhận ra dạng $0/0$ và chọn đúng một phép biến đổi.</li>
+    <li class="re">Ôn ngày 1 và 3; làm lại một câu sai mà không nhìn lời giải.</li></ul>
+  </div>
+</section>
+
+<!-- ================= NGÀY 05 ================= -->
+<section class="day" id="d05">
+  <header class="opener">
+    <div class="num"><span class="lbl">NGÀY</span><span class="n">05</span></div>
+    <div>
+      <div class="eyebrow">Chặng 1 · Giới hạn</div>
+      <h2>Lượng giác và vô cực</h2>
+      <p class="goal"><b>Mục tiêu:</b> dùng giới hạn $\sin$ chuẩn và so sánh bậc cao nhất của đa thức.</p>
+      <label class="done"><input type="checkbox" data-done="5"> Đã học xong</label>
+    </div>
+  </header>
+
+  <div class="box aims"><div class="tag"><span class="zh">本日重點</span>Bài này bạn sẽ</div>
+    <ul><li>Đưa $\dfrac{\sin(kx)}{x}$ về dạng chuẩn $\dfrac{\sin u}{u}$.</li>
+    <li>Nhìn bậc cao nhất để đoán giới hạn ở vô cực trong 3 giây.</li>
+    <li>Nhớ vì sao phải dùng radian.</li></ul>
+  </div>
+
+  <h3 class="sec"><span class="zh">觀念</span>Khái niệm</h3>
+  <p class="txt">Khi $x$ rất lớn, số hạng bậc cao nhất "nuốt" các số hạng còn lại: $2x^2+1$ gần như chỉ là $2x^2$. Vì vậy với phân thức đa thức, chỉ cần so bậc của tử và mẫu.</p>
+  <p class="txt">Khi $x$ gần 0 và tính bằng radian, $\sin x$ gần bằng $x$ (cung nhỏ gần bằng dây). Đó là lý do $\dfrac{\sin x}{x}\to1$. Ở chế độ độ, tỉ số này tiến tới $\pi/180$, không phải 1.</p>
+
+  <div class="box key"><div class="tag"><span class="zh">重點</span>Công thức cốt lõi</div>
+    <div class="scroll"><table class="ktab">
+      <tr><td class="f">$\displaystyle\lim_{u\to0}\dfrac{\sin u}{u}=1,\qquad \lim_{x\to0}\dfrac{\sin(kx)}{x}=k$</td><td class="c">$u$ phải là <b>cùng một biểu thức</b> ở trên và dưới.</td></tr>
+      <tr><td class="f">$\displaystyle\lim_{x\to+\infty}\dfrac{a_nx^n+\cdots}{b_nx^n+\cdots}=\dfrac{a_n}{b_n}$</td><td class="c">Bậc bằng nhau: tỉ số hệ số đầu.</td></tr>
+    </table></div>
+    <p style="margin-top:10px;font-size:14px"><b>Ba trường hợp ở vô cực:</b> bậc tử &lt; bậc mẫu → 0; bậc bằng nhau → tỉ số hệ số đầu; bậc tử &gt; bậc mẫu → $\pm\infty$, phải xét dấu, không mặc định là $+\infty$.</p>
+  </div>
+
+  <div class="box ex"><div class="tag"><span class="zh">範例</span>Ví dụ 1 · Đưa về giới hạn chuẩn</div>
+    <p class="prob"><b>Đề:</b> Tính $\displaystyle\lim_{x\to0}\dfrac{\sin(3x)}{x}$.</p>
+    <ol class="steps">
+      <li><div class="m">$\dfrac{\sin(3x)}{x}=3\cdot\dfrac{\sin(3x)}{3x}$</div><div class="note">Nhân và chia cho 3 để mẫu giống hệt bên trong $\sin$.</div></li>
+      <li><div class="m">$u=3x\to0 \Rightarrow \dfrac{\sin u}{u}\to1$</div><div class="note">Áp dụng giới hạn chuẩn.</div></li>
+      <li><div class="m">$\longrightarrow 3\cdot1=3$</div><div class="note"></div></li>
+    </ol>
+    <p class="result"><b>Kết quả:</b> $3$.</p>
+  </div>
+
+  <div class="box ex"><div class="tag"><span class="zh">範例</span>Ví dụ 2 · Chia cho lũy thừa cao nhất</div>
+    <p class="prob"><b>Đề:</b> Tính $\displaystyle\lim_{x\to+\infty}\dfrac{2x^2+1}{5x^2-x}$.</p>
+    <ol class="steps">
+      <li><div class="m">$\dfrac{2+\dfrac1{x^2}}{5-\dfrac1x}$</div><div class="note">Chia cả tử và mẫu cho $x^2$ (lũy thừa cao nhất ở mẫu).</div></li>
+      <li><div class="m">$\dfrac1{x^2}\to0,\ \dfrac1x\to0$</div><div class="note">Các phần "lẻ" biến mất khi $x\to\infty$.</div></li>
+      <li><div class="m">$\longrightarrow\dfrac{2}{5}$</div><div class="note">Đúng bằng tỉ số hệ số đầu.</div></li>
+    </ol>
+    <p class="result"><b>Kết quả:</b> $\dfrac25$.</p>
+  </div>
+
+  <div class="box warn"><div class="tag"><span class="zh">注意</span>Lỗi hay gặp</div>
+    <ul><li>Viết $\dfrac{\sin(3x)}{x}\to1$ vì "sin chia x bằng 1". Phải có cùng $3x$ ở dưới.</li>
+    <li>Bậc tử lớn hơn bậc mẫu và ghi ngay $+\infty$. Ví dụ $\dfrac{-x^3}{x^2}\to-\infty$.</li></ul>
+  </div>
+
+  <div class="box drill"><div class="tag"><span class="zh">練習</span>Bạn tự làm</div>
+    <ol class="probs">
+      <li><span class="pid">05.1</span>Tính $\displaystyle\lim_{x\to0}\dfrac{\sin(5x)}{x}$ ($x$ tính bằng radian).
+        <details class="ans"><summary>Xem đáp án</summary><div class="body"><p>$=5\cdot\dfrac{\sin(5x)}{5x}\to5$.</p><p class="fin">$5$.</p></div></details></li>
+      <li><span class="pid">05.2</span>Tính $\displaystyle\lim_{x\to0}\dfrac{\sin(2x)}{3x}$.
+        <details class="ans"><summary>Xem đáp án</summary><div class="body"><p>$=\dfrac23\cdot\dfrac{\sin(2x)}{2x}\to\dfrac23$.</p><p class="fin">$\dfrac23$.</p></div></details></li>
+      <li><span class="pid">05.3</span>Tính $\displaystyle\lim_{x\to+\infty}\dfrac{3x^2-x}{2x^2+7}$.
+        <details class="ans"><summary>Xem đáp án</summary><div class="body"><p>Bậc bằng nhau; tỉ số hệ số $x^2$.</p><p class="fin">$\dfrac32$.</p></div></details></li>
+      <li><span class="pid">05.4</span>Tính $\displaystyle\lim_{x\to+\infty}\dfrac{4x+1}{x^2+1}$.
+        <details class="ans"><summary>Xem đáp án</summary><div class="body"><p>Bậc tử (1) nhỏ hơn bậc mẫu (2).</p><p class="fin">$0$.</p></div></details></li>
+    </ol>
+  </div>
+
+  <div class="box recap"><div class="tag"><span class="zh">回顧</span>Trước khi đóng sách</div>
+    <ul><li class="ok">Đạt yêu cầu: đúng 3/4 câu và không dùng chế độ độ cho giới hạn $\sin$.</li>
+    <li class="re">Ôn ngày 2 và 4.</li></ul>
+  </div>
+</section>
+
+<!-- ================= NGÀY 06 ================= -->
+<section class="day" id="d06">
+  <header class="opener">
+    <div class="num"><span class="lbl">NGÀY</span><span class="n">06</span></div>
+    <div>
+      <div class="eyebrow">Chặng 1 · Giới hạn</div>
+      <h2>Liên tục và kiểm tra chặng 1 <span class="test">KIỂM TRA 40′</span></h2>
+      <p class="goal"><b>Mục tiêu:</b> nối giới hạn với tính liên tục; tự kiểm tra nền tảng.</p>
+      <label class="done"><input type="checkbox" data-done="6"> Đã học xong</label>
+    </div>
+  </header>
+
+  <h3 class="sec"><span class="zh">觀念</span>Khái niệm</h3>
+  <p class="txt">Liên tục tại $a$ nghĩa là ba thứ khớp nhau: $f(a)$ tồn tại, giới hạn khi $x\to a$ tồn tại, và hai số đó bằng nhau. Nói nôm na: đồ thị đi qua điểm $a$ mà không phải nhấc bút. Với hàm cho theo từng đoạn, phải kiểm tra <b>cả bên trái và bên phải</b> tại chỗ nối.</p>
+
+  <div class="box key"><div class="tag"><span class="zh">重點</span>Công thức cốt lõi</div>
+    <div class="scroll"><table class="ktab">
+      <tr><td class="f">$f$ liên tục tại $a \iff \displaystyle\lim_{x\to a}f(x)=f(a)$</td><td class="c">Bao hàm: giới hạn trái = giới hạn phải = $f(a)$.</td></tr>
+    </table></div>
+  </div>
+
+  <div class="box ex"><div class="tag"><span class="zh">範例</span>Ví dụ · Tìm hằng số để liên tục</div>
+    <p class="prob"><b>Đề:</b> $f(x)=x^2$ khi $x&lt;1$ và $f(x)=2x+c$ khi $x\ge1$. Tìm $c$ để $f$ liên tục tại 1.</p>
+    <ol class="steps">
+      <li><div class="m">Trái: $\displaystyle\lim_{x\to1^-}x^2=1$</div><div class="note">Dùng nhánh $x&lt;1$.</div></li>
+      <li><div class="m">Phải và $f(1)$: $2\cdot1+c=2+c$</div><div class="note">Dùng nhánh $x\ge1$.</div></li>
+      <li><div class="m">$1=2+c\ \Longrightarrow\ c=-1$</div><div class="note">Ép hai phía bằng nhau.</div></li>
+    </ol>
+    <p class="result"><b>Kết quả:</b> $c=-1$.</p>
+  </div>
+
+  <div class="box tip"><div class="tag"><span class="zh">提示</span>Cách làm bài kiểm tra</div>
+    <p>40 phút, không xem ví dụ. Mỗi câu 1 điểm; câu nhiều ý chia đều. Mục tiêu ít nhất <b>5/6</b>. Trước mỗi câu, tự nói: "Đây là thay trực tiếp, $0/0$, hay vô cực?"</p>
+  </div>
+
+  <div class="box drill"><div class="tag"><span class="zh">練習</span>Bài kiểm tra chặng 1</div>
+    <ol class="probs">
+      <li><span class="pid">06.1</span>Tìm miền xác định của $f(x)=\dfrac{\sqrt{x+1}}{x-2}$.
+        <details class="ans"><summary>Xem đáp án</summary><div class="body"><p>Căn: $x\ge-1$. Mẫu: $x\ne2$.</p><p class="fin">$D=[-1,2)\cup(2,+\infty)$.</p></div></details></li>
+      <li><span class="pid">06.2</span>Tính $\displaystyle\lim_{x\to1}\dfrac{x^2-1}{x-1}$.
+        <details class="ans"><summary>Xem đáp án</summary><div class="body"><p>$(x-1)(x+1)/(x-1)=x+1\to2$.</p><p class="fin">$2$.</p></div></details></li>
+      <li><span class="pid">06.3</span>Tính $\displaystyle\lim_{x\to0}\dfrac{\sqrt{9+x}-3}{x}$.
+        <details class="ans"><summary>Xem đáp án</summary><div class="body"><p>Nhân liên hợp $\sqrt{9+x}+3$; còn $\dfrac{1}{\sqrt{9+x}+3}\to\dfrac16$.</p><p class="fin">$\dfrac16$.</p></div></details></li>
+      <li><span class="pid">06.4</span>Tính $\displaystyle\lim_{x\to0}\dfrac{\sin(4x)}{2x}$.
+        <details class="ans"><summary>Xem đáp án</summary><div class="body"><p>$=\dfrac42\cdot\dfrac{\sin 4x}{4x}\to2$.</p><p class="fin">$2$.</p></div></details></li>
+      <li><span class="pid">06.5</span>Tính $\displaystyle\lim_{x\to+\infty}\dfrac{5x^2+3}{2x^2-x}$.
+        <details class="ans"><summary>Xem đáp án</summary><div class="body"><p>Bậc bằng nhau, tỉ số hệ số bậc hai.</p><p class="fin">$\dfrac52$.</p></div></details></li>
+      <li><span class="pid">06.6</span>$f(x)=x+2$ khi $x&lt;1$ và $f(x)=kx$ khi $x\ge1$. Tìm $k$ để liên tục tại 1.
+        <details class="ans"><summary>Xem đáp án</summary><div class="body"><p>Trái: $1+2=3$. Phải và $f(1)$: $k$.</p><p class="fin">$k=3$.</p></div></details></li>
+    </ol>
+    <p class="score">Chấm: ___/6. Nếu dưới 5/6, dùng 30 phút đầu ngày 7 chữa đúng dạng đã sai.</p>
+  </div>
+
+  <div class="box recap"><div class="tag"><span class="zh">回顧</span>Trước khi đóng sách</div>
+    <ul><li class="ok">Đạt yêu cầu: ít nhất 5/6.</li>
+    <li class="re">Ôn ngày 3–5 bằng cách tự nêu: khi nào được thay trực tiếp?</li></ul>
+  </div>
+</section>
+
+<!-- ================= NGÀY 07 ================= -->
+<section class="day" id="d07">
+  <header class="opener">
+    <div class="num"><span class="lbl">NGÀY</span><span class="n">07</span></div>
+    <div>
+      <div class="eyebrow">Chặng 2 · Đạo hàm</div>
+      <h2>Tốc độ thay đổi tức thời</h2>
+      <p class="goal"><b>Mục tiêu:</b> hiểu đạo hàm là giới hạn của hệ số góc cát tuyến.</p>
+      <label class="done"><input type="checkbox" data-done="7"> Đã học xong</label>
+    </div>
+  </header>
+
+  <div class="box aims"><div class="tag"><span class="zh">本日重點</span>Bài này bạn sẽ</div>
+    <ul><li>Đi từ "tốc độ trung bình giữa hai điểm" đến "tốc độ tại một điểm".</li>
+    <li>Dùng định nghĩa tính được vài đạo hàm đơn giản.</li>
+    <li>Viết phương trình tiếp tuyến khi biết điểm và độ dốc.</li></ul>
+  </div>
+
+  <h3 class="sec"><span class="zh">觀念</span>Khái niệm</h3>
+  <p class="txt">Tốc độ thay đổi trung bình dùng <b>hai điểm</b> cách nhau một khoảng $h$: đó là độ dốc của cát tuyến. Cho $h$ tiến về 0, hai điểm nhập lại thành một, cát tuyến trở thành tiếp tuyến, và độ dốc của nó là <b>đạo hàm</b> tại điểm đó.</p>
+  <p class="txt">Phân biệt: $f'(a)$ là <em>một con số</em> (độ dốc tại $a$); $f'(x)$ là <em>một hàm mới</em> cho biết độ dốc tại mọi $x$.</p>
+
+  <div class="box key"><div class="tag"><span class="zh">重點</span>Công thức cốt lõi</div>
+    <div class="scroll"><table class="ktab">
+      <tr><td class="f">$f'(a)=\displaystyle\lim_{h\to0}\dfrac{f(a+h)-f(a)}{h}$</td><td class="c">Trong phân số, $h\ne0$ <b>trước</b> khi lấy giới hạn.</td></tr>
+      <tr><td class="f">$y-f(a)=f'(a)(x-a)$</td><td class="c">Tiếp tuyến tại $a$: cần điểm $(a,f(a))$ và độ dốc $f'(a)$.</td></tr>
+    </table></div>
+    <p style="margin-top:10px;font-size:14px">Hàm có đạo hàm tại $a$ thì liên tục tại $a$; chiều ngược lại không luôn đúng (ví dụ $|x|$ tại 0).</p>
+  </div>
+
+  <div class="box ex"><div class="tag"><span class="zh">範例</span>Ví dụ · Đạo hàm của $x^2$ bằng định nghĩa</div>
+    <p class="prob"><b>Đề:</b> Với $f(x)=x^2$, tìm $f'(x)$ rồi viết tiếp tuyến tại $x=1$.</p>
+    <ol class="steps">
+      <li><div class="m">$\dfrac{(x+h)^2-x^2}{h}$</div><div class="note">Lập tỉ số định nghĩa.</div></li>
+      <li><div class="m">$=\dfrac{x^2+2xh+h^2-x^2}{h}=\dfrac{2xh+h^2}{h}$</div><div class="note">Khai triển, $x^2$ triệt tiêu.</div></li>
+      <li><div class="m">$=2x+h\ \longrightarrow\ 2x$</div><div class="note">Khử $h$ (vì $h\ne0$), rồi cho $h\to0$.</div></li>
+      <li><div class="m">Tại $x=1$: điểm $(1,1)$, độ dốc $f'(1)=2$</div><div class="note">Tọa độ tiếp điểm lấy từ $f$, độ dốc lấy từ $f'$.</div></li>
+      <li><div class="m">$y-1=2(x-1)\ \Longrightarrow\ y=2x-1$</div><div class="note">Công thức tiếp tuyến.</div></li>
+    </ol>
+    <p class="result"><b>Kết quả:</b> $f'(x)=2x$; tiếp tuyến $y=2x-1$.</p>
+  </div>
+
+  <div class="box tip"><div class="tag"><span class="zh">提示</span>Đọc đạo hàm bằng lời</div>
+    <p>Nếu $s(t)$ là vị trí (m) theo thời gian (s), thì $s'(t)$ là vận tốc (m/s). Nếu $C(x)$ là chi phí sản xuất $x$ đơn vị, $C'(x)$ là chi phí tăng thêm khi làm thêm một đơn vị. Đạo hàm luôn có đơn vị "đầu ra chia đầu vào".</p>
+  </div>
+
+  <div class="box drill"><div class="tag"><span class="zh">練習</span>Bạn tự làm</div>
+    <ol class="probs">
+      <li><span class="pid">07.1</span>Dùng định nghĩa tìm đạo hàm của $f(x)=3x+1$.
+        <details class="ans"><summary>Xem đáp án</summary><div class="body"><p>$f(x+h)-f(x)=3h$; chia $h$ được 3; giới hạn là 3.</p><p class="fin">$f'(x)=3$.</p></div></details></li>
+      <li><span class="pid">07.2</span>Dùng định nghĩa tìm đạo hàm của $g(x)=x^2+2$.
+        <details class="ans"><summary>Xem đáp án</summary><div class="body"><p>Hằng số 2 triệt tiêu; còn $\dfrac{2xh+h^2}{h}=2x+h\to2x$.</p><p class="fin">$g'(x)=2x$.</p></div></details></li>
+      <li><span class="pid">07.3</span>Với $g$ ở câu 2, tính $g'(3)$ và viết tiếp tuyến tại $x=3$.
+        <details class="ans"><summary>Xem đáp án</summary><div class="body"><p>$g(3)=11$, $g'(3)=6$. $y-11=6(x-3)$.</p><p class="fin">$g'(3)=6$; tiếp tuyến $y=6x-7$.</p></div></details></li>
+      <li><span class="pid">07.4</span>Vị trí $s(t)=t^2$ (m), $t$ tính bằng giây. Tìm tốc độ thay đổi trung bình từ $t=1$ đến $t=3$ và vận tốc tại $t=3$.
+        <details class="ans"><summary>Xem đáp án</summary><div class="body"><p>Trung bình: $\dfrac{s(3)-s(1)}{3-1}=\dfrac{9-1}{2}=4$ m/s. Tức thời: $s'(t)=2t$, $s'(3)=6$ m/s.</p><p class="fin">$4$ m/s và $6$ m/s.</p></div></details></li>
+    </ol>
+  </div>
+
+  <div class="box recap"><div class="tag"><span class="zh">回顧</span>Trước khi đóng sách</div>
+    <ul><li class="ok">Đạt yêu cầu: giải thích được ý nghĩa của đạo hàm mà không chỉ đọc công thức.</li>
+    <li class="re">Ôn ngày 4 và chữa câu sai của bài kiểm tra ngày 6.</li></ul>
+  </div>
+</section>
+
+<!-- ================= NGÀY 08 ================= -->
+<section class="day" id="d08">
+  <header class="opener">
+    <div class="num"><span class="lbl">NGÀY</span><span class="n">08</span></div>
+    <div>
+      <div class="eyebrow">Chặng 2 · Đạo hàm</div>
+      <h2>Quy tắc lũy thừa và tổng</h2>
+      <p class="goal"><b>Mục tiêu:</b> lấy đạo hàm đa thức, căn và lũy thừa âm.</p>
+      <label class="done"><input type="checkbox" data-done="8"> Đã học xong</label>
+    </div>
+  </header>
+
+  <div class="box aims"><div class="tag"><span class="zh">本日重點</span>Bài này bạn sẽ</div>
+    <ul><li>Thuộc câu thần chú: "đưa số mũ xuống, giảm số mũ đi 1".</li>
+    <li>Đổi căn và $1/x^k$ về $x^p$ trước khi tính (nhờ ngày 2).</li>
+    <li>Biết hằng số cộng biến mất, hệ số nhân được giữ.</li></ul>
+  </div>
+
+  <h3 class="sec"><span class="zh">觀念</span>Khái niệm</h3>
+  <p class="txt">Ngày 7 ta tìm được $(x^2)'=2x$ bằng định nghĩa. Làm tương tự với $x^3, x^4,\dots$ sẽ thấy quy luật: $(x^n)'=nx^{n-1}$. Quy tắc này còn đúng cho số mũ âm và phân số, nên căn và phân thức đơn giản đều xử lý được nếu viết về dạng lũy thừa.</p>
+
+  <div class="box key"><div class="tag"><span class="zh">重點</span>Công thức cốt lõi</div>
+    <div class="scroll"><table class="ktab">
+      <tr><td class="f">$\dfrac{d}{dx}c=0$</td><td class="c">Hằng số không thay đổi nên tốc độ thay đổi bằng 0.</td></tr>
+      <tr><td class="f">$\dfrac{d}{dx}x^n=nx^{n-1}$</td><td class="c">Dùng tại các điểm biểu thức có nghĩa; số mũ thực tổng quát thì làm trên $x&gt;0$.</td></tr>
+      <tr><td class="f">$(af+bg)'=af'+bg'$</td><td class="c">Tuyến tính: tính từng số hạng, giữ hệ số.</td></tr>
+    </table></div>
+  </div>
+
+  <div class="box ex"><div class="tag"><span class="zh">範例</span>Ví dụ · Đạo hàm đa thức</div>
+    <p class="prob"><b>Đề:</b> Tính $\dfrac{d}{dx}(3x^4-2x+7)$.</p>
+    <ol class="steps">
+      <li><div class="m">$(3x^4)'=3\cdot4x^3=12x^3$</div><div class="note">Đưa 4 xuống, số mũ còn 3, giữ hệ số 3.</div></li>
+      <li><div class="m">$(-2x)'=-2$</div><div class="note">$x=x^1$, đạo hàm là 1.</div></li>
+      <li><div class="m">$(7)'=0$</div><div class="note">Hằng số cộng biến mất.</div></li>
+      <li><div class="m">$\Rightarrow 12x^3-2$</div><div class="note">Cộng lại.</div></li>
+    </ol>
+    <p class="result"><b>Kết quả:</b> $12x^3-2$.</p>
+  </div>
+
+  <div class="box tip"><div class="tag"><span class="zh">提示</span>Bảng đổi dạng nhanh</div>
+    <p>$\sqrt x=x^{1/2}$, $\sqrt[3]{x}=x^{1/3}$, $\dfrac1x=x^{-1}$, $\dfrac{2}{x^3}=2x^{-3}$, $\dfrac{1}{\sqrt x}=x^{-1/2}$. Đổi xong rồi mới đạo hàm; kết quả có thể đổi ngược lại về căn cho đẹp.</p>
+  </div>
+
+  <div class="box warn"><div class="tag"><span class="zh">注意</span>Lỗi hay gặp</div>
+    <ul><li>Giữ lại hằng số cộng: $(x^2+7)'=2x+7$ là sai, đúng là $2x$.</li>
+    <li>Với số mũ âm, quên rằng "giảm 1" làm số mũ <em>âm hơn</em>: $(x^{-3})'=-3x^{-4}$.</li></ul>
+  </div>
+
+  <div class="box drill"><div class="tag"><span class="zh">練習</span>Bạn tự làm</div>
+    <ol class="probs">
+      <li><span class="pid">08.1</span>Tìm đạo hàm của $y=5x^3-4x^2+6x-9$.
+        <details class="ans"><summary>Xem đáp án</summary><div class="body"><p>Tính từng số hạng.</p><p class="fin">$y'=15x^2-8x+6$.</p></div></details></li>
+      <li><span class="pid">08.2</span>Tìm đạo hàm của $y=\sqrt x$ với $x&gt;0$.
+        <details class="ans"><summary>Xem đáp án</summary><div class="body"><p>$y=x^{1/2}$, $y'=\tfrac12x^{-1/2}$.</p><p class="fin">$y'=\dfrac{1}{2\sqrt x}$.</p></div></details></li>
+      <li><span class="pid">08.3</span>Tìm đạo hàm của $y=\dfrac{2}{x^3}$ với $x\ne0$.
+        <details class="ans"><summary>Xem đáp án</summary><div class="body"><p>$y=2x^{-3}$, $y'=-6x^{-4}$.</p><p class="fin">$y'=-\dfrac{6}{x^4}$.</p></div></details></li>
+      <li><span class="pid">08.4</span>Tính $f'(2)$ với $f(x)=x^4-3x^2$.
+        <details class="ans"><summary>Xem đáp án</summary><div class="body"><p>Đạo hàm trước: $f'(x)=4x^3-6x$. Thay $x=2$ sau: $32-12$.</p><p class="fin">$f'(2)=20$.</p></div></details></li>
+    </ol>
+  </div>
+
+  <div class="box recap"><div class="tag"><span class="zh">回顧</span>Trước khi đóng sách</div>
+    <ul><li class="ok">Đạt yêu cầu: đúng ít nhất 3/4 câu và không giữ lại hằng số cộng.</li>
+    <li class="re">Ôn ngày 1 và 7.</li></ul>
+  </div>
+</section>
+
+<!-- ================= NGÀY 09 ================= -->
+<section class="day" id="d09">
+  <header class="opener">
+    <div class="num"><span class="lbl">NGÀY</span><span class="n">09</span></div>
+    <div>
+      <div class="eyebrow">Chặng 2 · Đạo hàm</div>
+      <h2>Đạo hàm tích và thương</h2>
+      <p class="goal"><b>Mục tiêu:</b> phân biệt đạo hàm của một tổng với đạo hàm của một tích hoặc thương.</p>
+      <label class="done"><input type="checkbox" data-done="9"> Đã học xong</label>
+    </div>
+  </header>
+
+  <div class="box aims"><div class="tag"><span class="zh">本日重點</span>Bài này bạn sẽ</div>
+    <ul><li>Hiểu vì sao tích cần <b>hai</b> số hạng.</li>
+    <li>Thuộc quy tắc thương với đúng dấu trừ và mẫu bình phương.</li>
+    <li>Biết khi nào nên khai triển trước cho nhẹ.</li></ul>
+  </div>
+
+  <h3 class="sec"><span class="zh">觀念</span>Khái niệm</h3>
+  <p class="txt">Trong một tích $u\cdot v$, <b>cả hai thừa số cùng thay đổi</b>. Hình dung hình chữ nhật có cạnh $u$ và $v$ đang lớn lên: diện tích tăng thêm gồm một dải do $u$ tăng (rộng $v$) và một dải do $v$ tăng (rộng $u$). Vì thế cần hai số hạng $u'v+uv'$. Đạo hàm của thương <b>không</b> phải thương của hai đạo hàm.</p>
+
+  <div class="box key"><div class="tag"><span class="zh">重點</span>Công thức cốt lõi</div>
+    <div class="scroll"><table class="ktab">
+      <tr><td class="f">$(uv)'=u'v+uv'$</td><td class="c">Đạo hàm thứ nhất nhân thứ hai, cộng thứ nhất nhân đạo hàm thứ hai.</td></tr>
+      <tr><td class="f">$\left(\dfrac uv\right)'=\dfrac{u'v-uv'}{v^2}\quad(v\ne0)$</td><td class="c">Đọc: "đạo hàm tử nhân mẫu, <b>trừ</b> tử nhân đạo hàm mẫu, chia mẫu bình phương".</td></tr>
+    </table></div>
+  </div>
+
+  <div class="box ex"><div class="tag"><span class="zh">範例</span>Ví dụ · Quy tắc tích</div>
+    <p class="prob"><b>Đề:</b> Tính $[x^2(x+1)]'$.</p>
+    <ol class="steps">
+      <li><div class="m">$u=x^2,\ v=x+1$</div><div class="note">Đặt tên hai thừa số.</div></li>
+      <li><div class="m">$u'=2x,\ v'=1$</div><div class="note">Đạo hàm từng cái.</div></li>
+      <li><div class="m">$u'v+uv'=2x(x+1)+x^2\cdot1$</div><div class="note">Áp công thức.</div></li>
+      <li><div class="m">$=2x^2+2x+x^2=3x^2+2x$</div><div class="note">Kiểm tra: khai triển $x^3+x^2$ rồi đạo hàm cũng ra $3x^2+2x$.</div></li>
+    </ol>
+    <p class="result"><b>Kết quả:</b> $3x^2+2x$.</p>
+  </div>
+
+  <div class="box tip"><div class="tag"><span class="zh">提示</span>Mẹo nhớ quy tắc thương</div>
+    <p>Tử của kết quả bắt đầu bằng <b>đạo hàm của tử</b>. Vì có dấu trừ nên thứ tự quan trọng; với quy tắc tích thì đổi thứ tự không sao. Nếu khai triển hoặc rút gọn trước làm bài dễ hơn, cứ làm nhưng phải giữ miền xác định ban đầu.</p>
+  </div>
+
+  <div class="box drill"><div class="tag"><span class="zh">練習</span>Bạn tự làm</div>
+    <ol class="probs">
+      <li><span class="pid">09.1</span>Tính đạo hàm bằng quy tắc tích: $y=(x^2+1)(x^3-2)$.
+        <details class="ans"><summary>Xem đáp án</summary><div class="body"><p>$y'=2x(x^3-2)+(x^2+1)(3x^2)=2x^4-4x+3x^4+3x^2$.</p><p class="fin">$y'=5x^4+3x^2-4x$.</p></div></details></li>
+      <li><span class="pid">09.2</span>Tính đạo hàm và ghi điểm bị loại khỏi miền xác định: $y=\dfrac{x+1}{x-1}$.
+        <details class="ans"><summary>Xem đáp án</summary><div class="body"><p>Tử mới: $1\cdot(x-1)-(x+1)\cdot1=-2$.</p><p class="fin">$y'=\dfrac{-2}{(x-1)^2}$, loại $x=1$.</p></div></details></li>
+      <li><span class="pid">09.3</span>Tính đạo hàm của $y=\dfrac{x^2}{x+2}$.
+        <details class="ans"><summary>Xem đáp án</summary><div class="body"><p>Tử mới: $2x(x+2)-x^2\cdot1=x^2+4x$.</p><p class="fin">$y'=\dfrac{x^2+4x}{(x+2)^2}$, $x\ne-2$.</p></div></details></li>
+      <li><span class="pid">09.4</span>Một bạn viết $(x\cdot x)'=1\cdot1=1$. Sửa và giải thích lỗi.
+        <details class="ans"><summary>Xem đáp án</summary><div class="body"><p>Không được nhân hai đạo hàm. Phải dùng $u'v+uv'=1\cdot x+x\cdot1=2x$. Kiểm tra: $x\cdot x=x^2$ có đạo hàm $2x$.</p><p class="fin">$(x\cdot x)'=2x$.</p></div></details></li>
+    </ol>
+  </div>
+
+  <div class="box recap"><div class="tag"><span class="zh">回顧</span>Trước khi đóng sách</div>
+    <ul><li class="ok">Đạt yêu cầu: viết đúng dấu trừ và mẫu bình phương trong quy tắc thương.</li>
+    <li class="re">Ôn ngày 2 và 8.</li></ul>
+  </div>
+</section>
+
+<!-- ================= NGÀY 10 ================= -->
+<section class="day" id="d10">
+  <header class="opener">
+    <div class="num"><span class="lbl">NGÀY</span><span class="n">10</span></div>
+    <div>
+      <div class="eyebrow">Chặng 2 · Đạo hàm</div>
+      <h2>Quy tắc dây chuyền</h2>
+      <p class="goal"><b>Mục tiêu:</b> nhận ra hàm ngoài và hàm trong, rồi nhân đủ đạo hàm hàm trong.</p>
+      <label class="done"><input type="checkbox" data-done="10"> Đã học xong</label>
+    </div>
+  </header>
+
+  <div class="box aims"><div class="tag"><span class="zh">本日重點</span>Bài này bạn sẽ</div>
+    <ul><li>Khoanh được "hàm trong" trong mọi biểu thức.</li>
+    <li>Làm theo hai nhịp: đạo hàm ngoài (giữ nguyên trong), nhân đạo hàm trong.</li>
+    <li>Chuẩn bị nền cho ngày 11 và cho phép đổi biến ở ngày 16.</li></ul>
+  </div>
+
+  <h3 class="sec"><span class="zh">觀念</span>Khái niệm</h3>
+  <p class="txt">Hàm hợp giống hai bước xử lý nối tiếp: $x$ đi qua hàm trong $u=g(x)$, rồi $u$ đi qua hàm ngoài $f(u)$. Nếu bước trong làm $u$ chạy nhanh gấp 3 lần $x$, và bước ngoài làm $y$ chạy nhanh gấp 4 lần $u$, thì $y$ chạy nhanh gấp $12$ lần $x$. Tốc độ của hai bước <b>nhân với nhau</b>.</p>
+
+  <div class="box key"><div class="tag"><span class="zh">重點</span>Công thức cốt lõi</div>
+    <div class="scroll"><table class="ktab">
+      <tr><td class="f">$\dfrac{d}{dx}f(g(x))=f'(g(x))\cdot g'(x)$</td><td class="c">Đạo hàm ngoài (tại hàm trong) <b>nhân</b> đạo hàm trong.</td></tr>
+      <tr><td class="f">$\dfrac{d}{dx}[u(x)]^n=n[u(x)]^{n-1}\cdot u'(x)$</td><td class="c">Dạng hay gặp nhất: lũy thừa của một biểu thức.</td></tr>
+    </table></div>
+  </div>
+
+  <div class="box ex"><div class="tag"><span class="zh">範例</span>Ví dụ · Lũy thừa của biểu thức</div>
+    <p class="prob"><b>Đề:</b> Tính $[(3x+1)^4]'$.</p>
+    <ol class="steps">
+      <li><div class="m">Hàm trong $u=3x+1$, hàm ngoài $u^4$</div><div class="note">Khoanh phần trong ngoặc.</div></li>
+      <li><div class="m">Ngoài: $4u^3=4(3x+1)^3$</div><div class="note">Đạo hàm ngoài, <b>giữ nguyên</b> phần trong.</div></li>
+      <li><div class="m">Trong: $u'=3$</div><div class="note"></div></li>
+      <li><div class="m">$4(3x+1)^3\cdot3=12(3x+1)^3$</div><div class="note">Nhân hai nhịp lại.</div></li>
+    </ol>
+    <p class="result"><b>Kết quả:</b> $12(3x+1)^3$.</p>
+  </div>
+
+  <div class="box warn"><div class="tag"><span class="zh">注意</span>Lỗi hay gặp</div>
+    <ul><li>Quên nhân $u'$: viết $[(3x+1)^4]'=4(3x+1)^3$. Thiếu hệ số 3.</li>
+    <li>Đạo hàm luôn cả phần trong ở nhịp ngoài: viết $4\cdot3^3$. Phần trong phải giữ nguyên.</li></ul>
+  </div>
+
+  <div class="box drill"><div class="tag"><span class="zh">練習</span>Bạn tự làm</div>
+    <ol class="probs">
+      <li><span class="pid">10.1</span>Tìm đạo hàm của $y=(2x-1)^5$.
+        <details class="ans"><summary>Xem đáp án</summary><div class="body"><p>Trong $u=2x-1$, $u'=2$: $5(2x-1)^4\cdot2$.</p><p class="fin">$y'=10(2x-1)^4$.</p></div></details></li>
+      <li><span class="pid">10.2</span>Tìm đạo hàm của $y=(x^2+3)^4$.
+        <details class="ans"><summary>Xem đáp án</summary><div class="body"><p>$4(x^2+3)^3\cdot2x$.</p><p class="fin">$y'=8x(x^2+3)^3$.</p></div></details></li>
+      <li><span class="pid">10.3</span>Tìm đạo hàm trên miền $x&gt;-1/3$: $y=\sqrt{3x+1}$.
+        <details class="ans"><summary>Xem đáp án</summary><div class="body"><p>$y=(3x+1)^{1/2}$; $y'=\tfrac12(3x+1)^{-1/2}\cdot3$.</p><p class="fin">$y'=\dfrac{3}{2\sqrt{3x+1}}$.</p></div></details></li>
+      <li><span class="pid">10.4</span>Tìm đạo hàm trên miền $x\ne-1$: $y=\dfrac{1}{(x+1)^2}$.
+        <details class="ans"><summary>Xem đáp án</summary><div class="body"><p>$y=(x+1)^{-2}$; $y'=-2(x+1)^{-3}\cdot1$.</p><p class="fin">$y'=-\dfrac{2}{(x+1)^3}$.</p></div></details></li>
+    </ol>
+  </div>
+
+  <div class="box recap"><div class="tag"><span class="zh">回顧</span>Trước khi đóng sách</div>
+    <ul><li class="ok">Đạt yêu cầu: mỗi bài đều chỉ ra được hàm trong và hàm ngoài.</li>
+    <li class="re">Ôn ngày 3 và 9.</li></ul>
+  </div>
+</section>
+
+<!-- ================= NGÀY 11 ================= -->
+<section class="day" id="d11">
+  <header class="opener">
+    <div class="num"><span class="lbl">NGÀY</span><span class="n">11</span></div>
+    <div>
+      <div class="eyebrow">Chặng 2 · Đạo hàm</div>
+      <h2>Hàm mũ, logarit, lượng giác</h2>
+      <p class="goal"><b>Mục tiêu:</b> dùng bảng đạo hàm cơ bản cùng quy tắc dây chuyền.</p>
+      <label class="done"><input type="checkbox" data-done="11"> Đã học xong</label>
+    </div>
+  </header>
+
+  <div class="box aims"><div class="tag"><span class="zh">本日重點</span>Bài này bạn sẽ</div>
+    <ul><li>Nhớ 4 nhóm công thức: $e^x$, $\ln$, $\sin/\cos$, $\tan$.</li>
+    <li>Mỗi khi thay $x$ bằng $u(x)$, nhân thêm $u'(x)$.</li>
+    <li>Giữ dấu âm của $(\cos x)'$.</li></ul>
+  </div>
+
+  <h3 class="sec"><span class="zh">觀念</span>Khái niệm</h3>
+  <p class="txt">Các công thức dưới đây là <b>mẫu gốc</b> với biến là $x$. Trong thực tế, biến thường là một biểu thức $u(x)$; lúc đó dùng dây chuyền: đạo hàm theo mẫu gốc rồi nhân $u'$. Riêng $e^x$ có tính chất đặc biệt: đạo hàm bằng chính nó, đó là lý do $e$ xuất hiện khắp nơi trong giải tích. Các công thức $\sin,\cos,\tan$ chỉ đúng với radian.</p>
+
+  <div class="box key"><div class="tag"><span class="zh">重點</span>Công thức cốt lõi</div>
+    <div class="scroll"><table class="ktab">
+      <tr><td class="f">$(e^x)'=e^x,\qquad (a^x)'=a^x\ln a\ (a&gt;0)$</td><td class="c">Dạng $u$: $(e^u)'=e^u\,u'$.</td></tr>
+      <tr><td class="f">$(\ln|x|)'=\dfrac1x\ (x\ne0)$</td><td class="c">Dạng $u$: $(\ln u)'=\dfrac{u'}{u}$, cần $u&gt;0$ (hoặc $u\ne0$ với $\ln|u|$).</td></tr>
+      <tr><td class="f">$(\sin x)'=\cos x,\qquad (\cos x)'=-\sin x$</td><td class="c"><b>Đừng mất dấu âm</b> của cos.</td></tr>
+      <tr><td class="f">$(\tan x)'=\dfrac{1}{\cos^2x}\ (\cos x\ne0)$</td><td class="c">Suy ra từ quy tắc thương với $\tan=\sin/\cos$.</td></tr>
+    </table></div>
+  </div>
+
+  <div class="box ex"><div class="tag"><span class="zh">範例</span>Ví dụ · $\ln$ của một biểu thức</div>
+    <p class="prob"><b>Đề:</b> Tính đạo hàm của $y=\ln(x^2+1)$.</p>
+    <ol class="steps">
+      <li><div class="m">$u=x^2+1&gt;0$ với mọi $x$</div><div class="note">Kiểm tra điều kiện của $\ln$ trước.</div></li>
+      <li><div class="m">$u'=2x$</div><div class="note"></div></li>
+      <li><div class="m">$y'=\dfrac{u'}{u}=\dfrac{2x}{x^2+1}$</div><div class="note">Đạo hàm trong chia chính nó.</div></li>
+    </ol>
+    <p class="result"><b>Kết quả:</b> $y'=\dfrac{2x}{x^2+1}$.</p>
+  </div>
+
+  <div class="box tip"><div class="tag"><span class="zh">提示</span>Kiểm tra nhanh $\ln(2x)$</div>
+    <p>$(\ln(2x))'=\dfrac{2}{2x}=\dfrac1x$, không phải $\dfrac1{2x}$. Kiểm tra bằng cách khác: $\ln(2x)=\ln2+\ln x$, đạo hàm là $0+\dfrac1x$. Hai cách ra cùng đáp số thì mới yên tâm.</p>
+  </div>
+
+  <div class="box drill"><div class="tag"><span class="zh">練習</span>Bạn tự làm</div>
+    <ol class="probs">
+      <li><span class="pid">11.1</span>Tìm đạo hàm của $y=e^{3x}$.
+        <details class="ans"><summary>Xem đáp án</summary><div class="body"><p>$u=3x$, $u'=3$.</p><p class="fin">$y'=3e^{3x}$.</p></div></details></li>
+      <li><span class="pid">11.2</span>Tìm đạo hàm của $y=\ln(2x)$, $x&gt;0$.
+        <details class="ans"><summary>Xem đáp án</summary><div class="body"><p>$\dfrac{2}{2x}$.</p><p class="fin">$y'=\dfrac1x$.</p></div></details></li>
+      <li><span class="pid">11.3</span>Tìm đạo hàm của $y=\sin(2x)+\cos x$.
+        <details class="ans"><summary>Xem đáp án</summary><div class="body"><p>Nhân 2 ở $\sin(2x)$; giữ dấu âm của cos.</p><p class="fin">$y'=2\cos(2x)-\sin x$.</p></div></details></li>
+      <li><span class="pid">11.4</span>Tìm đạo hàm của $y=xe^x$.
+        <details class="ans"><summary>Xem đáp án</summary><div class="body"><p>Quy tắc tích: $1\cdot e^x+x\cdot e^x$.</p><p class="fin">$y'=(x+1)e^x$.</p></div></details></li>
+    </ol>
+  </div>
+
+  <div class="box recap"><div class="tag"><span class="zh">回顧</span>Trước khi đóng sách</div>
+    <ul><li class="ok">Đạt yêu cầu: nhớ 4 nhóm công thức và dùng đúng đạo hàm hàm trong.</li>
+    <li class="re">Ôn ngày 4 và 10.</li></ul>
+  </div>
+</section>
+
+<!-- ================= NGÀY 12 ================= -->
+<section class="day" id="d12">
+  <header class="opener">
+    <div class="num"><span class="lbl">NGÀY</span><span class="n">12</span></div>
+    <div>
+      <div class="eyebrow">Chặng 2 · Đạo hàm</div>
+      <h2>Tiếp tuyến, vi phân, hàm ẩn</h2>
+      <p class="goal"><b>Mục tiêu:</b> dùng đạo hàm để viết tiếp tuyến và xấp xỉ; nhận biết $y$ phụ thuộc $x$.</p>
+      <label class="done"><input type="checkbox" data-done="12"> Đã học xong</label>
+    </div>
+  </header>
+
+  <div class="box aims"><div class="tag"><span class="zh">本日重點</span>Bài này bạn sẽ</div>
+    <ul><li>Xấp xỉ một giá trị khó tính bằng tiếp tuyến ở điểm dễ tính.</li>
+    <li>Phân biệt $dy$ (xấp xỉ) và $\Delta y$ (thay đổi thật).</li>
+    <li>Đạo hàm phương trình có $y$ mà không cần giải ra $y$.</li></ul>
+  </div>
+
+  <h3 class="sec"><span class="zh">觀念</span>Khái niệm</h3>
+  <p class="txt"><b>Vi phân</b> dùng đường tiếp tuyến để xấp xỉ một thay đổi nhỏ: gần tiếp điểm, đường cong và tiếp tuyến gần như trùng nhau. <b>Hàm ẩn</b>: trong phương trình như $x^2+y^2=25$, $y$ cũng thay đổi theo $x$, nên khi đạo hàm $y^2$ theo $x$ phải dùng dây chuyền: $2y\cdot y'$.</p>
+
+  <div class="box key"><div class="tag"><span class="zh">重點</span>Công thức cốt lõi</div>
+    <div class="scroll"><table class="ktab">
+      <tr><td class="f">$y-f(a)=f'(a)(x-a)$</td><td class="c">Tiếp tuyến tại $a$.</td></tr>
+      <tr><td class="f">$dy=f'(x)\,dx,\qquad f(a+h)\approx f(a)+f'(a)h$</td><td class="c">Dấu $\approx$ không phải dấu bằng.</td></tr>
+      <tr><td class="f">$\dfrac{d}{dx}y^2=2y\dfrac{dy}{dx}$</td><td class="c">Mỗi đạo hàm theo $y$ phải nhân $y'$.</td></tr>
+    </table></div>
+  </div>
+
+  <div class="box ex"><div class="tag"><span class="zh">範例</span>Ví dụ 1 · Xấp xỉ bằng vi phân</div>
+    <p class="prob"><b>Đề:</b> Ước lượng $\sqrt{4{,}1}$.</p>
+    <ol class="steps">
+      <li><div class="m">$f(x)=\sqrt x,\ a=4,\ h=0{,}1$</div><div class="note">Chọn $a$ là số gần nhất có căn "đẹp".</div></li>
+      <li><div class="m">$f'(x)=\dfrac{1}{2\sqrt x}\Rightarrow f'(4)=\dfrac14$</div><div class="note">Độ dốc tại tiếp điểm.</div></li>
+      <li><div class="m">$\sqrt{4{,}1}\approx2+\dfrac14(0{,}1)=2{,}025$</div><div class="note">Giá trị thật $\approx2{,}0248$: sai lệch rất nhỏ.</div></li>
+    </ol>
+    <p class="result"><b>Kết quả:</b> $\sqrt{4{,}1}\approx2{,}025$.</p>
+  </div>
+
+  <div class="box ex"><div class="tag"><span class="zh">範例</span>Ví dụ 2 · Đạo hàm hàm ẩn</div>
+    <p class="prob"><b>Đề:</b> Từ đường tròn $x^2+y^2=25$, tìm $y'$.</p>
+    <ol class="steps">
+      <li><div class="m">$\dfrac{d}{dx}(x^2)+\dfrac{d}{dx}(y^2)=\dfrac{d}{dx}(25)$</div><div class="note">Đạo hàm cả hai vế theo $x$.</div></li>
+      <li><div class="m">$2x+2yy'=0$</div><div class="note">$y^2$ cho $2y\cdot y'$ vì $y$ phụ thuộc $x$.</div></li>
+      <li><div class="m">$y'=-\dfrac{x}{y}\quad(y\ne0)$</div><div class="note">Giải ra $y'$.</div></li>
+    </ol>
+    <p class="result"><b>Kết quả:</b> $y'=-x/y$. Tại $(3,4)$ độ dốc là $-3/4$, đúng với hình vẽ đường tròn.</p>
+  </div>
+
+  <div class="box drill"><div class="tag"><span class="zh">練習</span>Bạn tự làm</div>
+    <ol class="probs">
+      <li><span class="pid">12.1</span>Viết tiếp tuyến của $y=x^2+1$ tại $x=2$.
+        <details class="ans"><summary>Xem đáp án</summary><div class="body"><p>Điểm $(2,5)$, độ dốc $y'(2)=4$. $y-5=4(x-2)$.</p><p class="fin">$y=4x-3$.</p></div></details></li>
+      <li><span class="pid">12.2</span>Dùng vi phân xấp xỉ $\sqrt{9{,}06}$.
+        <details class="ans"><summary>Xem đáp án</summary><div class="body"><p>$a=9$, $h=0{,}06$, $f'(9)=\dfrac16$. $3+\dfrac{0{,}06}{6}$.</p><p class="fin">$\sqrt{9{,}06}\approx3{,}01$.</p></div></details></li>
+      <li><span class="pid">12.3</span>Tìm $dy/dx$ từ $x^2+y^2=13$; tính tại $(2,3)$.
+        <details class="ans"><summary>Xem đáp án</summary><div class="body"><p>$2x+2yy'=0\Rightarrow y'=-x/y$.</p><p class="fin">$\dfrac{dy}{dx}=-\dfrac xy$; tại $(2,3)$: $-\dfrac23$.</p></div></details></li>
+      <li><span class="pid">12.4</span>Với $y=x^3$, tại $x=2$ và $dx=0{,}01$, tính $dy$ và độ thay đổi thật $\Delta y$. Hai giá trị có bằng nhau không?
+        <details class="ans"><summary>Xem đáp án</summary><div class="body"><p>$dy=3x^2\,dx=12\cdot0{,}01=0{,}12$. $\Delta y=2{,}01^3-8=0{,}120601$.</p><p class="fin">Không bằng nhau: $dy$ là xấp xỉ bậc nhất, $\Delta y$ có thêm các hạng bậc cao ($0{,}000601$).</p></div></details></li>
+    </ol>
+  </div>
+
+  <div class="box recap"><div class="tag"><span class="zh">回顧</span>Trước khi đóng sách</div>
+    <ul><li class="ok">Đạt yêu cầu: phân biệt $dy$ với $\Delta y$; luôn ghi tọa độ tiếp điểm.</li>
+    <li class="re">Ôn ngày 5 và 11.</li></ul>
+  </div>
+</section>
+
+<!-- ================= NGÀY 13 ================= -->
+<section class="day" id="d13">
+  <header class="opener">
+    <div class="num"><span class="lbl">NGÀY</span><span class="n">13</span></div>
+    <div>
+      <div class="eyebrow">Chặng 2 · Ứng dụng đạo hàm</div>
+      <h2>Tăng, giảm và cực trị</h2>
+      <p class="goal"><b>Mục tiêu:</b> lập bảng dấu $f'$ và phân biệt cực trị địa phương với giá trị lớn nhất, nhỏ nhất.</p>
+      <label class="done"><input type="checkbox" data-done="13"> Đã học xong</label>
+    </div>
+  </header>
+
+  <div class="box aims"><div class="tag"><span class="zh">本日重點</span>Bài này bạn sẽ</div>
+    <ul><li>Đọc dấu của $f'$ thành chiều của đồ thị.</li>
+    <li>Coi $f'=0$ chỉ là <b>ứng viên</b>, phải xét đổi dấu mới kết luận.</li>
+    <li>Trên đoạn đóng, so thêm hai đầu mút.</li></ul>
+  </div>
+
+  <h3 class="sec"><span class="zh">觀念</span>Khái niệm</h3>
+  <p class="txt">Đạo hàm dương thì hàm đang đi lên, âm thì đang đi xuống. Đỉnh núi là nơi đường đi chuyển từ lên sang xuống ($f'$ từ $+$ sang $-$); đáy thung lũng ngược lại. Một điểm có $f'=0$ mà không đổi dấu (như $x^3$ tại 0) chỉ là chỗ "phẳng tạm", không phải cực trị.</p>
+  <p class="txt">Cực trị <em>địa phương</em> là cao/thấp so với vùng lân cận. Giá trị <em>lớn nhất/nhỏ nhất</em> trên một đoạn còn phải so với hai đầu mút.</p>
+
+  <div class="box key"><div class="tag"><span class="zh">重點</span>Công thức cốt lõi</div>
+    <div class="scroll"><table class="ktab">
+      <tr><td class="f">$f'&gt;0$: tăng; $f'&lt;0$: giảm</td><td class="c">Trên một khoảng.</td></tr>
+      <tr><td class="f">$f'$: $+\to-$ tại $c$ ⇒ cực đại địa phương tại $c$</td><td class="c">Ứng viên: $f'(c)=0$ hoặc $f'(c)$ không tồn tại.</td></tr>
+      <tr><td class="f">$f'$: $-\to+$ tại $c$ ⇒ cực tiểu địa phương tại $c$</td><td class="c">Xét dấu hai bên $c$.</td></tr>
+      <tr><td class="f">$f''&gt;0$: cong lên; $f''&lt;0$: cong xuống</td><td class="c">Cách thứ hai để phân loại điểm dừng.</td></tr>
+    </table></div>
+  </div>
+
+  <div class="box ex"><div class="tag"><span class="zh">範例</span>Ví dụ · Bảng dấu</div>
+    <p class="prob"><b>Đề:</b> Khảo sát $f(x)=x^2-4x+1$.</p>
+    <ol class="steps">
+      <li><div class="m">$f'(x)=2x-4$</div><div class="note"></div></li>
+      <li><div class="m">$f'=0\iff x=2$</div><div class="note">Ứng viên duy nhất.</div></li>
+      <li><div class="m">$x&lt;2$: $f'&lt;0$; $x&gt;2$: $f'&gt;0$</div><div class="note">Thử $x=0$ và $x=3$.</div></li>
+      <li><div class="m">$-\to+$ ⇒ cực tiểu tại $x=2$, $f(2)=-3$</div><div class="note">Ghi cả hoành độ và giá trị.</div></li>
+    </ol>
+    <p class="result"><b>Kết quả:</b> giảm trên $(-\infty,2)$, tăng trên $(2,+\infty)$, cực tiểu $f(2)=-3$.</p>
+  </div>
+
+  <div class="box tip"><div class="tag"><span class="zh">提示</span>Quy trình 4 bước tìm max/min trên $[a,b]$</div>
+    <p><b>1.</b> Tính $f'$. <b>2.</b> Tìm điểm $f'=0$ hoặc không tồn tại <em>trong</em> $(a,b)$. <b>3.</b> Tính $f$ tại các điểm đó và tại $a$, $b$. <b>4.</b> Số lớn nhất là max, nhỏ nhất là min. Không cần xét dấu ở bước này.</p>
+  </div>
+
+  <div class="box drill"><div class="tag"><span class="zh">練習</span>Bạn tự làm</div>
+    <ol class="probs">
+      <li><span class="pid">13.1</span>Tìm khoảng tăng, giảm và cực trị của $f(x)=x^2-6x+5$.
+        <details class="ans"><summary>Xem đáp án</summary><div class="body"><p>$f'=2x-6$: âm khi $x&lt;3$, dương khi $x&gt;3$.</p><p class="fin">Giảm trên $(-\infty,3)$, tăng trên $(3,+\infty)$; cực tiểu $f(3)=-4$.</p></div></details></li>
+      <li><span class="pid">13.2</span>Tìm các điểm dừng và phân loại bằng dấu đạo hàm: $g(x)=x^3-3x$.
+        <details class="ans"><summary>Xem đáp án</summary><div class="body"><p>$g'=3x^2-3=3(x-1)(x+1)$; dấu $+,-,+$ trên ba khoảng.</p><p class="fin">Cực đại tại $x=-1$ ($g=2$); cực tiểu tại $x=1$ ($g=-2$).</p></div></details></li>
+      <li><span class="pid">13.3</span>Hàm $h(x)=x^3$ có $h'(0)=0$. $x=0$ có phải cực trị không? Giải thích.
+        <details class="ans"><summary>Xem đáp án</summary><div class="body"><p class="fin">Không. $h'=3x^2\ge0$ ở cả hai phía, không đổi dấu tại 0, nên hàm chỉ "phẳng tạm" rồi tiếp tục tăng.</p></div></details></li>
+      <li><span class="pid">13.4</span>Tìm giá trị lớn nhất, nhỏ nhất của $p(x)=x^2-2x$ trên $[0,3]$.
+        <details class="ans"><summary>Xem đáp án</summary><div class="body"><p>$p'=2x-2=0\Rightarrow x=1$. So $p(0)=0$, $p(1)=-1$, $p(3)=3$.</p><p class="fin">Min $=-1$ tại $x=1$; max $=3$ tại $x=3$.</p></div></details></li>
+    </ol>
+  </div>
+
+  <div class="box recap"><div class="tag"><span class="zh">回顧</span>Trước khi đóng sách</div>
+    <ul><li class="ok">Đạt yêu cầu: không kết luận cực trị chỉ từ phương trình $f'=0$.</li>
+    <li class="re">Ôn ngày 6 và 12.</li></ul>
+  </div>
+</section>
+
+<!-- ================= NGÀY 14 ================= -->
+<section class="day" id="d14">
+  <header class="opener">
+    <div class="num"><span class="lbl">NGÀY</span><span class="n">14</span></div>
+    <div>
+      <div class="eyebrow">Chặng 2 · Ứng dụng đạo hàm</div>
+      <h2>Tối ưu và kiểm tra chặng 2 <span class="test">KIỂM TRA 50′</span></h2>
+      <p class="goal"><b>Mục tiêu:</b> đổi đề bằng lời thành hàm số cần tối ưu hoặc đạo hàm theo thời gian.</p>
+      <label class="done"><input type="checkbox" data-done="14"> Đã học xong</label>
+    </div>
+  </header>
+
+  <h3 class="sec"><span class="zh">觀念</span>Khái niệm</h3>
+  <p class="txt"><b>Quy trình tối ưu:</b> đặt biến và điều kiện → viết đại lượng cần tối ưu → đưa về một biến → đạo hàm → kiểm tra ứng viên và biên. <b>Tốc độ liên quan:</b> các đại lượng đều là hàm của thời gian $t$; đạo hàm phương trình liên hệ theo $t$ rồi thay số vào <em>sau</em>.</p>
+
+  <div class="box key"><div class="tag"><span class="zh">重點</span>Công thức cốt lõi</div>
+    <div class="scroll"><table class="ktab">
+      <tr><td class="f">$A=xy,\quad 2x+2y=P\ \Rightarrow\ A(x)=x\!\left(\dfrac P2-x\right)$</td><td class="c">Dùng điều kiện để <b>khử một biến</b>.</td></tr>
+      <tr><td class="f">$A=\pi r^2\ \Rightarrow\ \dfrac{dA}{dt}=2\pi r\dfrac{dr}{dt}$</td><td class="c">Đạo hàm theo $t$ với dây chuyền.</td></tr>
+    </table></div>
+  </div>
+
+  <div class="box ex"><div class="tag"><span class="zh">範例</span>Ví dụ · Hình chữ nhật chu vi 20 m</div>
+    <p class="prob"><b>Đề:</b> Tìm hình chữ nhật chu vi 20 m có diện tích lớn nhất.</p>
+    <ol class="steps">
+      <li><div class="m">$2x+2y=20\Rightarrow y=10-x,\ 0&lt;x&lt;10$</div><div class="note">Đặt cạnh $x,y$; ghi miền của $x$.</div></li>
+      <li><div class="m">$A(x)=x(10-x)=10x-x^2$</div><div class="note">Đưa về một biến.</div></li>
+      <li><div class="m">$A'=10-2x=0\Rightarrow x=5$</div><div class="note">Ứng viên.</div></li>
+      <li><div class="m">$A''=-2&lt;0$ ⇒ cực đại</div><div class="note">Cong xuống: đỉnh.</div></li>
+      <li><div class="m">$x=y=5\text{ m},\ A_{\max}=25\text{ m}^2$</div><div class="note">Luôn ghi đơn vị.</div></li>
+    </ol>
+    <p class="result"><b>Kết quả:</b> hình vuông cạnh 5 m, diện tích 25 m².</p>
+  </div>
+
+  <div class="box tip"><div class="tag"><span class="zh">提示</span>Cách làm bài kiểm tra</div>
+    <p>50 phút, 6 câu, mỗi câu 1 điểm. Mục tiêu 5/6. Câu ứng dụng phải có đơn vị. Nếu chưa đạt, chữa đúng nhóm quy tắc bị sai trước ngày 15.</p>
+  </div>
+
+  <div class="box drill"><div class="tag"><span class="zh">練習</span>Bài kiểm tra chặng 2</div>
+    <ol class="probs">
+      <li><span class="pid">14.1</span>Tìm đạo hàm của $y=(x^2+1)^3$.
+        <details class="ans"><summary>Xem đáp án</summary><div class="body"><p>Dây chuyền: $3(x^2+1)^2\cdot2x$.</p><p class="fin">$y'=6x(x^2+1)^2$.</p></div></details></li>
+      <li><span class="pid">14.2</span>Tìm đạo hàm của $y=\dfrac{\ln x}{x}$, $x&gt;0$.
+        <details class="ans"><summary>Xem đáp án</summary><div class="body"><p>Thương: $\dfrac{\frac1x\cdot x-\ln x\cdot1}{x^2}$.</p><p class="fin">$y'=\dfrac{1-\ln x}{x^2}$.</p></div></details></li>
+      <li><span class="pid">14.3</span>Viết tiếp tuyến của $y=e^x$ tại $x=0$.
+        <details class="ans"><summary>Xem đáp án</summary><div class="body"><p>Điểm $(0,1)$, độ dốc $e^0=1$.</p><p class="fin">$y=x+1$.</p></div></details></li>
+      <li><span class="pid">14.4</span>Tìm và phân loại cực trị của $f(x)=x^3-3x^2$.
+        <details class="ans"><summary>Xem đáp án</summary><div class="body"><p>$f'=3x^2-6x=3x(x-2)$, dấu $+,-,+$.</p><p class="fin">Cực đại tại $x=0$ ($f=0$); cực tiểu tại $x=2$ ($f=-4$).</p></div></details></li>
+      <li><span class="pid">14.5</span>Hình chữ nhật chu vi 40 m có diện tích lớn nhất bao nhiêu? Tìm hai cạnh.
+        <details class="ans"><summary>Xem đáp án</summary><div class="body"><p>$y=20-x$, $A=x(20-x)$, $A'=20-2x=0\Rightarrow x=10$; $A''=-2&lt;0$.</p><p class="fin">Hai cạnh 10 m và 10 m; $A_{\max}=100$ m².</p></div></details></li>
+      <li><span class="pid">14.6</span>Bán kính hình tròn đang tăng 2 cm/s. Khi $r=3$ cm, diện tích tăng với tốc độ bao nhiêu?
+        <details class="ans"><summary>Xem đáp án</summary><div class="body"><p>$\dfrac{dA}{dt}=2\pi r\dfrac{dr}{dt}=2\pi\cdot3\cdot2$.</p><p class="fin">$12\pi\approx37{,}7$ cm²/s.</p></div></details></li>
+    </ol>
+    <p class="score">Chấm: ___/6.</p>
+  </div>
+
+  <div class="box recap"><div class="tag"><span class="zh">回顧</span>Trước khi đóng sách</div>
+    <ul><li class="ok">Đạt yêu cầu: 5/6.</li>
+    <li class="re">Ôn ngày 7 và 13.</li></ul>
+  </div>
+</section>
+
+<!-- ================= NGÀY 15 ================= -->
+<section class="day" id="d15">
+  <header class="opener">
+    <div class="num"><span class="lbl">NGÀY</span><span class="n">15</span></div>
+    <div>
+      <div class="eyebrow">Chặng 3 · Tích phân</div>
+      <h2>Nguyên hàm và hằng số C</h2>
+      <p class="goal"><b>Mục tiêu:</b> hiểu nguyên hàm là "tìm ngược" đạo hàm.</p>
+      <label class="done"><input type="checkbox" data-done="15"> Đã học xong</label>
+    </div>
+  </header>
+
+  <div class="box aims"><div class="tag"><span class="zh">本日重點</span>Bài này bạn sẽ</div>
+    <ul><li>Chạy ngược quy tắc lũy thừa: tăng số mũ lên 1, chia cho số mũ mới.</li>
+    <li>Hiểu tại sao luôn có $+C$.</li>
+    <li>Kiểm tra mọi nguyên hàm bằng cách đạo hàm lại.</li></ul>
+  </div>
+
+  <h3 class="sec"><span class="zh">觀念</span>Khái niệm</h3>
+  <p class="txt">Nếu $F'(x)=f(x)$ thì $F$ là <b>một</b> nguyên hàm của $f$. Vì đạo hàm của hằng số là 0, nên $F+5$, $F-2$, $F+C$ đều là nguyên hàm. Tích phân không xác định $\int f\,dx$ ký hiệu cả họ $F(x)+C$: một chồng đồ thị giống nhau, dịch lên xuống.</p>
+
+  <div class="box key"><div class="tag"><span class="zh">重點</span>Công thức cốt lõi</div>
+    <div class="scroll"><table class="ktab">
+      <tr><td class="f">$\displaystyle\int f(x)\,dx=F(x)+C\iff F'(x)=f(x)$</td><td class="c">Định nghĩa. Kiểm tra bằng đạo hàm.</td></tr>
+      <tr><td class="f">$\displaystyle\int x^n\,dx=\dfrac{x^{n+1}}{n+1}+C\quad(n\ne-1)$</td><td class="c">Tăng số mũ lên 1, chia cho số mũ mới.</td></tr>
+      <tr><td class="f">$\displaystyle\int\dfrac1x\,dx=\ln|x|+C\quad(x\ne0)$</td><td class="c">Trường hợp đặc biệt $n=-1$.</td></tr>
+    </table></div>
+    <p style="margin-top:10px;font-size:14px"><b>Tuyến tính:</b> tích phân của tổng bằng tổng tích phân; hệ số hằng đưa ra ngoài. Chỉ cần <b>một</b> $C$ chung.</p>
+  </div>
+
+  <div class="box ex"><div class="tag"><span class="zh">範例</span>Ví dụ · Nguyên hàm của đa thức</div>
+    <p class="prob"><b>Đề:</b> Tính $\displaystyle\int(3x^2+2)\,dx$.</p>
+    <ol class="steps">
+      <li><div class="m">$\displaystyle\int3x^2\,dx=3\cdot\dfrac{x^3}{3}=x^3$</div><div class="note">Số mũ $2\to3$, chia 3.</div></li>
+      <li><div class="m">$\displaystyle\int2\,dx=2x$</div><div class="note">$2=2x^0$, số mũ $0\to1$.</div></li>
+      <li><div class="m">$x^3+2x+C$</div><div class="note">Thêm một $C$ chung.</div></li>
+      <li><div class="m">Kiểm tra: $(x^3+2x+C)'=3x^2+2$ ✔</div><div class="note">Đúng bằng hàm ban đầu.</div></li>
+    </ol>
+    <p class="result"><b>Kết quả:</b> $x^3+2x+C$.</p>
+  </div>
+
+  <div class="box warn"><div class="tag"><span class="zh">注意</span>Lỗi hay gặp</div>
+    <ul><li>Quên $+C$ trong tích phân không xác định.</li>
+    <li>Áp quy tắc lũy thừa cho $x^{-1}$: $\dfrac{x^0}{0}$ vô nghĩa. Phải dùng $\ln|x|$.</li></ul>
+  </div>
+
+  <div class="box drill"><div class="tag"><span class="zh">練習</span>Bạn tự làm</div>
+    <ol class="probs">
+      <li><span class="pid">15.1</span>Tìm nguyên hàm $\displaystyle\int(4x^3-2x+5)\,dx$.
+        <details class="ans"><summary>Xem đáp án</summary><div class="body"><p>Từng hạng: $x^4$, $-x^2$, $5x$.</p><p class="fin">$x^4-x^2+5x+C$.</p></div></details></li>
+      <li><span class="pid">15.2</span>Tìm nguyên hàm $\displaystyle\int\sqrt x\,dx$ với $x&gt;0$.
+        <details class="ans"><summary>Xem đáp án</summary><div class="body"><p>$x^{1/2}\to\dfrac{x^{3/2}}{3/2}$.</p><p class="fin">$\dfrac23x^{3/2}+C$.</p></div></details></li>
+      <li><span class="pid">15.3</span>Tìm nguyên hàm $\displaystyle\int\dfrac3x\,dx$.
+        <details class="ans"><summary>Xem đáp án</summary><div class="body"><p>Trường hợp $n=-1$.</p><p class="fin">$3\ln|x|+C$.</p></div></details></li>
+      <li><span class="pid">15.4</span>Tìm $F$ biết $F'(x)=2x$ và $F(1)=5$.
+        <details class="ans"><summary>Xem đáp án</summary><div class="body"><p>$F=x^2+C$; $1+C=5\Rightarrow C=4$.</p><p class="fin">$F(x)=x^2+4$.</p></div></details></li>
+    </ol>
+  </div>
+
+  <div class="box recap"><div class="tag"><span class="zh">回顧</span>Trước khi đóng sách</div>
+    <ul><li class="ok">Đạt yêu cầu: nhớ $+C$ và kiểm tra được nguyên hàm bằng đạo hàm.</li>
+    <li class="re">Ôn ngày 8 và chữa bài kiểm tra ngày 14.</li></ul>
+  </div>
+</section>
+
+<!-- ================= NGÀY 16 ================= -->
+<section class="day" id="d16">
+  <header class="opener">
+    <div class="num"><span class="lbl">NGÀY</span><span class="n">16</span></div>
+    <div>
+      <div class="eyebrow">Chặng 3 · Tích phân</div>
+      <h2>Đổi biến</h2>
+      <p class="goal"><b>Mục tiêu:</b> nhìn ra một hàm bên trong và đạo hàm của nó ở bên ngoài.</p>
+      <label class="done"><input type="checkbox" data-done="16"> Đã học xong</label>
+    </div>
+  </header>
+
+  <div class="box aims"><div class="tag"><span class="zh">本日重點</span>Bài này bạn sẽ</div>
+    <ul><li>Hiểu đổi biến là quy tắc dây chuyền chạy ngược.</li>
+    <li>Viết đủ ba dòng: $u=\dots$, $du=\dots$, phép thay.</li>
+    <li>Đổi kết quả về $x$ và thêm $C$.</li></ul>
+  </div>
+
+  <h3 class="sec"><span class="zh">觀念</span>Khái niệm</h3>
+  <p class="txt">Ngày 10 ta biết $[F(g(x))]'=F'(g(x))\,g'(x)$. Đọc ngược: hễ trong tích phân có một hàm $g(x)$ <em>và</em> đạo hàm $g'(x)$ của nó đứng bên ngoài, thì đặt $u=g(x)$ sẽ gom cả cụm $g'(x)\,dx$ thành $du$, đưa bài về một biến $u$ đơn giản.</p>
+
+  <div class="box key"><div class="tag"><span class="zh">重點</span>Công thức cốt lõi</div>
+    <div class="scroll"><table class="ktab">
+      <tr><td class="f">$u=g(x),\qquad du=g'(x)\,dx$</td><td class="c">Hai dòng bắt buộc phải ghi.</td></tr>
+      <tr><td class="f">$\displaystyle\int f(g(x))\,g'(x)\,dx=\int f(u)\,du$</td><td class="c">Sau khi thay, <b>không còn</b> $x$ nào.</td></tr>
+    </table></div>
+    <p style="margin-top:10px;font-size:14px">Chọn $u$ chỉ có ích nếu phần còn lại viết được theo $u$ và $du$. Nếu thiếu hệ số hằng, ta bù bằng cách nhân chia hằng số.</p>
+  </div>
+
+  <div class="box ex"><div class="tag"><span class="zh">範例</span>Ví dụ · Hàm trong và đạo hàm của nó</div>
+    <p class="prob"><b>Đề:</b> Tính $\displaystyle\int2x(x^2+1)^3\,dx$.</p>
+    <ol class="steps">
+      <li><div class="m">$u=x^2+1$</div><div class="note">Phần trong ngoặc là hàm trong.</div></li>
+      <li><div class="m">$du=2x\,dx$</div><div class="note">Cụm $2x\,dx$ có sẵn ngoài ngoặc. Đẹp.</div></li>
+      <li><div class="m">$\displaystyle\int u^3\,du=\dfrac{u^4}{4}+C$</div><div class="note">Tích phân theo $u$ bằng quy tắc lũy thừa.</div></li>
+      <li><div class="m">$=\dfrac{(x^2+1)^4}{4}+C$</div><div class="note">Đổi về $x$.</div></li>
+    </ol>
+    <p class="result"><b>Kết quả:</b> $\dfrac{(x^2+1)^4}{4}+C$. Kiểm tra: đạo hàm ra $4\cdot\frac{(x^2+1)^3}{4}\cdot2x$ ✔</p>
+  </div>
+
+  <div class="box tip"><div class="tag"><span class="zh">提示</span>Khi thiếu hệ số</div>
+    <p>Với $\displaystyle\int e^{2x}dx$: đặt $u=2x$, $du=2\,dx$ nên $dx=\dfrac{du}{2}$. Tích phân thành $\dfrac12\displaystyle\int e^u du=\dfrac12e^{u}+C$. Hằng số thiếu luôn bù được; biến $x$ thừa thì không.</p>
+  </div>
+
+  <div class="box drill"><div class="tag"><span class="zh">練習</span>Bạn tự làm</div>
+    <ol class="probs">
+      <li><span class="pid">16.1</span>Tìm nguyên hàm bằng đổi biến: $\displaystyle\int2x(x^2+4)^2\,dx$.
+        <details class="ans"><summary>Xem đáp án</summary><div class="body"><p>$u=x^2+4$, $du=2x\,dx$: $\displaystyle\int u^2du=\dfrac{u^3}{3}$.</p><p class="fin">$\dfrac{(x^2+4)^3}{3}+C$.</p></div></details></li>
+      <li><span class="pid">16.2</span>Tìm nguyên hàm với $x&gt;-1/3$: $\displaystyle\int\dfrac{3}{\sqrt{3x+1}}\,dx$.
+        <details class="ans"><summary>Xem đáp án</summary><div class="body"><p>$u=3x+1$, $du=3\,dx$: $\displaystyle\int u^{-1/2}du=2u^{1/2}$.</p><p class="fin">$2\sqrt{3x+1}+C$.</p></div></details></li>
+      <li><span class="pid">16.3</span>Tìm nguyên hàm $\displaystyle\int e^{2x}\,dx$.
+        <details class="ans"><summary>Xem đáp án</summary><div class="body"><p>$u=2x$, $dx=du/2$.</p><p class="fin">$\dfrac12e^{2x}+C$.</p></div></details></li>
+      <li><span class="pid">16.4</span>Tìm nguyên hàm $\displaystyle\int\dfrac{x}{x^2+1}\,dx$.
+        <details class="ans"><summary>Xem đáp án</summary><div class="body"><p>$u=x^2+1$, $x\,dx=du/2$; $u&gt;0$ nên bỏ được trị tuyệt đối.</p><p class="fin">$\dfrac12\ln(x^2+1)+C$.</p></div></details></li>
+    </ol>
+  </div>
+
+  <div class="box recap"><div class="tag"><span class="zh">回顧</span>Trước khi đóng sách</div>
+    <ul><li class="ok">Đạt yêu cầu: ghi đủ $u$, $du$ và phép thay trước khi tích phân.</li>
+    <li class="re">Ôn ngày 9 và 15.</li></ul>
+  </div>
+</section>
+
+<!-- ================= NGÀY 17 ================= -->
+<section class="day" id="d17">
+  <header class="opener">
+    <div class="num"><span class="lbl">NGÀY</span><span class="n">17</span></div>
+    <div>
+      <div class="eyebrow">Chặng 3 · Tích phân</div>
+      <h2>Tích phân từng phần</h2>
+      <p class="goal"><b>Mục tiêu:</b> giảm độ khó của tích hai hàm bằng cách chọn $u$ và $dv$.</p>
+      <label class="done"><input type="checkbox" data-done="17"> Đã học xong</label>
+    </div>
+  </header>
+
+  <div class="box aims"><div class="tag"><span class="zh">本日重點</span>Bài này bạn sẽ</div>
+    <ul><li>Thấy công thức từng phần là quy tắc tích viết ngược.</li>
+    <li>Chọn $u$ sao cho $du$ đơn giản hơn, chọn $dv$ sao cho tìm được $v$.</li>
+    <li>Viết đủ bốn thứ $u, dv, du, v$ trước khi thay.</li></ul>
+  </div>
+
+  <h3 class="sec"><span class="zh">觀念</span>Khái niệm</h3>
+  <p class="txt">Từ $(uv)'=u'v+uv'$, lấy tích phân hai vế: $uv=\int v\,du+\int u\,dv$. Chuyển vế được công thức từng phần. Ý nghĩa: đổi một tích phân khó $\int u\,dv$ thành một tích phân dễ hơn $\int v\,du$, với "giá" phải trả là số hạng $uv$.</p>
+
+  <div class="box key"><div class="tag"><span class="zh">重點</span>Công thức cốt lõi</div>
+    <div class="scroll"><table class="ktab">
+      <tr><td class="f">$\displaystyle\int u\,dv=uv-\int v\,du$</td><td class="c">Giữ đúng dấu trừ.</td></tr>
+      <tr><td class="f">$\displaystyle\int e^x dx=e^x+C,\quad \int\cos x\,dx=\sin x+C$</td><td class="c">Cần để tìm $v$ từ $dv$.</td></tr>
+      <tr><td class="f">$\displaystyle\int\sin x\,dx=-\cos x+C$</td><td class="c">Dấu âm ở đây, không phải ở $\cos$.</td></tr>
+    </table></div>
+    <p style="margin-top:10px;font-size:14px"><b>Gợi ý chọn:</b> với $x\cdot e^x$ hoặc $x\cdot\sin x$, chọn $u=x$. Với $\ln x$ đứng một mình, xem là $\ln x\cdot1$ và chọn $dv=dx$. Đây là gợi ý, không phải luật cho mọi bài.</p>
+  </div>
+
+  <div class="box ex"><div class="tag"><span class="zh">範例</span>Ví dụ · $x$ nhân hàm mũ</div>
+    <p class="prob"><b>Đề:</b> Tính $\displaystyle\int xe^x\,dx$.</p>
+    <ol class="steps">
+      <li><div class="m">$u=x,\quad dv=e^x\,dx$</div><div class="note">$u=x$ vì đạo hàm của nó là 1, đơn giản hơn.</div></li>
+      <li><div class="m">$du=dx,\quad v=e^x$</div><div class="note">Tìm $v$ bằng nguyên hàm của $dv$.</div></li>
+      <li><div class="m">$\displaystyle\int xe^x dx=xe^x-\int e^x\,dx$</div><div class="note">Thay vào công thức.</div></li>
+      <li><div class="m">$=xe^x-e^x+C$</div><div class="note">Tích phân còn lại là bảng cơ bản.</div></li>
+    </ol>
+    <p class="result"><b>Kết quả:</b> $xe^x-e^x+C=(x-1)e^x+C$. Kiểm tra: đạo hàm ra $e^x+(x-1)e^x=xe^x$ ✔</p>
+  </div>
+
+  <div class="box drill"><div class="tag"><span class="zh">練習</span>Bạn tự làm</div>
+    <ol class="probs">
+      <li><span class="pid">17.1</span>Tính bằng từng phần: $\displaystyle\int x\cos x\,dx$.
+        <details class="ans"><summary>Xem đáp án</summary><div class="body"><p>$u=x$, $dv=\cos x\,dx$; $du=dx$, $v=\sin x$. $x\sin x-\int\sin x\,dx$.</p><p class="fin">$x\sin x+\cos x+C$.</p></div></details></li>
+      <li><span class="pid">17.2</span>Tính bằng từng phần: $\displaystyle\int xe^{2x}\,dx$.
+        <details class="ans"><summary>Xem đáp án</summary><div class="body"><p>$u=x$, $dv=e^{2x}dx$; $v=\dfrac{e^{2x}}{2}$. $\dfrac{xe^{2x}}{2}-\dfrac12\int e^{2x}dx$.</p><p class="fin">$\dfrac{xe^{2x}}{2}-\dfrac{e^{2x}}{4}+C$.</p></div></details></li>
+      <li><span class="pid">17.3</span>Tính với $x&gt;0$: $\displaystyle\int\ln x\,dx$.
+        <details class="ans"><summary>Xem đáp án</summary><div class="body"><p>$u=\ln x$, $dv=dx$; $du=dx/x$, $v=x$. $x\ln x-\int x\cdot\dfrac1x\,dx$.</p><p class="fin">$x\ln x-x+C$.</p></div></details></li>
+      <li><span class="pid">17.4</span>Dùng đạo hàm để kiểm tra kết quả câu 1.
+        <details class="ans"><summary>Xem đáp án</summary><div class="body"><p>$[x\sin x+\cos x]'=\sin x+x\cos x-\sin x$; hai hạng $\sin x$ triệt tiêu.</p><p class="fin">$=x\cos x$ ✔</p></div></details></li>
+    </ol>
+  </div>
+
+  <div class="box recap"><div class="tag"><span class="zh">回顧</span>Trước khi đóng sách</div>
+    <ul><li class="ok">Đạt yêu cầu: chọn đủ $u,dv,du,v$ và giữ đúng dấu trừ.</li>
+    <li class="re">Ôn ngày 10 và 16.</li></ul>
+  </div>
+</section>
+
+<!-- ================= NGÀY 18 ================= -->
+<section class="day" id="d18">
+  <header class="opener">
+    <div class="num"><span class="lbl">NGÀY</span><span class="n">18</span></div>
+    <div>
+      <div class="eyebrow">Chặng 3 · Tích phân</div>
+      <h2>Tích phân xác định</h2>
+      <p class="goal"><b>Mục tiêu:</b> tính tích lũy trên một đoạn bằng nguyên hàm và hai cận.</p>
+      <label class="done"><input type="checkbox" data-done="18"> Đã học xong</label>
+    </div>
+  </header>
+
+  <div class="box aims"><div class="tag"><span class="zh">本日重點</span>Bài này bạn sẽ</div>
+    <ul><li>Hiểu tích phân xác định là "cộng dồn các miếng rất nhỏ".</li>
+    <li>Dùng $F(b)-F(a)$, kết quả là <b>một số</b>, không có $C$.</li>
+    <li>Đổi biến thì đổi luôn cả hai cận.</li></ul>
+  </div>
+
+  <h3 class="sec"><span class="zh">觀念</span>Khái niệm</h3>
+  <p class="txt">Tích phân xác định $\int_a^b f(x)\,dx$ cộng dồn các phần rất nhỏ $f(x)\,dx$ từ $x=a$ đến $x=b$. Điều kỳ diệu của <b>định lý cơ bản</b>: thay vì cộng vô hạn miếng, chỉ cần một nguyên hàm $F$ và tính $F(b)-F(a)$. Hằng số $C$ triệt tiêu khi trừ nên không cần viết.</p>
+
+  <div class="box key"><div class="tag"><span class="zh">重點</span>Công thức cốt lõi</div>
+    <div class="scroll"><table class="ktab">
+      <tr><td class="f">$\displaystyle\int_a^b f(x)\,dx=\big[F(x)\big]_a^b=F(b)-F(a)$</td><td class="c">Cận trên trừ cận dưới. Giữ ngoặc khi thay.</td></tr>
+      <tr><td class="f">$\displaystyle\int_b^a f=-\int_a^b f,\qquad \int_a^c f=\int_a^b f+\int_b^c f$</td><td class="c">Đảo cận đổi dấu; chia đoạn được cộng.</td></tr>
+      <tr><td class="f">$\displaystyle\int_a^b f(g(x))g'(x)\,dx=\int_{g(a)}^{g(b)}f(u)\,du$</td><td class="c">Đổi biến thì <b>đổi cận</b> theo $u$.</td></tr>
+    </table></div>
+  </div>
+
+  <div class="box ex"><div class="tag"><span class="zh">範例</span>Ví dụ · Thay cận</div>
+    <p class="prob"><b>Đề:</b> Tính $\displaystyle\int_1^3 2x\,dx$.</p>
+    <ol class="steps">
+      <li><div class="m">$F(x)=x^2$</div><div class="note">Một nguyên hàm của $2x$; không cần $C$.</div></li>
+      <li><div class="m">$\big[x^2\big]_1^3=3^2-1^2$</div><div class="note">Cận trên trước, trừ cận dưới.</div></li>
+      <li><div class="m">$=9-1=8$</div><div class="note">Kết quả là một số.</div></li>
+    </ol>
+    <p class="result"><b>Kết quả:</b> $8$. Kiểm tra hình học: hình thang dưới $y=2x$ từ 1 đến 3 có diện tích $\frac{(2+6)\cdot2}{2}=8$ ✔</p>
+  </div>
+
+  <div class="box warn"><div class="tag"><span class="zh">注意</span>Lỗi hay gặp khi đổi biến</div>
+    <p>Đặt $u=x^2+1$ rồi vẫn giữ cận $0$ và $1$ của $x$. Phải đổi: $x=0\Rightarrow u=1$, $x=1\Rightarrow u=2$. Hoặc quay về biểu thức theo $x$ trước rồi mới dùng cận $x$. Chọn một trong hai, không trộn.</p>
+  </div>
+
+  <div class="box drill"><div class="tag"><span class="zh">練習</span>Bạn tự làm</div>
+    <ol class="probs">
+      <li><span class="pid">18.1</span>Tính $\displaystyle\int_0^2(3x^2+1)\,dx$.
+        <details class="ans"><summary>Xem đáp án</summary><div class="body"><p>$\big[x^3+x\big]_0^2=(8+2)-0$.</p><p class="fin">$10$.</p></div></details></li>
+      <li><span class="pid">18.2</span>Tính $\displaystyle\int_1^e\dfrac1x\,dx$.
+        <details class="ans"><summary>Xem đáp án</summary><div class="body"><p>$\big[\ln x\big]_1^e=\ln e-\ln1=1-0$.</p><p class="fin">$1$.</p></div></details></li>
+      <li><span class="pid">18.3</span>Đổi biến và đổi cận để tính $\displaystyle\int_0^1 2x(x^2+1)\,dx$.
+        <details class="ans"><summary>Xem đáp án</summary><div class="body"><p>$u=x^2+1$, $du=2x\,dx$; cận $1\to2$. $\displaystyle\int_1^2u\,du=\Big[\dfrac{u^2}{2}\Big]_1^2=2-\dfrac12$.</p><p class="fin">$\dfrac32$.</p></div></details></li>
+      <li><span class="pid">18.4</span>Tính và giải thích dấu: $\displaystyle\int_2^0 x\,dx$.
+        <details class="ans"><summary>Xem đáp án</summary><div class="body"><p>Cận trên nhỏ hơn cận dưới: $=-\displaystyle\int_0^2x\,dx=-\Big[\dfrac{x^2}{2}\Big]_0^2=-2$.</p><p class="fin">$-2$; âm vì đảo cận, dù hàm không âm trên đoạn.</p></div></details></li>
+    </ol>
+  </div>
+
+  <div class="box recap"><div class="tag"><span class="zh">回顧</span>Trước khi đóng sách</div>
+    <ul><li class="ok">Đạt yêu cầu: phân biệt tích phân không xác định (họ hàm) và xác định (số).</li>
+    <li class="re">Ôn ngày 11 và 17.</li></ul>
+  </div>
+</section>
+
+<!-- ================= NGÀY 19 ================= -->
+<section class="day" id="d19">
+  <header class="opener">
+    <div class="num"><span class="lbl">NGÀY</span><span class="n">19</span></div>
+    <div>
+      <div class="eyebrow">Chặng 3 · Ứng dụng tích phân</div>
+      <h2>Diện tích và dấu</h2>
+      <p class="goal"><b>Mục tiêu:</b> phân biệt tích phân có dấu với diện tích hình học.</p>
+      <label class="done"><input type="checkbox" data-done="19"> Đã học xong</label>
+    </div>
+  </header>
+
+  <div class="box aims"><div class="tag"><span class="zh">本日重點</span>Bài này bạn sẽ</div>
+    <ul><li>Biết phần dưới trục $x$ đóng góp âm vào tích phân.</li>
+    <li>Tính diện tích giữa hai đường bằng "trên trừ dưới".</li>
+    <li>Luôn vẽ phác hoặc xét dấu trước khi đặt tích phân.</li></ul>
+  </div>
+
+  <h3 class="sec"><span class="zh">觀念</span>Khái niệm</h3>
+  <p class="txt">Tích phân là tổng <em>có dấu</em>: miếng nào ở dưới trục $x$ thì $f(x)&lt;0$ và đóng góp âm. Diện tích hình học thì luôn không âm. Vì thế để tính diện tích, phải tìm chỗ hàm đổi dấu (hoặc hai đường đổi vị trí trên/dưới), chia khoảng tại đó, rồi lấy trị tuyệt đối từng phần.</p>
+
+  <div class="box key"><div class="tag"><span class="zh">重點</span>Công thức cốt lõi</div>
+    <div class="scroll"><table class="ktab">
+      <tr><td class="f">$A=\displaystyle\int_a^b|f(x)|\,dx$</td><td class="c">Diện tích giữa đồ thị và trục $x$.</td></tr>
+      <tr><td class="f">$A=\displaystyle\int_a^b[f(x)-g(x)]\,dx\quad\text{khi }f\ge g$</td><td class="c">Đường trên trừ đường dưới, trên từng khoảng.</td></tr>
+    </table></div>
+  </div>
+
+  <div class="box ex"><div class="tag"><span class="zh">範例</span>Ví dụ · Tích phân bằng 0 nhưng diện tích khác 0</div>
+    <p class="prob"><b>Đề:</b> Với $f(x)=x$ trên $[-1,1]$, tính tích phân và diện tích.</p>
+    <ol class="steps">
+      <li><div class="m">$\displaystyle\int_{-1}^1x\,dx=\Big[\dfrac{x^2}{2}\Big]_{-1}^1=\dfrac12-\dfrac12=0$</div><div class="note">Phần âm bên trái triệt tiêu phần dương bên phải.</div></li>
+      <li><div class="m">$f&lt;0$ trên $[-1,0]$, $f&gt;0$ trên $[0,1]$</div><div class="note">Chia tại $x=0$.</div></li>
+      <li><div class="m">$A=-\displaystyle\int_{-1}^0x\,dx+\int_0^1x\,dx=\dfrac12+\dfrac12=1$</div><div class="note">Đảo dấu phần âm.</div></li>
+    </ol>
+    <p class="result"><b>Kết quả:</b> tích phân $=0$, diện tích $=1$ (hai tam giác vuông cạnh 1).</p>
+  </div>
+
+  <div class="box drill"><div class="tag"><span class="zh">練習</span>Bạn tự làm</div>
+    <ol class="probs">
+      <li><span class="pid">19.1</span>Tính diện tích dưới $y=2x$ trên $[0,2]$.
+        <details class="ans"><summary>Xem đáp án</summary><div class="body"><p>Hàm không âm: $\displaystyle\int_0^2 2x\,dx=\big[x^2\big]_0^2$.</p><p class="fin">$4$.</p></div></details></li>
+      <li><span class="pid">19.2</span>Tính diện tích giữa $y=x$ và $y=x^2$ trên $[0,1]$.
+        <details class="ans"><summary>Xem đáp án</summary><div class="body"><p>Trên $[0,1]$, $x\ge x^2$: $\displaystyle\int_0^1(x-x^2)dx=\dfrac12-\dfrac13$.</p><p class="fin">$\dfrac16$.</p></div></details></li>
+      <li><span class="pid">19.3</span>Với $y=x$ trên $[-2,1]$, tính cả tích phân có dấu và diện tích hình học.
+        <details class="ans"><summary>Xem đáp án</summary><div class="body"><p>Tích phân: $\Big[\dfrac{x^2}{2}\Big]_{-2}^1=\dfrac12-2=-\dfrac32$. Diện tích: chia tại 0: $2+\dfrac12$.</p><p class="fin">Tích phân $=-\dfrac32$; diện tích $=\dfrac52$.</p></div></details></li>
+      <li><span class="pid">19.4</span>Tìm diện tích miền kín giữa $y=4-x^2$ và trục $x$.
+        <details class="ans"><summary>Xem đáp án</summary><div class="body"><p>Giao trục tại $x=\pm2$; hàm không âm ở giữa. $\Big[4x-\dfrac{x^3}{3}\Big]_{-2}^2=2\Big(8-\dfrac83\Big)$.</p><p class="fin">$\dfrac{32}{3}$.</p></div></details></li>
+    </ol>
+  </div>
+
+  <div class="box recap"><div class="tag"><span class="zh">回顧</span>Trước khi đóng sách</div>
+    <ul><li class="ok">Đạt yêu cầu: vẽ phác hoặc xét dấu trước khi đặt tích phân diện tích.</li>
+    <li class="re">Ôn ngày 12 và 18.</li></ul>
+  </div>
+</section>
+
+<!-- ================= NGÀY 20 ================= -->
+<section class="day" id="d20">
+  <header class="opener">
+    <div class="num"><span class="lbl">NGÀY</span><span class="n">20</span></div>
+    <div>
+      <div class="eyebrow">Chặng 3 · Ứng dụng tích phân</div>
+      <h2>Thể tích và giá trị trung bình</h2>
+      <p class="goal"><b>Mục tiêu:</b> chọn mặt cắt để tính thể tích; tính giá trị trung bình của hàm.</p>
+      <label class="done"><input type="checkbox" data-done="20"> Đã học xong</label>
+    </div>
+  </header>
+
+  <div class="box aims"><div class="tag"><span class="zh">本日重點</span>Bài này bạn sẽ</div>
+    <ul><li>Xem vật thể là chồng các lát cắt mỏng, thể tích là tổng diện tích lát.</li>
+    <li>Xác định bán kính là khoảng cách tới <b>trục quay</b>.</li>
+    <li>Hiểu giá trị trung bình của hàm là "san phẳng" diện tích.</li></ul>
+  </div>
+
+  <h3 class="sec"><span class="zh">觀念</span>Khái niệm</h3>
+  <p class="txt">Cắt vật thể thành các lát mỏng dày $dx$; mỗi lát có thể tích $A(x)\,dx$. Cộng dồn được $V=\int A(x)\,dx$. Khi quay một miền quanh trục $x$, mỗi lát là một đĩa tròn (hoặc vành khăn nếu miền không chạm trục) với bán kính đo từ trục quay.</p>
+  <p class="txt">Giá trị trung bình của $f$ trên $[a,b]$ là chiều cao của hình chữ nhật có cùng diện tích với phần dưới đồ thị.</p>
+
+  <div class="box key"><div class="tag"><span class="zh">重點</span>Công thức cốt lõi</div>
+    <div class="scroll"><table class="ktab">
+      <tr><td class="f">$V=\displaystyle\int_a^bA(x)\,dx$</td><td class="c">$A(x)$ là diện tích mặt cắt tại $x$.</td></tr>
+      <tr><td class="f">$V=\pi\displaystyle\int_a^b\big[R(x)^2-r(x)^2\big]dx\quad(R\ge r\ge0)$</td><td class="c">Vành khăn: bình phương <b>từng</b> bán kính rồi trừ. Không dùng $(R-r)^2$.</td></tr>
+      <tr><td class="f">$f_{\text{tb}}=\dfrac{1}{b-a}\displaystyle\int_a^bf(x)\,dx$</td><td class="c">Tích phân chia chiều dài đoạn.</td></tr>
+    </table></div>
+  </div>
+
+  <div class="box ex"><div class="tag"><span class="zh">範例</span>Ví dụ · Hình nón bằng tích phân</div>
+    <p class="prob"><b>Đề:</b> Quay miền $0\le y\le x$, $0\le x\le2$ quanh trục $x$. Tính thể tích.</p>
+    <ol class="steps">
+      <li><div class="m">$R(x)=x,\quad r(x)=0$</div><div class="note">Miền chạm trục nên lát là đĩa đặc.</div></li>
+      <li><div class="m">$A(x)=\pi x^2$</div><div class="note">Diện tích đĩa.</div></li>
+      <li><div class="m">$V=\pi\displaystyle\int_0^2x^2\,dx=\pi\Big[\dfrac{x^3}{3}\Big]_0^2=\dfrac{8\pi}{3}$</div><div class="note">Trùng công thức nón $\frac13\pi r^2h$ với $r=h=2$ ✔</div></li>
+    </ol>
+    <p class="result"><b>Kết quả:</b> $V=\dfrac{8\pi}{3}$ (đơn vị khối).</p>
+  </div>
+
+  <div class="box drill"><div class="tag"><span class="zh">練習</span>Bạn tự làm</div>
+    <ol class="probs">
+      <li><span class="pid">20.1</span>Quay miền dưới $y=2$, trên trục $x$, từ $x=0$ đến $x=3$ quanh trục $x$. Tính thể tích.
+        <details class="ans"><summary>Xem đáp án</summary><div class="body"><p>Mặt cắt là đĩa bán kính 2, diện tích $4\pi$: $\pi\displaystyle\int_0^3 4\,dx$.</p><p class="fin">$12\pi$ (hình trụ).</p></div></details></li>
+      <li><span class="pid">20.2</span>Quay miền dưới $y=\sqrt x$, trên trục $x$, từ $x=0$ đến $x=4$ quanh trục $x$. Tính thể tích.
+        <details class="ans"><summary>Xem đáp án</summary><div class="body"><p>$R=\sqrt x$, $R^2=x$: $\pi\displaystyle\int_0^4x\,dx=\pi\cdot8$.</p><p class="fin">$8\pi$.</p></div></details></li>
+      <li><span class="pid">20.3</span>Tính giá trị trung bình của $f(x)=x^2$ trên $[0,3]$.
+        <details class="ans"><summary>Xem đáp án</summary><div class="body"><p>$\displaystyle\int_0^3x^2dx=9$; chia chiều dài 3.</p><p class="fin">$3$.</p></div></details></li>
+      <li><span class="pid">20.4</span>Quay miền $1\le y\le2$, $0\le x\le3$ quanh trục $x$. Tính thể tích vành khăn.
+        <details class="ans"><summary>Xem đáp án</summary><div class="body"><p>$R=2$, $r=1$: $\pi\displaystyle\int_0^3(4-1)\,dx=\pi\cdot3\cdot3$.</p><p class="fin">$9\pi$.</p></div></details></li>
+    </ol>
+  </div>
+
+  <div class="box recap"><div class="tag"><span class="zh">回顧</span>Trước khi đóng sách</div>
+    <ul><li class="ok">Đạt yêu cầu: tự xác định bán kính và đơn vị: diện tích bậc hai, thể tích bậc ba.</li>
+    <li class="re">Ôn ngày 13 và 19.</li></ul>
+  </div>
+</section>
+
+<!-- ================= NGÀY 21 ================= -->
+<section class="day" id="d21">
+  <header class="opener">
+    <div class="num"><span class="lbl">NGÀY</span><span class="n">21</span></div>
+    <div>
+      <div class="eyebrow">Chặng 3 · Ứng dụng tích phân</div>
+      <h2>Chuyển động và điện lượng</h2>
+      <p class="goal"><b>Mục tiêu:</b> nhìn tích phân như sự tích lũy và giữ đúng đơn vị.</p>
+      <label class="done"><input type="checkbox" data-done="21"> Đã học xong</label>
+    </div>
+  </header>
+
+  <div class="box aims"><div class="tag"><span class="zh">本日重點</span>Bài này bạn sẽ</div>
+    <ul><li>Đọc "tích phân của tốc độ" là "lượng tích lũy".</li>
+    <li>Phân biệt độ dời (có dấu) với quãng đường (trị tuyệt đối).</li>
+    <li>Kiểm tra đơn vị: m/s × s = m; A × s = C; W × s = J.</li></ul>
+  </div>
+
+  <h3 class="sec"><span class="zh">觀念</span>Khái niệm</h3>
+  <p class="txt">Mọi đại lượng "tốc độ" khi tích phân theo thời gian cho ra "lượng tích lũy": vận tốc → độ dời, dòng điện (tốc độ chuyển điện tích) → điện lượng, công suất (tốc độ truyền năng lượng) → năng lượng. Dấu của $v$ cho biết chiều chuyển động; muốn quãng đường thật sự đi được thì phải lấy $|v|$ và chia khoảng tại chỗ đổi dấu.</p>
+
+  <div class="box key"><div class="tag"><span class="zh">重點</span>Công thức cốt lõi</div>
+    <div class="scroll"><table class="ktab">
+      <tr><td class="f">$v=s',\quad a=v',\quad s(b)-s(a)=\displaystyle\int_a^bv(t)\,dt$</td><td class="c">Độ dời (có dấu).</td></tr>
+      <tr><td class="f">Quãng đường $=\displaystyle\int_a^b|v(t)|\,dt$</td><td class="c">Chia khoảng tại chỗ $v=0$.</td></tr>
+      <tr><td class="f">$q(b)-q(a)=\displaystyle\int_a^bi(t)\,dt,\qquad W=\displaystyle\int_a^bP(t)\,dt$</td><td class="c">Điện lượng (C) và năng lượng (J).</td></tr>
+    </table></div>
+  </div>
+
+  <div class="box ex"><div class="tag"><span class="zh">範例</span>Ví dụ · Điện lượng</div>
+    <p class="prob"><b>Đề:</b> Dòng $i(t)=2t$ A trong $0\le t\le3$ s. Tính điện lượng chuyển qua.</p>
+    <ol class="steps">
+      <li><div class="m">$\Delta q=\displaystyle\int_0^3 2t\,dt$</div><div class="note">Tích phân dòng điện theo thời gian.</div></li>
+      <li><div class="m">$=\big[t^2\big]_0^3=9$</div><div class="note"></div></li>
+      <li><div class="m">Đơn vị: A·s = C</div><div class="note">Luôn ghi đơn vị ở bài ứng dụng.</div></li>
+    </ol>
+    <p class="result"><b>Kết quả:</b> $\Delta q=9$ C.</p>
+  </div>
+
+  <div class="box drill"><div class="tag"><span class="zh">練習</span>Bạn tự làm</div>
+    <ol class="probs">
+      <li><span class="pid">21.1</span>Vận tốc $v(t)=3t^2$ m/s, $s(0)=2$ m. Tìm $s(2)$.
+        <details class="ans"><summary>Xem đáp án</summary><div class="body"><p>$s(2)=s(0)+\displaystyle\int_0^2 3t^2dt=2+\big[t^3\big]_0^2=2+8$.</p><p class="fin">$s(2)=10$ m.</p></div></details></li>
+      <li><span class="pid">21.2</span>Vận tốc $v(t)=t-1$ m/s trên $[0,3]$ s. Tính độ dời và quãng đường.
+        <details class="ans"><summary>Xem đáp án</summary><div class="body"><p>Độ dời: $\Big[\dfrac{t^2}{2}-t\Big]_0^3=1{,}5$. $v$ đổi dấu tại $t=1$: hai tam giác diện tích $0{,}5$ và $2$.</p><p class="fin">Độ dời $1{,}5$ m; quãng đường $2{,}5$ m.</p></div></details></li>
+      <li><span class="pid">21.3</span>Dòng $i(t)=2+3t$ A trên $[0,2]$ s. Tính điện lượng chuyển qua.
+        <details class="ans"><summary>Xem đáp án</summary><div class="body"><p>$\big[2t+1{,}5t^2\big]_0^2=4+6$.</p><p class="fin">$10$ C.</p></div></details></li>
+      <li><span class="pid">21.4</span>Công suất $P(t)=10t$ W trên $[0,3]$ s. Tính năng lượng.
+        <details class="ans"><summary>Xem đáp án</summary><div class="body"><p>$\big[5t^2\big]_0^3=45$.</p><p class="fin">$45$ J.</p></div></details></li>
+    </ol>
+  </div>
+
+  <div class="box recap"><div class="tag"><span class="zh">回顧</span>Trước khi đóng sách</div>
+    <ul><li class="ok">Đạt yêu cầu: nêu được tích phân đang cộng dồn đại lượng gì và ra đơn vị nào.</li>
+    <li class="re">Ôn ngày 14 và 20.</li></ul>
+  </div>
+</section>
+
+<!-- ================= NGÀY 22 ================= -->
+<section class="day" id="d22">
+  <header class="opener">
+    <div class="num"><span class="lbl">NGÀY</span><span class="n">22</span></div>
+    <div>
+      <div class="eyebrow">Chặng 3 · Tích phân</div>
+      <h2>Kiểm tra chặng 3 <span class="test">KIỂM TRA 50′</span></h2>
+      <p class="goal"><b>Mục tiêu:</b> tự chọn nguyên hàm cơ bản, đổi biến, từng phần hoặc chia miền.</p>
+      <label class="done"><input type="checkbox" data-done="22"> Đã học xong</label>
+    </div>
+  </header>
+
+  <h3 class="sec"><span class="zh">觀念</span>Khái niệm</h3>
+  <p class="txt">Đừng bắt đầu bằng việc đoán công thức. Hỏi trước: đây là nguyên hàm (kết quả là họ hàm $+C$), tích phân xác định (kết quả là số) hay bài ứng dụng (cần đơn vị và xét dấu)? Sau đó mới nhận dạng cấu trúc để chọn phương pháp.</p>
+
+  <div class="box key"><div class="tag"><span class="zh">重點</span>Sơ đồ chọn phương pháp</div>
+    <div class="scroll"><table class="ktab">
+      <tr><td class="f">Có $g'(x)$ nhân $f(g(x))$</td><td class="c">→ <b>Đổi biến</b> $u=g(x)$.</td></tr>
+      <tr><td class="f">Tích của $x$ với hàm mũ / lượng giác, hoặc $\ln x$ một mình</td><td class="c">→ <b>Từng phần</b>.</td></tr>
+      <tr><td class="f">Đa thức, $1/x$, $e^x$, $\sin$, $\cos$ đứng riêng</td><td class="c">→ <b>Bảng cơ bản</b> + tuyến tính.</td></tr>
+      <tr><td class="f">Diện tích, quãng đường</td><td class="c">→ <b>Xét dấu, chia khoảng</b> trước.</td></tr>
+    </table></div>
+  </div>
+
+  <div class="box tip"><div class="tag"><span class="zh">提示</span>Cách làm bài kiểm tra</div>
+    <p>50 phút, mỗi câu 1 điểm, mục tiêu ít nhất 5/6. Sau khi chấm, phân loại lỗi vào bốn nhóm: <b>chọn phương pháp</b>, <b>đại số</b>, <b>dấu/cận</b>, <b>diễn giải</b>. Nhóm nào nhiều lỗi nhất là nhóm ôn đầu ngày 23.</p>
+  </div>
+
+  <div class="box drill"><div class="tag"><span class="zh">練習</span>Bài kiểm tra chặng 3</div>
+    <ol class="probs">
+      <li><span class="pid">22.1</span>Tìm nguyên hàm $\displaystyle\int\left(6x^2+\dfrac2x\right)dx$.
+        <details class="ans"><summary>Xem đáp án</summary><div class="body"><p>Tuyến tính; $\int\frac1x=\ln|x|$.</p><p class="fin">$2x^3+2\ln|x|+C$.</p></div></details></li>
+      <li><span class="pid">22.2</span>Tìm nguyên hàm $\displaystyle\int xe^{x^2}dx$.
+        <details class="ans"><summary>Xem đáp án</summary><div class="body"><p>$u=x^2$, $du=2x\,dx$, $x\,dx=du/2$.</p><p class="fin">$\dfrac12e^{x^2}+C$.</p></div></details></li>
+      <li><span class="pid">22.3</span>Tính $\displaystyle\int_0^1xe^x\,dx$.
+        <details class="ans"><summary>Xem đáp án</summary><div class="body"><p>Nguyên hàm $xe^x-e^x$ (ngày 17). Tại 1: $e-e=0$; tại 0: $0-1=-1$.</p><p class="fin">$0-(-1)=1$.</p></div></details></li>
+      <li><span class="pid">22.4</span>Tính diện tích giữa $y=x$ và $y=x^2$ trên $[0,1]$.
+        <details class="ans"><summary>Xem đáp án</summary><div class="body"><p>Trên trừ dưới: $\displaystyle\int_0^1(x-x^2)dx$.</p><p class="fin">$\dfrac16$.</p></div></details></li>
+      <li><span class="pid">22.5</span>Quay miền dưới $y=x$, trên trục $x$, từ 0 đến 1 quanh trục $x$. Tính thể tích.
+        <details class="ans"><summary>Xem đáp án</summary><div class="body"><p>$R=x$: $\pi\displaystyle\int_0^1x^2dx$.</p><p class="fin">$\dfrac{\pi}{3}$.</p></div></details></li>
+      <li><span class="pid">22.6</span>$v(t)=2t-2$ m/s trên $[0,2]$ s. Tính độ dời và quãng đường.
+        <details class="ans"><summary>Xem đáp án</summary><div class="body"><p>Độ dời: $\big[t^2-2t\big]_0^2=0$. $v$ đổi dấu tại $t=1$; hai tam giác cùng diện tích 1.</p><p class="fin">Độ dời $0$ m; quãng đường $2$ m.</p></div></details></li>
+    </ol>
+    <p class="score">Chấm: ___/6. Nếu dưới 5/6, dành 30 phút đầu ngày 23 sửa bài trước khi học mới.</p>
+  </div>
+
+  <div class="box recap"><div class="tag"><span class="zh">回顧</span>Trước khi đóng sách</div>
+    <ul><li class="ok">Đạt yêu cầu: 5/6.</li>
+    <li class="re">Ôn ngày 15–21 và tự chọn lại phương pháp cho các câu sai.</li></ul>
+  </div>
+</section>
+
+<!-- ================= NGÀY 23 ================= -->
+<section class="day" id="d23">
+  <header class="opener">
+    <div class="num"><span class="lbl">NGÀY</span><span class="n">23</span></div>
+    <div>
+      <div class="eyebrow">Chặng 4 · Nhiều biến</div>
+      <h2>Đạo hàm riêng</h2>
+      <p class="goal"><b>Mục tiêu:</b> lấy đạo hàm theo một biến khi các biến khác được giữ cố định.</p>
+      <label class="done"><input type="checkbox" data-done="23"> Đã học xong</label>
+    </div>
+  </header>
+
+  <div class="box aims"><div class="tag"><span class="zh">本日重點</span>Bài này bạn sẽ</div>
+    <ul><li>Xem $y$ như một hằng số khi lấy $f_x$, và ngược lại.</li>
+    <li>Tính đạo hàm riêng bậc hai, kể cả hỗn hợp.</li>
+    <li>Không làm biến đang giữ cố định biến mất sai cách.</li></ul>
+  </div>
+
+  <h3 class="sec"><span class="zh">觀念</span>Khái niệm</h3>
+  <p class="txt">Với mặt $z=f(x,y)$, đứng tại một điểm bạn có thể đi theo hướng $x$ hoặc hướng $y$. Đạo hàm riêng $f_x$ đo độ dốc khi đi theo hướng $x$ và <b>giữ $y$ cố định</b>: trong bước tính, $y$ được đối xử hoàn toàn như một con số. Đạo hàm riêng bậc hai chỉ là lặp lại phép đó.</p>
+
+  <div class="box key"><div class="tag"><span class="zh">重點</span>Công thức cốt lõi</div>
+    <div class="scroll"><table class="ktab">
+      <tr><td class="f">$f_x=\dfrac{\partial f}{\partial x},\qquad f_y=\dfrac{\partial f}{\partial y}$</td><td class="c">Ký hiệu $\partial$ ("đạo hàm riêng") nhắc rằng còn biến khác.</td></tr>
+      <tr><td class="f">$f_{xx}=\dfrac{\partial}{\partial x}(f_x),\qquad f_{xy}=\dfrac{\partial}{\partial y}(f_x)$</td><td class="c">$f_{xy}$: lấy theo $x$ <b>rồi</b> theo $y$.</td></tr>
+    </table></div>
+    <p style="margin-top:10px;font-size:14px">Với các hàm trơn trong bài, $f_{xy}=f_{yx}$. Không mặc định điều đó cho mọi hàm thiếu điều kiện liên tục của đạo hàm bậc hai.</p>
+  </div>
+
+  <div class="box ex"><div class="tag"><span class="zh">範例</span>Ví dụ · Hai hướng, hai đạo hàm</div>
+    <p class="prob"><b>Đề:</b> $f=x^2y+3y^2$. Tìm $f_x$ và $f_y$.</p>
+    <ol class="steps">
+      <li><div class="m">Theo $x$: $y$ là hệ số, $3y^2$ là hằng số</div><div class="note">$(x^2y)_x=2x\cdot y$; $(3y^2)_x=0$.</div></li>
+      <li><div class="m">$f_x=2xy$</div><div class="note"></div></li>
+      <li><div class="m">Theo $y$: $x^2$ là hệ số</div><div class="note">$(x^2y)_y=x^2$; $(3y^2)_y=6y$.</div></li>
+      <li><div class="m">$f_y=x^2+6y$</div><div class="note"></div></li>
+    </ol>
+    <p class="result"><b>Kết quả:</b> $f_x=2xy$, $f_y=x^2+6y$.</p>
+  </div>
+
+  <div class="box drill"><div class="tag"><span class="zh">練習</span>Bạn tự làm</div>
+    <ol class="probs">
+      <li><span class="pid">23.1</span>Tìm $f_x$ và $f_y$ của $f(x,y)=x^2y+y^3$.
+        <details class="ans"><summary>Xem đáp án</summary><div class="body"><p>Giữ biến còn lại cố định.</p><p class="fin">$f_x=2xy$, $f_y=x^2+3y^2$.</p></div></details></li>
+      <li><span class="pid">23.2</span>Tìm $g_x$ và $g_y$ của $g(x,y)=e^{xy}$.
+        <details class="ans"><summary>Xem đáp án</summary><div class="body"><p>Dây chuyền: $(e^{u})'=e^u u'$ với $u=xy$; $u_x=y$, $u_y=x$.</p><p class="fin">$g_x=ye^{xy}$, $g_y=xe^{xy}$.</p></div></details></li>
+      <li><span class="pid">23.3</span>Với $f$ ở câu 1, tính $f_x(1,2)$ và $f_y(1,2)$.
+        <details class="ans"><summary>Xem đáp án</summary><div class="body"><p>Đạo hàm trước, thay số sau: $2\cdot1\cdot2$ và $1+3\cdot4$.</p><p class="fin">$f_x(1,2)=4$, $f_y(1,2)=13$.</p></div></details></li>
+      <li><span class="pid">23.4</span>Tìm $f_{xx}, f_{xy}, f_{yx}, f_{yy}$ của $f$ ở câu 1.
+        <details class="ans"><summary>Xem đáp án</summary><div class="body"><p>Từ $f_x=2xy$: theo $x$ ra $2y$, theo $y$ ra $2x$. Từ $f_y=x^2+3y^2$: theo $x$ ra $2x$, theo $y$ ra $6y$.</p><p class="fin">$f_{xx}=2y,\ f_{xy}=f_{yx}=2x,\ f_{yy}=6y$.</p></div></details></li>
+    </ol>
+  </div>
+
+  <div class="box recap"><div class="tag"><span class="zh">回顧</span>Trước khi đóng sách</div>
+    <ul><li class="ok">Đạt yêu cầu: không làm biến đang giữ cố định biến mất sai cách.</li>
+    <li class="re">Ôn ngày 16 và chữa bài kiểm tra ngày 22.</li></ul>
+  </div>
+</section>
+
+<!-- ================= NGÀY 24 ================= -->
+<section class="day" id="d24">
+  <header class="opener">
+    <div class="num"><span class="lbl">NGÀY</span><span class="n">24</span></div>
+    <div>
+      <div class="eyebrow">Chặng 4 · Nhiều biến</div>
+      <h2>Vi phân toàn phần và gradient</h2>
+      <p class="goal"><b>Mục tiêu:</b> xấp xỉ thay đổi theo hai biến; tính đạo hàm theo một hướng.</p>
+      <label class="done"><input type="checkbox" data-done="24"> Đã học xong</label>
+    </div>
+  </header>
+
+  <div class="box aims"><div class="tag"><span class="zh">本日重點</span>Bài này bạn sẽ</div>
+    <ul><li>Gom $f_x, f_y$ thành vectơ gradient và đọc ý nghĩa của nó.</li>
+    <li>Cộng đủ hai phần trong $df$.</li>
+    <li>Chuẩn hóa vectơ hướng trước khi tính $D_{\mathbf u}f$.</li></ul>
+  </div>
+
+  <h3 class="sec"><span class="zh">觀念</span>Khái niệm</h3>
+  <p class="txt"><b>Gradient</b> $\nabla f=(f_x,f_y)$ là "mũi tên" chỉ hướng lên dốc nhanh nhất tại một điểm; độ dài của nó là độ dốc theo hướng đó. Đi theo một hướng đơn vị $\mathbf u$ bất kỳ, độ dốc là hình chiếu của gradient lên $\mathbf u$, tức tích vô hướng $\nabla f\cdot\mathbf u$. <b>Vi phân toàn phần</b> $df$ là phiên bản hai biến của $dy=f'\,dx$: thay đổi nhỏ theo $x$ cộng thay đổi nhỏ theo $y$.</p>
+
+  <div class="box key"><div class="tag"><span class="zh">重點</span>Công thức cốt lõi</div>
+    <div class="scroll"><table class="ktab">
+      <tr><td class="f">$df=f_x\,dx+f_y\,dy,\qquad \Delta f\approx df$</td><td class="c">Dùng khi hàm khả vi và $dx,dy$ nhỏ.</td></tr>
+      <tr><td class="f">$\nabla f=(f_x,f_y),\qquad D_{\mathbf u}f=\nabla f\cdot\mathbf u,\ \ \|\mathbf u\|=1$</td><td class="c">$\mathbf u$ phải là vectơ <b>đơn vị</b>.</td></tr>
+      <tr><td class="f">$\dfrac{df}{dt}=f_x\dfrac{dx}{dt}+f_y\dfrac{dy}{dt}$</td><td class="c">Dây chuyền nhiều biến khi $x,y$ phụ thuộc $t$.</td></tr>
+    </table></div>
+    <p style="margin-top:10px;font-size:14px">Trong mặt phẳng: $(a,b)\cdot(c,d)=ac+bd$; $\|(a,b)\|=\sqrt{a^2+b^2}$.</p>
+  </div>
+
+  <div class="box ex"><div class="tag"><span class="zh">範例</span>Ví dụ · Vi phân toàn phần</div>
+    <p class="prob"><b>Đề:</b> $f=x^2+y^2$ tại $(1,2)$, với $dx=0{,}01$, $dy=-0{,}02$. Ước lượng $\Delta f$.</p>
+    <ol class="steps">
+      <li><div class="m">$f_x=2x,\ f_y=2y\Rightarrow\nabla f(1,2)=(2,4)$</div><div class="note">Đạo hàm riêng rồi thay điểm.</div></li>
+      <li><div class="m">$df=2(0{,}01)+4(-0{,}02)$</div><div class="note">Cộng <b>cả hai</b> phần.</div></li>
+      <li><div class="m">$=0{,}02-0{,}08=-0{,}06$</div><div class="note">Hàm giảm nhẹ vì $y$ giảm mạnh hơn $x$ tăng.</div></li>
+    </ol>
+    <p class="result"><b>Kết quả:</b> $\Delta f\approx-0{,}06$.</p>
+  </div>
+
+  <div class="box drill"><div class="tag"><span class="zh">練習</span>Bạn tự làm</div>
+    <ol class="probs">
+      <li><span class="pid">24.1</span>Tìm gradient của $f(x,y)=x^2+3y^2$ tại $(1,2)$.
+        <details class="ans"><summary>Xem đáp án</summary><div class="body"><p>$\nabla f=(2x,6y)$.</p><p class="fin">$\nabla f(1,2)=(2,12)$.</p></div></details></li>
+      <li><span class="pid">24.2</span>Với $f$ ở câu 1, xấp xỉ thay đổi khi $dx=0{,}02$ và $dy=-0{,}01$.
+        <details class="ans"><summary>Xem đáp án</summary><div class="body"><p>$df=2(0{,}02)+12(-0{,}01)=0{,}04-0{,}12$.</p><p class="fin">$df=-0{,}08$.</p></div></details></li>
+      <li><span class="pid">24.3</span>Tính đạo hàm theo hướng của $f$ ở câu 1 tại $(1,2)$, hướng vectơ $\mathbf v=(3,4)$.
+        <details class="ans"><summary>Xem đáp án</summary><div class="body"><p>$\|\mathbf v\|=5$ nên $\mathbf u=(3/5,4/5)$. $D_{\mathbf u}f=2\cdot\frac35+12\cdot\frac45=\frac{6+48}{5}$.</p><p class="fin">$\dfrac{54}{5}=10{,}8$.</p></div></details></li>
+      <li><span class="pid">24.4</span>Cho $f=x^2+y^2$, $x=t$, $y=2t$. Dùng dây chuyền tìm $df/dt$.
+        <details class="ans"><summary>Xem đáp án</summary><div class="body"><p>$f_x=2x$, $f_y=2y$; $x'=1$, $y'=2$. $2t\cdot1+4t\cdot2$.</p><p class="fin">$\dfrac{df}{dt}=10t$. (Kiểm tra: $f=t^2+4t^2=5t^2$, đạo hàm $10t$ ✔)</p></div></details></li>
+    </ol>
+  </div>
+
+  <div class="box recap"><div class="tag"><span class="zh">回顧</span>Trước khi đóng sách</div>
+    <ul><li class="ok">Đạt yêu cầu: chuẩn hóa hướng đúng và cộng đủ hai phần trong $df$.</li>
+    <li class="re">Ôn ngày 17 và 23.</li></ul>
+  </div>
+</section>
+
+<!-- ================= NGÀY 25 ================= -->
+<section class="day" id="d25">
+  <header class="opener">
+    <div class="num"><span class="lbl">NGÀY</span><span class="n">25</span></div>
+    <div>
+      <div class="eyebrow">Chặng 4 · Nhiều biến</div>
+      <h2>Cực trị hai biến</h2>
+      <p class="goal"><b>Mục tiêu:</b> tìm điểm dừng và dùng định thức Hessian để phân loại.</p>
+      <label class="done"><input type="checkbox" data-done="25"> Đã học xong</label>
+    </div>
+  </header>
+
+  <div class="box aims"><div class="tag"><span class="zh">本日重點</span>Bài này bạn sẽ</div>
+    <ul><li>Giải hệ $f_x=0$, $f_y=0$ để tìm điểm dừng.</li>
+    <li>Dùng $D=f_{xx}f_{yy}-f_{xy}^2$ để phân loại: cực tiểu, cực đại, yên ngựa.</li>
+    <li>Hiểu $D=0$ nghĩa là "chưa kết luận", không phải "không có cực trị".</li></ul>
+  </div>
+
+  <h3 class="sec"><span class="zh">觀念</span>Khái niệm</h3>
+  <p class="txt">Ở bên trong miền, điểm cực trị của hàm khả vi phải "phẳng" theo mọi hướng, tức $f_x=f_y=0$. Nhưng phẳng chưa đủ: mặt có thể cong lên (đáy chén), cong xuống (đỉnh đồi) hoặc cong lên theo hướng này và xuống theo hướng kia (<b>yên ngựa</b>). Định thức $D$ gói gọn thông tin độ cong theo nhiều hướng để phân biệt ba trường hợp đó.</p>
+
+  <div class="box key"><div class="tag"><span class="zh">重點</span>Công thức cốt lõi</div>
+    <div class="scroll"><table class="ktab">
+      <tr><td class="f">$f_x=0,\ f_y=0$</td><td class="c">Điểm dừng.</td></tr>
+      <tr><td class="f">$D=f_{xx}f_{yy}-(f_{xy})^2$</td><td class="c">Tính tại điểm dừng.</td></tr>
+      <tr><td class="f">$D&gt;0,\ f_{xx}&gt;0$: cực tiểu; $D&gt;0,\ f_{xx}&lt;0$: cực đại</td><td class="c">Dấu của $f_{xx}$ quyết định lên hay xuống.</td></tr>
+      <tr><td class="f">$D&lt;0$: yên ngựa; $D=0$: chưa kết luận</td><td class="c">$D=0$ thì dùng cách khác (xét dấu trực tiếp).</td></tr>
+    </table></div>
+    <p style="margin-top:10px;font-size:14px">Muốn tìm lớn nhất/nhỏ nhất trên miền đóng, còn phải kiểm tra biên.</p>
+  </div>
+
+  <div class="box ex"><div class="tag"><span class="zh">範例</span>Ví dụ · Đáy chén</div>
+    <p class="prob"><b>Đề:</b> Phân loại điểm dừng của $f=(x-1)^2+(y+2)^2$.</p>
+    <ol class="steps">
+      <li><div class="m">$f_x=2(x-1)=0,\ f_y=2(y+2)=0$</div><div class="note">Điểm dừng $(1,-2)$.</div></li>
+      <li><div class="m">$f_{xx}=2,\ f_{yy}=2,\ f_{xy}=0$</div><div class="note"></div></li>
+      <li><div class="m">$D=2\cdot2-0=4&gt;0,\quad f_{xx}=2&gt;0$</div><div class="note">Cong lên theo mọi hướng.</div></li>
+    </ol>
+    <p class="result"><b>Kết quả:</b> cực tiểu tại $(1,-2)$, $f(1,-2)=0$. Hợp lý: tổng hai bình phương nhỏ nhất bằng 0.</p>
+  </div>
+
+  <div class="box drill"><div class="tag"><span class="zh">練習</span>Bạn tự làm</div>
+    <ol class="probs">
+      <li><span class="pid">25.1</span>Tìm và phân loại điểm dừng của $f(x,y)=x^2+y^2-4x+6y$.
+        <details class="ans"><summary>Xem đáp án</summary><div class="body"><p>$f_x=2x-4=0\Rightarrow x=2$; $f_y=2y+6=0\Rightarrow y=-3$. $D=2\cdot2-0=4&gt;0$, $f_{xx}=2&gt;0$.</p><p class="fin">Cực tiểu tại $(2,-3)$, $f=-13$. (Hoàn thành bình phương: $(x-2)^2+(y+3)^2-13$ ✔)</p></div></details></li>
+      <li><span class="pid">25.2</span>Phân loại điểm dừng của $g(x,y)=x^2-y^2$.
+        <details class="ans"><summary>Xem đáp án</summary><div class="body"><p>Điểm $(0,0)$; $D=2\cdot(-2)-0=-4&lt;0$.</p><p class="fin">Yên ngựa tại $(0,0)$.</p></div></details></li>
+      <li><span class="pid">25.3</span>Phân loại điểm dừng của $h(x,y)=-x^2-2y^2$.
+        <details class="ans"><summary>Xem đáp án</summary><div class="body"><p>Điểm $(0,0)$; $D=(-2)(-4)-0=8&gt;0$, $h_{xx}=-2&lt;0$.</p><p class="fin">Cực đại tại $(0,0)$, $h=0$.</p></div></details></li>
+      <li><span class="pid">25.4</span>Với $p(x,y)=x^4+y^4$ tại $(0,0)$, $D$ có kết luận được không? Dùng dấu của $p$ để kết luận.
+        <details class="ans"><summary>Xem đáp án</summary><div class="body"><p>$p_{xx}=12x^2$, $p_{yy}=12y^2$, $p_{xy}=0$ nên tại gốc $D=0$: phép thử không kết luận. Nhưng $p\ge0$ và chỉ bằng 0 tại gốc.</p><p class="fin">$(0,0)$ là cực tiểu, cũng là nhỏ nhất toàn cục.</p></div></details></li>
+    </ol>
+  </div>
+
+  <div class="box recap"><div class="tag"><span class="zh">回顧</span>Trước khi đóng sách</div>
+    <ul><li class="ok">Đạt yêu cầu: đúng 3/4; giải thích được vì sao $D=0$ không đồng nghĩa không có cực trị.</li>
+    <li class="re">Ôn ngày 18 và 24.</li></ul>
+  </div>
+</section>
+
+<!-- ================= NGÀY 26 ================= -->
+<section class="day" id="d26">
+  <header class="opener">
+    <div class="num"><span class="lbl">NGÀY</span><span class="n">26</span></div>
+    <div>
+      <div class="eyebrow">Chặng 5 · Vectơ</div>
+      <h2>Vectơ và đường cong tham số</h2>
+      <p class="goal"><b>Mục tiêu:</b> tính tích vô hướng, tích có hướng, vận tốc và tốc độ.</p>
+      <label class="done"><input type="checkbox" data-done="26"> Đã học xong</label>
+    </div>
+  </header>
+
+  <div class="box aims"><div class="tag"><span class="zh">本日重點</span>Bài này bạn sẽ</div>
+    <ul><li>Tính $\mathbf a\cdot\mathbf b$ (ra số) và $\mathbf a\times\mathbf b$ (ra vectơ).</li>
+    <li>Đạo hàm từng thành phần của $\mathbf r(t)$ để được vận tốc.</li>
+    <li>Không nhầm vectơ vận tốc với số đo tốc độ.</li></ul>
+  </div>
+
+  <h3 class="sec"><span class="zh">觀念</span>Khái niệm</h3>
+  <p class="txt">Hàm vectơ $\mathbf r(t)$ cho vị trí theo thời gian. Đạo hàm từng thành phần cho <b>vectơ vận tốc</b> (có hướng); độ dài của nó là <b>tốc độ</b> (một số). Độ dài đường cong là tích phân của tốc độ, vì mỗi khoảng thời gian nhỏ $dt$ ta đi được $\|\mathbf v\|\,dt$.</p>
+
+  <div class="box key"><div class="tag"><span class="zh">重點</span>Công thức cốt lõi</div>
+    <div class="scroll"><table class="ktab">
+      <tr><td class="f">$\mathbf a\cdot\mathbf b=a_xb_x+a_yb_y+a_zb_z,\qquad\|\mathbf a\|=\sqrt{\mathbf a\cdot\mathbf a}$</td><td class="c">Tích vô hướng ra <b>một số</b>.</td></tr>
+      <tr><td class="f">$\mathbf a\times\mathbf b=(a_yb_z-a_zb_y,\ a_zb_x-a_xb_z,\ a_xb_y-a_yb_x)$</td><td class="c">Ra <b>vectơ</b> vuông góc cả hai; đổi thứ tự thì đổi dấu.</td></tr>
+      <tr><td class="f">$\mathbf v=\mathbf r'(t),\quad\mathbf a=\mathbf r''(t),\quad L=\displaystyle\int_\alpha^\beta\|\mathbf r'(t)\|\,dt$</td><td class="c">Độ dài đường cong tích phân <b>tốc độ</b>, không tích phân vectơ.</td></tr>
+    </table></div>
+  </div>
+
+  <div class="box ex"><div class="tag"><span class="zh">範例</span>Ví dụ · Parabola tham số</div>
+    <p class="prob"><b>Đề:</b> $\mathbf r(t)=(t,t^2)$. Tìm vận tốc, gia tốc, tốc độ.</p>
+    <ol class="steps">
+      <li><div class="m">$\mathbf v=\mathbf r'(t)=(1,2t)$</div><div class="note">Đạo hàm từng thành phần.</div></li>
+      <li><div class="m">$\mathbf a=\mathbf r''(t)=(0,2)$</div><div class="note">Gia tốc luôn hướng lên trục $y$.</div></li>
+      <li><div class="m">$\|\mathbf v\|=\sqrt{1+4t^2}$</div><div class="note">Tốc độ là một số, phụ thuộc $t$.</div></li>
+    </ol>
+  </div>
+
+  <div class="box tip"><div class="tag"><span class="zh">提示</span>Nhớ tích có hướng</div>
+    <p>Viết hai vectơ thành hai hàng $(a_x,a_y,a_z)$ và $(b_x,b_y,b_z)$. Thành phần $x$ của kết quả dùng hai cột $y,z$; thành phần $y$ dùng cột $z,x$; thành phần $z$ dùng cột $x,y$. Luôn theo vòng $x\to y\to z\to x$.</p>
+  </div>
+
+  <div class="box drill"><div class="tag"><span class="zh">練習</span>Bạn tự làm</div>
+    <ol class="probs">
+      <li><span class="pid">26.1</span>Cho $\mathbf a=(1,2,0)$, $\mathbf b=(3,-1,2)$. Tính $\mathbf a\cdot\mathbf b$ và $\|\mathbf a\|$.
+        <details class="ans"><summary>Xem đáp án</summary><div class="body"><p>$3-2+0$; $\sqrt{1+4+0}$.</p><p class="fin">$\mathbf a\cdot\mathbf b=1$, $\|\mathbf a\|=\sqrt5$.</p></div></details></li>
+      <li><span class="pid">26.2</span>Tính tích có hướng của $\mathbf a=(1,0,0)$ với $\mathbf b=(0,1,0)$.
+        <details class="ans"><summary>Xem đáp án</summary><div class="body"><p>$(0\cdot0-0\cdot1,\ 0\cdot0-1\cdot0,\ 1\cdot1-0\cdot0)$.</p><p class="fin">$\mathbf a\times\mathbf b=(0,0,1)$.</p></div></details></li>
+      <li><span class="pid">26.3</span>Với $\mathbf r(t)=(t^2,3t)$, tính vận tốc, gia tốc và tốc độ tại $t=1$.
+        <details class="ans"><summary>Xem đáp án</summary><div class="body"><p>$\mathbf r'=(2t,3)$, $\mathbf r''=(2,0)$.</p><p class="fin">$\mathbf v(1)=(2,3)$, $\mathbf a(1)=(2,0)$, tốc độ $\sqrt{13}$.</p></div></details></li>
+      <li><span class="pid">26.4</span>Tính chiều dài đường cong $\mathbf r(t)=(3t,4t)$, $0\le t\le2$.
+        <details class="ans"><summary>Xem đáp án</summary><div class="body"><p>$\mathbf r'=(3,4)$, $\|\mathbf r'\|=5$. $L=\displaystyle\int_0^2 5\,dt$.</p><p class="fin">$L=10$.</p></div></details></li>
+    </ol>
+  </div>
+
+  <div class="box recap"><div class="tag"><span class="zh">回顧</span>Trước khi đóng sách</div>
+    <ul><li class="ok">Đạt yêu cầu: không nhầm vectơ vận tốc với số đo tốc độ.</li>
+    <li class="re">Ôn ngày 19 và 25.</li></ul>
+  </div>
+</section>
+
+<!-- ================= NGÀY 27 ================= -->
+<section class="day" id="d27">
+  <header class="opener">
+    <div class="num"><span class="lbl">NGÀY</span><span class="n">27</span></div>
+    <div>
+      <div class="eyebrow">Chặng 5 · Vectơ</div>
+      <h2>Trường vectơ, div và curl</h2>
+      <p class="goal"><b>Mục tiêu:</b> tính được gradient, divergence và curl ở ví dụ đơn giản.</p>
+      <label class="done"><input type="checkbox" data-done="27"> Đã học xong</label>
+    </div>
+  </header>
+
+  <div class="box aims"><div class="tag"><span class="zh">本日重點</span>Bài này bạn sẽ</div>
+    <ul><li>Phân biệt trường vô hướng (nhiệt độ) và trường vectơ (dòng chảy).</li>
+    <li>Nhớ "kiểu dữ liệu": grad nhận số cho vectơ; div nhận vectơ cho số; curl nhận vectơ cho vectơ.</li>
+    <li>Làm quen tích phân đường (mở rộng).</li></ul>
+  </div>
+
+  <h3 class="sec"><span class="zh">觀念</span>Khái niệm</h3>
+  <p class="txt">Trường vô hướng gán một số cho mỗi điểm (nhiệt độ trong phòng). Trường vectơ gán một mũi tên cho mỗi điểm (vận tốc nước trong sông). <b>Div</b> đo xu hướng "tỏa ra" tại một điểm: dương là nguồn, âm là hút. <b>Curl</b> đo xu hướng "xoay" tại một điểm: thả một chiếc chong chóng nhỏ vào dòng, nó quay thì curl khác 0.</p>
+
+  <div class="box key"><div class="tag"><span class="zh">重點</span>Công thức cốt lõi</div>
+    <div class="scroll"><table class="ktab">
+      <tr><td class="f">$\mathbf F=(P,Q,R),\qquad\nabla\cdot\mathbf F=P_x+Q_y+R_z$</td><td class="c">Div: mỗi thành phần đạo hàm theo <b>đúng biến của nó</b>.</td></tr>
+      <tr><td class="f">$\nabla\times\mathbf F=(R_y-Q_z,\ P_z-R_x,\ Q_x-P_y)$</td><td class="c">Curl: cùng vòng $x\to y\to z$ như tích có hướng.</td></tr>
+      <tr><td class="f">$\displaystyle\int_C\mathbf F\cdot d\mathbf r=\int_a^b\mathbf F(\mathbf r(t))\cdot\mathbf r'(t)\,dt$</td><td class="c">Tích phân đường (mở rộng): cần đường đi và chiều tham số.</td></tr>
+    </table></div>
+  </div>
+
+  <div class="box ex"><div class="tag"><span class="zh">範例</span>Ví dụ · Trường tỏa đều</div>
+    <p class="prob"><b>Đề:</b> $\mathbf F=(x,y,z)$. Tính div và curl.</p>
+    <ol class="steps">
+      <li><div class="m">$P=x,\ Q=y,\ R=z$</div><div class="note">Đặt tên ba thành phần.</div></li>
+      <li><div class="m">$\nabla\cdot\mathbf F=1+1+1=3$</div><div class="note">Mũi tên hướng ra ngoài ở mọi nơi: div dương.</div></li>
+      <li><div class="m">$\nabla\times\mathbf F=(0-0,\ 0-0,\ 0-0)=(0,0,0)$</div><div class="note">Không có xoáy: trường thuần tỏa.</div></li>
+    </ol>
+    <p class="result"><b>Kết quả:</b> $\nabla\cdot\mathbf F=3$, $\nabla\times\mathbf F=\mathbf 0$.</p>
+  </div>
+
+  <div class="box drill"><div class="tag"><span class="zh">練習</span>Bạn tự làm</div>
+    <ol class="probs">
+      <li><span class="pid">27.1</span>Tính gradient của $f=x^2+y^2+z^2$ tại $(1,0,-1)$.
+        <details class="ans"><summary>Xem đáp án</summary><div class="body"><p>$\nabla f=(2x,2y,2z)$.</p><p class="fin">$\nabla f(1,0,-1)=(2,0,-2)$.</p></div></details></li>
+      <li><span class="pid">27.2</span>Tính div của $\mathbf F=(x^2,y^2,z^2)$.
+        <details class="ans"><summary>Xem đáp án</summary><div class="body"><p>$(x^2)_x+(y^2)_y+(z^2)_z$.</p><p class="fin">$\nabla\cdot\mathbf F=2x+2y+2z$.</p></div></details></li>
+      <li><span class="pid">27.3</span>Tính div và curl của $\mathbf G=(-y,x,0)$.
+        <details class="ans"><summary>Xem đáp án</summary><div class="body"><p>Div: $0+0+0$. Curl: thành phần $z$ là $Q_x-P_y=1-(-1)=2$; hai thành phần còn lại bằng 0.</p><p class="fin">$\nabla\cdot\mathbf G=0$, $\nabla\times\mathbf G=(0,0,2)$: trường xoay quanh trục $z$.</p></div></details></li>
+      <li><span class="pid">27.4</span><em>Mở rộng:</em> $\mathbf F=(1,0,0)$, $\mathbf r(t)=(t,0,0)$, $0\le t\le2$. Tính tích phân đường của $\mathbf F$ theo chiều $t$ tăng.
+        <details class="ans"><summary>Xem đáp án</summary><div class="body"><p>$\mathbf r'=(1,0,0)$; $\mathbf F\cdot\mathbf r'=1$. $\displaystyle\int_0^2 1\,dt$.</p><p class="fin">$2$.</p></div></details></li>
+    </ol>
+  </div>
+
+  <div class="box recap"><div class="tag"><span class="zh">回顧</span>Trước khi đóng sách</div>
+    <ul><li class="ok">Đạt yêu cầu: đúng 3 câu cốt lõi đầu; câu 4 mở rộng nếu còn thời gian.</li>
+    <li class="re">Ôn ngày 20, 23 và 26.</li></ul>
+  </div>
+</section>
+
+<!-- ================= NGÀY 28 ================= -->
+<section class="day" id="d28">
+  <header class="opener">
+    <div class="num"><span class="lbl">NGÀY</span><span class="n">28</span></div>
+    <div>
+      <div class="eyebrow">Chặng 6 · Nhiều lớp</div>
+      <h2>Tích phân kép và miền tích phân</h2>
+      <p class="goal"><b>Mục tiêu:</b> đọc thứ tự tích phân và đặt cận cho hình chữ nhật, tam giác.</p>
+      <label class="done"><input type="checkbox" data-done="28"> Đã học xong</label>
+    </div>
+  </header>
+
+  <div class="box aims"><div class="tag"><span class="zh">本日重點</span>Bài này bạn sẽ</div>
+    <ul><li>Tính tích phân lặp từ trong ra ngoài.</li>
+    <li>Vẽ miền trước, đặt cận sau.</li>
+    <li>Đổi thứ tự bằng cách mô tả lại cùng một miền.</li></ul>
+  </div>
+
+  <h3 class="sec"><span class="zh">觀念</span>Khái niệm</h3>
+  <p class="txt">Tích phân kép cộng dồn trên một miền hai chiều $D$. Cách tính: quét từng "que" theo $y$ tại mỗi $x$ cố định (tích phân trong), rồi cộng các que dọc theo $x$ (tích phân ngoài). Với $dy\,dx$, làm theo $y$ trước và xem $x$ là hằng số. Cận trong có thể phụ thuộc biến ngoài; cận ngoài là hằng số.</p>
+
+  <div class="box key"><div class="tag"><span class="zh">重點</span>Công thức cốt lõi</div>
+    <div class="scroll"><table class="ktab">
+      <tr><td class="f">$\displaystyle\iint_Df\,dA=\int_a^b\!\left[\int_{g_1(x)}^{g_2(x)}f(x,y)\,dy\right]dx$</td><td class="c">Trong ra ngoài. Cận trong theo $x$, cận ngoài là số.</td></tr>
+      <tr><td class="f">$A(D)=\displaystyle\iint_D1\,dA,\qquad V=\iint_Df\,dA\ (f\ge0)$</td><td class="c">Diện tích miền; thể tích dưới mặt.</td></tr>
+    </table></div>
+    <p style="margin-top:10px;font-size:14px">Đổi thứ tự phải mô tả lại cùng miền, không chỉ đổi chỗ $dx$ với $dy$.</p>
+  </div>
+
+  <div class="box ex"><div class="tag"><span class="zh">範例</span>Ví dụ · Hình chữ nhật</div>
+    <p class="prob"><b>Đề:</b> $D=[0,1]\times[0,2]$. Tính $\displaystyle\iint_D(x+y)\,dA$.</p>
+    <ol class="steps">
+      <li><div class="m">$\displaystyle\int_0^1\!\int_0^2(x+y)\,dy\,dx$</div><div class="note">Trong theo $y$ (0→2), ngoài theo $x$ (0→1).</div></li>
+      <li><div class="m">Trong: $\Big[xy+\dfrac{y^2}{2}\Big]_{y=0}^{2}=2x+2$</div><div class="note">$x$ là hằng số trong bước này.</div></li>
+      <li><div class="m">Ngoài: $\displaystyle\int_0^1(2x+2)\,dx=\big[x^2+2x\big]_0^1=3$</div><div class="note">Giờ mới tích phân theo $x$.</div></li>
+    </ol>
+    <p class="result"><b>Kết quả:</b> $3$.</p>
+  </div>
+
+  <div class="box tip"><div class="tag"><span class="zh">提示</span>Tam giác $x+y\le1$ ở góc phần tư thứ nhất</div>
+    <p>Que dọc: với $x$ cố định trong $[0,1]$, $y$ chạy từ $0$ đến $1-x$ → $\displaystyle\int_0^1\!\int_0^{1-x}\cdots dy\,dx$. Que ngang: với $y$ cố định trong $[0,1]$, $x$ chạy từ $0$ đến $1-y$ → $\displaystyle\int_0^1\!\int_0^{1-y}\cdots dx\,dy$. Cùng một miền, hai cách mô tả.</p>
+  </div>
+
+  <div class="box drill"><div class="tag"><span class="zh">練習</span>Bạn tự làm</div>
+    <ol class="probs">
+      <li><span class="pid">28.1</span>Tính $\displaystyle\int_0^1\!\int_0^2xy\,dy\,dx$.
+        <details class="ans"><summary>Xem đáp án</summary><div class="body"><p>Trong: $\Big[\dfrac{xy^2}{2}\Big]_0^2=2x$. Ngoài: $\displaystyle\int_0^1 2x\,dx$.</p><p class="fin">$1$.</p></div></details></li>
+      <li><span class="pid">28.2</span>Tính diện tích miền $0\le x\le1$, $0\le y\le x$ bằng tích phân kép.
+        <details class="ans"><summary>Xem đáp án</summary><div class="body"><p>$\displaystyle\int_0^1\!\int_0^x1\,dy\,dx=\int_0^1x\,dx$.</p><p class="fin">$\dfrac12$ (tam giác vuông cạnh 1).</p></div></details></li>
+      <li><span class="pid">28.3</span>Tính tích phân trên miền tam giác: $\displaystyle\int_0^1\!\int_0^{1-x}1\,dy\,dx$.
+        <details class="ans"><summary>Xem đáp án</summary><div class="body"><p>Trong bằng $1-x$. Ngoài: $\displaystyle\int_0^1(1-x)dx$.</p><p class="fin">$\dfrac12$.</p></div></details></li>
+      <li><span class="pid">28.4</span>Đổi thứ tự tích phân của câu 3, rồi kiểm tra kết quả không đổi.
+        <details class="ans"><summary>Xem đáp án</summary><div class="body"><p>Miền $x+y\le1$, $x,y\ge0$. Với $y$ cố định: $0\le x\le1-y$.</p><p class="fin">$\displaystyle\int_0^1\!\int_0^{1-y}1\,dx\,dy=\int_0^1(1-y)dy=\dfrac12$ ✔</p></div></details></li>
+    </ol>
+  </div>
+
+  <div class="box recap"><div class="tag"><span class="zh">回顧</span>Trước khi đóng sách</div>
+    <ul><li class="ok">Đạt yêu cầu: vẽ được miền trước khi ghi cận; tính đúng từ trong ra ngoài.</li>
+    <li class="re">Ôn ngày 21 và 27.</li></ul>
+  </div>
+</section>
+
+<!-- ================= NGÀY 29 ================= -->
+<section class="day" id="d29">
+  <header class="opener">
+    <div class="num"><span class="lbl">NGÀY</span><span class="n">29</span></div>
+    <div>
+      <div class="eyebrow">Chặng 6 · Nhiều lớp</div>
+      <h2>Tọa độ cực và tích phân ba lớp</h2>
+      <p class="goal"><b>Mục tiêu:</b> nhớ hệ số $r$ khi đổi sang tọa độ cực; tính ba lớp trên khối hộp.</p>
+      <label class="done"><input type="checkbox" data-done="29"> Đã học xong</label>
+    </div>
+  </header>
+
+  <div class="box aims"><div class="tag"><span class="zh">本日重點</span>Bài này bạn sẽ</div>
+    <ul><li>Hiểu tại sao $dA=r\,dr\,d\theta$ có thêm $r$.</li>
+    <li>Đặt cận cho đĩa: $0\le r\le R$, $0\le\theta\le2\pi$.</li>
+    <li>Tính tích phân ba lớp trên khối hộp từ trong ra ngoài.</li></ul>
+  </div>
+
+  <h3 class="sec"><span class="zh">觀念</span>Khái niệm</h3>
+  <p class="txt">Miền tròn mô tả bằng bán kính $r$ và góc $\theta$ đơn giản hơn nhiều so với $x,y$. Nhưng miếng diện tích nhỏ trong tọa độ cực không phải hình vuông $dr\times d\theta$: nó có cạnh $dr$ và cạnh cung $r\,d\theta$ (càng xa tâm, cung càng dài). Vì thế $dA=r\,dr\,d\theta$. Quên hệ số $r$ này là lỗi phổ biến nhất.</p>
+
+  <div class="box key"><div class="tag"><span class="zh">重點</span>Công thức cốt lõi</div>
+    <div class="scroll"><table class="ktab">
+      <tr><td class="f">$x=r\cos\theta,\ y=r\sin\theta,\ x^2+y^2=r^2,\quad dA=r\,dr\,d\theta$</td><td class="c">Jacobian $r$: <b>không quên</b>.</td></tr>
+      <tr><td class="f">$\displaystyle\iiint_Ef\,dV=\int_a^b\!\int_c^d\!\int_e^gf\,dz\,dy\,dx,\quad E=[a,b]\times[c,d]\times[e,g]$</td><td class="c">Khối hộp: cận đều là hằng số; trong ra ngoài.</td></tr>
+    </table></div>
+    <p style="margin-top:10px;font-size:14px">Phân biệt biến $r$ với cận trên cố định $R$.</p>
+  </div>
+
+  <div class="box ex"><div class="tag"><span class="zh">範例</span>Ví dụ · Diện tích đĩa bán kính 2</div>
+    <p class="prob"><b>Đề:</b> Tính diện tích đĩa $x^2+y^2\le4$ bằng tọa độ cực.</p>
+    <ol class="steps">
+      <li><div class="m">$0\le r\le2,\quad 0\le\theta\le2\pi$</div><div class="note">Cận cho đĩa tâm gốc.</div></li>
+      <li><div class="m">$A=\displaystyle\int_0^{2\pi}\!\int_0^2 r\,dr\,d\theta$</div><div class="note">Hàm là 1, nhưng có $r$ từ $dA$.</div></li>
+      <li><div class="m">Trong: $\Big[\dfrac{r^2}{2}\Big]_0^2=2$; ngoài: $\displaystyle\int_0^{2\pi}2\,d\theta=4\pi$</div><div class="note">Khớp $\pi R^2=4\pi$ ✔</div></li>
+    </ol>
+    <p class="result"><b>Kết quả:</b> $A=4\pi$.</p>
+  </div>
+
+  <div class="box drill"><div class="tag"><span class="zh">練習</span>Bạn tự làm</div>
+    <ol class="probs">
+      <li><span class="pid">29.1</span>Dùng tọa độ cực tính diện tích đĩa $x^2+y^2\le9$.
+        <details class="ans"><summary>Xem đáp án</summary><div class="body"><p>$r$ từ 0 đến 3, $\theta$ từ 0 đến $2\pi$: $2\pi\cdot\dfrac{9}{2}$.</p><p class="fin">$9\pi$.</p></div></details></li>
+      <li><span class="pid">29.2</span>Tính tích phân của $x^2+y^2$ trên đĩa đơn vị $x^2+y^2\le1$.
+        <details class="ans"><summary>Xem đáp án</summary><div class="body"><p>Hàm thành $r^2$, nhân $r$ từ $dA$: $\displaystyle\int_0^{2\pi}\!\int_0^1r^3\,dr\,d\theta=2\pi\cdot\dfrac14$.</p><p class="fin">$\dfrac{\pi}{2}$.</p></div></details></li>
+      <li><span class="pid">29.3</span>Tính thể tích khối hộp: $\displaystyle\int_0^1\!\int_0^2\!\int_0^3 1\,dz\,dy\,dx$.
+        <details class="ans"><summary>Xem đáp án</summary><div class="body"><p>Ba độ dài $1,2,3$ nhân nhau.</p><p class="fin">$6$.</p></div></details></li>
+      <li><span class="pid">29.4</span>Tính $\displaystyle\int_0^1\!\int_0^1\!\int_0^1(x+y+z)\,dz\,dy\,dx$.
+        <details class="ans"><summary>Xem đáp án</summary><div class="body"><p>Mỗi số hạng đóng góp $\dfrac12$ trên khối đơn vị (ví dụ $\iiint x\,dV=\int_0^1x\,dx\cdot1\cdot1=\frac12$).</p><p class="fin">$\dfrac32$.</p></div></details></li>
+    </ol>
+  </div>
+
+  <div class="box recap"><div class="tag"><span class="zh">回顧</span>Trước khi đóng sách</div>
+    <ul><li class="ok">Đạt yêu cầu: không quên Jacobian $r$ khi đổi tọa độ cực.</li>
+    <li class="re">Ôn ngày 22 và 28.</li></ul>
+  </div>
+</section>
+
+<!-- ================= NGÀY 30 ================= -->
+<section class="day" id="d30">
+  <header class="opener">
+    <div class="num"><span class="lbl">NGÀY</span><span class="n">30</span></div>
+    <div>
+      <div class="eyebrow">Chặng 6 · Tổng kết</div>
+      <h2>Bài kiểm tra cuối tháng <span class="test">KIỂM TRA 75′</span></h2>
+      <p class="goal"><b>Mục tiêu:</b> tự nhận ra dạng bài, chọn công cụ và trình bày có điều kiện, đơn vị.</p>
+      <label class="done"><input type="checkbox" data-done="30"> Đã học xong</label>
+    </div>
+  </header>
+
+  <div class="box tip"><div class="tag"><span class="zh">提示</span>Cách làm</div>
+    <p>Làm <b>75 phút không xem công thức</b>, sau đó dành 45 phút đối chiếu và làm lại câu sai. 12 câu, mỗi câu 1 điểm, các ý chia đều.</p>
+    <ul style="margin-top:6px"><li><b>10–12 điểm:</b> nền cơ bản tốt, có thể mở rộng.</li><li><b>8–9 điểm:</b> ôn lại các nhóm sai.</li><li><b>Dưới 8:</b> ưu tiên củng cố giới hạn, đạo hàm và tích phân một biến trước.</li></ul>
+  </div>
+
+  <div class="box drill"><div class="tag"><span class="zh">練習</span>Bài kiểm tra cuối tháng</div>
+    <ol class="probs">
+      <li><span class="pid">30.1</span>Tính $\displaystyle\lim_{x\to2}\dfrac{x^2-4}{x-2}$.
+        <details class="ans"><summary>Xem đáp án</summary><div class="body"><p>Phân tích và khử $x-2$: còn $x+2$.</p><p class="fin">$4$.</p></div></details></li>
+      <li><span class="pid">30.2</span>Tính đạo hàm của $y=e^{x^2}$.
+        <details class="ans"><summary>Xem đáp án</summary><div class="body"><p>Dây chuyền, nhân đạo hàm của $x^2$.</p><p class="fin">$y'=2xe^{x^2}$.</p></div></details></li>
+      <li><span class="pid">30.3</span>Tìm các điểm cực trị và phân loại: $f(x)=x^3-3x$.
+        <details class="ans"><summary>Xem đáp án</summary><div class="body"><p>$f'=3(x-1)(x+1)$ có dấu $+,-,+$.</p><p class="fin">Cực đại tại $(-1,2)$; cực tiểu tại $(1,-2)$.</p></div></details></li>
+      <li><span class="pid">30.4</span>Hình chữ nhật chu vi 24 có diện tích lớn nhất bao nhiêu?
+        <details class="ans"><summary>Xem đáp án</summary><div class="body"><p>Hai cạnh tổng 12; $A=x(12-x)$ đạt cực đại tại $x=6$.</p><p class="fin">$A_{\max}=36$ (hình vuông cạnh 6).</p></div></details></li>
+      <li><span class="pid">30.5</span>Tìm nguyên hàm $\displaystyle\int2x\cos(x^2)\,dx$.
+        <details class="ans"><summary>Xem đáp án</summary><div class="body"><p>$u=x^2$, $du=2x\,dx$.</p><p class="fin">$\sin(x^2)+C$.</p></div></details></li>
+      <li><span class="pid">30.6</span>Tính $\displaystyle\int_0^2(x+1)\,dx$.
+        <details class="ans"><summary>Xem đáp án</summary><div class="body"><p>$\Big[\dfrac{x^2}{2}+x\Big]_0^2=2+2$.</p><p class="fin">$4$.</p></div></details></li>
+      <li><span class="pid">30.7</span>Tính diện tích giữa $y=x$ và $y=x^2$ trên $[0,1]$.
+        <details class="ans"><summary>Xem đáp án</summary><div class="body"><p>Trên trừ dưới.</p><p class="fin">$\dfrac16$.</p></div></details></li>
+      <li><span class="pid">30.8</span>Tính $f_x$, $f_y$ tại $(1,2)$ với $f(x,y)=x^2y+y^2$.
+        <details class="ans"><summary>Xem đáp án</summary><div class="body"><p>$f_x=2xy$, $f_y=x^2+2y$.</p><p class="fin">$f_x(1,2)=4$, $f_y(1,2)=5$.</p></div></details></li>
+      <li><span class="pid">30.9</span>Phân loại điểm dừng của $f(x,y)=x^2+2y^2$.
+        <details class="ans"><summary>Xem đáp án</summary><div class="body"><p>Điểm $(0,0)$; $D=2\cdot4-0=8&gt;0$, $f_{xx}=2&gt;0$.</p><p class="fin">Cực tiểu tại $(0,0)$, $f=0$.</p></div></details></li>
+      <li><span class="pid">30.10</span>Với $\mathbf r(t)=(t,t^2,0)$, tính tốc độ tại $t=1$; với $\mathbf F=(x,y,z)$, tính $\nabla\cdot\mathbf F$.
+        <details class="ans"><summary>Xem đáp án</summary><div class="body"><p>$\mathbf r'(1)=(1,2,0)$; div $=1+1+1$.</p><p class="fin">Tốc độ $\sqrt5$; $\nabla\cdot\mathbf F=3$.</p></div></details></li>
+      <li><span class="pid">30.11</span>Tính $\displaystyle\int_0^1\!\int_0^2(x+y)\,dy\,dx$.
+        <details class="ans"><summary>Xem đáp án</summary><div class="body"><p>Trong: $2x+2$. Ngoài: $\big[x^2+2x\big]_0^1$.</p><p class="fin">$3$.</p></div></details></li>
+      <li><span class="pid">30.12</span>Tính $\displaystyle\int_0^1\!\int_0^2\!\int_0^3 1\,dz\,dy\,dx$.
+        <details class="ans"><summary>Xem đáp án</summary><div class="body"><p>Thể tích khối hộp $1\times2\times3$.</p><p class="fin">$6$.</p></div></details></li>
+    </ol>
+    <p class="score">Chấm: ___/12. Ghi điểm từng nhóm: giới hạn (1) · đạo hàm (2–4) · tích phân (5–7) · nhiều biến (8–9) · vectơ (10) · nhiều lớp (11–12).</p>
+  </div>
+
+  <div class="box recap"><div class="tag"><span class="zh">回顧</span>Sau ngày 30</div>
+    <ul><li class="re">Làm lại câu sai sau <b>1 ngày, 3 ngày và 7 ngày</b>.</li>
+    <li class="re">Ghi 3 dạng còn sai nhiều nhất; mỗi dạng làm lại một bài theo lịch trên.</li>
+    <li class="ok">Khi phần cơ bản chắc, mới mở rộng: tích phân khó, chuỗi, tích phân đường/mặt và các định lý vectơ (Green, Stokes, Gauss); sau đó nối sang phương trình vi phân và toán kỹ thuật.</li></ul>
+  </div>
+</section>
+
+<!-- ================= THẺ CÔNG THỨC ================= -->
+<section class="day" id="cards">
+  <header class="opener">
+    <div class="num"><span class="lbl">PHỤ LỤC</span><span class="n">∑</span></div>
+    <div>
+      <div class="eyebrow">Ôn nhanh</div>
+      <h2>Thẻ công thức</h2>
+      <p class="goal">Dùng để ôn <b>sau khi</b> đã hiểu ví dụ; không chỉ học thuộc hình dạng công thức.</p>
+    </div>
+  </header>
+
+  <h3 class="sec"><span class="zh">一變數</span>Một biến</h3>
+  <div class="cards">
+    <div class="card"><h4>01 · Giới hạn và liên tục</h4>
+      <ul><li>$0/0$: thử phân tích nhân tử hoặc liên hợp.</li><li>Phân thức ở vô cực: so bậc; luôn xét dấu.</li><li>Quy tắc tổng/tích/thương cần giới hạn thành phần tồn tại, mẫu có giới hạn khác 0.</li><li>Liên tục tại $a$: $\lim_{x\to a}f=f(a)$.</li></ul></div>
+    <div class="card"><h4>02 · Đạo hàm</h4>
+      <ul><li>$(x^n)'=nx^{n-1}$; $(e^x)'=e^x$; $(\ln|x|)'=1/x$; $(\sin)'=\cos$; $(\cos)'=-\sin$.</li><li>Tích $u'v+uv'$; thương $\dfrac{u'v-uv'}{v^2}$; dây chuyền $f'(g)\,g'$.</li><li>Cực trị cần $f'$ đổi dấu; max/min trên đoạn cần hai đầu mút.</li></ul></div>
+    <div class="card"><h4>03 · Tích phân</h4>
+      <ul><li>$\int x^n=\dfrac{x^{n+1}}{n+1}+C\ (n\ne-1)$; $\int\frac1x=\ln|x|+C$.</li><li>Đổi biến: $u=g(x)$, $du=g'(x)dx$, đổi cả cận.</li><li>Từng phần: $\int u\,dv=uv-\int v\,du$.</li><li>Diện tích: trị tuyệt đối hoặc trên trừ dưới. Quãng đường: $\int|v|$. Thể tích quay: $\pi\int(R^2-r^2)$.</li></ul></div>
+  </div>
+
+  <h3 class="sec"><span class="zh">多變數</span>Nhiều biến</h3>
+  <div class="cards">
+    <div class="card"><h4>04 · Đạo hàm riêng và cực trị</h4>
+      <ul><li>$f_x$: giữ $y$ cố định. $df=f_xdx+f_ydy$. $D_{\mathbf u}f=\nabla f\cdot\mathbf u$, $\|\mathbf u\|=1$.</li><li>Tại điểm dừng: $D=f_{xx}f_{yy}-f_{xy}^2$. $D&gt;0,f_{xx}&gt;0$ min; $D&gt;0,f_{xx}&lt;0$ max; $D&lt;0$ yên ngựa; $D=0$ chưa kết luận.</li></ul></div>
+    <div class="card"><h4>05 · Vectơ</h4>
+      <ul><li>Gradient: số → vectơ. Div: vectơ → số. Curl (3D): vectơ → vectơ.</li><li>$\mathbf v=\mathbf r'$, tốc độ $=\|\mathbf v\|$, $L=\int\|\mathbf r'\|dt$ với cận tham số ứng hai đầu đoạn đường.</li></ul></div>
+    <div class="card"><h4>06 · Tích phân nhiều lớp</h4>
+      <ul><li>Tính từ trong ra ngoài. Phác miền trước khi đặt cận hoặc đổi thứ tự.</li><li>Tọa độ cực: $dA=r\,dr\,d\theta$, nhân thêm $r$.</li><li>Các bài nhập môn dùng hàm liên tục trên miền hữu hạn, đơn giản.</li></ul></div>
+  </div>
+</section>
+
+<p class="foot">Trình bày lại từ tài liệu "Giải tích trong 30 ngày" (bài học, bài tập và đáp án). Đáp án đã được giải đầy đủ thay cho gợi ý ngắn trong bản gốc.</p>
+</main>
+</div>
+
+<script>
+(function(){
+  var days = [
+    [1,'Hàm số và đại số'],[2,'Lũy thừa, logarit, lượng giác'],[3,'Giới hạn là tiến gần'],[4,'Xử lý dạng 0/0'],[5,'Lượng giác và vô cực'],[6,'Liên tục · Kiểm tra chặng 1'],
+    [7,'Tốc độ thay đổi tức thời'],[8,'Quy tắc lũy thừa và tổng'],[9,'Đạo hàm tích và thương'],[10,'Quy tắc dây chuyền'],[11,'Hàm mũ, logarit, lượng giác'],[12,'Tiếp tuyến, vi phân, hàm ẩn'],[13,'Tăng, giảm và cực trị'],[14,'Tối ưu · Kiểm tra chặng 2'],
+    [15,'Nguyên hàm và hằng số C'],[16,'Đổi biến'],[17,'Tích phân từng phần'],[18,'Tích phân xác định'],[19,'Diện tích và dấu'],[20,'Thể tích và giá trị trung bình'],[21,'Chuyển động và điện lượng'],[22,'Kiểm tra chặng 3'],
+    [23,'Đạo hàm riêng'],[24,'Vi phân toàn phần và gradient'],[25,'Cực trị hai biến'],
+    [26,'Vectơ và đường cong tham số'],[27,'Trường vectơ, div và curl'],
+    [28,'Tích phân kép và miền tích phân'],[29,'Tọa độ cực và tích phân ba lớp'],[30,'Bài kiểm tra cuối tháng']
+  ];
+  var stages = [
+    {t:'Chặng 1',s:'Nền tảng và giới hạn',d:'Bạn cần biết hàm số nhận đầu vào nào, tiến gần một điểm nghĩa là gì và khi nào được thay số trực tiếp.',r:[1,6]},
+    {t:'Chặng 2',s:'Đạo hàm và ứng dụng',d:'Bạn cần tính được tốc độ thay đổi, tiếp tuyến, cực trị và mô hình tối ưu đơn giản.',r:[7,14]},
+    {t:'Chặng 3',s:'Tích phân và ứng dụng',d:'Bạn cần chọn được nguyên hàm, đổi biến hoặc từng phần; phân biệt tích lũy có dấu với diện tích và quãng đường.',r:[15,22]},
+    {t:'Chặng 4',s:'Nhiều biến',d:'Đạo hàm riêng học trước grad/div/curl vì các phép toán vectơ cần dùng nó.',r:[23,25]},
+    {t:'Chặng 5',s:'Vectơ',d:'Vận tốc, tốc độ, gradient, div, curl trên ví dụ đơn giản.',r:[26,27]},
+    {t:'Chặng 6',s:'Nhiều lớp và tổng kết',d:'Tích phân hai, ba lớp trên miền đơn giản; ngày 30 kiểm tra và xác định phần cần ôn.',r:[28,30]}
+  ];
+  function pad(n){return (n<10?'0':'')+n;}
+  var side = document.getElementById('side'), rm = document.getElementById('rm'), jump = document.getElementById('jump');
+  var sideHTML='', rmHTML='', jumpHTML='';
+  stages.forEach(function(st){
+    sideHTML += '<h4>'+st.t+' · '+st.s+'</h4>';
+    rmHTML += '<div class="stage"><h3>'+st.t+' <small>Ngày '+st.r[0]+'–'+st.r[1]+' · '+st.s+'</small></h3><p>'+st.d+'</p><ol>';
+    days.forEach(function(d){
+      if(d[0]<st.r[0]||d[0]>st.r[1]) return;
+      var id='d'+pad(d[0]);
+      sideHTML += '<a href="#'+id+'" data-nav="'+d[0]+'"><span class="d">'+pad(d[0])+'</span><span>'+d[1]+'</span><span class="ck">✓</span></a>';
+      rmHTML += '<li><a href="#'+id+'" data-nav="'+d[0]+'"><span class="d">'+pad(d[0])+'</span><span>'+d[1]+'</span><span class="ck">✓</span></a></li>';
+      jumpHTML += '<option value="'+id+'">Ngày '+pad(d[0])+' · '+d[1]+'</option>';
+    });
+    rmHTML += '</ol></div>';
+  });
+  sideHTML += '<h4>Phụ lục</h4><a href="#cards"><span class="d">∑</span><span>Thẻ công thức</span></a>';
+  side.innerHTML = sideHTML; rm.innerHTML = rmHTML; jump.innerHTML += jumpHTML + '<option value="cards">Phụ lục · Thẻ công thức</option>';
+  jump.addEventListener('change', function(){ if(this.value){ location.hash = this.value; this.value=''; } });
+
+  // progress (per-viewer convenience only)
+  var KEY='gt30-done'; var done={};
+  try{ done = JSON.parse(localStorage.getItem(KEY)||'{}')||{}; }catch(e){ done={}; }
+  function save(){ try{ localStorage.setItem(KEY, JSON.stringify(done)); }catch(e){} }
+  function render(){
+    var n=0;
+    for(var i=1;i<=30;i++){
+      var on=!!done[i]; if(on) n++;
+      var cb=document.querySelector('input[data-done="'+i+'"]'); if(cb) cb.checked=on;
+      document.querySelectorAll('a[data-nav="'+i+'"]').forEach(function(a){ a.classList.toggle('is-done',on); });
+    }
+    document.getElementById('progTxt').textContent = n+'/30 ngày';
+    document.getElementById('progBar').style.width = (n/30*100)+'%';
+  }
+  document.querySelectorAll('input[data-done]').forEach(function(cb){
+    cb.addEventListener('change', function(){ var k=this.getAttribute('data-done'); if(this.checked) done[k]=1; else delete done[k]; save(); render(); });
+  });
+  render();
+})();
+</script>
+</body></html>

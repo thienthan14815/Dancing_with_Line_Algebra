@@ -33,6 +33,7 @@ const WEEK_FULL = ['Thứ 2', 'Thứ 3', 'Thứ 4', 'Thứ 5', 'Thứ 6', 'Thứ
 
 /** Công cụ nhanh — nhãn + route thật + icon lucide. */
 const QUICK_TOOLS = [
+  { label: 'Giải tích 30 ngày', route: '/giai-tich', Icon: CalendarRange },
   { label: 'Lý thuyết', route: '/so-tay', Icon: BookOpen },
   { label: 'Công thức & Ký hiệu', route: '/wiki', Icon: Sigma },
   { label: 'Thẻ ghi nhớ', route: '/luyen?tab=the', Icon: Layers },
@@ -159,6 +160,13 @@ export default function Home() {
         <div className="ho-hero-char">
           <LinalCharacter size={96} />
         </div>
+      </section>
+
+      <section className="la-card-xl" style={{ padding: 24 }} aria-label="Giáo án Giải tích">
+        <span className="la-badge">GIÁO ÁN MỚI</span>
+        <h2>Giải tích trong 30 ngày</h2>
+        <p>6 chặng từ giới hạn, đạo hàm đến tích phân nhiều biến. Có bài giảng, ví dụ, bài tập và lời giải.</p>
+        <button type="button" className="dl-btn dl-btn-primary" onClick={() => navigate('/giai-tich')}>Mở giáo án →</button>
       </section>
 
       {/* (2) 4 StatCard */}
