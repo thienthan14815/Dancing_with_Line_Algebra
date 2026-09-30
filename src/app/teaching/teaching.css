@@ -40,3 +40,55 @@
   .teach-visual { padding: 6px 2px; overflow-x: auto; }
   .teach-visual svg { min-width: 360px; }
 }
+
+/* Continuous reading keeps every rule and worked example available together. */
+.teach-brief { min-width: 0; }
+.teach-reading-intro, .teach-section-intro { color: var(--text-secondary); line-height: 1.7; font-size: 14px; }
+.teach-reading-intro { margin: 10px 0 0; max-width: 65ch; }
+.teach-reading-modes { display: flex; flex-wrap: wrap; gap: 6px; padding: 5px; width: fit-content; max-width: 100%; margin: 20px 0; border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--panel-2); }
+.teach-reading-modes button { border: 1px solid transparent; border-radius: var(--radius-sm); padding: 10px 16px; color: var(--text-secondary); background: transparent; font: inherit; font-size: 14px; font-weight: 650; cursor: pointer; }
+.teach-reading-modes button[aria-pressed=true] { background: var(--surface); border-color: var(--accent); color: var(--accent-strong); }
+.teach-reading-modes button:focus-visible, .teach-skill-chapter:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
+.teach-skills { padding-bottom: 18px; border-bottom: 1px solid var(--border); }
+.teach-skills button { text-align: left; overflow-wrap: anywhere; }
+.teach-skills button span { color: var(--accent); font-weight: 750; }
+.teach-lessons, .teach-skill-chapter, .teach-skill, .teach-stage-content, .teach-section { min-width: 0; max-width: 100%; }
+.teach-skill-chapter { scroll-margin-top: 100px; }
+.teach-skill-chapter + .teach-skill-chapter { margin-top: 32px; padding-top: 28px; border-top: 2px solid var(--border); }
+.teach-skill-title { display: flex; align-items: baseline; gap: 12px; font-size: clamp(18px, 2.3vw, 22px); line-height: 1.45; margin: 0 0 24px; }
+.teach-skill-title > span { flex: none; color: var(--accent); font-size: .8em; font-variant-numeric: tabular-nums; }
+.teach-section h4 { display: flex; align-items: baseline; gap: 10px; font-size: 16px; line-height: 1.5; margin: 0 0 14px; }
+.teach-section-number { color: var(--text-secondary); font-size: 12px; font-variant-numeric: tabular-nums; letter-spacing: .04em; }
+.teach-skill-full .teach-section + .teach-section { margin-top: 28px; padding-top: 24px; border-top: 1px solid var(--border); }
+.teach-section-intro { margin: -4px 0 16px; }
+.teach-retrieval { padding: 16px 18px; border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--surface); }
+.teach-retrieval > p { margin: 0; }
+.teach-retrieval ol { margin: 10px 0 0; padding-left: 22px; }
+.teach-retrieval li { padding-left: 4px; margin-top: 8px; font-size: 14px; line-height: 1.7; }
+.teach-example li, .teach-rule, .teach-pitfall, .teach-retrieval { overflow-wrap: anywhere; }
+.teach-example li > p { min-width: 0; }
+.teach-visual { max-width: 100%; overflow-x: auto; }
+@media (max-width: 480px) {
+  .teach-brief { padding: 16px; }
+  .teach-reading-modes { width: 100%; }
+  .teach-reading-modes button { flex: 1; padding: 10px 8px; font-size: 13px; }
+  .teach-skill-title { gap: 8px; }
+  .teach-section h4 { font-size: 15px; }
+  .teach-example li { padding: 12px; gap: 9px; }
+  .teach-retrieval { padding: 14px; }
+  .teach-navigation { gap: 5px; }
+  .teach-navigation button { padding: 9px 8px; }
+  .teach-skill-chapter + .teach-skill-chapter { margin-top: 26px; padding-top: 22px; }
+}
+@media print {
+  .teach-brief { border: 0; border-radius: 0; padding: 0; margin: 0 0 24pt; color: #111; background: white; }
+  .teach-reading-modes, .teach-reading-intro, .teach-skills, .teach-stages, .teach-navigation, .teach-reminder { display: none !important; }
+  .teach-skill-chapter[hidden], .teach-section[hidden] { display: block !important; }
+  .teach-section + .teach-section { margin-top: 18pt; padding-top: 14pt; border-top: 1px solid #bbb; }
+  .teach-skill-title, .teach-section h4 { break-after: avoid; }
+  .teach-rule, .teach-visual, .teach-example li, .teach-pitfall, .teach-retrieval { break-inside: avoid; color: #111; background: white; border-color: #999; }
+  .teach-visual { overflow: visible; }
+  .teach-visual svg { min-width: 0; max-width: 560px; }
+  .teach-rule .mathtext-block { overflow: visible; }
+  .teach-rule-text, .teach-condition, .teach-section-intro, .teach-visual figcaption, .teach-visual-description { color: #222; }
+}

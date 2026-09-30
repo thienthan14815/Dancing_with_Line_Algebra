@@ -32,6 +32,8 @@ export interface ModuleLesson {
   kind: ModuleLessonKind;
   /** Các skill bài này rèn — PHẢI nằm trong `ContentModule.skills`. */
   skillIds: string[];
+  /** Optional fixed assessment: deliver every listed exercise, in this order. */
+  practiceExerciseIds?: string[];
   /**
    * (Tùy chọn) Bài trực quan tương tác cho route deep-dive
    * `#/ch/<moduleId>/<lessonId>`. Trả về một React component nhận `{ lessonId }`.

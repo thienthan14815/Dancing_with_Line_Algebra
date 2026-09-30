@@ -13,7 +13,7 @@ export default function LessonPage({ view = 'theory' }: { view?: LessonView }) {
   const { chapterId = '', lessonId = '' } = useParams();
   const navigate = useNavigate();
   const chapter = findChapter(chapterId);
-  const [expanded, setExpanded] = useState(false);
+  const [expanded, setExpanded] = useState(true);
 
   const LazyChapter = useMemo(() => {
     if (!chapter) return null;
@@ -23,7 +23,7 @@ export default function LessonPage({ view = 'theory' }: { view?: LessonView }) {
   // Đổi bài hoặc đổi chế độ xem → về đầu trang.
   useEffect(() => {
     window.scrollTo(0, 0);
-    setExpanded(false);
+    setExpanded(true);
   }, [chapterId, lessonId, view]);
 
   if (!chapter || !LazyChapter) {

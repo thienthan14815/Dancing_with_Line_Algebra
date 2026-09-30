@@ -124,3 +124,24 @@ Nếu triển khai qua SFTP, tải asset trước, sau đó mới thay `index.ht
 Sau triển khai, mở `https://<ten-mien>/#/giai-tich`, kiểm tra ngày 1, ngày 30,
 thẻ công thức và bài luyện tập. Tải lại app để service worker nhận bản mới.
 Không xóa localStorage: tiến độ học vẫn được lưu trên thiết bị của người học.
+
+### Bản mở rộng giáo trình 2026-09-30
+
+Toàn bộ 30 ngày Giải tích có lớp biên soạn bổ sung tại
+`src/content/modules/calculus-30/editorial/`: giải thích, phương pháp, ví dụ có
+kiểm chứng, bài chuyển dạng và câu hỏi khái niệm. Import lại HTML không ghi đè
+lớp này. Giữ 134 lời giải gốc; ngân hàng chấm điểm có 102 câu. Đề ngày 30 dùng
+`practiceExerciseIds` để luôn đưa đủ 12 câu theo thứ tự, không lấy mẫu 6 câu.
+Các giáo trình còn lại mặc định mở toàn bộ nội dung sẵn có và có chế độ học từng bước.
+
+Gói triển khai: `releases/linal-lab-cpanel-20260930-154516.zip` (158 file).
+SHA256: `2ae2d284398513365d7f342a5ac1dcaff7ff2e27af18f71b2c035fd04c3db964`.
+Gói phiên bản trước để khôi phục: `linal-lab-cpanel-20260930-151546.zip`
+trong thư mục home của cPanel, ngoài `public_html`.
+
+Validation: 260 kiểm thử đạt; TypeScript/Vite/PWA build đạt. Đã kiểm tra desktop,
+390px, mục lục, ẩn/hiện đáp án, cát tuyến tương tác và phiên đề tổng kết 12 câu.
+Chi tiết phạm vi và review nằm trong `EDITORIAL_UPGRADE.md`.
+Đã xác nhận file trên cPanel trỏ tới `assets/index-D0k7MBvD.js` và quyền 0644.
+Ở lượt kiểm tra này, trình duyệt public còn trả bản PWA cũ, còn yêu cầu HTTP(S)
+trực tiếp bị reset; việc client HTTPS nhận bản mới chưa được xác minh.

@@ -170,6 +170,21 @@ export function inspectModule(
       push(errors, `exercise "${ex.id}" có skillId lạ "${ex.skillId}" (chưa khai báo trong module.skills)`);
   }
 
+  for (const lesson of lessons) {
+    if (lesson?.practiceExerciseIds === undefined) continue;
+    if (!Array.isArray(lesson.practiceExerciseIds)) {
+      push(errors, `lesson "${lesson.id}" có practiceExerciseIds không phải mảng`);
+      continue;
+    }
+    const seen = new Set<string>();
+    for (const exerciseId of lesson.practiceExerciseIds) {
+      const exercise = exercises.find(item => item.id === exerciseId);
+      if (!exercise) push(errors, `lesson "${lesson.id}" tham chiếu bài tập không tồn tại "${exerciseId}"`);
+      else if (!lesson.skillIds?.includes(exercise.skillId)) push(errors, `lesson "${lesson.id}" tham chiếu bài tập khác kỹ năng "${exerciseId}"`);
+      if (seen.has(exerciseId)) push(errors, `lesson "${lesson.id}" lặp bài tập "${exerciseId}"`);
+      seen.add(exerciseId);
+    }
+  }
   return { errors, warnings };
 }
 
@@ -246,7 +261,7 @@ function toUnit(module: ContentModule, lesson: ModuleLesson): Unit {
     id: `${unitId}:practice`,
     title: `${lesson.title} — Luyện tập`,
     skillIds: lesson.skillIds,
-    exerciseIds: [],
+    exerciseIds: lesson.practiceExerciseIds ?? [],
     kind: 'practice',
   };
   return { id: unitId, title: lesson.title, lessons: [concept, practice] };

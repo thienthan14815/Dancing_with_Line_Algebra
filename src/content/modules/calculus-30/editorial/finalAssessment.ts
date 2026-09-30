@@ -1,0 +1,118 @@
+import type { Exercise } from '../../../../core/exercises/types';
+
+const tex = String.raw;
+
+/** One independently graded item per domain in the original 12-part day 30 exam. */
+export const finalAssessment: Exercise[] = [
+  {
+    id: 'calculus-final-01-limit', skillId: 'calculus_d30',
+    type: 'numeric-input', dimension: 'compute', difficulty: 2,
+    prompt: tex`Tính $\displaystyle\lim_{x\to2}\frac{x^2-4}{x-2}$.`,
+    answer: 4, tolerance: 0.001,
+    hints: [{ level: 1, text: 'Thay trực tiếp gặp 0/0, nên cần biến đổi biểu thức.' }, { level: 2, text: 'Phân tích x² − 4 thành (x − 2)(x + 2), rồi xét x khác 2.' }],
+    explain: 'Với x ≠ 2, thương bằng x + 2. Giới hạn khi x tiến đến 2 là 4. Việc khử nhân tử không khẳng định hàm ban đầu xác định tại 2.',
+  },
+  {
+    id: 'calculus-final-02-chain-rule', skillId: 'calculus_d30',
+    type: 'multiple-choice', dimension: 'compute', difficulty: 2,
+    prompt: tex`Đạo hàm của $y=e^{x^2}$ là biểu thức nào?`,
+    options: [tex`$e^{x^2}$`, tex`$2xe^{x^2}$`, tex`$2xe^x$`, tex`$x^2e^{x^2-1}$`], answerIndex: 1,
+    hints: [{ level: 1, text: 'Nhận diện hàm ngoài eᵘ và hàm trong u = x².' }, { level: 2, text: 'Đạo hàm lớp ngoài tại u rồi nhân u′.' }],
+    explain: 'Quy tắc dây chuyền cho y′ = e^(x²) × (x²)′ = 2xe^(x²). Chỉ lấy đạo hàm lớp ngoài sẽ thiếu hệ số 2x.',
+  },
+  {
+    id: 'calculus-final-03-extrema', skillId: 'calculus_d30',
+    type: 'multiple-choice', dimension: 'explain', difficulty: 2,
+    prompt: tex`Với $f(x)=x^3-3x$, kết luận nào đúng về cực trị địa phương?`,
+    options: [
+      'Cực tiểu tại (−1, 2); cực đại tại (1, −2).',
+      'Cực đại tại (−1, 2); không có cực tiểu.',
+      'Cực đại tại (−1, 2); cực tiểu tại (1, −2).',
+      'Hai điểm x = −1 và x = 1 đều là cực tiểu.',
+    ], answerIndex: 2,
+    hints: [{ level: 1, text: 'Tìm nghiệm của f′ rồi xét dấu trên ba khoảng.' }, { level: 2, text: 'f′ = 3(x − 1)(x + 1) có dấu +, −, +.' }],
+    explain: 'Tại −1, đạo hàm đổi từ dương sang âm nên có cực đại, f(−1) = 2. Tại 1, đạo hàm đổi từ âm sang dương nên có cực tiểu, f(1) = −2. Đây không phải cực trị toàn cục trên ℝ.',
+  },
+  {
+    id: 'calculus-final-04-optimization', skillId: 'calculus_d30',
+    type: 'numeric-input', dimension: 'compute', difficulty: 2,
+    prompt: 'Hình chữ nhật có chu vi 24 cm. Diện tích lớn nhất bằng bao nhiêu cm²?',
+    answer: 36, tolerance: 0.001, unit: 'cm²',
+    hints: [{ level: 1, text: 'Gọi một cạnh là x; hai cạnh kề có tổng bằng 12.' }, { level: 2, text: 'Diện tích A(x) = x(12 − x) = 36 − (x − 6)² với 0 < x < 12.' }],
+    explain: 'A = x(12 − x) = 36 − (x − 6)² ≤ 36. Dấu bằng xảy ra tại x = 6, khi hình chữ nhật là hình vuông cạnh 6 cm.',
+  },
+  {
+    id: 'calculus-final-05-substitution', skillId: 'calculus_d30',
+    type: 'multiple-choice', dimension: 'compute', difficulty: 2,
+    prompt: tex`Họ nguyên hàm của $2x\cos(x^2)$ là gì?`,
+    options: [tex`$\sin(x^2)+C$`, tex`$\cos(x^2)+C$`, tex`$2x\sin(x^2)+C$`, tex`$-\sin(x^2)+C$`], answerIndex: 0,
+    hints: [{ level: 1, text: 'Tìm hàm trong lượng giác và đạo hàm của nó.' }, { level: 2, text: 'Đặt u = x² thì du = 2x dx; nguyên hàm cos u là sin u.' }],
+    explain: 'Đặt u = x² biến tích phân thành tích phân cos u du = sin u + C. Thay lại u được sin(x²) + C; đạo hàm kiểm tra cho đúng 2x cos(x²).',
+  },
+  {
+    id: 'calculus-final-06-definite-integral', skillId: 'calculus_d30',
+    type: 'numeric-input', dimension: 'compute', difficulty: 1,
+    prompt: tex`Tính $\displaystyle\int_0^2(x+1)\,dx$.`,
+    answer: 4, tolerance: 0.001,
+    hints: [{ level: 1, text: 'Tìm nguyên hàm của từng hạng rồi lấy cận trên trừ cận dưới.' }, { level: 2, text: 'Một nguyên hàm là x²/2 + x.' }],
+    explain: 'Tích phân bằng [x²/2 + x] từ 0 đến 2 = (2 + 2) − 0 = 4. Kết quả là một số, không có hằng số C.',
+  },
+  {
+    id: 'calculus-final-07-area', skillId: 'calculus_d30',
+    type: 'multiple-choice', dimension: 'explain', difficulty: 2,
+    prompt: tex`Diện tích giữa $y=x$ và $y=x^2$ trên $[0,1]$ được tính đúng bằng cách nào?`,
+    options: [
+      tex`$S=\int_0^1(x^2-x)\,dx=-\frac16$`,
+      tex`$S=\int_0^1(x+x^2)\,dx=\frac56$`,
+      tex`$S=\int_0^1x^2\,dx=\frac13$`,
+      tex`$S=\int_0^1(x-x^2)\,dx=\frac16$`,
+    ], answerIndex: 3,
+    hints: [{ level: 1, text: 'So sánh x và x² khi 0 ≤ x ≤ 1.' }, { level: 2, text: 'Lấy đường trên trừ đường dưới: x − x².' }],
+    explain: 'Trên [0, 1], x ≥ x². Chiều cao mỗi lát là x − x², nên S = [x²/2 − x³/3] từ 0 đến 1 = 1/6; diện tích phải không âm.',
+  },
+  {
+    id: 'calculus-final-08-partial-derivatives', skillId: 'calculus_d30',
+    type: 'multiple-choice', dimension: 'compute', difficulty: 2,
+    prompt: tex`Cho $f(x,y)=x^2y+y^2$. Cặp $(f_x(1,2),f_y(1,2))$ bằng bao nhiêu?`,
+    options: ['(2, 4)', '(4, 5)', '(5, 4)', '(4, 4)'], answerIndex: 1,
+    hints: [{ level: 1, text: 'Đạo hàm theo một biến thì giữ biến kia như hằng số.' }, { level: 2, text: 'Tính fₓ = 2xy và fᵧ = x² + 2y trước khi thay điểm.' }],
+    explain: 'fₓ = 2xy nên fₓ(1, 2) = 4. fᵧ = x² + 2y nên fᵧ(1, 2) = 1 + 4 = 5. Thứ tự trong cặp là theo x trước, theo y sau.',
+  },
+  {
+    id: 'calculus-final-09-hessian', skillId: 'calculus_d30',
+    type: 'multiple-choice', dimension: 'explain', difficulty: 2,
+    prompt: tex`Điểm dừng của $f(x,y)=x^2+2y^2$ được phân loại thế nào?`,
+    options: [
+      'Cực đại tại (0, 0) vì D = 8 > 0.',
+      'Yên ngựa tại (0, 0) vì fₓᵧ = 0.',
+      'Cực tiểu tại (0, 0) vì D = 8 > 0 và fₓₓ = 2 > 0.',
+      'Chưa kết luận vì gradient bằng 0.',
+    ], answerIndex: 2,
+    hints: [{ level: 1, text: 'Giải 2x = 0, 4y = 0 rồi dùng đạo hàm cấp hai.' }, { level: 2, text: 'D = fₓₓ fᵧᵧ − fₓᵧ² = 2 × 4 − 0.' }],
+    explain: 'Điểm dừng duy nhất là (0, 0). D = 8 và fₓₓ = 2 cho cực tiểu địa phương. Vì x² + 2y² ≥ 0 trên toàn mặt phẳng, đó còn là cực tiểu toàn cục, giá trị 0.',
+  },
+  {
+    id: 'calculus-final-10-vectors-and-divergence', skillId: 'calculus_d30',
+    type: 'multiple-choice', dimension: 'compute', difficulty: 2,
+    prompt: tex`Cho $\mathbf r(t)=(t,t^2,0)$ và $\mathbf F=(x,y,z)$. Cặp (tốc độ tại $t=1$; $\nabla\cdot\mathbf F$) nào đúng?`,
+    options: [tex`$(\sqrt5;3)$`, tex`$(3;3)$`, tex`$(\sqrt5;0)$`, tex`$(5;1)$`], answerIndex: 0,
+    hints: [{ level: 1, text: 'Tốc độ là chuẩn của r′; divergence cộng các đạo hàm theo trục tương ứng.' }, { level: 2, text: 'r′(1) = (1, 2, 0); div F = ∂x/∂x + ∂y/∂y + ∂z/∂z.' }],
+    explain: 'Tốc độ là √(1² + 2² + 0²) = √5. Divergence bằng 1 + 1 + 1 = 3. Tốc độ và divergence đều là số nhưng đo những đại lượng khác nhau.',
+  },
+  {
+    id: 'calculus-final-11-double-integral', skillId: 'calculus_d30',
+    type: 'numeric-input', dimension: 'compute', difficulty: 2,
+    prompt: tex`Tính $\displaystyle\int_0^1\int_0^2(x+y)\,dy\,dx$.`,
+    answer: 3, tolerance: 0.001,
+    hints: [{ level: 1, text: 'Tính từ trong ra; khi tích phân theo y, x được giữ như hằng số.' }, { level: 2, text: 'Tích phân trong bằng [xy + y²/2] từ y = 0 đến y = 2.' }],
+    explain: 'Tích phân theo y cho 2x + 2. Tích phân theo x từ 0 đến 1 cho [x² + 2x] từ 0 đến 1 = 3.',
+  },
+  {
+    id: 'calculus-final-12-triple-integral', skillId: 'calculus_d30',
+    type: 'numeric-input', dimension: 'compute', difficulty: 2,
+    prompt: tex`Tính $\displaystyle\int_0^1\int_0^2\int_0^3 1\,dz\,dy\,dx$.`,
+    answer: 6, tolerance: 0.001,
+    hints: [{ level: 1, text: 'Tích phân của 1 trên một khối bằng thể tích khối đó.' }, { level: 2, text: 'Ba cạnh khối hộp có độ dài 1, 2 và 3.' }],
+    explain: 'Tích phân theo z cho 3, theo y cho 6, theo x vẫn là 6. Kiểm hình học: thể tích hộp bằng 1 × 2 × 3 = 6.',
+  },
+];

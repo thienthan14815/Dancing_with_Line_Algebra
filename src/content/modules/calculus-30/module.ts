@@ -1,6 +1,8 @@
 import type { ContentModule } from '../../types';
 import lessons from './lessons.json';
 import { exercises } from './practice';
+import { conceptualExercises } from './editorial';
+import { finalAssessment } from './editorial/finalAssessment';
 
 const module: ContentModule = {
   id: 'calculus-30', num: 16, track: 'calculus', trackTitle: 'Giải tích',
@@ -11,8 +13,9 @@ const module: ContentModule = {
   lessons: lessons.map(lesson => ({
     id: lesson.id, title: `Ngày ${lesson.day}: ${lesson.title}`, kind: 'concept',
     skillIds: [lesson.skillId], component: () => import('./CalculusLesson'),
+    ...(lesson.id === 'd30' ? { practiceExerciseIds: finalAssessment.map(exercise => exercise.id) } : {}),
   })),
-  exercises,
+  exercises: [...exercises, ...conceptualExercises, ...finalAssessment],
   guide: {
     concepts: [
       'Ngày 1–6: hàm số, điều kiện xác định, giới hạn và liên tục.',

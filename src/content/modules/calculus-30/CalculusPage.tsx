@@ -25,7 +25,8 @@ export default function CalculusPage() {
     <header className="la-card-xl la-hero-grad calculus-intro">
       <p className="la-badge">GIÁO ÁN · 30 NGÀY</p>
       <h1>Giải tích trong 30 ngày</h1>
-      <p>Từ hàm số và giới hạn đến đạo hàm, tích phân và giải tích nhiều biến. Mỗi ngày có mục tiêu, ví dụ, bài tự làm và lời giải để đối chiếu.</p>
+      <p>Từ hàm số và giới hạn đến đạo hàm, tích phân và giải tích nhiều biến. Mỗi ngày đi từ hình minh họa và bản chất đến phương pháp, ví dụ có kiểm chứng và bài chuyển dạng.</p>
+      <p>30 bài giảng mở đầy đủ · 134 lời giải gốc · 30 bài chuyển dạng · 102 câu trong ngân hàng chấm điểm, gồm đề tổng kết trọn bộ 12 câu.</p>
       <p aria-live="polite">Đã đọc {read}/30 ngày · Đã luyện tập {practiced}/30 ngày</p>
       <div className="calculus-actions">
         <Link className="dl-btn dl-btn-primary" to={`/giai-tich/${next.id}`}>{read ? 'Học tiếp' : 'Bắt đầu'} · Ngày {next.day} →</Link>

@@ -976,7 +976,14 @@ export function getExercisesForLesson(
   max = 6,
   seed?: number,
 ): Exercise[] {
-  const skillIds = getMicroLesson(lessonId)?.skillIds ?? [];
+  const lesson = getMicroLesson(lessonId);
+  // An authored assessment is a complete set, not a sampled practice session.
+  if (max <= 0) return [];
+  if (lesson?.exerciseIds?.length) {
+    return lesson.exerciseIds.map(id => EXERCISES.find(exercise => exercise.id === id))
+      .filter((exercise): exercise is Exercise => !!exercise);
+  }
+  const skillIds = lesson?.skillIds ?? [];
   const picked = getExercisesForSkills(skillIds, max, seed);
   if (picked.length > 0) return picked;
   return SAMPLE_EXERCISES.slice(0, Math.max(0, Math.min(max, SAMPLE_EXERCISES.length)));
